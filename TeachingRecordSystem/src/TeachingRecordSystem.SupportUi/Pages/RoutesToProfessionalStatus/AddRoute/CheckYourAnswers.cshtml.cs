@@ -7,21 +7,19 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
+public class CheckYourAnswersModel(
+    TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IFileService fileService,
-    IClock clock) :
-    AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+    IClock clock)
+    : AddRoutePostStatusPageModel(AddRoutePage.CheckYourAnswers, linkGenerator, referenceDataCache)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
     public ChangeReasonOption? ChangeReason;
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
     public string? UploadedEvidenceFileUrl { get; set; }
-
-    public string BackLink =>
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.CheckYourAnswers) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
     {
@@ -79,7 +77,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
 
         TempData.SetFlashSuccess("Route to professional status added");
 
-        return Redirect(LinkGenerator.PersonQualifications(PersonId));
+        return await ContinueAsync();
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -96,39 +94,33 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         //    return;
         //}
 
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
-            .OrderBy(p => p);
-
-        foreach (var page in pagesInOrder)
-        {
-            var pageRequired = PageDriver.FieldRequirementForPage(page, Route, Status);
-
-            if (pageRequired == FieldRequirement.Mandatory && !JourneyInstance!.State.IsComplete(page))
-            {
-                context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId));
-                return;
-
-                //// if the route has an implicit exemption, don't show the induction exemption page
-                //if (page == AddRoutePage.InductionExemption
-                //    && route.InductionExemptionReason is not null
-                //    && route.InductionExemptionReason.RouteImplicitExemption)
-                //{
-                //    continue;
-                //}
-                //else
-                //{
-                //    return page;
-                //}
-            }
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
         Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         Status = JourneyInstance!.State.Status!.Value;
+
+        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
+            .Cast<AddRoutePage>()
+            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
+            .OrderBy(p => p);
+
+        foreach (var page in pagesInOrder)
+        {
+            var pageRequired = page.FieldRequirementForPage(Route, Status);
+
+            if (pageRequired == FieldRequirement.Mandatory &&
+                !JourneyInstance!.State.IsComplete(page) &&
+                // if the route has an implicit exemption, don't show the induction exemption page
+                (page != AddRoutePage.InductionExemption ||
+                 Route.InductionExemptionReason is null ||
+                 !Route.InductionExemptionReason.RouteImplicitExemption))
+            {
+                context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true));
+                return;
+            }
+        }
 
         var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
         ChangeReason = JourneyInstance!.State.ChangeReason;

@@ -24,7 +24,12 @@ public class AddRouteState : IRegisterJourney
     public bool? IsExemptFromInduction { get; set; }
     public Guid? DegreeTypeId { get; set; }
     public ChangeReasonOption? ChangeReason { get; set; }
-    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
+    public ChangeReasonDetailsState ChangeReasonDetail { get; init; } = new();
+
+    public HashSet<AddRoutePage> History { get; init; } = new();
+
+    public AddRoutePage? GetPreviousPage(AddRoutePage currentPage) =>
+        History.OrderByDescending(p => p).Select(p => (AddRoutePage?)p).FirstOrDefault(p => p < currentPage);
 
     public bool IsComplete(AddRoutePage page)
     {

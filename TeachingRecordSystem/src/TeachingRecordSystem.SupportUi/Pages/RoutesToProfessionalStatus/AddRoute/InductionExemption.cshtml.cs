@@ -6,12 +6,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+    : AddRoutePostStatusPageModel(AddRoutePage.InductionExemption, linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.InductionExemption) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
-
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]
     [Required(ErrorMessage = "Select yes if this route provides an induction exemption")]
@@ -30,14 +26,15 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.IsExemptFromInduction = IsExemptFromInduction;
+        });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.InductionExemption) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
         {
@@ -53,6 +50,6 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
             return;
         }
 
-        await base.OnPageHandlerExecutionAsync(context, next);
+        // NB: Don't call base method as we're overriding the default behaviour
     }
 }

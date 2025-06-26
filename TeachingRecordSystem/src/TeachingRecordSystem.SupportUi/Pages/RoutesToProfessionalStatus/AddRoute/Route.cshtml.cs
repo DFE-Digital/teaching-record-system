@@ -1,28 +1,20 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class RouteModel(TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache) : PageModel
+public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : AddRouteCommonPageModel(AddRoutePage.Route, linkGenerator, referenceDataCache)
 {
-    public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
-
-    public string? PersonName { get; set; }
+    public override AddRoutePage? NextPage => AddRoutePage.Status;
+    public override AddRoutePage? PreviousPage => null;
 
     public RouteToProfessionalStatusType[] Routes { get; set; } = [];
 
     public RouteToProfessionalStatusType[] ArchivedRoutes { get; set; } = [];
-
-    [FromQuery]
-    public Guid PersonId { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
 
     [BindProperty]
     [Display(Name = "Route type")]
@@ -35,6 +27,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
     public void OnGet()
     {
         var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
+
         if (Routes.Any(r => r.RouteToProfessionalStatusTypeId == preselectedRouteId))
         {
             RouteId = preselectedRouteId;
@@ -43,12 +36,6 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
         {
             ArchivedRouteId = preselectedRouteId;
         }
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -61,29 +48,26 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
         {
             ModelState.AddModelError(nameof(RouteId), "Enter only one route type");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
-        await JourneyInstance!.UpdateStateAsync(
-            state =>
-            {
-                state.RouteToProfessionalStatusId = RouteId.HasValue ? RouteId.Value : ArchivedRouteId!.Value;
-            });
-        return Redirect(FromCheckAnswers
-            ? linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId)
-            : linkGenerator.RouteAddStatus(PersonId, JourneyInstance!.InstanceId));
+
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.RouteToProfessionalStatusId = RouteId ?? ArchivedRouteId!.Value;
+        });
+
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync();
+        var allRoutes = await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         Routes = allRoutes.Where(r => r.IsActive).ToArray();
         ArchivedRoutes = allRoutes.Where(r => !r.IsActive).ToArray();
 
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-
-        await base.OnPageHandlerExecutionAsync(context, next);
+        await base.OnPageHandlerExecutingAsync(context);
     }
 }

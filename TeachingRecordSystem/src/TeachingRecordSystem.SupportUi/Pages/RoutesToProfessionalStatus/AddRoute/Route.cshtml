@@ -42,7 +42,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == false ? LinkGenerator.PersonQualifications(Model.PersonId) :LinkGenerator.RouteAddCheckYourAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@Model.BackLink">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">

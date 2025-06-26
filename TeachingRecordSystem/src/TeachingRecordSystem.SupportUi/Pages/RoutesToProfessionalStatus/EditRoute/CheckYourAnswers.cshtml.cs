@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -102,11 +103,32 @@ public class CheckYourAnswersModel(
         var route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         var status = JourneyInstance!.State.Status;
 
-        if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
+        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
+            .Cast<AddRoutePage>()
+            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
+            .OrderBy(p => p);
+
+        foreach (var page in pagesInOrder)
         {
-            context.Result = Redirect(linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
-            return;
+            var pageRequired = page.FieldRequirementForPage(route, status);
+
+            if (pageRequired == FieldRequirement.Mandatory &&
+                !JourneyInstance!.State.IsComplete(page) &&
+                // if the route has an implicit exemption, don't show the induction exemption page
+                (page != AddRoutePage.InductionExemption ||
+                 route.InductionExemptionReason is null ||
+                 !route.InductionExemptionReason.RouteImplicitExemption))
+            {
+                context.Result = Redirect(linkGenerator.RouteEditPage(page, QualificationId, JourneyInstance.InstanceId, fromCheckAnswers: true));
+                return;
+            }
         }
+
+        // if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
+        // {
+        //     context.Result = Redirect(linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+        //     return;
+        // }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;

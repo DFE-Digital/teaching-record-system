@@ -8,9 +8,8 @@ using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    IFileService fileService) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+public class ChangeReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache, IFileService fileService)
+    : AddRoutePostStatusPageModel(AddRoutePage.ChangeReason, linkGenerator, referenceDataCache)
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
@@ -45,10 +44,6 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string BackLink => FromCheckAnswers == true
-        ? LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId)
-        : LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.ChangeReason) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
-
     public async Task OnGetAsync()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
@@ -66,6 +61,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         {
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
+
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
@@ -101,6 +97,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         {
             return this.PageWithErrors();
         }
+
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
@@ -113,17 +110,15 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
             state.ChangeReasonDetail.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
         });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.ChangeReason) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return await ContinueAsync();
     }
 
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         EvidenceFileId = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileSizeDescription;
 
-        return base.OnPageHandlerExecutionAsync(context, next);
+        return base.OnPageHandlerExecutingAsync(context);
     }
 }

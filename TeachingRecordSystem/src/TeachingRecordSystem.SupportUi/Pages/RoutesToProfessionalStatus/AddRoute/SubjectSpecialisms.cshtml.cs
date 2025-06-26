@@ -6,12 +6,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+    : AddRoutePostStatusPageModel(AddRoutePage.SubjectSpecialisms, linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
-
     public DisplayInfo[] Subjects { get; set; } = [];
 
     public string PageHeading => "Enter the subject they specialise in teaching" + (!SubjectSpecialismRequired ? " (optional)" : "");
@@ -40,6 +36,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             ModelState.AddModelError(nameof(SubjectId1), "Enter a subject");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -47,14 +44,15 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
         Guid[] subjects = new Guid?[] { SubjectId1, SubjectId2, SubjectId3 }.Where(s => s.HasValue).Select(s => s!.Value).ToArray();
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingSubjectIds = subjects);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.TrainingSubjectIds = subjects;
+        });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
@@ -63,6 +61,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
                 DisplayName = $"{s.Reference} - {s.Name}"
             })
             .ToArray();
-        await base.OnPageHandlerExecutionAsync(context, next);
+
+        await base.OnPageHandlerExecutingAsync(context);
     }
 }

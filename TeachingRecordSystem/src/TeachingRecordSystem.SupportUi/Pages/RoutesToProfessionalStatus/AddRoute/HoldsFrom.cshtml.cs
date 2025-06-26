@@ -4,17 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Professional status date")]
     [Required(ErrorMessage = "Enter the professional status date")]
     [Display(Name = "Enter a professional status date")]
     public DateOnly? HoldsFrom { get; set; }
-
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.HoldsFrom) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
@@ -27,14 +24,17 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
         {
             ModelState.AddModelError(nameof(HoldsFrom), "Professional status date must not be in the future");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
-        await JourneyInstance!.UpdateStateAsync(state => state.HoldsFrom = HoldsFrom);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.HoldsFrom) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.HoldsFrom = HoldsFrom;
+        });
+
+        return await ContinueAsync();
     }
 }
