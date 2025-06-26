@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using OpenIddict.EntityFrameworkCore.Models;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -202,5 +203,14 @@ public class TrsDbContext : DbContext
         var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
         ConfigureOptions(optionsBuilder, connectionString, commandTimeout);
         return optionsBuilder.Options;
+    }
+
+    public static TrsDbContext Create(NpgsqlDataSource dataSource, int? commandTimeout = null)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
+        ConfigureOptions(optionsBuilder, connectionString: null, commandTimeout);
+        var dbContext = new TrsDbContext(optionsBuilder.Options);
+        dbContext.Database.SetDbConnection(dataSource.CreateConnection(), contextOwnsConnection: true);
+        return dbContext;
     }
 }
