@@ -43,6 +43,8 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
+        await base.OnPageHandlerExecutingAsync(context);
+
         TrainingCountries = (await ReferenceDataCache.GetTrainingCountriesAsync())
             .Select(r => new CountryDisplayInfo()
             {
@@ -50,7 +52,5 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
                 DisplayName = $"{r.CountryId} - {r.Name}"
             })
             .ToArray();
-
-        await base.OnPageHandlerExecutingAsync(context);
     }
 }

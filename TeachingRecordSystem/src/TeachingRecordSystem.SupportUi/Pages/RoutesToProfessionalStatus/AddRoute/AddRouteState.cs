@@ -26,11 +26,6 @@ public class AddRouteState : IRegisterJourney
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; init; } = new();
 
-    public HashSet<AddRoutePage> History { get; init; } = new();
-
-    public AddRoutePage? GetPreviousPage(AddRoutePage currentPage) =>
-        History.OrderByDescending(p => p).Select(p => (AddRoutePage?)p).FirstOrDefault(p => p < currentPage);
-
     public bool IsComplete(AddRoutePage page)
     {
         return page switch
@@ -68,9 +63,6 @@ public class AddRouteState : IRegisterJourney
             _ => throw new ArgumentOutOfRangeException(nameof(page))
         };
     }
-
-    //[JsonIgnore]
-    //public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {

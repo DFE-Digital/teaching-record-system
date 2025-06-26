@@ -44,9 +44,8 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        TrainingProviders = await ReferenceDataCache.GetTrainingProvidersAsync();
-
         await base.OnPageHandlerExecutingAsync(context);
-    }
 
+        TrainingProviders = await ReferenceDataCache.GetTrainingProvidersAsync();
+    }
 }

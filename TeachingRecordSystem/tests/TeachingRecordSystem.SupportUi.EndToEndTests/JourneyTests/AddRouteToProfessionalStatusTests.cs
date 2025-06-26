@@ -317,7 +317,6 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
             .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory
                 && r.InductionExemptionReason is not null
                 && r.InductionExemptionReason.RouteImplicitExemption == false
-                // && r.HoldsFromRequired != FieldRequirement.NotApplicable
                 && r.TrainingProviderRequired == FieldRequirement.NotApplicable
                 && r.DegreeTypeRequired == FieldRequirement.NotApplicable
                 && r.TrainingCountryRequired == FieldRequirement.Mandatory)

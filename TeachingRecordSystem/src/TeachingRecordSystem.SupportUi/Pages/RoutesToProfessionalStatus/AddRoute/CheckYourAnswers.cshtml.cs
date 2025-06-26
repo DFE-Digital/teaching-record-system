@@ -80,26 +80,9 @@ public class CheckYourAnswersModel(
         return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))
-        {
-            context.Result = new BadRequestResult();
-            return;
-        }
-
-        //if (!JourneyInstance!.State.ChangeReasonIsComplete)
-        //{
-        //    context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
-        //    return;
-        //}
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
-        Status = JourneyInstance!.State.Status!.Value;
+        await base.OnPageHandlerExecutingAsync(context);
 
         var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
             .Cast<AddRoutePage>()
@@ -128,7 +111,7 @@ public class CheckYourAnswersModel(
         RouteDetail = new RouteDetailViewModel
         {
             RouteToProfessionalStatusType = Route,
-            Status = JourneyInstance!.State.Status.Value,
+            Status = Status,
             HoldsFrom = JourneyInstance!.State.HoldsFrom,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
             TrainingEndDate = JourneyInstance!.State.TrainingEndDate,
@@ -143,13 +126,11 @@ public class CheckYourAnswersModel(
             IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction,
             FromCheckAnswers = true,
             JourneyInstanceId = JourneyInstance!.InstanceId,
-            PersonId = PersonId,
+            PersonId = PersonId
         };
 
         UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?
             await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
-
-        await next();
     }
 }

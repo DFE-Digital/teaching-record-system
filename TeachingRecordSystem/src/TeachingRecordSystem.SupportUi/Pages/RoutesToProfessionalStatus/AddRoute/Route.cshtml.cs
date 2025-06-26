@@ -64,10 +64,10 @@ public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refer
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
+        await base.OnPageHandlerExecutingAsync(context);
+
         var allRoutes = await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         Routes = allRoutes.Where(r => r.IsActive).ToArray();
         ArchivedRoutes = allRoutes.Where(r => !r.IsActive).ToArray();
-
-        await base.OnPageHandlerExecutingAsync(context);
     }
 }

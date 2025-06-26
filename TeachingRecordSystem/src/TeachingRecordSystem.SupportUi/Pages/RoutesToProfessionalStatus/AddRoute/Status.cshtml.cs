@@ -46,6 +46,8 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
+        await base.OnPageHandlerExecutingAsync(context);
+
         if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
         {
             context.Result = BadRequest();
@@ -54,7 +56,5 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
 
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
         Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
-
-        await base.OnPageHandlerExecutingAsync(context);
     }
 }

@@ -54,6 +54,8 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
+        await base.OnPageHandlerExecutingAsync(context);
+
         Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
             {
@@ -61,7 +63,5 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
                 DisplayName = $"{s.Reference} - {s.Name}"
             })
             .ToArray();
-
-        await base.OnPageHandlerExecutingAsync(context);
     }
 }

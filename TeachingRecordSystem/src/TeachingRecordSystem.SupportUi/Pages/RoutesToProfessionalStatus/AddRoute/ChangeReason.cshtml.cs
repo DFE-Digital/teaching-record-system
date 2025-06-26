@@ -113,12 +113,12 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCach
         return await ContinueAsync();
     }
 
-    public override Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
+        await base.OnPageHandlerExecutingAsync(context);
+
         EvidenceFileId = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileSizeDescription;
-
-        return base.OnPageHandlerExecutingAsync(context);
     }
 }

@@ -124,12 +124,6 @@ public class CheckYourAnswersModel(
             }
         }
 
-        // if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
-        // {
-        //     context.Result = Redirect(linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
-        //     return;
-        // }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
@@ -162,46 +156,5 @@ public class CheckYourAnswersModel(
             await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
         await next();
-    }
-
-
-    private bool IsComplete(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status)
-    {
-        var errors = NotCompleteError.None |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.TrainingEndDate is null) ? NotCompleteError.StartDate : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.TrainingEndDate is null) ? NotCompleteError.EndDate : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.HoldsFromRequired, status.GetAwardDateRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.HoldsFrom is null) ? NotCompleteError.AwardDate : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.DegreeTypeRequired, status.GetDegreeTypeRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.DegreeTypeId is null) ? NotCompleteError.DegreeType : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingAgeSpecialismTypeRequired, status.GetAgeSpecialismRequirement()) == FieldRequirement.Mandatory
-                && (JourneyInstance!.State.TrainingAgeSpecialismRangeFrom is null || JourneyInstance!.State.TrainingAgeSpecialismRangeTo is null)
-                && JourneyInstance!.State.TrainingAgeSpecialismType is null) ? NotCompleteError.AgeSpecialism : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingCountryRequired, status.GetCountryRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.TrainingCountryId is null) ? NotCompleteError.Country : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingSubjectsRequired, status.GetSubjectsRequirement()) == FieldRequirement.Mandatory
-                && !JourneyInstance!.State.TrainingSubjectIds.IsNullOrEmpty()) ? NotCompleteError.Subject : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingProviderRequired, status.GetTrainingProviderRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.TrainingProviderId is null) ? NotCompleteError.Provider : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.InductionExemptionRequired, status.GetInductionExemptionRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.IsExemptFromInduction is null) ? NotCompleteError.InductionExemption : NotCompleteError.None);
-
-        return errors == NotCompleteError.None;
-    }
-
-    enum NotCompleteError
-    {
-        None = 0,
-        StartDate = 1,
-        EndDate = 1 << 1,
-        AwardDate = 1 << 2,
-        DegreeType = 1 << 3,
-        AgeSpecialism = 1 << 4,
-        Country = 1 << 5,
-        Subject = 1 << 6,
-        Provider = 1 << 7,
-        InductionExemption = 1 << 8
     }
 }

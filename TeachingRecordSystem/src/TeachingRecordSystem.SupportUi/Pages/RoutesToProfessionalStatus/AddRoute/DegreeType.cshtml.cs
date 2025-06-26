@@ -44,8 +44,8 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        DegreeTypes = await ReferenceDataCache.GetDegreeTypesAsync();
-
         await base.OnPageHandlerExecutingAsync(context);
+
+        DegreeTypes = await ReferenceDataCache.GetDegreeTypesAsync();
     }
 }
