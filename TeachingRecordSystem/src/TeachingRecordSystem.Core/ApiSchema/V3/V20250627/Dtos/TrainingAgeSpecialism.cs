@@ -1,7 +1,7 @@
 using Optional;
 using TrainingAgeSpecialismType = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.TrainingAgeSpecialismType;
 
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
 
 public record TrainingAgeSpecialism
 {

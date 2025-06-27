@@ -1,23 +1,22 @@
-using AutoMapper.Configuration.Annotations;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
-using Alert = TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos.Alert;
-using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;
+using TeachingRecordSystem.Api.V3.V20250627.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
 using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsStatus;
-using QtsInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.QtsInfo;
+using QtsInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.QtsInfo;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Responses;
+namespace TeachingRecordSystem.Api.V3.V20250627.Responses;
 
-[AutoMap(typeof(FindPersonsResult))]
-public record FindPersonsResponse
+public record FindPersonResponse
 {
     public required int Total { get; init; }
-    [SourceMember(nameof(FindPersonsResult.Items))]
-    public required IReadOnlyCollection<FindPersonsResponseResult> Results { get; init; }
+    public required FindPersonRequest Query { get; init; }
+    public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
 [AutoMap(typeof(FindPersonsResultItem))]
-public record FindPersonsResponseResult
+public record FindPersonResponseResult
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }

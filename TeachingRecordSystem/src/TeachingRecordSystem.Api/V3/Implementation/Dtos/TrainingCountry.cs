@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
 public record TrainingCountry
 {
