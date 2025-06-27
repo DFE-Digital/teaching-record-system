@@ -35,10 +35,43 @@ public class EditRouteState : IRegisterJourney
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     [JsonIgnore]
-    public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
-
-    [JsonIgnore]
     public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to 'holds'
+
+    public bool IsComplete(AddRoutePage page)
+    {
+        return page switch
+        {
+            AddRoutePage.Route => true,
+            AddRoutePage.Status => true,
+            AddRoutePage.StartAndEndDate =>
+                TrainingStartDate != null ||
+                TrainingEndDate != null,
+            AddRoutePage.HoldsFrom =>
+                HoldsFrom != null,
+            AddRoutePage.InductionExemption =>
+                IsExemptFromInduction != null,
+            AddRoutePage.TrainingProvider =>
+                TrainingProviderId != null,
+            AddRoutePage.DegreeType =>
+                DegreeTypeId != null,
+            AddRoutePage.Country =>
+                TrainingCountryId != null,
+            AddRoutePage.AgeRangeSpecialism =>
+                TrainingAgeSpecialismType != null ||
+                TrainingAgeSpecialismRangeFrom != null ||
+                TrainingAgeSpecialismRangeTo != null,
+            AddRoutePage.SubjectSpecialisms =>
+                TrainingSubjectIds.Any(),
+            AddRoutePage.ChangeReason =>
+                ChangeReason != null ||
+                ChangeReasonDetail.ChangeReasonDetail != null ||
+                ChangeReasonDetail.HasAdditionalReasonDetail != null ||
+                ChangeReasonDetail.UploadEvidence != null ||
+                ChangeReasonDetail.EvidenceFileId != null,
+            AddRoutePage.CheckYourAnswers => false,
+            _ => throw new ArgumentOutOfRangeException(nameof(page))
+        };
+    }
 
     public void EnsureInitialized(RouteToProfessionalStatus routeToProfessionalStatus)
     {

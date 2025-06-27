@@ -1,23 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : PageModel
+public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : AddRouteCommonPageModel(AddRoutePage.Status, linkGenerator, referenceDataCache)
 {
-    public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromQuery]
-    public Guid PersonId { get; set; }
-
-    public string? PersonName { get; set; }
+    public override AddRoutePage? NextPage => PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
+    public override AddRoutePage? PreviousPage => AddRoutePage.Route;
 
     public RouteToProfessionalStatusType Route { get; set; } = null!;
 
@@ -27,10 +20,6 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
     [Required(ErrorMessage = "Select a route status")]
     [Display(Name = "Select the route status")]
     public RouteToProfessionalStatusStatus? Status { get; set; }
-
-    public string BackLink => FromCheckAnswers ?
-        linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        linkGenerator.RouteAddRoute(PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
@@ -44,29 +33,21 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(
-            x =>
-            {
-                x.Status = Status;
-                x.IsExemptFromInduction = Status is RouteToProfessionalStatusStatus.Holds ?
-                    Route.InductionExemptionReason?.RouteImplicitExemption
-                    : null;
-            });
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.Status = Status;
+            state.IsExemptFromInduction = Status is RouteToProfessionalStatusStatus.Holds
+                ? Route.InductionExemptionReason?.RouteImplicitExemption
+                : null;
+        });
 
-        var nextPage = PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
-        return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteAddPage(nextPage, PersonId, JourneyInstance!.InstanceId));
+        return await ContinueAsync();
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
+        await base.OnPageHandlerExecutingAsync(context);
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
         if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
         {
             context.Result = BadRequest();
@@ -74,11 +55,6 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
         }
 
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
-        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        await next();
+        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
     }
 }

@@ -1,17 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-         LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.AgeRangeSpecialism) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
-
     [BindProperty]
     [AgeRangeRequiredValidation]
     [Display(Name = "Add age range specialism")]
@@ -33,22 +29,14 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             return this.PageWithErrors();
         }
-        await JourneyInstance!.UpdateStateAsync(s =>
+
+        await JourneyInstance!.UpdateStateAsync(state =>
         {
-            s.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
-            s.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
-            s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType.ToTrainingAgeSpecialismType();
+            state.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
+            state.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
+            state.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType.ToTrainingAgeSpecialismType();
         });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.AgeRangeSpecialism) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
+        return await ContinueAsync();
     }
 }

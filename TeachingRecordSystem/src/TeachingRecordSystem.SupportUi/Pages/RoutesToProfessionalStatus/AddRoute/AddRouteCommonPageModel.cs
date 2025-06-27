@@ -1,12 +1,33 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : PageModel
+public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : PageModel
 {
+    public AddRoutePage CurrentPage => currentPage;
+
+    public abstract AddRoutePage? NextPage { get; }
+    public abstract AddRoutePage? PreviousPage { get; }
+
+    public string BackLink
+    {
+        get
+        {
+            var previousPage = PreviousPage ??
+                               (FromCheckAnswers ?? false ? AddRoutePage.CheckYourAnswers : AddRoutePage.Route);
+
+            return (currentPage, FromCheckAnswers) switch
+            {
+                (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
+                (AddRoutePage.Route, _) => LinkGenerator.PersonQualifications(PersonId),
+                _ => LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers),
+            };
+        }
+    }
+
     protected TrsLinkGenerator LinkGenerator => linkGenerator;
 
     protected ReferenceDataCache ReferenceDataCache => referenceDataCache;
@@ -14,15 +35,25 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
     public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
 
     [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public bool? FromCheckAnswers { get; set; }
 
     [FromQuery]
+
     public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
-    public RouteToProfessionalStatusType Route { get; set; } = null!;
-    public RouteToProfessionalStatusStatus Status { get; set; }
+    protected Task<IActionResult> ContinueAsync()
+    {
+        IActionResult nextPage = Redirect((currentPage, FromCheckAnswers) switch
+        {
+            (AddRoutePage.CheckYourAnswers, _) => LinkGenerator.PersonQualifications(PersonId),
+            (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
+            _ => LinkGenerator.RouteAddPage(NextPage ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers)
+        });
+
+        return Task.FromResult(nextPage);
+    }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
@@ -30,30 +61,28 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         return Redirect(LinkGenerator.PersonQualifications(PersonId));
     }
 
-    public AddRoutePage? NextPage(AddRoutePage currentPage)
-    {
-        return PageDriver.NextPage(Route, Status, currentPage);
-    }
-
-    public AddRoutePage? PreviousPage(AddRoutePage currentPage)
-    {
-        return PageDriver.PreviousPage(Route, Status, currentPage);
-    }
-
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))
-        {
-            context.Result = new BadRequestResult();
-            return;
-        }
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(next);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
 
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
-        Status = JourneyInstance!.State.Status!.Value;
-        await next();
+        OnPageHandlerExecuting(context);
+        await OnPageHandlerExecutingAsync(context);
+        if (context.Result == null)
+        {
+            var executedContext = await next();
+            OnPageHandlerExecuted(executedContext);
+            await OnPageHandlerExecutedAsync(executedContext);
+        }
     }
+
+    public virtual Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+        => Task.CompletedTask;
+
+    public virtual Task OnPageHandlerExecutedAsync(PageHandlerExecutedContext context)
+        => Task.CompletedTask;
 }

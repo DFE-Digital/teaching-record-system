@@ -5,12 +5,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : AddRoutePostStatusPageModel(AddRoutePage.TrainingProvider, linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
-
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
     public string PageHeading => "Enter the training provider for this route" + (!TrainingProviderRequired ? " (optional)" : "");
@@ -31,22 +28,24 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
         {
             ModelState.AddModelError(nameof(TrainingProviderId), "Select a training provider");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.TrainingProviderId = TrainingProviderId;
+        });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        TrainingProviders = await ReferenceDataCache.GetTrainingProvidersAsync();
-        await base.OnPageHandlerExecutionAsync(context, next);
-    }
+        await base.OnPageHandlerExecutingAsync(context);
 
+        TrainingProviders = await ReferenceDataCache.GetTrainingProvidersAsync();
+    }
 }

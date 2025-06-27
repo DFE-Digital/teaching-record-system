@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : AddRoutePostStatusPageModel(AddRoutePage.StartAndEndDate, linkGenerator, referenceDataCache)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -17,10 +18,6 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
     [Required(ErrorMessage = "Enter an end date")]
     [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
-
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.StartAndEndDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
@@ -40,14 +37,12 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s =>
+        await JourneyInstance!.UpdateStateAsync(state =>
         {
-            s.TrainingStartDate = TrainingStartDate;
-            s.TrainingEndDate = TrainingEndDate;
+            state.TrainingStartDate = TrainingStartDate;
+            state.TrainingEndDate = TrainingEndDate;
         });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.StartAndEndDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return await ContinueAsync();
     }
 }

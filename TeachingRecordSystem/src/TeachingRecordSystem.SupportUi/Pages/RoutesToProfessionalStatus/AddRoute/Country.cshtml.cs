@@ -5,12 +5,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+    : AddRoutePostStatusPageModel(AddRoutePage.Country, linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
-
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
     public string PageHeading => "Enter the country associated with their route" + (!CountryRequired ? " (optional)" : "");
@@ -31,20 +27,24 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
         {
             ModelState.AddModelError("TrainingCountryId", "Enter a country");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingCountryId = TrainingCountryId);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.TrainingCountryId = TrainingCountryId;
+        });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId));
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
+        await base.OnPageHandlerExecutingAsync(context);
+
         TrainingCountries = (await ReferenceDataCache.GetTrainingCountriesAsync())
             .Select(r => new CountryDisplayInfo()
             {
@@ -52,6 +52,5 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
                 DisplayName = $"{r.CountryId} - {r.Name}"
             })
             .ToArray();
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

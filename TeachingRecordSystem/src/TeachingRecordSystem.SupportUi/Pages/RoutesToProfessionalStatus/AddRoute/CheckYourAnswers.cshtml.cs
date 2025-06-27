@@ -7,21 +7,19 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
+public class CheckYourAnswersModel(
+    TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IFileService fileService,
-    IClock clock) :
-    AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+    IClock clock)
+    : AddRoutePostStatusPageModel(AddRoutePage.CheckYourAnswers, linkGenerator, referenceDataCache)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
     public ChangeReasonOption? ChangeReason;
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
     public string? UploadedEvidenceFileUrl { get; set; }
-
-    public string BackLink =>
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.CheckYourAnswers) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
     {
@@ -79,29 +77,33 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
 
         TempData.SetFlashSuccess("Route to professional status added");
 
-        return Redirect(LinkGenerator.PersonQualifications(PersonId));
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))
+        await base.OnPageHandlerExecutingAsync(context);
+
+        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
+            .Cast<AddRoutePage>()
+            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
+            .OrderBy(p => p);
+
+        foreach (var page in pagesInOrder)
         {
-            context.Result = new BadRequestResult();
-            return;
+            var pageRequired = page.FieldRequirementForPage(Route, Status);
+
+            if (pageRequired == FieldRequirement.Mandatory &&
+                !JourneyInstance!.State.IsComplete(page) &&
+                // if the route has an implicit exemption, don't show the induction exemption page
+                (page != AddRoutePage.InductionExemption ||
+                 Route.InductionExemptionReason is null ||
+                 !Route.InductionExemptionReason.RouteImplicitExemption))
+            {
+                context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true));
+                return;
+            }
         }
-        if (!JourneyInstance!.State.ChangeReasonIsComplete)
-        {
-            context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
-
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
-        Status = JourneyInstance!.State.Status!.Value;
 
         var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
         ChangeReason = JourneyInstance!.State.ChangeReason;
@@ -109,7 +111,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         RouteDetail = new RouteDetailViewModel
         {
             RouteToProfessionalStatusType = Route,
-            Status = JourneyInstance!.State.Status.Value,
+            Status = Status,
             HoldsFrom = JourneyInstance!.State.HoldsFrom,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
             TrainingEndDate = JourneyInstance!.State.TrainingEndDate,
@@ -130,7 +132,5 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?
             await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
-
-        await next();
     }
 }

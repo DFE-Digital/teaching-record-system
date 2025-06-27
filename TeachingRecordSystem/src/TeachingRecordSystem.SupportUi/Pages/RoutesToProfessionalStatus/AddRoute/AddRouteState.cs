@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 public class AddRouteState : IRegisterJourney
@@ -26,10 +24,45 @@ public class AddRouteState : IRegisterJourney
     public bool? IsExemptFromInduction { get; set; }
     public Guid? DegreeTypeId { get; set; }
     public ChangeReasonOption? ChangeReason { get; set; }
-    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
+    public ChangeReasonDetailsState ChangeReasonDetail { get; init; } = new();
 
-    [JsonIgnore]
-    public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
+    public bool IsComplete(AddRoutePage page)
+    {
+        return page switch
+        {
+            AddRoutePage.Route =>
+                RouteToProfessionalStatusId != null,
+            AddRoutePage.Status =>
+                Status != null,
+            AddRoutePage.StartAndEndDate =>
+                TrainingStartDate != null ||
+                TrainingEndDate != null,
+            AddRoutePage.HoldsFrom =>
+                HoldsFrom != null,
+            AddRoutePage.InductionExemption =>
+                IsExemptFromInduction != null,
+            AddRoutePage.TrainingProvider =>
+                TrainingProviderId != null,
+            AddRoutePage.DegreeType =>
+                DegreeTypeId != null,
+            AddRoutePage.Country =>
+                TrainingCountryId != null,
+            AddRoutePage.AgeRangeSpecialism =>
+                TrainingAgeSpecialismType != null ||
+                TrainingAgeSpecialismRangeFrom != null ||
+                TrainingAgeSpecialismRangeTo != null,
+            AddRoutePage.SubjectSpecialisms =>
+                TrainingSubjectIds.Any(),
+            AddRoutePage.ChangeReason =>
+                ChangeReason != null ||
+                ChangeReasonDetail.ChangeReasonDetail != null ||
+                ChangeReasonDetail.HasAdditionalReasonDetail != null ||
+                ChangeReasonDetail.UploadEvidence != null ||
+                ChangeReasonDetail.EvidenceFileId != null,
+            AddRoutePage.CheckYourAnswers => false,
+            _ => throw new ArgumentOutOfRangeException(nameof(page))
+        };
+    }
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {
