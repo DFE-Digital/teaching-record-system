@@ -146,7 +146,9 @@ public class ExemptionReasonModel(
             return;
         }
 
-        var exemptionReasons = await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true);
+        var exemptionReasons = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus)
+            ? await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true)
+            : await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
 
         if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
         {
@@ -165,6 +167,7 @@ public class ExemptionReasonModel(
                     RouteToProfessionalStatusName = r.RouteToProfessionalStatusType.Name
                 });
         }
+        // note: RoutesWithInductionExemptions is null if the Feature RoutesToProfessionalStatus isn't enabled
         if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any()) // exclude some exemptions from the choices if they apply because of a route
         {
             var exemptionReasonIdsToExclude = ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld
@@ -173,7 +176,7 @@ public class ExemptionReasonModel(
                     r => r.InductionExemptionReasonId,
                     (guid, route) => route.InductionExemptionReasonId);
 
-            var exemptionReasonsToDisplay = ExemptionReasonCategories.ExemptionReasonIds
+            var exemptionReasonsToDisplay = ExemptionReasonCategories.RouteFeatureExemptionReasonIds
                 .Where(id => !exemptionReasonIdsToExclude.Contains(id))
                 .Join(exemptionReasons,
                     guid => guid,
