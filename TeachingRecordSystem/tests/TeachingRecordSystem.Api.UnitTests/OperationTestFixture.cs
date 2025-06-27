@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Api.Infrastructure.Security;
@@ -17,7 +18,8 @@ public class OperationTestFixture
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        ICurrentUserProvider currentUserProvider)
+        ICurrentUserProvider currentUserProvider,
+        IConfiguration configuration)
     {
         _currentUserProvider = currentUserProvider;
         Clock = new TestableClock();
@@ -31,7 +33,8 @@ public class OperationTestFixture
             Clock,
             new TestableAuditRepository(),
             new NullLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object);
+            BlobStorageFileService.Object,
+            configuration);
 
         TestData = new(
             DbFixture.GetDbContextFactory(),

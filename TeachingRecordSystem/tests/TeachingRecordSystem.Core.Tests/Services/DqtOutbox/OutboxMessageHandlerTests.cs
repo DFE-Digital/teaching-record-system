@@ -228,7 +228,8 @@ public class OutboxMessageHandlerFixture
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IFileService>().Object);
+            new Mock<IFileService>().Object,
+            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

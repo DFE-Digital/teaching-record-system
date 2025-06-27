@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -17,7 +18,8 @@ public class QtsImporterTests : IAsyncLifetime
       ReferenceDataCache referenceDataCache,
       FakeTrnGenerator trnGenerator,
       IServiceProvider provider,
-      ILoggerFactory loggerFactory)
+      ILoggerFactory loggerFactory,
+      IConfiguration configuration)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -28,7 +30,8 @@ public class QtsImporterTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object);
+            BlobStorageFileService.Object,
+            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

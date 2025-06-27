@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,8 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IConfiguration configuration)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -28,7 +30,8 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
             Clock,
             AuditRepository,
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object);
+            BlobStorageFileService.Object,
+            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -53,7 +56,7 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
 
     public Task PublishChangedItemAndConsumeAsync(string modelType, IChangedItem changedItem)
     {
-        var (entityLogicalname, _) = TrsDataSyncHelper.GetEntityInfoForModelType(modelType);
+        var (entityLogicalname, _) = Helper.GetEntityInfoForModelType(modelType);
 
         return WithServiceAsync(entityLogicalname, async (service, changesObserver) =>
         {

@@ -72,7 +72,7 @@ public sealed class CrmClientFixture : IDisposable
                 _referenceDataCache,
                 Clock,
                 () => _trnGenerationApiClient.GenerateTrnAsync(),
-                withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock, new TestableAuditRepository(), _loggerFactory.CreateLogger<TrsDataSyncHelper>(), BlobStorageFileServiceMock.Object)) : TestDataSyncConfiguration.NoSync()),
+                withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock, new TestableAuditRepository(), _loggerFactory.CreateLogger<TrsDataSyncHelper>(), BlobStorageFileServiceMock.Object, Configuration)) : TestDataSyncConfiguration.NoSync()),
             _memoryCache,
             onAsyncDispose);
     }

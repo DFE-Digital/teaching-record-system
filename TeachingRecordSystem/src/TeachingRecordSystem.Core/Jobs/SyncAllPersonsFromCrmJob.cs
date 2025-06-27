@@ -30,7 +30,7 @@ public class SyncAllPersonsFromCrmJob
         const int pageSize = 1000;
 
         var serviceClient = _crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
-        var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames);
+        var columns = new ColumnSet(_trsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames);
 
         // Ensure this is kept in sync with the predicate in TrsDataSyncHelper.SyncContacts
         var filter = new FilterExpression(LogicalOperator.And);
