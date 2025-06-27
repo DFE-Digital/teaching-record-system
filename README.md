@@ -75,13 +75,6 @@ A `just` recipe will install the required local tools:
 just install-tools
 ```
 
-### Restore dependencies
-
-As well as NuGet packages, there are some client-side libraries required. A `just` recipe will install both:
-```shell
-just restore
-```
-
 ### Blob storage emulator
 
 The Support UI uses Azure Blob Storage for storing files. For local development, you can use the Azure Storage Emulator - Azurite. If you
@@ -159,10 +152,10 @@ just cli migrate-db
 
 **Note:** `just build` needs to be run first to make sure that the latest migration is compiled into the `TeachingRecordSystem.Cli` dll - `just cli migrate-db` will fail if the dll doesn't exist.
 
-The trs_tests database for the tests should be migrated automatically when running the tests. 
+The trs_tests database for the tests should be migrated automatically when running the tests.
 
 #### Downgrading the local database
-To rollback a series of migrations, use the `--target-migration` parameter to indicate the name of a migration to end on 
+To rollback a series of migrations, use the `--target-migration` parameter to indicate the name of a migration to end on
 (the database will be left in the state just after applying this migration)
 
 ```shell
@@ -354,7 +347,7 @@ For either of these recipes to work, the [Terraform tool must be installed](http
 **Note:** `just format` and `just format-changed` call `dotnet dotnet-format` - this is different to `dotnet format` so be aware that calling `dotnet format` may produce different results.
 
 ### Visual Studio Code Cleanup
-If you're using Visual Studio 2022 you can also set up Code Cleanup, this will use the settings defined in the `.editorconfig` file in the repository root (this is also added to the Solution Items folder in the solution). 
+If you're using Visual Studio 2022 you can also set up Code Cleanup, this will use the settings defined in the `.editorconfig` file in the repository root (this is also added to the Solution Items folder in the solution).
 
 To set this up, go to `Tools > Options > Text Editor > Code Cleanup` and click `Configure Code Cleanup`. This will present you with a window with two profiles to configure, the easiest thing to do is to select `Profile 1 (default)`, and select the following from "Available fixers" (bottom panel), and add them to the "Included fixers" (top panel):
 
