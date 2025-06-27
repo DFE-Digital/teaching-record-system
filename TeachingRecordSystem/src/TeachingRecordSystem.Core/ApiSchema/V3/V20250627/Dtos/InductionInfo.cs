@@ -1,6 +1,6 @@
 using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.InductionStatus;
 
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
 
 public record InductionInfo
 {

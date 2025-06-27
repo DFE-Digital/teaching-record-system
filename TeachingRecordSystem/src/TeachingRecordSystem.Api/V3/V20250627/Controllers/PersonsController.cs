@@ -5,14 +5,14 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
-using TeachingRecordSystem.Api.V3.VNext.Responses;
+using TeachingRecordSystem.Api.V3.V20250627.Requests;
+using TeachingRecordSystem.Api.V3.V20250627.Responses;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20250627.Controllers;
 
 [Route("persons")]
-public partial class PersonsController(IMapper mapper) : ControllerBase
+public class PersonsController(IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(

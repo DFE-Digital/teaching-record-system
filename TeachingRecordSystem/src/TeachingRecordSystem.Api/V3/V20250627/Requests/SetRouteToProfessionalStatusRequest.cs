@@ -1,8 +1,8 @@
 using Optional;
-using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.RouteToProfessionalStatusStatus;
+using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.RouteToProfessionalStatusStatus;
 using TrainingAgeSpecialismType = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.TrainingAgeSpecialismType;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20250627.Requests;
 
 public record SetRouteToProfessionalStatusRequest
 {

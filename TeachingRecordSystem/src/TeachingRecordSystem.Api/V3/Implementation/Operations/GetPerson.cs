@@ -3,7 +3,6 @@ using Microsoft.Xrm.Sdk.Query;
 using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -159,17 +158,17 @@ public record GetPersonResultRouteToProfessionalStatus
     public required DateOnly? HoldsFrom { get; init; }
     public required DateOnly? TrainingStartDate { get; init; }
     public required DateOnly? TrainingEndDate { get; init; }
-    public required IReadOnlyCollection<TrainingSubject> TrainingSubjects { get; init; }
+    public required IReadOnlyCollection<PostgresModels.TrainingSubject> TrainingSubjects { get; init; }
     public required TrainingAgeSpecialism? TrainingAgeSpecialism { get; init; }
     public required TrainingCountry? TrainingCountry { get; init; }
-    public required TrainingProvider? TrainingProvider { get; init; }
-    public required DegreeType? DegreeType { get; init; }
+    public required PostgresModels.TrainingProvider? TrainingProvider { get; init; }
+    public required PostgresModels.DegreeType? DegreeType { get; init; }
     public required GetPersonResultRouteToProfessionalStatusInductionExemption InductionExemption { get; init; }
 }
 
 public record GetPersonResultRouteToProfessionalStatusForAppropriateBody
 {
-    public required TrainingProvider TrainingProvider { get; init; }
+    public required PostgresModels.TrainingProvider TrainingProvider { get; init; }
 }
 
 public record GetPersonResultRouteToProfessionalStatusInductionExemption
@@ -577,12 +576,11 @@ public class GetPersonHandler(
                 TrainingEndDate = r.TrainingEndDate,
                 TrainingSubjects = await r.TrainingSubjectIds.ToAsyncEnumerable()
                     .SelectAwait(async id => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
-                    .Select(TrainingSubject.FromModel)
                     .ToArrayAsync(),
                 TrainingAgeSpecialism = TrainingAgeSpecialismExtensions.FromRoute(r),
                 TrainingCountry = TrainingCountry.FromModel(r.TrainingCountry),
-                TrainingProvider = TrainingProvider.FromModel(r.TrainingProvider),
-                DegreeType = DegreeType.FromModel(r.DegreeType),
+                TrainingProvider = r.TrainingProvider,
+                DegreeType = r.DegreeType,
                 InductionExemption = new GetPersonResultRouteToProfessionalStatusInductionExemption()
                 {
                     IsExempt = r.ExemptFromInduction == true || r.ExemptFromInductionDueToQtsDate == true,

@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.VNext;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250627;
 
 public class GetPersonByTrnTests : TestBase
 {

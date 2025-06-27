@@ -1,16 +1,16 @@
 using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos;
 using Alert = TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos.Alert;
-using EytsInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.EytsInfo;
-using InductionInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.InductionInfo;
+using EytsInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.EytsInfo;
+using InductionInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.InductionInfo;
 using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;
 using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsStatus;
-using QtsInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.QtsInfo;
-using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.RouteToProfessionalStatusStatus;
+using QtsInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.QtsInfo;
+using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.RouteToProfessionalStatusStatus;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Responses;
+namespace TeachingRecordSystem.Api.V3.V20250627.Responses;
 
 [AutoMap(typeof(GetPersonResult))]
 public record GetPersonResponse

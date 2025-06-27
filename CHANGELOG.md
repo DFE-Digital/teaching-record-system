@@ -2,6 +2,10 @@
 
 ## vNext
 
+An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record with the given TRN exists and is active.
+
+## 20250627
+
 ### `PUT /v3/persons/<trn>/professional-statuses/<reference>`
 - This endpoint has been moved to `/v3/persons/<trn>/routes-to-professional-statuses/<reference>`.
 - The `routeTypeId` property has been renamed to `routeToProfessionalStatusTypeId`.

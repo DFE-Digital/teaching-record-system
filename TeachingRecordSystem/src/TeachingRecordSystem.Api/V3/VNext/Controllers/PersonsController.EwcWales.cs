@@ -7,7 +7,8 @@ using TeachingRecordSystem.Api.V3.VNext.Requests;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
-public partial class PersonsController
+[Route("persons")]
+public class PersonsController : ControllerBase
 {
     [HttpPut("{trn}/welsh-induction")]
     [SwaggerOperation(

@@ -1,9 +1,9 @@
 using FluentValidation;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20250627.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.RouteToProfessionalStatusStatus;
+using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250627.Dtos.RouteToProfessionalStatusStatus;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Validators;
+namespace TeachingRecordSystem.Api.V3.V20250627.Validators;
 
 public class SetRouteToProfessionalStatusRequestValidator : AbstractValidator<SetRouteToProfessionalStatusRequest>
 {
