@@ -271,7 +271,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
         var holdsFromDate = Clock.Today;
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
             .Join(exemptionReasons,
