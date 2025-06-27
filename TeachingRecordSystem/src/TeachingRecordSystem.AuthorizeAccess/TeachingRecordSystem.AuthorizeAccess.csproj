@@ -2,13 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <RestoreGovUkFrontendNpmPackage>true</RestoreGovUkFrontendNpmPackage>
+    <GovUkFrontendNpmPackageLocation>wwwroot/lib/govuk-frontend</GovUkFrontendNpmPackageLocation>
+    <EnableDefaultSassItems>false</EnableDefaultSassItems>
   </PropertyGroup>
 
-  <Target Name="CompileSass" BeforeTargets="Build">
-    <Exec Command="sass -q wwwroot/Styles/site.scss wwwroot/Styles/site.css" />
+  <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
+    <Copy SourceFiles="wwwroot/lib/govuk-frontend/govuk-frontend.min.js"
+          DestinationFolder="wwwroot"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
+    <Copy SourceFiles="wwwroot/lib/govuk-frontend/govuk-frontend.min.js"
+          DestinationFolder="wwwroot"
+          SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>
+    <PackageReference Include="DartSassBuilder" />
     <PackageReference Include="Dfe.Analytics" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="GovUk.OneLogin.AspNetCore" />
@@ -20,6 +32,10 @@
   <ItemGroup>
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <SassFile Include="wwwroot/Styles/site.scss" Exclude="wwwroot/lib/**/*" />
   </ItemGroup>
 
   <ItemGroup>

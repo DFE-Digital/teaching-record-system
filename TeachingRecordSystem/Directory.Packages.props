@@ -16,6 +16,7 @@
     <PackageVersion Include="CloudNative.CloudEvents" Version="2.8.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
     <PackageVersion Include="CsvHelper" Version="30.1.0" />
+    <PackageVersion Include="DartSassBuilder" Version="1.1.0" />
     <PackageVersion Include="dbup-sqlserver" Version="5.0.37" />
     <PackageVersion Include="Dfe.Analytics" Version="0.2.5" />
     <PackageVersion Include="DistributedLock.Azure" Version="1.0.0" />
@@ -28,7 +29,7 @@
     <PackageVersion Include="Google.Cloud.Storage.V1" Version="4.10.0" />
     <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.3.1" />
     <PackageVersion Include="GovukNotify" Version="6.1.0" />
-    <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="3.0.0" />
+    <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="3.2.2" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.14" />
     <PackageVersion Include="Hangfire.Core" Version="1.8.14" />
     <PackageVersion Include="Hangfire.NetCore" Version="1.8.14" />
