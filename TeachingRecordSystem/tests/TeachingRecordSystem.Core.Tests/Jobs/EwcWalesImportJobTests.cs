@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using Azure.Storage.Blobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -912,7 +913,8 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
         IServiceProvider provider,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IConfiguration configuration)
     {
         OrganizationService = provider.GetService<IOrganizationServiceAsync2>()!;
         DbFixture = dbFixture;
@@ -924,7 +926,8 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object);
+            BlobStorageFileService.Object,
+            configuration);
 
         var blobServiceClient = new Mock<BlobServiceClient>();
         var qtsImporter = ActivatorUtilities.CreateInstance<QtsImporter>(provider);

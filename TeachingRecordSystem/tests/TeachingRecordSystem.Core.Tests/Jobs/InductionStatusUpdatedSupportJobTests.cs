@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,7 +22,8 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
         IServiceProvider provider,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IConfiguration configuration)
     {
         OrganizationService = provider.GetService<IOrganizationServiceAsync2>()!;
         DbFixture = dbFixture!;
@@ -33,7 +35,8 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object);
+            BlobStorageFileService.Object,
+            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

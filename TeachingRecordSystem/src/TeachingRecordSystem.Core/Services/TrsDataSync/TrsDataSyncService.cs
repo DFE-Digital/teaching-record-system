@@ -97,7 +97,7 @@ public class TrsDataSyncService(
             _ => $"{ChangesKeyPrefix}:{modelType}"
         };
 
-        var (entityLogicalName, attributeNames) = TrsDataSyncHelper.GetEntityInfoForModelType(modelType);
+        var (entityLogicalName, attributeNames) = trsDataSyncHelper.GetEntityInfoForModelType(modelType);
         var columns = new ColumnSet(attributeNames);
 
         var modifiedSince = await trsDataSyncHelper.GetLastModifiedOnForModelTypeAsync(modelType);

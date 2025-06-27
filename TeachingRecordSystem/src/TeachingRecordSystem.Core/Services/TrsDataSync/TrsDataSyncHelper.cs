@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -22,13 +23,12 @@ namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 public class TrsDataSyncHelper(
     NpgsqlDataSource trsDbDataSource,
     [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
-#pragma warning disable CS9113 // Parameter is unread.
     ReferenceDataCache referenceDataCache,
-#pragma warning restore CS9113 // Parameter is unread.
     IClock clock,
     IAuditRepository auditRepository,
     ILogger<TrsDataSyncHelper> logger,
-    IFileService fileService)
+    IFileService fileService,
+    IConfiguration configuration)
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -36,13 +36,16 @@ public class TrsDataSyncHelper(
     private const string IdsParameterName = "@ids";
     private const int MaxAuditRequestsPerBatch = 10;
 
-    private static readonly IReadOnlyDictionary<string, ModelTypeSyncInfo> _modelTypeSyncInfo = new Dictionary<string, ModelTypeSyncInfo>()
-    {
-        { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
-        { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
-        { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() },
-        { ModelTypes.DqtNote, GetModelTypeSyncInfoForNotes() },
-    };
+    private IReadOnlyDictionary<string, ModelTypeSyncInfo> GetModelTypeSyncInfo() =>
+        new Dictionary<string, ModelTypeSyncInfo>()
+        {
+            { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
+            { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
+            { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() },
+            { ModelTypes.DqtNote, GetModelTypeSyncInfoForNotes() }
+        };
+
+    private IReadOnlyDictionary<string, ModelTypeSyncInfo> AllModelTypeSyncInfo => GetModelTypeSyncInfo();
 
     private static IReadOnlyDictionary<dfeta_ITTProgrammeType, Guid> _programmeTypeRouteMapping = new Dictionary<dfeta_ITTProgrammeType, Guid>()
     {
@@ -406,7 +409,7 @@ public class TrsDataSyncHelper(
 
     private bool IsFakeXrm { get; } = organizationService.GetType().FullName == "Castle.Proxies.ObjectProxy_2";
 
-    public static (string EntityLogicalName, string[] AttributeNames) GetEntityInfoForModelType(string modelType)
+    public (string EntityLogicalName, string[] AttributeNames) GetEntityInfoForModelType(string modelType)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
@@ -1432,11 +1435,11 @@ public class TrsDataSyncHelper(
         }
     }
 
-    private static ModelTypeSyncInfo<TModel> GetModelTypeSyncInfo<TModel>(string modelType) =>
+    private ModelTypeSyncInfo<TModel> GetModelTypeSyncInfo<TModel>(string modelType) =>
         (ModelTypeSyncInfo<TModel>)GetModelTypeSyncInfo(modelType);
 
-    private static ModelTypeSyncInfo GetModelTypeSyncInfo(string modelType) =>
-        _modelTypeSyncInfo.TryGetValue(modelType, out var modelTypeSyncInfo) ?
+    private ModelTypeSyncInfo GetModelTypeSyncInfo(string modelType) =>
+        AllModelTypeSyncInfo.TryGetValue(modelType, out var modelTypeSyncInfo) ?
             modelTypeSyncInfo :
             throw new ArgumentException($"Unknown data type: '{modelType}.", nameof(modelType));
 
@@ -1718,7 +1721,7 @@ public class TrsDataSyncHelper(
         };
     }
 
-    private static ModelTypeSyncInfo GetModelTypeSyncInfoForPerson()
+    private ModelTypeSyncInfo GetModelTypeSyncInfoForPerson()
     {
         var tempTableName = "temp_person_import";
         var tableName = "persons";
@@ -1749,6 +1752,11 @@ public class TrsDataSyncHelper(
             "eyts_date",
             "qtls_status"
         };
+
+        if (configuration["SkipQtsSync"] == "true")
+        {
+            columnNames = columnNames.Except(["qts_date", "eyts_date", "qtls_status"]).ToArray();
+        }
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
 
@@ -2392,7 +2400,7 @@ public class TrsDataSyncHelper(
                 mapped.Add(IttQtsMapResult.Succeeded(ps));
             }
 
-            // Filter out ITT which we aren't migrating to TRS            
+            // Filter out ITT which we aren't migrating to TRS
             foreach (var itt in contactItt.Where(i => i.dfeta_Result is not null && IttResultsToIgnore.Contains(i.dfeta_Result!.Value)).ToArray())
             {
                 var failedReason = IttQtsMapResultFailedReason.DoNotMigrateIttResult;
@@ -2886,7 +2894,7 @@ public class TrsDataSyncHelper(
                 bool isEarlyYears,
                 out Guid? routeId)
             {
-                // Based on rules defined in spreadsheet try and derive which routeId to map to where there are conflicts from mapping from ITT, QTS and ITT Qualification 
+                // Based on rules defined in spreadsheet try and derive which routeId to map to where there are conflicts from mapping from ITT, QTS and ITT Qualification
                 RouteMappingPrecedence[] defaultPrecedenceOrder = [RouteMappingPrecedence.TeachingStatus, RouteMappingPrecedence.ProgrammeType, RouteMappingPrecedence.IttQualification];
                 RouteMappingPrecedence[] precedenceOrder = defaultPrecedenceOrder;
 
@@ -3140,7 +3148,7 @@ public class TrsDataSyncHelper(
                     TrainingAgeSpecialismRangeTo = trainingAgeSpecialism?.TrainingAgeSpecialismRangeTo,
                     HoldsFrom = awardedDate,
                     DegreeTypeId = degreeTypeId,
-                    ExemptFromInduction = false,  // TODO  
+                    ExemptFromInduction = false,  // TODO
                     //InductionExemptionReasonId = inductionExemptionReasonId,  // FIXME
                     TrainingSubjectIds = trainingSubjectIds.ToArray(),
                     TrainingCountryId = country?.CountryId,

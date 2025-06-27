@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.Files;
@@ -14,7 +15,8 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IConfiguration configuration)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -26,7 +28,8 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            Mock.Of<IFileService>());
+            Mock.Of<IFileService>(),
+            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

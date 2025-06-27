@@ -1,5 +1,6 @@
 using Google.Apis.Upload;
 using Google.Cloud.Storage.V1;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -19,7 +20,8 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IConfiguration configuration)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -31,7 +33,8 @@ public class WorkforceDataExporterTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IFileService>().Object);
+            new Mock<IFileService>().Object,
+            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

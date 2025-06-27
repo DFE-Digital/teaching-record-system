@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -15,7 +16,8 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IConfiguration configuration)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -27,7 +29,8 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IFileService>().Object);
+            new Mock<IFileService>().Object,
+            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

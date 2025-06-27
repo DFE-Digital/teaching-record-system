@@ -41,7 +41,7 @@ public partial class Commands
                 var crmQueryDispatcher = services.GetRequiredKeyedService<ICrmQueryDispatcher>(TrsDataSyncService.CrmClientName);
                 var syncHelper = services.GetRequiredService<TrsDataSyncHelper>();
 
-                var entityInfo = TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person);
+                var entityInfo = syncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person);
                 var contact = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactByTrnQuery(trn, new Microsoft.Xrm.Sdk.Query.ColumnSet(entityInfo.AttributeNames)));
 
                 if (contact is null)
