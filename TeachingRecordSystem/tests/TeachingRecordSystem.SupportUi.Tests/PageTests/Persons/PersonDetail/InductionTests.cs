@@ -5,35 +5,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_FeatureFlagOff_NoInductionTabShown()
-    {
-        // Arrange
-        FeatureProvider.Features.Clear();
-        var person = await TestData.CreatePersonAsync();
-
-        // Act
-        var response = await HttpClient.GetAsync($"/persons/{person.ContactId}");
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("induction-tab"));
-    }
-
-    [Fact]
-    public async Task Get_FeatureFlagOn_InductionTabShown()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        // Act
-        var response = await HttpClient.GetAsync($"/persons/{person.ContactId}");
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetElementByTestId("induction-tab"));
-    }
-
-    [Fact]
     public async Task Get_WithPersonIdForPersonWithNoQts_DisplaysExpectedContent()
     {
         // Arrange

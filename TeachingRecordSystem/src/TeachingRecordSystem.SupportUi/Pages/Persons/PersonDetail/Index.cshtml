@@ -7,7 +7,7 @@
     ViewBag.SelectedTab = PersonDetailSubNavigationTab.General;
 }
 
-@if (FeatureProvider.IsEnabled(FeatureNames.Alerts) && Model.HasOpenAlert)
+@if (Model.HasOpenAlert)
 {
     <govuk-notification-banner data-testid="OpenAlertNotification">
         <p class="govuk-notification-banner__heading">
