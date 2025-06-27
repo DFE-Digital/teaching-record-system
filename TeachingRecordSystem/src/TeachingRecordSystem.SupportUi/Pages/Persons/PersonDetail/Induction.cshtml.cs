@@ -65,8 +65,9 @@ public class InductionModel(
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
         ExemptionReasonIdsHeldOnPerson = person.InductionExemptionReasonIds;
-        ExemptionReasonNames = (await referenceDataCache
-            .GetPersonLevelInductionExemptionReasonsAsync())
+        ExemptionReasonNames = (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus)
+            ? (await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync())
+            : (await referenceDataCache.GetInductionExemptionReasonsAsync()))
             .Where(i => ExemptionReasonIdsHeldOnPerson.Contains(i.InductionExemptionReasonId))
             .Select(i => i.Name)
             .OrderDescending();
