@@ -99,6 +99,12 @@
         "resolved": "17.12.19",
         "contentHash": "v3IYeedjoktvZ+GqYmLudxZJngmf/YWIxNT2Uy6QMMN19cvw+nkWoip1Gr1RtnFkUo1MPUVMis4C8Kj8d8DpSQ=="
       },
+      "Microsoft.Web.LibraryManager.Build": {
+        "type": "Direct",
+        "requested": "[3.0.71, )",
+        "resolved": "3.0.71",
+        "contentHash": "uO0RegM2P5ZZhQDJQ+YSiugXJgNnh4gmjMd3VofeoE9MSu60zYoR3meA9SAm6PVJW2t//SzICXQf4+JtfUTJQA=="
+      },
       "Apache.Arrow": {
         "type": "Transitive",
         "resolved": "11.0.0",

@@ -20,7 +20,6 @@ install-tools:
 # Restore dependencies
 restore:
   @cd {{solution-root}} && dotnet restore --locked-mode
-  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi" }} && dotnet libman restore --verbosity quiet
 
 # Install Playwright
 install-playwright:
