@@ -20,6 +20,30 @@ public static class ExemptionReasonCategories
         { ExemptionReasonCategory.Miscellaneous, new List<Guid> {
             InductionExemptionReason.QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id,
             InductionExemptionReason.ExemptDataLossOrErrorCriteriaId,
+            InductionExemptionReason.QtlsId,
+            InductionExemptionReason.OverseasTrainedTeacherId,
+            InductionExemptionReason.ExemptId,
+            InductionExemptionReason.QualifiedThroughEEAMutualRecognitionRouteId} },
+        { ExemptionReasonCategory.HistoricalQualificationRoute, new List<Guid> {
+            InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId,
+            InductionExemptionReason.RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceId,
+            InductionExemptionReason.QualifiedBefore7May2000Id} },
+        { ExemptionReasonCategory.InductionCompletedOutsideEngland, new List<Guid> {
+            InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId,
+            InductionExemptionReason.PassedInductionInJerseyId,
+            InductionExemptionReason.PassedInductionInNorthernIrelandId,
+            InductionExemptionReason.PassedInWalesId,
+            InductionExemptionReason.PassedInductionInServiceChildrensEducationSchoolsInGermanyOrCyprusId,
+            InductionExemptionReason.PassedProbationaryPeriodInGibraltarId,
+            InductionExemptionReason.PassedInductionInIsleOfManId,
+            InductionExemptionReason.PassedInductionInGuernseyId} }
+    };
+
+    private static Dictionary<ExemptionReasonCategory, IEnumerable<Guid>> RoutesFeatureExemptionReasonCategoryMap => new()
+    {
+        { ExemptionReasonCategory.Miscellaneous, new List<Guid> {
+            InductionExemptionReason.QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id,
+            InductionExemptionReason.ExemptDataLossOrErrorCriteriaId,
             InductionExemptionReason.ExemptId,
             InductionExemptionReason.QualifiedThroughEEAMutualRecognitionRouteId} },
         { ExemptionReasonCategory.HistoricalQualificationRoute, new List<Guid> {
@@ -58,10 +82,6 @@ public static class ExemptionReasonCategories
     public static IEnumerable<Guid> ExemptionReasonIds =>
         ExemptionReasonCategoryMap.Values.SelectMany(g => g);
 
-    public static IEnumerable<Guid> GetExemptionReasonIdsForCategory(ExemptionReasonCategory category)
-    {
-        return ExemptionReasonCategoryMap.ContainsKey(category) ? ExemptionReasonCategoryMap[category] : new List<Guid>();
-    }
-
-    public static IEnumerable<ExemptionReasonCategory> All => Enum.GetValues(typeof(ExemptionReasonCategory)).Cast<ExemptionReasonCategory>();
+    public static IEnumerable<Guid> RouteFeatureExemptionReasonIds =>
+        RoutesFeatureExemptionReasonCategoryMap.Values.SelectMany(g => g);
 }
