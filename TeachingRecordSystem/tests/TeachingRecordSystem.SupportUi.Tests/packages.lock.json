@@ -2491,6 +2491,7 @@
           "Microsoft.Extensions.Caching.StackExchangeRedis": "[8.0.8, )",
           "Microsoft.Identity.Web": "[2.17.0, )",
           "Microsoft.Identity.Web.GraphServiceClientBeta": "[2.16.0, )",
+          "Microsoft.Web.LibraryManager.Build": "[3.0.71, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "TeachingRecordSystem.WebCommon": "[1.0.0, )"
         }
@@ -3035,6 +3036,12 @@
         "dependencies": {
           "Microsoft.PowerPlatform.Dataverse.Client": "1.1.0"
         }
+      },
+      "Microsoft.Web.LibraryManager.Build": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.71, )",
+        "resolved": "3.0.71",
+        "contentHash": "uO0RegM2P5ZZhQDJQ+YSiugXJgNnh4gmjMd3VofeoE9MSu60zYoR3meA9SAm6PVJW2t//SzICXQf4+JtfUTJQA=="
       },
       "Npgsql.DependencyInjection": {
         "type": "CentralTransitive",
