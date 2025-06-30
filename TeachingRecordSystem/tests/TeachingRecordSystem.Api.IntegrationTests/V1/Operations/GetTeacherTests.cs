@@ -8,6 +8,7 @@ public class GetTeacherTests : TestBase
     public GetTeacherTests(HostFixture hostFixture)
         : base(hostFixture)
     {
+        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
     }
 
     [Theory]

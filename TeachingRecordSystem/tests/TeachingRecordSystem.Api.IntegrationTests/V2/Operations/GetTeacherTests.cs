@@ -11,6 +11,7 @@ public class GetTeacherTests : TestBase
         : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson });
+        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
     }
 
     [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
