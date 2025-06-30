@@ -8,6 +8,7 @@ public class CreateIntegrationTransactionRecordBuilder
     private bool? _duplicate;
     private DateTime _createdDate;
     private IntegrationTransactionRecordStatus _status;
+    private bool _hasActiveAlerts;
 
     public CreateIntegrationTransactionRecordBuilder WithRowData(string rowData)
     {
@@ -45,6 +46,12 @@ public class CreateIntegrationTransactionRecordBuilder
         return this;
     }
 
+    public CreateIntegrationTransactionRecordBuilder WithActiveAlerts(bool hasActiveAlerts)
+    {
+        _hasActiveAlerts = hasActiveAlerts;
+        return this;
+    }
+
     public IntegrationTransactionRecord Execute()
     {
         return new IntegrationTransactionRecord
@@ -56,6 +63,7 @@ public class CreateIntegrationTransactionRecordBuilder
             Duplicate = _duplicate,
             CreatedDate = _createdDate,
             Status = _status,
+            HasActiveAlert = _hasActiveAlerts
         };
     }
 }

@@ -169,7 +169,7 @@ public record ItDetailResult(
 
 public record ItrRow(
     long IntegrationTransactionRecordId,
-    Guid ContactId,
+    Guid? ContactId,
     string ContactName,
     bool? Duplicate,
     IntegrationTransactionRecordStatus Status);

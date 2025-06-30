@@ -42,7 +42,7 @@ public class QtsImporterTests : IAsyncLifetime
             trnGenerator,
             TestDataSyncConfiguration.Sync(Helper));
         var blobServiceClient = new Mock<BlobServiceClient>();
-        Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider);
+        Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
     }
 
     private DbFixture DbFixture { get; }

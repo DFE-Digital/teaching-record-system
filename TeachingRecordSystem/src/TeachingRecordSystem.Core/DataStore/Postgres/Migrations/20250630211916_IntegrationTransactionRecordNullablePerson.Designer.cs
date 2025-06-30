@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250630211916_IntegrationTransactionRecordNullablePerson")]
+    partial class IntegrationTransactionRecordNullablePerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3484,15 +3487,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(3000)")
                         .HasColumnName("failure_message");
 
-                    b.Property<bool?>("HasActiveAlert")
-                        .HasColumnType("boolean")
-                        .HasColumnName("has_active_alert");
-
                     b.Property<long?>("IntegrationTransactionId")
                         .HasColumnType("bigint")
                         .HasColumnName("integration_transaction_id");
 
                     b.Property<Guid?>("PersonId")
+                        .IsRequired()
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
@@ -19357,6 +19357,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_integration_transaction_records_persons_person_id");
 
                     b.Navigation("IntegrationTransaction");

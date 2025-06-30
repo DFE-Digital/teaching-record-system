@@ -8,7 +8,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
@@ -18,12 +17,14 @@ public class InductionImporter
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
+    private readonly IClock _clock;
 
-    public InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger, TrsDbContext dbContext)
+    public InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger, TrsDbContext dbContext, IClock clock)
     {
         _crmQueryDispatcher = crmQueryDispatcher;
         _dbContext = dbContext;
         _logger = logger;
+        _clock = clock;
     }
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -34,13 +35,23 @@ public class InductionImporter
         };
         using (var csv = new CsvReader(csvReaderStream, csvConfig))
         {
-            var integrationJob = new CreateIntegrationTransactionQuery()
+            await using var txn = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+            var integrationJob = new IntegrationTransaction()
             {
-                StartDate = DateTime.Now,
-                TypeId = (int)dfeta_IntegrationInterface.GTCWalesImport,
-                FileName = fileName
+                IntegrationTransactionId = 0,
+                InterfaceType = IntegrationTransactionInterfaceType.EwcWales,
+                ImportStatus = IntegrationTransactionImportStatus.InProgress,
+                TotalCount = 0,
+                SuccessCount = 0,
+                FailureCount = 0,
+                DuplicateCount = 0,
+                FileName = fileName,
+                CreatedDate = _clock.UtcNow,
+                IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
             };
-            var integrationId = await _crmQueryDispatcher.ExecuteQueryAsync(integrationJob);
+            _dbContext.IntegrationTransactions.Add(integrationJob);
+            await _dbContext.SaveChangesAsync();
+            var integrationId = integrationJob.IntegrationTransactionId;
 
             var records = csv.GetRecords<EwcWalesInductionImportData>().ToList();
             var validationMessages = new List<string>();
@@ -83,24 +94,17 @@ public class InductionImporter
                     }
                     else
                     {
-                        rowTransaction.AppendQuery(new CreateDqtOutboxMessageTransactionalQuery(new AddInductionExemptionMessage
+                        if (lookupData.Person != null)
                         {
-                            PersonId = lookupData.Person!.Id,
-                            ExemptionReasonId = InductionExemptionReason.PassedInWalesId,
-                            TrsUserId = DataStore.Postgres.Models.SystemUser.SystemUserId
-                        }));
-
-                        if (lookupData.HasActiveAlerts)
-                        {
-                            var query = new CreateTaskTransactionalQuery()
-                            {
-                                ContactId = lookupData.Person!.Id,
-                                Category = "GTC Wales Import",
-                                Description = "QTS/Induction update with Active Sanction",
-                                Subject = "Notification for QTS Unit Team",
-                                ScheduledEnd = DateTime.Now
-                            };
-                            rowTransaction.AppendQuery(query);
+                            var person = _dbContext.Persons.Single(x => x.PersonId == lookupData.Person!.Id);
+                            person.TrySetWelshInductionStatus(
+                                passed: true,
+                                startDate: null,
+                                completedDate: null,
+                                updatedBy: DataStore.Postgres.Models.SystemUser.SystemUserId,
+                                _clock.UtcNow,
+                                out var _
+                                );
                         }
 
                         //soft validation errors can be appended to the IntegrationTransactionRecord Failure message
@@ -123,37 +127,25 @@ public class InductionImporter
                     }
 
                     //create ITR row with status of import row
-                    var createIntegrationTransactionRecord = new CreateIntegrationTransactionRecordTransactionalQuery()
+                    integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                     {
-                        IntegrationTransactionId = integrationId,
-                        Reference = totalRowCount.ToString(),
-                        ContactId = personId,
-                        InitialTeacherTrainingId = null,
-                        QualificationId = null,
-                        InductionId = null,
-                        InductionPeriodId = null,
-                        DuplicateStatus = null,
+                        IntegrationTransactionRecordId = 0,
+                        CreatedDate = _clock.UtcNow,
+                        RowData = "",
+                        Status = validationFailures.Errors.Count == 0 ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
+                        PersonId = lookupData.Person != null ? lookupData.Person!.Id : null,
                         FailureMessage = itrFailureMessage.ToString(),
-                        StatusCode = validationFailures.Errors.Count == 0 ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
-                        RowData = ConvertToCSVString(row),
-                        FileName = fileName
-                    };
-                    rowTransaction.AppendQuery(createIntegrationTransactionRecord);
+                        Duplicate = null,
+                        HasActiveAlert = lookupData.HasActiveAlerts
+                    });
 
                     //update IntegrationTransaction so that it's always up to date with
                     //counts of rows
-                    var updateIntegrationTransactionQuery = new UpdateIntegrationTransactionTransactionalQuery()
-                    {
-                        IntegrationTransactionId = integrationId,
-                        EndDate = null,
-                        TotalCount = totalRowCount,
-                        SuccessCount = successCount,
-                        DuplicateCount = 0,
-                        FailureCount = failureRowCount,
-                        FailureMessage = itrFailureMessage.ToString()
-                    };
-                    rowTransaction.AppendQuery(updateIntegrationTransactionQuery);
-                    await rowTransaction.ExecuteAsync();
+                    integrationJob.TotalCount = totalRowCount;
+                    integrationJob.FailureCount = failureRowCount;
+                    integrationJob.SuccessCount = successCount;
+                    integrationJob.DuplicateCount = duplicateRowCount;
+                    await _dbContext.SaveChangesAsync();
                 }
                 catch (Exception e)
                 {
@@ -162,20 +154,13 @@ public class InductionImporter
                 }
             }
 
-            var updateIntTrxQuery = new UpdateIntegrationTransactionTransactionalQuery()
-            {
-                IntegrationTransactionId = integrationId,
-                EndDate = DateTime.Now,
-                TotalCount = totalRowCount,
-                SuccessCount = successCount,
-                DuplicateCount = duplicateRowCount,
-                FailureCount = failureRowCount,
-                FailureMessage = failureMessage.ToString()
-            };
-
-            using var txn = _crmQueryDispatcher.CreateTransactionRequestBuilder();
-            txn.AppendQuery(updateIntTrxQuery);
-            await txn.ExecuteAsync();
+            //update integration transaction counts as job has finished
+            integrationJob.TotalCount = totalRowCount;
+            integrationJob.SuccessCount = successCount;
+            integrationJob.FailureCount = failureRowCount;
+            integrationJob.DuplicateCount = duplicateRowCount;
+            await _dbContext.SaveChangesAsync();
+            await txn.CommitAsync();
 
             return new InductionImportResult(totalRowCount, successCount, duplicateRowCount, failureRowCount, failureMessage.ToString(), integrationId);
         }
