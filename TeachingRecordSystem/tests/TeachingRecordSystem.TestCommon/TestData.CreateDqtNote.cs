@@ -11,7 +11,7 @@ public partial class TestData
             NoteId = Guid.NewGuid(),
             PersonId = personId,
             ContentHtml = noteText,
-            CreatedByDqtUserName = createdByUserName ?? Faker.Name.FullName(),
+            CreatedByDqtUserName = createdByUserName ?? GenerateName(),
             CreatedByDqtUserId = createdByUserId,
             CreatedOn = createDate ?? Clock.UtcNow,
             UpdatedByDqtUserId = null,

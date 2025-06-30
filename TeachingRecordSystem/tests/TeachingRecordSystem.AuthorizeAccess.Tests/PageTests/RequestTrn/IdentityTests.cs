@@ -43,7 +43,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
         state.EvidenceFileId = Guid.NewGuid();
@@ -108,7 +108,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
         var journeyInstance = await CreateJourneyInstance(state);
@@ -128,7 +128,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
         var journeyInstance = await CreateJourneyInstance(state);
@@ -153,7 +153,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
         var journeyInstance = await CreateJourneyInstance(state);

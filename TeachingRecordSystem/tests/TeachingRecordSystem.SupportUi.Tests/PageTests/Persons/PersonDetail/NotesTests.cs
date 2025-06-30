@@ -46,7 +46,7 @@ public class NotesTests : TestBase
         // Arrange
         var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
         var expectedNoteText = "Note without attachment";
-        var expectedCreatedBy = Faker.Name.FullName();
+        var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var note = await TestData.CreateNoteAsync(createPersonResult.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
 
@@ -78,7 +78,7 @@ public class NotesTests : TestBase
         // Arrange
         var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
         var expectedNoteText = "Note without attachment";
-        var expectedCreatedBy = Faker.Name.FullName();
+        var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var expectedOriginalFileName = "file.png";
         var note = await TestData.CreateNoteAsync(createPersonResult.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, expectedOriginalFileName, Guid.NewGuid());
@@ -113,7 +113,7 @@ public class NotesTests : TestBase
         var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
         var expectedNoteText = "Note without attachment";
         var htmlNote = $"<html><b>{expectedNoteText}<b><html>";
-        var expectedCreatedBy = Faker.Name.FullName();
+        var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var expectedOriginalFileName = "file.png";
         var note = await TestData.CreateNoteAsync(createPersonResult.ContactId, htmlNote, createdByUserId, expectedCreatedBy, expectedOriginalFileName, null);
@@ -136,12 +136,12 @@ public class NotesTests : TestBase
         // Arrange
         var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
         var expectedNoteText1 = "Note without attachment";
-        var expectedCreatedBy1 = Faker.Name.FullName();
+        var expectedCreatedBy1 = TestData.GenerateName();
         var createdByUserId1 = Guid.NewGuid();
         var expectedOriginalFileName1 = "file.png";
         var expectedCreatedDate1 = Clock.UtcNow.AddMonths(-1);
         var expectedNoteText2 = "A second note that means something";
-        var expectedCreatedBy2 = Faker.Name.FullName();
+        var expectedCreatedBy2 = TestData.GenerateName();
         var createdByUserId2 = Guid.NewGuid();
         var expectedOriginalFileName2 = "file2.png";
         var expectedCreatedDate2 = Clock.UtcNow;

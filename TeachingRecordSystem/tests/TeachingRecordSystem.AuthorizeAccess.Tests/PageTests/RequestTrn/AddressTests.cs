@@ -43,8 +43,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;
@@ -114,8 +114,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;
@@ -170,8 +170,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;
@@ -209,8 +209,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;

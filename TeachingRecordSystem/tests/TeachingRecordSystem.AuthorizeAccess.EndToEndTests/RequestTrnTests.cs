@@ -50,8 +50,8 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
             //name
             await page.WaitForUrlPathAsync("/request-trn/name");
-            var name = Faker.Name.FullName();
-            var previousName = Faker.Name.FullName();
+            var name = TestData.GenerateName();
+            var previousName = TestData.GenerateName();
             await page.FillAsync("input[name=Name]", name);
             await page.ClickButtonAsync("Continue");
 
@@ -182,8 +182,8 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         //name
         await page.WaitForUrlPathAsync("/request-trn/name");
-        var name = Faker.Name.FullName();
-        var previousName = Faker.Name.FullName();
+        var name = TestData.GenerateName();
+        var previousName = TestData.GenerateName();
         await page.FillAsync("input[name=Name]", name);
         await page.ClickButtonAsync("Continue");
 

@@ -31,7 +31,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = null;
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -63,7 +63,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = null;
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -127,7 +127,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = null;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -158,7 +158,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = true;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -190,7 +190,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = null;
@@ -223,7 +223,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -255,7 +255,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -287,7 +287,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -319,7 +319,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -354,9 +354,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = true;
-        state.PreviousName = Faker.Name.FullName();
+        state.PreviousName = TestData.GenerateName();
         state.DateOfBirth = new DateOnly(1999, 01, 01);
         state.EvidenceFileId = Guid.NewGuid();
         state.EvidenceFileName = "evidence-file-name.jpg";
@@ -420,7 +420,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -463,7 +463,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -506,7 +506,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = null;
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -566,7 +566,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = null;
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1998, 01, 01);
@@ -598,7 +598,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = null;
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -662,7 +662,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = null;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1999, 01, 01);
@@ -694,7 +694,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = true;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1998, 01, 01);
@@ -726,7 +726,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = null;
@@ -758,7 +758,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1998, 01, 01);
@@ -790,7 +790,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1998, 01, 01);
@@ -822,7 +822,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1998, 01, 01);
@@ -854,7 +854,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1998, 01, 01);
@@ -889,7 +889,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         state.HasPreviousName = false;
         state.PreviousName = null;
         state.DateOfBirth = new DateOnly(1998, 01, 01);

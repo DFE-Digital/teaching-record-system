@@ -28,7 +28,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -75,7 +75,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -106,7 +106,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -137,9 +137,9 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
-        var newName = Faker.Name.FullName();
+        var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -173,7 +173,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var userId = Guid.NewGuid().ToString();
-        var newName = Faker.Name.FullName();
+        var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
 
         ConfigureUserServiceMock(userId, null);
@@ -202,7 +202,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
         var role = UserRoles.RecordManager;
 
@@ -237,7 +237,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -271,7 +271,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -305,7 +305,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -339,7 +339,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
@@ -373,9 +373,9 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
-        var newName = Faker.Name.FullName();
+        var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
