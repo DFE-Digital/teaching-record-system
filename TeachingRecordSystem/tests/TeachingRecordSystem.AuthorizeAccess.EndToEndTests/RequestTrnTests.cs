@@ -102,7 +102,7 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var addressLine2 = Faker.Address.SecondaryAddress();
                 var townOrCity = Faker.Address.City();
                 var postalCode = Faker.Address.ZipCode();
-                var country = Faker.Address.Country();
+                var country = TestData.GenerateCountry();
 
                 await page.FillAsync("input[name=AddressLine1]", addressLine1);
                 await page.FillAsync("input[name=AddressLine2]", addressLine2);
@@ -234,7 +234,7 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             var addressLine2 = Faker.Address.SecondaryAddress();
             var townOrCity = Faker.Address.City();
             var postalCode = Faker.Address.ZipCode();
-            var country = Faker.Address.Country();
+            var country = TestData.GenerateCountry();
 
             await page.FillAsync("input[name=AddressLine1]", addressLine1);
             await page.FillAsync("input[name=AddressLine2]", addressLine2);

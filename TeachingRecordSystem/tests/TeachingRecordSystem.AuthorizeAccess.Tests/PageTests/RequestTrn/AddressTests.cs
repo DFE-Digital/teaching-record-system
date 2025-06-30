@@ -51,7 +51,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.AddressLine1 = Faker.Address.StreetAddress();
         state.AddressLine2 = Faker.Address.SecondaryAddress();
         state.TownOrCity = Faker.Address.City();
-        state.Country = Faker.Address.Country();
+        state.Country = TestData.GenerateCountry();
         state.PostalCode = Faker.Address.ZipCode();
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -144,7 +144,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (emptyAddressLineType != AddressLineType.Country)
         {
-            content.Add("Country", Faker.Address.Country());
+            content.Add("Country", TestData.GenerateCountry());
         }
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/address?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -182,7 +182,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         var addressLine2 = overflowAddressLineType == AddressLineType.AddressLine2 ? new string('a', 201) : Faker.Address.SecondaryAddress();
         var townOrCity = overflowAddressLineType == AddressLineType.TownOrCity ? new string('a', 201) : Faker.Address.City();
         var postalCode = overflowAddressLineType == AddressLineType.PostalCode ? new string('a', 51) : Faker.Address.ZipCode();
-        var country = overflowAddressLineType == AddressLineType.Country ? new string('a', 201) : Faker.Address.Country();
+        var country = overflowAddressLineType == AddressLineType.Country ? new string('a', 201) : TestData.GenerateCountry();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/address?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -220,7 +220,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         var addressLine2 = Faker.Address.SecondaryAddress();
         var townOrCity = Faker.Address.City();
         var postalCode = Faker.Address.ZipCode();
-        var country = Faker.Address.Country();
+        var country = TestData.GenerateCountry();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/address?{journeyInstance.GetUniqueIdQueryParameter()}")
         {

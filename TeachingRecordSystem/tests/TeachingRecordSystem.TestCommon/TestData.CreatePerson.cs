@@ -21,8 +21,8 @@ public partial class TestData
         var referenceData = new CreatePersonBuilder.ReferenceData(
             await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(),
             await ReferenceDataCache.GetDegreeTypesAsync(),
-            await ReferenceDataCache.GetTrainingProvidersAsync(),
-            await ReferenceDataCache.GetTrainingSubjectsAsync(),
+            (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => x.Name.Contains('\'')).AsReadOnly(),
+            (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.Name.Contains('\'')).AsReadOnly(),
             await ReferenceDataCache.GetTrainingCountriesAsync());
 
         var builder = new CreatePersonBuilder(referenceData);

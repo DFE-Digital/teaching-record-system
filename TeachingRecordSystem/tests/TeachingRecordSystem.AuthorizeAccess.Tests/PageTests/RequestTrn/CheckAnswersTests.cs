@@ -369,7 +369,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state.AddressLine1 = Faker.Address.StreetAddress();
             state.AddressLine2 = Faker.Address.SecondaryAddress();
             state.TownOrCity = Faker.Address.City();
-            state.Country = Faker.Address.Country();
+            state.Country = TestData.GenerateCountry();
             state.PostalCode = Faker.Address.ZipCode();
         }
         state.HasPendingTrnRequest = false;
@@ -903,7 +903,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state.AddressLine1 = Faker.Address.StreetAddress();
             state.AddressLine2 = Faker.Address.SecondaryAddress();
             state.TownOrCity = Faker.Address.City();
-            state.Country = Faker.Address.Country();
+            state.Country = TestData.GenerateCountry();
             state.PostalCode = Faker.Address.ZipCode();
         }
         state.HasPendingTrnRequest = false;
