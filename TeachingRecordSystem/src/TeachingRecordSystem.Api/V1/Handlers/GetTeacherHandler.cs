@@ -9,19 +9,16 @@ using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Handlers;
 
-public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse>
+public class GetTeacherHandler(
+    IDataverseAdapter dataverseAdapter,
+    TrsDbContext dbContext,
+    IFeatureProvider featureProvider) :
+    IRequestHandler<GetTeacherRequest, GetTeacherResponse>
 {
-    private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly TrsDbContext _dbContext;
-
-    public GetTeacherHandler(IDataverseAdapter dataverseAdapter, TrsDbContext dbContext)
-    {
-        _dataverseAdapter = dataverseAdapter;
-        _dbContext = dbContext;
-    }
-
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
+        var routesMigrated = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus);
+
         var query = new FindTeachersByTrnBirthDateAndNinoQuery()
         {
             BirthDate = request.BirthDate,
@@ -34,7 +31,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        var result = await _dataverseAdapter.FindTeachersAsync(query);
+        var result = await dataverseAdapter.FindTeachersAsync(query);
 
         var teacher = result.FirstOrDefault(match => match.dfeta_TRN == query.Trn) ??
                       result.FirstOrDefault(match => match.dfeta_NINumber == query.NationalInsuranceNumber);
@@ -44,9 +41,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        var person = await _dbContext.Persons.SingleAsync(p => p.PersonId == teacher.Id);
+        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == teacher.Id);
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
+        var qualifications = await dataverseAdapter.GetQualificationsForTeacherAsync(
             teacher.Id,
             columnNames: new[]
             {
@@ -71,13 +68,17 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             teacher.dfeta_contact_dfeta_qualification = qualifications;
         }
 
-        var hasActiveAlert = await _dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
+        var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
 
-        var response = MapContactToResponse(teacher, hasActiveAlert, person);
+        var response = MapContactToResponse(teacher, hasActiveAlert, person, routesMigrated);
         return response;
     }
 
-    internal static GetTeacherResponse MapContactToResponse(Contact teacher, bool hasActiveAlert, PostgresModels.Person person)
+    internal static GetTeacherResponse MapContactToResponse(
+        Contact teacher,
+        bool hasActiveAlert,
+        PostgresModels.Person person,
+        bool routesMigrated)
     {
         return new GetTeacherResponse()
         {
@@ -112,14 +113,25 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         QualifiedTeacherStatus MapQualifiedTeacherStatus()
         {
+            if (routesMigrated && person.QtsDate is not null)
+            {
+                return new QualifiedTeacherStatus
+                {
+                    Name = "",
+                    State = dfeta_qtsregistrationState.Active,
+                    StateName = "Active",
+                    QtsDate = person.QtsDate.ToDateTime()
+                };
+            }
+
             var qts = teacher.Extract<dfeta_qtsregistration>();
 
             return qts != null ?
                 new QualifiedTeacherStatus()
                 {
                     Name = qts.dfeta_name,
-                    State = qts.StateCode.Value,
-                    StateName = qts.FormattedValues[dfeta_qtsregistration.Fields.StateCode],
+                    State = dfeta_qtsregistrationState.Active,
+                    StateName = "Active",
                     QtsDate = qts.dfeta_QTSDate
                 } :
                 null;
@@ -127,6 +139,11 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         InitialTeacherTraining MapInitialTeacherTraining()
         {
+            if (routesMigrated)
+            {
+                return null;
+            }
+
             var itt = teacher.Extract<dfeta_initialteachertraining>();
 
             if (itt == null)

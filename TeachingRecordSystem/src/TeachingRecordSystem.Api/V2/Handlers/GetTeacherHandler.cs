@@ -9,20 +9,17 @@ using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
-public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse>
+public class GetTeacherHandler(
+    IDataverseAdapter dataverseAdapter,
+    TrsDbContext dbContext,
+    IFeatureProvider featureProvider) :
+    IRequestHandler<GetTeacherRequest, GetTeacherResponse>
 {
-    private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly TrsDbContext _dbContext;
-
-    public GetTeacherHandler(IDataverseAdapter dataverseAdapter, TrsDbContext dbContext)
-    {
-        _dataverseAdapter = dataverseAdapter;
-        _dbContext = dbContext;
-    }
-
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var teacher = await _dataverseAdapter.GetTeacherByTrnAsync(
+        var routesMigrated = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus);
+
+        var teacher = await dataverseAdapter.GetTeacherByTrnAsync(
             request.Trn,
             columnNames: new[]
             {
@@ -44,7 +41,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        var qtsRegistrations = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(
+        var person = routesMigrated ? await dbContext.Persons.SingleAsync(p => p.PersonId == teacher.Id) : null;
+
+        var qtsRegistrations = await dataverseAdapter.GetQtsRegistrationsByTeacherAsync(
             teacher.Id,
             columnNames: new[]
             {
@@ -57,10 +56,10 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         var earlyYearsQtsRegistration = qtsRegistrations.SingleOrDefault(qts => qts.dfeta_EarlyYearsStatusId is not null);
         if (earlyYearsQtsRegistration is not null)
         {
-            earlyYearsStatus = await _dataverseAdapter.GetEarlyYearsStatusAsync(earlyYearsQtsRegistration.dfeta_EarlyYearsStatusId.Id);
+            earlyYearsStatus = await dataverseAdapter.GetEarlyYearsStatusAsync(earlyYearsQtsRegistration.dfeta_EarlyYearsStatusId.Id);
         }
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
+        var itt = await dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacher.Id,
             columnNames: new[]
             {
@@ -81,7 +80,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             null,
             request.IncludeInactive != true);
 
-        var hasActiveAlert = await _dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
+        var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
 
         return new GetTeacherResponse()
         {
@@ -92,36 +91,38 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             MiddleName = teacher.MiddleName,
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             Trn = teacher.dfeta_TRN,
-            QtsDate = teacher.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            EytsDate = teacher.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            QtsDate = routesMigrated ? person?.QtsDate : teacher.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            EytsDate = routesMigrated ? person?.EytsDate : teacher.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             HusId = teacher.dfeta_HUSID,
-            EarlyYearsStatus = earlyYearsStatus is not null ?
+            EarlyYearsStatus = earlyYearsStatus is not null && !routesMigrated ?
                 new GetTeacherResponseEarlyYearsStatus()
                 {
                     Name = earlyYearsStatus.dfeta_name,
                     Value = earlyYearsStatus.dfeta_Value
                 } :
                 null,
-            InitialTeacherTraining = itt.Select(i =>
-            {
-                var provider = i.Extract<Account>("establishment", Account.PrimaryIdAttribute);
-
-                return new GetTeacherResponseInitialTeacherTraining()
+            InitialTeacherTraining = !routesMigrated ?
+                itt.Select(i =>
                 {
-                    ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                    Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
-                    Provider = provider is not null ?
-                        new()
-                        {
-                            Ukprn = provider.dfeta_UKPRN
-                        } :
-                        null,
-                    HusId = i.dfeta_TraineeID,
-                    Active = i.StateCode == dfeta_initialteachertrainingState.Active
-                };
-            }),
+                    var provider = i.Extract<Account>("establishment", Account.PrimaryIdAttribute);
+
+                    return new GetTeacherResponseInitialTeacherTraining()
+                    {
+                        ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
+                        Result = i.dfeta_Result?.ConvertFromITTResult(),
+                        Provider = provider is not null ?
+                            new()
+                            {
+                                Ukprn = provider.dfeta_UKPRN
+                            } :
+                            null,
+                        HusId = i.dfeta_TraineeID,
+                        Active = i.StateCode == dfeta_initialteachertrainingState.Active
+                    };
+                }) :
+                [],
             AllowPIIUpdates = teacher.dfeta_AllowPiiUpdatesFromRegister ?? false
         };
     }
