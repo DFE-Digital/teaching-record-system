@@ -55,6 +55,8 @@ public class SetQtlsHandler(
                     person,
                     allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
                     routeToProfessionalStatusTypeId: qtlsRouteId,
+                    sourceApplicationUserId: null,
+                    sourceApplicationReference: null,
                     status: RouteToProfessionalStatusStatus.Holds,
                     holdsFrom: command.QtsDate,
                     trainingStartDate: null,
@@ -69,10 +71,10 @@ public class SetQtlsHandler(
                     isExemptFromInduction: true,
                     createdBy: currentUserId,
                     now: clock.UtcNow,
-                    null,
-                    null,
-                    null,
-                    out var @event);
+                    changeReason: null,
+                    changeReasonDetail: null,
+                    evidenceFile: null,
+                    @event: out var @event);
 
                 dbContext.Qualifications.Add(professionalStatus);
                 await dbContext.AddEventAndBroadcastAsync(@event);
