@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 public static class SupportTasksAuthorization
 {
-    public static AuthorizationBuilder AddChangeRequestManagementPolicies(this AuthorizationBuilder builder)
+    public static AuthorizationBuilder AddSupportTasksPolicies(this AuthorizationBuilder builder)
     {
         builder.AddPolicy(
             AuthorizationPolicies.SupportTasksView,
@@ -19,14 +19,14 @@ public static class SupportTasksAuthorization
             AuthorizationPolicies.SupportTasksEdit,
             policy => policy
                 .RequireAuthenticatedUser()
-                .AddRequirements(new ChangeManagementRequirement()));
+                .AddRequirements(new SupportTasksEditRequirement()));
 
         builder.Services
             .AddSingleton<IAuthorizationHandler, SupportTasksViewAuthorizationHandler>()
-            .AddSingleton<IAuthorizationHandler, ChangeManagementAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, SupportTasksEditAuthorizationHandler>()
             // AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
             .AddSingleton<IAuthorizationHandler, LegacySupportTasksViewAuthorizationHandler>()
-            .AddSingleton<IAuthorizationHandler, LegacyChangeManagementAuthorizationHandler>();
+            .AddSingleton<IAuthorizationHandler, LegacySupportTasksEditAuthorizationHandler>();
 
         return builder;
     }
