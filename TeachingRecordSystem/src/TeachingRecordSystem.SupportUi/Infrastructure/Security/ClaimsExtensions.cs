@@ -47,4 +47,8 @@ public static class ClaimsExtensions
 
         return userPermissionLevel >= minimum.Level;
     }
+
+    // If user has been migrated to the new user roles, they will have a set of permission claims based on their role
+    public static bool HasBeenMigrated(this ClaimsPrincipal user) =>
+        user.FindAll(CustomClaims.Permission).Any();
 }

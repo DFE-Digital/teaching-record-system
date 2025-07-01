@@ -10,15 +10,23 @@ public static class InductionAuthorization
     public static AuthorizationBuilder AddInductionPolicies(this AuthorizationBuilder builder)
     {
         builder.AddPolicy(
-            AuthorizationPolicies.InductionReadWrite,
+            AuthorizationPolicies.InductionView,
             policy => policy
                 .RequireAuthenticatedUser()
-                .AddRequirements(new InductionReadWriteRequirement()));
+                .AddRequirements(new InductionViewRequirement()));
+
+        builder.AddPolicy(
+            AuthorizationPolicies.InductionEdit,
+            policy => policy
+                .RequireAuthenticatedUser()
+                .AddRequirements(new InductionEditRequirement()));
 
         builder.Services
-            .AddSingleton<IAuthorizationHandler, InductionReadWriteAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, InductionViewAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, InductionEditAuthorizationHandler>()
             // AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
-            .AddSingleton<IAuthorizationHandler, LegacyInductionReadWriteAuthorizationHandler>();
+            .AddSingleton<IAuthorizationHandler, LegacyInductionViewAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, LegacyInductionEditAuthorizationHandler>();
 
         return builder;
     }

@@ -91,7 +91,7 @@ builder.Services.AddAuthorizationBuilder()
     .AddAdminOnlyPolicies()
     .AddChangeRequestManagementPolicies()
     .AddUserManagementPolicies()
-    .AddAlertPolicies()
+    .AddAlertsPolicies()
     .AddInductionPolicies()
     .AddPersonDataPolicies()
     .AddRoutesPolicies();

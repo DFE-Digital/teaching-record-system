@@ -57,52 +57,50 @@
 
     <govuk-service-navigation service-name="Teaching record system" service-url="/">
         <govuk-service-navigation-nav>
-            @if (User.Identity?.IsAuthenticated == true)
+            @if (User.Identity?.IsAuthenticated == true && User.IsActiveTrsUser())
             {
-                if (User.IsActiveTrsUser())
+                <govuk-service-navigation-nav-item
+                    href="@LinkGenerator.Persons()"
+                    active="@(Context.Request.Path.StartsWithSegments("/persons"))">
+                    Find a record
+                </govuk-service-navigation-nav-item>
+
+                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksView)).Succeeded)
                 {
                     <govuk-service-navigation-nav-item
-                        href="@LinkGenerator.Persons()"
-                        active="@(Context.Request.Path.StartsWithSegments("/persons"))">
-                        Find a record
+                        href="@LinkGenerator.SupportTasks()"
+                        active="@(Context.Request.Path.StartsWithSegments("/support-tasks") || Context.Request.Path.StartsWithSegments("/change-requests"))">
+                        Support tasks
                     </govuk-service-navigation-nav-item>
+                }
 
-                    if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.ChangeRequestManagement)).Succeeded)
+                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
+                {
+                    if (FeatureProvider.IsEnabled(FeatureNames.NewUserRoles))
                     {
                         <govuk-service-navigation-nav-item
-                            href="@LinkGenerator.SupportTasks()"
-                            active="@(Context.Request.Path.StartsWithSegments("/support-tasks") || Context.Request.Path.StartsWithSegments("/change-requests"))">
-                            Support tasks
+                            href="@LinkGenerator.Users()"
+                            active="@(Context.Request.Path.StartsWithSegments("/users"))">
+                            Add and manage users
                         </govuk-service-navigation-nav-item>
                     }
-
-                    if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
-                    {
-                        if (FeatureProvider.IsEnabled(FeatureNames.NewUserRoles))
-                        {
-                            <govuk-service-navigation-nav-item
-                                href="@LinkGenerator.Users()"
-                                active="@(Context.Request.Path.StartsWithSegments("/users"))">
-                                Add and manage users
-                            </govuk-service-navigation-nav-item>
-                        }
-                        else
-                        {
-                            <govuk-service-navigation-nav-item
-                                href="@LinkGenerator.LegacyUsers()"
-                                active="@(Context.Request.Path.StartsWithSegments("/legacy-users"))">
-                                Users
-                            </govuk-service-navigation-nav-item>
-                        }
-                    }
-                    if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AdminOnly)).Succeeded)
+                    else
                     {
                         <govuk-service-navigation-nav-item
-                            href="@LinkGenerator.ApplicationUsers()"
-                            active="@(Context.Request.Path.StartsWithSegments("/application-users") || Context.Request.Path.StartsWithSegments("/api-keys"))">
-                            Application users
+                            href="@LinkGenerator.LegacyUsers()"
+                            active="@(Context.Request.Path.StartsWithSegments("/legacy-users"))">
+                            Users
                         </govuk-service-navigation-nav-item>
                     }
+                }
+
+                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AdminOnly)).Succeeded)
+                {
+                    <govuk-service-navigation-nav-item
+                        href="@LinkGenerator.ApplicationUsers()"
+                        active="@(Context.Request.Path.StartsWithSegments("/application-users") || Context.Request.Path.StartsWithSegments("/api-keys"))">
+                        Application users
+                    </govuk-service-navigation-nav-item>
                 }
             }
         </govuk-service-navigation-nav>

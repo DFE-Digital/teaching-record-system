@@ -5,19 +5,27 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-public static class ChangeRequestManagementAuthorization
+public static class SupportTasksAuthorization
 {
     public static AuthorizationBuilder AddChangeRequestManagementPolicies(this AuthorizationBuilder builder)
     {
         builder.AddPolicy(
-            AuthorizationPolicies.ChangeRequestManagement,
+            AuthorizationPolicies.SupportTasksView,
+            policy => policy
+                .RequireAuthenticatedUser()
+                .AddRequirements(new SupportTasksViewRequirement()));
+
+        builder.AddPolicy(
+            AuthorizationPolicies.SupportTasksEdit,
             policy => policy
                 .RequireAuthenticatedUser()
                 .AddRequirements(new ChangeManagementRequirement()));
 
         builder.Services
+            .AddSingleton<IAuthorizationHandler, SupportTasksViewAuthorizationHandler>()
             .AddSingleton<IAuthorizationHandler, ChangeManagementAuthorizationHandler>()
             // AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
+            .AddSingleton<IAuthorizationHandler, LegacySupportTasksViewAuthorizationHandler>()
             .AddSingleton<IAuthorizationHandler, LegacyChangeManagementAuthorizationHandler>();
 
         return builder;

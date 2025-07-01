@@ -3,9 +3,9 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
 
-public class InductionReadWriteAuthorizationHandler : AuthorizationHandler<InductionReadWriteRequirement>
+public class InductionEditAuthorizationHandler : AuthorizationHandler<InductionEditRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, InductionReadWriteRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, InductionEditRequirement requirement)
     {
         if (context.User.HasMinimumPermission(new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.Edit)))
         {

@@ -7,6 +7,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
+[Authorize(Policy = AuthorizationPolicies.AlertsRead)]
 public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDataCache, IAuthorizationService authorizationService) : PageModel
 {
     [FromRoute]

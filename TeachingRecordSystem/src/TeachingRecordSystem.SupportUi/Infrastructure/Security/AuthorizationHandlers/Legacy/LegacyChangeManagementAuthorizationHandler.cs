@@ -11,6 +11,13 @@ public class LegacyChangeManagementAuthorizationHandler : AuthorizationHandler<C
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ChangeManagementRequirement requirement)
     {
+        // If the user has been migrated to the new user roles, they may still have the legacy roles, so we need to
+        // disregard them for this user as they may be different to their new role.
+        if (context.User.HasBeenMigrated())
+        {
+            return Task.CompletedTask;
+        }
+
         if (context.User.IsInRole(LegacyUserRoles.Helpdesk)
             || context.User.IsInRole(LegacyUserRoles.Administrator))
         {

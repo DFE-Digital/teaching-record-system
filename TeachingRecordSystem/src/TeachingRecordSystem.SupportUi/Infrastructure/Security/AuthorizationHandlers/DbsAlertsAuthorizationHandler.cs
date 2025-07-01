@@ -3,19 +3,22 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
 
-public class NonDbsAlertAuthorizationHandler : AuthorizationHandler<NonDbsAlertRequirement>
+public class DbsAlertsAuthorizationHandler : AuthorizationHandler<DbsAlertsRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, NonDbsAlertRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DbsAlertsRequirement requirement)
     {
         switch (requirement.AlertsPermission)
         {
             case Permissions.Alerts.Flag:
             case Permissions.Alerts.Read:
-                context.Succeed(requirement);
+                if (context.User.HasMinimumPermission(new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.View)))
+                {
+                    context.Succeed(requirement);
+                }
                 break;
 
             case Permissions.Alerts.Write:
-                if (context.User.HasMinimumPermission(new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit)))
+                if (context.User.HasMinimumPermission(new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.Edit)))
                 {
                     context.Succeed(requirement);
                 }

@@ -2,6 +2,4 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
-public class AdminOnlyRequirement : IAuthorizationRequirement
-{
-}
+public record AdminOnlyRequirement : IAuthorizationRequirement;
