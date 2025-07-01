@@ -40,7 +40,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddAlertDetailsPageAsync();
 
-        await page.FillAsync($"label{TextIsSelector($"Enter details about the alert type: {alertType.Name}")}", details);
+        await page.FillAsync("#Details", details);
 
         await page.ClickContinueButtonAsync();
 
