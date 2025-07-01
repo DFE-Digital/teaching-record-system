@@ -1,7 +1,7 @@
 @page "/alerts/add/details/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.DetailsModel
 @{
-    ViewBag.Title = $"Enter details about the alert type: {Model.AlertTypeName}";
+    ViewBag.Title = $"Enter details about the alert type: {Model.AlertTypeName} (optional)";
 }
 
 @section BeforeContent {
@@ -12,13 +12,13 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.AlertAddDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
-
-            <govuk-character-count asp-for="Details" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" data-testid="details">
-                <govuk-character-count-label class="govuk-label--l" is-page-heading="true">
-                    @ViewBag.Title
-                </govuk-character-count-label>
-            </govuk-character-count>
-
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <govuk-inset-text>Do not enter details if the alert type is:
+                <li>interim prohibition by the Secretary of State</li>
+                <li>prohibition by the Secretary of State - misconduct</li>
+                <li>Secretary of State decision - no prohibition</li>
+            </govuk-inset-text>
+            <govuk-character-count asp-for="Details" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" data-testid="details"/>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
                 <govuk-button formaction="@LinkGenerator.AlertAddDetailsCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
