@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using TeachingRecordSystem.Core.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers.Legacy;
