@@ -1383,7 +1383,7 @@ public class TrsDataSyncHelper(
                 }
 
                 continue;
-            }            
+            }
 
             if (!dryRun)
             {
@@ -2090,16 +2090,16 @@ public class TrsDataSyncHelper(
         var createTempTableStatement = $"CREATE TEMP TABLE {tempTableName} (LIKE {tableName} INCLUDING DEFAULTS)";
 
         var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
-        
+
         var insertStatement =
             $"""
             INSERT INTO {tableName} AS t ({columnList})
             SELECT {columnList} FROM {tempTableName}
-            """;        
+            """;
 
         Action<NpgsqlBinaryImporter, RouteToProfessionalStatus> writeRecord = (writer, route) =>
         {
-            writer.WriteValueOrNull(route.QualificationId, NpgsqlDbType.Uuid);            
+            writer.WriteValueOrNull(route.QualificationId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(route.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(route.UpdatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull((int)route.QualificationType, NpgsqlDbType.Integer);
@@ -3326,7 +3326,7 @@ public class TrsDataSyncHelper(
                 dfeta_teacherstatus? teacherStatus,
                 dfeta_earlyyearsstatus? eyStatus,
                 bool ignoreInvalidData = true)
-            {                
+            {
                 var sourceApplicationReference = itt?.dfeta_SlugId;
                 Guid? sourceApplicationUserId = null;
                 if (sourceApplicationReference is not null)
@@ -3430,7 +3430,7 @@ public class TrsDataSyncHelper(
                                 multiplePotentialCompatibleIttRecords: null,
                                 contactIttRowCount: 0,
                                 contactQtsRowCount: 0));
-                    }                    
+                    }
                 }
 
                 if (itt?.dfeta_Subject3Id is not null)
