@@ -331,11 +331,11 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     }
 
     [Theory]
-    [InlineData(UserRoles.AccessManager, false)]
     [InlineData(UserRoles.Viewer, true)]
     [InlineData(UserRoles.AlertsManagerTra, true)]
     [InlineData(UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.AccessManager, true)]
     [InlineData(UserRoles.Administrator, true)]
     public async Task Get_RoutesPage_UserRoles_CanViewPageAsExpected(string userRole, bool canViewPage)
     {
@@ -361,6 +361,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     [InlineData(UserRoles.AlertsManagerTra, false)]
     [InlineData(UserRoles.AlertsManagerTraDbs, false)]
     [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.AccessManager, true)]
     [InlineData(UserRoles.Administrator, true)]
     public async Task Get_RoutesPage_UserRolesWithViewOrEditRoutesPermissions_EditLinkShownAsExpected(string userRole, bool canSeeEditLinks)
     {

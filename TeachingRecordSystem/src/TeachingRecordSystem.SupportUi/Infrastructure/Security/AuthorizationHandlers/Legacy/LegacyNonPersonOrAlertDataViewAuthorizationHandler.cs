@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using TeachingRecordSystem.Core.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers.Legacy;
@@ -7,9 +6,9 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHa
 /// <summary>
 /// AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
 /// </summary>
-public class LegacyUserManagementAuthorizationHandler : AuthorizationHandler<UserManagementRequirement>
+public class LegacyNonPersonOrAlertDataViewAuthorizationHandler : AuthorizationHandler<NonPersonOrAlertDataViewRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, UserManagementRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, NonPersonOrAlertDataViewRequirement requirement)
     {
         // If the user has been migrated to the new user roles, they may still have the legacy roles, so we need to
         // disregard them for this user as they may be different to their new role.
@@ -18,10 +17,9 @@ public class LegacyUserManagementAuthorizationHandler : AuthorizationHandler<Use
             return Task.CompletedTask;
         }
 
-        if (context.User.IsInRole(LegacyUserRoles.Administrator))
-        {
-            context.Succeed(requirement);
-        }
+        // The Inductions tab was previously visible to all users, so if the user hasn't been migrated yet,
+        // they should still see the tab.
+        context.Succeed(requirement);
 
         return Task.CompletedTask;
     }

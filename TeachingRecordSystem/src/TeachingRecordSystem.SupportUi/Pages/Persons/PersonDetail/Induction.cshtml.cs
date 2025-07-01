@@ -7,6 +7,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
+[Authorize(Policy = AuthorizationPolicies.NonPersonOrAlertDataView)]
 public class InductionModel(
     TrsDbContext dbContext,
     IClock clock,
@@ -82,7 +83,7 @@ public class InductionModel(
                 .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatusType != null && r.ExemptFromInduction == true);
         }
 
-        CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
+        CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit))
             .Succeeded;
     }
 }

@@ -3,9 +3,9 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
 
-public class DbsAlertAuthorizationHandler : AuthorizationHandler<DbsAlertRequirement>
+public class DbsAlertsAuthorizationHandler : AuthorizationHandler<DbsAlertsRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DbsAlertRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DbsAlertsRequirement requirement)
     {
         switch (requirement.AlertsPermission)
         {

@@ -7,10 +7,17 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHa
 /// <summary>
 /// AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
 /// </summary>
-public class LegacyInductionReadWriteAuthorizationHandler : AuthorizationHandler<InductionReadWriteRequirement>
+public class LegacyNonPersonOrAlertDataEditAuthorizationHandler : AuthorizationHandler<NonPersonOrAlertDataEditRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, InductionReadWriteRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, NonPersonOrAlertDataEditRequirement requirement)
     {
+        // If the user has been migrated to the new user roles, they may still have the legacy roles, so we need to
+        // disregard them for this user as they may be different to their new role.
+        if (context.User.HasBeenMigrated())
+        {
+            return Task.CompletedTask;
+        }
+
         if (context.User.IsInRole(LegacyUserRoles.InductionReadWrite)
             || context.User.IsInRole(LegacyUserRoles.Administrator))
         {

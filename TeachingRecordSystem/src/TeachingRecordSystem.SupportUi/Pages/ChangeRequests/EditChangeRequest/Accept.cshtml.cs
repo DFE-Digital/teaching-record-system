@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
-[Authorize(Policy = AuthorizationPolicies.ChangeRequestManagement)]
+[Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class AcceptModel : PageModel
 {
     private readonly TrsLinkGenerator _linkGenerator;

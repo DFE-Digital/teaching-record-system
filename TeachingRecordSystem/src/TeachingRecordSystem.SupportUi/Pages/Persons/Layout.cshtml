@@ -1,6 +1,9 @@
+@using Microsoft.AspNetCore.Authorization
 @using TeachingRecordSystem.Core.Dqt.Models;
-@using TeachingRecordSystem.SupportUi.Pages.Common;
-@using TeachingRecordSystem.SupportUi.Pages.Persons;
+@using TeachingRecordSystem.SupportUi.Infrastructure.Security
+
+@inject IAuthorizationService AuthorizationService
+
 @{
     Layout = "_Layout";
     var selectedTab = (PersonsSubNavigationTab)ViewBag.SelectedTab;
@@ -15,9 +18,13 @@
             <li class="moj-sub-navigation__item">
                 <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonsSubNavigationTab.FindARecord ? "page" : null)" href="@LinkGenerator.Persons()">Find a record</a>
             </li>
-            <li class="moj-sub-navigation__item">
-                <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonsSubNavigationTab.CreateARecord ? "page" : null)" href="@LinkGenerator.PersonCreate()">Create a record</a>
-            </li>
+
+            @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
+            {
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonsSubNavigationTab.CreateARecord ? "page" : null)" href="@LinkGenerator.PersonCreate()">Create a record</a>
+                </li>
+            }
         </ul>
     </nav>
 }

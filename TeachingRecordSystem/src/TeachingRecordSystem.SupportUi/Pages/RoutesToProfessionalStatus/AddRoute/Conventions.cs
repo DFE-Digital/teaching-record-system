@@ -16,7 +16,7 @@ public class Conventions : IConfigureFolderConventions
                 model.Filters.Add(new CheckPersonExistsFilterFactory());
                 model.EndpointMetadata.Add(new AuthorizeAttribute()
                 {
-                    Policy = AuthorizationPolicies.RoutesEdit
+                    Policy = AuthorizationPolicies.NonPersonOrAlertDataEdit
                 });
             });
     }

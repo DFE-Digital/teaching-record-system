@@ -17,7 +17,7 @@ public class Conventions : IConfigureFolderConventions
                 // The AlertType page will deal with ensuring that only permitted alert types can be selected.
                 model.EndpointMetadata.Add(new AuthorizeAttribute()
                 {
-                    Policy = AuthorizationPolicies.AlertWrite
+                    Policy = AuthorizationPolicies.AlertsWrite
                 });
 
                 model.Filters.Add(new CheckPersonExistsFilterFactory());

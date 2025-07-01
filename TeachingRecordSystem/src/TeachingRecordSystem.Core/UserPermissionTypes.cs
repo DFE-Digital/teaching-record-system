@@ -23,9 +23,6 @@ public static class UserPermissionTypes
     [Display(Name = "Support tasks", Description = "Access to the Support tasks area of the console")]
     public const string SupportTasks = nameof(SupportTasks);
 
-    [Display(Name = "Routes and qualifications")]
-    public const string Routes = nameof(Routes);
-
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
         PersonData,
@@ -33,8 +30,7 @@ public static class UserPermissionTypes
         NonDbsAlerts,
         DbsAlerts,
         ManageUsers,
-        SupportTasks,
-        Routes
+        SupportTasks
     };
 
     public static string GetDisplayNameForPermissionType(string permissionType)

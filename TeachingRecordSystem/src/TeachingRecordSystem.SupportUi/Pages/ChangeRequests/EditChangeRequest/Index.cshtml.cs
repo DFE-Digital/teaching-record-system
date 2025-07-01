@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
-[Authorize(Policy = AuthorizationPolicies.ChangeRequestManagement)]
+[Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public partial class IndexModel : PageModel
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;

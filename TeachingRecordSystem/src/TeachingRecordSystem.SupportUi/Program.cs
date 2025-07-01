@@ -89,12 +89,11 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
 builder.Services.AddAuthorizationBuilder()
     .AddAdminOnlyPolicies()
-    .AddChangeRequestManagementPolicies()
+    .AddSupportTasksPolicies()
     .AddUserManagementPolicies()
-    .AddAlertPolicies()
-    .AddInductionPolicies()
-    .AddPersonDataPolicies()
-    .AddRoutesPolicies();
+    .AddAlertsPolicies()
+    .AddNonPersonOrAlertDataPolicies()
+    .AddPersonDataPolicies();
 
 builder.Services
     .AddRazorPages(options =>
