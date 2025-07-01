@@ -22,7 +22,7 @@ public partial class TestData
             await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(),
             await ReferenceDataCache.GetDegreeTypesAsync(),
             (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => !x.Name.Contains('\'')).AsReadOnly(),
-            (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.Name.Contains('\'')).AsReadOnly(),
+            (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => !x.Name.Contains('\'')).AsReadOnly(),
             await ReferenceDataCache.GetTrainingCountriesAsync());
 
         var builder = new CreatePersonBuilder(referenceData);
