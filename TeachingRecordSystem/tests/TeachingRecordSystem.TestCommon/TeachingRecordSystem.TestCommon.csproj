@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <IsTestProject>false</IsTestProject>
+    <IsPublishable>false</IsPublishable>
     <UserSecretsId>TeachingRecordSystemTests</UserSecretsId>
   </PropertyGroup>
 

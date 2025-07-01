@@ -8,6 +8,8 @@
     <NoWarn>GFA0001</NoWarn>
 
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
+    <IsPublishable Condition="'$(IsTestProject)' == 'true'">false</IsPublishable>
+    <PublishIISAssets Condition="'$(IsTestProject)' == 'true'">false</PublishIISAssets>
 
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>

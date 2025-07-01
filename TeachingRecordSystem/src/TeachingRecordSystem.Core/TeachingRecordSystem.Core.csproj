@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <IsPublishable>false</IsPublishable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -188,7 +189,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0054_QtsAndEytsDates.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0055_TrsQualificationsRemoveProfessionalStatusType.sql" />
-    <EmbeddedResource Include="Services\DqtReporting\Migrations\0056_PqtsAndHasEyps.sql" />    
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0056_PqtsAndHasEyps.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0057_TrsQualificationsProfessionalStatusTypeAndExemptFromInduction.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0058_TrsNotes.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0059_TrsNotesNullContentHtml.sql" />
