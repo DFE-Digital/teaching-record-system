@@ -34,7 +34,19 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
     {
         var alertType = await GetKnownAlertTypeAsync();
 
-        return await
+        return await CreateJourneyInstanceForCompletedStepAsync(step, personId, alertType, populateOptional);
+    }
+
+    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, Guid alertTypeId, bool populateOptional = true)
+    {
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertTypeId);
+
+        return await CreateJourneyInstanceForCompletedStepAsync(step, personId, alertType, populateOptional);
+    }
+
+    protected Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, AlertType alertType, bool populateOptional = true)
+    {
+        return
             (step switch
             {
                 JourneySteps.New or JourneySteps.Index =>
@@ -78,7 +90,7 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
     }
 
     protected Task<AlertType> GetKnownAlertTypeAsync(bool isDbsAlertType = false) =>
-        isDbsAlertType ? TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("") : TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("T1");
+        isDbsAlertType ? TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("") : TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("T4");
 
     private Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceAsync(Guid personId, AddAlertState state) =>
         CreateJourneyInstance(
