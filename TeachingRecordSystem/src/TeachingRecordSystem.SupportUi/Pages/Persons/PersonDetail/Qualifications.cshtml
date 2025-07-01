@@ -9,7 +9,7 @@
     Layout = "Layout";
     ViewBag.SelectedTab = PersonDetailSubNavigationTab.Qualifications;
     var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
-    var canEdit = (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.RoutesEdit)).Succeeded;
+    var canEdit = (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit)).Succeeded;
 }
 
 @section BeforeContent {

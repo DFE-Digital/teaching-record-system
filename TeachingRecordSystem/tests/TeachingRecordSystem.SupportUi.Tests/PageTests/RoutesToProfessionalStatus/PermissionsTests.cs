@@ -10,11 +10,11 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
 {
     private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> RoleAccess = [
         (null, false),
-        (UserRoles.AccessManager, false),
         (UserRoles.Viewer, false),
         (UserRoles.AlertsManagerTra, false),
         (UserRoles.AlertsManagerTraDbs, false),
         (UserRoles.RecordManager, true),
+        (UserRoles.AccessManager, true),
         (UserRoles.Administrator, true),
     ];
 

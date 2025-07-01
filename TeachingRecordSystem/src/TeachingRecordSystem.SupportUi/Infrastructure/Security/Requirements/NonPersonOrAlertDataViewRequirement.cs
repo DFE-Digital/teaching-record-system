@@ -2,4 +2,4 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
-public record RoutesViewRequirement : IAuthorizationRequirement;
+public record NonPersonOrAlertDataViewRequirement : IAuthorizationRequirement;

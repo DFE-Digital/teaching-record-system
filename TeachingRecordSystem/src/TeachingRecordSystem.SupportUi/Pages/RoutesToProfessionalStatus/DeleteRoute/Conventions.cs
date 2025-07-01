@@ -14,7 +14,7 @@ public class Conventions : IConfigureFolderConventions
             {
                 model.EndpointMetadata.Add(new AuthorizeAttribute()
                 {
-                    Policy = AuthorizationPolicies.RoutesEdit
+                    Policy = AuthorizationPolicies.NonPersonOrAlertDataEdit
                 });
             });
     }

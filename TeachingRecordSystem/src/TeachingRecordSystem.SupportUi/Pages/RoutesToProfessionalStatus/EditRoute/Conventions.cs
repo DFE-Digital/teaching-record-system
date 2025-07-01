@@ -16,7 +16,7 @@ public class Conventions : IConfigureFolderConventions
                 model.Filters.Add(new CheckRouteToProfessionalStatusExistsFilterFactory());
                 model.EndpointMetadata.Add(new AuthorizeAttribute()
                 {
-                    Policy = AuthorizationPolicies.RoutesEdit
+                    Policy = AuthorizationPolicies.NonPersonOrAlertDataEdit
                 });
             });
     }

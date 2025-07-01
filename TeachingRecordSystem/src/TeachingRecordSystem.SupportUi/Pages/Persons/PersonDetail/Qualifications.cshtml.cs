@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-[Authorize(Policy = AuthorizationPolicies.RoutesView)]
+[Authorize(Policy = AuthorizationPolicies.NonPersonOrAlertDataView)]
 public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache referenceDataCache) : PageModel
 {
     [FromRoute]

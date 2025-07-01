@@ -15,7 +15,7 @@ public class Conventions : IConfigureFolderConventions
             {
                 model.EndpointMetadata.Add(new AuthorizeAttribute()
                 {
-                    Policy = AuthorizationPolicies.InductionEdit
+                    Policy = AuthorizationPolicies.NonPersonOrAlertDataEdit
                 });
 
                 model.Filters.Add(new CheckPersonExistsFilterFactory());

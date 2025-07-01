@@ -3,9 +3,9 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
 
-public class InductionViewAuthorizationHandler : AuthorizationHandler<InductionViewRequirement>
+public class NonPersonOrAlertDataViewAuthorizationHandler : AuthorizationHandler<NonPersonOrAlertDataViewRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, InductionViewRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, NonPersonOrAlertDataViewRequirement requirement)
     {
         if (context.User.HasMinimumPermission(new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.View)))
         {

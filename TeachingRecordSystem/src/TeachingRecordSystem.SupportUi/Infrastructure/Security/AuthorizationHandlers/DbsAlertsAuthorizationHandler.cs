@@ -10,6 +10,9 @@ public class DbsAlertsAuthorizationHandler : AuthorizationHandler<DbsAlertsRequi
         switch (requirement.AlertsPermission)
         {
             case Permissions.Alerts.Flag:
+                context.Succeed(requirement);
+                break;
+
             case Permissions.Alerts.Read:
                 if (context.User.HasMinimumPermission(new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.View)))
                 {
