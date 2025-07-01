@@ -50,8 +50,8 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
             //name
             await page.WaitForUrlPathAsync("/request-trn/name");
-            var name = Faker.Name.FullName();
-            var previousName = Faker.Name.FullName();
+            var name = TestData.GenerateName();
+            var previousName = TestData.GenerateName();
             await page.FillAsync("input[name=Name]", name);
             await page.ClickButtonAsync("Continue");
 
@@ -102,7 +102,7 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var addressLine2 = Faker.Address.SecondaryAddress();
                 var townOrCity = Faker.Address.City();
                 var postalCode = Faker.Address.ZipCode();
-                var country = Faker.Address.Country();
+                var country = TestData.GenerateCountry();
 
                 await page.FillAsync("input[name=AddressLine1]", addressLine1);
                 await page.FillAsync("input[name=AddressLine2]", addressLine2);
@@ -182,8 +182,8 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         //name
         await page.WaitForUrlPathAsync("/request-trn/name");
-        var name = Faker.Name.FullName();
-        var previousName = Faker.Name.FullName();
+        var name = TestData.GenerateName();
+        var previousName = TestData.GenerateName();
         await page.FillAsync("input[name=Name]", name);
         await page.ClickButtonAsync("Continue");
 
@@ -234,7 +234,7 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             var addressLine2 = Faker.Address.SecondaryAddress();
             var townOrCity = Faker.Address.City();
             var postalCode = Faker.Address.ZipCode();
-            var country = Faker.Address.Country();
+            var country = TestData.GenerateCountry();
 
             await page.FillAsync("input[name=AddressLine1]", addressLine1);
             await page.FillAsync("input[name=AddressLine2]", addressLine2);

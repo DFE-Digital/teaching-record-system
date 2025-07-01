@@ -43,8 +43,8 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         var dateOfBirth = new DateOnly(1980, 1, 1);
         state.DateOfBirth = dateOfBirth;
@@ -85,8 +85,8 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -107,8 +107,8 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -162,8 +162,8 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         var dateOfBirth = new DateOnly(1980, 3, 1);
         state.DateOfBirth = dateOfBirth;

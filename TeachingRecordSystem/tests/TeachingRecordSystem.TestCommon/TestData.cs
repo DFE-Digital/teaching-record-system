@@ -314,6 +314,19 @@ public partial class TestData
         return newValue;
     }
 
+    public string GenerateCountry()
+    {
+        string countryName;
+
+        do
+        {
+            countryName = Faker.Address.Country();
+        }
+        while (countryName.Contains('\''));
+
+        return countryName;
+    }
+
     protected async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();

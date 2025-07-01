@@ -48,7 +48,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkingInSchoolOrEducationalSetting = true;
         state.PersonalEmail = Faker.Internet.Email();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -111,7 +111,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["Name"] = Faker.Name.FullName()
+                ["Name"] = TestData.GenerateName()
             }),
         };
 
@@ -137,7 +137,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["Name"] = Faker.Name.FullName()
+                ["Name"] = TestData.GenerateName()
             }),
         };
 
@@ -159,7 +159,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.WorkEmail = Faker.Internet.Email();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>

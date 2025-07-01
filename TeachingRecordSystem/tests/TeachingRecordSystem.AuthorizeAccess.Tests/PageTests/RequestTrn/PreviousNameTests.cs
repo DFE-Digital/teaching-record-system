@@ -43,8 +43,8 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
+        state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -102,14 +102,14 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["PreviousName"] = Faker.Name.FullName(),
+                ["PreviousName"] = TestData.GenerateName(),
             }),
         };
 
@@ -126,7 +126,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -149,10 +149,10 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var state = CreateNewState();
         state.WorkEmail = Faker.Internet.Email();
-        state.Name = Faker.Name.FullName();
+        state.Name = TestData.GenerateName();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var previousName = Faker.Name.FullName();
+        var previousName = TestData.GenerateName();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>

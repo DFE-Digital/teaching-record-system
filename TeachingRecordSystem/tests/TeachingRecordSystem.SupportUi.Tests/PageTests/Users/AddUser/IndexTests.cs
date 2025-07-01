@@ -151,7 +151,7 @@ public class IndexTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
         ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User()
@@ -185,7 +185,7 @@ public class IndexTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
+        var name = TestData.GenerateName();
         var userId = Guid.NewGuid();
         var existingUser = await TestData.CreateUserAsync(name: name, email: email, azureAdUserId: userId);
 
