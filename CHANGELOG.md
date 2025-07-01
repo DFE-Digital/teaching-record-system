@@ -4,6 +4,9 @@
 
 An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record with the given TRN exists and is active.
 
+The following new endpoints have been added:
+- `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
+
 ## 20250627
 
 ### `PUT /v3/persons/<trn>/professional-statuses/<reference>`
@@ -14,7 +17,7 @@ An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record wit
 
 ### `GET /v3/persons/<trn>` and `GET /v3/person` changes
 - The `awarded` property in each member of `mandatoryQualifications` has been renamed to `endDate`.
-- A `qualificationId` property has been added to each member of `mandatoryQualifications`.
+- A `mandatoryQualificationId` property has been added to each member of `mandatoryQualifications`.
 - `NpqQualifications` and `InitialTeacherTraining` can no longer be requested in the `include` query parameter.
 - `RoutesToProfessionalStatuses` can be requested in the `include` query parameter.
 - An `exemptions` property has been added to the `induction` property.
@@ -25,9 +28,6 @@ In their place is `holdsFrom` and a list of the route types that apply.
 - The `inductionStatus` property has been replaced by an `induction` object.
 - The `awarded`, `certificateUrl` and `statusDescription` properties are no longer present on the `qts` and `eyts` objects.
 In their place is `holdsFrom` and a list of the route types that apply.
-
-The following new endpoints have been added:
-- `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 
 ## 20250425
 
