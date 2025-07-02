@@ -102,7 +102,7 @@ jobs:
       - name: Run Incrementalist
         id: get_test_projects
         run: |
-          dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch ${{ github.event.pull_request.base.ref }} --dir ../ --target-glob "**/*Tests.csproj" --skip-glob "**/*CrmIntegrationTests.csproj"
+          dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch main --dir ../ --target-glob "**/*Tests.csproj" --skip-glob "**/*CrmIntegrationTests.csproj"
           echo "project_dirs=$(cat ${{ runner.temp }}/test_projects.txt | xargs -n 1 dirname | xargs -n 1 basename | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
         working-directory: TeachingRecordSystem
 

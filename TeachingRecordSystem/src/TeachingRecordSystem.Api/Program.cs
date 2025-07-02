@@ -54,8 +54,6 @@ public class Program
         var env = builder.Environment;
         var configuration = builder.Configuration;
 
-        Console.WriteLine("tes");
-
         builder.ConfigureLogging((config, services) =>
         {
             config.Enrich.With(ActivatorUtilities.CreateInstance<AddUserIdLogEventEnricher>(services));
