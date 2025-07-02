@@ -15,7 +15,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task AddAlert()
     {
         var person = await TestData.CreatePersonAsync();
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(Guid.Parse("9fafaa80-f9f8-44a0-b7b3-cffedcbe0298")); // Failed induction
         var details = TestData.GenerateLoremIpsum();
         var link = TestData.GenerateUrl();
         var startDate = new DateOnly(2021, 1, 1);
