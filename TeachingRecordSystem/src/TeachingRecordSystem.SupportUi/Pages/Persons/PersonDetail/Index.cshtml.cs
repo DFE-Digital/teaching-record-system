@@ -78,7 +78,7 @@ public class IndexModel(
                 NationalInsuranceNumber = person.NationalInsuranceNumber,
                 Email = person.EmailAddress,
                 MobileNumber = person.MobileNumber,
-                Gender = null,
+                Gender = person.Gender,
                 HasActiveAlert = hasActiveAlert,
                 PreviousNames = previousNames
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
@@ -114,7 +114,7 @@ public class IndexModel(
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 Email = contact.EMailAddress1,
                 MobileNumber = contact.MobilePhone,
-                Gender = contact.GenderCode.ToString(),
+                Gender = contact.GenderCode.ToGender(),
                 HasActiveAlert = hasActiveAlert,
                 PreviousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
@@ -141,7 +141,7 @@ public class IndexModel(
         public required string? NationalInsuranceNumber { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
-        public required string? Gender { get; init; }
+        public required Gender? Gender { get; init; }
         public required bool HasActiveAlert { get; init; }
         public required string[] PreviousNames { get; init; }
     }

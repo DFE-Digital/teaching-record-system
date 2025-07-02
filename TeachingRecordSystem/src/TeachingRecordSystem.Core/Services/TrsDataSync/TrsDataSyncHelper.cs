@@ -1852,6 +1852,7 @@ public class TrsDataSyncHelper(
             "email_address",
             "national_insurance_number",
             "mobile_number",
+            "gender",
             "dqt_contact_id",
             "dqt_state",
             "dqt_created_on",
@@ -1904,9 +1905,10 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_StatedMiddleName,
             Contact.Fields.dfeta_StatedLastName,
             Contact.Fields.BirthDate,
+            Contact.Fields.EMailAddress1,
             Contact.Fields.dfeta_NINumber,
             Contact.Fields.MobilePhone,
-            Contact.Fields.EMailAddress1,
+            Contact.Fields.GenderCode,
             Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_qtlsdate,
             Contact.Fields.dfeta_QTSDate,
@@ -1930,6 +1932,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.EmailAddress, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.NationalInsuranceNumber, NpgsqlDbType.Char);
             writer.WriteValueOrNull(person.MobileNumber, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull((int?)person.Gender, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(person.DqtContactId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.DqtState, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(person.DqtCreatedOn, NpgsqlDbType.TimestampTz);
@@ -2195,6 +2198,7 @@ public class TrsDataSyncHelper(
             EmailAddress = c.EMailAddress1.NormalizeString(),
             NationalInsuranceNumber = c.dfeta_NINumber.NormalizeString(),
             MobileNumber = c.MobilePhone.NormalizeMobileNumber(),
+            Gender = c.GenderCode.ToGender(),
             QtsDate = c.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             EytsDate = c.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             DqtContactId = c.Id,
@@ -3646,6 +3650,7 @@ public class TrsDataSyncHelper(
         public required string? EmailAddress { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required string? MobileNumber { get; init; }
+        public required Gender? Gender { get; init; }
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
         public required Guid? DqtContactId { get; init; }

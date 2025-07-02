@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using Gender = TeachingRecordSystem.Api.V3.Implementation.Dtos.Gender;
 
 #pragma warning disable TRS0001
 

@@ -30,6 +30,7 @@ public class ChangeLogCreateEventTests : TestBase
         string? emailAddress = "old@email-address.com";
         string? mobileNumber = "07654321098";
         string? nationalInsuranceNumber = "AB 12 34 56 D";
+        Gender? gender = Gender.Female;
 
         var createReason = CreateReasonOption.AnotherReason.GetDisplayName();
         var createReasonDetail = "Reason detail";
@@ -47,7 +48,8 @@ public class ChangeLogCreateEventTests : TestBase
             DateOfBirth = dateOfBirth,
             EmailAddress = emailAddress,
             MobileNumber = mobileNumber,
-            NationalInsuranceNumber = nationalInsuranceNumber
+            NationalInsuranceNumber = nationalInsuranceNumber,
+            Gender = gender
         };
 
         var createdEvent = new PersonCreatedEvent
@@ -86,6 +88,7 @@ public class ChangeLogCreateEventTests : TestBase
         doc.AssertSummaryListValue("details", "Email address", v => Assert.Equal(emailAddress, v.TrimmedText()));
         doc.AssertSummaryListValue("details", "Mobile number", v => Assert.Equal(mobileNumber, v.TrimmedText()));
         doc.AssertSummaryListValue("details", "National Insurance number", v => Assert.Equal(nationalInsuranceNumber, v.TrimmedText()));
+        doc.AssertSummaryListValue("details", "Gender", v => Assert.Equal(gender.GetDisplayName(), v.TrimmedText()));
 
         doc.AssertSummaryListValue("create-reason", "Reason", v => Assert.Equal(createReason, v.TrimmedText()));
         doc.AssertSummaryListValue("create-reason", "Reason details", v => Assert.Equal(createReasonDetail, v.TrimmedText()));
@@ -114,7 +117,8 @@ public class ChangeLogCreateEventTests : TestBase
             DateOfBirth = dateOfBirth,
             EmailAddress = null,
             MobileNumber = null,
-            NationalInsuranceNumber = null
+            NationalInsuranceNumber = null,
+            Gender = null
         };
 
         var createdEvent = new PersonCreatedEvent
@@ -149,6 +153,7 @@ public class ChangeLogCreateEventTests : TestBase
         doc.AssertSummaryListRowDoesNotExist("details", "Email address");
         doc.AssertSummaryListRowDoesNotExist("details", "Mobile number");
         doc.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
+        doc.AssertSummaryListRowDoesNotExist("details", "Gender");
 
         doc.AssertSummaryListValue("create-reason", "Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListValue("create-reason", "Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));

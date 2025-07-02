@@ -25,6 +25,7 @@ public class CheckAnswersModel(
     public EmailAddress? EmailAddress { get; set; }
     public MobileNumber? MobileNumber { get; set; }
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
+    public Gender? Gender { get; set; }
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
     public Guid? NameChangeEvidenceFileId { get; set; }
     public string? NameChangeEvidenceFileName { get; set; }
@@ -69,6 +70,7 @@ public class CheckAnswersModel(
             EmailAddress,
             MobileNumber,
             NationalInsuranceNumber,
+            Gender,
             NameChangeReason?.GetDisplayName(),
             NameChangeEvidenceFileId is Guid nameFileId
                 ? new EventModels.File()
@@ -143,6 +145,7 @@ public class CheckAnswersModel(
         MobileNumber = JourneyInstance.State.MobileNumber.Parsed;
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
+        Gender = JourneyInstance.State.Gender;
         NameChangeReason = JourneyInstance.State.NameChangeReason;
         NameChangeEvidenceFileId = JourneyInstance.State.NameChangeEvidenceFileId;
         NameChangeEvidenceFileName = JourneyInstance.State.NameChangeEvidenceFileName;

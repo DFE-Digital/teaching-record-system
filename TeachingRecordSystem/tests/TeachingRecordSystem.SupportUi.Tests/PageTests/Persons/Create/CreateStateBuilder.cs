@@ -11,6 +11,7 @@ public class CreateStateBuilder
     public string? EmailAddress { get; set; }
     public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
+    public Gender? Gender { get; set; }
 
     public CreateReasonOption? CreateReason { get; set; }
     public string? CreateReasonDetail { get; set; }
@@ -60,6 +61,12 @@ public class CreateStateBuilder
         return this;
     }
 
+    public CreateStateBuilder WithGender(Gender? gender)
+    {
+        Gender = gender;
+        return this;
+    }
+
     public CreateStateBuilder WithCreateReasonChoice(CreateReasonOption option, string? detailText = null)
     {
         CreateReason = option;
@@ -90,6 +97,7 @@ public class CreateStateBuilder
             EmailAddress = CreateFieldState<EmailAddress>.FromRawValue(EmailAddress),
             MobileNumber = CreateFieldState<MobileNumber>.FromRawValue(MobileNumber),
             NationalInsuranceNumber = CreateFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
+            Gender = Gender,
 
             CreateReason = CreateReason,
             CreateReasonDetail = CreateReasonDetail,

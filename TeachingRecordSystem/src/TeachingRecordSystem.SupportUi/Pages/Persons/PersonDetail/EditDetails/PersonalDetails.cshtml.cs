@@ -55,6 +55,10 @@ public class PersonalDetailsModel(
     [Display(Name = "National Insurance number (optional)")]
     public string? NationalInsuranceNumber { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Gender (optional)")]
+    public Gender? Gender { get; set; }
+
     public bool NameChanged =>
         (FirstName ?? "") != JourneyInstance!.State.OriginalFirstName ||
         (MiddleName ?? "") != JourneyInstance!.State.OriginalMiddleName ||
@@ -64,7 +68,8 @@ public class PersonalDetailsModel(
         DateOfBirth != JourneyInstance!.State.OriginalDateOfBirth ||
         EditDetailsFieldState<EmailAddress>.FromRawValue(EmailAddress) != JourneyInstance!.State.OriginalEmailAddress ||
         EditDetailsFieldState<MobileNumber>.FromRawValue(MobileNumber) != JourneyInstance!.State.OriginalMobileNumber ||
-        EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber) != JourneyInstance!.State.OriginalNationalInsuranceNumber;
+        EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber) != JourneyInstance!.State.OriginalNationalInsuranceNumber ||
+        Gender != JourneyInstance!.State.OriginalGender;
 
     public string BackLink => GetPageLink(
         FromCheckAnswers
@@ -92,12 +97,20 @@ public class PersonalDetailsModel(
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed?.ToDisplayString() ?? JourneyInstance.State.EmailAddress.Raw;
         MobileNumber = JourneyInstance.State.MobileNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.MobileNumber.Raw;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.NationalInsuranceNumber.Raw;
+        Gender = JourneyInstance.State.Gender;
 
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        // NotAvailable is not a value the user is allowed to select in the UI. We only allow it
+        // if it's a pre-existing value on the Person record and the user is leaving it unchanged.
+        if (Gender == Core.Models.Gender.NotAvailable && _person!.Gender != Core.Models.Gender.NotAvailable)
+        {
+            return BadRequest();
+        }
+
         if (!NameChanged && !OtherDetailsChanged)
         {
             ModelState.AddModelError("", "Please change one or more of the person\u2019s details");
@@ -142,6 +155,7 @@ public class PersonalDetailsModel(
             state.EmailAddress = new(EmailAddress ?? "", emailAddress);
             state.MobileNumber = new(MobileNumber ?? "", mobileNumber);
             state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", nationalInsuranceNumber);
+            state.Gender = Gender;
 
             if (!NameChanged && state.NameChangeReason is not null)
             {

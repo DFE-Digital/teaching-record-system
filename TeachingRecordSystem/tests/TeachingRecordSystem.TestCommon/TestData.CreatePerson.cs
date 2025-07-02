@@ -46,9 +46,10 @@ public partial class TestData
         private string? _lastName;
         private string? _email;
         private string? _mobileNumber;
-        private Contact_GenderCode? _gender;
         private bool? _hasNationalInsuranceNumber;
         private string? _nationalInsuranceNumber;
+        private bool? _hasGender;
+        private Contact_GenderCode? _gender;
         private readonly List<Qualification> _qualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
@@ -256,8 +257,21 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithGender(Contact_GenderCode? gender)
+        public CreatePersonBuilder WithGender(bool hasGender = true)
         {
+            _hasGender = hasGender;
+
+            if (_hasGender is false)
+            {
+                _gender = null;
+            }
+
+            return this;
+        }
+
+        public CreatePersonBuilder WithGender(Contact_GenderCode gender)
+        {
+            _hasGender = true;
             _gender = gender;
             return this;
         }
@@ -444,7 +458,6 @@ public partial class TestData
             var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
             var lastName = _lastName ?? testData.GenerateLastName();
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
-            var gender = _gender ?? testData.GenerateGender();
 
             var events = new List<EventBase>();
 
@@ -458,7 +471,6 @@ public partial class TestData
                 dfeta_StatedMiddleName = statedMiddleName,
                 dfeta_StatedLastName = lastName,
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
-                GenderCode = gender,
                 dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
                 dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
                 dfeta_TrnToken = _trnToken,
@@ -485,6 +497,11 @@ public partial class TestData
             if (_hasNationalInsuranceNumber ?? false)
             {
                 contact.dfeta_NINumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
+            }
+
+            if (_hasGender ?? false)
+            {
+                contact.GenderCode = _gender ?? testData.GenerateGender();
             }
 
             if (_qtlsDate is not null)
@@ -850,8 +867,8 @@ public partial class TestData
                 StatedLastName = lastName,
                 Email = _email,
                 MobileNumber = _mobileNumber,
-                Gender = gender.ToString(),
                 NationalInsuranceNumber = contact.dfeta_NINumber,
+                Gender = contact.GenderCode.ToGender(),
                 QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 MandatoryQualifications = mqs,
@@ -1331,7 +1348,7 @@ public partial class TestData
         public required string StatedLastName { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
-        public required string Gender { get; init; }
+        public required Gender? Gender { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }

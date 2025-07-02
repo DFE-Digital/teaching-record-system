@@ -52,7 +52,8 @@ public class IndexTests : TestBase
             .WithTrn()
             .WithEmail((string?)email)
             .WithMobileNumber((string?)mobileNumber)
-            .WithNationalInsuranceNumber());
+            .WithNationalInsuranceNumber()
+            .WithGender());
 
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.ContactId)
@@ -76,11 +77,11 @@ public class IndexTests : TestBase
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TrimmedText());
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TrimmedText());
         Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(createPersonResult.Gender, doc.GetSummaryListValueForKey("Gender"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email"));
         Assert.Equal(createPersonResult.MobileNumber, doc.GetSummaryListValueForKey("Mobile number"));
+        Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueForKey("Gender"));
     }
 
     [Fact(Skip = "Flaky on CI")]
@@ -106,7 +107,8 @@ public class IndexTests : TestBase
             .WithTrn()
             .WithEmail((string?)email)
             .WithMobileNumber((string?)mobileNumber)
-            .WithNationalInsuranceNumber());
+            .WithNationalInsuranceNumber()
+            .WithGender());
 
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.ContactId)
@@ -132,8 +134,7 @@ public class IndexTests : TestBase
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TrimmedText());
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TrimmedText());
         Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
-        // TODO: expected createPersonResult.Gender when Gender migration issue is resolved
-        Assert.Equal("Not provided", doc.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueForKey("Gender"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email"));
@@ -161,6 +162,7 @@ public class IndexTests : TestBase
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Email"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Mobile number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Gender"));
     }
 
     [Fact]

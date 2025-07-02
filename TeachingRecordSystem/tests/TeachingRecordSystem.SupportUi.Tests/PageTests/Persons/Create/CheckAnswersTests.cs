@@ -61,6 +61,7 @@ public class CheckAnswersTests : TestBase
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
+                .WithGender(Gender.Other)
                 .WithCreateReasonChoice(CreateReasonOption.MandatoryQualification)
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -78,6 +79,7 @@ public class CheckAnswersTests : TestBase
         doc.AssertSummaryListValue("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
+        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Other", v.TrimmedText()));
     }
 
     [Fact]
@@ -105,6 +107,7 @@ public class CheckAnswersTests : TestBase
         doc.AssertSummaryListValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Fact]
@@ -178,6 +181,7 @@ public class CheckAnswersTests : TestBase
         var emailAddress = "test@test.com";
         var mobileNumber = "447891234567";
         var nationalInsuranceNumber = "AB123456C";
+        var gender = Gender.Female;
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
@@ -190,6 +194,7 @@ public class CheckAnswersTests : TestBase
                 .WithEmail(emailAddress)
                 .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
+                .WithGender(gender)
                 .WithCreateReasonChoice(CreateReasonOption.AnotherReason, _changeReasonDetails)
                 .WithUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
@@ -224,6 +229,7 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(emailAddress, createdPersonRecord.EmailAddress);
             Assert.Equal(mobileNumber, createdPersonRecord.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, createdPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(gender, createdPersonRecord.Gender);
         });
 
         var RaisedBy = GetCurrentUserId();
@@ -241,6 +247,7 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(emailAddress, actualEvent.Details.EmailAddress);
             Assert.Equal(mobileNumber, actualEvent.Details.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
+            Assert.Equal(gender, actualEvent.Details.Gender);
             Assert.Equal("Another reason", actualEvent.CreateReason);
             Assert.Equal(_changeReasonDetails, actualEvent.CreateReasonDetail);
             Assert.Equal(otherEvidenceFileId, actualEvent.EvidenceFile!.FileId);

@@ -52,6 +52,10 @@ public class PersonalDetailsModel(
     [Display(Name = "National Insurance number (optional)")]
     public string? NationalInsuranceNumber { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Gender (optional)")]
+    public Gender? Gender { get; set; }
+
     public string BackLink => GetPageLink(
         FromCheckAnswers
             ? CreateJourneyPage.CheckAnswers
@@ -72,6 +76,7 @@ public class PersonalDetailsModel(
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed?.ToDisplayString() ?? JourneyInstance.State.EmailAddress.Raw;
         MobileNumber = JourneyInstance.State.MobileNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.MobileNumber.Raw;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.NationalInsuranceNumber.Raw;
+        Gender = JourneyInstance.State.Gender;
 
         return Page();
     }
@@ -117,6 +122,7 @@ public class PersonalDetailsModel(
             state.EmailAddress = new(EmailAddress ?? "", emailAddress);
             state.MobileNumber = new(MobileNumber ?? "", mobileNumber);
             state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", nationalInsuranceNumber);
+            state.Gender = Gender;
         });
 
         return Redirect(nextPage);

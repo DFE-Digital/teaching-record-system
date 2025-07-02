@@ -17,6 +17,7 @@ public class CreateState : IRegisterJourney
     public CreateFieldState<EmailAddress> EmailAddress { get; set; } = new("", null);
     public CreateFieldState<MobileNumber> MobileNumber { get; set; } = new("", null);
     public CreateFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new("", null);
+    public Gender? Gender { get; set; }
 
     public CreateReasonOption? CreateReason { get; set; }
     public string? CreateReasonDetail { get; set; }
