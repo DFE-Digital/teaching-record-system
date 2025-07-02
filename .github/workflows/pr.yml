@@ -100,7 +100,7 @@ jobs:
         run: just install-tools
 
       - name: Run Incrementalist
-        id: get-test-projects
+        id: get_test_projects
         run: |
           dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch ${{ github.event.pull_request.base.ref }} --dir ../ --target-glob "**/*Tests.csproj" --skip-glob "**/*CrmIntegrationTests.csproj"
           echo "project_paths=$(cat ${{ runner.temp }}/test_projects.txt | jq -c --raw-input --slurp 'split("\n")')" >> $GITHUB_OUTPUT
