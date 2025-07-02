@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      project_paths: ${{ steps.get_test_projects.outputs.project_paths }}
+      project_dirs: ${{ steps.get_test_projects.outputs.project_dirs }}
 
     steps:
       - uses: actions/checkout@v4
@@ -103,7 +103,7 @@ jobs:
         id: get_test_projects
         run: |
           dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch ${{ github.event.pull_request.base.ref }} --dir ../ --target-glob "**/*Tests.csproj" --skip-glob "**/*CrmIntegrationTests.csproj"
-          echo "project_paths=$(cat ${{ runner.temp }}/test_projects.txt | jq -c --raw-input --slurp 'split("\n")')" >> $GITHUB_OUTPUT
+          echo "project_dirs=$(cat ${{ runner.temp }}/test_projects.txt | xargs -n 1 dirname | xargs -n 1 basename | jq -c --raw-input --slurp 'split("\n")')" >> $GITHUB_OUTPUT
         working-directory: TeachingRecordSystem
 
   tests:
@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: ${{ fromJson(needs.get_affected_projects.outputs.project_paths) }}
+        project_directory: ${{ fromJson(needs.get_affected_projects.outputs.project_dirs) }}
 
     services:
       postgres:
