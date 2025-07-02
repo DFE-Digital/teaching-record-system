@@ -82,23 +82,35 @@ jobs:
           working_directory: terraform/aks
         continue-on-error: true # temporary- we're getting sporadic 503 errors here in action setup
 
+  get_test_projects:
+    name: Get test projects
+    runs-on: ubuntu-latest
+
+    outputs:
+      project_paths: ${{ steps.get_test_projects.outputs.project_paths }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: extractions/setup-just@v2
+
+      - name: Install tools
+        run: just install-tools
+
+      - id: get-test-projects
+        run: |
+          dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch ${{ github.event.pull_request.base.ref }} --dir ../ --target-glob "**/*Tests.csproj" --skip-glob "**/*CrmIntegrationTests.csproj"
+          echo "project_paths=$(cat ${{ runner.temp }}/test_projects.txt | jq -c --raw-input --slurp 'split("\n")')" >> $GITHUB_OUTPUT
+        working-directory: TeachingRecordSystem
+
   tests:
     name: Tests
     runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
+    needs: [get_test_projects]
     strategy:
       fail-fast: false
       matrix:
-        project:
-          [
-            TeachingRecordSystem.Core.Tests,
-            TeachingRecordSystem.Api.UnitTests,
-            TeachingRecordSystem.Api.IntegrationTests,
-            TeachingRecordSystem.SupportUi.Tests,
-            TeachingRecordSystem.AuthorizeAccess.Tests,
-            TeachingRecordSystem.SupportUi.EndToEndTests,
-            TeachingRecordSystem.AuthorizeAccess.EndToEndTests,
-            TeachingRecordSystem.WebCommon.Tests,
-          ]
+        project: ${{ fromJson(needs.get_test_projects.outputs.project_paths) }}
 
     services:
       postgres:
