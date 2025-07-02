@@ -82,23 +82,39 @@ jobs:
           working_directory: terraform/aks
         continue-on-error: true # temporary- we're getting sporadic 503 errors here in action setup
 
+  get_affected_projects:
+    name: Get affected projects
+    runs-on: ubuntu-latest
+
+    outputs:
+      project_dirs: ${{ steps.get_test_projects.outputs.project_dirs }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: extractions/setup-just@v2
+
+      - name: Install tools
+        run: just install-tools
+
+      - name: Run Incrementalist
+        id: get_test_projects
+        run: |
+          dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch main --dir ../ --target-glob "**/*Tests.csproj" --skip-glob "**/*CrmIntegrationTests.csproj"
+          echo "project_dirs=$(cat ${{ runner.temp }}/test_projects.txt | xargs -n 1 dirname | xargs -n 1 basename | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
+        working-directory: TeachingRecordSystem
+
   tests:
     name: Tests
     runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
+    needs: [get_affected_projects]
+    if: needs.get_affected_projects.outputs.project_dirs != '[]'
     strategy:
       fail-fast: false
       matrix:
-        project:
-          [
-            TeachingRecordSystem.Core.Tests,
-            TeachingRecordSystem.Api.UnitTests,
-            TeachingRecordSystem.Api.IntegrationTests,
-            TeachingRecordSystem.SupportUi.Tests,
-            TeachingRecordSystem.AuthorizeAccess.Tests,
-            TeachingRecordSystem.SupportUi.EndToEndTests,
-            TeachingRecordSystem.AuthorizeAccess.EndToEndTests,
-            TeachingRecordSystem.WebCommon.Tests,
-          ]
+        project_directory: ${{ fromJson(needs.get_affected_projects.outputs.project_dirs) }}
 
     services:
       postgres:
@@ -155,22 +171,22 @@ jobs:
 
       - name: Build project
         run: dotnet build -c Release --no-restore
-        working-directory: TeachingRecordSystem/tests/${{ matrix.project }}
+        working-directory: TeachingRecordSystem/tests/${{ matrix.project_directory }}
 
       - name: Install Playwright if required
         run: |
           if [[ "$PROJECT_NAME" =~ .*EndToEndTests ]]; then
             pwsh ./bin/Release/net8.0/playwright.ps1 install chromium
           fi
-        working-directory: TeachingRecordSystem/tests/${{ matrix.project }}
+        working-directory: TeachingRecordSystem/tests/${{ matrix.project_directory }}
         env:
-          PROJECT_NAME: ${{ matrix.project }}
+          PROJECT_NAME: ${{ matrix.project_directory }}
 
       - name: Run tests
         uses: ./.github/workflows/actions/test
         with:
-          test_project_path: TeachingRecordSystem/tests/${{ matrix.project }}
-          report_name: "${{ matrix.project }} test results"
+          test_project_path: TeachingRecordSystem/tests/${{ matrix.project_directory }}
+          report_name: "${{ matrix.project_directory }} test results"
           dotnet_test_args: >-
             --no-build
             -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
@@ -185,6 +201,7 @@ jobs:
     name: Deploy dev environment
     runs-on: ubuntu-latest
     needs: [lint, validate_terraform, tests, package]
+    if: always() && needs.tests.status != 'failure'
     environment: dev
     concurrency: deploy_dev
     steps:

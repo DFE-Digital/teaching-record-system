@@ -6,19 +6,22 @@
       "version": "8.0.453106",
       "commands": [
         "dotnet-format"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-ef": {
       "version": "8.0.8",
       "commands": [
         "dotnet-ef"
-      ]
+      ],
+      "rollForward": false
     },
-    "microsoft.web.librarymanager.cli": {
-      "version": "2.1.175",
+    "incrementalist.cmd": {
+      "version": "1.0.0",
       "commands": [
-        "libman"
-      ]
+        "incrementalist"
+      ],
+      "rollForward": false
     }
   }
 }
