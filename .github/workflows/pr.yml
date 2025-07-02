@@ -82,8 +82,8 @@ jobs:
           working_directory: terraform/aks
         continue-on-error: true # temporary- we're getting sporadic 503 errors here in action setup
 
-  get_test_projects:
-    name: Get test projects
+  get_affected_projects:
+    name: Get affected projects
     runs-on: ubuntu-latest
 
     outputs:
@@ -106,11 +106,11 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
-    needs: [get_test_projects]
+    needs: [get_affected_projects]
     strategy:
       fail-fast: false
       matrix:
-        project: ${{ fromJson(needs.get_test_projects.outputs.project_paths) }}
+        project: ${{ fromJson(needs.get_affected_projects.outputs.project_paths) }}
 
     services:
       postgres:
