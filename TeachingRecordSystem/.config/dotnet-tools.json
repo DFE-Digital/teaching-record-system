@@ -16,13 +16,6 @@
       ],
       "rollForward": false
     },
-    "microsoft.web.librarymanager.cli": {
-      "version": "2.1.175",
-      "commands": [
-        "libman"
-      ],
-      "rollForward": false
-    },
     "incrementalist.cmd": {
       "version": "1.0.0",
       "commands": [
