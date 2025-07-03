@@ -24,6 +24,8 @@ CREATE TABLE trs_integration_transactions
     duplicate_count INT NOT NULL,
     file_name NVARCHAR(MAX) NOT NULL,
     created_date DATETIME NOT NULL,
+    [__Inserted] [datetime] NULL,
+	[__Updated] [datetime] NULL,
     CONSTRAINT pk_trs_integration_transactions PRIMARY KEY (integration_transaction_id)
 );
 
@@ -38,6 +40,8 @@ CREATE TABLE trs_integration_transaction_records
     created_date DATETIME NOT NULL,
     integration_transaction_id BIGINT,
     has_active_alert BIT,
+    [__Inserted] [datetime] NULL,
+	[__Updated] [datetime] NULL,
     CONSTRAINT pk_trs_integration_transaction_records PRIMARY KEY (integration_transaction_record_id),
     CONSTRAINT fk_trs_integration_transaction_records_persons_person_id FOREIGN KEY (person_id)
         REFERENCES trs_persons (person_id),

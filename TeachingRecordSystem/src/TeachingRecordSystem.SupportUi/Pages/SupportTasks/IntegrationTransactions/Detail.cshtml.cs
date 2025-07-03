@@ -68,10 +68,10 @@ public class DetailModel(TrsDbContext context) : PageModel
             InterfaceType: integrationTransaction.InterfaceType,
             CreatedOn: integrationTransaction.CreatedDate,
             ImportStatus: integrationTransaction.ImportStatus,
-            TotalCount: records.Count(),
-            SuccessesCount: records.Count(r => r.Status == IntegrationTransactionRecordStatus.Success),
-            FailuresCount: records.Count(r => r.Status == IntegrationTransactionRecordStatus.Failure),
-            DuplicatesCount: records.Count(r => r.Duplicate == true),
+            TotalCount: integrationTransaction.TotalCount,
+            SuccessesCount: integrationTransaction.SuccessCount,
+            FailuresCount: integrationTransaction.FailureCount,
+            DuplicatesCount: integrationTransaction.DuplicateCount,
             FileName: integrationTransaction.FileName
         );
 

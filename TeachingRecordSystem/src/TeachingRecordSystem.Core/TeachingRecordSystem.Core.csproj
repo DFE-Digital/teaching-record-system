@@ -102,7 +102,7 @@
     <None Remove="Services\DqtReporting\Migrations\0066_TrsPersonQtlsStatus.sql" />
     <None Remove="Services\DqtReporting\Migrations\0067_TrsRoutesModelChanges.sql" />
     <None Remove="Services\DqtReporting\Migrations\0072_TrsQualificationsDqtAgeRange.sql" />
-    <None Remove="Services\DqtReporting\Migrations\0075_TrsIntegrationTranactionFKCorrection.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0076_TrsIntegrationTranactionFKCorrection.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -207,7 +207,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0070_TrsQualificationsExemptFromInductionDueToQtsDate.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />  
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0072_TrsQualificationsDqtAgeRange.sql" />
-    <EmbeddedResource Include="Services\DqtReporting\Migrations\0075_TrsIntegrationTranactionFKCorrection.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0076_TrsIntegrationTranactionFKCorrection.sql" />
   </ItemGroup>
 
   <ItemGroup>
