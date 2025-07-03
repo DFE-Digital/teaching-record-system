@@ -30,4 +30,14 @@ public static class GenderExtensions
             Contact_GenderCode.Notavailable => Gender.NotAvailable,
             _ => null
         };
+
+    public static Contact_GenderCode? ToContact_GenderCode(this Gender gender)
+        => gender switch
+        {
+            Gender.Male => Contact_GenderCode.Male,
+            Gender.Female => Contact_GenderCode.Female,
+            Gender.Other => Contact_GenderCode.Other,
+            Gender.NotAvailable => Contact_GenderCode.Notavailable,
+            _ => null
+        };
 }
