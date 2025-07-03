@@ -12,10 +12,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(r => r.TrainingStartDateRequired == FieldRequirement.Optional && r.TrainingEndDateRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Mandatory && s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Optional && s.TrainingEndDateRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
@@ -54,10 +54,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.Mandatory)
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Optional && r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Optional && s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
@@ -102,10 +102,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = startDate.AddMonths(1);
         var newEndDate = endDate.AddDays(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.Mandatory)
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Optional && r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Optional && s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
@@ -144,7 +144,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(newEndDate, journeyInstance.State.TrainingEndDate);
     }
 
-    [Fact]
+    [Fact(Skip = "There are no routes with mandatory start and end dates at present")]
     public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -185,7 +185,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingStartDate", "Enter a start date");
     }
 
-    [Fact]
+    [Fact(Skip = "There are no routes with mandatory start and end dates at present")]
     public async Task Post_WhenNoEndDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -234,10 +234,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddDays(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(r => r.TrainingStartDateRequired == FieldRequirement.Optional && r.TrainingEndDateRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Mandatory && s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Optional && s.TrainingEndDateRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
@@ -278,10 +278,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
