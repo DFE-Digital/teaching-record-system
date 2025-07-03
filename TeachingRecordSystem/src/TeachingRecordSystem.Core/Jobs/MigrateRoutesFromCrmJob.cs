@@ -30,7 +30,9 @@ public class MigrateRoutesFromCrmJob(
 
         const int pageSize = 1000;
 
-        var columns = new ColumnSet(Contact.Fields.dfeta_qtlsdate);
+        var columns = new ColumnSet(
+            Contact.Fields.dfeta_qtlsdate,
+            Contact.Fields.dfeta_QtlsDateHasBeenSet);
 
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
