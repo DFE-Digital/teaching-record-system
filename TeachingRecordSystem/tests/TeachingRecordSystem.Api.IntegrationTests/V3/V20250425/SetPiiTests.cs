@@ -153,7 +153,7 @@ public class SetPiiTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithGender(Contact_GenderCode.Male));
+            .WithGender(Core.Models.Gender.Male));
 
         var updatedFirstName = Faker.Name.First();
         var updatedMiddleName = Faker.Name.Middle();
@@ -199,7 +199,7 @@ public class SetPiiTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithGender(Contact_GenderCode.Male)
+            .WithGender(Core.Models.Gender.Male)
             .WithEmail(Faker.Internet.Email())
             .WithNationalInsuranceNumber(Faker.Identification.UkNationalInsuranceNumber()));
 

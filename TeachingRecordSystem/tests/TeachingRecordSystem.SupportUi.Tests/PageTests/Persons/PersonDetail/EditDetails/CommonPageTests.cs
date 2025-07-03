@@ -92,7 +92,7 @@ public class CommonPageTests : TestBase
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
+            .WithGender(Gender.Other));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -161,7 +161,7 @@ public class CommonPageTests : TestBase
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Male));
+            .WithGender(Gender.Male));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -263,7 +263,7 @@ public class CommonPageTests : TestBase
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
+            .WithGender(Gender.Other));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -433,7 +433,7 @@ public class CommonPageTests : TestBase
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
+            .WithGender(Gender.Female));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -513,7 +513,7 @@ public class CommonPageTests : TestBase
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
+            .WithGender(Gender.Female));
 
         var originalFirstName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var originalMiddleName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;

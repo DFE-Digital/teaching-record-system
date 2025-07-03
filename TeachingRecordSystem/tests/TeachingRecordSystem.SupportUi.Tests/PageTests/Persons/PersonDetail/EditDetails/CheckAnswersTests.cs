@@ -366,7 +366,7 @@ public class CheckAnswersTests : TestBase
             .WithEmail("test@test.com")
             .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
+            .WithGender(Gender.Other));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;

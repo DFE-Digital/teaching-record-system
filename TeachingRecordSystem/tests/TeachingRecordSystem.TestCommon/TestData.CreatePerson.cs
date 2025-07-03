@@ -49,7 +49,7 @@ public partial class TestData
         private bool? _hasNationalInsuranceNumber;
         private string? _nationalInsuranceNumber;
         private bool? _hasGender;
-        private Contact_GenderCode? _gender;
+        private Gender? _gender;
         private readonly List<Qualification> _qualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
@@ -269,7 +269,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithGender(Contact_GenderCode gender)
+        public CreatePersonBuilder WithGender(Gender gender)
         {
             _hasGender = true;
             _gender = gender;
@@ -458,6 +458,7 @@ public partial class TestData
             var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
             var lastName = _lastName ?? testData.GenerateLastName();
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
+            var gender = _gender ?? testData.GenerateGender();
 
             var events = new List<EventBase>();
 
@@ -501,7 +502,7 @@ public partial class TestData
 
             if (_hasGender ?? false)
             {
-                contact.GenderCode = _gender ?? testData.GenerateGender();
+                contact.GenderCode = gender.ToContact_GenderCode();
             }
 
             if (_qtlsDate is not null)
