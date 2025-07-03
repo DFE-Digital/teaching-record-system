@@ -119,7 +119,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
         DateOnly holdsFrom = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == "Apprenticeship");
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == "Postgraduate Teaching Apprenticeship");
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r =>

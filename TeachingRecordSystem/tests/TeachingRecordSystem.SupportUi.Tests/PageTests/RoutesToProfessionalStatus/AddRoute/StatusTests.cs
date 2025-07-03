@@ -38,8 +38,8 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("Apprenticeship", RouteToProfessionalStatusStatus.InTraining, "start-and-end-date")]
-    [InlineData("Apprenticeship", RouteToProfessionalStatusStatus.Failed, "country")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, "start-and-end-date")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Failed, "country")]
     public async Task Post_Status_PersistsDataAndRedirectsToExpected(string routeName, RouteToProfessionalStatusStatus status, string expected)
     {
         // Arrange
@@ -79,7 +79,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Single(r => r.Name == "Apprenticeship");
+            .Single(r => r.Name == "Postgraduate Teaching Apprenticeship");
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
