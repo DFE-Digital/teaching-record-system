@@ -1,18 +1,14 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
-using Xunit.Abstractions;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
 [Collection(nameof(DisableParallelization))]
 public class PersonalDetailsTests : TestBase
 {
-    private readonly ITestOutputHelper _outputHelper;
-
-    public PersonalDetailsTests(HostFixture hostFixture, ITestOutputHelper outputHelper) : base(hostFixture)
+    public PersonalDetailsTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-        _outputHelper = outputHelper;
     }
 
     public override void Dispose()
@@ -774,9 +770,7 @@ public class PersonalDetailsTests : TestBase
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
-        _outputHelper.WriteLine(response.StatusCode.ToString());
-        _outputHelper.WriteLine(person.Gender.ToString());
-        _outputHelper.WriteLine(await response.Content.ReadAsStringAsync());
+
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
