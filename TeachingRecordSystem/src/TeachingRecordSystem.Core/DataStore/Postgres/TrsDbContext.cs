@@ -1,3 +1,4 @@
+using System.Data.Common;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.DependencyInjection;
@@ -211,6 +212,15 @@ public class TrsDbContext : DbContext
         ConfigureOptions(optionsBuilder, connectionString: null, commandTimeout);
         var dbContext = new TrsDbContext(optionsBuilder.Options);
         dbContext.Database.SetDbConnection(dataSource.CreateConnection(), contextOwnsConnection: true);
+        return dbContext;
+    }
+
+    public static TrsDbContext Create(DbConnection connection, int? commandTimeout = null)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
+        ConfigureOptions(optionsBuilder, connectionString: null, commandTimeout);
+        var dbContext = new TrsDbContext(optionsBuilder.Options);
+        dbContext.Database.SetDbConnection(connection, contextOwnsConnection: false);
         return dbContext;
     }
 }

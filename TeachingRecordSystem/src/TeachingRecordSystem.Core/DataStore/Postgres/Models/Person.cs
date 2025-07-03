@@ -330,6 +330,22 @@ public class Person
         return true;
     }
 
+    public bool UnsafeRemoveInductionExemptionReason(
+        Guid exemptionReasonId,
+        EventModels.RaisedByUserInfo updatedBy,
+        DateTime now)
+    {
+        if (!InductionExemptionReasonIds.Contains(exemptionReasonId))
+        {
+            return false;
+        }
+
+        InductionExemptionReasonIds = InductionExemptionReasonIds.Except([exemptionReasonId]).ToArray();
+        InductionModifiedOn = now;
+
+        return true;
+    }
+
     public bool RemoveInductionExemptionReason(
         Guid exemptionReasonId,
         EventModels.RaisedByUserInfo updatedBy,
