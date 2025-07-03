@@ -47,7 +47,7 @@ public class InductionStatusUpdatedSupportJob(TrsDbContext dbContext, ICrmQueryD
                 {
                     ContactId = changeEvent.PersonId,
                     Category = "Induction Status Updated",
-                    Description = $"Induction Status Updated from {changeEvent.OldInduction!.Status.ToString()} to {changeEvent!.Induction.Status.ToString()}"!,
+                    Description = $"Induction Status Updated from {changeEvent.OldInduction?.Status.ToString()} to {changeEvent!.Induction.Status.ToString()}"!,
                     Subject = "Induction Status Updated",
                     ScheduledEnd = clock.UtcNow
                 });
