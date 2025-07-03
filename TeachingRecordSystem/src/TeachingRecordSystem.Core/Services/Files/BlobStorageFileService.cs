@@ -1,6 +1,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
+using Microsoft.Extensions.Hosting;
 
 namespace TeachingRecordSystem.Core.Services.Files;
 
@@ -8,11 +9,13 @@ public class BlobStorageFileService : IFileService
 {
     private const string UploadsContainerName = "uploads";
     private readonly BlobServiceClient _blobServiceClient;
+    private readonly IHostEnvironment _hostEnvironment;
     private BlobContainerClient? _blobContainerClient;
 
-    public BlobStorageFileService(BlobServiceClient blobServiceClient)
+    public BlobStorageFileService(BlobServiceClient blobServiceClient, IHostEnvironment hostEnvironment)
     {
         _blobServiceClient = blobServiceClient;
+        _hostEnvironment = hostEnvironment;
     }
 
     public async Task<Guid> UploadFileAsync(Stream stream, string? contentType, Guid? fileIdOverride = null)
@@ -33,7 +36,7 @@ public class BlobStorageFileService : IFileService
             BlobContainerName = UploadsContainerName,
             BlobName = fileId.ToString(),
             ExpiresOn = DateTimeOffset.UtcNow.Add(expiresAfter),
-            Protocol = SasProtocol.Https
+            Protocol = _hostEnvironment.IsDevelopment() ? SasProtocol.HttpsAndHttp : SasProtocol.Https
         };
 
         sasBuilder.SetPermissions(BlobSasPermissions.Read);
