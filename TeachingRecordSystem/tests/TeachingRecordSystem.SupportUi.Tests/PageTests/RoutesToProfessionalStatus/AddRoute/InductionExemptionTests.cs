@@ -77,7 +77,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
 
     [Theory]
     [InlineData("Graduate Teacher Programme", "training-provider")]
-    [InlineData("Apply for QTS", "country")]
+    [InlineData("Apply for Qualified Teacher Status in England", "country")]
     public async Task Post_WhenExemptionEntered_SavesDataAndRedirectsToNextPage(string routeName, string page)
     {
         // Arrange
