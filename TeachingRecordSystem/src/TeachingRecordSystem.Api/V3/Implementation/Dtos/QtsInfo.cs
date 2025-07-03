@@ -26,14 +26,15 @@ public record QtsInfo
             .Where(r => r.RouteToProfessionalStatusType!.ProfessionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && r.Status is RouteToProfessionalStatusStatus.Holds)
             .ToArray();
 
-        var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).First();
-        Debug.Assert(oldestRoute.HoldsFrom == person.QtsDate);
+        // TEMP until we get data fixed up
+        var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).FirstOrDefault();
+        Debug.Assert(oldestRoute is null || oldestRoute.HoldsFrom == person.QtsDate);
 
         return new QtsInfo()
         {
-            HoldsFrom = oldestRoute.HoldsFrom.Value,
+            HoldsFrom = person.QtsDate!.Value,
             CertificateUrl = "/v3/certificates/qts",
-            StatusDescription = oldestRoute.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.QtlsAndSetMembershipId
+            StatusDescription = oldestRoute?.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.QtlsAndSetMembershipId
                 ? "Qualified Teacher Learning and Skills status"
                 : "Qualified",
             AwardedOrApprovedCount = holdsRoutes.Length,
