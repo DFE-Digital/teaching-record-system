@@ -173,27 +173,6 @@ public class DetailsTests : AddAlertTestBase
         AlertType.SosDecisionNoProhibition
     };
 
-    [Theory]
-    [MemberData(nameof(AlertTypesRequiringNoDetails))]
-    public async Task Post_AlertTypeRequiresNoDetails_WhenDetailsHasContent_RendersValidationError(Guid alertTypeId)
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId, alertTypeId);
-        var details = "some text to enter";
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = CreatePostContent(details)
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", $"Do not enter details if the alert type is {journeyInstance!.State.AlertTypeName}");
-    }
-
     [Fact]
     public async Task Post_DetailsAreTooLong_ReturnsError()
     {

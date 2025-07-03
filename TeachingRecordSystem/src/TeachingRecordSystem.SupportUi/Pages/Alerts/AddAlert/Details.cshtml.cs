@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.IdentityModel.Tokens;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -34,13 +32,6 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!Details.IsNullOrEmpty() &&
-            JourneyInstance!.State.AlertTypeId == AlertType.ProhibitionBySoSMisconduct ||
-            JourneyInstance!.State.AlertTypeId == AlertType.SosDecisionNoProhibition ||
-            JourneyInstance!.State.AlertTypeId == AlertType.InterimProhibitionBySoS)
-        {
-            ModelState.AddModelError(nameof(Details), $"Do not enter details if the alert type is {JourneyInstance!.State.AlertTypeName}");
-        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
