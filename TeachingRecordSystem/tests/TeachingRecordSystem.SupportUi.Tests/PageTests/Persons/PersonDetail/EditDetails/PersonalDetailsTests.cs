@@ -628,17 +628,22 @@ public class PersonalDetailsTests : TestBase
     [InlineData("AB 12 34 56 D", true)]
     [InlineData("AB 12 34 56 E", false)]
     [InlineData("AB 12 34 56 X", false)]
-    // The characters D, F, I, Q, U, and V are not used as either the first or second letter of a NINO prefix.
+    // 2025-07-03: F|M|U are allowed as postfixes to accomodate legacy data
+    [InlineData("AB 12 34 56 F", true)]
+    [InlineData("AB 12 34 56 M", true)]
+    [InlineData("AB 12 34 56 U", true)]
+    // The characters D, F, I, (Q), U, and V are not used as either the first or second letter of a NINO prefix.
+    // 2025-07-03: Q is allowed as a prefix to accomodate legacy data
     [InlineData("DA 12 34 56 A", false)]
     [InlineData("FA 12 34 56 A", false)]
     [InlineData("IA 12 34 56 A", false)]
-    [InlineData("QA 12 34 56 A", false)]
+    [InlineData("QA 12 34 56 A", true)]
     [InlineData("UA 12 34 56 A", false)]
     [InlineData("VA 12 34 56 A", false)]
     [InlineData("AD 12 34 56 A", false)]
     [InlineData("AF 12 34 56 A", false)]
     [InlineData("AI 12 34 56 A", false)]
-    [InlineData("AQ 12 34 56 A", false)]
+    [InlineData("AQ 12 34 56 A", true)]
     [InlineData("AU 12 34 56 A", false)]
     [InlineData("AV 12 34 56 A", false)]
     // The letter O is not used as the second letter of a prefix.

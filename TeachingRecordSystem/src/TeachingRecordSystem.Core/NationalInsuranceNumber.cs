@@ -16,7 +16,8 @@ public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuran
     // A NINO is made up of 2 letters, 6 numbers and a final letter, which is always A, B, C, or D
     // The characters D, F, I, Q, U, and V are not used as either the first or second letter of a NINO prefix.
     // The letter O is not used as the second letter of a prefix.
-    private const string ValidNinoRegexPattern = "^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$";
+    // 2025-07-03: Added QQ as a valid prefix and F|M|U as valid postfixes as apparently TPS workforce data uses these
+    private const string ValidNinoRegexPattern = "^[A-CEGHJ-PQR-TW-Z]{1}[A-CEGHJ-NPQR-TW-Z]{1}[0-9]{6}[A-DFMU]{1}$";
     // Prefixes BG, GB, KN, NK, NT, TN and ZZ are not to be used
     private static readonly string[] _invalidPrefixes = ["BG", "GB", "KN", "NK", "NT", "TN", "ZZ"];
     // It is sometimes necessary to use a Temporary Reference Number (TRN) for Individuals. The format of a TRN is 11 a1 11 11
