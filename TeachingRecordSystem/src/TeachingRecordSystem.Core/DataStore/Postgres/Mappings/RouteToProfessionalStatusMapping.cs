@@ -19,7 +19,7 @@ public class RouteToProfessionalStatusMapping : IEntityTypeConfiguration<RouteTo
         builder
             .Property(q => q.SourceApplicationReference)
             .HasMaxLength(RouteToProfessionalStatus.SourceApplicationReferenceMaxLength);
-        builder.HasIndex(q => new { q.SourceApplicationUserId, q.SourceApplicationReference })
+        builder.HasIndex(q => new { q.PersonId, q.SourceApplicationUserId, q.SourceApplicationReference })
             .IsUnique()
             .HasFilter("source_application_user_id is not null and source_application_reference is not null");
         builder.Property(q => q.ExemptFromInductionDueToQtsDate);
