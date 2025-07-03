@@ -1,18 +1,24 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class NotesModel(TrsDbContext dbContext) : PageModel
+public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizationService) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
 
     public List<Note> Notes { get; set; } = new List<Note>();
 
+    public bool NotesNotVisibleFlag { get; set; }
+
     public async Task OnGetAsync()
     {
+        NotesNotVisibleFlag = (await authorizationService.AuthorizeAsync(User, PersonId, AuthorizationPolicies.NotesView)) is not { Succeeded: true };
+
         var notesResult = await dbContext.Notes
             .Where(x => x.PersonId == PersonId)
             .ToArrayAsync();
