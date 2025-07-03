@@ -503,7 +503,8 @@ public class Person
 
         var holdsQtsProfessionalStatuses = routes
             .Where(p => allRouteTypes.Single(rt => rt.RouteToProfessionalStatusTypeId == p.RouteToProfessionalStatusTypeId).ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
-                p.Status is RouteToProfessionalStatusStatus.Holds)
+                p.Status is RouteToProfessionalStatusStatus.Holds &&
+                p.DeletedOn is null)
             .ToArray();
 
         var awardedBeforeInduction = holdsQtsProfessionalStatuses.Any(p => p.ExemptFromInductionDueToQtsDate == true);
