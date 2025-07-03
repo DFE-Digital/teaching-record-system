@@ -5,8 +5,8 @@ namespace TeachingRecordSystem.Core.Models;
 public enum RouteToProfessionalStatusStatus
 {
     [ProfessionalStatusStatusInfo("In training",
-        startDate: FieldRequirement.Mandatory,
-        endDate: FieldRequirement.Mandatory,
+        startDate: FieldRequirement.Optional,
+        endDate: FieldRequirement.Optional,
         awardDate: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.Optional,
@@ -17,8 +17,8 @@ public enum RouteToProfessionalStatusStatus
     InTraining = 0,
 
     [ProfessionalStatusStatusInfo("Holds",
-        startDate: FieldRequirement.Mandatory,
-        endDate: FieldRequirement.Mandatory,
+        startDate: FieldRequirement.Optional,
+        endDate: FieldRequirement.Optional,
         awardDate: FieldRequirement.Mandatory,
         inductionExemption: FieldRequirement.Mandatory,
         trainingProvider: FieldRequirement.Optional,
@@ -77,8 +77,8 @@ public enum RouteToProfessionalStatusStatus
     Withdrawn = 5,
 
     [ProfessionalStatusStatusInfo("Under assessment",
-        startDate: FieldRequirement.Mandatory,
-        endDate: FieldRequirement.Mandatory,
+        startDate: FieldRequirement.Optional,
+        endDate: FieldRequirement.Optional,
         awardDate: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.Optional,
