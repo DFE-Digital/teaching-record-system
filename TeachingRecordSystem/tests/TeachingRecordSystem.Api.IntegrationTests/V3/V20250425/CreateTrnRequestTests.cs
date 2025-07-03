@@ -1,12 +1,12 @@
 using System.Net;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.V20250425.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using Gender = TeachingRecordSystem.Api.V3.Implementation.Dtos.Gender;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 

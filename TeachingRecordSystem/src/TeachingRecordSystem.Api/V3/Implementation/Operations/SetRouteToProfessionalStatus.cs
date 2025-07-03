@@ -153,8 +153,10 @@ public partial class SetRouteToProfessionalStatusHandler(
 
         var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var route = await dbContext.RouteToProfessionalStatuses
-            .SingleOrDefaultAsync(r => r.SourceApplicationReference == command.SourceApplicationReference && r.SourceApplicationUserId == currentUserId);
+        var route = await dbContext.RouteToProfessionalStatuses.SingleOrDefaultAsync(r =>
+            r.PersonId == person.PersonId &&
+            r.SourceApplicationReference == command.SourceApplicationReference &&
+            r.SourceApplicationUserId == currentUserId);
 
         if (route is not null)
         {

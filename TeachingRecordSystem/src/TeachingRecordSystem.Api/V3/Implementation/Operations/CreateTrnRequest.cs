@@ -26,7 +26,7 @@ public record CreateTrnRequestCommand
     public required string? NationalInsuranceNumber { get; init; }
     public required bool? IdentityVerified { get; init; }
     public required string? OneLoginUserSubject { get; init; }
-    public required Gender? Gender { get; init; }
+    public required Dtos.Gender? Gender { get; init; }
 }
 
 public class CreateTrnRequestHandler(

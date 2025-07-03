@@ -60,6 +60,13 @@
                             <govuk-summary-list-row-value use-empty-fallback>@nino</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
+                    @if (details.Gender is not null)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@details.Gender</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
             </govuk-summary-list>
         </div>
 

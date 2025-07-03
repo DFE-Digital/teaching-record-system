@@ -11,6 +11,7 @@ public class CreatePostRequestContentBuilder : PostRequestContentBuilder
     private string? EmailAddress { get; set; }
     private string? MobileNumber { get; set; }
     private string? NationalInsuranceNumber { get; set; }
+    private Gender? Gender { get; set; }
     private CreateReasonOption? CreateReason { get; set; }
     private string? CreateReasonDetail { get; set; }
     private bool? UploadEvidence { get; set; }
@@ -59,6 +60,12 @@ public class CreatePostRequestContentBuilder : PostRequestContentBuilder
     public CreatePostRequestContentBuilder WithNationalInsuranceNumber(string? nationalInsuranceNumber)
     {
         NationalInsuranceNumber = nationalInsuranceNumber;
+        return this;
+    }
+
+    public CreatePostRequestContentBuilder WithGender(Gender? gender)
+    {
+        Gender = gender;
         return this;
     }
 

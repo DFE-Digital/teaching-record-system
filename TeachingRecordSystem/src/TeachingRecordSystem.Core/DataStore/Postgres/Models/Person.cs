@@ -29,6 +29,7 @@ public class Person
     public string? EmailAddress { get; set; }
     public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
+    public Gender? Gender { get; private set; }
     public InductionStatus InductionStatus { get; private set; }
     public InductionStatus InductionStatusWithoutExemption { get; private set; }
     public Guid[] InductionExemptionReasonIds { get; private set; } = [];
@@ -72,6 +73,7 @@ public class Person
         EmailAddress? emailAddress,
         MobileNumber? mobileNumber,
         NationalInsuranceNumber? nationalInsuranceNumber,
+        Gender? gender,
         string? nameChangeReason,
         EventModels.File? nameChangeEvidenceFile,
         string? detailsChangeReason,
@@ -90,6 +92,7 @@ public class Person
         MobileNumber = (string?)mobileNumber;
         EmailAddress = (string?)emailAddress;
         NationalInsuranceNumber = (string?)nationalInsuranceNumber;
+        Gender = gender;
         UpdatedOn = now;
 
         var changes = PersonDetailsUpdatedEventChanges.None |
@@ -99,7 +102,8 @@ public class Person
             (DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
             (EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
             (MobileNumber != oldDetails.MobileNumber ? PersonDetailsUpdatedEventChanges.MobileNumber : 0) |
-            (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0);
+            (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
+            (Gender != oldDetails.Gender ? PersonDetailsUpdatedEventChanges.Gender : 0);
 
         if (changes == PersonDetailsUpdatedEventChanges.None)
         {
@@ -503,7 +507,8 @@ public class Person
 
         var holdsQtsProfessionalStatuses = routes
             .Where(p => allRouteTypes.Single(rt => rt.RouteToProfessionalStatusTypeId == p.RouteToProfessionalStatusTypeId).ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
-                p.Status is RouteToProfessionalStatusStatus.Holds)
+                p.Status is RouteToProfessionalStatusStatus.Holds &&
+                p.DeletedOn is null)
             .ToArray();
 
         var awardedBeforeInduction = holdsQtsProfessionalStatuses.Any(p => p.ExemptFromInductionDueToQtsDate == true);
@@ -642,6 +647,7 @@ public class Person
         EmailAddress? emailAddress,
         MobileNumber? mobileNumber,
         NationalInsuranceNumber? nationalInsuranceNumber,
+        Gender? gender,
         string? createReason,
         string? createReasonDetail,
         EventModels.File? evidenceFile,
@@ -660,6 +666,7 @@ public class Person
             MobileNumber = (string?)mobileNumber,
             EmailAddress = (string?)emailAddress,
             NationalInsuranceNumber = (string?)nationalInsuranceNumber,
+            Gender = gender,
             CreatedOn = now,
             UpdatedOn = now,
         };

@@ -75,6 +75,7 @@ public partial class TestData
                             (EmailAddress?)person.EmailAddress,
                             (MobileNumber?)person.MobileNumber,
                             (NationalInsuranceNumber?)person.NationalInsuranceNumber,
+                            (Gender?)person.Gender,
                             nameChangeReason: "Test",
                             nameChangeEvidenceFile: null,
                             detailsChangeReason: "Test",

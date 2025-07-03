@@ -93,6 +93,7 @@ public class CheckAnswersTests : TestBase
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
+                .WithGender(Gender.Male)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false)
                 .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
@@ -112,6 +113,7 @@ public class CheckAnswersTests : TestBase
         doc.AssertSummaryListValue("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
+        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Male", v.TrimmedText()));
     }
 
     [Fact]
@@ -145,6 +147,7 @@ public class CheckAnswersTests : TestBase
         doc.AssertSummaryListValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Fact]
@@ -350,7 +353,8 @@ public class CheckAnswersTests : TestBase
     [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress)]
     [InlineData(PersonDetailsUpdatedEventChanges.MobileNumber)]
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
     public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonDetailsUpdatedEventChanges changes)
     {
         // Arrange
@@ -361,7 +365,8 @@ public class CheckAnswersTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
             .WithMobileNumber("447891234567")
-            .WithNationalInsuranceNumber("AB123456C"));
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;
@@ -370,6 +375,7 @@ public class CheckAnswersTests : TestBase
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.Email;
         var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "447654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
@@ -383,6 +389,7 @@ public class CheckAnswersTests : TestBase
                 .WithEmail(emailAddress)
                 .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
+                .WithGender(gender)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
                 .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
@@ -415,6 +422,7 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(emailAddress, updatedPersonRecord.EmailAddress);
             Assert.Equal(mobileNumber, updatedPersonRecord.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(gender, updatedPersonRecord.Gender);
         });
 
         var RaisedBy = GetCurrentUserId();
@@ -432,6 +440,7 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(emailAddress, actualEvent.Details.EmailAddress);
             Assert.Equal(mobileNumber, actualEvent.Details.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
+            Assert.Equal(gender, actualEvent.Details.Gender);
             Assert.Equal("Correcting an error", actualEvent.NameChangeReason);
             Assert.Equal(nameEvidenceFileId, actualEvent.NameChangeEvidenceFile!.FileId);
             Assert.Equal("name-evidence.pdf", actualEvent.NameChangeEvidenceFile.Name);

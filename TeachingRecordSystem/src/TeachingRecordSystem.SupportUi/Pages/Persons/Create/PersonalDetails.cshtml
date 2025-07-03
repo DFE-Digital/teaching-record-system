@@ -39,6 +39,21 @@
                 <govuk-input-hint>For example, &lsquo;QQ 12 34 56 C&rsquo;</govuk-input-hint>
             </govuk-input>
 
+            <govuk-radios asp-for="Gender" data-testid="edit-details-gender-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" data-testid="edit-details-gender-options-legend"/>
+                    <govuk-radios-item value="@Gender.Male">
+                        @Gender.Male.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@Gender.Female">
+                        @Gender.Female.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@Gender.Other">
+                        @Gender.Other.GetDisplayName()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
                 <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.PersonCreateCancel(Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>

@@ -34,6 +34,8 @@ public class BackfillDqtReportingPersons(IConfiguration configuration, TrsDbCont
         dataTable.Columns.Add("date_of_birth", typeof(DateOnly));
         dataTable.Columns.Add("email_address", typeof(string));
         dataTable.Columns.Add("national_insurance_number", typeof(string));
+        dataTable.Columns.Add("mobile_number", typeof(string));
+        dataTable.Columns.Add("gender", typeof(int));
         dataTable.Columns.Add("dqt_contact_id", typeof(Guid));
         dataTable.Columns.Add("dqt_state", typeof(int));
         dataTable.Columns.Add("dqt_first_name", typeof(string));
@@ -71,6 +73,8 @@ public class BackfillDqtReportingPersons(IConfiguration configuration, TrsDbCont
                     e.DateOfBirth,
                     e.EmailAddress,
                     e.NationalInsuranceNumber,
+                    e.MobileNumber,
+                    (int?)e.Gender,
                     e.DqtContactId,
                     e.DqtState,
                     e.DqtFirstName,

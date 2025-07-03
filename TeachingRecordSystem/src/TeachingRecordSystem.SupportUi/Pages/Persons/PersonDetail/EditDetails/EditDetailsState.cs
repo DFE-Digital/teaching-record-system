@@ -18,6 +18,7 @@ public class EditDetailsState : IRegisterJourney
     public EditDetailsFieldState<EmailAddress> OriginalEmailAddress { get; set; } = new("", null);
     public EditDetailsFieldState<MobileNumber> OriginalMobileNumber { get; set; } = new("", null);
     public EditDetailsFieldState<NationalInsuranceNumber> OriginalNationalInsuranceNumber { get; set; } = new("", null);
+    public Gender? OriginalGender { get; set; }
 
     public string FirstName { get; set; } = "";
     public string MiddleName { get; set; } = "";
@@ -26,6 +27,7 @@ public class EditDetailsState : IRegisterJourney
     public EditDetailsFieldState<EmailAddress> EmailAddress { get; set; } = new("", null);
     public EditDetailsFieldState<MobileNumber> MobileNumber { get; set; } = new("", null);
     public EditDetailsFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new("", null);
+    public Gender? Gender { get; set; }
 
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
     public bool? NameChangeUploadEvidence { get; set; }
@@ -53,7 +55,8 @@ public class EditDetailsState : IRegisterJourney
         DateOfBirth != OriginalDateOfBirth ||
         EmailAddress != OriginalEmailAddress ||
         MobileNumber != OriginalMobileNumber ||
-        NationalInsuranceNumber != OriginalNationalInsuranceNumber;
+        NationalInsuranceNumber != OriginalNationalInsuranceNumber ||
+        Gender != OriginalGender;
 
     [JsonIgnore]
     public bool IsPersonalDetailsComplete =>
@@ -97,6 +100,7 @@ public class EditDetailsState : IRegisterJourney
         OriginalEmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(person.EmailAddress);
         OriginalMobileNumber = EditDetailsFieldState<MobileNumber>.FromRawValue(person.MobileNumber);
         OriginalNationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(person.NationalInsuranceNumber);
+        OriginalGender = person.Gender;
 
         FirstName = OriginalFirstName;
         MiddleName = OriginalMiddleName;
@@ -105,6 +109,7 @@ public class EditDetailsState : IRegisterJourney
         EmailAddress = OriginalEmailAddress;
         MobileNumber = OriginalMobileNumber;
         NationalInsuranceNumber = OriginalNationalInsuranceNumber;
+        Gender = OriginalGender;
 
         Initialized = true;
     }
