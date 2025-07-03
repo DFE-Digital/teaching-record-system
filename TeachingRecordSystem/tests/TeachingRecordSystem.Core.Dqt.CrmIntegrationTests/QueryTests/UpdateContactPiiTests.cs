@@ -22,7 +22,7 @@ public class UpdateContactPiiTests : IAsyncLifetime
         var person = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithNationalInsuranceNumber();
-            x.WithGender(Contact_GenderCode.Male);
+            x.WithGender(Gender.Male);
         });
 
         var newFirstName = _dataScope.TestData.GenerateChangedFirstName(person.FirstName);

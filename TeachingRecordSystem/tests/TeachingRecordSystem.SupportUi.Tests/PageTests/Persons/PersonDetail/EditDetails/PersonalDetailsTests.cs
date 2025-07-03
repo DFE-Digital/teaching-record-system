@@ -82,7 +82,7 @@ public class PersonalDetailsTests : TestBase
             .WithEmail("test@test.com")
             .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456C")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
+            .WithGender(Gender.Female));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person));
 
@@ -746,7 +746,7 @@ public class PersonalDetailsTests : TestBase
             .WithEmail("test@test.com")
             .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Male));
+            .WithGender(Gender.Male));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -787,7 +787,7 @@ public class PersonalDetailsTests : TestBase
             .WithEmail("test@test.com")
             .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Notavailable));
+            .WithGender(Gender.NotAvailable));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -828,7 +828,7 @@ public class PersonalDetailsTests : TestBase
             .WithEmail("test@test.com")
             .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Male));
+            .WithGender(Gender.Male));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -915,7 +915,7 @@ public class PersonalDetailsTests : TestBase
             .WithEmail("original@email.com")
             .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
+            .WithGender(Gender.Female));
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
@@ -989,7 +989,7 @@ public class PersonalDetailsTests : TestBase
             .WithEmail("original@email.com")
             .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
-            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
+            .WithGender(Gender.Other));
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
