@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class DetailsTests : AddAlertTestBase
@@ -162,6 +164,34 @@ public class DetailsTests : AddAlertTestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+    }
+
+    public static TheoryData<Guid> AlertTypesRequiringNoDetails => new()
+    {
+        AlertType.ProhibitionBySoSMisconduct,
+        AlertType.InterimProhibitionBySoS,
+        AlertType.SosDecisionNoProhibition
+    };
+
+    [Theory]
+    [MemberData(nameof(AlertTypesRequiringNoDetails))]
+    public async Task Post_AlertTypeRequiresNoDetails_WhenDetailsHasContent_RendersValidationError(Guid alertTypeId)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId, alertTypeId);
+        var details = "some text to enter";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(details)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", $"Do not enter details if the alert type is {journeyInstance!.State.AlertTypeName}");
     }
 
     [Fact]
