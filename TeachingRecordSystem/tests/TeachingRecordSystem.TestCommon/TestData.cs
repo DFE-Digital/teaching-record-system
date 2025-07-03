@@ -262,7 +262,21 @@ public partial class TestData
 
     public Task<string> GenerateTrnAsync() => _generateTrn();
 
-    public Contact_GenderCode GenerateGender() => Faker.Enum.Random<Contact_GenderCode>();
+    public Contact_GenderCode GenerateGender()
+    {
+        Contact_GenderCode gender;
+
+        lock (_gate)
+        {
+            do
+            {
+                gender = Faker.Enum.Random<Contact_GenderCode>();
+            }
+            while (gender == Contact_GenderCode.Notprovided);
+        }
+
+        return gender;
+    }
 
     public DateOnly GenerateDate() => GenerateDate(min: new DateOnly(1990, 1, 1), max: new DateOnly(2030, 1, 1));
 

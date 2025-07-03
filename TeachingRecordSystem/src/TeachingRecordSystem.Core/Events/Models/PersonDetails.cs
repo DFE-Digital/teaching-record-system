@@ -11,6 +11,7 @@ public record PersonDetails
     public required string? EmailAddress { get; set; }
     public required string? MobileNumber { get; set; }
     public required string? NationalInsuranceNumber { get; set; }
+    public required Gender? Gender { get; set; }
 
     public static PersonDetails FromModel(Person person) => new()
     {
@@ -20,6 +21,7 @@ public record PersonDetails
         DateOfBirth = person.DateOfBirth,
         EmailAddress = person.EmailAddress,
         MobileNumber = person.MobileNumber,
-        NationalInsuranceNumber = person.NationalInsuranceNumber
+        NationalInsuranceNumber = person.NationalInsuranceNumber,
+        Gender = person.Gender
     };
 }

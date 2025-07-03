@@ -11,6 +11,7 @@ public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
     private string? EmailAddress { get; set; }
     private string? MobileNumber { get; set; }
     private string? NationalInsuranceNumber { get; set; }
+    private Gender? Gender { get; set; }
     private EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
     private bool? NameChangeUploadEvidence { get; set; }
     private (HttpContent, string)? NameChangeEvidenceFile { get; set; }
@@ -66,6 +67,12 @@ public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
     public EditDetailsPostRequestContentBuilder WithNationalInsuranceNumber(string? nationalInsuranceNumber)
     {
         NationalInsuranceNumber = nationalInsuranceNumber;
+        return this;
+    }
+
+    public EditDetailsPostRequestContentBuilder WithGender(Gender? gender)
+    {
+        Gender = gender;
         return this;
     }
 

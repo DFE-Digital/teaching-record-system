@@ -27,6 +27,7 @@
         <govuk-error-summary-item for="EmailAddress" />
         <govuk-error-summary-item for="MobileNumber" />
         <govuk-error-summary-item for="NationalInsuranceNumber" />
+        <govuk-error-summary-item for="Gender" />
     </govuk-error-summary>
 }
 
@@ -56,6 +57,28 @@
             <govuk-input asp-for="NationalInsuranceNumber" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-national-insurance-number">
                 <govuk-input-hint>For example, &lsquo;QQ 12 34 56 C&rsquo;</govuk-input-hint>
             </govuk-input>
+
+            <govuk-radios asp-for="Gender" data-testid="edit-details-gender-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" data-testid="edit-details-gender-options-legend"/>
+                    <govuk-radios-item value="@Gender.Male">
+                        @Gender.Male.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@Gender.Female">
+                        @Gender.Female.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@Gender.Other">
+                        @Gender.Other.GetDisplayName()
+                    </govuk-radios-item>
+                    @* We only allow NotAvailable if it's a pre-existing value on the Person record *@ 
+                    @if (Model.Gender == Gender.NotAvailable)
+                    {
+                        <govuk-radios-item value="@Gender.NotAvailable">
+                            @Gender.NotAvailable.GetDisplayName()
+                        </govuk-radios-item>
+                    }
+                </govuk-radios-fieldset>
+            </govuk-radios>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>

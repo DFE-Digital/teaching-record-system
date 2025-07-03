@@ -31,9 +31,12 @@ public class ChangeLogEditDetailsEventTests : TestBase
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, false)]
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, true)]
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, true, false)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, false)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, true)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, true, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender, false, true)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender, true, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, true)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, true, false)]
     public async Task Person_WithPersonDetailsUpdatedEvent_RendersExpectedContent(PersonDetailsUpdatedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
@@ -47,6 +50,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
         string? oldEmailAddress = "old@email-address.com";
         string? oldMobileNumber = "07654321098";
         string? oldNationalInsuranceNumber = "AB 12 34 56 D";
+        Gender? oldGender = Gender.Male;
 
         string firstName = "Megan";
         string middleName = "Thee";
@@ -55,6 +59,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
         string emailAddress = "new@email-address.com";
         string? mobileNumber = "07890123456";
         string? nationalInsuranceNumber = "XY 98 76 54 A";
+        Gender? gender = Gender.Female;
 
         var updatedFirstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? firstName : oldFirstName;
         var updatedMiddleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? middleName : oldMiddleName;
@@ -94,6 +99,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             EmailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) && !newValueIsDefault ? emailAddress : null,
             MobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) && !newValueIsDefault ? mobileNumber : null,
             NationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) && !newValueIsDefault ? nationalInsuranceNumber : null,
+            Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !newValueIsDefault ? gender : null,
         };
 
         var oldDetails = new EventModels.PersonDetails
@@ -105,6 +111,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             EmailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) && !previousValueIsDefault ? oldEmailAddress : null,
             MobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) && !previousValueIsDefault ? oldMobileNumber : null,
             NationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) && !previousValueIsDefault ? oldNationalInsuranceNumber : null,
+            Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !previousValueIsDefault ? oldGender : null,
         };
 
         var updatedEvent = new PersonDetailsUpdatedEvent
@@ -195,6 +202,17 @@ public class ChangeLogEditDetailsEventTests : TestBase
         {
             doc.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
             doc.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
+        }
+
+        if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+        {
+            doc.AssertSummaryListValue("details", "Gender", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : gender.GetDisplayName(), v.TrimmedText()));
+            doc.AssertSummaryListValue("previous-details", "Gender", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldGender.GetDisplayName(), v.TrimmedText()));
+        }
+        else
+        {
+            doc.AssertSummaryListRowDoesNotExist("details", "Gender");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Gender");
         }
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))

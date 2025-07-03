@@ -15,7 +15,7 @@ public record SetPiiCommand
     public required DateOnly DateOfBirth { get; init; }
     public required string? EmailAddresses { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
-    public required Gender? Gender { get; init; }
+    public required Dtos.Gender? Gender { get; init; }
 }
 
 public class SetPiiHandler(ICrmQueryDispatcher crmQueryDispatcher)

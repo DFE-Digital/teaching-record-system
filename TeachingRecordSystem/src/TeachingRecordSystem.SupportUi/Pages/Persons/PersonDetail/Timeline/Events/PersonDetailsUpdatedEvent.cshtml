@@ -80,6 +80,13 @@
                         <govuk-summary-list-row-value use-empty-fallback>@nino</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
+                @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@details.Gender</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
             </govuk-summary-list>
         </div>
 
@@ -181,6 +188,13 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback>@oldNino</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@oldDetails.Gender</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                 </govuk-summary-list>

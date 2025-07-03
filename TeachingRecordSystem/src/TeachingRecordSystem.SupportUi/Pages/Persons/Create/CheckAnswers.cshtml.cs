@@ -26,6 +26,7 @@ public class CheckAnswersModel(
     public EmailAddress? EmailAddress { get; set; }
     public MobileNumber? MobileNumber { get; set; }
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
+    public Gender? Gender { get; set; }
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
     public CreateReasonOption? CreateReason { get; set; }
     public string? ReasonDetail { get; set; }
@@ -63,6 +64,7 @@ public class CheckAnswersModel(
             EmailAddress,
             MobileNumber,
             NationalInsuranceNumber,
+            Gender,
             CreateReason?.GetDisplayName(),
             ReasonDetail,
             EvidenceFileId is Guid detailsFileId
@@ -102,6 +104,7 @@ public class CheckAnswersModel(
         MobileNumber = JourneyInstance.State.MobileNumber.Parsed;
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
+        Gender = JourneyInstance.State.Gender;
         CreateReason = JourneyInstance.State.CreateReason;
         ReasonDetail = JourneyInstance.State.CreateReasonDetail;
         EvidenceFileId = JourneyInstance.State.EvidenceFileId;

@@ -5,8 +5,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20250425.Requests;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
+using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
 
 namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 

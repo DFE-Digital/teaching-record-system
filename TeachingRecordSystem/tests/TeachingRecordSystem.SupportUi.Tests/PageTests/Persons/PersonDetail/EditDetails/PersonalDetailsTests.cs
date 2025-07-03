@@ -81,7 +81,8 @@ public class PersonalDetailsTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
             .WithMobileNumber("07891234567")
-            .WithNationalInsuranceNumber("AB123456C"));
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person));
 
@@ -104,6 +105,8 @@ public class PersonalDetailsTests : TestBase
         var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
         var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
+        var genderSelection = GetChildElementsOfTestId<IHtmlInputElement>(doc, "edit-details-gender-options", "input[type='radio']")
+            .Single(i => i.IsChecked == true);
 
         Assert.Equal("Alfred", firstName.Value.Trim());
         Assert.Equal("The", middleName.Value.Trim());
@@ -115,6 +118,7 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("test@test.com", emailAddress.Value.Trim());
         Assert.Equal("07891234567", mobileNumber.Value.Trim());
         Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
+        Assert.Equal("Female", genderSelection.Value.Trim());
     }
 
     [Fact]
@@ -164,6 +168,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
+                .WithGender(Gender.Other)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -180,6 +185,8 @@ public class PersonalDetailsTests : TestBase
         var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
         var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
+        var genderSelection = GetChildElementsOfTestId<IHtmlInputElement>(doc, "edit-details-gender-options", "input[type='radio']")
+            .Single(i => i.IsChecked == true);
 
         Assert.Equal("Alfred", firstName.Value.Trim());
         Assert.Equal("The", middleName.Value.Trim());
@@ -191,6 +198,39 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("test@test.com", emailAddress.Value.Trim());
         Assert.Equal("07891234567", mobileNumber.Value.Trim());
         Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
+        Assert.Equal("Other", genderSelection.Value.Trim());
+    }
+
+    [Theory]
+    [InlineData(Gender.Male, new string[] { "Male", "Female", "Other" })]
+    [InlineData(Gender.Female, new string[] { "Male", "Female", "Other" })]
+    [InlineData(Gender.Other, new string[] { "Male", "Female", "Other" })]
+    [InlineData(null, new string[] { "Male", "Female", "Other" })]
+    [InlineData(Gender.NotAvailable, new string[] { "Male", "Female", "Other", "NotAvailable" })]
+    public async Task Get_NotAvailableGender_OptionNotVisible_UnlessPreExistingValueOnPersonRecord(Gender? preExistingGenderValue, string[] expectedOptions)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithGender(preExistingGenderValue)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var genderOptions = GetChildElementsOfTestId<IHtmlInputElement>(doc, "edit-details-gender-options", "input[type='radio']");
+
+        Action<IHtmlInputElement> AssertRadioButtonValue(string expectedValue) =>
+            radio => Assert.Equal(expectedValue, radio.Value);
+
+        Assert.Collection(genderOptions, expectedOptions.Select(AssertRadioButtonValue).ToArray());
     }
 
     [Fact]
@@ -695,7 +735,7 @@ public class PersonalDetailsTests : TestBase
     }
 
     [Fact]
-    public async Task Post_NoDetailsChanged_ShowsPageError()
+    public async Task Post_UpdatingGenderToNotAvailable_ReturnsBadRequest()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -705,7 +745,8 @@ public class PersonalDetailsTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
             .WithMobileNumber("447891234567")
-            .WithNationalInsuranceNumber("AB123456C"));
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Male));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -723,6 +764,89 @@ public class PersonalDetailsTests : TestBase
                 .WithEmailAddress("test@test.com")
                 .WithMobileNumber("447891234567")
                 .WithNationalInsuranceNumber("AB123456C")
+                .WithGender(Gender.NotAvailable)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_LeavingPreExistingNotAvailableGenderUnchanged_Succeeds()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("test@test.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Notavailable));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfrede")
+                .WithMiddleName("Thee")
+                .WithLastName("Greate") // Need to change some values so the validation doesn't fail
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("test@test.com")
+                .WithMobileNumber("447891234567")
+                .WithNationalInsuranceNumber("AB123456C")
+                .WithGender(Gender.NotAvailable)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_NoDetailsChanged_ShowsPageError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("test@test.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Male));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("test@test.com")
+                .WithMobileNumber("447891234567")
+                .WithNationalInsuranceNumber("AB123456C")
+                .WithGender(Gender.Male)
                 .BuildFormUrlEncoded()
         };
 
@@ -747,6 +871,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
+                .WithGender(Gender.Male)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -759,6 +884,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmailAddress("new@email.com")
                 .WithMobileNumber("07987 654321")
                 .WithNationalInsuranceNumber("AB 65 43 21 D")
+                .WithGender(Gender.Other)
                 .BuildFormUrlEncoded()
         };
 
@@ -774,6 +900,7 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
         Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+        Assert.Equal(Gender.Other, journeyInstance.State.Gender);
     }
 
     [Fact]
@@ -787,7 +914,8 @@ public class PersonalDetailsTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("original@email.com")
             .WithMobileNumber("447891234567")
-            .WithNationalInsuranceNumber("AB123456C"));
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
@@ -801,6 +929,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmail("new@email.com")
                 .WithMobileNumber("447987654321")
                 .WithNationalInsuranceNumber("AB654321D")
+                .WithGender(Gender.Other)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
                 .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
                 .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
@@ -817,6 +946,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmailAddress("new@email.com")
                 .WithMobileNumber("447987654321")
                 .WithNationalInsuranceNumber("AB654321D")
+                .WithGender(Gender.Other)
                 .BuildFormUrlEncoded()
         };
 
@@ -838,6 +968,7 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
         Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+        Assert.Equal(Gender.Other, journeyInstance.State.Gender);
         Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
         Assert.Equal("Some reason", journeyInstance.State.OtherDetailsChangeReasonDetail);
         Assert.Equal(true, journeyInstance.State.OtherDetailsChangeUploadEvidence);
@@ -857,7 +988,8 @@ public class PersonalDetailsTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("original@email.com")
             .WithMobileNumber("447891234567")
-            .WithNationalInsuranceNumber("AB123456C"));
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
@@ -871,6 +1003,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmail("new@email.com")
                 .WithMobileNumber("447987654321")
                 .WithNationalInsuranceNumber("AB654321D")
+                .WithGender(Gender.Female)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
                 .WithNameChangeUploadEvidenceChoice(true, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
                 .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
@@ -887,6 +1020,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmailAddress("original@email.com")
                 .WithMobileNumber("447891234567")
                 .WithNationalInsuranceNumber("AB123456C")
+                .WithGender(Gender.Other)
                 .BuildFormUrlEncoded()
         };
 

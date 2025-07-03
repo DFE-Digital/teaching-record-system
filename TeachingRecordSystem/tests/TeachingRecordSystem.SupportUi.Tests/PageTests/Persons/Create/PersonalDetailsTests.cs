@@ -53,6 +53,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
+                .WithGender(Gender.Female)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
@@ -69,6 +70,8 @@ public class PersonalDetailsTests : TestBase
         var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
         var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
+        var genderSelection = GetChildElementsOfTestId<IHtmlInputElement>(doc, "edit-details-gender-options", "input[type='radio']")
+            .Single(i => i.IsChecked == true);
 
         Assert.Equal("Alfred", firstName.Value.Trim());
         Assert.Equal("The", middleName.Value.Trim());
@@ -80,6 +83,7 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("test@test.com", emailAddress.Value.Trim());
         Assert.Equal("07891234567", mobileNumber.Value.Trim());
         Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
+        Assert.Equal("Female", genderSelection.Value.Trim());
     }
 
     [Fact]
@@ -574,6 +578,7 @@ public class PersonalDetailsTests : TestBase
                 .WithEmailAddress("new@email.com")
                 .WithMobileNumber("07987 654321")
                 .WithNationalInsuranceNumber("AB 65 43 21 D")
+                .WithGender(Gender.Other)
                 .BuildFormUrlEncoded()
         };
 
@@ -589,6 +594,7 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
         Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+        Assert.Equal(Gender.Other, journeyInstance.State.Gender);
     }
 
     private string GetRequestPath() =>

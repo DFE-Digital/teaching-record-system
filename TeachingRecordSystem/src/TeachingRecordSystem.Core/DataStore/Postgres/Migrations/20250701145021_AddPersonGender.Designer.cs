@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250701145021_AddPersonGender")]
+    partial class AddPersonGender
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -19108,9 +19111,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid[]")
                         .HasColumnName("training_subject_ids");
 
-                    b.HasIndex("PersonId", "SourceApplicationUserId", "SourceApplicationReference")
+                    b.HasIndex("SourceApplicationUserId", "SourceApplicationReference")
                         .IsUnique()
-                        .HasDatabaseName("ix_qualifications_person_id_source_application_user_id_source_")
+                        .HasDatabaseName("ix_qualifications_source_application_user_id_source_applicatio")
                         .HasFilter("source_application_user_id is not null and source_application_reference is not null");
 
                     b.HasDiscriminator().HasValue(1);

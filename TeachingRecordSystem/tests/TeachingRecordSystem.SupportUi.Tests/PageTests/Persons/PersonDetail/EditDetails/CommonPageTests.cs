@@ -91,7 +91,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
-            .WithNationalInsuranceNumber("AB123456D"));
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -100,6 +101,7 @@ public class CommonPageTests : TestBase
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
         var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
         var state = new EditDetailsStateBuilder()
             .WithInitializedState(person)
@@ -107,7 +109,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithMobileNumber(mobileNumber)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber);
+            .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            .WithGender(gender);
 
         if (hasNameChangeReason)
         {
@@ -157,7 +160,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
-            .WithNationalInsuranceNumber("AB123456D"));
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Male));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -166,6 +170,7 @@ public class CommonPageTests : TestBase
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
         var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
         var state = new EditDetailsStateBuilder()
             .WithInitializedState(person)
@@ -214,6 +219,7 @@ public class CommonPageTests : TestBase
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
+    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     // Edit details (name and other details changes): redirects to change name reason page
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason")]
@@ -230,18 +236,21 @@ public class CommonPageTests : TestBase
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
+    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     // Change reason (other details changes only): redirects to check answers page
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
+    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
     // Change reason (name and other details changes): redirects to check answers page
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
+    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
     public async Task Post_RedirectsToExpectedPage(string fromPage, PersonDetailsUpdatedEventChanges changes, string expectedNextPageUrl)
     {
@@ -253,7 +262,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
-            .WithNationalInsuranceNumber("AB123456D"));
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Other));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -262,6 +272,7 @@ public class CommonPageTests : TestBase
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
         var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
         var state = new EditDetailsStateBuilder()
             .WithInitializedState(person)
@@ -269,7 +280,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithMobileNumber(mobileNumber)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber);
+            .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            .WithGender(gender);
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
@@ -296,6 +308,7 @@ public class CommonPageTests : TestBase
                     .WithEmailAddress(emailAddress)
                     .WithMobileNumber(mobileNumber)
                     .WithNationalInsuranceNumber(nationalInsuranceNumber)
+                    .WithGender(gender)
                     .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
                     .WithNameChangeEvidence(false)
                     .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
@@ -419,7 +432,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
-            .WithNationalInsuranceNumber("AB123456D"));
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
 
         var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -428,6 +442,7 @@ public class CommonPageTests : TestBase
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
         var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Other : person.Gender;
 
         var state = new EditDetailsStateBuilder()
             .WithInitializedState(person)
@@ -435,7 +450,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
             .WithMobileNumber(mobileNumber)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber);
+            .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            .WithGender(gender);
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
@@ -496,7 +512,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
             .WithMobileNumber("07891234567")
-            .WithNationalInsuranceNumber("AB123456D"));
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Core.Dqt.Models.Contact_GenderCode.Female));
 
         var originalFirstName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var originalMiddleName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -505,6 +522,7 @@ public class CommonPageTests : TestBase
         var originalEmailAddress = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
         var originalMobileNumber = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var originalNationalInsuranceNumber = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var originalGender = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
 
         var newFirstName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Megan" : person.FirstName;
         var newMiddleName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
@@ -513,6 +531,7 @@ public class CommonPageTests : TestBase
         var newEmailAddress = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
         var newMobileNumber = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var newNationalInsuranceNumber = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
+        var newGender = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
 
         var state = new EditDetailsStateBuilder()
             .WithInitializedState(person)
@@ -520,7 +539,8 @@ public class CommonPageTests : TestBase
             .WithDateOfBirth(originalDateOfBirth)
             .WithEmail(originalEmailAddress)
             .WithMobileNumber(originalMobileNumber)
-            .WithNationalInsuranceNumber(originalNationalInsuranceNumber);
+            .WithNationalInsuranceNumber(originalNationalInsuranceNumber)
+            .WithGender(originalGender);
 
         if (originalChanges.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
@@ -547,6 +567,7 @@ public class CommonPageTests : TestBase
                 .WithEmailAddress(newEmailAddress)
                 .WithMobileNumber(newMobileNumber)
                 .WithNationalInsuranceNumber(newNationalInsuranceNumber)
+                .WithGender(newGender)
                 .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
                 .WithNameChangeEvidence(false)
                 .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
