@@ -43,7 +43,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.Name == "NI R") // a route with mandatory induction exemption that isn't implicit (requires a yes/no answer)
+            .Where(r => r.Name == "Northern Irish Recognition") // a route with mandatory induction exemption that isn't implicit (requires a yes/no answer)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
@@ -125,7 +125,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.Name == "NI R")
+            .Where(r => r.Name == "Northern Irish Recognition")
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
@@ -157,7 +157,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.Name == "NI R") // a route that requires the induction exemption question
+            .Where(r => r.Name == "Northern Irish Recognition") // a route that requires the induction exemption question
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)

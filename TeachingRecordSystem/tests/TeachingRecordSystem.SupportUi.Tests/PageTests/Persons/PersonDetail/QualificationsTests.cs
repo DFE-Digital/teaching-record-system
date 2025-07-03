@@ -302,7 +302,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var status = RouteToProfessionalStatusStatus.InTraining;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
         var ageFrom = 4;
         var ageTo = 11;
         var person = await TestData.CreatePersonAsync(p => p
@@ -380,7 +380,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
         DateOnly holdsFrom = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
 
         var qualificationProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var qualificationSpecialism = MandatoryQualificationSpecialism.Hearing;
