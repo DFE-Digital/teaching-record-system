@@ -10,7 +10,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     public async Task Route_AddJourneyToCyaPageAndBack()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
-            .Single(r => r.Name == "Apprenticeship");
+            .Single(r => r.Name == "Postgraduate Teaching Apprenticeship");
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
@@ -112,7 +112,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     public async Task Route_AddJourney()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
-            .Single(r => r.Name == "Apprenticeship");
+            .Single(r => r.Name == "Postgraduate Teaching Apprenticeship");
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
@@ -186,7 +186,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     public async Task Route_AddJourney_OnlyCountryApplicable()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
-            .Single(r => r.Name == "Apprenticeship");
+            .Single(r => r.Name == "Postgraduate Teaching Apprenticeship");
         var status = RouteToProfessionalStatusStatus.Deferred;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne()
@@ -408,7 +408,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     public async Task Route_AddJourneyToCyaPage_EditFields_BackToCyaPage()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
-            .Single(r => r.Name == "Apprenticeship");
+            .Single(r => r.Name == "Postgraduate Teaching Apprenticeship");
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
