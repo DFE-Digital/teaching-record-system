@@ -28,7 +28,7 @@ public class RouteToProfessionalStatus : Qualification
     public required Guid? TrainingProviderId { get; set; }
     public TrainingProvider? TrainingProvider { get; }
     public required bool? ExemptFromInduction { get; set; }
-    public bool? ExemptFromInductionDueToQtsDate { get; private set; }
+    public bool? ExemptFromInductionDueToQtsDate { get; set; }
     public required Guid? DegreeTypeId { get; set; }
     public DegreeType? DegreeType { get; }
     public string? DqtTeacherStatusName { get; init; }

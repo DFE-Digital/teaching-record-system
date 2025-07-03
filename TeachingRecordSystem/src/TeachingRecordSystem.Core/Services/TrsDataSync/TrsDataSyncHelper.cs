@@ -17,6 +17,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
+using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -1308,92 +1309,178 @@ public class TrsDataSyncHelper(
         return events.Count;
     }
 
-    private async Task<int> SyncRoutesAsync(
-        IReadOnlyCollection<RouteToProfessionalStatus> routes,
+    private async Task<Guid[]> EnsurePersonsSyncedAsync(Guid[] personIds, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
+    {
+        using var dbContext = TrsDbContext.Create(trsDbDataSource);
+        var alreadySyncedPersonIds = await dbContext.Persons
+            .Where(p => personIds.Contains(p.PersonId))
+            .Select(p => p.PersonId)
+            .ToListAsync(cancellationToken);
+        var unsyncedPersonIds = personIds.Except(alreadySyncedPersonIds).ToArray();
+        if (!unsyncedPersonIds.Any())
+        {
+            return personIds;
+        }
+
+        var syncedPersonIds = await SyncPersonsAsync(unsyncedPersonIds, syncAudit: true, ignoreInvalid, dryRun, cancellationToken);
+        var unsyncablePersonIds = unsyncedPersonIds.Where(id => !syncedPersonIds.Contains(id)).ToArray();
+        if (unsyncablePersonIds.Length > 0)
+        {
+            return personIds.Except(unsyncablePersonIds).ToArray();
+        }
+
+        return personIds;
+    }
+
+    private async Task<int> MigrateRoutesAsync(
+        IReadOnlyCollection<ContactIttQtsMapResult> mappings,
         bool ignoreInvalid,
         bool dryRun,
         CancellationToken cancellationToken = default)
     {
-        if (!routes.Any())
+        if (!mappings.Any())
         {
             return 0;
         }
 
-        var toSync = routes.ToList();
+        // Ensure we sync any Persons that are not already synced
+        var personIds = mappings.Where(m => m.MappedResults.Any(r => r.Success)).Select(m => m.ContactId).Distinct().ToArray();
+        var syncedPersonIds = await EnsurePersonsSyncedAsync(personIds, ignoreInvalid, dryRun: false, cancellationToken);
+        var unsyncedPersonIds = personIds.Except(syncedPersonIds).ToArray();
+        var mappingsToProcess = mappings.ToArray();
+        if (ignoreInvalid && unsyncedPersonIds.Length > 0)
+        {
+            // Remove mappings for persons that could not be synced - although I guess we could still report on them in non-prod environments
+            mappingsToProcess = mappingsToProcess.Where(m => !unsyncedPersonIds.Contains(m.ContactId)).ToArray();
+        }
+
+        var personIdsToSync = mappingsToProcess
+            .Where(m => m.MappedResults.Any(r => r.Success)).Select(m => m.ContactId)
+            .ToArray();
+
         var modelTypeSyncInfo = GetModelTypeSyncInfo<RouteToProfessionalStatus>(ModelTypes.Route);
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
-        do
+        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+        using var dbContext = TrsDbContext.Create(connection);
+
+        var persons = await dbContext.Persons
+            .FromSql(
+            $"""
+            SELECT
+            	*
+            FROM
+            	persons p
+            WHERE
+            	person_id = ANY({personIdsToSync})
+            FOR UPDATE
+            """)
+            .IgnoreQueryFilters()
+            .ToListAsync();
+
+        var toSync = new List<RouteToProfessionalStatus>();
+        var events = new List<EventBase>();
+        foreach (var mapping in mappingsToProcess.Where(m => personIdsToSync.Contains(m.ContactId)))
         {
-            using var txn = await connection.BeginTransactionAsync(cancellationToken);
-
-            using (var createTempTableCommand = connection.CreateCommand())
+            var person = persons.Single(p => p.PersonId == mapping.ContactId);
+            var inductionExemptionReasonIdsToRemove = new HashSet<Guid>();
+            foreach (var result in mapping.MappedResults.Where(m => m.Success))
             {
-                createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
-                createTempTableCommand.Transaction = txn;
-                await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
-            }
-
-            using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
-
-            foreach (var route in toSync)
-            {
-                writer.StartRow();
-                modelTypeSyncInfo.WriteRecord!(writer, route);
-            }
-
-            await writer.CompleteAsync(cancellationToken);
-            await writer.CloseAsync(cancellationToken);
-
-            var syncedRoutePersonIds = new List<Guid>();
-
-            try
-            {
-                using (var mergeCommand = connection.CreateCommand())
+                var inductionExemptionReasonIdsMovedFromPerson = new List<Guid>();
+                var inductionExemptionReasonId = result.ProfessionalStatusInfo!.RouteToProfessionalStatusType!.InductionExemptionReasonId;
+                if (inductionExemptionReasonId is not null)
                 {
-                    mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
-                    mergeCommand.Transaction = txn;
-                    await mergeCommand.ExecuteNonQueryAsync();
-                }
-            }
-            catch (PostgresException ex) when (ex.SqlState == "23503" && ex.ConstraintName == "fk_qualifications_person")
-            {
-                // This means that the person_id in the route does not exist in the persons table so will need to sync.
-                // ex.Detail will be something like "Key (person_id)=(78958d54-fc32-eb11-a813-000d3a2287a4) is not present in table "persons""
-                var unsyncedPersonId = Guid.Parse(ex.Detail!.Substring("Key (person_id)=(".Length, 36));
-                await txn.DisposeAsync();
-
-                var personSynced = await SyncPersonAsync(unsyncedPersonId, syncAudit: true, ignoreInvalid, dryRun: false, cancellationToken);
-                if (!personSynced)
-                {
-                    var errorMessage = $"Attempted to migrate routes for persons but the Contact records with ID {unsyncedPersonId} does not meet the sync criteria.";
-                    if (ignoreInvalid)
+                    if (person.InductionExemptionReasonIds.Any(id => id == inductionExemptionReasonId))
                     {
-                        logger.LogWarning(errorMessage);
-                        toSync.RemoveAll(i => i.PersonId == unsyncedPersonId);
-                        if (toSync.Count == 0)
-                        {
-                            return 0;
-                        }
+                        inductionExemptionReasonIdsToRemove.Add(inductionExemptionReasonId.Value);
+                        inductionExemptionReasonIdsMovedFromPerson.Add(inductionExemptionReasonId.Value);
+                        result.ProfessionalStatusInfo!.ProfessionalStatus!.ExemptFromInduction = true;
                     }
                     else
                     {
-                        throw new InvalidOperationException(errorMessage);
+                        result.ProfessionalStatusInfo!.ProfessionalStatus!.ExemptFromInduction = false;
                     }
                 }
 
-                continue;
+                if (result.ProfessionalStatusInfo!.RouteToProfessionalStatusType!.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
+                    result.ProfessionalStatusInfo!.ProfessionalStatus!.Status == RouteToProfessionalStatusStatus.Holds &&
+                    result.ProfessionalStatusInfo!.ProfessionalStatus.HoldsFrom < new DateOnly(2000, 05, 07) &&
+                    person.InductionExemptionReasonIds.Any(id => id == InductionExemptionReason.QualifiedBefore7May2000Id))
+                {
+                    inductionExemptionReasonIdsToRemove.Add(InductionExemptionReason.QualifiedBefore7May2000Id);
+                    inductionExemptionReasonIdsMovedFromPerson.Add(InductionExemptionReason.QualifiedBefore7May2000Id);
+                    result.ProfessionalStatusInfo!.ProfessionalStatus!.ExemptFromInductionDueToQtsDate = true;
+                }
+
+                result.InductionExemptionReasonIdsMovedFromPerson = inductionExemptionReasonIdsMovedFromPerson.ToArray();
+
+                toSync.Add(result.ProfessionalStatusInfo!.ProfessionalStatus!);
+                // TODO add migrated event to the events list
             }
 
-            if (!dryRun)
+            // Remove any induction exemption reasons that need to be moved to the route
+            foreach (var inductionExemptionReasonId in inductionExemptionReasonIdsToRemove)
             {
-                await txn.CommitAsync(cancellationToken);
+                var oldEventInduction = EventModels.Induction.FromModel(person);
+                var now = clock.UtcNow;
+                if (person.UnsafeRemoveInductionExemptionReason(inductionExemptionReasonId, SystemUser.SystemUserId, now))
+                {
+                    events.Add(new PersonInductionUpdatedEvent()
+                    {
+                        EventId = Guid.NewGuid(),
+                        CreatedUtc = now,
+                        RaisedBy = SystemUser.SystemUserId,
+                        PersonId = person.PersonId,
+                        Induction = EventModels.Induction.FromModel(person),
+                        OldInduction = oldEventInduction,
+                        ChangeReason = "Moved to route",
+                        ChangeReasonDetail = $"Moved induction exemption reason '{inductionExemptionReasonId}' to route.",
+                        EvidenceFile = null,
+                        Changes = PersonInductionUpdatedEventChanges.InductionExemptionReasons
+                    });
+                }
             }
-
-            break;
         }
-        while (true);
 
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        // TODO also sync the events for the routes
+        // TODO populate table with mapping results for verification
+
+        using (var createTempTableCommand = connection.CreateCommand())
+        {
+            createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
+            createTempTableCommand.Transaction = txn;
+            await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
+
+        foreach (var route in toSync)
+        {
+            writer.StartRow();
+            modelTypeSyncInfo.WriteRecord!(writer, route);
+        }
+
+        await writer.CompleteAsync(cancellationToken);
+        await writer.CloseAsync(cancellationToken);
+
+        using (var mergeCommand = connection.CreateCommand())
+        {
+            mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
+            mergeCommand.Transaction = txn;
+            await mergeCommand.ExecuteNonQueryAsync();
+        }
+
+        await txn.SaveEventsAsync(events, "events_route_migration", clock, cancellationToken, timeoutSeconds: 120);
+
+        if (!dryRun)
+        {
+            await txn.CommitAsync(cancellationToken);
+        }
+
+        _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
         return toSync.Count;
     }
 
@@ -2084,6 +2171,8 @@ public class TrsDataSyncHelper(
             "holds_from",
             "training_end_date",
             "degree_type_id",
+            "exempt_from_induction",
+            "exempt_from_induction_due_to_qts_date",
             "dqt_age_range_from",
             "dqt_age_range_to"
         };
@@ -2127,6 +2216,8 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(route.HoldsFrom, NpgsqlDbType.Date);
             writer.WriteValueOrNull(route.TrainingEndDate, NpgsqlDbType.Date);
             writer.WriteValueOrNull(route.DegreeTypeId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(route.ExemptFromInduction, NpgsqlDbType.Boolean);
+            writer.WriteValueOrNull(route.ExemptFromInductionDueToQtsDate, NpgsqlDbType.Boolean);
             writer.WriteValueOrNull(route.DqtAgeRangeFrom, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(route.DqtAgeRangeTo, NpgsqlDbType.Varchar);
         };
@@ -2456,34 +2547,29 @@ public class TrsDataSyncHelper(
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var results = await MapIttAndQtsRegistrationsAsync(contacts, qts, itt, createMigratedEvent: true);
-        var succeeded = results.Where(r => r.Success).Select(r => r.ProfessionalStatus!).AsReadOnly();
-        await SyncRoutesAsync(succeeded, ignoreInvalid, dryRun);
+        var contactIttQtsMapResults = await MapIttAndQtsRegistrationsAsync(contacts, qts, itt);
+        await MigrateRoutesAsync(contactIttQtsMapResults, ignoreInvalid, dryRun);
     }
 
-    public async Task<IttQtsMapResult[]> MapIttAndQtsRegistrationsAsync(
+    public async Task<ContactIttQtsMapResult[]> MapIttAndQtsRegistrationsAsync(
         IEnumerable<Contact> contacts,
         IEnumerable<dfeta_qtsregistration> qts,
-        IEnumerable<dfeta_initialteachertraining> itt,
-        //IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
-        bool createMigratedEvent)
+        IEnumerable<dfeta_initialteachertraining> itt)
     {
         using var dbContext = TrsDbContext.Create(trsDbDataSource);
 
-        var registerApplicationUserId = (await dbContext.ApplicationUsers.SingleAsync(u => u.ShortName == "Register")).UserId!;
-        var afqtsApplicationUserId = (await dbContext.ApplicationUsers.SingleAsync(u => u.ShortName == "AfQTS")).UserId!;
+        var registerApplicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.ShortName == "Register");
+        var afqtsApplicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.ShortName == "AfQTS");
         var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
         var earlyYearsProfessionalStatus = await referenceDataCache.GetEarlyYearsStatusByValueAsync("222");
         var noQualificationRestrictedByGtc = await referenceDataCache.GetIttQualificationByValueAsync("998");
         var partiallyQualifiedTeacherStatus = await referenceDataCache.GetTeacherStatusByValueAsync("214");
         var qualifiedTeacherTrainedTeacherStatus = await referenceDataCache.GetTeacherStatusByValueAsync("71");
 
-        // TODO Events, inc. for deactivated
-
         var ittByContact = itt.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());
         var qtsByContact = qts.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());
 
-        var result = new List<IttQtsMapResult>();
+        var result = new List<ContactIttQtsMapResult>();
 
         if (!contacts.Any())
         {
@@ -2495,17 +2581,21 @@ public class TrsDataSyncHelper(
             try
             {
                 var succeeded = await MapContactIttAndQtsAsync(contact);
-                result.AddRange(succeeded);
+                result.Add(succeeded);
             }
             catch (IttQtsMapException ex)
             {
-                result.Add(ex.Result);
+                result.Add(new ContactIttQtsMapResult()
+                {
+                    ContactId = contact.Id,
+                    MappedResults = [ex.Result]
+                });
             }
         }
 
         return result.ToArray();
 
-        async Task<IEnumerable<IttQtsMapResult>> MapContactIttAndQtsAsync(Contact contact)
+        async Task<ContactIttQtsMapResult> MapContactIttAndQtsAsync(Contact contact)
         {
             var contactId = contact.Id;
             var qtlsDate = contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: true);
@@ -2522,8 +2612,8 @@ public class TrsDataSyncHelper(
             if (qtlsDate is not null)
             {
                 var ps = await CreateProfessionalStatusAsync(
-                    registerApplicationUserId,
-                    afqtsApplicationUserId,
+                    registerApplicationUser,
+                    afqtsApplicationUser,
                     clock,
                     referenceDataCache,
                     allRoutes,
@@ -2549,48 +2639,52 @@ public class TrsDataSyncHelper(
                     failedReason = IttQtsMapResultFailedReason.DoNotMigrateNoQualificationRestrictedByGtc;
                 }
 
-                mapped.Add(IttQtsMapResult.Failed(
-                    contactId,
-                    failedReason,
-                    qtsRegistrationId: null,
-                    itt: itt,
-                    teacherStatus: null,
-                    qtsDate: null,
-                    earlyYearsStatus: null,
-                    eytsDate: null,
-                    partialRecognitionDate: null,
-                    qtlsDate,
-                    ittQualification: null,
-                    statusDerivedRouteId: null,
-                    programmeTypeDerivedRouteId: null,
-                    ittQualificationDerivedRouteId: null,
-                    multiplePotentialCompatibleIttRecords: null,
-                    contactIttRowCount,
-                    contactQtsRowCount));
+                mapped.Add(
+                    await IttQtsMapResult.FailedAsync(
+                        referenceDataCache,
+                        contactId,
+                        failedReason,
+                        qtsRegistrationId: null,
+                        itt: itt,
+                        teacherStatus: null,
+                        qtsDate: null,
+                        earlyYearsStatus: null,
+                        eytsDate: null,
+                        partialRecognitionDate: null,
+                        qtlsDate,
+                        ittQualification: null,
+                        statusDerivedRouteId: null,
+                        programmeTypeDerivedRouteId: null,
+                        ittQualificationDerivedRouteId: null,
+                        multiplePotentialCompatibleIttRecords: null,
+                        contactIttRowCount,
+                        contactQtsRowCount));
                 contactItt.Remove(itt!);
             }
 
             // Filter out QTS registrations which we aren't migrating to TRS
             foreach (var qts in contactQts.Where(q => q.dfeta_TeacherStatusId is null && q.dfeta_EarlyYearsStatusId is null).ToArray())
             {
-                mapped.Add(IttQtsMapResult.Failed(
-                    contactId,
-                    IttQtsMapResultFailedReason.DoNotMigrateQtsRegistrationHasNoStatus,
-                    qts.Id,
-                    itt: null,
-                    teacherStatus: null,
-                    qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    earlyYearsStatus: null,
-                    qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    qtlsDate,
-                    ittQualification: null,
-                    statusDerivedRouteId: null,
-                    programmeTypeDerivedRouteId: null,
-                    ittQualificationDerivedRouteId: null,
-                    multiplePotentialCompatibleIttRecords: null,
-                    contactIttRowCount,
-                    contactQtsRowCount));
+                mapped.Add(
+                    await IttQtsMapResult.FailedAsync(
+                        referenceDataCache,
+                        contactId,
+                        IttQtsMapResultFailedReason.DoNotMigrateQtsRegistrationHasNoStatus,
+                        qts.Id,
+                        itt: null,
+                        teacherStatus: null,
+                        qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        earlyYearsStatus: null,
+                        qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        qtlsDate,
+                        ittQualification: null,
+                        statusDerivedRouteId: null,
+                        programmeTypeDerivedRouteId: null,
+                        ittQualificationDerivedRouteId: null,
+                        multiplePotentialCompatibleIttRecords: null,
+                        contactIttRowCount,
+                        contactQtsRowCount));
                 contactQts.Remove(qts);
             }
 
@@ -2624,24 +2718,26 @@ public class TrsDataSyncHelper(
                         (qts.dfeta_TeacherStatusId?.Id != partiallyQualifiedTeacherStatus.Id && qts.dfeta_DateofRecognition is not null) ||
                         (qts.dfeta_DateofRecognition is not null && (qts.dfeta_QTSDate is not null || qts.dfeta_EYTSDate is not null)))
                     {
-                        mapped.Add(IttQtsMapResult.Failed(
-                            contactId,
-                            IttQtsMapResultFailedReason.PartialRecognitionIsInvalid,
-                            qts.Id,
-                            itt: null,
-                            teacherStatus,
-                            qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                            eyStatus,
-                            qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                            qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                            qtlsDate,
-                            ittQualification: null,
-                            statusDerivedRouteId: null,
-                            programmeTypeDerivedRouteId: null,
-                            ittQualificationDerivedRouteId: null,
-                            multiplePotentialCompatibleIttRecords: null,
-                            contactIttRowCount,
-                            contactQtsRowCount));
+                        mapped.Add(
+                            await IttQtsMapResult.FailedAsync(
+                                referenceDataCache,
+                                contactId,
+                                IttQtsMapResultFailedReason.PartialRecognitionIsInvalid,
+                                qts.Id,
+                                itt: null,
+                                teacherStatus,
+                                qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                eyStatus,
+                                qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                qtlsDate,
+                                ittQualification: null,
+                                statusDerivedRouteId: null,
+                                programmeTypeDerivedRouteId: null,
+                                ittQualificationDerivedRouteId: null,
+                                multiplePotentialCompatibleIttRecords: null,
+                                contactIttRowCount,
+                                contactQtsRowCount));
                         continue;
                     }
 
@@ -2713,24 +2809,26 @@ public class TrsDataSyncHelper(
                             failedReason = IttQtsMapResultFailedReason.DoNotMigrateNoQualificationRestrictedByGtc;
                         }
 
-                        mapped.Add(IttQtsMapResult.Failed(
-                            contactId,
-                            failedReason,
-                            qts.Id,
-                            itt: itt,
-                            teacherStatus,
-                            qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                            eyStatus,
-                            qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                            qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                            qtlsDate,
-                            ittQualification: null,
-                            statusDerivedRouteId: null,
-                            programmeTypeDerivedRouteId: null,
-                            ittQualificationDerivedRouteId: null,
-                            mutlipleCompatibleIttIds,
-                            contactIttRowCount,
-                            contactQtsRowCount));
+                        mapped.Add(
+                            await IttQtsMapResult.FailedAsync(
+                                referenceDataCache,
+                                contactId,
+                                failedReason,
+                                qts.Id,
+                                itt: itt,
+                                teacherStatus,
+                                qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                eyStatus,
+                                qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                qtlsDate,
+                                ittQualification: null,
+                                statusDerivedRouteId: null,
+                                programmeTypeDerivedRouteId: null,
+                                ittQualificationDerivedRouteId: null,
+                                mutlipleCompatibleIttIds,
+                                contactIttRowCount,
+                                contactQtsRowCount));
                         continue;
                     }
 
@@ -2751,7 +2849,7 @@ public class TrsDataSyncHelper(
 
                     var status = (isEy && (qts.dfeta_EYTSDate is not null || eyStatus?.dfeta_Value == earlyYearsProfessionalStatus.dfeta_Value)) || (!isEy && (qts.dfeta_QTSDate is not null || qts.dfeta_DateofRecognition is not null))
                         ? RouteToProfessionalStatusStatus.Holds
-                        : MapStatus(itt, qts, ittQualification, teacherStatus, eyStatus);
+                        : await MapStatusAsync(itt, qts, ittQualification, teacherStatus, eyStatus);
 
                     // Map ITT, QTS & ITT Qual and check they resolve to the same route type (where mapping is possible)
                     // If not, use precedence rules (see 'Manual cases' tab)
@@ -2793,7 +2891,8 @@ public class TrsDataSyncHelper(
                         else
                         {
                             throw new IttQtsMapException(
-                                IttQtsMapResult.Failed(
+                                await IttQtsMapResult.FailedAsync(
+                                    referenceDataCache,
                                     contactId,
                                     IttQtsMapResultFailedReason.CannotDeriveRoute,
                                     qts.Id,
@@ -2826,8 +2925,8 @@ public class TrsDataSyncHelper(
                     }
 
                     var ps = await CreateProfessionalStatusAsync(
-                        registerApplicationUserId,
-                        afqtsApplicationUserId,
+                        registerApplicationUser,
+                        afqtsApplicationUser,
                         clock,
                         referenceDataCache,
                         allRoutes,
@@ -2841,22 +2940,24 @@ public class TrsDataSyncHelper(
                         ittQualification,
                         teacherStatus,
                         eyStatus);
-                    mapped.Add(IttQtsMapResult.Succeeded(
-                        ps,
-                        itt,
-                        teacherStatus,
-                        qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                        eyStatus,
-                        qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                        qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                        qtlsDate,
-                        ittQualification,
-                        statusDerivedRouteId,
-                        programmeTypeDerivedRouteId,
-                        ittQualificationDerivedRouteId,
-                        mutlipleCompatibleIttIds,
-                        contactIttRowCount,
-                        contactQtsRowCount));
+                    mapped.Add(
+                        await IttQtsMapResult.SucceededAsync(
+                            referenceDataCache,
+                            ps,
+                            itt,
+                            teacherStatus,
+                            qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            eyStatus,
+                            qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qtlsDate,
+                            ittQualification,
+                            statusDerivedRouteId,
+                            programmeTypeDerivedRouteId,
+                            ittQualificationDerivedRouteId,
+                            mutlipleCompatibleIttIds,
+                            contactIttRowCount,
+                            contactQtsRowCount));
                 }
             }
 
@@ -2873,24 +2974,26 @@ public class TrsDataSyncHelper(
                         failedReason = IttQtsMapResultFailedReason.DoNotMigrateNoQualificationRestrictedByGtc;
                     }
 
-                    mapped.Add(IttQtsMapResult.Failed(
-                        contactId,
-                        failedReason,
-                        qtsRegistrationId: null,
-                        itt: itt,
-                        teacherStatus: null,
-                        qtsDate: null,
-                        earlyYearsStatus: null,
-                        eytsDate: null,
-                        partialRecognitionDate: null,
-                        qtlsDate,
-                        ittQualification: null,
-                        statusDerivedRouteId: null,
-                        programmeTypeDerivedRouteId: null,
-                        ittQualificationDerivedRouteId: null,
-                        multiplePotentialCompatibleIttRecords: null,
-                        contactIttRowCount,
-                        contactQtsRowCount));
+                    mapped.Add(
+                        await IttQtsMapResult.FailedAsync(
+                            referenceDataCache,
+                            contactId,
+                            failedReason,
+                            qtsRegistrationId: null,
+                            itt: itt,
+                            teacherStatus: null,
+                            qtsDate: null,
+                            earlyYearsStatus: null,
+                            eytsDate: null,
+                            partialRecognitionDate: null,
+                            qtlsDate,
+                            ittQualification: null,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount));
                     continue;
                 }
 
@@ -2904,7 +3007,9 @@ public class TrsDataSyncHelper(
                         failedReason = hasWelshItt ? IttQtsMapResultFailedReason.DoNotMigrateQtsAwardedInWalesDuplicateIttRecords : IttQtsMapResultFailedReason.PotentialDuplicateIttRecords;
                     }
 
-                    mapped.Add(IttQtsMapResult.Failed(
+                    mapped.Add(
+                        await IttQtsMapResult.FailedAsync(
+                            referenceDataCache,
                             contactId,
                             failedReason,
                             qtsRegistrationId: null,
@@ -2929,7 +3034,7 @@ public class TrsDataSyncHelper(
                         ? await referenceDataCache.GetIttQualificationByIdAsync(itt.dfeta_ITTQualificationId.Id)
                         : null;
 
-                var status = MapStatus(itt, qts: null, ittQualification, teacherStatus: null, earlyYearsStatus: null);
+                var status = await MapStatusAsync(itt, qts: null, ittQualification, teacherStatus: null, earlyYearsStatus: null);
 
                 var ittQualificationDerivedRouteId = ittQualification is not null
                         ? (_ittQualificationRouteIdMapping.TryGetValue(ittQualification.dfeta_Value, out var id) ? id : null)
@@ -2966,7 +3071,8 @@ public class TrsDataSyncHelper(
                     else
                     {
                         throw new IttQtsMapException(
-                            IttQtsMapResult.Failed(
+                            await IttQtsMapResult.FailedAsync(
+                                referenceDataCache,
                                 contactId,
                                 IttQtsMapResultFailedReason.CannotDeriveRoute,
                                 qtsRegistrationId: null,
@@ -2990,8 +3096,8 @@ public class TrsDataSyncHelper(
                 var routeId = derivedRouteIds.Single();
 
                 var ps = await CreateProfessionalStatusAsync(
-                        registerApplicationUserId,
-                        afqtsApplicationUserId,
+                        registerApplicationUser,
+                        afqtsApplicationUser,
                         clock,
                         referenceDataCache,
                         allRoutes,
@@ -3005,25 +3111,31 @@ public class TrsDataSyncHelper(
                         ittQualification,
                         teacherStatus: null,
                         eyStatus: null);
-                mapped.Add(IttQtsMapResult.Succeeded(
-                    ps,
-                    itt,
-                    teacherStatus: null,
-                    qtsDate: null,
-                    earlyYearsStatus: null,
-                    eytsDate: null,
-                    partialRecognitionDate: null,
-                    qtlsDate,
-                    ittQualification,
-                    statusDerivedRouteId: null,
-                    programmeTypeDerivedRouteId,
-                    ittQualificationDerivedRouteId,
-                    multiplePotentialCompatibleIttRecords: null,
-                    contactIttRowCount,
-                    contactQtsRowCount));
+                mapped.Add(
+                    await IttQtsMapResult.SucceededAsync(
+                        referenceDataCache,
+                        ps,
+                        itt,
+                        teacherStatus: null,
+                        qtsDate: null,
+                        earlyYearsStatus: null,
+                        eytsDate: null,
+                        partialRecognitionDate: null,
+                        qtlsDate,
+                        ittQualification,
+                        statusDerivedRouteId: null,
+                        programmeTypeDerivedRouteId,
+                        ittQualificationDerivedRouteId,
+                        multiplePotentialCompatibleIttRecords: null,
+                        contactIttRowCount,
+                        contactQtsRowCount));
             }
 
-            return mapped;
+            return new ContactIttQtsMapResult()
+            {
+                ContactId = contactId,
+                MappedResults = mapped.ToArray()
+            };
 
             bool TryDeriveRouteId(
                 dfeta_teacherstatus? teacherStatus,
@@ -3153,7 +3265,7 @@ public class TrsDataSyncHelper(
                 return false;
             }
 
-            RouteToProfessionalStatusStatus MapStatus(
+            async Task<RouteToProfessionalStatusStatus> MapStatusAsync(
                 dfeta_initialteachertraining? itt,
                 dfeta_qtsregistration? qts,
                 dfeta_ittqualification? ittQualification,
@@ -3161,7 +3273,8 @@ public class TrsDataSyncHelper(
                 dfeta_earlyyearsstatus? earlyYearsStatus) => itt?.dfeta_Result switch
                 {
                     dfeta_ITTResult.Approved => throw new IttQtsMapException(
-                        IttQtsMapResult.Failed(
+                        await IttQtsMapResult.FailedAsync(
+                            referenceDataCache,
                             contactId,
                             IttQtsMapResultFailedReason.ApprovedResultHasNoAwardDate,
                             qts?.Id,
@@ -3184,7 +3297,8 @@ public class TrsDataSyncHelper(
                     dfeta_ITTResult.Fail => RouteToProfessionalStatusStatus.Failed,
                     dfeta_ITTResult.InTraining => RouteToProfessionalStatusStatus.InTraining,
                     dfeta_ITTResult.Pass => throw new IttQtsMapException(
-                        IttQtsMapResult.Failed(
+                        await IttQtsMapResult.FailedAsync(
+                            referenceDataCache,
                             contactId,
                             IttQtsMapResultFailedReason.PassResultHasNoAwardDate,
                             qts?.Id,
@@ -3205,7 +3319,8 @@ public class TrsDataSyncHelper(
                     dfeta_ITTResult.UnderAssessment => RouteToProfessionalStatusStatus.UnderAssessment,
                     dfeta_ITTResult.Withdrawn => RouteToProfessionalStatusStatus.Withdrawn,
                     _ => throw new IttQtsMapException(
-                        IttQtsMapResult.Failed(
+                        await IttQtsMapResult.FailedAsync(
+                            referenceDataCache,
                             contactId,
                             IttQtsMapResultFailedReason.CannotMapStatus,
                             qts?.Id,
@@ -3225,9 +3340,9 @@ public class TrsDataSyncHelper(
                             contactQtsRowCount))
                 };
 
-            static async Task<RouteToProfessionalStatus> CreateProfessionalStatusAsync(
-                Guid registerApplicationUserId,
-                Guid afqtsApplicationsUserId,
+            static async Task<RouteToProfessionalStatusInfo> CreateProfessionalStatusAsync(
+                ApplicationUser registerApplicationUser,
+                ApplicationUser afqtsApplicationsUser,
                 IClock clock,
                 ReferenceDataCache referenceDataCache,
                 RouteToProfessionalStatusType[] allRoutes,
@@ -3244,15 +3359,18 @@ public class TrsDataSyncHelper(
                 bool ignoreInvalidData = true)
             {
                 var sourceApplicationReference = itt?.dfeta_SlugId;
-                Guid? sourceApplicationUserId = null;
+                ApplicationUser? sourceApplicationUser = null;
                 if (sourceApplicationReference is not null)
                 {
-                    sourceApplicationUserId = routeId.IsOverseas() ? afqtsApplicationsUserId : registerApplicationUserId;
+                    sourceApplicationUser = routeId.IsOverseas() ? afqtsApplicationsUser : registerApplicationUser;
                 }
 
                 var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == routeId);
                 var trainingAgeSpecialism = AgeRange.ConvertToTrsTrainingAgeSpecialism(itt?.dfeta_AgeRangeFrom, itt?.dfeta_AgeRangeTo);
                 var degreeTypeId = ittQualification?.ConvertToTrsDegreeTypeId() ?? null;
+                var degreeType = degreeTypeId is not null
+                    ? await referenceDataCache.GetDegreeTypeByIdAsync(degreeTypeId.Value)
+                    : null;
 
                 Country? country = null;
                 if (itt?.dfeta_CountryId is not null && itt.dfeta_CountryId.Id != Guid.Empty)
@@ -3265,7 +3383,8 @@ public class TrsDataSyncHelper(
                     else if (!ignoreInvalidData)
                     {
                         throw new IttQtsMapException(
-                            IttQtsMapResult.Failed(
+                            await IttQtsMapResult.FailedAsync(
+                                referenceDataCache,
                                 personId,
                                 IttQtsMapResultFailedReason.UnmappableIttCountryId,
                                 qts?.Id,
@@ -3287,17 +3406,20 @@ public class TrsDataSyncHelper(
                 }
 
                 var trainingSubjectIds = new List<Guid>();
+                TrainingSubject? trainingSubject1 = null;
                 if (itt?.dfeta_Subject1Id is not null)
                 {
                     var result = await itt.dfeta_Subject1Id.Id.TryConvertToTrsTrainingSubjectAsync(referenceDataCache);
                     if (result.IsSuccess)
                     {
                         trainingSubjectIds.Add(result.Result!.TrainingSubjectId);
+                        trainingSubject1 = result.Result;
                     }
                     else if (!ignoreInvalidData)
                     {
                         throw new IttQtsMapException(
-                            IttQtsMapResult.Failed(
+                            await IttQtsMapResult.FailedAsync(
+                                referenceDataCache,
                                 personId,
                                 IttQtsMapResultFailedReason.UnmappableIttSubjectId,
                                 qts?.Id,
@@ -3318,17 +3440,20 @@ public class TrsDataSyncHelper(
                     }
                 }
 
+                var trainingSubject2 = default(TrainingSubject);
                 if (itt?.dfeta_Subject2Id is not null)
                 {
                     var result = await itt.dfeta_Subject2Id.Id.TryConvertToTrsTrainingSubjectAsync(referenceDataCache);
                     if (result.IsSuccess)
                     {
                         trainingSubjectIds.Add(result.Result!.TrainingSubjectId);
+                        trainingSubject2 = result.Result;
                     }
                     else if (!ignoreInvalidData)
                     {
                         throw new IttQtsMapException(
-                            IttQtsMapResult.Failed(
+                            await IttQtsMapResult.FailedAsync(
+                                referenceDataCache,
                                 personId,
                                 IttQtsMapResultFailedReason.UnmappableIttSubjectId,
                                 qts?.Id,
@@ -3349,17 +3474,20 @@ public class TrsDataSyncHelper(
                     }
                 }
 
+                var trainingSubject3 = default(TrainingSubject);
                 if (itt?.dfeta_Subject3Id is not null)
                 {
                     var result = await itt.dfeta_Subject3Id.Id.TryConvertToTrsTrainingSubjectAsync(referenceDataCache);
                     if (result.IsSuccess)
                     {
                         trainingSubjectIds.Add(result.Result!.TrainingSubjectId);
+                        trainingSubject3 = result.Result;
                     }
                     else if (!ignoreInvalidData)
                     {
                         throw new IttQtsMapException(
-                            IttQtsMapResult.Failed(
+                            await IttQtsMapResult.FailedAsync(
+                                referenceDataCache,
                                 personId,
                                 IttQtsMapResultFailedReason.UnmappableIttSubjectId,
                                 qts?.Id,
@@ -3384,10 +3512,10 @@ public class TrsDataSyncHelper(
                     ? await itt.dfeta_EstablishmentId.Id.ConvertToTrsTrainingProviderAsync(referenceDataCache)
                     : null;
 
-                return new RouteToProfessionalStatus
+                var professionalStatus = new RouteToProfessionalStatus
                 {
                     SourceApplicationReference = sourceApplicationReference,
-                    SourceApplicationUserId = sourceApplicationUserId,
+                    SourceApplicationUserId = sourceApplicationUser?.UserId,
                     QualificationId = Guid.NewGuid(),
                     CreatedOn = clock.UtcNow,
                     UpdatedOn = clock.UtcNow,
@@ -3402,11 +3530,10 @@ public class TrsDataSyncHelper(
                     TrainingAgeSpecialismRangeTo = trainingAgeSpecialism?.TrainingAgeSpecialismRangeTo,
                     HoldsFrom = awardedDate,
                     DegreeTypeId = degreeTypeId,
-                    ExemptFromInduction = false,  // TODO
-                    //InductionExemptionReasonId = inductionExemptionReasonId,  // FIXME
                     TrainingSubjectIds = trainingSubjectIds.ToArray(),
                     TrainingCountryId = country?.CountryId,
                     TrainingProviderId = trainingProvider?.TrainingProviderId,
+                    ExemptFromInduction = null,
                     DqtTeacherStatusName = teacherStatus?.dfeta_name,
                     DqtTeacherStatusValue = teacherStatus?.dfeta_Value,
                     DqtEarlyYearsStatusName = eyStatus?.dfeta_name,
@@ -3416,8 +3543,41 @@ public class TrsDataSyncHelper(
                     DqtAgeRangeFrom = itt?.dfeta_AgeRangeFrom.ToString(),
                     DqtAgeRangeTo = itt?.dfeta_AgeRangeTo.ToString(),
                 };
+
+                return new RouteToProfessionalStatusInfo
+                {
+                    ProfessionalStatus = professionalStatus,
+                    RouteToProfessionalStatusType = route,
+                    SourceApplicationUser = sourceApplicationUser,
+                    DegreeType = degreeType,
+                    TrainingProvider = trainingProvider,
+                    TrainingCountry = country,
+                    TrainingSubject1 = trainingSubject1,
+                    TrainingSubject2 = trainingSubject2,
+                    TrainingSubject3 = trainingSubject3
+                };
             }
         }
+    }
+
+    public sealed class RouteToProfessionalStatusInfo
+    {
+        public RouteToProfessionalStatus? ProfessionalStatus { get; init; }
+        public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; init; }
+        public ApplicationUser? SourceApplicationUser { get; init; }
+        public DegreeType? DegreeType { get; init; }
+        public TrainingProvider? TrainingProvider { get; init; }
+        public Country? TrainingCountry { get; init; }
+        public TrainingSubject? TrainingSubject1 { get; init; }
+        public TrainingSubject? TrainingSubject2 { get; init; }
+        public TrainingSubject? TrainingSubject3 { get; init; }
+        public InductionExemptionReason? InductionExemptionReason { get; init; }
+    }
+
+    public sealed class ContactIttQtsMapResult
+    {
+        public required Guid ContactId { get; init; }
+        public required IttQtsMapResult[] MappedResults { get; init; }
     }
 
     public sealed class IttQtsMapResult
@@ -3428,7 +3588,7 @@ public class TrsDataSyncHelper(
 
         public bool Success { get; private set; }
 
-        public RouteToProfessionalStatus? ProfessionalStatus { get; private set; }
+        public RouteToProfessionalStatusInfo? ProfessionalStatusInfo { get; private set; }
 
         public Guid ContactId { get; private set; }
 
@@ -3456,21 +3616,21 @@ public class TrsDataSyncHelper(
 
         public dfeta_ittqualification? IttQualification { get; private set; }
 
-        public Guid? IttProviderId { get; private set; }
+        public Account? IttProvider { get; private set; }
 
-        public Guid? IttSubjectId1 { get; private set; }
+        public dfeta_ittsubject? IttSubject1 { get; private set; }
 
-        public Guid? IttSubjectId2 { get; private set; }
+        public dfeta_ittsubject? IttSubject2 { get; private set; }
 
-        public Guid? IttSubjectId3 { get; private set; }
+        public dfeta_ittsubject? IttSubject3 { get; private set; }
 
-        public Guid? IttCountryId { get; private set; }
+        public dfeta_country? IttCountry { get; private set; }
 
-        public Guid? StatusDerivedRouteId { get; private set; }
+        public RouteToProfessionalStatusType? StatusDerivedRoute { get; private set; }
 
-        public Guid? ProgrammeTypeDerivedRouteId { get; private set; }
+        public RouteToProfessionalStatusType? ProgrammeTypeDerivedRoute { get; private set; }
 
-        public Guid? IttQualificationDerivedRouteId { get; private set; }
+        public RouteToProfessionalStatusType? IttQualificationDerivedRoute { get; private set; }
 
         public Guid[]? MultiplePotentialCompatibleIttRecords { get; private set; }
 
@@ -3478,20 +3638,21 @@ public class TrsDataSyncHelper(
 
         public int ContactQtsRowCount { get; private set; }
 
-        public static IttQtsMapResult Succeeded(RouteToProfessionalStatus ps)
+        public Guid[]? InductionExemptionReasonIdsMovedFromPerson { get; set; }
+
+        public static IttQtsMapResult Succeeded(RouteToProfessionalStatusInfo ps)
         {
             return new IttQtsMapResult()
             {
                 Success = true,
-                ProfessionalStatus = ps,
-                ContactId = ps.PersonId,
-                QtsRegistrationId = ps.DqtQtsRegistrationId,
-                IttId = ps.DqtInitialTeacherTrainingId
+                ProfessionalStatusInfo = ps,
+                ContactId = ps.ProfessionalStatus!.PersonId
             };
         }
 
-        public static IttQtsMapResult Succeeded(
-            RouteToProfessionalStatus ps,
+        public static async Task<IttQtsMapResult> SucceededAsync(
+            ReferenceDataCache referenceDataCache,
+            RouteToProfessionalStatusInfo ps,
             dfeta_initialteachertraining? itt,
             dfeta_teacherstatus? teacherStatus,
             DateOnly? qtsDate,
@@ -3507,13 +3668,51 @@ public class TrsDataSyncHelper(
             int contactIttRowCount,
             int contactQtsRowCount)
         {
+            var ittProvider = itt?.dfeta_EstablishmentId?.Id is not null
+                ? await referenceDataCache.GetIttProviderByIdAsync(itt!.dfeta_EstablishmentId.Id)
+                : null;
+
+            var ittCountry = itt?.dfeta_CountryId?.Id is not null
+                ? await referenceDataCache.GetCountryByIdAsync(itt!.dfeta_CountryId.Id)
+                : null;
+
+            var ittSubject1 = itt?.dfeta_Subject1Id?.Id is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(itt!.dfeta_Subject1Id.Id)
+                : null;
+
+            var ittSubject2 = itt?.dfeta_Subject2Id?.Id is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(itt!.dfeta_Subject2Id.Id)
+                : null;
+
+            var ittSubject3 = itt?.dfeta_Subject3Id?.Id is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(itt!.dfeta_Subject3Id.Id)
+                : null;
+
+            RouteToProfessionalStatusType? statusDerivedRoute = null;
+            if (statusDerivedRouteId is not null)
+            {
+                statusDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(statusDerivedRouteId.Value);
+            }
+
+            RouteToProfessionalStatusType? programmeTypeDerivedRoute = null;
+            if (programmeTypeDerivedRouteId is not null)
+            {
+                programmeTypeDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(programmeTypeDerivedRouteId.Value);
+            }
+
+            RouteToProfessionalStatusType? ittQualificationDerivedRoute = null;
+            if (ittQualificationDerivedRouteId is not null)
+            {
+                ittQualificationDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(ittQualificationDerivedRouteId.Value);
+            }
+
             return new IttQtsMapResult()
             {
                 Success = true,
-                ProfessionalStatus = ps,
-                ContactId = ps.PersonId,
-                QtsRegistrationId = ps.DqtQtsRegistrationId,
-                IttId = ps.DqtInitialTeacherTrainingId,
+                ProfessionalStatusInfo = ps,
+                ContactId = ps.ProfessionalStatus!.PersonId,
+                QtsRegistrationId = ps.ProfessionalStatus.DqtQtsRegistrationId,
+                IttId = ps.ProfessionalStatus.DqtInitialTeacherTrainingId,
                 TeacherStatus = teacherStatus,
                 QtsDate = qtsDate,
                 EarlyYearsStatus = earlyYearsStatus,
@@ -3522,22 +3721,23 @@ public class TrsDataSyncHelper(
                 QtlsDate = qtlsDate,
                 ProgrammeType = itt?.dfeta_ProgrammeType,
                 IttResult = itt?.dfeta_Result,
-                IttProviderId = itt?.dfeta_EstablishmentId?.Id,
-                IttSubjectId1 = itt?.dfeta_Subject1Id?.Id,
-                IttSubjectId2 = itt?.dfeta_Subject2Id?.Id,
-                IttSubjectId3 = itt?.dfeta_Subject3Id?.Id,
-                IttCountryId = itt?.dfeta_CountryId?.Id,
+                IttProvider = ittProvider,
+                IttSubject1 = ittSubject1,
+                IttSubject2 = ittSubject2,
+                IttSubject3 = ittSubject3,
+                IttCountry = ittCountry,
                 IttQualification = ittQualification,
-                StatusDerivedRouteId = statusDerivedRouteId,
-                ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,
-                IttQualificationDerivedRouteId = ittQualificationDerivedRouteId,
+                StatusDerivedRoute = statusDerivedRoute,
+                ProgrammeTypeDerivedRoute = programmeTypeDerivedRoute,
+                IttQualificationDerivedRoute = ittQualificationDerivedRoute,
                 MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords,
                 ContactIttRowCount = contactIttRowCount,
                 ContactQtsRowCount = contactQtsRowCount
             };
         }
 
-        public static IttQtsMapResult Failed(
+        public static async Task<IttQtsMapResult> FailedAsync(
+            ReferenceDataCache referenceDataCache,
             Guid contactId,
             IttQtsMapResultFailedReason reason,
             Guid? qtsRegistrationId,
@@ -3556,6 +3756,44 @@ public class TrsDataSyncHelper(
             int contactIttRowCount,
             int contactQtsRowCount)
         {
+            var ittProvider = itt?.dfeta_EstablishmentId?.Id is not null
+                ? await referenceDataCache.GetIttProviderByIdAsync(itt!.dfeta_EstablishmentId.Id)
+                : null;
+
+            var ittCountry = itt?.dfeta_CountryId?.Id is not null
+                ? await referenceDataCache.GetCountryByIdAsync(itt!.dfeta_CountryId.Id)
+                : null;
+
+            var ittSubject1 = itt?.dfeta_Subject1Id?.Id is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(itt!.dfeta_Subject1Id.Id)
+                : null;
+
+            var ittSubject2 = itt?.dfeta_Subject2Id?.Id is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(itt!.dfeta_Subject2Id.Id)
+                : null;
+
+            var ittSubject3 = itt?.dfeta_Subject3Id?.Id is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(itt!.dfeta_Subject3Id.Id)
+                : null;
+
+            RouteToProfessionalStatusType? statusDerivedRoute = null;
+            if (statusDerivedRouteId is not null)
+            {
+                statusDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(statusDerivedRouteId.Value);
+            }
+
+            RouteToProfessionalStatusType? programmeTypeDerivedRoute = null;
+            if (programmeTypeDerivedRouteId is not null)
+            {
+                programmeTypeDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(programmeTypeDerivedRouteId.Value);
+            }
+
+            RouteToProfessionalStatusType? ittQualificationDerivedRoute = null;
+            if (ittQualificationDerivedRouteId is not null)
+            {
+                ittQualificationDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(ittQualificationDerivedRouteId.Value);
+            }
+
             return new IttQtsMapResult()
             {
                 Success = false,
@@ -3571,15 +3809,15 @@ public class TrsDataSyncHelper(
                 QtlsDate = qtlsDate,
                 ProgrammeType = itt?.dfeta_ProgrammeType,
                 IttResult = itt?.dfeta_Result,
-                IttProviderId = itt?.dfeta_EstablishmentId?.Id,
-                IttSubjectId1 = itt?.dfeta_Subject1Id?.Id,
-                IttSubjectId2 = itt?.dfeta_Subject2Id?.Id,
-                IttSubjectId3 = itt?.dfeta_Subject3Id?.Id,
-                IttCountryId = itt?.dfeta_CountryId?.Id,
+                IttProvider = ittProvider,
+                IttSubject1 = ittSubject1,
+                IttSubject2 = ittSubject2,
+                IttSubject3 = ittSubject3,
+                IttCountry = ittCountry,
                 IttQualification = ittQualification,
-                StatusDerivedRouteId = statusDerivedRouteId,
-                ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,
-                IttQualificationDerivedRouteId = ittQualificationDerivedRouteId,
+                StatusDerivedRoute = statusDerivedRoute,
+                ProgrammeTypeDerivedRoute = programmeTypeDerivedRoute,
+                IttQualificationDerivedRoute = ittQualificationDerivedRoute,
                 MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords,
                 ContactIttRowCount = contactIttRowCount,
                 ContactQtsRowCount = contactQtsRowCount
