@@ -761,9 +761,9 @@ public class PersonalDetailsTests : TestBase
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithFirstName("Alfrede")
-                .WithMiddleName("Thee")
-                .WithLastName("Greate") // Need to change some values so the validation doesn't fail
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmailAddress("test@test.com")
                 .WithMobileNumber("447891234567")
@@ -804,9 +804,9 @@ public class PersonalDetailsTests : TestBase
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithFirstName("Alfred")
-                .WithMiddleName("The")
-                .WithLastName("Great")
+                .WithFirstName("Alfrede")
+                .WithMiddleName("Thee")
+                .WithLastName("Greate") // Need to change some values so the validation doesn't fail
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmailAddress("test@test.com")
                 .WithMobileNumber("447891234567")

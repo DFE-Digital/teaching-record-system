@@ -111,7 +111,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             EmailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) && !previousValueIsDefault ? oldEmailAddress : null,
             MobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) && !previousValueIsDefault ? oldMobileNumber : null,
             NationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) && !previousValueIsDefault ? oldNationalInsuranceNumber : null,
-            Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !previousValueIsDefault ? gender : null,
+            Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !previousValueIsDefault ? oldGender : null,
         };
 
         var updatedEvent = new PersonDetailsUpdatedEvent
