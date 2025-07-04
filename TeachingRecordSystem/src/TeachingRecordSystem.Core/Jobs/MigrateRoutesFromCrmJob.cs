@@ -35,6 +35,12 @@ public class MigrateRoutesFromCrmJob(
             Contact.Fields.dfeta_QtlsDateHasBeenSet,
             Contact.Fields.CreatedOn);
 
+        // 2023-02-21 16:15:51+00
+        var startingCreatedOn = new DateTime(2023, 02, 12, 16, 15, 51, DateTimeKind.Utc);
+
+        var contactFilter = new FilterExpression();
+        contactFilter.AddCondition(Contact.Fields.CreatedOn, ConditionOperator.GreaterThan, startingCreatedOn);
+
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = columns,
@@ -47,7 +53,8 @@ public class MigrateRoutesFromCrmJob(
             {
                 Count = pageSize,
                 PageNumber = 1
-            }
+            },
+            Criteria = contactFilter
         };
 
         var ittLink = query.AddLink(

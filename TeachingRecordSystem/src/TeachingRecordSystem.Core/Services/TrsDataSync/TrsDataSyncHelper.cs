@@ -1364,6 +1364,7 @@ public class TrsDataSyncHelper(
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using var dbContext = TrsDbContext.Create(connection);
+        dbContext.Database.UseTransaction(txn);
 
         var persons = await dbContext.Persons
             .FromSql(
