@@ -1176,6 +1176,28 @@ public class PersonTests
                 InductionStatus.Exempt,
                 InductionStatus.None));
 
+        // Person with 'Exempt' at route-level then route removed goes to 'None'
+        WithPerson(
+            InductionStatus.Exempt,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [],
+                InductionStatus.None,
+                InductionStatus.None));
+
+        // Person with 'Exempt' at route-level with another awarded QTS route then route removed goes to 'RequiredToComplete'
+        WithPerson(
+            InductionStatus.Exempt,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person, exemptFromInduction: false)],
+                InductionStatus.RequiredToComplete,
+                InductionStatus.RequiredToComplete));
+
         return data;
 
         static void WithPerson(

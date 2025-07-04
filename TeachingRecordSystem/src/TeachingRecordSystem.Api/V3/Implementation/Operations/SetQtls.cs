@@ -27,6 +27,7 @@ public class SetQtlsHandler(
 
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)
+            .ThenInclude(q => ((PostgresModels.RouteToProfessionalStatus?)q)!.RouteToProfessionalStatusType)
             .SingleOrDefaultAsync(p => p.Trn == command.Trn);
 
         if (person is null)
