@@ -77,7 +77,8 @@ async IAsyncEnumerable<TrsDataSyncHelper.ContactIttQtsMapResult[]> MapAsync()
 
     var columns = new ColumnSet(
         Contact.Fields.dfeta_qtlsdate,
-        Contact.Fields.dfeta_QtlsDateHasBeenSet);
+        Contact.Fields.dfeta_QtlsDateHasBeenSet,
+        Contact.Fields.CreatedOn);
 
     var query = new QueryExpression(Contact.EntityLogicalName)
     {
@@ -180,27 +181,29 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.ContactIttQtsMap
     using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
     csvWriter.WriteField("Contact ID");
     csvWriter.WriteField("Success");
-    csvWriter.WriteField("Failed reason");
+    csvWriter.WriteField("Not migrated reason");
     csvWriter.WriteField("ITT ID");
     csvWriter.WriteField("Slug ID");
     csvWriter.WriteField("QTS ID");
     csvWriter.WriteField("Route ID");
     csvWriter.WriteField("Route Name");
-    csvWriter.WriteField("Age Specialism Type");
-    csvWriter.WriteField("Age Specialism Range From");
-    csvWriter.WriteField("Age Specialism Range To");
+    csvWriter.WriteField("Source Application User Short Name");
+    csvWriter.WriteField("Source Application Reference");
     csvWriter.WriteField("Status");
     csvWriter.WriteField("Holds From");
     csvWriter.WriteField("Training Start Date");
     csvWriter.WriteField("Training End Date");
-    csvWriter.WriteField("Degree Type");
-    csvWriter.WriteField("Training Provider Name");
-    csvWriter.WriteField("Training Country");
     csvWriter.WriteField("Training Subject Code 1");
     csvWriter.WriteField("Training Subject Code 2");
     csvWriter.WriteField("Training Subject Code 3");
-    csvWriter.WriteField("Exempt From Induction");
-    csvWriter.WriteField("Exempt From Induction Due To Qts Date");
+    csvWriter.WriteField("Age Specialism Type");
+    csvWriter.WriteField("Age Specialism Range From");
+    csvWriter.WriteField("Age Specialism Range To");
+    csvWriter.WriteField("Training Provider Name");
+    csvWriter.WriteField("Training Provider UKPRN");
+    csvWriter.WriteField("Training Country Id");
+    csvWriter.WriteField("Training Country Name");
+    csvWriter.WriteField("Degree Type");
     csvWriter.WriteField("Teacher Status Value");
     csvWriter.WriteField("Teacher Status Name");
     csvWriter.WriteField("QTS Date");
@@ -219,7 +222,9 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.ContactIttQtsMap
     csvWriter.WriteField("ITT Qual Value");
     csvWriter.WriteField("ITT Qual Name");
     csvWriter.WriteField("ITT Provider Name");
-    csvWriter.WriteField("ITT Country");
+    csvWriter.WriteField("ITT Provider UKPRN");
+    csvWriter.WriteField("ITT Country Value");
+    csvWriter.WriteField("ITT Country Name");
     csvWriter.WriteField("ITT Subject 1");
     csvWriter.WriteField("ITT Subject 2");
     csvWriter.WriteField("ITT Subject 3");
@@ -232,7 +237,6 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.ContactIttQtsMap
     csvWriter.WriteField("Multiple compatible ITT records");
     csvWriter.WriteField("Contact ITT Row Count");
     csvWriter.WriteField("Contact QTS Row Count");
-    csvWriter.WriteField("Induction Exemption Reason Ids Moved From Person");
     csvWriter.NextRecord();
 
     await foreach (var block in results)
@@ -249,21 +253,23 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.ContactIttQtsMap
                 csvWriter.WriteField(r.QtsRegistrationId);
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.RouteToProfessionalStatusType?.RouteToProfessionalStatusTypeId);
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.RouteToProfessionalStatusType?.Name);
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismType);
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismRangeFrom);
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismRangeTo);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.SourceApplicationUser?.ShortName);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.SourceApplicationReference);
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.Status.ToString());
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.HoldsFrom?.ToString("dd/MM/yyyy"));
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingStartDate?.ToString("dd/MM/yyyy"));
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingEndDate?.ToString("dd/MM/yyyy"));
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.DegreeType?.Name);
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingProvider?.Name);
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingCountry?.CountryId);
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingSubject1?.Reference);
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingSubject2?.Reference);
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingSubject3?.Reference);
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.ExemptFromInduction);
-                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.ExemptFromInductionDueToQtsDate);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismType);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismRangeFrom);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismRangeTo);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingProvider?.Name);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingProvider?.Ukprn);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingCountry?.CountryId);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.TrainingCountry?.Name);
+                csvWriter.WriteField(r.ProfessionalStatusInfo?.DegreeType?.Name);
                 csvWriter.WriteField(r.TeacherStatus?.dfeta_Value);
                 csvWriter.WriteField(r.TeacherStatus?.dfeta_name);
                 csvWriter.WriteField(r.QtsDate?.ToString("dd/MM/yyyy"));
@@ -274,13 +280,17 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.ContactIttQtsMap
                 csvWriter.WriteField(r.QtlsDate?.ToString("dd/MM/yyyy"));
                 csvWriter.WriteField(r.QtlsDateHasBeenSet);
                 csvWriter.WriteField(r.ProgrammeType);
+                csvWriter.WriteField(r.ProgrammeStartDate?.ToString("dd/MM/yyyy"));
+                csvWriter.WriteField(r.ProgrammeEndDate?.ToString("dd/MM/yyyy"));
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.DqtAgeRangeFrom);
                 csvWriter.WriteField(r.ProfessionalStatusInfo?.ProfessionalStatus?.DqtAgeRangeTo);
                 csvWriter.WriteField(r.IttResult);
                 csvWriter.WriteField(r.IttQualification?.dfeta_Value);
                 csvWriter.WriteField(r.IttQualification?.dfeta_name);
                 csvWriter.WriteField(r.IttProvider?.Name);
+                csvWriter.WriteField(r.IttProvider?.dfeta_UKPRN);
                 csvWriter.WriteField(r.IttCountry?.dfeta_Value);
+                csvWriter.WriteField(r.IttCountry?.dfeta_name);
                 csvWriter.WriteField(r.IttSubject1?.dfeta_Value);
                 csvWriter.WriteField(r.IttSubject2?.dfeta_Value);
                 csvWriter.WriteField(r.IttSubject3?.dfeta_Value);
@@ -293,7 +303,6 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.ContactIttQtsMap
                 csvWriter.WriteField(JsonSerializer.Serialize(r.MultiplePotentialCompatibleIttRecords));
                 csvWriter.WriteField(r.ContactIttRowCount);
                 csvWriter.WriteField(r.ContactQtsRowCount);
-                csvWriter.WriteField(JsonSerializer.Serialize(r.InductionExemptionReasonIdsMovedFromPerson));
                 csvWriter.NextRecord();
             }
         }
