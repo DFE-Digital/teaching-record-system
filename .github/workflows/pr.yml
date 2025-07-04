@@ -201,7 +201,7 @@ jobs:
     name: Deploy dev environment
     runs-on: ubuntu-latest
     needs: [lint, validate_terraform, tests, package]
-    if: always() && needs.tests.status != 'failure'
+    if: always() && (needs.tests.result == 'success' || needs.tests.result == 'skipped')
     environment: dev
     concurrency: deploy_dev
     steps:
