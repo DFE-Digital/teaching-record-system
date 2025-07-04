@@ -514,6 +514,7 @@ public class Person
         var oldInduction = EventModels.Induction.FromModel(this);
 
         var currentStatus = InductionStatus;
+        var currentStatusWithoutExemption = InductionStatusWithoutExemption;
 
         var routes = routesHint ??
             Qualifications?
@@ -530,38 +531,35 @@ public class Person
         var awardedBeforeInduction = holdsQtsProfessionalStatuses.Any(p => p.ExemptFromInductionDueToQtsDate == true);
         var requiredToComplete = holdsQtsProfessionalStatuses.Any() && !awardedBeforeInduction;
 
-        if (!requiredToComplete &&
-            currentStatus is InductionStatus.InProgress or InductionStatus.Passed or InductionStatus.Failed)
+        if (!requiredToComplete && currentStatus is not InductionStatus.RequiredToComplete && currentStatus.RequiresQts())
         {
             throw new InvalidOperationException($"Cannot remove the induction requirement for a person who is '{InductionStatus}'.");
         }
 
-        var exemptViaRoute = awardedBeforeInduction || holdsQtsProfessionalStatuses.Any(p => p.ExemptFromInduction == true);
-        var routeDerivedStatus = exemptViaRoute ? InductionStatus.Exempt :
-            requiredToComplete ? InductionStatus.RequiredToComplete :
+        var newStatusWithoutExemption = requiredToComplete ?
+            (InductionStatus.RequiredToComplete.IsHigherPriorityThan(currentStatusWithoutExemption) ? InductionStatus.RequiredToComplete : currentStatusWithoutExemption) :
             InductionStatus.None;
 
-        var newStatus = routeDerivedStatus.IsHigherPriorityThan(currentStatus) || currentStatus is InductionStatus.RequiredToComplete ?
-            routeDerivedStatus :
-            currentStatus;
-        var changed = newStatus != currentStatus;
+        var exempt = InductionExemptWithoutReason || InductionExemptionReasonIds.Any() || holdsQtsProfessionalStatuses.Any(r => r.ExemptFromInduction == true);
+        var newStatus = exempt && InductionStatus.Exempt.IsHigherPriorityThan(newStatusWithoutExemption) ? InductionStatus.Exempt : newStatusWithoutExemption;
+
+        bool changed = false;
+
+        if (newStatus != currentStatus)
+        {
+            InductionStatus = newStatus;
+            changed = true;
+        }
+
+        if (newStatusWithoutExemption != currentStatusWithoutExemption)
+        {
+            InductionStatusWithoutExemption = newStatusWithoutExemption;
+            changed = true;
+        }
 
         if (changed)
         {
-            InductionStatus = newStatus;
             InductionModifiedOn = now;
-            changed = true;
-        }
-
-        if (requiredToComplete && InductionStatus.RequiredToComplete.IsHigherPriorityThan(InductionStatusWithoutExemption))
-        {
-            InductionStatusWithoutExemption = InductionStatus.RequiredToComplete;
-            changed = true;
-        }
-        else if (!requiredToComplete && InductionStatusWithoutExemption == InductionStatus.RequiredToComplete)
-        {
-            InductionStatusWithoutExemption = InductionStatus.None;
-            changed = true;
         }
 
         var newInduction = EventModels.Induction.FromModel(this);

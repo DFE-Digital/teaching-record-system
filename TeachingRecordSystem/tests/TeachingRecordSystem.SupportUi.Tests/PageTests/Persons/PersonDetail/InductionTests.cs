@@ -107,8 +107,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(
             builder => builder
                 .WithQts()
-                .WithInductionStatus(builder => builder
-                    .WithStatus(setInductionStatus)));
+                .WithInductionStatus(setInductionStatus));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
