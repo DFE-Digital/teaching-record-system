@@ -240,7 +240,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = Clock.Today;
         var awardDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.Name == "NI R")
+            .Where(r => r.Name == "Northern Irish Recognition")
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync(p => p

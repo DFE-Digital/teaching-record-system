@@ -255,7 +255,7 @@ public class IndexTests : TestBase
         Assert.Equal(person.Person.QtsDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("QTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
-        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years practitioner status (EYPS)"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
         Assert.NotNull(doc.GetSummaryListValueForKey("Induction status"));
     }
 
@@ -279,7 +279,7 @@ public class IndexTests : TestBase
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal(person.Person.EytsDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("EYTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
-        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years practitioner status (EYPS)"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
         Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
     }
@@ -302,7 +302,7 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
-        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Early years practitioner status (EYPS)"));
+        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
         Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
@@ -330,7 +330,7 @@ public class IndexTests : TestBase
         Assert.Equal(person.Person.PqtsDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("PQTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
-        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years practitioner status (EYPS)"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
         Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
     }
 

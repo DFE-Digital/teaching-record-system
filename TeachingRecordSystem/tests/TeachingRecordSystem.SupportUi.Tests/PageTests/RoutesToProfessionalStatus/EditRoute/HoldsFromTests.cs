@@ -151,7 +151,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.Name == "NI R") // an induction exemption route that requires the exemption question
+            .Where(r => r.Name == "Northern Irish Recognition") // an induction exemption route that requires the exemption question
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
