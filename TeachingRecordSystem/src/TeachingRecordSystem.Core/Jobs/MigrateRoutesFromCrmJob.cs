@@ -34,6 +34,9 @@ public class MigrateRoutesFromCrmJob(
             Contact.Fields.dfeta_qtlsdate,
             Contact.Fields.dfeta_QtlsDateHasBeenSet);
 
+        ////var contactFilter = new FilterExpression();
+        ////contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, Guid.Parse("d77050ce-deae-e311-b8ed-005056822391"));
+
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = columns,
@@ -45,7 +48,8 @@ public class MigrateRoutesFromCrmJob(
             {
                 Count = pageSize,
                 PageNumber = 1
-            }
+            },
+            ////Criteria = contactFilter
         };
 
         var ittLink = query.AddLink(

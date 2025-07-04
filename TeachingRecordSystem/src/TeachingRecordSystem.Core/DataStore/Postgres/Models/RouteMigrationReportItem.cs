@@ -53,8 +53,9 @@ public class RouteMigrationReportItem
     public string? RouteToProfessionalStatusTypeName { get; init; }
     public string? SourceApplicationReference { get; init; }
     public Guid? SourceApplicationUserId { get; init; }
+    public string? SourceApplicationUserShortName { get; init; }
     public string? Status { get; init; }
-    public DateOnly? HoldsFrom { get; init; }    
+    public DateOnly? HoldsFrom { get; init; }
     public DateOnly? TrainingStartDate { get; init; }
     public DateOnly? TrainingEndDate { get; init; }
     public string? TrainingSubject1Name { get; init; }
