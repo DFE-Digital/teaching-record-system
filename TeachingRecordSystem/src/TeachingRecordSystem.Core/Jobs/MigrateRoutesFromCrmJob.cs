@@ -32,13 +32,15 @@ public class MigrateRoutesFromCrmJob(
 
         var columns = new ColumnSet(
             Contact.Fields.dfeta_qtlsdate,
-            Contact.Fields.dfeta_QtlsDateHasBeenSet);
+            Contact.Fields.dfeta_QtlsDateHasBeenSet,
+            Contact.Fields.CreatedOn);
 
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = columns,
             Orders =
         {
+            new OrderExpression(Contact.Fields.CreatedOn, OrderType.Ascending),
             new OrderExpression(Contact.PrimaryIdAttribute, OrderType.Ascending)
         },
             PageInfo = new PagingInfo()
