@@ -17,5 +17,6 @@ public class EytsAwardedEmailsJobItemMapping : IEntityTypeConfiguration<EytsAwar
         builder.Property(i => i.Personalization).HasJsonConversion().IsRequired().HasColumnType("jsonb");
         builder.HasIndex(i => i.Personalization).HasMethod("gin");
         builder.HasOne(i => i.EytsAwardedEmailsJob).WithMany(j => j.JobItems).HasForeignKey(i => i.EytsAwardedEmailsJobId);
+        builder.HasIndex(i => i.Trn);
     }
 }
