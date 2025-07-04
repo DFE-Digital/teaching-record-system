@@ -36,7 +36,7 @@ public class MigrateRoutesFromCrmJob(
             Contact.Fields.CreatedOn);
 
         // 2023-02-21 16:15:51+00
-        var startingCreatedOn = new DateTime(2023, 02, 12, 16, 15, 51, DateTimeKind.Utc);
+        var startingCreatedOn = new DateTime(2023, 02, 21, 16, 15, 51, DateTimeKind.Utc);
 
         var contactFilter = new FilterExpression();
         contactFilter.AddCondition(Contact.Fields.CreatedOn, ConditionOperator.GreaterThan, startingCreatedOn);
