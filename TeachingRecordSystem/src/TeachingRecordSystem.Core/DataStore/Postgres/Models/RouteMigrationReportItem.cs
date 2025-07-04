@@ -75,5 +75,5 @@ public class RouteMigrationReportItem
     public bool? ExemptFromInductionDueToQtsDate { get; init; }
     public Guid? DegreeTypeId { get; init; }
     public string? DegreeTypeName { get; init; }
-    public DateTime? CreatedOn { get; init; }
+    public DateTime CreatedOn { get; init; }
 }

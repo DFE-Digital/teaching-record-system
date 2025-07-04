@@ -107,6 +107,7 @@
     <None Remove="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />
     <None Remove="Services\DqtReporting\Migrations\0072_TrsQualificationsDqtAgeRange.sql" />
     <None Remove="Services\DqtReporting\Migrations\0073_TrsPersonsGender.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0074_TrsRouteMigrationReportItem.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -212,6 +213,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0072_TrsQualificationsDqtAgeRange.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0073_TrsPersonsGender.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0074_TrsRouteMigrationReportItem.sql" />
   </ItemGroup>
 
   <ItemGroup>
