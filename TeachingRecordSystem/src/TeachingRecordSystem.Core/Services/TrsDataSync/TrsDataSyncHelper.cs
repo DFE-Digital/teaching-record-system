@@ -1416,7 +1416,7 @@ public class TrsDataSyncHelper(
                 result.InductionExemptionReasonIdsMovedFromPerson = inductionExemptionReasonIdsMovedFromPerson.ToArray();
 
                 toSync.Add(result.ProfessionalStatusInfo!.ProfessionalStatus!);
-                // TODO add migrated event to the events list
+                events.Add(MapMigratedEvent(result));
             }
 
             // Remove any induction exemption reasons that need to be moved to the route
@@ -1445,7 +1445,6 @@ public class TrsDataSyncHelper(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        // TODO also sync the events for the routes
         // TODO populate table with mapping results for verification
 
         using (var createTempTableCommand = connection.CreateCommand())
@@ -1482,6 +1481,74 @@ public class TrsDataSyncHelper(
 
         _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
         return toSync.Count;
+
+        EventBase MapMigratedEvent(IttQtsMapResult mapResult)
+        {
+            return new RouteToProfessionalStatusMigratedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = SystemUser.SystemUserId,
+                PersonId = mapResult.ContactId,
+                RouteToProfessionalStatus = Events.Models.RouteToProfessionalStatus.FromModel(mapResult.ProfessionalStatusInfo!.ProfessionalStatus!),
+                DqtInitialTeacherTraining = MapInitialTeacherTraining(mapResult),
+                DqtQtsRegistration = MapQtsRegistration(mapResult),
+                DqtQtlsDate = mapResult.QtlsDate,
+                DqtQtlsDateHasBeenSet = mapResult.QtlsDateHasBeenSet
+            };
+        }
+
+        Events.Models.DqtInitialTeacherTraining? MapInitialTeacherTraining(IttQtsMapResult mapResult)
+        {
+            if (mapResult.IttId is null)
+            {
+                return null;
+            }
+
+            return new Events.Models.DqtInitialTeacherTraining()
+            {
+                InitialTeacherTrainingId = mapResult.IttId,
+                SlugId = mapResult.IttSlugId,
+                ProgrammeType = mapResult.ProgrammeType?.ToString(),
+                ProgrammeStartDate = mapResult.ProgrammeStartDate,
+                ProgrammeEndDate = mapResult.ProgrammeEndDate,
+                Result = mapResult.IttResult?.ToString(),
+                QualificationName = mapResult.IttQualification?.dfeta_name,
+                QualificationValue = mapResult.IttQualification?.dfeta_Value,
+                ProviderId = mapResult.IttProvider?.Id,
+                ProviderName = mapResult.IttProvider?.Name,
+                ProviderUkprn = mapResult.IttProvider?.dfeta_UKPRN,
+                CountryName = mapResult.IttCountry?.dfeta_name,
+                CountryValue = mapResult.IttCountry?.dfeta_Value,
+                Subject1Name = mapResult.IttSubject1?.dfeta_name,
+                Subject1Value = mapResult.IttSubject1?.dfeta_Value,
+                Subject2Name = mapResult.IttSubject2?.dfeta_name,
+                Subject2Value = mapResult.IttSubject2?.dfeta_Value,
+                Subject3Name = mapResult.IttSubject3?.dfeta_name,
+                AgeRangeFrom = mapResult.ProfessionalStatusInfo?.ProfessionalStatus?.DqtAgeRangeFrom,
+                AgeRangeTo = mapResult.ProfessionalStatusInfo?.ProfessionalStatus?.DqtAgeRangeTo
+            };
+        }
+
+        EventModels.DqtQtsRegistration? MapQtsRegistration(IttQtsMapResult mapResult)
+        {
+            if (mapResult.QtsRegistrationId is null)
+            {
+                return null;
+            }
+
+            return new EventModels.DqtQtsRegistration()
+            {
+                QtsRegistrationId = mapResult.QtsRegistrationId,
+                TeacherStatusName = mapResult.TeacherStatus?.dfeta_name,
+                TeacherStatusValue = mapResult.TeacherStatus?.dfeta_Value,
+                EarlyYearsStatusName = mapResult.EarlyYearsStatus?.dfeta_name,
+                EarlyYearsStatusValue = mapResult.EarlyYearsStatus?.dfeta_Value,
+                QtsDate = mapResult.QtsDate,
+                EytsDate = mapResult.EytsDate,
+                PartialRecognitionDate = mapResult.PartialRecognitionDate
+            };
+        }
     }
 
     private EntityVersionInfo<TEntity>[] GetEntityVersions<TEntity>(TEntity latest, IEnumerable<AuditDetail> auditDetails, string[] attributeNames)
@@ -2599,6 +2666,7 @@ public class TrsDataSyncHelper(
         {
             var contactId = contact.Id;
             var qtlsDate = contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: true);
+            var qtlsDateHasBeenSet = contact.dfeta_QtlsDateHasBeenSet;
             var contactItt = ittByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
             var contactQts = qtsByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
             var contactIttRowCount = contactItt.Count;
@@ -2652,6 +2720,7 @@ public class TrsDataSyncHelper(
                         eytsDate: null,
                         partialRecognitionDate: null,
                         qtlsDate,
+                        qtlsDateHasBeenSet,
                         ittQualification: null,
                         statusDerivedRouteId: null,
                         programmeTypeDerivedRouteId: null,
@@ -2678,6 +2747,7 @@ public class TrsDataSyncHelper(
                         qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                         qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                         qtlsDate,
+                        qtlsDateHasBeenSet,
                         ittQualification: null,
                         statusDerivedRouteId: null,
                         programmeTypeDerivedRouteId: null,
@@ -2731,6 +2801,7 @@ public class TrsDataSyncHelper(
                                 qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qtlsDate,
+                                qtlsDateHasBeenSet,
                                 ittQualification: null,
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId: null,
@@ -2822,6 +2893,7 @@ public class TrsDataSyncHelper(
                                 qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qtlsDate,
+                                qtlsDateHasBeenSet,
                                 ittQualification: null,
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId: null,
@@ -2903,6 +2975,7 @@ public class TrsDataSyncHelper(
                                     qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                     qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                     qtlsDate,
+                                    qtlsDateHasBeenSet,
                                     ittQualification,
                                     statusDerivedRouteId,
                                     programmeTypeDerivedRouteId,
@@ -2951,6 +3024,7 @@ public class TrsDataSyncHelper(
                             qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qtlsDate,
+                            qtlsDateHasBeenSet,
                             ittQualification,
                             statusDerivedRouteId,
                             programmeTypeDerivedRouteId,
@@ -2987,6 +3061,7 @@ public class TrsDataSyncHelper(
                             eytsDate: null,
                             partialRecognitionDate: null,
                             qtlsDate,
+                            qtlsDateHasBeenSet,
                             ittQualification: null,
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
@@ -3020,6 +3095,7 @@ public class TrsDataSyncHelper(
                             eytsDate: null,
                             partialRecognitionDate: null,
                             qtlsDate,
+                            qtlsDateHasBeenSet,
                             ittQualification: null,
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
@@ -3083,6 +3159,7 @@ public class TrsDataSyncHelper(
                                 eytsDate: null,
                                 partialRecognitionDate: null,
                                 qtlsDate,
+                            qtlsDateHasBeenSet,
                                 ittQualification,
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId,
@@ -3122,6 +3199,7 @@ public class TrsDataSyncHelper(
                         eytsDate: null,
                         partialRecognitionDate: null,
                         qtlsDate,
+                        qtlsDateHasBeenSet,
                         ittQualification,
                         statusDerivedRouteId: null,
                         programmeTypeDerivedRouteId,
@@ -3285,6 +3363,7 @@ public class TrsDataSyncHelper(
                             qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qtlsDate,
+                            qtlsDateHasBeenSet,
                             ittQualification,
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
@@ -3309,6 +3388,7 @@ public class TrsDataSyncHelper(
                             qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qtlsDate,
+                            qtlsDateHasBeenSet,
                             ittQualification,
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
@@ -3331,6 +3411,7 @@ public class TrsDataSyncHelper(
                             qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             qtlsDate,
+                            qtlsDateHasBeenSet,
                             ittQualification,
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
@@ -3395,6 +3476,7 @@ public class TrsDataSyncHelper(
                                 qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qtlsDate: null,
+                                qtlsDateHasBeenSet: null,
                                 ittQualification,
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId: null,
@@ -3430,6 +3512,7 @@ public class TrsDataSyncHelper(
                                 qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qtlsDate: null,
+                                qtlsDateHasBeenSet: null,
                                 ittQualification,
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId: null,
@@ -3464,6 +3547,7 @@ public class TrsDataSyncHelper(
                                 qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qtlsDate: null,
+                                qtlsDateHasBeenSet: null,
                                 ittQualification,
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId: null,
@@ -3498,6 +3582,7 @@ public class TrsDataSyncHelper(
                                 qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 qtlsDate: null,
+                                qtlsDateHasBeenSet: null,
                                 ittQualification,
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId: null,
@@ -3598,6 +3683,8 @@ public class TrsDataSyncHelper(
 
         public Guid? IttId { get; private set; }
 
+        public string? IttSlugId { get; private set; }
+
         public dfeta_teacherstatus? TeacherStatus { get; private set; }
 
         public DateOnly? QtsDate { get; private set; }
@@ -3610,7 +3697,13 @@ public class TrsDataSyncHelper(
 
         public DateOnly? QtlsDate { get; private set; }
 
+        public bool? QtlsDateHasBeenSet { get; private set; }
+
         public dfeta_ITTProgrammeType? ProgrammeType { get; private set; }
+
+        public DateOnly? ProgrammeStartDate { get; private set; }
+
+        public DateOnly? ProgrammeEndDate { get; private set; }
 
         public dfeta_ITTResult? IttResult { get; private set; }
 
@@ -3660,6 +3753,7 @@ public class TrsDataSyncHelper(
             DateOnly? eytsDate,
             DateOnly? partialRecognitionDate,
             DateOnly? qtlsDate,
+            bool? qtlsDateHasBeenSet,
             dfeta_ittqualification? ittQualification,
             Guid? statusDerivedRouteId,
             Guid? programmeTypeDerivedRouteId,
@@ -3719,7 +3813,10 @@ public class TrsDataSyncHelper(
                 EytsDate = eytsDate,
                 PartialRecognitionDate = partialRecognitionDate,
                 QtlsDate = qtlsDate,
+                QtlsDateHasBeenSet = qtlsDateHasBeenSet,
                 ProgrammeType = itt?.dfeta_ProgrammeType,
+                ProgrammeStartDate = itt?.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                ProgrammeEndDate = itt?.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 IttResult = itt?.dfeta_Result,
                 IttProvider = ittProvider,
                 IttSubject1 = ittSubject1,
@@ -3748,6 +3845,7 @@ public class TrsDataSyncHelper(
             DateOnly? eytsDate,
             DateOnly? partialRecognitionDate,
             DateOnly? qtlsDate,
+            bool? qtlsDateHasBeenSet,
             dfeta_ittqualification? ittQualification,
             Guid? statusDerivedRouteId,
             Guid? programmeTypeDerivedRouteId,
@@ -3801,13 +3899,17 @@ public class TrsDataSyncHelper(
                 FailedReason = reason,
                 QtsRegistrationId = qtsRegistrationId,
                 IttId = itt?.Id,
+                IttSlugId = itt?.dfeta_SlugId,
                 TeacherStatus = teacherStatus,
                 QtsDate = qtsDate,
+                QtlsDateHasBeenSet = qtlsDateHasBeenSet,
                 EarlyYearsStatus = earlyYearsStatus,
                 EytsDate = eytsDate,
                 PartialRecognitionDate = partialRecognitionDate,
                 QtlsDate = qtlsDate,
                 ProgrammeType = itt?.dfeta_ProgrammeType,
+                ProgrammeEndDate = itt?.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                ProgrammeStartDate = itt?.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 IttResult = itt?.dfeta_Result,
                 IttProvider = ittProvider,
                 IttSubject1 = ittSubject1,
