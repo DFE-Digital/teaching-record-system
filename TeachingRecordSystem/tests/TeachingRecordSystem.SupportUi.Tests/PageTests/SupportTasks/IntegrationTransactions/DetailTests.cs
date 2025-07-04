@@ -147,7 +147,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         doc.AssertResultsContainsIntegrationTransactionRecord(itr1.IntegrationTransactionRecordId);
         var rowItrId = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:id");
-        var rowContact = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:contactid");
+        var rowContact = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:personid");
         var rowDuplicate = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:duplicate");
         var rowStatus = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:status");
         Assert.NotNull(rowItrId);

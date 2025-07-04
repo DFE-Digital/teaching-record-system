@@ -18,6 +18,7 @@ public class RouteToProfessionalStatusType
     public static Guid EarlyYearsIttGraduateEntryId { get; } = new("DBC4125B-9235-41E4-ABD2-BAABBF63F829");
     public static Guid EarlyYearsIttUndergraduateId { get; } = new("C97C0FD2-FD84-4949-97C7-B0E2422FB3C8");
     public static Guid WelshRId { get; } = new("877ba701-fe26-4951-9f15-171f3755d50d");
+    public static Guid ECDirective { get; } = new("f4da123b-5c37-4060-ab00-52de4bd3599e");
 
     public required Guid RouteToProfessionalStatusTypeId { get; init; }
     public required string Name { get; init; }
