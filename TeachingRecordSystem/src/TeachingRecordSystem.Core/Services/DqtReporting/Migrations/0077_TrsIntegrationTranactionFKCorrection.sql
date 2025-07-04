@@ -15,7 +15,7 @@ IF OBJECT_ID('trs_integration_transactions', 'U') IS NOT NULL
 
 CREATE TABLE trs_integration_transactions
 (
-    integration_transaction_id BIGINT IDENTITY(1,1) NOT NULL,
+    integration_transaction_id BIGINT NOT NULL,
     interface_type INT NOT NULL,
     import_status INT NOT NULL,
     total_count INT NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE trs_integration_transactions
 
 CREATE TABLE trs_integration_transaction_records
 (
-    integration_transaction_record_id BIGINT IDENTITY(1,1) NOT NULL,
+    integration_transaction_record_id BIGINT NOT NULL,
     row_data NVARCHAR(3000),
     failure_message NVARCHAR(3000),
     person_id UNIQUEIDENTIFIER,
