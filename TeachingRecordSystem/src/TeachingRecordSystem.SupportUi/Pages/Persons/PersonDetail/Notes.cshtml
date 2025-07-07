@@ -18,30 +18,43 @@
     <h2 class="govuk-heading-m">Notes</h2>
 
 </div>
-@if (Model.Notes.Count() == 0)
+
+@if (Model.NotesNotVisibleFlag)
 {
-    <p class="govuk-body" data-testid="no-dqt-notes">There are no notes associated with this record</p>
+    <govuk-notification-banner data-testid="no-notes-permission">
+        <p class="govuk-notification-banner__heading">
+            You do not have permission to view Notes on this record.
+            <a class="govuk-notification-banner__link" href="mailto:TQ.DATARECEIPT@education.gov.uk">Contact the TRA</a> for more information.
+        </p>
+    </govuk-notification-banner>
 }
 else
 {
-    foreach (var note in Model.Notes)
+    @if (Model.Notes.Count() == 0)
     {
-        var downloadUrl = await fileService.GetFileUrlAsync(note.NoteId, TimeSpan.FromMinutes(15));
+        <p class="govuk-body" data-testid="no-dqt-notes">There are no notes associated with this record</p>
+    }
+    else
+    {
+        foreach (var note in Model.Notes)
+        {
+            var downloadUrl = await fileService.GetFileUrlAsync(note.NoteId, TimeSpan.FromMinutes(15));
 
-        <div data-testid="dqtnote">
-            <h3 class="govuk-heading-s">Added by <span data-testid="@note.NoteId-dqt-note-created-by">@note.CreatedByDqtUserName</span> on <span data-testid="@note.NoteId-dqt-note-created-on">@note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm")</span></h3>
-            <div class="govuk-details" data-testid="@note.NoteId-dqt-note">
-                <div class="govuk-details__text">
-                    <p>
-                        <span data-testid="@note.NoteId-dqt-note-text">@note.Description</span>
-                    </p>
-                    @if (note.OriginalFileName is not null)
-                    {
-                        <h2 class="govuk-heading-s">Attached file</h2>
-                        <a href=@downloadUrl target="_blank" class="govuk-link"><span data-testid="@note.NoteId-dqt-note-file-name">@note.OriginalFileName</span> (opens in a new tab)</a>
-                    }
+            <div data-testid="dqtnote">
+                <h3 class="govuk-heading-s">Added by <span data-testid="@note.NoteId-dqt-note-created-by">@note.CreatedByDqtUserName</span> on <span data-testid="@note.NoteId-dqt-note-created-on">@note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm")</span></h3>
+                <div class="govuk-details" data-testid="@note.NoteId-dqt-note">
+                    <div class="govuk-details__text">
+                        <p>
+                            <span data-testid="@note.NoteId-dqt-note-text">@note.Description</span>
+                        </p>
+                        @if (note.OriginalFileName is not null)
+                        {
+                            <h2 class="govuk-heading-s">Attached file</h2>
+                            <a href=@downloadUrl target="_blank" class="govuk-link"><span data-testid="@note.NoteId-dqt-note-file-name">@note.OriginalFileName</span> (opens in a new tab)</a>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     }
 }

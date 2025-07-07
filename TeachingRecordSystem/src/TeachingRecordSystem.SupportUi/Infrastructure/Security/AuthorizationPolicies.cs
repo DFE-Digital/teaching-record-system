@@ -17,4 +17,5 @@ public static class AuthorizationPolicies
     public const string NonPersonOrAlertDataView = nameof(NonPersonOrAlertDataView);
     public const string NonPersonOrAlertDataEdit = nameof(NonPersonOrAlertDataEdit);
     public const string PersonDataEdit = nameof(PersonDataEdit);
+    public const string NotesView = nameof(NotesView);
 }

@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class NotesTests : TestBase
@@ -8,7 +10,7 @@ public class NotesTests : TestBase
     }
 
     [Fact]
-    public async Task Get_PersonDoesNotExists_ReturnsNotFound()
+    public async Task Get_PersonDoesNotExist_ReturnsNotFound()
     {
         // Arrange
         var personId = Guid.NewGuid();
@@ -38,6 +40,69 @@ public class NotesTests : TestBase
         var noNotesMessage = doc.GetElementByTestId("no-dqt-notes");
         Assert.NotNull(noNotesMessage);
         Assert.Equal("There are no notes associated with this record", noNotesMessage.TrimmedText());
+    }
+
+    [Fact]
+    public async Task Get_PersonHasDbsAlert_UserHasDbsViewPermissions_ShowsNotes()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithAlert(a => a
+                .WithAlertTypeId(AlertType.DbsAlertTypeId)
+                .WithStartDate(Clock.Today.AddDays(-30))
+                .WithEndDate(Clock.Today.AddDays(-1))));
+
+        var expectedNoteText = "Note without attachment";
+        var expectedCreatedBy = TestData.GenerateName();
+        var createdByUserId = Guid.NewGuid();
+        var note1 = await TestData.CreateNoteAsync(person.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
+        var note2 = await TestData.CreateNoteAsync(person.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var notes = doc.GetAllElementsByTestId("dqtnote");
+        Assert.Collection(notes,
+            n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note1.NoteId}-dqt-note-text")?.TrimmedText()),
+            n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note2.NoteId}-dqt-note-text")?.TrimmedText()));
+        var note2Text = doc.GetElementByTestId($"{note2.NoteId}-dqt-note-text");
+    }
+
+    [Fact]
+    public async Task Get_PersonHasDbsAlert_UserDoesNotHaveDbsViewPermissions_ShowsFlagAndHidesNotes()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithAlert(a => a
+                .WithAlertTypeId(AlertType.DbsAlertTypeId)
+                .WithStartDate(Clock.Today.AddDays(-30))
+                .WithEndDate(Clock.Today.AddDays(-1))));
+
+        var expectedNoteText = "Note without attachment";
+        var expectedCreatedBy = TestData.GenerateName();
+        var createdByUserId = Guid.NewGuid();
+        var note1 = await TestData.CreateNoteAsync(person.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
+        var note2 = await TestData.CreateNoteAsync(person.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var flag = doc.GetElementByTestId("no-notes-permission");
+        var notes = doc.GetAllElementsByTestId("dqtnote");
+        Assert.NotNull(flag);
+        Assert.Empty(notes);
     }
 
     [Fact]
