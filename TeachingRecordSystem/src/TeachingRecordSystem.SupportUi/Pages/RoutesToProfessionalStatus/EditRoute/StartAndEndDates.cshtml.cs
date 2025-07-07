@@ -23,13 +23,11 @@ public class StartAndEndDateModel(
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
-    [Required(ErrorMessage = "Enter a start date")]
     [Display(Name = "Route start date")]
     public DateOnly? TrainingStartDate { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "End date")]
-    [Required(ErrorMessage = "Enter an end date")]
     [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 

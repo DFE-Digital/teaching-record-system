@@ -900,7 +900,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditInductionExemption_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.Name == "NI R")
+            .Where(r => r.Name == "Northern Irish Recognition")
             .First();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
