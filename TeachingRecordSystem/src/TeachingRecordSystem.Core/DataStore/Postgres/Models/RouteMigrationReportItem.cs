@@ -1,0 +1,80 @@
+namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
+public class RouteMigrationReportItem
+{
+    public const string PersonIdIndexName = "ix_route_migration_report_items_person_id";
+
+    public Guid RouteMigrationReportItemId { get; init; }
+    public Guid PersonId { get; init; }
+    public bool Migrated { get; init; }
+    public string? NotMigratedReason { get; init; }
+    public Guid? DqtInitialTeacherTrainingId { get; init; }
+    public string? DqtIttSlugId { get; init; }
+    public string? DqtIttProgrammeType { get; init; }
+    public DateOnly? DqtIttProgrammeStartDate { get; init; }
+    public DateOnly? DqtIttProgrammeEndDate { get; init; }
+    public string? DqtIttResult { get; init; }
+    public string? DqtIttQualificationName { get; init; }
+    public string? DqtIttQualificationValue { get; init; }
+    public Guid? DqtIttProviderId { get; init; }
+    public string? DqtIttProviderName { get; init; }
+    public string? DqtIttProviderUkprn { get; init; }
+    public string? DqtIttCountryName { get; init; }
+    public string? DqtIttCountryValue { get; init; }
+    public string? DqtIttSubject1Name { get; init; }
+    public string? DqtIttSubject1Value { get; init; }
+    public string? DqtIttSubject2Name { get; init; }
+    public string? DqtIttSubject2Value { get; init; }
+    public string? DqtIttSubject3Name { get; init; }
+    public string? DqtIttSubject3Value { get; init; }
+    public string? DqtAgeRangeFrom { get; init; }
+    public string? DqtAgeRangeTo { get; init; }
+    public Guid? DqtQtsRegistrationId { get; init; }
+    public string? DqtTeacherStatusName { get; init; }
+    public string? DqtTeacherStatusValue { get; init; }
+    public string? DqtEarlyYearsStatusName { get; init; }
+    public string? DqtEarlyYearsStatusValue { get; init; }
+    public DateOnly? DqtQtsDate { get; init; }
+    public DateOnly? DqtEytsDate { get; init; }
+    public DateOnly? DqtPartialRecognitionDate { get; init; }
+    public DateOnly? DqtQtlsDate { get; init; }
+    public bool? DqtQtlsDateHasBeenSet { get; init; }
+    public Guid? StatusDerivedRouteToProfessionalStatusTypeId { get; init; }
+    public string? StatusDerivedRouteToProfessionalStatusTypeName { get; init; }
+    public Guid? ProgrammeTypeDerivedRouteToProfessionalStatusTypeId { get; init; }
+    public string? ProgrammeTypeDerivedRouteToProfessionalStatusTypeName { get; init; }
+    public Guid? IttQualificationDerivedRouteToProfessionalStatusTypeId { get; init; }
+    public string? IttQualificationDerivedRouteToProfessionalStatusTypeName { get; init; }
+    public Guid[]? MultiplePotentialCompatibleIttRecords { get; init; }
+    public Guid[]? InductionExemptionReasonIdsMovedFromPerson { get; init; }
+    public int ContactIttRowCount { get; init; }
+    public int ContactQtsRowCount { get; init; }
+    public Guid? RouteToProfessionalStatusTypeId { get; init; }
+    public string? RouteToProfessionalStatusTypeName { get; init; }
+    public string? SourceApplicationReference { get; init; }
+    public Guid? SourceApplicationUserId { get; init; }
+    public string? SourceApplicationUserShortName { get; init; }
+    public string? Status { get; init; }
+    public DateOnly? HoldsFrom { get; init; }
+    public DateOnly? TrainingStartDate { get; init; }
+    public DateOnly? TrainingEndDate { get; init; }
+    public string? TrainingSubject1Name { get; init; }
+    public string? TrainingSubject1Reference { get; init; }
+    public string? TrainingSubject2Name { get; init; }
+    public string? TrainingSubject2Reference { get; init; }
+    public string? TrainingSubject3Name { get; init; }
+    public string? TrainingSubject3Reference { get; init; }
+    public string? TrainingAgeSpecialismType { get; init; }
+    public int? TrainingAgeSpecialismRangeFrom { get; init; }
+    public int? TrainingAgeSpecialismRangeTo { get; init; }
+    public string? TrainingCountryName { get; init; }
+    public string? TrainingCountryId { get; init; }
+    public Guid? TrainingProviderId { get; init; }
+    public string? TrainingProviderName { get; init; }
+    public string? TrainingProviderUkprn { get; init; }
+    public bool? ExemptFromInduction { get; init; }
+    public bool? ExemptFromInductionDueToQtsDate { get; init; }
+    public Guid? DegreeTypeId { get; init; }
+    public string? DegreeTypeName { get; init; }
+    public DateTime CreatedOn { get; init; }
+}

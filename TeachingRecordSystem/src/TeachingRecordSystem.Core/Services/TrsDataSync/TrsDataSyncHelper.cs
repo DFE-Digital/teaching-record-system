@@ -1364,6 +1364,7 @@ public class TrsDataSyncHelper(
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using var dbContext = TrsDbContext.Create(connection);
+        dbContext.Database.UseTransaction(txn);
 
         var persons = await dbContext.Persons
             .FromSql(
@@ -1397,8 +1398,14 @@ public class TrsDataSyncHelper(
                         inductionExemptionReasonIdsMovedFromPerson.Add(inductionExemptionReasonId.Value);
                         result.ProfessionalStatusInfo!.ProfessionalStatus!.ExemptFromInduction = true;
                     }
+                    else if (inductionExemptionReasonId == InductionExemptionReason.QtlsId)
+                    {
+                        // if for some reason the exemption reasons have got out of whack on Person for QTLS, still set it to true
+                        result.ProfessionalStatusInfo!.ProfessionalStatus!.ExemptFromInduction = true;
+                    }
                     else
                     {
+
                         result.ProfessionalStatusInfo!.ProfessionalStatus!.ExemptFromInduction = false;
                     }
                 }
@@ -1445,8 +1452,6 @@ public class TrsDataSyncHelper(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        // TODO populate table with mapping results for verification
-
         using (var createTempTableCommand = connection.CreateCommand())
         {
             createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
@@ -1473,6 +1478,12 @@ public class TrsDataSyncHelper(
         }
 
         await txn.SaveEventsAsync(events, "events_route_migration", clock, cancellationToken, timeoutSeconds: 120);
+
+        var reportItems = mappingsToProcess
+            .SelectMany(m => m.MappedResults.Select(r => MapReportItem(r)))
+            .ToList();
+
+        await SaveMigrationReportAsync(txn, reportItems, cancellationToken);
 
         if (!dryRun)
         {
@@ -1548,6 +1559,261 @@ public class TrsDataSyncHelper(
                 EytsDate = mapResult.EytsDate,
                 PartialRecognitionDate = mapResult.PartialRecognitionDate
             };
+        }
+
+        RouteMigrationReportItem MapReportItem(IttQtsMapResult result)
+        {
+            return new RouteMigrationReportItem
+            {
+                RouteMigrationReportItemId = Guid.NewGuid(),
+                PersonId = result.ContactId,
+                Migrated = result.Success,
+                NotMigratedReason = result.FailedReason?.ToString(),
+                DqtInitialTeacherTrainingId = result.IttId,
+                DqtIttSlugId = result.IttSlugId,
+                DqtIttProgrammeType = result.ProgrammeType?.ToString(),
+                DqtIttProgrammeStartDate = result.ProgrammeStartDate,
+                DqtIttProgrammeEndDate = result.ProgrammeEndDate,
+                DqtIttResult = result.IttResult?.ToString(),
+                DqtIttQualificationName = result.IttQualification?.dfeta_name,
+                DqtIttQualificationValue = result.IttQualification?.dfeta_Value,
+                DqtIttProviderId = result.IttProvider?.Id,
+                DqtIttProviderName = result.IttProvider?.Name,
+                DqtIttProviderUkprn = result.IttProvider?.dfeta_UKPRN,
+                DqtIttCountryName = result.IttCountry?.dfeta_name,
+                DqtIttCountryValue = result.IttCountry?.dfeta_Value,
+                DqtIttSubject1Name = result.IttSubject1?.dfeta_name,
+                DqtIttSubject1Value = result.IttSubject1?.dfeta_Value,
+                DqtIttSubject2Name = result.IttSubject2?.dfeta_name,
+                DqtIttSubject2Value = result.IttSubject2?.dfeta_Value,
+                DqtIttSubject3Name = result.IttSubject3?.dfeta_name,
+                DqtAgeRangeFrom = result.ProfessionalStatusInfo?.ProfessionalStatus?.DqtAgeRangeFrom,
+                DqtAgeRangeTo = result.ProfessionalStatusInfo?.ProfessionalStatus?.DqtAgeRangeTo,
+                DqtQtsRegistrationId = result.QtsRegistrationId,
+                DqtTeacherStatusName = result.TeacherStatus?.dfeta_name,
+                DqtTeacherStatusValue = result.TeacherStatus?.dfeta_Value,
+                DqtEarlyYearsStatusName = result.EarlyYearsStatus?.dfeta_name,
+                DqtEarlyYearsStatusValue = result.EarlyYearsStatus?.dfeta_Value,
+                DqtQtsDate = result.QtsDate,
+                DqtEytsDate = result.EytsDate,
+                DqtPartialRecognitionDate = result.PartialRecognitionDate,
+                DqtQtlsDate = result.QtlsDate,
+                DqtQtlsDateHasBeenSet = result.QtlsDateHasBeenSet,
+                StatusDerivedRouteToProfessionalStatusTypeId = result.StatusDerivedRoute?.RouteToProfessionalStatusTypeId,
+                StatusDerivedRouteToProfessionalStatusTypeName = result.StatusDerivedRoute?.Name,
+                ProgrammeTypeDerivedRouteToProfessionalStatusTypeId = result.ProgrammeTypeDerivedRoute?.RouteToProfessionalStatusTypeId,
+                ProgrammeTypeDerivedRouteToProfessionalStatusTypeName = result.ProgrammeTypeDerivedRoute?.Name,
+                IttQualificationDerivedRouteToProfessionalStatusTypeId = result.IttQualificationDerivedRoute?.RouteToProfessionalStatusTypeId,
+                IttQualificationDerivedRouteToProfessionalStatusTypeName = result.IttQualificationDerivedRoute?.Name,
+                MultiplePotentialCompatibleIttRecords = result.MultiplePotentialCompatibleIttRecords,
+                InductionExemptionReasonIdsMovedFromPerson = result.InductionExemptionReasonIdsMovedFromPerson,
+                ContactIttRowCount = result.ContactIttRowCount,
+                ContactQtsRowCount = result.ContactQtsRowCount,
+                RouteToProfessionalStatusTypeId = result.ProfessionalStatusInfo?.RouteToProfessionalStatusType?.RouteToProfessionalStatusTypeId,
+                RouteToProfessionalStatusTypeName = result.ProfessionalStatusInfo?.RouteToProfessionalStatusType?.Name,
+                SourceApplicationReference = result.ProfessionalStatusInfo?.ProfessionalStatus?.SourceApplicationReference,
+                SourceApplicationUserId = result.ProfessionalStatusInfo?.SourceApplicationUser?.UserId,
+                SourceApplicationUserShortName = result.ProfessionalStatusInfo?.SourceApplicationUser?.ShortName,
+                Status = result.ProfessionalStatusInfo?.ProfessionalStatus?.Status.ToString(),
+                HoldsFrom = result.ProfessionalStatusInfo?.ProfessionalStatus?.HoldsFrom,
+                TrainingStartDate = result.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingStartDate,
+                TrainingEndDate = result.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingEndDate,
+                TrainingSubject1Name = result.ProfessionalStatusInfo?.TrainingSubject1?.Name,
+                TrainingSubject1Reference = result.ProfessionalStatusInfo?.TrainingSubject1?.Reference,
+                TrainingSubject2Name = result.ProfessionalStatusInfo?.TrainingSubject2?.Name,
+                TrainingSubject2Reference = result.ProfessionalStatusInfo?.TrainingSubject2?.Reference,
+                TrainingSubject3Name = result.ProfessionalStatusInfo?.TrainingSubject3?.Name,
+                TrainingSubject3Reference = result.ProfessionalStatusInfo?.TrainingSubject3?.Reference,
+                TrainingAgeSpecialismType = result.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismType?.ToString(),
+                TrainingAgeSpecialismRangeFrom = result.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismRangeFrom,
+                TrainingAgeSpecialismRangeTo = result.ProfessionalStatusInfo?.ProfessionalStatus?.TrainingAgeSpecialismRangeTo,
+                TrainingCountryName = result.ProfessionalStatusInfo?.TrainingCountry?.Name,
+                TrainingCountryId = result.ProfessionalStatusInfo?.TrainingCountry?.CountryId,
+                TrainingProviderId = result.ProfessionalStatusInfo?.TrainingProvider?.TrainingProviderId,
+                TrainingProviderName = result.ProfessionalStatusInfo?.TrainingProvider?.Name,
+                TrainingProviderUkprn = result.ProfessionalStatusInfo?.TrainingProvider?.Ukprn,
+                ExemptFromInduction = result.ProfessionalStatusInfo?.ProfessionalStatus?.ExemptFromInduction,
+                ExemptFromInductionDueToQtsDate = result.ProfessionalStatusInfo?.ProfessionalStatus?.ExemptFromInductionDueToQtsDate,
+                DegreeTypeId = result.ProfessionalStatusInfo?.ProfessionalStatus?.DegreeTypeId,
+                DegreeTypeName = result.ProfessionalStatusInfo?.DegreeType?.Name,
+                CreatedOn = clock.UtcNow,
+            };
+        }
+
+        async Task<int> SaveMigrationReportAsync(
+            NpgsqlTransaction transaction,
+            IReadOnlyCollection<RouteMigrationReportItem> items,
+            CancellationToken cancellationToken)
+        {
+            if (items.Count == 0)
+            {
+                return 0;
+            }
+
+            var columnNames = new[]
+            {
+                "route_migration_report_item_id",
+                "person_id",
+                "migrated",
+                "not_migrated_reason",
+                "dqt_initial_teacher_training_id",
+                "dqt_itt_slug_id",
+                "dqt_itt_programme_type",
+                "dqt_itt_programme_start_date",
+                "dqt_itt_programme_end_date",
+                "dqt_itt_result",
+                "dqt_itt_qualification_name",
+                "dqt_itt_qualification_value",
+                "dqt_itt_provider_id",
+                "dqt_itt_provider_name",
+                "dqt_itt_provider_ukprn",
+                "dqt_itt_country_name",
+                "dqt_itt_country_value",
+                "dqt_itt_subject1_name",
+                "dqt_itt_subject1_value",
+                "dqt_itt_subject2_name",
+                "dqt_itt_subject2_value",
+                "dqt_itt_subject3_name",
+                "dqt_itt_subject3_value",
+                "dqt_age_range_from",
+                "dqt_age_range_to",
+                "dqt_qts_registration_id",
+                "dqt_teacher_status_name",
+                "dqt_teacher_status_value",
+                "dqt_early_years_status_name",
+                "dqt_early_years_status_value",
+                "dqt_qts_date",
+                "dqt_eyts_date",
+                "dqt_partial_recognition_date",
+                "dqt_qtls_date",
+                "dqt_qtls_date_has_been_set",
+                "status_derived_route_to_professional_status_type_id",
+                "status_derived_route_to_professional_status_type_name",
+                "programme_type_derived_route_to_professional_status_type_id",
+                "programme_type_derived_route_to_professional_status_type_name",
+                "itt_qualification_derived_route_to_professional_status_type_id",
+                "itt_qualification_derived_route_to_professional_status_type_name",
+                "multiple_potential_compatible_itt_records",
+                "induction_exemption_reason_ids_moved_from_person",
+                "contact_itt_row_count",
+                "contact_qts_row_count",
+                "route_to_professional_status_type_id",
+                "route_to_professional_status_type_name",
+                "source_application_reference",
+                "source_application_user_id",
+                "source_application_user_short_name",
+                "status",
+                "holds_from",
+                "training_start_date",
+                "training_end_date",
+                "training_subject1_name",
+                "training_subject1_reference",
+                "training_subject2_name",
+                "training_subject2_reference",
+                "training_subject3_name",
+                "training_subject3_reference",
+                "training_age_specialism_type",
+                "training_age_specialism_range_from",
+                "training_age_specialism_range_to",
+                "training_country_name",
+                "training_country_id",
+                "training_provider_id",
+                "training_provider_name",
+                "training_provider_ukprn",
+                "exempt_from_induction",
+                "exempt_from_induction_due_to_qts_date",
+                "degree_type_id",
+                "degree_type_name",
+                "created_on"
+            };
+
+            var columnList = string.Join(", ", columnNames);
+            var copyStatement = $"COPY route_migration_report_items ({columnList}) FROM STDIN (FORMAT BINARY)";
+
+            using var writer = await transaction.Connection!.BeginBinaryImportAsync(copyStatement, cancellationToken);
+
+            foreach (var item in items)
+            {
+                writer.StartRow();
+                writer.WriteValueOrNull(item.RouteMigrationReportItemId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.PersonId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.Migrated, NpgsqlDbType.Boolean);
+                writer.WriteValueOrNull(item.NotMigratedReason, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtInitialTeacherTrainingId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.DqtIttSlugId, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttProgrammeType, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttProgrammeStartDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.DqtIttProgrammeEndDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.DqtIttResult, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttQualificationName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttQualificationValue, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttProviderId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.DqtIttProviderName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttProviderUkprn, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttCountryName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttCountryValue, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttSubject1Name, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttSubject1Value, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttSubject2Name, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttSubject2Value, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttSubject3Name, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtIttSubject3Value, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtAgeRangeFrom, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtAgeRangeTo, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtQtsRegistrationId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.DqtTeacherStatusName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtTeacherStatusValue, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtEarlyYearsStatusName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtEarlyYearsStatusValue, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.DqtQtsDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.DqtEytsDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.DqtPartialRecognitionDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.DqtQtlsDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.DqtQtlsDateHasBeenSet, NpgsqlDbType.Boolean);
+                writer.WriteValueOrNull(item.StatusDerivedRouteToProfessionalStatusTypeId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.StatusDerivedRouteToProfessionalStatusTypeName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.ProgrammeTypeDerivedRouteToProfessionalStatusTypeId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.ProgrammeTypeDerivedRouteToProfessionalStatusTypeName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.IttQualificationDerivedRouteToProfessionalStatusTypeId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.IttQualificationDerivedRouteToProfessionalStatusTypeName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.MultiplePotentialCompatibleIttRecords, NpgsqlDbType.Array | NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.InductionExemptionReasonIdsMovedFromPerson, NpgsqlDbType.Array | NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.ContactIttRowCount, NpgsqlDbType.Integer);
+                writer.WriteValueOrNull(item.ContactQtsRowCount, NpgsqlDbType.Integer);
+                writer.WriteValueOrNull(item.RouteToProfessionalStatusTypeId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.RouteToProfessionalStatusTypeName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.SourceApplicationReference, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.SourceApplicationUserId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.SourceApplicationUserShortName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.Status, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.HoldsFrom, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.TrainingStartDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.TrainingEndDate, NpgsqlDbType.Date);
+                writer.WriteValueOrNull(item.TrainingSubject1Name, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingSubject1Reference, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingSubject2Name, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingSubject2Reference, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingSubject3Name, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingSubject3Reference, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingAgeSpecialismType, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingAgeSpecialismRangeFrom, NpgsqlDbType.Integer);
+                writer.WriteValueOrNull(item.TrainingAgeSpecialismRangeTo, NpgsqlDbType.Integer);
+                writer.WriteValueOrNull(item.TrainingCountryName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingCountryId, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingProviderId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.TrainingProviderName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.TrainingProviderUkprn, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.ExemptFromInduction, NpgsqlDbType.Boolean);
+                writer.WriteValueOrNull(item.ExemptFromInductionDueToQtsDate, NpgsqlDbType.Boolean);
+                writer.WriteValueOrNull(item.DegreeTypeId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(item.DegreeTypeName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(item.CreatedOn, NpgsqlDbType.TimestampTz);
+            }
+
+            await writer.CompleteAsync(cancellationToken);
+            await writer.CloseAsync(cancellationToken);
+
+            return items.Count;
         }
     }
 
@@ -2695,7 +2961,24 @@ public class TrsDataSyncHelper(
                     ittQualification: null,
                     teacherStatus: null,
                     eyStatus: null);
-                mapped.Add(IttQtsMapResult.Succeeded(ps));
+                mapped.Add(await IttQtsMapResult.SucceededAsync(
+                            referenceDataCache,
+                            ps,
+                            itt: null,
+                            teacherStatus: null,
+                            qtsDate: null,
+                            earlyYearsStatus: null,
+                            eytsDate: null,
+                            partialRecognitionDate: null,
+                            qtlsDate,
+                            qtlsDateHasBeenSet,
+                            ittQualification: null,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount));
             }
 
             // Filter out ITT which we aren't migrating to TRS
@@ -3733,16 +4016,6 @@ public class TrsDataSyncHelper(
 
         public Guid[]? InductionExemptionReasonIdsMovedFromPerson { get; set; }
 
-        public static IttQtsMapResult Succeeded(RouteToProfessionalStatusInfo ps)
-        {
-            return new IttQtsMapResult()
-            {
-                Success = true,
-                ProfessionalStatusInfo = ps,
-                ContactId = ps.ProfessionalStatus!.PersonId
-            };
-        }
-
         public static async Task<IttQtsMapResult> SucceededAsync(
             ReferenceDataCache referenceDataCache,
             RouteToProfessionalStatusInfo ps,
@@ -3807,6 +4080,7 @@ public class TrsDataSyncHelper(
                 ContactId = ps.ProfessionalStatus!.PersonId,
                 QtsRegistrationId = ps.ProfessionalStatus.DqtQtsRegistrationId,
                 IttId = ps.ProfessionalStatus.DqtInitialTeacherTrainingId,
+                IttSlugId = itt?.dfeta_SlugId,
                 TeacherStatus = teacherStatus,
                 QtsDate = qtsDate,
                 EarlyYearsStatus = earlyYearsStatus,
@@ -3902,11 +4176,11 @@ public class TrsDataSyncHelper(
                 IttSlugId = itt?.dfeta_SlugId,
                 TeacherStatus = teacherStatus,
                 QtsDate = qtsDate,
-                QtlsDateHasBeenSet = qtlsDateHasBeenSet,
                 EarlyYearsStatus = earlyYearsStatus,
                 EytsDate = eytsDate,
                 PartialRecognitionDate = partialRecognitionDate,
                 QtlsDate = qtlsDate,
+                QtlsDateHasBeenSet = qtlsDateHasBeenSet,
                 ProgrammeType = itt?.dfeta_ProgrammeType,
                 ProgrammeEndDate = itt?.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 ProgrammeStartDate = itt?.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
