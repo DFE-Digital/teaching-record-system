@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
@@ -87,7 +88,7 @@ public class ChangeHistoryModel(
             .ToAsyncEnumerableAsync()
             .SelectAwait(async at => (
                 AlertType: at,
-                CanRead: (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Read)) is { Succeeded: true }))
+                CanRead: (await authorizationService.AuthorizeAsync(User, at.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Read))) is { Succeeded: true }))
             .Where(t => t.CanRead)
             .ToArrayAsync();
 

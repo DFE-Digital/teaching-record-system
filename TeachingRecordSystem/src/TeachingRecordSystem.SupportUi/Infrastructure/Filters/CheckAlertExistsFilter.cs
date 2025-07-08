@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -38,10 +39,10 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
             return;
         }
 
-        var authorizationResult = await authorizationService.AuthorizeForAlertTypeAsync(
+        var authorizationResult = await authorizationService.AuthorizeAsync(
             context.HttpContext.User,
             currentAlert.AlertTypeId,
-            requiredPermissionType);
+            new AlertTypePermissionRequirement(requiredPermissionType));
 
         if (authorizationResult is not { Succeeded: true })
         {

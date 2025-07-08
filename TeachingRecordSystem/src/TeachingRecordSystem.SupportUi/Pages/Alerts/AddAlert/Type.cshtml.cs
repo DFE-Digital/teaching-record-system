@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -73,7 +74,7 @@ public class TypeModel(
         var alertTypes = await referenceDataCache.GetAlertTypesAsync(activeOnly: true);
         AlertTypes = await alertTypes
             .ToAsyncEnumerable()
-            .WhereAwait(async t => (await authorizationService.AuthorizeForAlertTypeAsync(User, t.AlertTypeId, Permissions.Alerts.Write)) is { Succeeded: true })
+            .WhereAwait(async t => (await authorizationService.AuthorizeAsync(User, t.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true })
             .Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder ?? int.MaxValue))
             .ToArrayAsync();
 
