@@ -74,12 +74,12 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
-        doc.AssertSummaryListValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
-        doc.AssertSummaryListValue("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
-        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
-        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
-        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Other", v.TrimmedText()));
+        doc.AssertRow("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
+        doc.AssertRow("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
+        doc.AssertRow("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
+        doc.AssertRow("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
+        doc.AssertRow("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
+        doc.AssertRow("Gender", v => Assert.Equal("Other", v.TrimmedText()));
     }
 
     [Fact]
@@ -103,11 +103,11 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
-        doc.AssertSummaryListValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
+        doc.AssertRow("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Fact]
@@ -132,10 +132,10 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for creating record", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason for creating record", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertSummaryListValue("Evidence", v =>
+        doc.AssertRow("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
@@ -165,9 +165,9 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for creating record", v => Assert.Equal("They were awarded a mandatory qualification", v.TrimmedText()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValues("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Reason for creating record", v => Assert.Equal("They were awarded a mandatory qualification", v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRows("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Fact]

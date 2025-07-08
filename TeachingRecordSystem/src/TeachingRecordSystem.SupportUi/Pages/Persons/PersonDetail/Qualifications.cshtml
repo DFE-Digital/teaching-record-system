@@ -135,6 +135,12 @@
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback data-testid="source-application-reference-@professionalStatus.QualificationId">
+                            @professionalStatus.SourceApplicationReference
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
         }

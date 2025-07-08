@@ -24,6 +24,7 @@ public partial class TestData
         private string? _changeReason;
         private string? _changeReasonDetail;
         private Core.Events.Models.File? _evidenceFile { get; set; }
+        private string? _sourceApplicationReference;
 
         public CreatePersonRouteToProfessionalStatusBuilder WithStatus(RouteToProfessionalStatusStatus status)
         {
@@ -126,6 +127,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonRouteToProfessionalStatusBuilder WithSourceApplicationReference(string sourceApplicationReference)
+        {
+            _sourceApplicationReference = sourceApplicationReference;
+            return this;
+        }
+
         internal async Task<(Guid ProfessionalStatusId, IReadOnlyCollection<EventBase> Events)> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             Person person,
@@ -148,7 +155,7 @@ public partial class TestData
                 allRouteTypes,
                 _routeToProfessionalStatusTypeId!.Value,
                 sourceApplicationUserId: null,
-                sourceApplicationReference: null,
+                sourceApplicationReference: _sourceApplicationReference,
                 status: _status,
                  holdsFrom: _holdsFrom,
                 trainingStartDate: _trainingStartDate,
