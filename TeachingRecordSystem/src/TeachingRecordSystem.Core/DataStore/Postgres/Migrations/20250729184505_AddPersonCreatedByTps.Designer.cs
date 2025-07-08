@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250729184505_AddPersonCreatedByTps")]
+    partial class AddPersonCreatedByTps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3963,10 +3966,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cpd_induction_modified_on");
 
-                    b.Property<bool>("CreatedByTps")
-                        .ValueGeneratedOnAdd()
+                    b.Property<bool?>("CreatedByTps")
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
                         .HasColumnName("created_by_tps");
 
                     b.Property<DateTime?>("CreatedOn")
@@ -4214,21 +4215,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("previous_name_id");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_on");
-
-                    b.Property<Guid?>("DqtAuditId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dqt_audit_id");
-
-                    b.Property<Guid[]>("DqtPreviousNameIds")
-                        .HasColumnType("uuid[]")
-                        .HasColumnName("dqt_previous_name_ids");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -4255,7 +4248,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
@@ -20018,7 +20011,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                 .HasForeignKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId")
                                 .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_application_user_");
 
-                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedPerson", "MatchedPersons", b2 =>
+                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedRecord", "MatchedRecords", b2 =>
                                 {
                                     b2.Property<Guid>("TrnRequestMatchesTrnRequestMetadataApplicationUserId")
                                         .HasColumnType("uuid");
@@ -20044,7 +20037,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                         .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_trn_request_matches");
                                 });
 
-                            b1.Navigation("MatchedPersons");
+                            b1.Navigation("MatchedRecords");
                         });
 
                     b.Navigation("ApplicationUser");

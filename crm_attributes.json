@@ -84,7 +84,8 @@
     "dfeta_qtlsdate",
     "dfeta_qtlsdatehasbeenset",
     "dfeta_dateofdeath",
-    "dfeta_mergedwith"
+    "dfeta_mergedwith",
+    "dfeta_capitatrnchangedon"
   ],
   "dfeta_businesseventaudit":[
     "createdby",

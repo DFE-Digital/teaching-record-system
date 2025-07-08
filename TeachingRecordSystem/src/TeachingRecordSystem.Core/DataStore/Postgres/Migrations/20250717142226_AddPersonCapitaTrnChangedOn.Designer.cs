@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250717142226_AddPersonCapitaTrnChangedOn")]
+    partial class AddPersonCapitaTrnChangedOn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3951,6 +3954,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
+                    b.Property<DateTime?>("CapitaTrnChangedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("capita_trn_changed_on");
+
                     b.Property<DateTime?>("CpdInductionCpdModifiedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cpd_induction_cpd_modified_on");
@@ -3962,12 +3969,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<DateTime?>("CpdInductionModifiedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cpd_induction_modified_on");
-
-                    b.Property<bool>("CreatedByTps")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("created_by_tps");
 
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
@@ -4105,6 +4106,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("middle_name")
                         .UseCollation("case_insensitive");
 
+                    b.Property<string>("MobileNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("mobile_number");
+
                     b.Property<string>("NationalInsuranceNumber")
                         .HasMaxLength(9)
                         .HasColumnType("character(9)")
@@ -4214,21 +4220,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("previous_name_id");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_on");
-
-                    b.Property<Guid?>("DqtAuditId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dqt_audit_id");
-
-                    b.Property<Guid[]>("DqtPreviousNameIds")
-                        .HasColumnType("uuid[]")
-                        .HasColumnName("dqt_previous_name_ids");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -4255,7 +4253,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
@@ -5038,7 +5036,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         {
                             RouteToProfessionalStatusTypeId = new Guid("8f5c0431-d006-4eda-9336-16dfc6a26a78"),
                             DegreeTypeRequired = 0,
-                            HoldsFromRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = false,
                             Name = "EYPS",
@@ -5054,7 +5052,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         {
                             RouteToProfessionalStatusTypeId = new Guid("eba0b7ae-cbce-44d5-a56f-988d69b03001"),
                             DegreeTypeRequired = 0,
-                            HoldsFromRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = false,
                             Name = "EYPS ITT Migrated",
@@ -5074,7 +5072,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = false,
                             Name = "EYTS ITT Migrated",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 2,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -19215,30 +19213,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("national_insurance_number");
 
-                    b.Property<string>("NpqApplicationId")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_application_id");
-
-                    b.Property<Guid?>("NpqEvidenceFileId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("npq_evidence_file_id");
-
-                    b.Property<string>("NpqEvidenceFileName")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_evidence_file_name");
-
-                    b.Property<string>("NpqName")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_name");
-
-                    b.Property<string>("NpqTrainingProvider")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_training_provider");
-
-                    b.Property<bool?>("NpqWorkingInEducationalSetting")
-                        .HasColumnType("boolean")
-                        .HasColumnName("npq_working_in_educational_setting");
-
                     b.Property<string>("OneLoginUserSubject")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -19263,10 +19237,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<Guid?>("ResolvedPersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("resolved_person_id");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
 
                     b.Property<string>("TrnToken")
                         .HasColumnType("text")
@@ -20018,7 +19988,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                 .HasForeignKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId")
                                 .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_application_user_");
 
-                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedPerson", "MatchedPersons", b2 =>
+                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedRecord", "MatchedRecords", b2 =>
                                 {
                                     b2.Property<Guid>("TrnRequestMatchesTrnRequestMetadataApplicationUserId")
                                         .HasColumnType("uuid");
@@ -20044,7 +20014,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                         .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_trn_request_matches");
                                 });
 
-                            b1.Navigation("MatchedPersons");
+                            b1.Navigation("MatchedRecords");
                         });
 
                     b.Navigation("ApplicationUser");

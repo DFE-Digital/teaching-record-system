@@ -106,6 +106,7 @@
     <None Remove="Services\DqtReporting\Migrations\0074_TrsRouteMigrationReportItem.sql" />
     <None Remove="Services\DqtReporting\Migrations\0075_TrsRouteMigrationReportItemStatusLength.sql" />
     <None Remove="Services\DqtReporting\Migrations\0077_TrsIntegrationTranactionFKCorrection.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0078_TrsPersonsCreatedByTps.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -223,6 +224,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0074_TrsRouteMigrationReportItem.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0075_TrsRouteMigrationReportItemStatusLength.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0077_TrsIntegrationTranactionFKCorrection.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0078_TrsPersonsCreatedByTps.sql" />
   </ItemGroup>
 
   <ItemGroup>

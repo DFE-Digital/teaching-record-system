@@ -58,6 +58,7 @@ public partial class TestData
         private CreatePersonInductionBuilder? _inductionBuilder;
         private QtlsStatus? _qtlsStatus;
         private TestDataPersonDataSource? _personDataSource;
+        private bool? _createdByTps;
 
         internal CreatePersonBuilder(ReferenceData referenceData)
         {
@@ -403,6 +404,18 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithCreatedByTps(bool? createdByTps)
+        {
+            if (_createdByTps is not null && _createdByTps != createdByTps)
+            {
+                throw new InvalidOperationException("WithCreatedByTps cannot be changed after it's set.");
+            }
+
+            _createdByTps = createdByTps;
+
+            return this;
+        }
+
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
             var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
@@ -434,7 +447,8 @@ public partial class TestData
                 dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
                 dfeta_TrnToken = _trnToken,
                 dfeta_SlugId = _slugId,
-                dfeta_loginfailedcounter = _loginFailedCounter
+                dfeta_loginfailedcounter = _loginFailedCounter,
+                dfeta_CapitaTRNChangedOn = _createdByTps == true ? null : DateTime.UtcNow
             };
 
             // The conditional is to work around issue in CRM where an explicit `null` TRN breaks a plugin
@@ -498,7 +512,8 @@ public partial class TestData
                     DqtFirstName = mappedPersonInfo.DqtFirstName,
                     DqtMiddleName = mappedPersonInfo.DqtMiddleName,
                     DqtLastName = mappedPersonInfo.DqtLastName,
-                    Gender = mappedPersonInfo.Gender
+                    Gender = mappedPersonInfo.Gender,
+                    CreatedByTps = mappedPersonInfo.CreatedByTps
                 });
 
                 await dbContext.SaveChangesAsync();

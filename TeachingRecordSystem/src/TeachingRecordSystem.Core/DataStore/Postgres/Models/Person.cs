@@ -63,6 +63,7 @@ public class Person
     public string? DqtLastName { get; set; }
     public DateTime? DqtInductionLastSync { get; set; }
     public DateTime? DqtInductionModifiedOn { get; set; }
+    public bool CreatedByTps { get; set; }
 
     public static CreatePersonResult Create(
         string trn,
@@ -73,7 +74,8 @@ public class Person
         EmailAddress? emailAddress,
         NationalInsuranceNumber? nationalInsuranceNumber,
         Gender? gender,
-        DateTime now)
+        DateTime now,
+        bool createdByTps = false)
     {
         var person = new Person
         {
@@ -87,7 +89,8 @@ public class Person
             NationalInsuranceNumber = (string?)nationalInsuranceNumber,
             Gender = gender,
             CreatedOn = now,
-            UpdatedOn = now
+            UpdatedOn = now,
+            CreatedByTps = createdByTps
         };
 
         return new(person, EventModels.PersonAttributes.FromModel(person));
