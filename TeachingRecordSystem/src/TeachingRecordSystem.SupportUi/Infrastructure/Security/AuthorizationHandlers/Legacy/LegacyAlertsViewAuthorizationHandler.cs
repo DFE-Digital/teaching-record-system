@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHa
 /// <summary>
 /// AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
 /// </summary>
-public class LegacyNonDbsAlertsAuthorizationHandler : AuthorizationHandler<NonDbsAlertsRequirement>
+public class LegacyAlertsViewAuthorizationHandler : AuthorizationHandler<AlertsViewRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, NonDbsAlertsRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AlertsViewRequirement requirement)
     {
         // If the user has been migrated to the new user roles, they may still have the legacy roles, so we need to
         // disregard them for this user as they may be different to their new role.
@@ -18,20 +18,13 @@ public class LegacyNonDbsAlertsAuthorizationHandler : AuthorizationHandler<NonDb
             return Task.CompletedTask;
         }
 
-        switch (requirement.AlertsPermission)
+        // Check the user has either the AlertsReadWrite or DbsAlertsReadWrite role.
+        // The AlertType page will deal with ensuring that only permitted alert types can be selected.
+        if (context.User.IsInRole(LegacyUserRoles.AlertsReadWrite)
+            || context.User.IsInRole(LegacyUserRoles.DbsAlertsReadWrite)
+            || context.User.IsInRole(LegacyUserRoles.Administrator))
         {
-            case Permissions.Alerts.Flag:
-            case Permissions.Alerts.Read:
-                context.Succeed(requirement);
-                break;
-
-            case Permissions.Alerts.Write:
-                if (context.User.IsInRole(LegacyUserRoles.AlertsReadWrite)
-                    || context.User.IsInRole(LegacyUserRoles.Administrator))
-                {
-                    context.Succeed(requirement);
-                }
-                break;
+            context.Succeed(requirement);
         }
 
         return Task.CompletedTask;

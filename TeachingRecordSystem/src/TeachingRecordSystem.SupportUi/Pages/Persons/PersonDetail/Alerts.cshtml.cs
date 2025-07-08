@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-[Authorize(Policy = AuthorizationPolicies.AlertsRead)]
+[Authorize(Policy = AuthorizationPolicies.AlertsView)]
 public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDataCache, IAuthorizationService authorizationService) : PageModel
 {
     [FromRoute]
@@ -33,9 +34,9 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
             .ToAsyncEnumerable()
             .SelectAwait(async id => (
                 AlertTypeId: id,
-                CanFlag: await authorizationService.AuthorizeForAlertTypeAsync(User, id, Permissions.Alerts.Flag) is { Succeeded: true },
-                CanRead: await authorizationService.AuthorizeForAlertTypeAsync(User, id, Permissions.Alerts.Read) is { Succeeded: true },
-                CanWrite: await authorizationService.AuthorizeForAlertTypeAsync(User, id, Permissions.Alerts.Write) is { Succeeded: true }))
+                CanFlag: await authorizationService.AuthorizeAsync(User, id, new AlertTypePermissionRequirement(Permissions.Alerts.Flag)) is { Succeeded: true },
+                CanRead: await authorizationService.AuthorizeAsync(User, id, new AlertTypePermissionRequirement(Permissions.Alerts.Read)) is { Succeeded: true },
+                CanWrite: await authorizationService.AuthorizeAsync(User, id, new AlertTypePermissionRequirement(Permissions.Alerts.Write)) is { Succeeded: true }))
             .ToDictionaryAsync(t => t.AlertTypeId);
 
         var authorizedAlerts = alerts
@@ -52,7 +53,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
 
         CanAddAlert = await referenceDataCache.GetAlertTypesAsync(activeOnly: true)
             .ToAsyncEnumerableAsync()
-            .AnyAwaitAsync(async at => (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Write)) is { Succeeded: true });
+            .AnyAwaitAsync(async at => (await authorizationService.AuthorizeAsync(User, at.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true });
 
         ShowOpenAlertFlag = alerts.Any(a => a.IsOpen && alertTypePermissions[a.AlertTypeId] is { CanFlag: true, CanRead: false });
     }

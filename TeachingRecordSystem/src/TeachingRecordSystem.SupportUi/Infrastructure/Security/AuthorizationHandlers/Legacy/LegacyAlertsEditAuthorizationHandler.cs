@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHa
 /// <summary>
 /// AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
 /// </summary>
-public class LegacyAlertsAuthorizationHandler : AuthorizationHandler<AlertsRequirement>
+public class LegacyAlertsEditAuthorizationHandler : AuthorizationHandler<AlertsEditRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AlertsRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AlertsEditRequirement requirement)
     {
         // If the user has been migrated to the new user roles, they may still have the legacy roles, so we need to
         // disregard them for this user as they may be different to their new role.

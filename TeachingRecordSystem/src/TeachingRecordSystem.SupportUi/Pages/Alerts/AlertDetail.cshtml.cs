@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts;
 
@@ -62,10 +63,10 @@ public class AlertDetailModel(
             null;
         ExternalLinkUri = TrsUriHelper.TryCreateWebsiteUri(Alert.ExternalLink, out var linkUri) ? linkUri : null;
 
-        CanEdit = (await authorizationService.AuthorizeForAlertTypeAsync(
+        CanEdit = (await authorizationService.AuthorizeAsync(
             User,
             Alert.AlertTypeId,
-            Permissions.Alerts.Write)) is { Succeeded: true };
+            new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true };
     }
 
     private record ChangeReasonInfo(string? ChangeReason, string? ChangeReasonDetail, Guid? EvidenceFileId, string? EvidenceFileName);

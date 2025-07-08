@@ -49,7 +49,7 @@
                     </li>
                 }
 
-                @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AlertsRead)).Succeeded)
+                @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AlertsView)).Succeeded)
                 {
                     <li class="moj-sub-navigation__item">
                         <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonAlerts(personId)">Alerts</a>
