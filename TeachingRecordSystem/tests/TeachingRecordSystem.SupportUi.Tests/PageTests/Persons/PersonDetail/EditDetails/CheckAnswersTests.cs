@@ -108,12 +108,12 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
-        doc.AssertSummaryListValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
-        doc.AssertSummaryListValue("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
-        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
-        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
-        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Male", v.TrimmedText()));
+        doc.AssertRow("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
+        doc.AssertRow("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
+        doc.AssertRow("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
+        doc.AssertRow("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
+        doc.AssertRow("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
+        doc.AssertRow("Gender", v => Assert.Equal("Male", v.TrimmedText()));
     }
 
     [Fact]
@@ -143,11 +143,11 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
-        doc.AssertSummaryListValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
+        doc.AssertRow("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Fact]
@@ -175,19 +175,19 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertRow("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertSummaryListValues("Evidence uploaded", v =>
+        doc.AssertRows("Evidence uploaded", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
 
-        doc.AssertSummaryListRowDoesNotExist("Personal details change");
-        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
-        doc.AssertSummaryListRowDoesNotExist("Reason details");
-        doc.AssertSummaryListRowDoesNotExist("Evidence");
+        doc.AssertRowDoesNotExist("Personal details change");
+        doc.AssertRowDoesNotExist("Other personal details change");
+        doc.AssertRowDoesNotExist("Reason details");
+        doc.AssertRowDoesNotExist("Evidence");
     }
 
     [Fact]
@@ -215,19 +215,19 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason for personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertSummaryListValue("Evidence uploaded", v =>
+        doc.AssertRow("Evidence uploaded", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
 
-        doc.AssertSummaryListRowDoesNotExist("Reason for name change");
-        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
-        doc.AssertSummaryListRowDoesNotExist("Evidence");
+        doc.AssertRowDoesNotExist("Reason for name change");
+        doc.AssertRowDoesNotExist("Other personal details change");
+        doc.AssertRowDoesNotExist("Evidence");
     }
 
     [Fact]
@@ -258,11 +258,11 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
-        doc.AssertSummaryListValue("Other personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertRow("Other personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertSummaryListValues("Evidence", v =>
+        doc.AssertRows("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("name-evidence.pdf (opens in new tab)", link.TrimmedText());
@@ -274,7 +274,7 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(expectedFileUrl, link.Href);
         });
 
-        doc.AssertSummaryListRowDoesNotExist("Reason for personal details change");
+        doc.AssertRowDoesNotExist("Reason for personal details change");
     }
 
     [Fact]
@@ -302,13 +302,13 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
-        doc.AssertSummaryListValues("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertRows("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
 
-        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
-        doc.AssertSummaryListRowDoesNotExist("Reason for personal details change");
-        doc.AssertSummaryListRowDoesNotExist("Reason details");
-        doc.AssertSummaryListRowDoesNotExist("Evidence");
+        doc.AssertRowDoesNotExist("Other personal details change");
+        doc.AssertRowDoesNotExist("Reason for personal details change");
+        doc.AssertRowDoesNotExist("Reason details");
+        doc.AssertRowDoesNotExist("Evidence");
     }
 
     [Fact]
@@ -336,13 +336,13 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for personal details change", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValues("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("Reason for personal details change", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRows("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
 
-        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
-        doc.AssertSummaryListRowDoesNotExist("Reason for name change");
-        doc.AssertSummaryListRowDoesNotExist("Evidence");
+        doc.AssertRowDoesNotExist("Other personal details change");
+        doc.AssertRowDoesNotExist("Reason for name change");
+        doc.AssertRowDoesNotExist("Evidence");
     }
 
     [Theory]
