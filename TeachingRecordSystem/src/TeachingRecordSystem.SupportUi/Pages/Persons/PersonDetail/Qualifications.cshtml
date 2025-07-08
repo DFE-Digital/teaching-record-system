@@ -27,7 +27,12 @@
     {
         @foreach (var professionalStatus in Model.ProfessionalStatuses)
         {
-            var statusTitle = ProfessionalStatusStatusRegistry.GetTitle(professionalStatus.Status);
+            var statusTitle = ProfessionalStatusStatusRegistry.GetTitle(professionalStatus.Status).ToUpper();
+            var statusColor = professionalStatus.Status switch {
+                RouteToProfessionalStatusStatus.Holds => "green",
+                RouteToProfessionalStatusStatus.InTraining => "light-blue",
+                _ => "pink"
+            };
             var cardTitle = $"{professionalStatus.RouteToProfessionalStatusType?.ProfessionalStatusType.GetDisplayName()}";
 
             <govuk-summary-card data-testid="professionalstatus-@professionalStatus.QualificationId">
@@ -46,7 +51,11 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="route-status-@professionalStatus.QualificationId">@statusTitle</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="route-status-@professionalStatus.QualificationId">
+                            <strong class="govuk-tag govuk-tag--@statusColor">
+                                @statusTitle
+                            </strong>
+                        </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType!.TrainingStartDateRequired, professionalStatus.Status.GetStartDateRequirement()) != FieldRequirement.NotApplicable)
                     {
