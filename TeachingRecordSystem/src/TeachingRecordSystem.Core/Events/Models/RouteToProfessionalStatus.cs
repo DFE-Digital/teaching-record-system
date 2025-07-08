@@ -2,6 +2,9 @@ namespace TeachingRecordSystem.Core.Events.Models;
 
 public record RouteToProfessionalStatus
 {
+    public required Guid QualificationId { get; init; }
+    public required Guid? SourceApplicationUserId { get; init; }
+    public required string? SourceApplicationReference { get; init; }
     public required Guid RouteToProfessionalStatusTypeId { get; init; }
     public required RouteToProfessionalStatusStatus Status { get; init; }
     public required DateOnly? HoldsFrom { get; init; }
@@ -14,11 +17,14 @@ public record RouteToProfessionalStatus
     public required string? TrainingCountryId { get; init; }
     public required Guid? TrainingProviderId { get; init; }
     public required bool? ExemptFromInduction { get; set; }
-    public required Guid? DegreeTypeId { get; init; }
     public required bool? ExemptFromInductionDueToQtsDate { get; init; }
+    public required Guid? DegreeTypeId { get; init; }
 
     public static RouteToProfessionalStatus FromModel(DataStore.Postgres.Models.RouteToProfessionalStatus model) => new()
     {
+        QualificationId = model.QualificationId,
+        SourceApplicationUserId = model.SourceApplicationUserId,
+        SourceApplicationReference = model.SourceApplicationReference,
         RouteToProfessionalStatusTypeId = model.RouteToProfessionalStatusTypeId,
         Status = model.Status,
         HoldsFrom = model.HoldsFrom,
