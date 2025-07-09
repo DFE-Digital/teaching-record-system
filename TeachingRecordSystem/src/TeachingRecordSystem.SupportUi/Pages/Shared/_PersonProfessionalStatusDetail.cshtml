@@ -15,6 +15,10 @@
                 <govuk-summary-list-row-value>@Model.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
         }
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Qualified Teacher Learning and Skills status (QTLS)</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value>@(Model.QtlsStatus == QtlsStatus.None ? "No" : Model.QtlsStatus.ToString())</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
         @if(Model.InductionStatusInfo.Value != InductionStatus.None)
         {
             <govuk-summary-list-row>

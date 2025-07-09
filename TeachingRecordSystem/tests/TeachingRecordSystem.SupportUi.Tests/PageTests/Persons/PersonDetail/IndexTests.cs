@@ -235,106 +235,6 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_PersonHasQts_ShowsDetails()
-    {
-        // Arrange
-        var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts(awardDate));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
-        Assert.Equal(person.Person.QtsDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("QTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
-        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
-        Assert.NotNull(doc.GetSummaryListValueForKey("Induction status"));
-    }
-
-    [Fact]
-    public async Task Get_PersonHasEyts_ShowsDetails()
-    {
-        // Arrange
-        var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
-        Assert.Equal(person.Person.EytsDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("EYTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
-        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
-        Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
-    }
-
-    [Fact]
-    public async Task Get_PersonHasEyps_ShowsDetails()
-    {
-        // Arrange
-        var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
-        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
-        Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
-    }
-
-    [Fact]
-    public async Task Get_PersonHasPqts_ShowsDetails()
-    {
-        // Arrange
-        var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
-        Assert.Equal(person.Person.PqtsDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("PQTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
-        Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
-        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
-        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
-    }
-
-    [Fact]
     public async Task Get_PersonHasQts_RoutesFeatureFlagOff_NoDetailsShown()
     {
         // Arrange
@@ -388,6 +288,151 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetAllElementsByTestId("professional-status-details"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasQts_ShowsDetails()
+    {
+        // Arrange
+        var awardDate = Clock.Today;
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithQts(awardDate));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
+        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Qualified teacher status (QTS)"));
+        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("QTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Qualified Teacher Learning and Skills status (QTLS)"));
+        Assert.Equal("Required to complete", doc.GetSummaryListValueForKey("Induction status"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years teacher status (EYTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Partial qualified teacher status (PQTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasQtls_ShowsDetails()
+    {
+        // Arrange
+        var awardDate = Clock.Today;
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithQtls(awardDate));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
+        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Qualified teacher status (QTS)"));
+        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("QTS held since"));
+        Assert.Equal("Active", doc.GetSummaryListValueForKey("Qualified Teacher Learning and Skills status (QTLS)"));
+        Assert.Equal("Required to complete", doc.GetSummaryListValueForKey("Induction status"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years teacher status (EYTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Partial qualified teacher status (PQTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasEyts_ShowsDetails()
+    {
+        // Arrange
+        var awardDate = Clock.Today;
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, awardDate));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Qualified teacher status (QTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Qualified Teacher Learning and Skills status (QTLS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
+        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Early years teacher status (EYTS)"));
+        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("EYTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Partial qualified teacher status (PQTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasEyps_ShowsDetails()
+    {
+        // Arrange
+        var awardDate = Clock.Today;
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Qualified teacher status (QTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Qualified Teacher Learning and Skills status (QTLS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years teacher status (EYTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
+        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Partial qualified teacher status (PQTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasPqts_ShowsDetails()
+    {
+        // Arrange
+        var awardDate = Clock.Today;
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus, awardDate));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Qualified teacher status (QTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("QTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Qualified Teacher Learning and Skills status (QTLS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years teacher status (EYTS)"));
+        Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
+        Assert.Equal("No", doc.GetSummaryListValueForKey("Early years professional status (EYPS)"));
+        Assert.Equal("Holds", doc.GetSummaryListValueForKey("Partial qualified teacher status (PQTS)"));
+        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("PQTS held since"));
     }
 
     [Theory]

@@ -43,7 +43,8 @@
             HasEyps = Model.PersonProfessionalStatus.HasEyps,
             InductionStatusInfo = InductionStatusRegistry.All.Single(s => s.Value == Model.PersonProfessionalStatus.InductionStatus),
             PqtsDate = Model.PersonProfessionalStatus.PqtsDate,
-            QtsDate = Model.PersonProfessionalStatus.QtsDate
+            QtsDate = Model.PersonProfessionalStatus.QtsDate,
+            QtlsStatus = Model.PersonProfessionalStatus.QtlsStatus
         };
         @await Html.PartialAsync("_PersonProfessionalStatusDetail", personStatusDetailModel)
     }
