@@ -52,7 +52,8 @@ public class IndexModel(
                 HasEyps = person.HasEyps,
                 InductionStatus = person.InductionStatus,
                 PqtsDate = person.PqtsDate,
-                QtsDate = person.QtsDate
+                QtsDate = person.QtsDate,
+                QtlsStatus = person.QtlsStatus
             };
         }
     }
@@ -150,6 +151,7 @@ public class IndexModel(
     {
         public required InductionStatus InductionStatus { get; init; }
         public required DateOnly? QtsDate { get; init; }
+        public required QtlsStatus QtlsStatus { get; init; }
         public required DateOnly? EytsDate { get; init; }
         public required bool HasEyps { get; init; }
         public required DateOnly? PqtsDate { get; init; }
