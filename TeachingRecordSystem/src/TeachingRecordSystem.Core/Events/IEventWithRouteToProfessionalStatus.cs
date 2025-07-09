@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public interface IEventWithProfessionalStatus
+public interface IEventWithRouteToProfessionalStatus
 {
     RouteToProfessionalStatus RouteToProfessionalStatus { get; }
     ProfessionalStatusPersonAttributes PersonAttributes { get; }

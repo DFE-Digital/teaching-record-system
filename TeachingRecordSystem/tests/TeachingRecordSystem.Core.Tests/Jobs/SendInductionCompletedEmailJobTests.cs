@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class SendInductionCompletedEmailJobTests : InductionCompletedEmailJobTestBase
+public class SendInductionCompletedEmailJobTests : NightlyEmailJobTestBase
 {
     public SendInductionCompletedEmailJobTests(NightlyEmailJobFixture dbFixture)
         : base(dbFixture)
@@ -45,7 +45,7 @@ public class SendInductionCompletedEmailJobTests : InductionCompletedEmailJobTes
             var batchJob = new InductionCompletedEmailsJob
             {
                 InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
-                AwardedToUtc = utcNow.AddDays(-1),
+                PassedEndUtc = utcNow.AddDays(-1),
                 ExecutedUtc = utcNow
             };
             dbContext.InductionCompletedEmailsJobs.Add(batchJob);

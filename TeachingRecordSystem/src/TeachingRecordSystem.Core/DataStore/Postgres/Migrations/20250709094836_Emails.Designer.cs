@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709094836_Emails")]
+    partial class Emails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -18929,21 +18932,21 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             TrainingSubjectId = new Guid("9caa584a-bb89-450d-8d8d-16ba0e84e28e"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Citizenship",
                             Reference = "999001"
                         },
                         new
                         {
                             TrainingSubjectId = new Guid("649d7736-d301-4c42-873a-b24486fd35d7"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Physical Education",
                             Reference = "999002"
                         },
                         new
                         {
                             TrainingSubjectId = new Guid("f3e91599-2a2e-4f81-b4e0-9098a1ce8ec7"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Design and technology",
                             Reference = "999003"
                         },

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
@@ -8,100 +7,81 @@ using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class SendQtsAwardedEmailJobTests : QtsAwardedEmailJobTestBase
+public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : NightlyEmailJobTestBase(dbFixture)
 {
-    public SendQtsAwardedEmailJobTests(DbFixture dbFixture)
-        : base(dbFixture)
-    {
-    }
-
     [Fact]
     public Task Execute_WhenCalled_GetsTrnTokenSendsEmailAddsEventAndUpdatesDatabase() =>
         DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var utcNow = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
-            var clock = new TestableClock();
             var notificationSender = new Mock<INotificationSender>();
             var getAnIdentityApiClient = new Mock<IGetAnIdentityApiClient>();
+
             var accessYourQualificationOptions = Options.Create(
                 new AccessYourTeachingQualificationsOptions
                 {
                     BaseAddress = "https://aytq.com"
                 });
-            clock.UtcNow = utcNow;
-            var qtsAwardedEmailsJobId = Guid.NewGuid();
-            var personId = Guid.NewGuid();
-            var trn = "1234567";
-            var emailAddress = Faker.Internet.Email();
-            var firstName = Faker.Name.First();
-            var lastName = Faker.Name.Last();
-            var personalisation = new Dictionary<string, string>()
+
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithEmail(TestData.GenerateUniqueEmail()));
+
+            var templateId = Guid.NewGuid().ToString();
+
+            var email = new Email
             {
-                { "first name", firstName },
-                { "last name", lastName },
+                EmailId = Guid.NewGuid(),
+                TemplateId = templateId,
+                EmailAddress = person.Email!,
+                Personalization = new Dictionary<string, string>
+                {
+                    ["first name"] = person.FirstName,
+                    ["last name"] = person.LastName
+                },
+                Metadata = new Dictionary<string, object> { ["Trn"] = person.Trn! },
+                SentOn = null
             };
 
-            var batchJob = new QtsAwardedEmailsJob
-            {
-                QtsAwardedEmailsJobId = qtsAwardedEmailsJobId,
-                AwardedToUtc = utcNow.AddDays(-1),
-                ExecutedUtc = utcNow
-            };
-            dbContext.QtsAwardedEmailsJobs.Add(batchJob);
-
-            var jobItem = new QtsAwardedEmailsJobItem
-            {
-                QtsAwardedEmailsJobId = qtsAwardedEmailsJobId,
-                PersonId = personId,
-                Trn = trn,
-                EmailAddress = emailAddress,
-                Personalization = personalisation
-            };
-            dbContext.QtsAwardedEmailsJobItems.Add(jobItem);
+            dbContext.Emails.Add(email);
             await dbContext.SaveChangesAsync();
 
             var tokenResponse = new CreateTrnTokenResponse
             {
-                Email = emailAddress,
-                Trn = trn,
-                TrnToken = "Thisismytrntoken",
-                ExpiresUtc = utcNow.AddDays(60)
+                Email = person.Email!,
+                Trn = person.Trn!,
+                TrnToken = "ThisIsMyTrnToken",
+                ExpiresUtc = Clock.UtcNow.AddDays(60)
             };
 
             getAnIdentityApiClient
                 .Setup(i => i.CreateTrnTokenAsync(
-                    It.Is<CreateTrnTokenRequest>(r => r.Trn == trn && r.Email == emailAddress)))
+                    It.Is<CreateTrnTokenRequest>(r => r.Trn == tokenResponse.Trn && r.Email == tokenResponse.Email)))
                 .ReturnsAsync(tokenResponse);
 
-            var job = new SendQtsAwardedEmailJob(
+            var job = new SendAytqInviteEmailJob(
                 notificationSender.Object,
                 dbContext,
                 getAnIdentityApiClient.Object,
                 accessYourQualificationOptions,
-                clock);
+                Clock);
 
             // Act
-            await job.ExecuteAsync(qtsAwardedEmailsJobId, personId);
+            await job.ExecuteAsync(email.EmailId);
 
             // Assert
             notificationSender
                 .Verify(
-                    n => n.SendEmailAsync(It.IsAny<string>(), It.Is<string>(s => s == emailAddress),
+                    n => n.SendEmailAsync(It.IsAny<string>(), It.Is<string>(s => s == person.Email),
                         It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
 
-            var updatedJobItem = await dbContext.QtsAwardedEmailsJobItems.SingleOrDefaultAsync(i =>
-                i.QtsAwardedEmailsJobId == qtsAwardedEmailsJobId && i.PersonId == personId);
-            Assert.NotNull(updatedJobItem);
-            Assert.True(updatedJobItem.EmailSent);
+            Assert.Equal(Clock.UtcNow, email.SentOn);
 
             var events = await dbContext.Events
-                .Where(e => e.EventName == "QtsAwardedEmailSentEvent")
+                .Where(e => e.EventName == nameof(EmailSentEvent))
                 .ToListAsync();
-            var emailSentEvent = events
-                .Select(e => JsonSerializer.Deserialize<QtsAwardedEmailSentEvent>(e.Payload))
-                .Where(e => e!.QtsAwardedEmailsJobId == qtsAwardedEmailsJobId && e.PersonId == personId)
-                .SingleOrDefault();
+
+            var @event = Assert.Single(events);
+            var emailSentEvent = (EmailSentEvent)@event.ToEventBase();
+
             Assert.NotNull(emailSentEvent);
         });
 }
