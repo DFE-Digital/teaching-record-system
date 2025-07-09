@@ -29,7 +29,9 @@ public class Event
             Payload = payload,
             Key = (@event as IEventWithKey)?.Key,
             PersonId = @event.TryGetPersonId(out var personId) ? personId : null,
-            QualificationId = (@event as IEventWithMandatoryQualification)?.MandatoryQualification.QualificationId,
+            QualificationId =
+                (@event as IEventWithMandatoryQualification)?.MandatoryQualification.QualificationId ??
+                (@event as IEventWithRouteToProfessionalStatus)?.RouteToProfessionalStatus.QualificationId,
             AlertId = (@event as IEventWithAlert)?.Alert.AlertId
         };
     }
