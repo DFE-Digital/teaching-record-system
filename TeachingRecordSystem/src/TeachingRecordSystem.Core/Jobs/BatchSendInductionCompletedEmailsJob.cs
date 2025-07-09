@@ -57,7 +57,7 @@ public class BatchSendInductionCompletedEmailsJob(
         dbContext.InductionCompletedEmailsJobs.Add(job);
 
         var totalInductionCompletees = 0;
-        foreach (var inductionCompletee in inductionCompletees)
+        foreach (var inductionCompletee in inductionCompletees.DistinctBy(p => p.Trn))
         {
             if (await dbContext.InductionCompletedEmailsJobItems.AnyAsync(i => i.Trn == inductionCompletee.Trn))
             {
