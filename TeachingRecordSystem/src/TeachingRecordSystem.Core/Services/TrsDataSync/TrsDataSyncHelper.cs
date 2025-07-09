@@ -888,7 +888,7 @@ public class TrsDataSyncHelper(
 
             if (personSynced)
             {
-                // Retry syncing the original person record   
+                // Retry syncing the original person record
                 return await SyncPersonsAsync(toSync, events, ignoreInvalid, dryRun, cancellationToken);
             }
             else
@@ -1423,7 +1423,7 @@ public class TrsDataSyncHelper(
                 result.InductionExemptionReasonIdsMovedFromPerson = inductionExemptionReasonIdsMovedFromPerson.ToArray();
 
                 toSync.Add(result.ProfessionalStatusInfo!.ProfessionalStatus!);
-                events.Add(MapMigratedEvent(result));
+                events.Add(MapMigratedEvent(result, person));
             }
 
             // Remove any induction exemption reasons that need to be moved to the route
@@ -1493,7 +1493,7 @@ public class TrsDataSyncHelper(
         _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
         return toSync.Count;
 
-        EventBase MapMigratedEvent(IttQtsMapResult mapResult)
+        EventBase MapMigratedEvent(IttQtsMapResult mapResult, Person person)
         {
             return new RouteToProfessionalStatusMigratedEvent()
             {
@@ -1501,7 +1501,9 @@ public class TrsDataSyncHelper(
                 CreatedUtc = clock.UtcNow,
                 RaisedBy = SystemUser.SystemUserId,
                 PersonId = mapResult.ContactId,
-                RouteToProfessionalStatus = Events.Models.RouteToProfessionalStatus.FromModel(mapResult.ProfessionalStatusInfo!.ProfessionalStatus!),
+                RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(mapResult.ProfessionalStatusInfo!.ProfessionalStatus!),
+                PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
+                OldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
                 DqtInitialTeacherTraining = MapInitialTeacherTraining(mapResult),
                 DqtQtsRegistration = MapQtsRegistration(mapResult),
                 DqtQtlsDate = mapResult.QtlsDate,
