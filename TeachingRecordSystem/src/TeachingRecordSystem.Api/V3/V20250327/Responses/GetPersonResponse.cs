@@ -112,6 +112,7 @@ public record GetPersonResponseNpqQualificationType
 [AutoMap(typeof(GetPersonResultMandatoryQualification))]
 public record GetPersonResponseMandatoryQualification
 {
+    [SourceMember("EndDate")]
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
 }

@@ -146,7 +146,8 @@ public record GetPersonResultInitialTeacherTrainingSubject
 
 public record GetPersonResultMandatoryQualification
 {
-    public required DateOnly Awarded { get; init; }
+    public required Guid MandatoryQualificationId { get; init; }
+    public required DateOnly EndDate { get; init; }
     public required string Specialism { get; init; }
 }
 
@@ -736,7 +737,8 @@ public class GetPersonHandler(
             .Where(q => q is { EndDate: not null, Specialism: not null })
             .Select(mq => new GetPersonResultMandatoryQualification()
             {
-                Awarded = mq.EndDate!.Value,
+                MandatoryQualificationId = mq.QualificationId,
+                EndDate = mq.EndDate!.Value,
                 Specialism = mq.Specialism!.Value.GetTitle()
             })
             .ToArray();
