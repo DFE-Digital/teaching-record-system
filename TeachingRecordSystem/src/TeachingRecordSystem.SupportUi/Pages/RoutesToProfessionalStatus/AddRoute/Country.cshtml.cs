@@ -23,7 +23,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (TrainingCountryId is null && CountryRequired)
+        if (CountryRequired && TrainingCountryId is null)
         {
             ModelState.AddModelError("TrainingCountryId", "Enter a country");
         }

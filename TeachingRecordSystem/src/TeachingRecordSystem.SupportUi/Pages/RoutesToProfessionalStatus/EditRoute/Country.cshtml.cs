@@ -25,7 +25,13 @@ public class CountryModel(
 
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
-    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
+    public RouteToProfessionalStatusType Route { get; set; } = null!;
+
+    public RouteToProfessionalStatusStatus Status { get; set; }
+
+    public string PageHeading => "Enter the country associated with their route" + (!CountryRequired ? " (optional)" : "");
+    public bool CountryRequired => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement())
+        == FieldRequirement.Mandatory;
 
     [BindProperty]
     [Display(Name = "Enter the country associated with their route")]
@@ -38,11 +44,11 @@ public class CountryModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var fieldRequirement = QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingCountryRequired, JourneyInstance!.State.Status.GetCountryRequirement());
-        if (fieldRequirement == FieldRequirement.Mandatory && TrainingCountryId is null)
+        if (CountryRequired && TrainingCountryId is null)
         {
-            ModelState.AddModelError(nameof(TrainingCountryId), "Enter a country");
+            ModelState.AddModelError("TrainingCountryId", "Enter a country");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -66,8 +72,9 @@ public class CountryModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
-        var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType;
+
+        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        Status = JourneyInstance!.State.Status;
 
         TrainingCountries = (await referenceDataCache.GetTrainingCountriesAsync())
             .Select(r => new CountryDisplayInfo()
@@ -76,6 +83,7 @@ public class CountryModel(
                 DisplayName = $"{r.CountryId} - {r.Name}"
             })
             .ToArray();
+
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
