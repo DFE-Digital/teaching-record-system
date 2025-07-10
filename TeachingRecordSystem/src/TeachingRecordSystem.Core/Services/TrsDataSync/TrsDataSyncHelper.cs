@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
@@ -21,6 +20,7 @@ using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUse
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
+#pragma warning disable CS9113 // Parameter is unread.
 public class TrsDataSyncHelper(
     NpgsqlDataSource trsDbDataSource,
     [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
@@ -30,6 +30,7 @@ public class TrsDataSyncHelper(
     ILogger<TrsDataSyncHelper> logger,
     IFileService fileService,
     IConfiguration configuration)
+#pragma warning restore CS9113 // Parameter is unread.
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -2281,16 +2282,8 @@ public class TrsDataSyncHelper(
             "dqt_modified_on",
             "dqt_first_name",
             "dqt_middle_name",
-            "dqt_last_name",
-            "qts_date",
-            "eyts_date",
-            "qtls_status"
+            "dqt_last_name"
         };
-
-        if (configuration["SkipQtsSync"] == "true")
-        {
-            columnNames = columnNames.Except(["qts_date", "eyts_date", "qtls_status"]).ToArray();
-        }
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
 
@@ -2332,11 +2325,7 @@ public class TrsDataSyncHelper(
             Contact.Fields.MobilePhone,
             Contact.Fields.GenderCode,
             Contact.Fields.dfeta_InductionStatus,
-            Contact.Fields.dfeta_qtlsdate,
-            Contact.Fields.dfeta_QTSDate,
-            Contact.Fields.dfeta_EYTSDate,
-            Contact.Fields.dfeta_MergedWith,
-            Contact.Fields.dfeta_QtlsDateHasBeenSet
+            Contact.Fields.dfeta_MergedWith
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -2362,9 +2351,6 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
-            writer.WriteValueOrNull(person.QtsDate, NpgsqlDbType.Date);
-            writer.WriteValueOrNull(person.EytsDate, NpgsqlDbType.Date);
-            writer.WriteValueOrNull((int)person.QtlsStatus, NpgsqlDbType.Integer);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -2625,18 +2611,13 @@ public class TrsDataSyncHelper(
             NationalInsuranceNumber = c.dfeta_NINumber.NormalizeString(),
             MobileNumber = c.MobilePhone.NormalizeMobileNumber(),
             Gender = c.GenderCode.ToGender(),
-            QtsDate = c.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            EytsDate = c.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             DqtContactId = c.Id,
             DqtState = (int)c.StateCode!,
             DqtCreatedOn = c.CreatedOn!.Value,
             DqtModifiedOn = c.ModifiedOn!.Value,
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
-            DqtLastName = c.LastName ?? string.Empty,
-            QtlsStatus = c.dfeta_qtlsdate is not null ? QtlsStatus.Active :
-                c.dfeta_QtlsDateHasBeenSet == true ? QtlsStatus.Expired :
-                QtlsStatus.None
+            DqtLastName = c.LastName ?? string.Empty
         })
         .ToList();
 
@@ -4267,8 +4248,6 @@ public class TrsDataSyncHelper(
         public required string? NationalInsuranceNumber { get; init; }
         public required string? MobileNumber { get; init; }
         public required Gender? Gender { get; init; }
-        public required DateOnly? QtsDate { get; init; }
-        public required DateOnly? EytsDate { get; init; }
         public required Guid? DqtContactId { get; init; }
         public required int? DqtState { get; init; }
         public required DateTime? DqtCreatedOn { get; init; }
@@ -4276,7 +4255,6 @@ public class TrsDataSyncHelper(
         public required string? DqtFirstName { get; init; }
         public required string? DqtMiddleName { get; init; }
         public required string? DqtLastName { get; init; }
-        public required QtlsStatus QtlsStatus { get; init; }
     }
 
     private record InductionInfo
