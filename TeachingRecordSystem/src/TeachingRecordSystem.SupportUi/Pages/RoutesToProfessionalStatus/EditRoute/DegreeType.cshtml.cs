@@ -24,10 +24,12 @@ public class DegreeTypeModel(
 
     public DegreeType[] DegreeTypes { get; set; } = [];
 
-    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
+    public RouteToProfessionalStatusType Route { get; set; } = null!;
+
+    public RouteToProfessionalStatusStatus Status { get; set; }
 
     public string PageHeading => "Enter the degree type awarded as part of this route" + (!DegreeTypeRequired ? " (optional)" : "");
-    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.DegreeTypeRequired, JourneyInstance!.State.Status.GetDegreeTypeRequirement())
+    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(Route!.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
         == FieldRequirement.Mandatory;
 
     [BindProperty]
@@ -40,11 +42,11 @@ public class DegreeTypeModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var fieldRequirement = QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.DegreeTypeRequired, JourneyInstance!.State.Status.GetDegreeTypeRequirement());
-        if (fieldRequirement == FieldRequirement.Mandatory && DegreeTypeId is null)
+        if (DegreeTypeRequired && DegreeTypeId is null)
         {
             ModelState.AddModelError(nameof(DegreeTypeId), "Select a degree type");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -68,9 +70,10 @@ public class DegreeTypeModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
-        var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType;
+        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        Status = JourneyInstance!.State.Status;
         DegreeTypes = await referenceDataCache.GetDegreeTypesAsync();
+
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
