@@ -22,6 +22,13 @@
         "incrementalist"
       ],
       "rollForward": false
+    },
+    "powershell": {
+      "version": "7.4.11",
+      "commands": [
+        "pwsh"
+      ],
+      "rollForward": false
     }
   }
 }
