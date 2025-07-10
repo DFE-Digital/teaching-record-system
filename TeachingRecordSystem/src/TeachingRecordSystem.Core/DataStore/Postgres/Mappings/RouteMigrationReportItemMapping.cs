@@ -38,7 +38,7 @@ public class RouteMigrationReportItemMapping : IEntityTypeConfiguration<RouteMig
         builder.Property(r => r.RouteToProfessionalStatusTypeName).HasMaxLength(100);
         builder.Property(r => r.SourceApplicationReference).HasMaxLength(200);
         builder.Property(r => r.SourceApplicationUserShortName).HasMaxLength(25);
-        builder.Property(r => r.Status).HasMaxLength(20);
+        builder.Property(r => r.Status).HasMaxLength(25);
         builder.Property(r => r.TrainingSubject1Name).HasColumnName("training_subject1_name").HasMaxLength(200);
         builder.Property(r => r.TrainingSubject1Reference).HasColumnName("training_subject1_reference").HasMaxLength(10);
         builder.Property(r => r.TrainingSubject2Name).HasColumnName("training_subject2_name").HasMaxLength(200);
