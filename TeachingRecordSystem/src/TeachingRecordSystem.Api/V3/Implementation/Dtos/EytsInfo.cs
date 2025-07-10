@@ -25,8 +25,9 @@ public record EytsInfo
             .Where(r => r.RouteToProfessionalStatusType!.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && r.Status is RouteToProfessionalStatusStatus.Holds)
             .ToArray();
 
-        var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).First();
-        Debug.Assert(oldestRoute.HoldsFrom == person.EytsDate);
+        // TEMP until we get data fixed up
+        var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).FirstOrDefault();
+        Debug.Assert(oldestRoute is null || oldestRoute.HoldsFrom == person.QtsDate);
 
         return person.EytsDate is not null
             ? new EytsInfo()
