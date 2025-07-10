@@ -1,11 +1,134 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
 public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == routeName).Single();
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = Clock.Today.AddDays(-1);
+        var holdsFrom = endDate.AddDays(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(status)
+                .WithTrainingStartDate(startDate)
+                .WithTrainingEndDate(endDate)
+                .WithHoldsFrom(holdsFrom)
+                .WithTrainingSubjectIds(subjects)
+                .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                .WithDegreeTypeId(degreeType.DegreeTypeId)
+                .WithTrainingCountryId(country.CountryId)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithHoldsFrom(holdsFrom)
+            .WithTrainingSubjectIds(subjects)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithTrainingCountryId(country.CountryId)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var heading = doc.QuerySelector("h1.govuk-fieldset__heading");
+        Assert.NotNull(heading);
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Contains("(optional)", heading.TrimmedText());
+        }
+        else
+        {
+            Assert.DoesNotContain("(optional)", heading.TrimmedText());
+        }
+    }
+
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool isValid)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == routeName).Single();
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = Clock.Today.AddDays(-1);
+        var holdsFrom = endDate.AddDays(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(status)
+                .WithTrainingStartDate(startDate)
+                .WithTrainingEndDate(endDate)
+                .WithHoldsFrom(holdsFrom)
+                .WithTrainingSubjectIds(subjects)
+                .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                .WithDegreeTypeId(degreeType.DegreeTypeId)
+                .WithTrainingCountryId(country.CountryId)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithHoldsFrom(holdsFrom)
+            .WithTrainingSubjectIds(subjects)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithTrainingCountryId(country.CountryId)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        if (isValid)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingAgeSpecialism.AgeRangeType", "Enter an age range specialism");
+        }
+    }
+
     [Fact]
     public async Task Post_WhenAgeRangeFromToIsEntered_PersistsDataAndRedirectsToDetail()
     {
@@ -29,16 +152,13 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithStatus(status)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            editRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), AgeSpecializationOption.Range },
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.Range },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeTo), ageTo }
             }
@@ -76,16 +196,13 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithStatus(status)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            editRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), AgeSpecializationOption.KeyStage4 },
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.KeyStage4 },
             }
         };
 
@@ -114,18 +231,15 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            editRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -8,10 +7,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache)
 {
+    public const string PageHeading = "Add age range specialism";
+
     [BindProperty]
-    [AgeRangeRequiredValidation]
-    [Display(Name = "Add age range specialism")]
+    [Display(Name = PageHeading)]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
+
+    public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())
+        == FieldRequirement.Mandatory;
 
     public void OnGet()
     {
@@ -19,12 +22,17 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom,
             AgeRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
-            AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType.ToAgeSpecializationOption()
+            AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType
         };
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (AgeRangeSpecialismRequired && TrainingAgeSpecialism.AgeRangeType is null)
+        {
+            ModelState.AddModelError($"{nameof(TrainingAgeSpecialism)}.{nameof(TrainingAgeSpecialism.AgeRangeType)}", "Enter an age range specialism");
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -34,7 +42,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             state.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
             state.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
-            state.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType.ToTrainingAgeSpecialismType();
+            state.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
         });
 
         return await ContinueAsync();

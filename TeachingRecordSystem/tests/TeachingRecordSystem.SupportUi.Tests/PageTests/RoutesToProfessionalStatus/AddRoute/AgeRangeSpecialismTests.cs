@@ -1,11 +1,84 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
 public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == routeName).Single();
+
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var heading = doc.QuerySelector("h1.govuk-fieldset__heading");
+        Assert.NotNull(heading);
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Contains("(optional)", heading.TrimmedText());
+        }
+        else
+        {
+            Assert.DoesNotContain("(optional)", heading.TrimmedText());
+        }
+    }
+
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == routeName).Single();
+
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingAgeSpecialism.AgeRangeType", "Enter an age range specialism");
+        }
+    }
+
     [Fact]
     public async Task Post_WhenAgeRangeFromToIsEntered_PersistsDataAndRedirectsToDetail()
     {
@@ -25,16 +98,13 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithStatus(status)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), AgeSpecializationOption.Range },
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.Range },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeTo), ageTo }
             }
@@ -68,16 +138,13 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithStatus(status)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), AgeSpecializationOption.KeyStage4 },
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.KeyStage4 },
             }
         };
 
@@ -108,10 +175,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithStatus(status)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

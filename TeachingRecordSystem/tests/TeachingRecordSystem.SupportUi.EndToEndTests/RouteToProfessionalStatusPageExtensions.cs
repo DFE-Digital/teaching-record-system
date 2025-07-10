@@ -1,5 +1,4 @@
 using Microsoft.Playwright;
-using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -11,7 +10,7 @@ public static class RouteToProfessionalStatusPageExtensions
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
-    public static Task SelectAgeRangeAsync(this IPage page, AgeSpecializationOption ageRangeType)
+    public static Task SelectAgeRangeAsync(this IPage page, TrainingAgeSpecialismType ageRangeType)
     {
         var radioButton = page.Locator($"input[type='radio'][value='{ageRangeType}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
