@@ -291,6 +291,11 @@ public class ReferenceDataCache(
         return routeTypes.Single(r => r.RouteToProfessionalStatusTypeId == id, $"Could not find route to professional status with ID: '{id}'.");
     }
 
+    public void RefreshRouteToProfessionalStatusTypes()
+    {
+        _routesTypesTask = null;
+    }
+
     public async Task<TrainingSubject[]> GetTrainingSubjectsAsync(bool activeOnly = false)
     {
         var trainingSubjects = await EnsureTrainingSubjectsAsync();
