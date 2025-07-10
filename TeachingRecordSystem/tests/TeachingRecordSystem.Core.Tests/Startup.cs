@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Tests.ApiSchema;
 using TeachingRecordSystem.Core.Tests.Jobs;
 using TeachingRecordSystem.Core.Tests.Services.Webhooks;
@@ -36,5 +37,10 @@ public class Startup
                 services.AddSingleton<PersonInfoCache>();
                 services.AddSingleton<EventMapperFixture>();
                 services.AddSingleton<NightlyEmailJobFixture>();
+                services.AddSingleton<IClock, TestableClock>();
+                services.AddSingleton<WebhookMessageFactory>();
+                services.AddSingleton<EventMapperRegistry>();
             });
+
+
 }

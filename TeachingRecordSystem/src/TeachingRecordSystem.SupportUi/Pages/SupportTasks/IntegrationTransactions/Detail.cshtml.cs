@@ -55,7 +55,9 @@ public class DetailModel(TrsDbContext context) : PageModel
             IntegrationTransactionRecordSortByOption.IntegrationTransactionRecordId => r => r.IntegrationTransactionRecordId,
             IntegrationTransactionRecordSortByOption.Duplicate => r => r.Duplicate ?? false,
             IntegrationTransactionRecordSortByOption.Status => r => r.Status,
-            IntegrationTransactionRecordSortByOption.Name => r => r.Person!.FirstName + " " + r.Person!.LastName,
+            IntegrationTransactionRecordSortByOption.Name => r => r.Person != null
+                ? r.Person.FirstName + " " + r.Person.LastName
+                : "Unknown",
             _ => r => r.Status
         };
 
@@ -66,10 +68,10 @@ public class DetailModel(TrsDbContext context) : PageModel
             InterfaceType: integrationTransaction.InterfaceType,
             CreatedOn: integrationTransaction.CreatedDate,
             ImportStatus: integrationTransaction.ImportStatus,
-            TotalCount: records.Count(),
-            SuccessesCount: records.Count(r => r.Status == IntegrationTransactionRecordStatus.Success),
-            FailuresCount: records.Count(r => r.Status == IntegrationTransactionRecordStatus.Failure),
-            DuplicatesCount: records.Count(r => r.Duplicate == true),
+            TotalCount: integrationTransaction.TotalCount,
+            SuccessesCount: integrationTransaction.SuccessCount,
+            FailuresCount: integrationTransaction.FailureCount,
+            DuplicatesCount: integrationTransaction.DuplicateCount,
             FileName: integrationTransaction.FileName
         );
 
@@ -77,7 +79,9 @@ public class DetailModel(TrsDbContext context) : PageModel
             .Select(r => new ItrRow(
                 r.IntegrationTransactionRecordId,
                 r.PersonId,
-                $"{r.Person!.FirstName} {r.Person.LastName}",
+                r.Person != null
+                    ? $"{r.Person.FirstName} {r.Person.LastName}"
+                    : "Unknown",
                 r.Duplicate,
                 r.Status
             ))
@@ -169,8 +173,8 @@ public record ItDetailResult(
 
 public record ItrRow(
     long IntegrationTransactionRecordId,
-    Guid ContactId,
-    string ContactName,
+    Guid? PersonId,
+    string PersonName,
     bool? Duplicate,
     IntegrationTransactionRecordStatus Status);
 

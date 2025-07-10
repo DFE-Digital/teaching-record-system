@@ -59,7 +59,7 @@ public class EwcWalesImportJob(BlobServiceClient blobServiceClient, InductionImp
         return streamingResult.Value.Content;
     }
 
-    public async Task<Guid?> ImportAsync(string fileName, StreamReader reader)
+    public async Task<long?> ImportAsync(string fileName, StreamReader reader)
     {
         var fileNameParts = fileName.Split("/");
         var fileNameWithoutFolder = fileNameParts.Last();
