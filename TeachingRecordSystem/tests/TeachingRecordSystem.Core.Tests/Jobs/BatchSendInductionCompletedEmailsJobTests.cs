@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Hangfire;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -6,39 +7,32 @@ using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUse
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmailJobTestBase
+public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture dbFixture) : NightlyEmailJobTestBase(dbFixture)
 {
-    public BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture dbFixture)
-        : base(dbFixture)
-    {
-    }
-
     [Fact]
-    public async Task Execute_WhenHasCompleteesForDateRange_UpdatesDatabaseAndEnqueuesJobToSendEmail()
+    public async Task Execute_EnqueuesEmailForInductionCompletees()
     {
         // Arrange
         var initialLastAwardedToUtc = Clock.Today.AddDays(-5).ToDateTime();
         var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
 
         var jobOptions = Options.Create(
-            new BatchSendInductionCompletedEmailsJobOptions
+            new BatchSendInductionCompletedEmailsJobOptions()
             {
                 EmailDelayDays = 3,
-                InitialLastAwardedToUtc = initialLastAwardedToUtc,
-                JobSchedule = "0 8 * * *"
+                InitialLastPassedEndUtc = initialLastAwardedToUtc,
+                JobSchedule = Cron.Never()
             });
 
-        await using var dbContext = await Fixture.DbFixture.GetDbContextFactory().CreateDbContextAsync();
-
-        var email = TestData.GenerateUniqueEmail();
         var inductionStartDate = new DateOnly(2020, 9, 1);
         var inductionCompletedDate = new DateOnly(2021, 10, 10);
 
         var inductionCompletee1 = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQts()
-            .WithEmail(email)
-            .WithInductionStatus(i => i.WithStatus(InductionStatus.RequiredToComplete)));
+            .WithEmail(TestData.GenerateUniqueEmail()));
+
+        await using var dbContext = await Fixture.DbFixture.GetDbContextFactory().CreateDbContextAsync();
 
         await Fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
@@ -57,12 +51,12 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
                 out var @event);
 
             Debug.Assert(@event is not null);
-            dbContext.AddEventWithoutBroadcast(@event!);
+            dbContext.AddEventWithoutBroadcast(@event);
 
             await dbContext.SaveChangesAsync();
         });
 
-        Clock.Advance(TimeSpan.FromDays(5));
+        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
         var job = new BatchSendInductionCompletedEmailsJob(
             jobOptions,
@@ -74,9 +68,8 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        var jobItem =
-            await dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(i =>
-                i.PersonId == inductionCompletee1.PersonId);
+        var jobItem = await dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(
+            i => i.PersonId == inductionCompletee1.PersonId);
         Assert.NotNull(jobItem);
         Assert.Equal(inductionCompletee1.Trn, jobItem.Trn);
         Assert.Equal(inductionCompletee1.Email, jobItem.EmailAddress);
@@ -85,8 +78,8 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
 
         backgroundJobScheduler
             .Verify(
-                s => s.EnqueueAsync(It
-                    .IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()),
+                s => s.EnqueueAsync(
+                    It.IsAny<System.Linq.Expressions.Expression<Func<SendInductionCompletedEmailJob, Task>>>()),
                 Times.Once);
     }
 }

@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.Jobs.Scheduling;
+namespace TeachingRecordSystem.Core.Jobs;
 
 public class InductionStatusUpdatedSupportJobOptions
 {

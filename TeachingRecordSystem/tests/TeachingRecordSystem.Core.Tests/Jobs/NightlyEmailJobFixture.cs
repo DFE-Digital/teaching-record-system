@@ -8,11 +8,9 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [CollectionDefinition(nameof(NightEmailJobCollection), DisableParallelization = true)]
-public class NightEmailJobCollection
-{
-}
+public class NightEmailJobCollection;
 
-public class NightlyEmailJobFixture : IAsyncLifetime
+public class NightlyEmailJobFixture
 {
     public NightlyEmailJobFixture(
         DbFixture dbFixture,
@@ -34,7 +32,7 @@ public class NightlyEmailJobFixture : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
+            Mock.Of<IFileService>(),
             configuration);
 
         TestData = new TestData(
@@ -59,12 +57,6 @@ public class NightlyEmailJobFixture : IAsyncLifetime
     public TestData TestData { get; }
 
     public ICrmServiceClientProvider CrmServiceClientProvider { get; }
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    Task IAsyncLifetime.InitializeAsync() => Task.CompletedTask;
-
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 
     private class TestCrmServiceClientProvider : ICrmServiceClientProvider
     {

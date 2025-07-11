@@ -131,6 +131,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<IntegrationTransactionRecord> IntegrationTransactionRecords => Set<IntegrationTransactionRecord>();
 
+    public DbSet<Email> Emails => Set<Email>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);

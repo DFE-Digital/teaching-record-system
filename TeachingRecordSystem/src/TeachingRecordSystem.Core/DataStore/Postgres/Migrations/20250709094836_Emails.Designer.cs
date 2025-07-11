@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709094836_Emails")]
+    partial class Emails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3529,15 +3532,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(3000)")
                         .HasColumnName("failure_message");
 
-                    b.Property<bool?>("HasActiveAlert")
-                        .HasColumnType("boolean")
-                        .HasColumnName("has_active_alert");
-
                     b.Property<long?>("IntegrationTransactionId")
                         .HasColumnType("bigint")
                         .HasColumnName("integration_transaction_id");
 
-                    b.Property<Guid?>("PersonId")
+                    b.Property<Guid>("PersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
@@ -4617,8 +4616,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("source_application_user_short_name");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(25)
-                        .HasColumnType("character varying(25)")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("status");
 
                     b.Property<Guid?>("StatusDerivedRouteToProfessionalStatusTypeId")
@@ -4908,9 +4907,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4924,9 +4923,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4940,9 +4939,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4956,9 +4955,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4972,9 +4971,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5100,9 +5099,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5116,9 +5115,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5164,9 +5163,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5196,9 +5195,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5212,9 +5211,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5485,9 +5484,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5501,9 +5500,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5517,9 +5516,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5565,9 +5564,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5581,9 +5580,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5646,9 +5645,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5662,9 +5661,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5678,9 +5677,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5743,9 +5742,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5791,9 +5790,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -18933,21 +18932,21 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             TrainingSubjectId = new Guid("9caa584a-bb89-450d-8d8d-16ba0e84e28e"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Citizenship",
                             Reference = "999001"
                         },
                         new
                         {
                             TrainingSubjectId = new Guid("649d7736-d301-4c42-873a-b24486fd35d7"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Physical Education",
                             Reference = "999002"
                         },
                         new
                         {
                             TrainingSubjectId = new Guid("f3e91599-2a2e-4f81-b4e0-9098a1ce8ec7"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Design and technology",
                             Reference = "999003"
                         },
@@ -19790,6 +19789,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_integration_transaction_records_persons_person_id");
 
                     b.Navigation("IntegrationTransaction");
