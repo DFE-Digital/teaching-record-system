@@ -506,13 +506,11 @@ public class Person
         return (CpdInductionModifiedOn is not null && (InductionCompletedDate is null || InductionCompletedDate > sevenYearsAgo));
     }
 
-    public (EventModels.Induction NewInduction, EventModels.Induction OldInduction, bool Changed) RefreshInductionStatusForQtsProfessionalStatusChanged(
+    public bool RefreshInductionStatusForQtsProfessionalStatusChanged(
         DateTime now,
         IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
         IEnumerable<RouteToProfessionalStatus>? routesHint = null)
     {
-        var oldInduction = EventModels.Induction.FromModel(this);
-
         var currentStatus = InductionStatus;
         var currentStatusWithoutExemption = InductionStatusWithoutExemption;
 
@@ -562,9 +560,7 @@ public class Person
             InductionModifiedOn = now;
         }
 
-        var newInduction = EventModels.Induction.FromModel(this);
-
-        return (newInduction, oldInduction, changed);
+        return changed;
     }
 
     public bool RefreshProfessionalStatusAttributes(
