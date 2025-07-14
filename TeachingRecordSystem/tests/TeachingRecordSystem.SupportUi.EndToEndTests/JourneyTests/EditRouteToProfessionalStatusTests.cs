@@ -724,8 +724,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditAgeRangeSpecialism_IncompleteInformation_ShowsError()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
-            .First();
+            .Single(r => r.Name == "Early Years Teacher Degree Apprenticeship");
         var status = RouteToProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder

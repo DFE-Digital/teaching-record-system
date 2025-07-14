@@ -8,7 +8,8 @@ public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbC
     : ReferenceDataCache(crmQueryDispatcher, dbContextFactory)
 {
     private RouteToProfessionalStatusType[] _testRoutes = [
-        new() {
+        new()
+        {
             RouteToProfessionalStatusTypeId = Guid.NewGuid(),
             Name = "Test Route With NotApplicable Country",
             ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus,
@@ -24,7 +25,8 @@ public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbC
             TrainingSubjectsRequired = FieldRequirement.Optional,
             InductionExemptionReasonId = null
         },
-        new() {
+        new()
+        {
             RouteToProfessionalStatusTypeId = Guid.NewGuid(),
             Name = "Test Route With Mandatory Start/End Dates",
             ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus,
@@ -40,7 +42,8 @@ public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbC
             TrainingSubjectsRequired = FieldRequirement.Optional,
             InductionExemptionReasonId = null
         },
-        new() {
+        new()
+        {
             RouteToProfessionalStatusTypeId = Guid.NewGuid(),
             Name = "Test Route With Optional HoldsFrom Date",
             ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus,
