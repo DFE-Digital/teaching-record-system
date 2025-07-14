@@ -60,7 +60,7 @@ The API is an ASP.NET Core 8 web application. To develop locally you will need t
 - a local Postgres 15+ instance;
 - NPM.
 
-A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH` as well as [PowerShell](https://microsoft.com/PowerShell) v7+.
+A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH`.
 
 If you're working on infrastructure you will also need:
 - make;
