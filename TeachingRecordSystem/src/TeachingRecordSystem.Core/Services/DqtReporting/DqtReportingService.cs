@@ -581,8 +581,20 @@ public partial class DqtReportingService : BackgroundService
                 }
             }
 
+            if (value is null)
+            {
+                value = DBNull.Value;
+            }
+
             var parameterName = $"@p{parameters.Count + 1}";
-            parameters.Add(new SqlParameter(parameterName, value ?? DBNull.Value));
+            var parameter = new SqlParameter(parameterName, value);
+
+            if (value is DateTime)
+            {
+                parameter.SqlDbType = SqlDbType.DateTime2;
+            }
+
+            parameters.Add(parameter);
             columnNames.Add(columnName);
         }
 
