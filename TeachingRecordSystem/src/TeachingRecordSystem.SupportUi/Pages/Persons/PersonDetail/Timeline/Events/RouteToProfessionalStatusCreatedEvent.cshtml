@@ -154,29 +154,29 @@
                         @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonHasEyps))
                         {
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
-                                    <govuk-summary-list-row-value data-testid="old-has-eyps">@(createdEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-key>Person has EYPS</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="old-has-eyps">@(createdEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                         @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
-                                    <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                         @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>PQTS date</govuk-summary-list-row-key>
-                                    <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                         @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
-                                    <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                     </govuk-summary-list>
