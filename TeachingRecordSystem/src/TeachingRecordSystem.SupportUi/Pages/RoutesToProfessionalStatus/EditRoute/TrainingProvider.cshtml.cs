@@ -41,8 +41,8 @@ public class TrainingProviderModel(
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
