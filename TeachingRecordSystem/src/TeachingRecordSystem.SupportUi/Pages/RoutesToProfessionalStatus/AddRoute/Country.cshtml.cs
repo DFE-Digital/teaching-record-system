@@ -7,9 +7,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.Country, linkGenerator, referenceDataCache)
 {
+    public string PageTitle = "Add training country";
+    public string PageHeading = "Enter the country associated with their route";
+
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
-    public string PageHeading => "Enter the country associated with their route" + (!CountryRequired ? " (optional)" : "");
     public bool CountryRequired => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement())
         == FieldRequirement.Mandatory;
 

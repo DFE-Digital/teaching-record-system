@@ -2,7 +2,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.CountryModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
-    ViewBag.Title = "Edit training country";
+    ViewBag.Title = Model.PageTitle;
 }
 
 @section Styles {
@@ -44,7 +44,12 @@
         <form action="@LinkGenerator.RouteEditTrainingCountry(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-select asp-for="TrainingCountryId" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true">@Model.PageHeading</govuk-select-label>
+                <govuk-select-label is-page-heading="true">
+                    @Model.PageHeading
+                    @if (!Model.CountryRequired) {
+                        <text>(optional)</text>
+                    }
+                </govuk-select-label>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var country in Model.TrainingCountries)
                 {

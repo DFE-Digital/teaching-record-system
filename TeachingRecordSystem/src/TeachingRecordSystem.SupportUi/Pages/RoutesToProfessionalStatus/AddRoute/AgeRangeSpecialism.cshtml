@@ -2,7 +2,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.AgeRangeSpecialismModel
 
 @{
-    ViewBag.Title = AgeRangeSpecialismModel.PageHeading;
+    ViewBag.Title = Model.PageTitle;
 }
 
 @section BeforeContent {
@@ -16,7 +16,7 @@
             <govuk-radios asp-for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
-                        @ViewBag.Title
+                        @Model.PageHeading
                         @if (!Model.AgeRangeSpecialismRequired) {
                             <text>(optional)</text>
                         }

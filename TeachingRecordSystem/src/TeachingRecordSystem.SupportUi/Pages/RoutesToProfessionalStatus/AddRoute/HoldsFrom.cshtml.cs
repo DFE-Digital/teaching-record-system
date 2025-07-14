@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
@@ -7,12 +6,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache)
 {
+    public string PageTitle = "Add professional status date";
+    public string PageHeading = "Enter the professional status date";
+
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Professional status date")]
-    [Display(Name = "Enter the professional status date")]
     public DateOnly? HoldsFrom { get; set; }
 
-    public string PageHeading => "Enter the professional status date" + (!HoldsFromRequired ? " (optional)" : "");
     public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(Route!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
         == FieldRequirement.Mandatory;
 

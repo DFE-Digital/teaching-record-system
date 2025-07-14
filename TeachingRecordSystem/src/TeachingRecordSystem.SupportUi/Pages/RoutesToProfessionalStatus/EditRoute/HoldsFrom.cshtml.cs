@@ -1,37 +1,19 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : PageModel
+public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromRoute]
-    public Guid QualificationId { get; set; }
-
-    public string? PersonName { get; set; }
-
-    public Guid PersonId { get; set; }
-
-    public RouteToProfessionalStatusType Route { get; set; } = null!;
-
-    public RouteToProfessionalStatusStatus Status { get; set; }
+    public string PageTitle = "Enter the professional status date";
+    public string PageHeading => PageTitle;
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Professional status date")]
-    [Display(Name = "Enter the professional status date")]
     public DateOnly? HoldsFrom { get; set; }
 
-    public string PageHeading => "Enter the professional status date" + (!HoldsFromRequired ? " (optional)" : "");
     public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(Route!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
         == FieldRequirement.Mandatory;
 
@@ -60,8 +42,8 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
         var nextPage = JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage :
             FromCheckAnswers ?
-                linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+                LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
         if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
         {
@@ -88,31 +70,18 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
         return Redirect(nextPage);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
+        await base.OnPageHandlerExecutingAsync(context);
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        var routeFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        Status = JourneyInstance!.State.Status;
         var inductionexemptionReason = Route!.InductionExemptionReason;
-
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public string BackLink => FromCheckAnswers ?
-            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
-                linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
-                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+                LinkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
+                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
 
     private bool IsLastCompletingRoutePage()
@@ -138,6 +107,6 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
 
     private string NextCompletingRoutePage =>
         IsLastCompletingRoutePage() ?
-            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
+            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
 }

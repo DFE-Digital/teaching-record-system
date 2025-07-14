@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
@@ -7,10 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache)
 {
-    public const string PageHeading = "Add age range specialism";
+    public string PageTitle = "Add age range specialism";
+    public string PageHeading => PageTitle;
 
     [BindProperty]
-    [Display(Name = PageHeading)]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
     public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())

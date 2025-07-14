@@ -8,9 +8,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.DegreeType, linkGenerator, referenceDataCache)
 {
+    public string PageTitle = "Add degree type";
+    public string PageHeading = "Enter the degree type awarded as part of this route";
+
     public DegreeType[] DegreeTypes { get; set; } = [];
 
-    public string PageHeading => "Enter the degree type awarded as part of this route" + (!DegreeTypeRequired ? " (optional)" : "");
     public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(Route.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
         == FieldRequirement.Mandatory;
 
@@ -24,7 +26,7 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (DegreeTypeId is null && DegreeTypeRequired)
+        if (DegreeTypeRequired && DegreeTypeId is null)
         {
             ModelState.AddModelError("DegreeTypeId", "Select a degree type");
         }

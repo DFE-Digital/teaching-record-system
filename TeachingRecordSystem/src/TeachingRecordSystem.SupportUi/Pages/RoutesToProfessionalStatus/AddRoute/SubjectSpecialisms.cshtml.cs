@@ -8,9 +8,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.SubjectSpecialisms, linkGenerator, referenceDataCache)
 {
+    public string PageTitle = "Add subject specialisms";
+    public string PageHeading = "Enter the subject they specialise in teaching";
+
     public DisplayInfo[] Subjects { get; set; } = [];
 
-    public string PageHeading => "Enter the subject they specialise in teaching" + (!SubjectSpecialismRequired ? " (optional)" : "");
     public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
         == FieldRequirement.Mandatory;
 

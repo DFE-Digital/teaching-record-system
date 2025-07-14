@@ -7,7 +7,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.StartAndEndDate, linkGenerator, referenceDataCache)
 {
-    public const string PageHeading = "Enter the route start and end dates";
+    public string PageTitle = "Enter the route start and end dates";
+    public string PageHeading => PageTitle;
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -36,6 +37,7 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
             {
                 ModelState.AddModelError(nameof(TrainingStartDate), "Enter a start date");
             }
+
             if (TrainingEndDate is null)
             {
                 ModelState.AddModelError(nameof(TrainingEndDate), "Enter an end date");

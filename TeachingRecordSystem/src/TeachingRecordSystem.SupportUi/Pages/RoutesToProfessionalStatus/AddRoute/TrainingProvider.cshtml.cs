@@ -8,9 +8,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.TrainingProvider, linkGenerator, referenceDataCache)
 {
-    public TrainingProvider[] TrainingProviders { get; set; } = [];
+    public string PageTitle = "Add training provider";
+    public string PageHeading = "Enter the training provider for this route";
 
-    public string PageHeading => "Enter the training provider for this route" + (!TrainingProviderRequired ? " (optional)" : "");
+    public TrainingProvider[] TrainingProviders
+    { get; set; } = [];
+
     public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
         == FieldRequirement.Mandatory;
 

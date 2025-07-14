@@ -1,34 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class DegreeTypeModel(
-    TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache) : PageModel
+public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromRoute]
-    public Guid QualificationId { get; set; }
-
-    public string? PersonName { get; set; }
-
-    public Guid PersonId { get; set; }
+    public string PageTitle = "Edit degree type";
+    public string PageHeading = "Enter the degree type awarded as part of this route";
 
     public DegreeType[] DegreeTypes { get; set; } = [];
 
-    public RouteToProfessionalStatusType Route { get; set; } = null!;
-
-    public RouteToProfessionalStatusStatus Status { get; set; }
-
-    public string PageHeading => "Enter the degree type awarded as part of this route" + (!DegreeTypeRequired ? " (optional)" : "");
     public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(Route!.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
         == FieldRequirement.Mandatory;
 
@@ -55,25 +40,14 @@ public class DegreeTypeModel(
         await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
+        await base.OnPageHandlerExecutingAsync(context);
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        Status = JourneyInstance!.State.Status;
-        DegreeTypes = await referenceDataCache.GetDegreeTypesAsync();
-
-        await base.OnPageHandlerExecutionAsync(context, next);
+        DegreeTypes = await ReferenceDataCache.GetDegreeTypesAsync();
     }
 }

@@ -12,6 +12,8 @@ public class StatusModel(
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
 {
+    public string PageTitle = "Edit status";
+
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }

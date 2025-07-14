@@ -9,6 +9,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRouteCommonPageModel(AddRoutePage.Status, linkGenerator, referenceDataCache)
 {
+    public string PageTitle = "Add status";
+
     public override AddRoutePage? NextPage => PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
     public override AddRoutePage? PreviousPage => AddRoutePage.Route;
 

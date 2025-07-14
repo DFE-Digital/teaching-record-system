@@ -1,7 +1,7 @@
 @page "/route/{qualificationId}/edit/start-and-end-date/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.StartAndEndDateModel
 @{
-    ViewBag.Title = StartAndEndDateModel.PageHeading;
+    ViewBag.Title = Model.PageTitle;
 }
 
 @section BeforeContent {
@@ -14,7 +14,7 @@
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-fieldset>
                 <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
-                    @ViewBag.Title
+                    @Model.PageHeading
                     @if (!Model.StartAndEndDatesRequired) {
                         <text>(optional)</text>
                     }
