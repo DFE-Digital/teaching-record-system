@@ -4,8 +4,88 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
-public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, true)]
+    public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = startDate.AddMonths(1);
+        var holdsFrom = endDate.AddDays(1);
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .WithHoldsFrom(holdsFrom)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var heading = doc.QuerySelector("h1.govuk-fieldset__heading");
+        Assert.NotNull(heading);
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Contains("(optional)", heading.TrimmedText());
+        }
+        else
+        {
+            Assert.DoesNotContain("(optional)", heading.TrimmedText());
+        }
+    }
+
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, true)]
+    public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = startDate.AddMonths(1);
+        var holdsFrom = endDate.AddDays(1);
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .WithHoldsFrom(holdsFrom)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter a professional status date");
+        }
+    }
+
     [Fact]
     public async Task Get_ShowsPreviouslyStoredEntry()
     {
@@ -27,10 +107,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithHoldsFrom(holdsFrom)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -208,7 +285,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the professional status date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter a professional status date");
     }
 
     [Fact]
