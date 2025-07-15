@@ -98,6 +98,13 @@
                                 <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@deletedEvent.PersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
+                        @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="qtls-status">@deletedEvent.PersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
                     </govuk-summary-list>
                 </govuk-details-text>
             </govuk-details>
@@ -132,6 +139,13 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="old-qtls-status">@deletedEvent.OldPersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
                 <govuk-summary-list-row>
