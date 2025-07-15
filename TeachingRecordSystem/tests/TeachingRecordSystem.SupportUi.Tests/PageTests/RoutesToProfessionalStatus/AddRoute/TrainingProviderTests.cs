@@ -5,6 +5,75 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var heading = doc.QuerySelector("label.govuk-label--l");
+        Assert.NotNull(heading);
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Contains("(optional)", heading.TrimmedText());
+        }
+        else
+        {
+            Assert.DoesNotContain("(optional)", heading.TrimmedText());
+        }
+    }
+
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
+        }
+    }
+
     [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
