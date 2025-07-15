@@ -13,7 +13,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public DisplayInfo[] Subjects { get; set; } = [];
 
-    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(Route!.TrainingSubjectsRequired, JourneyInstance!.State.Status.GetSubjectsRequirement())
+    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(Route!.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
         == FieldRequirement.Mandatory;
 
     [BindProperty]

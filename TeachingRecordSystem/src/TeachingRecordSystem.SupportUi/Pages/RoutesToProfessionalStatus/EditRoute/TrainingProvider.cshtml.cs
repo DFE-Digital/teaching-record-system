@@ -15,7 +15,7 @@ public class TrainingProviderModel(
 
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
-    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(Route!.TrainingProviderRequired, JourneyInstance!.State.Status.GetTrainingProviderRequirement())
+    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(Route!.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
             == FieldRequirement.Mandatory;
 
     [BindProperty]

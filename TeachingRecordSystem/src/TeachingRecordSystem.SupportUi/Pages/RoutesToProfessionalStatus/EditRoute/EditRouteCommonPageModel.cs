@@ -44,7 +44,7 @@ public abstract class EditRouteCommonPageModel(TrsLinkGenerator linkGenerator, R
         PersonName = personInfo.Name;
 
         Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        Status = JourneyInstance!.State.Status;
+        Status = JourneyInstance!.State.EditStatusState?.Status ?? JourneyInstance!.State.Status;
 
         OnPageHandlerExecuting(context);
         await OnPageHandlerExecutingAsync(context);
