@@ -1,5 +1,5 @@
 @page "/persons/{personId}"
-@using TeachingRecordSystem.SupportUi.Pages.Common;
+@using TeachingRecordSystem.SupportUi.Pages.Common
 @using TeachingRecordSystem.SupportUi.Pages.Shared
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel
 @{
@@ -34,18 +34,59 @@
 }
 @await Html.PartialAsync("_PersonDetail", personDetailModel)
 
-@{
-    if (Model.PersonProfessionalStatus is not null)
-    {
-        var personStatusDetailModel = new PersonProfessionalStatusDetailViewModel()
-        {
-            EytsDate = Model.PersonProfessionalStatus.EytsDate,
-            HasEyps = Model.PersonProfessionalStatus.HasEyps,
-            InductionStatusInfo = InductionStatusRegistry.All.Single(s => s.Value == Model.PersonProfessionalStatus.InductionStatus),
-            PqtsDate = Model.PersonProfessionalStatus.PqtsDate,
-            QtsDate = Model.PersonProfessionalStatus.QtsDate,
-            QtlsStatus = Model.PersonProfessionalStatus.QtlsStatus
-        };
-        @await Html.PartialAsync("_PersonProfessionalStatusDetail", personStatusDetailModel)
-    }
+@if (Model.PersonProfessionalStatus is not null)
+{
+    <govuk-summary-card>
+        <govuk-summary-card-title data-testid="professional-status-details">Professional status details</govuk-summary-card-title>
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Qualified teacher status (QTS)</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.QtsDate != null ? "Holds" : "No")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            @if (Model.PersonProfessionalStatus.QtsDate is not null)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>QTS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Qualified Teacher Learning and Skills status (QTLS)</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.QtlsStatus == QtlsStatus.None ? "No" : Model.PersonProfessionalStatus.QtlsStatus.ToString())</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            @if (Model.PersonProfessionalStatus.InductionStatus != InductionStatus.None)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.InductionStatus.GetTitle()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Early years teacher status (EYTS)</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.EytsDate is not null ? "Holds" : "No")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            @if (Model.PersonProfessionalStatus.EytsDate is not null)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>EYTS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Early years professional status (EYPS)</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.HasEyps ? "Holds" : "No")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Partial qualified teacher status (PQTS)</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>@(Model.PersonProfessionalStatus.PqtsDate != null ? "Holds" : "No")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            @if (Model.PersonProfessionalStatus.PqtsDate is not null)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>PQTS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.PersonProfessionalStatus.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+        </govuk-summary-list>
+    </govuk-summary-card>
 }
