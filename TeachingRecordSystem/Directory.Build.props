@@ -13,6 +13,8 @@
 
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
+
+    <_Foo>bar</_Foo>
   </PropertyGroup>
 
   <ItemGroup>
