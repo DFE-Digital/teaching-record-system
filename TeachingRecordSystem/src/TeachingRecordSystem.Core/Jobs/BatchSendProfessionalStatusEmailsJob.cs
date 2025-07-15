@@ -44,7 +44,7 @@ public class BatchSendProfessionalStatusEmailsJob(
         if (!jobMetadata.Metadata.TryGetValue(MetadataKeys.LastHoldsFromEnd, out var lastHoldsFromEndObj) ||
             lastHoldsFromEndObj is not DateTime lastHoldsFromEnd)
         {
-            lastHoldsFromEnd = _batchSendQtsAwardedEmailsJobOptions.InitialLastHoldsFromEndUtc;
+            lastHoldsFromEnd = DateTime.SpecifyKind(_batchSendQtsAwardedEmailsJobOptions.InitialLastHoldsFromEndUtc, DateTimeKind.Utc);
         }
 
         var start = lastHoldsFromEnd;
