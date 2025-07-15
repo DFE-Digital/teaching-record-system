@@ -79,6 +79,7 @@ public class ChangeHistoryModel(
             nameof(RouteToProfessionalStatusCreatedEvent),
             nameof(RouteToProfessionalStatusUpdatedEvent),
             nameof(RouteToProfessionalStatusDeletedEvent),
+            nameof(RouteToProfessionalStatusMigratedEvent),
             nameof(ApiTrnRequestSupportTaskUpdatedEvent)
         };
 
