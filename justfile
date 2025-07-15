@@ -55,15 +55,17 @@ format-changed:
     (git status --porcelain $Path) | foreach { $_.substring(3) } | Where-Object { Test-Path $_ }
   }
 
-  $changedTfFiles = Get-ChangedFiles "../terraform/*.tf"
+  cd ../
+
+  $changedTfFiles = Get-ChangedFiles "terraform/*.tf"
   foreach ($tf in $changedTfFiles) {
     terraform fmt $tf
   }
 
-  $changedCsFiles = (Get-ChangedFiles "**/*.cs")
+  $changedCsFiles = (Get-ChangedFiles "TeachingRecordSystem/**/*.cs") | foreach { $_ -Replace "^TeachingRecordSystem/", "" }
   if ($changedCsFiles.Length -gt 0) {
     $dotnetArgs = @("dotnet-format", "--no-restore", "--include") + $changedCsFiles
-    dotnet $dotnetArgs
+    cd TeachingRecordSystem && dotnet $dotnetArgs
   }
 
 # Run the EF Core Command-line Tools for the Core project
