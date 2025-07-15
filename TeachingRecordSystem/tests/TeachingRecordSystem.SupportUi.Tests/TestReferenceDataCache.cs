@@ -65,15 +65,13 @@ public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbC
     {
         using var dbContext = DbContextFactory.CreateDbContext();
 
-        var testRouteNames = _testRoutes.Select(tr => tr.Name).ToArray();
-
         var existingTestRoutes = await dbContext.RouteToProfessionalStatusTypes
-            .Where(r => testRouteNames.Contains(r.Name))
+            .Where(r => _testRoutes.Select(tr => tr.Name).Contains(r.Name))
             .ToArrayAsync();
 
         foreach (var testRoute in _testRoutes)
         {
-            var existingRoute = _testRoutes.SingleOrDefault(r => r.Name == testRoute.Name);
+            var existingRoute = existingTestRoutes.SingleOrDefault(r => r.Name == testRoute.Name);
             if (existingRoute is null)
             {
                 dbContext.RouteToProfessionalStatusTypes.Add(testRoute);
