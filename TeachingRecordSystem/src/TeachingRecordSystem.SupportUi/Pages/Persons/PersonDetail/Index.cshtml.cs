@@ -25,6 +25,7 @@ public class IndexModel(
     public ContactSearchSortByOption? SortBy { get; set; }
 
     public PersonInfo? Person { get; set; }
+
     public PersonProfessionalStatusInfo? PersonProfessionalStatus { get; set; }
 
     public bool HasOpenAlert { get; set; }
@@ -37,25 +38,27 @@ public class IndexModel(
 
     private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()
     {
-        var person = await dbContext.Persons
-                .SingleAsync(p => p.PersonId == PersonId);
+        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
 
-        if (person is null || (person.EytsDate is null && person.QtsDate is null && person.PqtsDate is null && !person.HasEyps && person.InductionStatus == InductionStatus.None))
+        var personProfessionalStatusInfo = new PersonProfessionalStatusInfo
         {
-            return null;
-        }
-        else
+            EytsDate = person.EytsDate,
+            HasEyps = person.HasEyps,
+            InductionStatus = person.InductionStatus,
+            PqtsDate = person.PqtsDate,
+            QtsDate = person.QtsDate,
+            QtlsStatus = person.QtlsStatus
+        };
+
+        return personProfessionalStatusInfo is
         {
-            return new PersonProfessionalStatusInfo
-            {
-                EytsDate = person.EytsDate,
-                HasEyps = person.HasEyps,
-                InductionStatus = person.InductionStatus,
-                PqtsDate = person.PqtsDate,
-                QtsDate = person.QtsDate,
-                QtlsStatus = person.QtlsStatus
-            };
-        }
+            EytsDate: null,
+            HasEyps: false,
+            InductionStatus: InductionStatus.None,
+            PqtsDate: null,
+            QtsDate: null,
+            QtlsStatus: QtlsStatus.None
+        } ? null : personProfessionalStatusInfo;
     }
 
     private async Task<PersonInfo> BuildPersonInfoAsync()
