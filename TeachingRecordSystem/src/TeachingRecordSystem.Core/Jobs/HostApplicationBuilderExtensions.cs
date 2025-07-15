@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 using TeachingRecordSystem.Core.Services.PublishApi;
 
@@ -16,78 +15,46 @@ public static class HostApplicationBuilderExtensions
     {
         if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
-            if (builder.Configuration.GetValue<bool>("RecurringJobs:Enabled"))
+            if (builder.Configuration.GetValue<bool>("RecurringJobsEnabled"))
             {
-                builder.Services.AddOptions<RecurringJobsOptions>()
-                    .Bind(builder.Configuration.GetSection("RecurringJobs"))
+                builder.Services.AddOptions<BatchSendProfessionalStatusEmailsOptions>()
+                    .Bind(builder.Configuration.GetSection("BatchSendProfessionalStatusEmailsJob"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
-                builder.Services.AddOptions<BatchSendQtsAwardedEmailsJobOptions>()
-                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendQtsAwardedEmails"))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
-                builder.Services.AddOptions<BatchSendInternationalQtsAwardedEmailsJobOptions>()
-                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendInternationalQtsAwardedEmails"))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
-                builder.Services.AddOptions<BatchSendEytsAwardedEmailsJobOptions>()
-                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendEytsAwardedEmails"))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
+
                 builder.Services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
-                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendInductionCompletedEmails"))
+                    .Bind(builder.Configuration.GetSection("BatchSendInductionCompletedEmailsJob"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
+
                 builder.Services.AddOptions<InductionStatusUpdatedSupportJobOptions>()
                     .Bind(builder.Configuration.GetSection("RecurringJobs:InductionStatusUpdatedSupportJob"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
-                builder.Services.AddTransient<SendQtsAwardedEmailJob>();
-                builder.Services.AddTransient<QtsAwardedEmailJobDispatcher>();
-                builder.Services.AddTransient<SendInternationalQtsAwardedEmailJob>();
-                builder.Services.AddTransient<InternationalQtsAwardedEmailJobDispatcher>();
-                builder.Services.AddTransient<SendEytsAwardedEmailJob>();
-                builder.Services.AddTransient<EytsAwardedEmailJobDispatcher>();
-                builder.Services.AddTransient<SendInductionCompletedEmailJob>();
-                builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
-                builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
-                builder.Services.AddTransient<InductionStatusUpdatedSupportJob>();
-                builder.Services.AddTransient<CpdInductionImporterJob>();
-                builder.Services.AddTransient<BackfillDqtNotesJob>();
-
                 builder.Services.AddStartupTask(sp =>
                 {
                     var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
-                    var options = sp.GetRequiredService<IOptions<RecurringJobsOptions>>().Value;
 
-                    recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(
-                        nameof(BatchSendQtsAwardedEmailsJob),
+                    var professionalStatusEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendProfessionalStatusEmailsOptions>>().Value;
+                    recurringJobManager.AddOrUpdate<BatchSendProfessionalStatusEmailsJob>(
+                        nameof(BatchSendProfessionalStatusEmailsJob),
                         job => job.ExecuteAsync(CancellationToken.None),
-                        options.BatchSendQtsAwardedEmails.JobSchedule);
+                        professionalStatusEmailJobOptions.JobSchedule);
 
-                    recurringJobManager.AddOrUpdate<BatchSendInternationalQtsAwardedEmailsJob>(
-                        nameof(BatchSendInternationalQtsAwardedEmailsJob),
-                        job => job.ExecuteAsync(CancellationToken.None),
-                        options.BatchSendInternationalQtsAwardedEmails.JobSchedule);
-
-                    recurringJobManager.AddOrUpdate<BatchSendEytsAwardedEmailsJob>(
-                        nameof(BatchSendEytsAwardedEmailsJob),
-                        job => job.ExecuteAsync(CancellationToken.None),
-                        options.BatchSendEytsAwardedEmails.JobSchedule);
-
+                    var inductionEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendInductionCompletedEmailsJobOptions>>().Value;
                     recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
                         nameof(BatchSendInductionCompletedEmailsJob),
                         job => job.ExecuteAsync(CancellationToken.None),
-                        options.BatchSendInductionCompletedEmails.JobSchedule);
+                        inductionEmailJobOptions.JobSchedule);
 
                     return Task.CompletedTask;
                 });
             }
 
-            builder.Services.AddTransient<EwcWalesImportJob>();
+            builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
+
             builder.Services.AddTransient<QtsImporter>();
-            builder.Services.AddTransient<InductionImporter>();
 
             builder.Services.AddStartupTask(sp =>
             {
@@ -96,6 +63,9 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.RemoveIfExists("MopUpQtsAwardeesJob");
                 recurringJobManager.RemoveIfExists("SyncAllMqsFromCrmJob");
                 recurringJobManager.RemoveIfExists("BackfillNinoAndPersonPostcodeInEmploymentHistoryJob");
+                recurringJobManager.RemoveIfExists("BatchSendQtsAwardedEmailsJob");
+                recurringJobManager.RemoveIfExists("BatchSendInternationalQtsAwardedEmailsJob");
+                recurringJobManager.RemoveIfExists("BatchSendEytsAwardedEmailsJob");
 
                 recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
                     nameof(SyncAllPersonsFromCrmJob),
@@ -116,7 +86,7 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.AddOrUpdate<RefreshEstablishmentsJob>(
                     nameof(RefreshEstablishmentsJob),
                     job => job.ExecuteAsync(CancellationToken.None),
-                    giasOptions!.Value.RefreshEstablishmentsJobSchedule);
+                    giasOptions.Value.RefreshEstablishmentsJobSchedule);
 
                 recurringJobManager.AddOrUpdate<ImportTpsCsvExtractFileJob>(
                     nameof(ImportTpsCsvExtractFileJob),

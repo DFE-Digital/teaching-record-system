@@ -7,29 +7,28 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class BatchSendInductionCompletedEmailsJob(
-    IOptions<BatchSendInductionCompletedEmailsJobOptions> batchSendInductionCompletedEmailsJobOptions,
+    IOptions<BatchSendInductionCompletedEmailsJobOptions> jobOptionsAccessor,
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock)
 {
-    private readonly BatchSendInductionCompletedEmailsJobOptions _batchSendInductionCompletedEmailsJobOptions = batchSendInductionCompletedEmailsJobOptions.Value;
-
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var lastAwardedToUtc = await dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
-            _batchSendInductionCompletedEmailsJobOptions.InitialLastAwardedToUtc;
+        var lastPassedEndUtc = await dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.PassedEndUtc) ??
+            jobOptionsAccessor.Value.InitialLastPassedEndUtc;
 
         // Look for new induction awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
-        var awardedToUtc = clock.Today.AddDays(-(_batchSendInductionCompletedEmailsJobOptions.EmailDelayDays + 1)).ToDateTime();
+        var passedEndUtc = clock.Today.AddDays(-(jobOptionsAccessor.Value.EmailDelayDays + 1)).ToDateTime();
 
         var executed = clock.UtcNow;
-        var startDate = lastAwardedToUtc;
-        var endDate = awardedToUtc;
+        var startDate = lastPassedEndUtc;
+        var endDate = passedEndUtc;
         var inductionCompletedEmailsJobId = Guid.NewGuid();
+
         var job = new InductionCompletedEmailsJob
         {
             InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
-            AwardedToUtc = awardedToUtc,
+            PassedEndUtc = passedEndUtc,
             ExecutedUtc = executed
         };
 
@@ -41,38 +40,25 @@ public class BatchSendInductionCompletedEmailsJob(
              and created < {endDate}
              and payload->'Induction'->>'Status' = '4'
              and payload->'OldInduction'->>'Status' != '4'
-             union
-             select * from events
-             where event_name = 'DqtInductionUpdatedEvent'
-             and created >= {startDate}
-             and created < {endDate}
-             and payload->'Induction'->>'InductionStatus' = 'Pass'
-             and payload->'OldInduction'->>'InductionStatus' != 'Pass'
              """)
             .Join(dbContext.Persons, e => e.PersonId, p => p.PersonId, (e, p) => p)
-            .ToArrayAsync();
+            .Where(p => p.InductionStatus == InductionStatus.Passed)  // Check the status is still Passed
+            .Where(p => p.Trn != null && p.EmailAddress != null)
+            .Where(p => !dbContext.InductionCompletedEmailsJobItems.Any(i => i.Trn == p.Trn))  // Ensure we haven't already processed this TRN
+            .Select(p => new { p.PersonId, Trn = p.Trn!, EmailAddress = p.EmailAddress!, p.FirstName, p.LastName })
+            .ToArrayAsync(cancellationToken: cancellationToken);
 
+        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         dbContext.InductionCompletedEmailsJobs.Add(job);
 
-        var totalInductionCompletees = 0;
         foreach (var inductionCompletee in inductionCompletees.DistinctBy(p => p.Trn))
         {
-            if (await dbContext.InductionCompletedEmailsJobItems.AnyAsync(i => i.Trn == inductionCompletee.Trn))
-            {
-                continue;
-            }
-
-            if (inductionCompletee.Trn is null || inductionCompletee.EmailAddress is null)
-            {
-                continue;
-            }
-
             var personalization = new Dictionary<string, string>()
             {
                 { "first name", inductionCompletee.FirstName },
-                { "last name", inductionCompletee.LastName },
+                { "last name", inductionCompletee.LastName }
             };
 
             var jobItem = new InductionCompletedEmailsJobItem
@@ -86,15 +72,10 @@ public class BatchSendInductionCompletedEmailsJob(
 
             dbContext.InductionCompletedEmailsJobItems.Add(jobItem);
 
-            totalInductionCompletees++;
+            await backgroundJobScheduler.EnqueueAsync<SendInductionCompletedEmailJob>(j => j.ExecuteAsync(inductionCompletedEmailsJobId, jobItem.PersonId));
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-
-        if (totalInductionCompletees > 0)
-        {
-            await backgroundJobScheduler.EnqueueAsync<InductionCompletedEmailJobDispatcher>(j => j.ExecuteAsync(inductionCompletedEmailsJobId));
-        }
 
         transaction.Complete();
     }

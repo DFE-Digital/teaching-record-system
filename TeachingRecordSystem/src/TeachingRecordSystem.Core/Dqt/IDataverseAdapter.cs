@@ -69,12 +69,6 @@ public interface IDataverseAdapter
 
     Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugIdAsync(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
 
-    IAsyncEnumerable<QtsAwardee[]> GetQtsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
-
-    IAsyncEnumerable<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
-
-    IAsyncEnumerable<EytsAwardee[]> GetEytsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
-
     Task<Contact[]> GetTeachersBySlugIdAndTrnAsync(string slugId, string trn, string[] columnNames, bool activeOnly = true);
 
     Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugIdAsync(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);

@@ -42,6 +42,13 @@ public abstract record EventBase
 
     public string Serialize() => JsonSerializer.Serialize(this, inputType: GetType(), JsonSerializerOptions);
 
+    public static IReadOnlyCollection<string> GetEventNamesForBaseType(Type type) =>
+        typeof(EventBase).Assembly
+            .GetTypes()
+            .Where(t => t is { IsAbstract: false, IsClass: true } && t.IsAssignableTo(type) && t.Namespace == typeof(EventBase).Namespace)
+            .Select(t => t.Name)
+            .AsReadOnly();
+
     public static EventBase Deserialize(string payload, string eventName)
     {
         var eventTypeName = $"{typeof(EventBase).Namespace}.{eventName}";
