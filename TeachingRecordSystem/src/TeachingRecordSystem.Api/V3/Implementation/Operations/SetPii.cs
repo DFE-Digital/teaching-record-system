@@ -1,5 +1,6 @@
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
@@ -18,7 +19,7 @@ public record SetPiiCommand
     public required Dtos.Gender? Gender { get; init; }
 }
 
-public class SetPiiHandler(ICrmQueryDispatcher crmQueryDispatcher)
+public class SetPiiHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
 {
     public async Task<ApiResult<Unit>> HandleAsync(SetPiiCommand command)
     {
@@ -46,27 +47,29 @@ public class SetPiiHandler(ICrmQueryDispatcher crmQueryDispatcher)
             return ApiError.PiiUpdatesForbidden();
         }
 
+        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == contact.Id);
+
         // return error if contact has qts.
-        if (contact.dfeta_QTSDate.HasValue)
+        if (person.QtsDate.HasValue)
         {
             return ApiError.PiiUpdatesForbiddenPersonHasQts();
         }
 
-        if (contact.dfeta_EYTSDate.HasValue)
+        if (person.EytsDate.HasValue)
         {
             return ApiError.PiiUpdatesForbiddenPersonHasEyts();
         }
 
-        await crmQueryDispatcher.ExecuteQueryAsync(new UpdateContactPiiQuery(
-            ContactId: contact.Id,
-            FirstName: firstName,
-            MiddleName: middleName,
-            LastName: command.LastName,
-            DateOfBirth: command.DateOfBirth,
-            NationalInsuranceNumber: NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber),
-            Gender: command.Gender?.ConvertToContact_GenderCode(),
-            EmailAddress: command.EmailAddresses
-        ));
+        await crmQueryDispatcher.ExecuteQueryAsync(
+            new UpdateContactPiiQuery(
+                ContactId: contact.Id,
+                FirstName: firstName,
+                MiddleName: middleName,
+                LastName: command.LastName,
+                DateOfBirth: command.DateOfBirth,
+                NationalInsuranceNumber: NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber),
+                Gender: command.Gender?.ConvertToContact_GenderCode(),
+                EmailAddress: command.EmailAddresses));
 
         return Unit.Instance;
     }

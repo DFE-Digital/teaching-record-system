@@ -156,15 +156,20 @@ public class CreateTrnRequestHandler(
         }
 
         var potentialDuplicatePersonIds = potentialDuplicates.Select(d => d.ContactId).ToList();
-        var resultsWithActiveAlerts = await dbContext.Alerts
-            .Where(a => potentialDuplicatePersonIds.Contains(a.PersonId) && a.IsOpen)
-            .Select(a => a.PersonId)
+        var potentialDuplicatePersons = (await dbContext.Persons
+            .Where(a => potentialDuplicatePersonIds.Contains(a.PersonId))
+            .Select(p => new { p.PersonId, HasOpenAlert = p.Alerts!.Any(a => a.IsOpen), p.QtsDate, p.EytsDate })
             .Distinct()
-            .ToArrayAsync();
+            .ToArrayAsync()).ToDictionary(p => p.PersonId, p => p);
 
         var reviewTasks = potentialDuplicates
-            .Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId)))
-            .Select(d => CreateDuplicateReviewTaskEntity(currentApplicationUserName, d.Duplicate, d.HasActiveAlert))
+            .Select(d => (
+                Duplicate: d,
+                HasActiveAlert: potentialDuplicatePersons[d.ContactId].HasOpenAlert,
+                HasQts: potentialDuplicatePersons[d.ContactId].QtsDate is not null,
+                HasEyts: potentialDuplicatePersons[d.ContactId].EytsDate is not null
+            ))
+            .Select(d => CreateDuplicateReviewTaskEntity(currentApplicationUserName, d.Duplicate, d.HasActiveAlert, d.HasQts, d.HasEyts))
             .ToArray();
 
         var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
@@ -239,7 +244,9 @@ public class CreateTrnRequestHandler(
     private CreateContactQueryDuplicateReviewTask CreateDuplicateReviewTaskEntity(
         string applicationUserName,
         FindPotentialDuplicateContactsResult duplicate,
-        bool hasActiveAlert)
+        bool hasActiveAlert,
+        bool hasQts,
+        bool hasEyts)
     {
         var description = GetDescription();
 
@@ -281,12 +288,12 @@ public class CreateTrnRequestHandler(
                 additionalFlags.Add("active sanctions");
             }
 
-            if (duplicate.HasQtsDate)
+            if (hasQts)
             {
                 additionalFlags.Add("QTS date");
             }
 
-            if (duplicate.HasEytsDate)
+            if (hasEyts)
             {
                 additionalFlags.Add("EYTS date");
             }

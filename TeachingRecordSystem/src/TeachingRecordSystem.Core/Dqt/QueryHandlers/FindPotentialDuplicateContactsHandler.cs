@@ -55,8 +55,6 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
             {
                 Columns =
                 {
-                    Contact.Fields.dfeta_QTSDate,
-                    Contact.Fields.dfeta_EYTSDate,
                     Contact.Fields.FirstName,
                     Contact.Fields.MiddleName,
                     Contact.Fields.LastName,
@@ -121,8 +119,6 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     ContactId = match.Id,
                     Trn = match.dfeta_TRN,
                     MatchedAttributes = matchedAttributeNames,
-                    HasQtsDate = match.dfeta_QTSDate.HasValue,
-                    HasEytsDate = match.dfeta_EYTSDate.HasValue,
                     FirstName = match.FirstName,
                     MiddleName = match.MiddleName ?? "",
                     LastName = match.LastName,
@@ -152,7 +148,6 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 
             // Don't try to match with any fields that are empty
             fields.RemoveAll(f =>
-                f.Value == null ||
                 (f.Value is string stringValue && string.IsNullOrEmpty(stringValue)) ||
                 (f.Value is IEnumerable<string> stringEnumerable && !stringEnumerable.Any()));
 

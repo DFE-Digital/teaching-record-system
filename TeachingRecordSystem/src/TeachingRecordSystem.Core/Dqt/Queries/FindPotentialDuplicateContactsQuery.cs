@@ -18,8 +18,6 @@ public record FindPotentialDuplicateContactsResult
     public required Guid ContactId { get; init; }
     public required string Trn { get; init; }
     public required IReadOnlyCollection<string> MatchedAttributes { get; init; }
-    public required bool HasQtsDate { get; init; }
-    public required bool HasEytsDate { get; init; }
     public required string FirstName { get; init; }
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }

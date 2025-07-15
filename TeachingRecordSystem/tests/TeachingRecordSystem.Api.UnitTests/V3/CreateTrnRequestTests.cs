@@ -397,7 +397,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
                 .WithFirstName(firstName)
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
-                .WithEyts(eytsDate: Clock.Today, eytsStatusValue: "221"));
+                .WithEyts(Clock.Today));
 
             var command = CreateCommand() with
             {

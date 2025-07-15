@@ -26,6 +26,13 @@ public partial class TestData
         private Core.Events.Models.File? _evidenceFile { get; set; }
         private string? _sourceApplicationReference;
 
+        internal RouteToProfessionalStatusStatus Status => _status;
+
+        internal DateOnly? HoldsFrom => _holdsFrom;
+
+        internal Guid RouteToProfessionalStatusTypeId => _routeToProfessionalStatusTypeId ??
+            throw new InvalidOperationException("RouteToProfessionalStatusTypeId not set.");
+
         public CreatePersonRouteToProfessionalStatusBuilder WithStatus(RouteToProfessionalStatusStatus status)
         {
             _status = status;
@@ -143,10 +150,8 @@ public partial class TestData
             {
                 throw new InvalidOperationException("RouteToProfessionalStatusId has not been set");
             }
-            if (_createdByUser is null)
-            {
-                _createdByUser = EventModels.RaisedByUserInfo.FromUserId(SystemUser.SystemUserId);
-            }
+
+            _createdByUser ??= SystemUser.SystemUserId;
 
             var allRouteTypes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
 

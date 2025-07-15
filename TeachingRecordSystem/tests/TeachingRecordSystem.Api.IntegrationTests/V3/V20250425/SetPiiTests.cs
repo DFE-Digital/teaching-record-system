@@ -96,7 +96,7 @@ public class SetPiiTests : TestBase
     }
 
     [Fact]
-    public async Task Put_PersontHasQts_ReturnsError()
+    public async Task Put_PersonHasQts_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -122,12 +122,12 @@ public class SetPiiTests : TestBase
     }
 
     [Fact]
-    public async Task Put_PersontHasEyts_ReturnsError()
+    public async Task Put_PersonHasEyts_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithEyts(new DateOnly(2000, 01, 10), "222"));
+            .WithEyts(new DateOnly(2000, 01, 10)));
 
         var content = CreateJsonContent(new
         {
