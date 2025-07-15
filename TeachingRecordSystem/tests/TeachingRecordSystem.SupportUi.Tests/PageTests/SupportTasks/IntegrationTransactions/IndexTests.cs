@@ -1,9 +1,8 @@
 using AngleSharp.Html.Dom;
-using Xunit.DependencyInjection;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.IntegrationTransactions;
 
-[DisableParallelization]
+[Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
