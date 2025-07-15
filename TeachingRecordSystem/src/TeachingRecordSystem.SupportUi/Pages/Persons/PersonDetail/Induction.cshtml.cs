@@ -12,8 +12,7 @@ public class InductionModel(
     TrsDbContext dbContext,
     IClock clock,
     ReferenceDataCache referenceDataCache,
-    IAuthorizationService authorizationService,
-    IFeatureProvider featureProvider) : PageModel
+    IAuthorizationService authorizationService) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher does not hold QTS and is therefore ineligible for induction.";
     private bool _statusIsManagedByCpd;
@@ -66,22 +65,17 @@ public class InductionModel(
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
         ExemptionReasonIdsHeldOnPerson = person.InductionExemptionReasonIds;
-        ExemptionReasonNames = (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus)
-            ? (await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync())
-            : (await referenceDataCache.GetInductionExemptionReasonsAsync()))
+        ExemptionReasonNames = (await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync())
             .Where(i => ExemptionReasonIdsHeldOnPerson.Contains(i.InductionExemptionReasonId))
             .Select(i => i.Name)
             .OrderDescending();
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         HasQts = person.QtsDate is not null;
 
-        if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
-        {
-            InductionExemptedRoutes = dbContext.RouteToProfessionalStatuses
-                .Include(r => r.RouteToProfessionalStatusType)
-                .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
-                .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatusType != null && r.ExemptFromInduction == true);
-        }
+        InductionExemptedRoutes = dbContext.RouteToProfessionalStatuses
+            .Include(r => r.RouteToProfessionalStatusType)
+            .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
+            .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatusType != null && r.ExemptFromInduction == true);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit))
             .Succeeded;
