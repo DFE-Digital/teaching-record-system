@@ -410,91 +410,121 @@ public partial class TestData
 
             var events = new List<EventBase>();
 
-            var contact = new Contact()
-            {
-                Id = PersonId,
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                dfeta_StatedFirstName = statedFirstName,
-                dfeta_StatedMiddleName = statedMiddleName,
-                dfeta_StatedLastName = lastName,
-                BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
-                dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
-                dfeta_TrnToken = _trnToken,
-                dfeta_SlugId = _slugId,
-                dfeta_loginfailedcounter = _loginFailedCounter
-            };
+            // var contact = new Contact()
+            // {
+            //     Id = PersonId,
+            //     FirstName = firstName,
+            //     MiddleName = middleName,
+            //     LastName = lastName,
+            //     dfeta_StatedFirstName = statedFirstName,
+            //     dfeta_StatedMiddleName = statedMiddleName,
+            //     dfeta_StatedLastName = lastName,
+            //     BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
+            //     dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            //     dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
+            //     dfeta_TrnToken = _trnToken,
+            //     dfeta_SlugId = _slugId,
+            //     dfeta_loginfailedcounter = _loginFailedCounter
+            // };
+            //
+            // // The conditional is to work around issue in CRM where an explicit `null` TRN breaks a plugin
+            // if (trn is not null)
+            // {
+            //     contact.dfeta_TRN = trn;
+            // }
+            //
+            // if (_email is not null)
+            // {
+            //     contact.EMailAddress1 = _email;
+            // }
+            //
+            // if (_mobileNumber is not null)
+            // {
+            //     contact.MobilePhone = _mobileNumber;
+            // }
+            //
+            // if (_hasNationalInsuranceNumber ?? false)
+            // {
+            //     contact.dfeta_NINumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
+            // }
+            //
+            // if (_hasGender ?? false)
+            // {
+            //     contact.GenderCode = gender.ToContact_GenderCode();
+            // }
+            //
+            // if (_qtlsDate is not null)
+            // {
+            //     contact.dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false);
+            // }
+            //
+            // if (trn is not null && _trnToken is null && _email is not null)
+            // {
+            //     _trnToken = Guid.NewGuid().ToString();
+            // }
 
-            // The conditional is to work around issue in CRM where an explicit `null` TRN breaks a plugin
-            if (trn is not null)
+            // var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
+            // txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
+            //
+            // var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+            // {
+            //     ColumnSet = new(allColumns: true),
+            //     Target = PersonId.ToEntityReference(Contact.EntityLogicalName)
+            // });
+            //
+            // await txnRequestBuilder.ExecuteAsync();
+            //
+            // // Read the contact record back (plugins may have added/amended data so our original record will be stale)
+            // contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
+            //
+            // var syncedPerson = await testData.SyncConfiguration.SyncIfEnabledAsync(
+            //     helper => helper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false),
+            //     _syncEnabledOverride);
+
             {
-                contact.dfeta_TRN = trn;
+                var p = new Person
+                {
+                    PersonId = PersonId,
+                    FirstName = statedFirstName,
+                    MiddleName = statedMiddleName,
+                    LastName = lastName,
+                    DateOfBirth = dateOfBirth,
+                    // dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+                    // dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
+                    // dfeta_TrnToken = _trnToken,
+                    // dfeta_SlugId = _slugId,
+                    // dfeta_loginfailedcounter = _loginFailedCounter,
+                    Trn = trn,
+                    EmailAddress = _email,
+                    MobileNumber = _mobileNumber,
+                    NationalInsuranceNumber = _nationalInsuranceNumber,
+                    CreatedOn = testData.Clock.UtcNow,
+                    UpdatedOn = testData.Clock.UtcNow,
+                    //Gender
+                };
+
+                await testData.WithDbContextAsync(async dbContext =>
+                {
+                    dbContext.Persons.Add(p);
+
+                    await dbContext.SaveChangesAsync();
+                });
             }
-
-            if (_email is not null)
-            {
-                contact.EMailAddress1 = _email;
-            }
-
-            if (_mobileNumber is not null)
-            {
-                contact.MobilePhone = _mobileNumber;
-            }
-
-            if (_hasNationalInsuranceNumber ?? false)
-            {
-                contact.dfeta_NINumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
-            }
-
-            if (_hasGender ?? false)
-            {
-                contact.GenderCode = gender.ToContact_GenderCode();
-            }
-
-            if (_qtlsDate is not null)
-            {
-                contact.dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false);
-            }
-
-            if (trn is not null && _trnToken is null && _email is not null)
-            {
-                _trnToken = Guid.NewGuid().ToString();
-            }
-
-            var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
-            txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
-
-            var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
-            {
-                ColumnSet = new(allColumns: true),
-                Target = PersonId.ToEntityReference(Contact.EntityLogicalName)
-            });
-
-            await txnRequestBuilder.ExecuteAsync();
-
-            // Read the contact record back (plugins may have added/amended data so our original record will be stale)
-            contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
-
-            var syncedPerson = await testData.SyncConfiguration.SyncIfEnabledAsync(
-                helper => helper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false),
-                _syncEnabledOverride);
 
             var (mqs, alerts, person, routes, previousNames) = await testData.WithDbContextAsync(async dbContext =>
             {
-                if (!syncedPerson)
-                {
-                    if (_alertBuilders.Any() ||
-                        _mqBuilders.Any() ||
-                        _trnRequest is { WriteMetadata: true } ||
-                        _inductionBuilder != null)
-                    {
-                        throw new InvalidOperationException("Cannot write TRS-owned data unless sync is enabled.");
-                    }
-
-                    return default;
-                }
+                // if (!syncedPerson)
+                // {
+                //     if (_alertBuilders.Any() ||
+                //         _mqBuilders.Any() ||
+                //         _trnRequest is { WriteMetadata: true } ||
+                //         _inductionBuilder != null)
+                //     {
+                //         throw new InvalidOperationException("Cannot write TRS-owned data unless sync is enabled.");
+                //     }
+                //
+                //     return default;
+                // }
 
                 var person = await dbContext.Persons
                     .Include(p => p.Qualifications)
@@ -518,7 +548,7 @@ public partial class TestData
                     .Include(p => p.Alerts!).AsSplitQuery()
                     .Include(p => p.PreviousNames).AsSplitQuery()
                     .Include(p => p.Qualifications).AsSplitQuery()
-                    .SingleAsync(p => p.PersonId == contact.Id);
+                    .SingleAsync(p => p.PersonId == PersonId);
 
                 var personMqs = person.Qualifications!.OfType<MandatoryQualification>().ToArray();
                 var personRoutes = person.Qualifications!.OfType<RouteToProfessionalStatus>().ToArray();
@@ -626,29 +656,29 @@ public partial class TestData
                 }
             });
 
-            var currentDqtUser = await testData.GetCurrentCrmUserAsync();
-            var auditId = Guid.NewGuid();
-            var auditDetail = new AttributeAuditDetail()
-            {
-                AuditRecord = new Audit()
-                {
-                    Action = Audit_Action.Create,
-                    AuditId = auditId,
-                    CreatedOn = testData.Clock.UtcNow,
-                    Id = auditId,
-                    Operation = Audit_Operation.Create,
-                    UserId = currentDqtUser
-                },
-                OldValue = new Entity(Contact.EntityLogicalName),
-                NewValue = contact.Clone()
-            };
+            // var currentDqtUser = await testData.GetCurrentCrmUserAsync();
+            // var auditId = Guid.NewGuid();
+            // var auditDetail = new AttributeAuditDetail()
+            // {
+            //     AuditRecord = new Audit()
+            //     {
+            //         Action = Audit_Action.Create,
+            //         AuditId = auditId,
+            //         CreatedOn = testData.Clock.UtcNow,
+            //         Id = auditId,
+            //         Operation = Audit_Operation.Create,
+            //         UserId = currentDqtUser
+            //     },
+            //     OldValue = new Entity(Contact.EntityLogicalName),
+            //     NewValue = contact.Clone()
+            // };
 
             return new CreatePersonResult()
             {
                 PersonId = PersonId,
                 Person = person,
                 Events = events.AsReadOnly(),
-                Contact = contact,
+                Contact = null!,
                 Trn = trn,
                 DateOfBirth = dateOfBirth,
                 FirstName = firstName,
@@ -659,13 +689,13 @@ public partial class TestData
                 StatedLastName = lastName,
                 Email = _email,
                 MobileNumber = _mobileNumber,
-                NationalInsuranceNumber = contact.dfeta_NINumber,
-                Gender = contact.GenderCode.ToGender(),
+                NationalInsuranceNumber = _nationalInsuranceNumber,
+                Gender = null,
                 QtsDate = person?.QtsDate,
                 EytsDate = person?.EytsDate,
                 MandatoryQualifications = mqs,
                 Alerts = alerts,
-                DqtContactAuditDetail = auditDetail,
+                DqtContactAuditDetail = null!,
                 ProfessionalStatuses = routes,
                 PreviousNames = previousNames
             };
