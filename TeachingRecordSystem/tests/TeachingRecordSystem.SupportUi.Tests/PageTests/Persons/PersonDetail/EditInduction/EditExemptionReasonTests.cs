@@ -116,55 +116,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Fact]
-    public async Task Get_RoutesFeatureFlagOff_PersonHasRouteWithInductionExemption_ShowsExemptionReasonsList()
-    {
-        // Arrange
-        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
-        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
-        var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(RouteToProfessionalStatusType.ApplyForQtsId);
-        var holdsFromDate = Clock.Today;
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .ToArray();
-        var exemptionReasonsForDisplay = allGuidsToDisplay
-            .Join(exemptionReasons,
-                guid => guid,
-                exemption => exemption.InductionExemptionReasonId,
-                (guid, exemption) => new { guid, exemption.Name })
-            .ToArray();
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
-            .WithRouteToProfessionalStatus(r => r
-                .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Holds)
-                .WithHoldsFrom(holdsFromDate)
-                .WithInductionExemption(true)));
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var exemptionReasonsElement = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
-        Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElement.Count());
-        Assert.All(exemptionReasonsElement, checkbox =>
-        {
-            Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.guid.ToString()));
-            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
-        });
-    }
-
-    [Fact]
     public async Task Get_PersonHasRouteWithInductionExemption_ShowsExemptionReasonsList()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var allGuidsToDisplay = ExemptionReasonCategories.RouteFeatureExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(RouteToProfessionalStatusType.ApplyForQtsId);
         var holdsFromDate = Clock.Today;
@@ -212,7 +166,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     }
     [Theory]
     [MemberData(nameof(SpecificInductionExemptedRoutesRequiringFilteredExemptionReasonsData))]
-    public async Task Get_RoutesFeatureFlagOn_PersonHasSomeSpecificRoutes_ShowsFilteredExceptionReasonsAndEditOnRouteMessage(Guid routeId)
+    public async Task Get_PersonHasSomeSpecificRoutes_ShowsFilteredExceptionReasonsAndEditOnRouteMessage(Guid routeId)
     {
         // Arrange
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
@@ -221,7 +175,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
-            .Where(guid => guid != route.InductionExemptionReason?.InductionExemptionReasonId) // exclude the holds route exemption reason 
+            .Where(guid => guid != route.InductionExemptionReason?.InductionExemptionReasonId) // exclude the holds route exemption reason
             .Join(exemptionReasons,
                 guid => guid,
                 exemption => exemption.InductionExemptionReasonId,
@@ -262,54 +216,6 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(expectedMessage2, messagesDisplayed[1].TextContent.Trim());
     }
 
-    [Theory]
-    [MemberData(nameof(SpecificInductionExemptedRoutesRequiringFilteredExemptionReasonsData))]
-    public async Task Get_RoutesFeatureFlagOff_PersonHasSomeSpecificRoutes_ShowsAllExceptionReasonsAndNoMessage(Guid routeId)
-    {
-        // Arrange
-        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
-        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
-        var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
-        var holdsFromDate = Clock.Today;
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .ToArray();
-        var exemptionReasonsForDisplay = allGuidsToDisplay
-            .Join(exemptionReasons,
-                guid => guid,
-                exemption => exemption.InductionExemptionReasonId,
-                (guid, exemption) => new { guid, exemption.Name })
-            .ToArray();
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
-            .WithRouteToProfessionalStatus(r => r
-                .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Holds)
-                .WithHoldsFrom(holdsFromDate)
-                .WithInductionExemption(true)));
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var exemptionReasonsElements = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
-        Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElements.Count());
-        Assert.All(exemptionReasonsElements, checkbox =>
-        {
-            Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.guid.ToString()));
-            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
-        });
-
-        Assert.Empty(doc.GetElementsByClassName("govuk-inset-text"));
-    }
-
     public static IEnumerable<object[]> InductionExemptedRoutesRequiringRouteExemptionMessageData()
     {
         yield return new object[] { RouteToProfessionalStatusType.ScotlandRId, true };
@@ -319,9 +225,10 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         yield return new object[] { RouteToProfessionalStatusType.NiRId, false };
         yield return new object[] { RouteToProfessionalStatusType.QtlsAndSetMembershipId, false };
     }
+
     [Theory]
     [MemberData(nameof(InductionExemptedRoutesRequiringRouteExemptionMessageData))]
-    public async Task Get_RoutesFeatureFlagOn_PersonHasInductionExemptionFromRoute_ShowsExpectedMessageContent(Guid routeId, bool hasExemption)
+    public async Task Get_PersonHasInductionExemptionFromRoute_ShowsExpectedMessageContent(Guid routeId, bool hasExemption)
     {
         // Arrange
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
@@ -359,40 +266,6 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         {
             Assert.Empty(doc.GetElementsByClassName("govuk-inset-text").Where(e => e.TextContent.Contains("This person has an induction exemption")));
         }
-    }
-
-    [Theory]
-    [MemberData(nameof(InductionExemptedRoutesRequiringRouteExemptionMessageData))]
-    public async Task Get_RoutesFeatureFlagOff_PersonHasInductionExemptionFromRoute_DoesntShowMessage(Guid routeId, bool hasExemption)
-    {
-        // Arrange
-        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
-        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
-        var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
-        var holdsFromDate = Clock.Today;
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
-            .WithRouteToProfessionalStatus(r => r
-                .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Holds)
-                .WithHoldsFrom(holdsFromDate)
-                .WithInductionExemption(hasExemption)));
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        Assert.Empty(doc.GetElementsByClassName("govuk-inset-text"));
     }
 
     [Fact]

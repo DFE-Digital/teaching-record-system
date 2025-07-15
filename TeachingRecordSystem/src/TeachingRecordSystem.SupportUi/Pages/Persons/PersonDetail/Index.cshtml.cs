@@ -32,7 +32,9 @@ public class IndexModel(
     public async Task OnGetAsync()
     {
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
-        (Person, PersonProfessionalStatus) = await GetPersonInfoAsync();
+
+        Person = await BuildPersonInfoAsync();
+        PersonProfessionalStatus = await BuildPersonStatusInfoAsync();
     }
 
     private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()
@@ -122,16 +124,6 @@ public class IndexModel(
                     .ToArray()
             };
         }
-    }
-
-    private async Task<(PersonInfo, PersonProfessionalStatusInfo?)> GetPersonInfoAsync()
-    {
-        return (
-            await BuildPersonInfoAsync(),
-            featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus) ?
-                await BuildPersonStatusInfoAsync()
-                : null
-            );
     }
 
     public record PersonInfo

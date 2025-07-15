@@ -7,7 +7,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public override void Dispose()
     {
         FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
 
         base.Dispose();
     }
@@ -31,7 +30,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_WithPersonIdForPersonWithNoMandatoryQualifications_DisplaysNoMandatoryQualifications()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
@@ -50,7 +48,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_WithPersonIdForPersonWithProfessionalStatuses_DisplaysNoProfessionalStatuses()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
@@ -118,7 +115,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatus_DisplaysExpectedCardTitle(ProfessionalStatusType statusType)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var status = RouteToProfessionalStatusStatus.Deferred;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
@@ -151,7 +147,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatusApprenticeship_DisplaysExpectedContent()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
@@ -204,7 +199,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatusGraduateTeacherProgramme_DisplaysExpectedContent()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
@@ -246,7 +240,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatusNIRecognition_DisplaysExpectedContent()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var status = RouteToProfessionalStatusStatus.Deferred;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.NiRId);
@@ -284,7 +277,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatusHoldsNIRecognition_DisplaysExpectedContent()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var holdsFromDate = Clock.Today.AddDays(-1);
         var status = RouteToProfessionalStatusStatus.Holds;
@@ -325,7 +317,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatus_AgeRangeFromTo_DisplaysExpectedContent()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
@@ -368,7 +359,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 
@@ -394,7 +384,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 

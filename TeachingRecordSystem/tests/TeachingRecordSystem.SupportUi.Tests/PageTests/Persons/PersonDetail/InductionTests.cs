@@ -69,35 +69,6 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Fact]
-    public async Task Get_ForPersonWithRouteInductionExemption_FeatureFlagOff_RouteInductionExemptionNotDisplayed()
-    {
-        // Arrange
-        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
-        var holdsFromDate = Clock.Today;
-        var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId)
-            .Single();
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
-            .WithInductionStatus(InductionStatus.Exempt)
-            .WithRouteToProfessionalStatus(r => r
-                .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Holds)
-                .WithHoldsFrom(holdsFromDate)
-                .WithInductionExemption(true)));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        Assert.Null(doc.GetSummaryListValueElementForKey("Route induction exemption reason"));
-    }
-
     [Theory]
     [InlineData(InductionStatus.Exempt)]
     [InlineData(InductionStatus.RequiredToComplete)]

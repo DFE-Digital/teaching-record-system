@@ -12,8 +12,7 @@ public class ExemptionReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
-    IFileService fileService,
-    IFeatureProvider featureProvider)
+    IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
     protected class RouteWithExemption
@@ -32,9 +31,9 @@ public class ExemptionReasonModel(
 
     protected IEnumerable<RouteWithExemption>? RoutesWithInductionExemptions;
 
-    public bool ShowInductionExemptionReasonNotAvailableMessage => featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus) &&
-        (RoutesWithInductionExemptions?
-        .Any(r => ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)) ?? false);
+    public bool ShowInductionExemptionReasonNotAvailableMessage =>
+        RoutesWithInductionExemptions?
+            .Any(r => ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)) ?? false;
 
     public string[]? InductionExemptionFromRoutesMessages
     {
@@ -146,27 +145,23 @@ public class ExemptionReasonModel(
             return;
         }
 
-        var exemptionReasons = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus)
-            ? await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true)
-            : await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
+        var exemptionReasons = await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true);
 
-        if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
-        {
-            RoutesWithInductionExemptions = DbContext.RouteToProfessionalStatuses
-                .Include(p => p.RouteToProfessionalStatusType)
-                .ThenInclude(r => r!.InductionExemptionReason)
-                .Where(
-                    p => p.PersonId == PersonId &&
-                    p.ExemptFromInduction == true &&
-                    p.RouteToProfessionalStatusType!.InductionExemptionReason != null)
-                .Select(r => new RouteWithExemption()
-                {
-                    InductionExemptionReasonId = r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value,
-                    RouteToProfessionalStatusId = r.RouteToProfessionalStatusTypeId,
-                    InductionExemptionReasonName = r.RouteToProfessionalStatusType.InductionExemptionReason!.Name,
-                    RouteToProfessionalStatusName = r.RouteToProfessionalStatusType.Name
-                });
-        }
+        RoutesWithInductionExemptions = DbContext.RouteToProfessionalStatuses
+            .Include(p => p.RouteToProfessionalStatusType)
+            .ThenInclude(r => r!.InductionExemptionReason)
+            .Where(
+                p => p.PersonId == PersonId &&
+                p.ExemptFromInduction == true &&
+                p.RouteToProfessionalStatusType!.InductionExemptionReason != null)
+            .Select(r => new RouteWithExemption()
+            {
+                InductionExemptionReasonId = r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value,
+                RouteToProfessionalStatusId = r.RouteToProfessionalStatusTypeId,
+                InductionExemptionReasonName = r.RouteToProfessionalStatusType.InductionExemptionReason!.Name,
+                RouteToProfessionalStatusName = r.RouteToProfessionalStatusType.Name
+            });
+
         // note: RoutesWithInductionExemptions is null if the Feature RoutesToProfessionalStatus isn't enabled
         if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any()) // exclude some exemptions from the choices if they apply because of a route
         {

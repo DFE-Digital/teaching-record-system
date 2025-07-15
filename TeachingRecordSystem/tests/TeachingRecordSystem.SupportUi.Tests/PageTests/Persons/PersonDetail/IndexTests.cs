@@ -239,7 +239,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var awardDate = Clock.Today;
-        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQts(awardDate));
@@ -258,8 +258,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasNoProfessionalStatusDetails_NoSummaryCardShown()
     {
         // Arrange
-        var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -295,7 +293,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQts(awardDate));
@@ -324,7 +322,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQtls(awardDate));
@@ -353,7 +351,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, awardDate));
@@ -382,7 +380,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
@@ -411,7 +409,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus, awardDate));
