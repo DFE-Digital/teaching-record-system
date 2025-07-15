@@ -235,48 +235,10 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_PersonHasQts_RoutesFeatureFlagOff_NoDetailsShown()
-    {
-        // Arrange
-        var awardDate = Clock.Today;
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts(awardDate));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("professional-status-details"));
-    }
-
-    [Fact]
     public async Task Get_PersonHasNoProfessionalStatusDetails_NoSummaryCardShown()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Empty(doc.GetAllElementsByTestId("professional-status-details"));
-    }
-
-    [Fact]
-    public async Task Get_NoFeatureFlag_NoSummaryCardShown()
-    {
-        // Arrange
-        FeatureProvider.Features.Clear();
-        var person = await TestData.CreatePersonAsync(p =>
-            p.WithQts());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 

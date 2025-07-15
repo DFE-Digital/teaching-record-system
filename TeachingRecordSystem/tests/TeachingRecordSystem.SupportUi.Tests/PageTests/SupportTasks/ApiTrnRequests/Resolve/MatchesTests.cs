@@ -156,11 +156,11 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
     }
 
     [Fact]
-    public async Task Get_MatchedRecordHasEyts_ShowsQtsTag()
+    public async Task Get_MatchedRecordHasEyts_ShowsEytsTag()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts(Clock.Today.AddDays(-1), "222"));
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts(Clock.Today.AddDays(-1)));
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithMatchedRecords(matchedPerson.PersonId));

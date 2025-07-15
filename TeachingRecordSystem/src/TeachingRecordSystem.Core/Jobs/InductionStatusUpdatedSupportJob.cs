@@ -4,7 +4,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Core.Jobs;
 

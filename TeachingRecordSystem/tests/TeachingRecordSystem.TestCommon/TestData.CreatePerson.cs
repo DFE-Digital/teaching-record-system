@@ -9,7 +9,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
-using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -32,8 +31,6 @@ public partial class TestData
 
     public class CreatePersonBuilder
     {
-        private const string TeacherStatusQualifiedTeacherTrained = "71";
-
         private static readonly DateOnly _defaultQtsDate = new DateOnly(2022, 9, 1);
         private static readonly DateOnly _defaultEytsDate = new DateOnly(2023, 4, 13);
 
@@ -50,8 +47,6 @@ public partial class TestData
         private string? _nationalInsuranceNumber;
         private bool? _hasGender;
         private Gender? _gender;
-        private readonly List<Qualification> _qualifications = new();
-        private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private readonly List<CreatePersonRouteToProfessionalStatusBuilder> _routeToProfessionalStatusBuilders = [];
@@ -120,23 +115,6 @@ public partial class TestData
             var alertBuilder = new CreatePersonAlertBuilder();
             configure?.Invoke(alertBuilder);
             _alertBuilders.Add(alertBuilder);
-
-            return this;
-        }
-
-        public CreatePersonBuilder WithQualification(
-            Guid? qualificationId,
-            dfeta_qualification_dfeta_Type type,
-            DateOnly? completionOrAwardDate = null,
-            bool? isActive = true,
-            string? heQualificationValue = null,
-            string? heSubject1Value = null,
-            string? heSubject2Value = null,
-            string? heSubject3Value = null)
-        {
-            EnsureTrn();
-
-            _qualifications.Add(new(qualificationId ?? Guid.NewGuid(), type, completionOrAwardDate, isActive!.Value, heQualificationValue, heSubject1Value, heSubject2Value, heSubject3Value));
 
             return this;
         }
@@ -239,8 +217,6 @@ public partial class TestData
             if (_alertBuilders.Any() ||
                 _mqBuilders.Any() ||
                 _qtlsDate.HasValue ||
-                _qtsRegistrations.Any() ||
-                _qualifications.Any() ||
                 _routeToProfessionalStatusBuilders.Any() ||
                 _inductionBuilder?.HasStatusRequiringQts == true)
             {
@@ -301,14 +277,6 @@ public partial class TestData
         {
             EnsureTrn();
 
-            _qtsRegistrations.Add(
-                new QtsRegistration(
-                    holdsFrom,
-                    TeacherStatusValue: TeacherStatusQualifiedTeacherTrained,
-                    CreatedOn: null,
-                    EytsDate: null,
-                    EytsStatusValue: null));
-
             WithHoldsRouteToProfessionalStatus(
                 routeToProfessionalStatusTypeId: new("4163C2FB-6163-409F-85FD-56E7C70A54DD"),
                 holdsFrom);
@@ -352,27 +320,7 @@ public partial class TestData
         {
             EnsureTrn();
 
-            _qtsRegistrations.Add(new QtsRegistration(null, null, null, holdsFrom, "222"));
-
             WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, holdsFrom);
-
-            return this;
-        }
-
-        public CreatePersonBuilder WithQtsRegistration(DateOnly? qtsDate, string? teacherStatusValue, DateTime? createdDate, DateOnly? eytsDate, string? eytsTeacherStatus)
-        {
-            EnsureTrn();
-
-            _qtsRegistrations.Add(new QtsRegistration(qtsDate, teacherStatusValue, createdDate, eytsDate, eytsTeacherStatus));
-
-            return this;
-        }
-
-        public CreatePersonBuilder WithEyts(DateOnly? eytsDate, string? eytsStatusValue, DateTime? createdDate = null)
-        {
-            EnsureTrn();
-
-            _qtsRegistrations.Add(new QtsRegistration(null, null, createdDate, eytsDate, eytsStatusValue));
 
             return this;
         }
@@ -518,152 +466,6 @@ public partial class TestData
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
-            IInnerRequestHandle<RetrieveResponse>? getQtsRegistationTask = null;
-            var qts = _qtsRegistrations.Where(x => x.TeacherStatusValue != null && x.QtsDate != null);
-            foreach (var item in qts)
-            {
-                var teacherStatus = await testData.ReferenceDataCache.GetTeacherStatusByValueAsync(item.TeacherStatusValue!);
-                var qtsRegistrationId = Guid.NewGuid();
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = new dfeta_qtsregistration()
-                    {
-                        Id = qtsRegistrationId,
-                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
-                        CreatedOn = item.CreatedOn
-                    }
-                });
-
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = new dfeta_initialteachertraining()
-                    {
-                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
-                        dfeta_Result = dfeta_ITTResult.Pass,
-                    }
-                });
-
-                getQtsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
-                {
-                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
-                    Target = qtsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName),
-                });
-
-                // Plugin which updates Contact with QTS Date only fires on Update or Delete
-                txnRequestBuilder.AddRequest(new UpdateRequest()
-                {
-                    Target = new dfeta_qtsregistration()
-                    {
-                        Id = qtsRegistrationId,
-                        dfeta_QTSDate = item.QtsDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                        dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
-                        CreatedOn = item.CreatedOn
-                    }
-                });
-
-                getQtsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
-                {
-                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
-                    Target = qtsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName),
-                });
-            }
-
-            var eyts = _qtsRegistrations.Where(x => x.EytsStatusValue != null && x.EytsDate != null);
-            IInnerRequestHandle<RetrieveResponse>? getEytsRegistationTask = null;
-            foreach (var item in eyts)
-            {
-                var eytsRegistrationId = Guid.NewGuid();
-                var earlyYearsStatus = await testData.ReferenceDataCache.GetEarlyYearsStatusByValueAsync(item.EytsStatusValue!);
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = new dfeta_qtsregistration()
-                    {
-                        Id = eytsRegistrationId,
-                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
-                        CreatedOn = item.CreatedOn
-                    }
-                });
-
-                getEytsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
-                {
-                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
-                    Target = eytsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName)
-                });
-
-                // Plugin which updates Contact with EYTS Date only fires on Update or Delete
-                txnRequestBuilder.AddRequest(new UpdateRequest()
-                {
-                    Target = new dfeta_qtsregistration()
-                    {
-                        Id = eytsRegistrationId,
-                        dfeta_EYTSDate = item.EytsDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                        dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
-                        CreatedOn = item.CreatedOn
-                    }
-                });
-
-                getEytsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
-                {
-                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
-                    Target = eytsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName)
-                });
-            }
-
-            foreach (var qualification in _qualifications)
-            {
-                var crmQualification = new dfeta_qualification()
-                {
-                    Id = qualification.QualificationId,
-                    dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
-                    dfeta_Type = qualification.Type,
-                    dfeta_CompletionorAwardDate = qualification.CompletionOrAwardDate?.ToDateTimeWithDqtBstFix(isLocalTime: true)
-                };
-
-                if (qualification.Type == dfeta_qualification_dfeta_Type.HigherEducation)
-                {
-                    if (qualification.HeQualificationValue is not null)
-                    {
-                        var heQualification = await testData.ReferenceDataCache.GetHeQualificationByValueAsync(qualification.HeQualificationValue!);
-                        crmQualification.dfeta_HE_HEQualificationId = heQualification.Id.ToEntityReference(dfeta_hequalification.EntityLogicalName);
-                    }
-
-                    if (qualification.HeSubject1Value is not null)
-                    {
-                        var heSubject1 = await testData.ReferenceDataCache.GetHeSubjectByValueAsync(qualification.HeSubject1Value!);
-                        crmQualification.dfeta_HE_HESubject1Id = heSubject1.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
-                    }
-
-                    if (qualification.HeSubject2Value is not null)
-                    {
-                        var heSubject2 = await testData.ReferenceDataCache.GetHeSubjectByValueAsync(qualification.HeSubject2Value!);
-                        crmQualification.dfeta_HE_HESubject2Id = heSubject2.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
-                    }
-
-                    if (qualification.HeSubject3Value is not null)
-                    {
-                        var heSubject3 = await testData.ReferenceDataCache.GetHeSubjectByValueAsync(qualification.HeSubject3Value!);
-                        crmQualification.dfeta_HE_HESubject3Id = heSubject3.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
-                    }
-                }
-
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = crmQualification
-                });
-
-                if (!qualification.IsActive)
-                {
-                    txnRequestBuilder.AddRequest(new UpdateRequest()
-                    {
-                        Target = new dfeta_qualification()
-                        {
-                            Id = qualification.QualificationId,
-                            StateCode = dfeta_qualificationState.Inactive
-                        }
-                    });
-                }
-            }
-
             var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
             {
                 ColumnSet = new(allColumns: true),
@@ -704,31 +506,24 @@ public partial class TestData
                 }
 
                 AddTrnRequestMetadata();
-                _inductionBuilder?.Execute(person, this, testData, dbContext);
                 var mqIds = await AddMqsAsync();
                 var alertIds = await AddAlertsAsync();
                 var routeIds = await AddProfessionalStatusRoutesAsync(person);
-                var previousNameIds = await AddPreviousNamesAsync();
+                _inductionBuilder?.Execute(person, testData, dbContext);
+                var previousNameIds = AddPreviousNames();
 
                 await dbContext.SaveChangesAsync();
 
                 person = await dbContext.Persons
-                    .Include(p => p.Alerts!)
-                    .AsSplitQuery()
-                    .Include(p => p.PreviousNames)
-                    .AsSplitQuery()
+                    .Include(p => p.Alerts!).AsSplitQuery()
+                    .Include(p => p.PreviousNames).AsSplitQuery()
+                    .Include(p => p.Qualifications).AsSplitQuery()
                     .SingleAsync(p => p.PersonId == contact.Id);
 
-                // Can't include this above https://github.com/dotnet/efcore/issues/7623
-                var personMqs = await dbContext.MandatoryQualifications
-                    .Where(q => q.PersonId == PersonId)
-                    .ToArrayAsync();
+                var personMqs = person.Qualifications!.OfType<MandatoryQualification>().ToArray();
+                var personRoutes = person.Qualifications!.OfType<RouteToProfessionalStatus>().ToArray();
 
-                var personRoutes = await dbContext.RouteToProfessionalStatuses
-                    .Where(p => p.PersonId == PersonId)
-                    .ToArrayAsync();
-
-                // Get MQs, Alerts and Professional Statuses that we've added *in the same order they were specified*.
+                // Get MQs, alerts, routes and previous names that we've added *in the same order they were specified*.
                 var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
                 var alerts = alertIds.Select(id => person.Alerts!.Single(a => a.AlertId == id)).AsReadOnly();
                 var routesToProfessionalStatus = routeIds
@@ -780,33 +575,29 @@ public partial class TestData
                     return alertIds;
                 }
 
-                async Task<IReadOnlyCollection<Guid>> AddPreviousNamesAsync()
+                IReadOnlyCollection<Guid> AddPreviousNames()
                 {
-                    return await testData.WithDbContextAsync(async dbContext =>
+                    var previousNameIds = new List<Guid>();
+
+                    foreach (var pn in _previousNames)
                     {
-                        var previousNameIds = new List<Guid>();
-                        foreach (var pn in _previousNames)
+                        var id = Guid.NewGuid();
+                        var previousName = new PreviousName
                         {
-                            var id = Guid.NewGuid();
-                            var previousName = new PreviousName
-                            {
-                                PreviousNameId = id,
-                                PersonId = PersonId,
-                                FirstName = pn.FirstName,
-                                MiddleName = pn.MiddleName ?? string.Empty,
-                                LastName = pn.LastName,
-                                CreatedOn = pn.Created,
-                                UpdatedOn = pn.Created
-                            };
+                            PreviousNameId = id,
+                            PersonId = PersonId,
+                            FirstName = pn.FirstName,
+                            MiddleName = pn.MiddleName ?? string.Empty,
+                            LastName = pn.LastName,
+                            CreatedOn = pn.Created,
+                            UpdatedOn = pn.Created
+                        };
 
-                            previousNameIds.Add(id);
-                            dbContext.PreviousNames.Add(previousName);
-                        }
+                        previousNameIds.Add(id);
+                        dbContext.PreviousNames.Add(previousName);
+                    }
 
-                        await dbContext.SaveChangesAsync();
-
-                        return previousNameIds;
-                    });
+                    return previousNameIds;
                 }
 
                 void AddTrnRequestMetadata()
@@ -870,29 +661,14 @@ public partial class TestData
                 MobileNumber = _mobileNumber,
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 Gender = contact.GenderCode.ToGender(),
-                QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
-                EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
+                QtsDate = person?.QtsDate,
+                EytsDate = person?.EytsDate,
                 MandatoryQualifications = mqs,
                 Alerts = alerts,
                 DqtContactAuditDetail = auditDetail,
                 ProfessionalStatuses = routes,
                 PreviousNames = previousNames
             };
-        }
-
-        internal DateOnly? GetQtsDate()
-        {
-            var qtsDates = _qtsRegistrations
-                .Where(q => q.QtsDate != null)
-                .Select(q => q.QtsDate!.Value)
-                .ToArray();
-
-            if (qtsDates.Length == 0)
-            {
-                return null;
-            }
-
-            return qtsDates.Min();
         }
 
         private void EnsureTrn()
@@ -904,6 +680,16 @@ public partial class TestData
                 throw new InvalidOperationException("Person requires a TRN.");
             }
         }
+
+        internal DateOnly? GetQtsDate() =>
+            _routeToProfessionalStatusBuilders
+                .Where(r =>
+                    r.Status == RouteToProfessionalStatusStatus.Holds &&
+                    _referenceData.RouteTypes.Single(
+                        t => t.RouteToProfessionalStatusTypeId == r.RouteToProfessionalStatusTypeId).ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+                .OrderBy(r => r.HoldsFrom)
+                .FirstOrDefault()
+                ?.HoldsFrom;
 
         internal DateOnly EnsureQts() => GetQtsDate() ??
             throw new InvalidOperationException("Person requires QTS.");
@@ -994,11 +780,6 @@ public partial class TestData
         {
             var personId = createPersonBuilder.PersonId;
 
-            if (_alertTypeId.HasValue && !(await testData.ReferenceDataCache.GetAlertTypesAsync()).Any(a => a.AlertTypeId == _alertTypeId.ValueOrDefault()))
-            {
-                throw new ArgumentException("AlertTypeId is invalid.");
-            }
-
             var alertTypeId = _alertTypeId.ValueOr((await testData.ReferenceDataCache.GetAlertTypesAsync()).RandomOne().AlertTypeId);
             var details = _details.ValueOr(testData.GenerateLoremIpsum());
             var externalLink = _externalLink.ValueOr((string?)null);
@@ -1006,7 +787,7 @@ public partial class TestData
             var endDate = _endDate.ValueOr((DateOnly?)null);
             var reason = _reason.ValueOr("Another reason");
             var reasonDetail = _reasonDetail.ValueOr(testData.GenerateLoremIpsum());
-            var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
+            var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(SystemUser.SystemUserId));
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
             var alert = Alert.Create(
@@ -1021,7 +802,7 @@ public partial class TestData
                 evidenceFile: null,
                 createdByUser,
                 createdUtc!.Value,
-                out var @createdEvent);
+                out var createdEvent);
 
             dbContext.Alerts.Add(alert);
             dbContext.AddEventWithoutBroadcast(createdEvent);
@@ -1290,13 +1071,10 @@ public partial class TestData
 
         internal IReadOnlyCollection<EventBase> Execute(
             Person person,
-            CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
         {
-            var qtsDate = createPersonBuilder.GetQtsDate();
-
-            var status = _status.ValueOr(qtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
+            var status = _status.ValueOr(person.QtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
             var startDate = _startDate.ValueOrDefault();
             var completedDate = _completedDate.ValueOrDefault();
             var exemptionReasons = _exemptionReasonIds.ValueOr([]);
@@ -1359,16 +1137,4 @@ public partial class TestData
         public required IReadOnlyCollection<PreviousName> PreviousNames { get; init; }
         public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
-
-    public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
-
-    public record Qualification(
-        Guid QualificationId,
-        dfeta_qualification_dfeta_Type Type,
-        DateOnly? CompletionOrAwardDate = null,
-        bool IsActive = true,
-        string? HeQualificationValue = null,
-        string? HeSubject1Value = null,
-        string? HeSubject2Value = null,
-        string? HeSubject3Value = null);
 }
