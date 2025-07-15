@@ -56,6 +56,13 @@
                     <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@createdEvent.PersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
+            @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtlsStatus))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="qtls-status">@createdEvent.PersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
                 <govuk-summary-list-row-value data-testid="route" use-empty-fallback>@routeType.Name</govuk-summary-list-row-value>
@@ -177,6 +184,13 @@
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                        @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtlsStatus))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="qtls-status">@createdEvent.OldPersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                     </govuk-summary-list>
