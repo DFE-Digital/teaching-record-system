@@ -12,8 +12,6 @@ public class StatusModel(
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
 {
-    public string PageTitle = "Edit status";
-
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
@@ -28,9 +26,10 @@ public class StatusModel(
     public Guid QualificationId { get; set; }
 
     [BindProperty]
-    [Display(Name = "Select the route status")]
     [Required(ErrorMessage = "Select a route status")]
     public RouteToProfessionalStatusStatus Status { get; set; }
+
+    public string PageHeading => "Select the route status";
 
     public void OnGet()
     {

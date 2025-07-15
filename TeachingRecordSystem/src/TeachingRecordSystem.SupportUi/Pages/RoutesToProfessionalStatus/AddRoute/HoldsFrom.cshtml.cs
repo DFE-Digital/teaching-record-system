@@ -6,15 +6,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Add professional status date";
-    public string PageHeading = "Enter the professional status date";
-
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Professional status date")]
     public DateOnly? HoldsFrom { get; set; }
 
-    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(Route!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
+    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
         == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the professional status date"
+       + (HoldsFromRequired ? "" : " (optional)");
 
     public void OnGet()
     {

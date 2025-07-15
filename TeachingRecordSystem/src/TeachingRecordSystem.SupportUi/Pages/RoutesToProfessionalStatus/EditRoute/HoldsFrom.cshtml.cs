@@ -7,15 +7,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Enter the professional status date";
-    public string PageHeading => PageTitle;
-
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Professional status date")]
     public DateOnly? HoldsFrom { get; set; }
 
-    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(Route!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
+    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
         == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the professional status date"
+       + (HoldsFromRequired ? "" : " (optional)");
 
     public void OnGet()
     {
@@ -74,7 +74,7 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
     {
         await base.OnPageHandlerExecutingAsync(context);
 
-        var inductionexemptionReason = Route!.InductionExemptionReason;
+        var inductionexemptionReason = RouteType!.InductionExemptionReason;
     }
 
     public string BackLink => FromCheckAnswers ?
@@ -88,15 +88,15 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
     {
         if (JourneyInstance!.State.EditStatusState != null)
         {
-            if (QuestionDriverHelper.FieldRequired(Route!.InductionExemptionRequired, JourneyInstance!.State.EditStatusState.Status.GetInductionExemptionRequirement())
+            if (QuestionDriverHelper.FieldRequired(RouteType!.InductionExemptionRequired, JourneyInstance!.State.EditStatusState.Status.GetInductionExemptionRequirement())
                 == FieldRequirement.NotApplicable)
             {
                 return true;
             }
             else
             {
-                return Route.InductionExemptionReason is not null &&
-                    Route.InductionExemptionReason.RouteImplicitExemption;
+                return RouteType.InductionExemptionReason is not null &&
+                    RouteType.InductionExemptionReason.RouteImplicitExemption;
             }
         }
         else

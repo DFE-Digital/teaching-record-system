@@ -1,7 +1,7 @@
 @page "/route/{qualificationId}/edit/holds-from/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.HoldsFromModel
 @{
-    ViewBag.Title = Model.PageTitle;
+    ViewBag.Title = Model.PageHeading;
 }
 
 @section BeforeContent {
@@ -17,9 +17,6 @@
                 <govuk-date-input-fieldset>
                      <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" >
                         @Model.PageHeading
-                        @if (!Model.HoldsFromRequired) {
-                            <text>(optional)</text>
-                        }
                     </govuk-date-input-fieldset-legend>
                     <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
                 </govuk-date-input-fieldset>

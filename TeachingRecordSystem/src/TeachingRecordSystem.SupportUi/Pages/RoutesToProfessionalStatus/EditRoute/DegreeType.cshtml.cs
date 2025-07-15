@@ -8,16 +8,16 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Edit degree type";
-    public string PageHeading = "Enter the degree type awarded as part of this route";
-
     public DegreeType[] DegreeTypes { get; set; } = [];
-
-    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(Route!.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
-        == FieldRequirement.Mandatory;
 
     [BindProperty]
     public Guid? DegreeTypeId { get; set; }
+
+    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteType!.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the degree type awarded as part of this route"
+       + (DegreeTypeRequired ? "" : " (optional)");
 
     public void OnGet()
     {

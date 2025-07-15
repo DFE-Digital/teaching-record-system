@@ -7,9 +7,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.StartAndEndDate, linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Enter the route start and end dates";
-    public string PageHeading => PageTitle;
-
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
     [Display(Name = "Route start date")]
@@ -20,8 +17,11 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
     [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
-    public bool StartAndEndDatesRequired => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement())
+    public bool StartAndEndDatesRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingEndDateRequired, Status.GetEndDateRequirement())
         == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the route start and end dates"
+       + (StartAndEndDatesRequired ? "" : " (optional)");
 
     public void OnGet()
     {

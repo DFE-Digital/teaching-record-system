@@ -40,8 +40,8 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
     {
         await base.OnPageHandlerExecutingAsync(context);
 
-        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
-            || (Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption))
+        if (RouteType.InductionExemptionRequired == FieldRequirement.NotApplicable
+            || (RouteType.InductionExemptionReason is not null && RouteType.InductionExemptionReason.RouteImplicitExemption))
         {
             context.Result = BadRequest();
             return;

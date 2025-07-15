@@ -8,17 +8,17 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Edit training country";
-    public string PageHeading = "Enter the country associated with their route";
-
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
-
-    public bool CountryRequired => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement())
-        == FieldRequirement.Mandatory;
 
     [BindProperty]
     [Display(Name = "Enter the country associated with their route")]
     public string? TrainingCountryId { get; set; }
+
+    public bool CountryRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingCountryRequired, Status.GetCountryRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the country associated with their route"
+       + (CountryRequired ? "" : " (optional)");
 
     public void OnGet()
     {

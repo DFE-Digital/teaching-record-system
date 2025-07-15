@@ -2,7 +2,7 @@
 
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.StartAndEndDateModel
 @{
-    ViewBag.Title = Model.PageTitle;
+    ViewBag.Title = Model.PageHeading;
 }
 
 @section BeforeContent {
@@ -16,9 +16,6 @@
             <govuk-fieldset>
                 <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
                     @Model.PageHeading
-                    @if (!Model.StartAndEndDatesRequired) {
-                        <text>(optional)</text>
-                    }
                 </govuk-fieldset-legend>
                 <govuk-date-input asp-for="TrainingStartDate">
                     <govuk-date-input-fieldset>

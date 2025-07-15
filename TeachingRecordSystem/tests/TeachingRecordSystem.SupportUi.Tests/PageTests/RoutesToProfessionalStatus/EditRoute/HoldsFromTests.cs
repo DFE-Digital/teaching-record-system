@@ -12,10 +12,6 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true, true)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, false)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, false)]
-    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, false, true)]
-    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, true, true)]
     public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool statusEditedDuringCurrentJourney, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -90,10 +86,6 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true, true)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, false)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, false)]
-    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, false, true)]
-    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, true, true)]
     public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool statusEditedDuringCurrentJourney, bool expectFieldsToBeOptional)
     {
         // Arrange

@@ -24,7 +24,7 @@ public abstract class EditRouteCommonPageModel(TrsLinkGenerator linkGenerator, R
 
     public Guid PersonId { get; set; }
 
-    public RouteToProfessionalStatusType Route { get; set; } = null!;
+    public RouteToProfessionalStatusType RouteType { get; set; } = null!;
 
     public RouteToProfessionalStatusStatus Status { get; set; }
 
@@ -43,7 +43,7 @@ public abstract class EditRouteCommonPageModel(TrsLinkGenerator linkGenerator, R
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
 
-        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        RouteType = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         Status = JourneyInstance!.State.EditStatusState?.Status ?? JourneyInstance!.State.Status;
 
         OnPageHandlerExecuting(context);

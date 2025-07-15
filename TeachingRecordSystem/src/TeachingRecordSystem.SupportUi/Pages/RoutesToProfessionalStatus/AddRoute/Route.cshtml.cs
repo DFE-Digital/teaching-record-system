@@ -9,8 +9,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRouteCommonPageModel(AddRoutePage.Route, linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Add route type";
-
     public override AddRoutePage? NextPage => AddRoutePage.Status;
     public override AddRoutePage? PreviousPage => null;
 
@@ -25,6 +23,8 @@ public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refer
     [BindProperty]
     [Display(Name = "Inactive route type")]
     public Guid? ArchivedRouteId { get; set; }
+
+    public string PageHeading => "Add route type";
 
     public void OnGet()
     {

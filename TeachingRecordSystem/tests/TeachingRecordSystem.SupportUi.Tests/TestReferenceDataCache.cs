@@ -41,23 +41,6 @@ public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbC
             TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional,
             TrainingSubjectsRequired = FieldRequirement.Optional,
             InductionExemptionReasonId = null
-        },
-        new()
-        {
-            RouteToProfessionalStatusTypeId = Guid.NewGuid(),
-            Name = "Test Route With Optional HoldsFrom Date",
-            ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus,
-            IsActive = true,
-            TrainingStartDateRequired = FieldRequirement.Optional,
-            TrainingEndDateRequired = FieldRequirement.Optional,
-            HoldsFromRequired = FieldRequirement.Optional,
-            InductionExemptionRequired = FieldRequirement.Optional,
-            TrainingProviderRequired = FieldRequirement.Optional,
-            DegreeTypeRequired = FieldRequirement.Optional,
-            TrainingCountryRequired = FieldRequirement.Optional,
-            TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional,
-            TrainingSubjectsRequired = FieldRequirement.Optional,
-            InductionExemptionReasonId = null
         }
     ];
 

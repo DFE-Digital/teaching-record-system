@@ -8,13 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRoutePostStatusPageModel(AddRoutePage.SubjectSpecialisms, linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Add subject specialisms";
-    public string PageHeading = "Enter the subject they specialise in teaching";
-
     public DisplayInfo[] Subjects { get; set; } = [];
-
-    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
-        == FieldRequirement.Mandatory;
 
     [BindProperty]
     public Guid? SubjectId1 { get; set; }
@@ -24,6 +18,12 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     [BindProperty]
     [Display(Name = "Third subject (optional)")]
     public Guid? SubjectId3 { get; set; }
+
+    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the subject they specialise in teaching"
+        + (SubjectSpecialismRequired ? "" : " (optional)");
 
     public void OnGet()
     {

@@ -6,14 +6,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Edit age range specialism";
-    public string PageHeading => PageTitle;
-
     [BindProperty]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
-    public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())
+    public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())
         == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Edit age range specialism"
+       + (AgeRangeSpecialismRequired ? "" : " (optional)");
 
     public void OnGet()
     {

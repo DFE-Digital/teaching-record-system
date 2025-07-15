@@ -42,7 +42,7 @@ public class CheckYourAnswersModel(
         var professionalStatus = RouteToProfessionalStatus.Create(
             person,
             allRoutes,
-            Route.RouteToProfessionalStatusTypeId,
+            RouteType.RouteToProfessionalStatusTypeId,
             sourceApplicationUserId: null,
             sourceApplicationReference: null,
             status: Status,
@@ -91,26 +91,26 @@ public class CheckYourAnswersModel(
 
         foreach (var page in pagesInOrder)
         {
-            var pageRequired = page.FieldRequirementForPage(Route, Status);
+            var pageRequired = page.FieldRequirementForPage(RouteType, Status);
 
             if (pageRequired == FieldRequirement.Mandatory &&
                 !JourneyInstance!.State.IsComplete(page) &&
                 // if the route has an implicit exemption, don't show the induction exemption page
                 (page != AddRoutePage.InductionExemption ||
-                 Route.InductionExemptionReason is null ||
-                 !Route.InductionExemptionReason.RouteImplicitExemption))
+                 RouteType.InductionExemptionReason is null ||
+                 !RouteType.InductionExemptionReason.RouteImplicitExemption))
             {
                 context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true));
                 return;
             }
         }
 
-        var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
+        var hasImplicitExemption = RouteType.InductionExemptionReason?.RouteImplicitExemption ?? false;
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
         RouteDetail = new RouteDetailViewModel
         {
-            RouteToProfessionalStatusType = Route,
+            RouteToProfessionalStatusType = RouteType,
             Status = Status,
             HoldsFrom = JourneyInstance!.State.HoldsFrom,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,

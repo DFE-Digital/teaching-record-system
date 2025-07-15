@@ -6,13 +6,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public abstract class AddRoutePostStatusPageModel(AddRoutePage currentPage, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRouteCommonPageModel(currentPage, linkGenerator, referenceDataCache)
 {
-    public RouteToProfessionalStatusType Route { get; set; } = null!;
+    public RouteToProfessionalStatusType RouteType { get; set; } = null!;
 
     public RouteToProfessionalStatusStatus Status { get; set; }
 
-    public override AddRoutePage? NextPage => PageDriver.NextPage(Route, Status, CurrentPage);
+    public override AddRoutePage? NextPage => PageDriver.NextPage(RouteType, Status, CurrentPage);
 
-    public override AddRoutePage? PreviousPage => PageDriver.PreviousPage(Route, Status, CurrentPage);
+    public override AddRoutePage? PreviousPage => PageDriver.PreviousPage(RouteType, Status, CurrentPage);
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -22,7 +22,7 @@ public abstract class AddRoutePostStatusPageModel(AddRoutePage currentPage, TrsL
             return;
         }
 
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+        RouteType = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         Status = JourneyInstance!.State.Status!.Value;
 
         await base.OnPageHandlerExecutingAsync(context);

@@ -10,8 +10,6 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, true)]
     public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -52,8 +50,6 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
     [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Test Route With Optional HoldsFrom Date", RouteToProfessionalStatusStatus.InTraining, true)]
     public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange

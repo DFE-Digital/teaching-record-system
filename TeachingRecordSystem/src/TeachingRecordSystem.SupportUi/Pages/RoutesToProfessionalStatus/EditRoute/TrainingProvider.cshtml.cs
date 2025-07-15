@@ -10,16 +10,16 @@ public class TrainingProviderModel(
     ReferenceDataCache referenceDataCache)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Edit training provider";
-    public string PageHeading = "Enter the training provider for this route";
-
     public TrainingProvider[] TrainingProviders { get; set; } = [];
-
-    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(Route!.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
-            == FieldRequirement.Mandatory;
 
     [BindProperty]
     public Guid? TrainingProviderId { get; set; }
+
+    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteType!.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
+            == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the training provider for this route"
+        + (TrainingProviderRequired ? "" : " (optional)");
 
     public void OnGet()
     {

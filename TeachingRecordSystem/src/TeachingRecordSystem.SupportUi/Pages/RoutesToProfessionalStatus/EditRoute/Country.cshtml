@@ -2,7 +2,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.CountryModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
-    ViewBag.Title = Model.PageTitle;
+    ViewBag.Title = Model.PageHeading;
 }
 
 @section Styles {
@@ -46,9 +46,6 @@
             <govuk-select asp-for="TrainingCountryId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
                     @Model.PageHeading
-                    @if (!Model.CountryRequired) {
-                        <text>(optional)</text>
-                    }
                 </govuk-select-label>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var country in Model.TrainingCountries)
