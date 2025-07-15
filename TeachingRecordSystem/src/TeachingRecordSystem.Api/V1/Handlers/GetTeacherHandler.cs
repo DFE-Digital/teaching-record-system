@@ -9,16 +9,11 @@ using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Handlers;
 
-public class GetTeacherHandler(
-    IDataverseAdapter dataverseAdapter,
-    TrsDbContext dbContext,
-    IFeatureProvider featureProvider) :
+public class GetTeacherHandler(IDataverseAdapter dataverseAdapter, TrsDbContext dbContext) :
     IRequestHandler<GetTeacherRequest, GetTeacherResponse>
 {
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var routesMigrated = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus);
-
         var query = new FindTeachersByTrnBirthDateAndNinoQuery()
         {
             BirthDate = request.BirthDate,
@@ -70,15 +65,14 @@ public class GetTeacherHandler(
 
         var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
 
-        var response = MapContactToResponse(teacher, hasActiveAlert, person, routesMigrated);
+        var response = MapContactToResponse(teacher, hasActiveAlert, person);
         return response;
     }
 
     internal static GetTeacherResponse MapContactToResponse(
         Contact teacher,
         bool hasActiveAlert,
-        PostgresModels.Person person,
-        bool routesMigrated)
+        PostgresModels.Person person)
     {
         return new GetTeacherResponse()
         {
@@ -86,7 +80,7 @@ public class GetTeacherHandler(
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             QualifiedTeacherStatus = MapQualifiedTeacherStatus(),
             Induction = MapInduction(),
-            InitialTeacherTraining = MapInitialTeacherTraining(),
+            InitialTeacherTraining = null,
             Qualifications = MapQualifications(),
             Name = teacher.FullName,
             DateOfBirth = teacher.BirthDate,
@@ -113,7 +107,7 @@ public class GetTeacherHandler(
 
         QualifiedTeacherStatus MapQualifiedTeacherStatus()
         {
-            if (routesMigrated && person.QtsDate is not null)
+            if (person.QtsDate is not null)
             {
                 return new QualifiedTeacherStatus
                 {
@@ -124,53 +118,7 @@ public class GetTeacherHandler(
                 };
             }
 
-            var qts = teacher.Extract<dfeta_qtsregistration>();
-
-            return qts != null ?
-                new QualifiedTeacherStatus()
-                {
-                    Name = qts.dfeta_name,
-                    State = dfeta_qtsregistrationState.Active,
-                    StateName = "Active",
-                    QtsDate = qts.dfeta_QTSDate
-                } :
-                null;
-        }
-
-        InitialTeacherTraining MapInitialTeacherTraining()
-        {
-            if (routesMigrated)
-            {
-                return null;
-            }
-
-            var itt = teacher.Extract<dfeta_initialteachertraining>();
-
-            if (itt == null)
-            {
-                return null;
-            }
-
-            var subject1 = itt.Extract<dfeta_ittsubject>($"{nameof(dfeta_ittsubject)}1", dfeta_ittsubject.PrimaryIdAttribute);
-            var subject2 = itt.Extract<dfeta_ittsubject>($"{nameof(dfeta_ittsubject)}2", dfeta_ittsubject.PrimaryIdAttribute);
-            var subject3 = itt.Extract<dfeta_ittsubject>($"{nameof(dfeta_ittsubject)}3", dfeta_ittsubject.PrimaryIdAttribute);
-
-            return new InitialTeacherTraining()
-            {
-                State = itt.StateCode.Value,
-                StateName = itt.FormattedValues[dfeta_qtsregistration.Fields.StateCode],
-                ProgrammeStartDate = itt.dfeta_ProgrammeStartDate,
-                ProgrammeEndDate = itt.dfeta_ProgrammeEndDate,
-                ProgrammeType = itt.FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_ProgrammeType),
-                Result = itt.FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Result),
-                Subject1Id = itt.FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Subject1Id),
-                Subject2Id = itt.FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Subject2Id),
-                Subject3Id = itt.FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Subject3Id),
-                Qualification = itt.FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId),
-                Subject1Code = subject1?.dfeta_Value,
-                Subject2Code = subject2?.dfeta_Value,
-                Subject3Code = subject3?.dfeta_Value
-            };
+            return null;
         }
 
         Qualification[] MapQualifications() =>

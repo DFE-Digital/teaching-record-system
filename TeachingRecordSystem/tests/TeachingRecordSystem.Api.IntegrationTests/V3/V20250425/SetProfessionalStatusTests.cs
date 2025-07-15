@@ -11,7 +11,6 @@ public class SetProfessionalStatusTests : TestBase
     public SetProfessionalStatusTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.SetProfessionalStatus]);
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
     }
 
     [Theory, RoleNamesData(except: ApiRoles.SetProfessionalStatus)]

@@ -170,17 +170,12 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithQtls(qtlsDate));
-
-        var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
-        entity[Contact.Fields.dfeta_qtlsdate] = null;
-        await TestData.OrganizationService.UpdateAsync(entity);
+            .WithQtlsStatus(Core.Models.QtlsStatus.Expired));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
         {

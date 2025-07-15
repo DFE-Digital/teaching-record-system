@@ -11,9 +11,8 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     PreviousNameHelper previousNameHelper,
-    ReferenceDataCache referenceDataCache,
-    IFeatureProvider featureProvider) :
-    FindPersonsHandlerBase(dbContext, crmQueryDispatcher, previousNameHelper, referenceDataCache, featureProvider)
+    ReferenceDataCache referenceDataCache) :
+    FindPersonsHandlerBase(dbContext, crmQueryDispatcher, previousNameHelper, referenceDataCache)
 {
     public async Task<ApiResult<FindPersonsResult>> HandleAsync(FindPersonByLastNameAndDateOfBirthCommand command)
     {

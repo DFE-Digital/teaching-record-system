@@ -74,17 +74,12 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithQtls(qtlsDate));
-
-        var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
-        entity[Contact.Fields.dfeta_qtlsdate] = null;
-        await TestData.OrganizationService.UpdateAsync(entity);
+            .WithQtlsStatus(Core.Models.QtlsStatus.Expired));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -169,9 +164,6 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
             .WithQts(qtsDate)
             .WithQtls(qtlsDate));
 
-        var status = await ReferenceCache.GetTeacherStatusByValueAsync("71"); //qualified teacher
-        var qtsRegistration = new dfeta_qtsregistration() { dfeta_QTSDate = qtsDate.ToDateTime(), dfeta_TeacherStatusId = status.ToEntityReference() };
-        DataverseAdapterMock.Setup(x => x.GetQtsRegistrationsByTeacherAsync(It.IsAny<Guid>(), It.IsAny<string[]>())).ReturnsAsync(new[] { qtsRegistration });
         var request = new HttpRequestMessage(
             HttpMethod.Get,
             $"/v3/persons?findBy=LastNameAndDateOfBirth&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
