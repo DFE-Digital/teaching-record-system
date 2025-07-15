@@ -1,8 +1,6 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -28,13 +26,10 @@ public record SetRouteToProfessionalStatusCommandTrainingAgeSpecialism(
 
 public record SetRouteToProfessionalStatusResult;
 
-public partial class SetRouteToProfessionalStatusHandler(
+public class SetRouteToProfessionalStatusHandler(
     TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    TrsDataSyncHelper syncHelper,
     ICurrentUserProvider currentUserProvider,
     ReferenceDataCache referenceDataCache,
-    IFeatureProvider featureProvider,
     IClock clock)
 {
     private static readonly IReadOnlyCollection<Guid> _permittedRouteTypeIds =
@@ -74,11 +69,6 @@ public partial class SetRouteToProfessionalStatusHandler(
 
     public async Task<ApiResult<SetRouteToProfessionalStatusResult>> HandleAsync(SetRouteToProfessionalStatusCommand command)
     {
-        if (!featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
-        {
-            return await HandleOverDqtAsync(command);
-        }
-
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)
             .Include(p => p.Qualifications).AsSplitQuery()

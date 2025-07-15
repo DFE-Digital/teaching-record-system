@@ -30,12 +30,14 @@ public abstract class FindPersonsHandlerBase(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     PreviousNameHelper previousNameHelper,
-    ReferenceDataCache referenceDataCache,
-    IFeatureProvider featureProvider)
+    ReferenceDataCache referenceDataCache)
 {
     protected TrsDbContext DbContext => dbContext;
+
     protected ICrmQueryDispatcher CrmQueryDispatcher => crmQueryDispatcher;
+
     protected PreviousNameHelper PreviousNameHelper => previousNameHelper;
+
     protected ReferenceDataCache ReferenceDataCache => referenceDataCache;
 
     protected static ColumnSet ContactColumnSet { get; } = new(
@@ -63,8 +65,6 @@ public abstract class FindPersonsHandlerBase(
 
     protected async Task<FindPersonsResult> CreateResultAsync(IReadOnlyCollection<Contact> matched)
     {
-        var routesMigrated = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus);
-
         var contactsById = matched.ToDictionary(r => r.Id, r => r);
 
         var getPersonsTask = dbContext.Persons
@@ -146,9 +146,9 @@ public abstract class FindPersonsHandlerBase(
                         StatusDescription = statusDescription!
                     } :
                     null,
-                Qts = routesMigrated ? QtsInfo.Create(persons[r.Id]) : await QtsInfo.CreateAsync(qtsRegistrations[r.Id], r.dfeta_qtlsdate, referenceDataCache),
-                Eyts = routesMigrated ? EytsInfo.Create(persons[r.Id]) : await EytsInfo.CreateAsync(qtsRegistrations[r.Id], referenceDataCache),
-                QtlsStatus = routesMigrated ? persons[r.Id].QtlsStatus : MapQtlsStatusFromDqt(r.dfeta_qtlsdate, r.dfeta_QtlsDateHasBeenSet)
+                Qts = QtsInfo.Create(persons[r.Id]),
+                Eyts = EytsInfo.Create(persons[r.Id]),
+                QtlsStatus = persons[r.Id].QtlsStatus
             })
             .OrderBy(c => c.Trn)
             .ToArrayAsync();

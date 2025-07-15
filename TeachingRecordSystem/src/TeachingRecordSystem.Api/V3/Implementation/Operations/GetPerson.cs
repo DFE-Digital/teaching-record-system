@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.Xrm.Sdk.Query;
 using OneOf;
 using Optional;
@@ -183,13 +182,11 @@ public class GetPersonHandler(
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
     IDataverseAdapter dataverseAdapter,
-    PreviousNameHelper previousNameHelper,
-    IFeatureProvider featureProvider)
+    PreviousNameHelper previousNameHelper)
 {
     public async Task<ApiResult<GetPersonResult>> HandleAsync(GetPersonCommand command)
     {
         var options = command.Options ?? new GetPersonCommandOptions();
-        var routesMigrated = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus);
 
         if (options.ApplyAppropriateBodyUserRestrictions)
         {
@@ -259,23 +256,6 @@ public class GetPersonHandler(
             }
         }
 
-        // DataverseAdapter operations share an IOrganizationService, which is not thread-safe in our setup.
-        // This lock should be used around all calls to DataverseAdapter.
-        using var dataverseLock = new SemaphoreSlim(1, 1);
-
-        async Task<T> WithDataverseAdapterLockAsync<T>(Func<Task<T>> action)
-        {
-            await dataverseLock.WaitAsync();
-            try
-            {
-                return await action();
-            }
-            finally
-            {
-                dataverseLock.Release();
-            }
-        }
-
         var contact = contactDetail.Contact;
         var personId = contact.Id;
 
@@ -283,50 +263,15 @@ public class GetPersonHandler(
             .Where(p => p.PersonId == personId)
             .Include(p => p.Qualifications).AsSplitQuery();
 
-        var getIttTask = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) && !routesMigrated ?
-            WithDataverseAdapterLockAsync(() => dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
-                contact.Id,
-                columnNames:
-                [
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
-                    dfeta_initialteachertraining.Fields.dfeta_Result,
-                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
-                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
-                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                    dfeta_initialteachertraining.Fields.dfeta_TraineeID,
-                    dfeta_initialteachertraining.Fields.StateCode
-                ],
-                establishmentColumnNames:
-                [
-                    Account.PrimaryIdAttribute,
-                    Account.Fields.dfeta_UKPRN,
-                    Account.Fields.Name
-                ],
-                subjectColumnNames:
-                [
-                    dfeta_ittsubject.PrimaryIdAttribute,
-                    dfeta_ittsubject.Fields.dfeta_name,
-                    dfeta_ittsubject.Fields.dfeta_Value
-                ],
-                qualificationColumnNames:
-                [
-                    dfeta_ittqualification.PrimaryIdAttribute,
-                    dfeta_ittqualification.Fields.dfeta_name
-                ],
-                activeOnly: true)) :
-            null;
-
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
             var nameChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Name");
             var dateOfBirthChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Date of Birth");
 
-            var incidents = await WithDataverseAdapterLockAsync(() => dataverseAdapter.GetIncidentsByContactIdAsync(
+            var incidents = await dataverseAdapter.GetIncidentsByContactIdAsync(
                 contact.Id,
                 IncidentState.Active,
-                columnNames: [Incident.Fields.SubjectId, Incident.Fields.StateCode]));
+                columnNames: [Incident.Fields.SubjectId, Incident.Fields.StateCode]);
 
             var pendingNameChange = incidents.Any(i => i.SubjectId.Id == nameChangeSubject.Id);
             var pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
@@ -358,27 +303,6 @@ public class GetPersonHandler(
         var middleName = contact.ResolveMiddleName();
         var lastName = contact.ResolveLastName();
 
-        var qtsRegistrations = !routesMigrated
-            ? (await crmQueryDispatcher.ExecuteQueryAsync(
-                new GetActiveQtsRegistrationsByContactIdsQuery(
-                    [contact.Id],
-                    new ColumnSet(
-                        dfeta_qtsregistration.Fields.dfeta_QTSDate,
-                        dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
-                        dfeta_qtsregistration.Fields.dfeta_name,
-                        dfeta_qtsregistration.Fields.dfeta_EYTSDate,
-                        dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
-                        dfeta_qtsregistration.Fields.dfeta_PersonId))))[contact.Id]
-            : null;
-
-        var qtsInfo = routesMigrated
-            ? QtsInfo.Create(person)
-            : await QtsInfo.CreateAsync(qtsRegistrations!, contact.dfeta_qtlsdate, referenceDataCache);
-
-        var eytsInfo = routesMigrated
-            ? EytsInfo.Create(person)
-            : await EytsInfo.CreateAsync(qtsRegistrations!, referenceDataCache);
-
         var allowIdSignInWithProhibitions = command.Include.HasFlag(GetPersonCommandIncludes.AllowIdSignInWithProhibitions) ?
             Option.Some(contact.dfeta_AllowIDSignInWithProhibitions == true) :
             default;
@@ -392,8 +316,6 @@ public class GetPersonHandler(
             induction = Option.Some(mappedInduction.Induction);
         }
 
-        var qtlsStatus = routesMigrated ? person.QtlsStatus : MapQtlsStatus_Dqt(contact.dfeta_qtlsdate, contact.dfeta_QtlsDateHasBeenSet);
-
         return new GetPersonResult()
         {
             Trn = command.Trn,
@@ -404,21 +326,19 @@ public class GetPersonHandler(
             NationalInsuranceNumber = contact.dfeta_NINumber,
             PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingNameRequest) : default,
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
-            Qts = qtsInfo,
-            QtlsStatus = qtlsStatus,
-            Eyts = eytsInfo,
+            Qts = QtsInfo.Create(person),
+            QtlsStatus = person.QtlsStatus,
+            Eyts = EytsInfo.Create(person),
             EmailAddress = contact.EMailAddress1,
             Induction = induction,
             DqtInduction = dqtInduction,
             InitialTeacherTraining = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
                 Option.Some(
                     ApplyRoleBasedResponseFilters(
-                        routesMigrated
-                            ? await MapInitialTeacherTrainingAsync(
-                                person.Qualifications!
-                                    .OfType<PostgresModels.RouteToProfessionalStatus>()
-                                    .OrderBy(q => q.CreatedOn))
-                            : MapInitialTeacherTrainingFromDqt((await getIttTask!)),
+                        await MapInitialTeacherTrainingAsync(
+                            person.Qualifications!
+                                .OfType<PostgresModels.RouteToProfessionalStatus>()
+                                .OrderBy(q => q.CreatedOn)),
                         options.ApplyAppropriateBodyUserRestrictions)) :
                 default,
             RoutesToProfessionalStatuses = command.Include.HasFlag(GetPersonCommandIncludes.RoutesToProfessionalStatuses) ?
@@ -620,35 +540,6 @@ public class GetPersonHandler(
             })
             .ToArrayAsync();
 
-    private static IEnumerable<GetPersonResultInitialTeacherTraining> MapInitialTeacherTrainingFromDqt(dfeta_initialteachertraining[] itt) =>
-        itt
-            .Select(i => new GetPersonResultInitialTeacherTraining()
-            {
-                Qualification = MapIttQualification(i),
-                ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                ProgrammeTypeDescription =
-                    i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
-                StartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                EndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Result = i.dfeta_Result?.ConvertFromITTResult(),
-                AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
-                Provider = MapIttProvider(i),
-                Subjects = MapSubjects(i)
-            })
-            .OrderByDescending(i => i.StartDate);
-
-    private static GetPersonResultInitialTeacherTrainingQualification? MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)
-    {
-        var qualification = initialTeacherTraining.Extract<dfeta_ittqualification>("qualification", dfeta_ittqualification.PrimaryIdAttribute);
-
-        return qualification != null ?
-            new GetPersonResultInitialTeacherTrainingQualification()
-            {
-                Name = qualification.dfeta_name
-            } :
-            null;
-    }
-
     private static GetPersonResultInitialTeacherTrainingAgeRange? MapAgeRange(
         TrainingAgeSpecialismType? trainingAge,
         int? from,
@@ -666,69 +557,6 @@ public class GetPersonHandler(
                 to is not null ? $"{to}" :
                 trainingAge.GetDisplayName()!
         };
-    }
-
-    private static GetPersonResultInitialTeacherTrainingAgeRange? MapAgeRange(dfeta_AgeRange? ageRangeFrom, dfeta_AgeRange? ageRangeTo)
-    {
-        var ageRangeDescription = new StringBuilder();
-        var ageRangeFromName = ageRangeFrom.HasValue ? ageRangeFrom.Value.GetMetadata().Name : null;
-        var ageRangeToName = ageRangeTo.HasValue ? ageRangeTo.Value.GetMetadata().Name : null;
-
-        if (ageRangeFromName != null)
-        {
-            ageRangeDescription.AppendFormat("{0} ", ageRangeFromName);
-        }
-
-        if (ageRangeToName != null)
-        {
-            ageRangeDescription.AppendFormat("to {0} ", ageRangeToName);
-        }
-
-        if (ageRangeDescription.Length > 0)
-        {
-            ageRangeDescription.Append("years");
-        }
-
-        return ageRangeDescription.Length > 0 ?
-            new GetPersonResultInitialTeacherTrainingAgeRange()
-            {
-                Description = ageRangeDescription.ToString()
-            } :
-            null;
-    }
-
-    private static GetPersonResultInitialTeacherTrainingProvider? MapIttProvider(dfeta_initialteachertraining initialTeacherTraining)
-    {
-        var establishment = initialTeacherTraining.Extract<Account>("establishment", Account.PrimaryIdAttribute);
-
-        return establishment != null ?
-            new GetPersonResultInitialTeacherTrainingProvider()
-            {
-                Name = establishment.Name,
-                Ukprn = establishment.dfeta_UKPRN
-            } :
-            null;
-    }
-
-    private static IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject> MapSubjects(dfeta_initialteachertraining initialTeacherTraining)
-    {
-        var subjects = new List<GetPersonResultInitialTeacherTrainingSubject>();
-
-        for (var index = 1; index <= 3; index++)
-        {
-            var subject = initialTeacherTraining.Extract<dfeta_ittsubject>($"subject{index}", dfeta_ittsubject.PrimaryIdAttribute);
-
-            if (subject is not null)
-            {
-                subjects.Add(new GetPersonResultInitialTeacherTrainingSubject()
-                {
-                    Code = subject.dfeta_Value,
-                    Name = subject.dfeta_name
-                });
-            }
-        }
-
-        return subjects;
     }
 
     private static IReadOnlyCollection<GetPersonResultMandatoryQualification> MapMandatoryQualifications(
