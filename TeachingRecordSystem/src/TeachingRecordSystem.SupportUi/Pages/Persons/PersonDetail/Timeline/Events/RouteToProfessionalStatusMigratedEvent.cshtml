@@ -1,0 +1,228 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
+@using TeachingRecordSystem.Core.Services.Files
+@inject ReferenceDataCache ReferenceDataCache
+@inject IFileService FileService
+@model TimelineItem<TimelineEvent<RouteToProfessionalStatusMigratedEvent>>
+@{
+    var migratedEvent = Model.ItemModel.Event;
+    var professionalStatus = migratedEvent.RouteToProfessionalStatus;
+    var routeType = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(professionalStatus.RouteToProfessionalStatusTypeId);
+    var trainingProvider = professionalStatus.TrainingProviderId.HasValue ? await ReferenceDataCache.GetTrainingProviderByIdAsync(professionalStatus.TrainingProviderId.Value) : null;
+    var country = !string.IsNullOrEmpty(professionalStatus.TrainingCountryId) ? await ReferenceDataCache.GetTrainingCountryByIdAsync(professionalStatus.TrainingCountryId) : null;
+    var degreeType = professionalStatus.DegreeTypeId.HasValue ? await ReferenceDataCache.GetDegreeTypeByIdAsync(professionalStatus.DegreeTypeId.Value) : null;
+    var ageRangeType = professionalStatus.TrainingAgeSpecialismType;
+    var ageRangeFromTo = (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeTo is not null) ?
+        $"From {professionalStatus.TrainingAgeSpecialismRangeFrom} to {professionalStatus.TrainingAgeSpecialismRangeTo}" : null;
+    var subjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(professionalStatus.TrainingSubjectIds, ReferenceDataCache);
+    var dqtQtsRegistration = migratedEvent.DqtQtsRegistration;
+    var dqtInitialTeacherTraining = migratedEvent.DqtInitialTeacherTraining;
+    var dqtIttSubjectList = new List<string>();
+    if (dqtInitialTeacherTraining?.Subject1Value is not null)
+    {
+        dqtIttSubjectList.Add($"{dqtInitialTeacherTraining.Subject1Value} - {dqtInitialTeacherTraining.Subject1Name}");
+    }
+    if (dqtInitialTeacherTraining?.Subject2Value is not null)
+    {
+        dqtIttSubjectList.Add($"{dqtInitialTeacherTraining.Subject2Value} - {dqtInitialTeacherTraining.Subject2Name}");
+    }
+    if (dqtInitialTeacherTraining?.Subject3Value is not null)
+    {
+        dqtIttSubjectList.Add($"{dqtInitialTeacherTraining.Subject3Value} - {dqtInitialTeacherTraining.Subject3Name}");
+    }
+    var dqtIttSubjects = dqtIttSubjectList.ToArray();
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-route-migrated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Route migrated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="route" use-empty-fallback>@routeType.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Professional Status date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="training-provider" use-empty-fallback>@trainingProvider?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="degree-type" use-empty-fallback>@degreeType?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Country</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="country" use-empty-fallback>@country?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
+                @if (ageRangeFromTo is not null)
+                {
+                    <govuk-summary-list-row-value data-testid="age-range">@ageRangeFromTo</govuk-summary-list-row-value>
+                }
+                else
+                {
+                    <govuk-summary-list-row-value data-testid="age-range" use-empty-fallback>@ageRangeType?.GetDisplayName()</govuk-summary-list-row-value>
+                }
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>
+                    @if (subjects is not null && subjects.Length > 0)
+                    {
+                        <list-text-items text-items="@subjects" data-testid="subjects" />
+                    }
+                    else
+                    {
+                        <span use-empty-fallback data-testid="subjects"></span>
+                    }
+                </govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testId="source-application-reference" use-empty-fallback>@professionalStatus.SourceApplicationReference</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>        
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Migrated data</govuk-details-summary>
+            <govuk-details-text>
+                 <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>QTS registration ID</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="qts-registration-id" use-empty-fallback>@dqtQtsRegistration?.QtsRegistrationId</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Teacher status name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="teacher-status-name" use-empty-fallback>@dqtQtsRegistration?.TeacherStatusName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Teacher status value</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="teacher-status-value" use-empty-fallback>@dqtQtsRegistration?.TeacherStatusValue</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Early years status name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="early-years-status-name" use-empty-fallback>@dqtQtsRegistration?.EarlyYearsStatusName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Early years status value</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="early-years-status-value" use-empty-fallback>@dqtQtsRegistration?.EarlyYearsStatusValue</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@dqtQtsRegistration?.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@dqtQtsRegistration?.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Partial QTS date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@dqtQtsRegistration?.PartialRecognitionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>QTLS date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="qtls-date" use-empty-fallback>@migratedEvent?.DqtQtlsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>ITT ID</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="itt-id" use-empty-fallback>@dqtInitialTeacherTraining?.InitialTeacherTrainingId</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Slug ID</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="slug-id" use-empty-fallback>@dqtInitialTeacherTraining?.SlugId</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Programme type</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="programme-type" use-empty-fallback>@dqtInitialTeacherTraining?.ProgrammeType</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="programme-start-date" use-empty-fallback>@dqtInitialTeacherTraining?.ProgrammeStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="programme-end-date" use-empty-fallback>@dqtInitialTeacherTraining?.ProgrammeEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="itt-result" use-empty-fallback>@dqtInitialTeacherTraining?.Result</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Qualification name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="qualification-name" use-empty-fallback>@dqtInitialTeacherTraining?.QualificationName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Qualification value</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="qualification-value" use-empty-fallback>@dqtInitialTeacherTraining?.QualificationValue</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Provider ID</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="provider-id" use-empty-fallback>@dqtInitialTeacherTraining?.ProviderId</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Provider name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="provider-name" use-empty-fallback>@dqtInitialTeacherTraining?.ProviderName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Provider UKPRN</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="provider-ukprn" use-empty-fallback>@dqtInitialTeacherTraining?.ProviderUkprn</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Country name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="country-name" use-empty-fallback>@dqtInitialTeacherTraining?.CountryName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Country value</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="country-value" use-empty-fallback>@dqtInitialTeacherTraining?.CountryValue</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Age range from</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="dqt-age-range-from" use-empty-fallback>@dqtInitialTeacherTraining?.AgeRangeFrom</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Age range to</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="dqt-age-range-to" use-empty-fallback>@dqtInitialTeacherTraining?.AgeRangeTo</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (dqtIttSubjects.Length > 0)
+                            {
+                                <list-text-items text-items="@dqtIttSubjects" data-testid="dqt-subjects" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback data-testid="dqt-subjects"></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>

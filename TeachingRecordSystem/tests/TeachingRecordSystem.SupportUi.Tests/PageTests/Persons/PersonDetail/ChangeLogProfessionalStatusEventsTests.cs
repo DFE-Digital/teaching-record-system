@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 using ProfessionalStatusType = TeachingRecordSystem.Core.Models.ProfessionalStatusType;
@@ -652,5 +653,205 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.NotNull(timelineItem);
         Assert.Equal("No", timelineItem.GetElementByTestId("has-eyps")?.TrimmedText());
         Assert.Equal("Yes", timelineItem.GetElementByTestId("old-has-eyps")?.TrimmedText());
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ProfessionalStatusMigratedEvent_RendersExpectedContent(bool populateOptional)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = Clock.Today.AddDays(-1);
+        var awardDate = endDate.AddDays(1);
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var status = populateOptional ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var ageRangeType = TrainingAgeSpecialismType.Range;
+        var ageRangeFrom = 10;
+        var ageRangeTo = 16;
+        var createdByUser = await TestData.CreateUserAsync();
+        var sourceApplicationUserId = Guid.NewGuid();
+        var sourceApplicationReference = "source-application-reference";
+        var qualifiedTeacherStatus = await ReferenceDataCache.GetTeacherStatusByValueAsync("71");
+        var earlyYearsTeacherStatus = await ReferenceDataCache.GetEarlyYearsStatusByValueAsync("221");
+        var qtsDate = awardDate;
+        var eytsDate = awardDate.AddDays(1);
+        var pqtsDate = awardDate.AddDays(2);
+        var qtlsDate = awardDate.AddDays(3);
+        var ittQualification = await ReferenceDataCache.GetIttQualificationByValueAsync("008");
+        var ittProvider = await ReferenceDataCache.GetIttProviderByUkPrnAsync("10007799");
+        var ittSubject1 = await ReferenceDataCache.GetIttSubjectBySubjectCodeAsync("100078");
+        var ittSubject2 = await ReferenceDataCache.GetIttSubjectBySubjectCodeAsync("100079");
+        var ittSubject3 = await ReferenceDataCache.GetIttSubjectBySubjectCodeAsync("100343");
+        var dqtAgeRangeFrom = dfeta_AgeRange._10;
+        var dqtAgeRangeTo = dfeta_AgeRange._16;
+        var programmeType = dfeta_ITTProgrammeType.AssessmentOnlyRoute;
+        var ittResult = dfeta_ITTResult.Pass;
+        var dqtCountry = await ReferenceDataCache.GetCountryByCountryCodeAsync("XK");
+
+        // Use populateOptional to deliberately populate OR not populate ALL optional fields to test rendering.
+        // (even though in reality not all combinations of these fields would happen).
+        EventModels.RouteToProfessionalStatus routeToProfessionalStatus;
+        EventModels.DqtQtsRegistration? dqtQtsRegistration = null;
+        EventModels.DqtInitialTeacherTraining? dqtInitialTeacherTraining = null;
+
+        if (populateOptional)
+        {
+            routeToProfessionalStatus = new EventModels.RouteToProfessionalStatus()
+            {
+                QualificationId = Guid.NewGuid(),
+                RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
+                Status = status,
+                TrainingStartDate = startDate,
+                TrainingEndDate = endDate,
+                HoldsFrom = awardDate,
+                TrainingProviderId = trainingProvider.TrainingProviderId,
+                TrainingCountryId = country.CountryId,
+                TrainingSubjectIds = subjects.Select(s => s.TrainingSubjectId).ToArray(),
+                TrainingAgeSpecialismType = ageRangeType,
+                TrainingAgeSpecialismRangeFrom = ageRangeFrom,
+                TrainingAgeSpecialismRangeTo = ageRangeTo,
+                DegreeTypeId = degreeType.DegreeTypeId,
+                SourceApplicationUserId = sourceApplicationUserId,
+                SourceApplicationReference = sourceApplicationReference,
+                ExemptFromInduction = true,
+                ExemptFromInductionDueToQtsDate = true
+            };
+
+            dqtQtsRegistration = new EventModels.DqtQtsRegistration()
+            {
+                QtsRegistrationId = Guid.NewGuid(),
+                TeacherStatusName = qualifiedTeacherStatus.dfeta_name,
+                TeacherStatusValue = qualifiedTeacherStatus.dfeta_Value,
+                EarlyYearsStatusName = earlyYearsTeacherStatus.dfeta_name,
+                EarlyYearsStatusValue = earlyYearsTeacherStatus.dfeta_Value,
+                QtsDate = qtsDate,
+                EytsDate = eytsDate,
+                PartialRecognitionDate = pqtsDate
+            };
+
+            dqtInitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            {
+                InitialTeacherTrainingId = Guid.NewGuid(),
+                SlugId = sourceApplicationReference,
+                ProgrammeType = programmeType.ToString(),
+                ProgrammeStartDate = startDate,
+                ProgrammeEndDate = endDate,
+                Result = ittResult.ToString(),
+                QualificationName = ittQualification.dfeta_name,
+                QualificationValue = ittQualification.dfeta_Value,
+                ProviderId = ittProvider!.Id,
+                ProviderName = ittProvider.Name,
+                ProviderUkprn = ittProvider.dfeta_UKPRN,
+                CountryName = dqtCountry!.dfeta_name,
+                CountryValue = dqtCountry.dfeta_Value,
+                Subject1Name = ittSubject1!.dfeta_name,
+                Subject1Value = ittSubject1.dfeta_Value,
+                Subject2Name = ittSubject2!.dfeta_name,
+                Subject2Value = ittSubject2.dfeta_Value,
+                Subject3Name = ittSubject3!.dfeta_name,
+                Subject3Value = ittSubject3.dfeta_Value,
+                AgeRangeFrom = dqtAgeRangeFrom.ToString(),
+                AgeRangeTo = dqtAgeRangeTo.ToString()
+            };
+        }
+        else
+        {
+            routeToProfessionalStatus = new EventModels.RouteToProfessionalStatus()
+            {
+                QualificationId = Guid.NewGuid(),
+                RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
+                Status = status,
+                TrainingStartDate = null,
+                TrainingEndDate = null,
+                HoldsFrom = null,
+                TrainingProviderId = null,
+                TrainingCountryId = null,
+                TrainingSubjectIds = [],
+                TrainingAgeSpecialismType = null,
+                TrainingAgeSpecialismRangeFrom = null,
+                TrainingAgeSpecialismRangeTo = null,
+                DegreeTypeId = null,
+                SourceApplicationUserId = null,
+                SourceApplicationReference = null,
+                ExemptFromInduction = null,
+                ExemptFromInductionDueToQtsDate = null
+            };
+        }
+
+        var migratedEvent = new RouteToProfessionalStatusMigratedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            RouteToProfessionalStatus = routeToProfessionalStatus,
+            DqtQtsRegistration = dqtQtsRegistration,
+            DqtInitialTeacherTraining = dqtInitialTeacherTraining,
+            DqtQtlsDate = populateOptional ? qtlsDate : null,
+            DqtQtlsDateHasBeenSet = populateOptional ? true : null,
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person.Person),
+            OldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person.Person)
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(migratedEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-migrated-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        Assert.Equal(populateOptional ? awardDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("award-date")?.TrimmedText());
+        Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
+        Assert.Equal(route.Name, timelineItem.GetElementByTestId("route")?.TrimmedText());
+        Assert.Equal(populateOptional ? startDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("start-date")!.TrimmedText());
+        Assert.Equal(populateOptional ? endDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("end-date")!.TrimmedText());
+        Assert.Equal(populateOptional ? "Yes" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("exemption")?.TrimmedText());
+        Assert.Equal(populateOptional ? trainingProvider.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("training-provider")?.TrimmedText());
+        Assert.Equal(populateOptional ? degreeType.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
+        Assert.Equal(populateOptional ? country.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("country")?.TrimmedText());
+        Assert.Equal(populateOptional ? $"From {ageRangeFrom} to {ageRangeTo}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("age-range")?.TrimmedText());
+        Assert.Equal(populateOptional ? $"{subjects.Single().Reference} - {subjects.Single().Name}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal(populateOptional ? sourceApplicationReference : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.QtsRegistrationId.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-registration-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.TeacherStatusName : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("teacher-status-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.TeacherStatusValue : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("teacher-status-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.EarlyYearsStatusName : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("early-years-status-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtQtsRegistration!.EarlyYearsStatusValue : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("early-years-status-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? pqtsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? qtlsDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qtls-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtInitialTeacherTraining!.InitialTeacherTrainingId.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("itt-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtInitialTeacherTraining?.SlugId : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("slug-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtInitialTeacherTraining?.ProgrammeType : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("programme-type")?.TrimmedText());
+        Assert.Equal(populateOptional ? startDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("programme-start-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? endDate.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("programme-end-date")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittResult.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("itt-result")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittQualification.dfeta_name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qualification-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittQualification.dfeta_Value : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qualification-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittProvider!.Id.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("provider-id")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittProvider!.Name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("provider-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? ittProvider!.dfeta_UKPRN : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("provider-ukprn")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtCountry!.dfeta_name : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("country-name")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtCountry!.dfeta_Value : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("country-value")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtAgeRangeFrom.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-age-range-from")?.TrimmedText());
+        Assert.Equal(populateOptional ? dqtAgeRangeTo.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-age-range-to")?.TrimmedText());
+        Assert.Equal(populateOptional ? $"{ittSubject1!.dfeta_Value} - {ittSubject1!.dfeta_name}{ittSubject2!.dfeta_Value} - {ittSubject2!.dfeta_name}{ittSubject3!.dfeta_Value} - {ittSubject3!.dfeta_name}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-subjects")?.TrimmedText());
     }
 }
