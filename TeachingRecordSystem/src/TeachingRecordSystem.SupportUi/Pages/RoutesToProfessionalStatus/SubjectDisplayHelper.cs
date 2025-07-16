@@ -6,7 +6,7 @@ public static class SubjectDisplayHelper
         IEnumerable<Guid>? subjectIds,
         ReferenceDataCache referenceDataCache)
     {
-        if (subjectIds == null)
+        if (subjectIds == null || !subjectIds.Any())
         {
             return null;
         }

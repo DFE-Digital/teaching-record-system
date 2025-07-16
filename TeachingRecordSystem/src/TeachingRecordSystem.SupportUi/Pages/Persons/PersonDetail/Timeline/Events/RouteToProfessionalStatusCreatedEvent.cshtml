@@ -32,7 +32,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="has-eyps">@createdEvent.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="has-eyps" use-empty-fallback>@createdEvent.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate))
@@ -60,7 +60,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="qtls-status">@createdEvent.PersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="qtls-status" use-empty-fallback>@createdEvent.PersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             <govuk-summary-list-row>
@@ -112,11 +112,11 @@
             </govuk-summary-list-row>
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="subjects"><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="subjects" use-empty-fallback><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value use-empty-fallback data-testId="source-application-reference">
+                <govuk-summary-list-row-value data-testId="source-application-reference" use-empty-fallback>
                     @professionalStatus.SourceApplicationReference
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
@@ -138,7 +138,7 @@
                             }
                             else
                             {
-                                <span use-empty-fallback data-testid="reason-detail"></span>
+                                <span data-testid="reason-detail" use-empty-fallback></span>
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>

@@ -40,7 +40,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="has-eyps">@(updatedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="has-eyps" use-empty-fallback>@(updatedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonEytsDate))
@@ -68,7 +68,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="qtls-status">@updatedEvent.PersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="qtls-status" use-empty-fallback>@updatedEvent.PersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
@@ -145,12 +145,12 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="subjects"><list-text-items text-items="@subjects" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="subjects" use-empty-fallback><list-text-items text-items="@subjects" /></govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value use-empty-fallback data-testId="source-application-reference">
+                <govuk-summary-list-row-value data-testId="source-application-reference" use-empty-fallback>
                     @professionalStatus.SourceApplicationReference
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
@@ -172,7 +172,7 @@
                             }
                             else
                             {
-                                <span use-empty-fallback data-testid="reason-detail"></span>
+                                <span data-testid="reason-detail" use-empty-fallback></span>
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
@@ -200,7 +200,7 @@
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Person has EYPS</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-has-eyps">@(updatedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value data-testid="old-has-eyps" use-empty-fallback>@(updatedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonEytsDate))
@@ -228,7 +228,7 @@
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>QTLS status</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-qtls-status">@updatedEvent.OldPersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value data-testid="old-qtls-status" use-empty-fallback>@updatedEvent.OldPersonAttributes.QtlsStatus.ToString()</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
@@ -305,12 +305,12 @@
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testId="old-subjects"><list-text-items text-items="@oldSubjects" /></govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value data-testId="old-subjects" use-empty-fallback><list-text-items text-items="@oldSubjects" /></govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback data-testId="old-source-application-reference">
+                        <govuk-summary-list-row-value data-testId="old-source-application-reference" use-empty-fallback>
                             @oldDetails.SourceApplicationReference
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
