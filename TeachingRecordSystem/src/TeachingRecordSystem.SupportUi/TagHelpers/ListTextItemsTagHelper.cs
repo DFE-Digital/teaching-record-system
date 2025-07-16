@@ -23,5 +23,9 @@ public class ListTextItemsTagHelper : TagHelper
             }
             output.TagMode = TagMode.StartTagAndEndTag;
         }
+        else
+        {
+            output.SuppressOutput();
+        }
     }
 }
