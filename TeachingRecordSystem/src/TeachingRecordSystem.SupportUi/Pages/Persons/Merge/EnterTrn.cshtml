@@ -1,0 +1,25 @@
+@page "/persons/{personId}/merge/enter-trn"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.Merge.EnterTrnModel
+@{
+    Layout = "_Layout";
+    ViewBag.Title = Html.DisplayNameFor(m => m.OtherTrn);
+}
+
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.PersonMergeEnterTrn(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post" data-testid="submit-form">
+            <govuk-input asp-for="OtherTrn" data-testid="other-trn">
+                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+                <govuk-input-hint class="govuk-inset-text">You&rsquo;re merging into the record with the TRN <strong data-testid="this-trn">@Model.ThisTrn</strong>. You&rsquo;ll be able to review both records before completing the merge.</govuk-input-hint>
+            </govuk-input>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.PersonMergeCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit" data-testid="cancel-button">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

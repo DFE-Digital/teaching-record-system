@@ -11,8 +11,6 @@ public class ReferenceDataCache(
     ICrmQueryDispatcher crmQueryDispatcher,
     IDbContextFactory<TrsDbContext> dbContextFactory) : IStartupTask
 {
-    private object _routeTypesSyncObj = new();
-
     // CRM
     private Task<dfeta_mqestablishment[]>? _mqEstablishmentsTask;
     private Task<dfeta_sanctioncode[]>? _getSanctionCodesTask;
@@ -477,7 +475,6 @@ public class ReferenceDataCache(
     private Task<RouteToProfessionalStatusType[]> EnsureRouteToProfessionalStatusTypesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _routesTypesTask,
-            ref _routeTypesSyncObj,
             InitializeRouteToProfessionalStatusTypesAsync);
 
     protected async virtual Task<RouteToProfessionalStatusType[]> InitializeRouteToProfessionalStatusTypesAsync()

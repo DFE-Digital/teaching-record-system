@@ -9,7 +9,7 @@
 
 @if (Model.HasOpenAlert)
 {
-    <govuk-notification-banner data-testid="OpenAlertNotification">
+    <govuk-notification-banner data-testid="open-alert-notification">
         <p class="govuk-notification-banner__heading">
             Alert on record.
             <a class="govuk-notification-banner__link" href="@LinkGenerator.PersonAlerts(Model.PersonId)">View alerts.</a>
@@ -89,4 +89,9 @@
             }
         </govuk-summary-list>
     </govuk-summary-card>
+}
+
+@if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated) && Model.ShowMergeButton)
+{
+    <govuk-button-link data-testid="merge-button" href="@LinkGenerator.PersonMergeEnterTrn(Model.PersonId)" class="govuk-button--secondary">Merge with another record</govuk-button-link>
 }

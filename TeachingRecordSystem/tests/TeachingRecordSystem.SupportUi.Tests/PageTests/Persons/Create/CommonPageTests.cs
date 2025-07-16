@@ -28,8 +28,16 @@ public class CommonPageTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new CreateStateBuilder()
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .Build());
+
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/create/{page}");
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"/persons/create/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
         var response = await HttpClient.SendAsync(request);
 
         // Assert
