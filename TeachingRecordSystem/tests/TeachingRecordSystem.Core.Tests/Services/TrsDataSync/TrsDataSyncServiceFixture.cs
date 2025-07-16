@@ -39,7 +39,7 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
     }
 
     public TestableClock Clock { get; }

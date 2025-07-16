@@ -1,11 +1,7 @@
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Establishments.Tps;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Tps;
@@ -31,22 +27,10 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        FakeTrnGenerator trnGenerator)
     {
         DbFixture = dbFixture;
         Clock = new();
-
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            organizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IFileService>().Object,
-            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -54,7 +38,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
     }
 
     public static TheoryData<TpsEstablishmentFileImportTestScenarioData> GetImportFileTestScenarioData()
@@ -343,8 +327,6 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
     private TestData TestData { get; }
 
     private TestableClock Clock { get; }
-
-    public TrsDataSyncHelper Helper { get; }
 }
 
 public class TpsEstablishmentFileImportTestScenarioData

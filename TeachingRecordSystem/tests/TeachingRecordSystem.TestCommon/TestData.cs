@@ -1,8 +1,6 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -21,14 +19,14 @@ public partial class TestData
         ReferenceDataCache referenceDataCache,
         IClock clock,
         FakeTrnGenerator trnGenerator,
-        TestDataSyncConfiguration syncConfiguration)
+        TestDataPersonDataSource personDataSource)
         : this(
               dbContextFactory,
               organizationService,
               referenceDataCache,
               clock,
               generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()),
-              syncConfiguration)
+              personDataSource)
     {
     }
 
@@ -38,14 +36,14 @@ public partial class TestData
         ReferenceDataCache referenceDataCache,
         IClock clock,
         Func<Task<string>> generateTrn,
-        TestDataSyncConfiguration syncConfiguration)
+        TestDataPersonDataSource personDataSource)
     {
         DbContextFactory = dbContextFactory;
         OrganizationService = organizationService;
         ReferenceDataCache = referenceDataCache;
         Clock = clock;
         _generateTrn = generateTrn;
-        SyncConfiguration = syncConfiguration;
+        PersonDataSource = personDataSource;
     }
 
     // https://stackoverflow.com/a/30290754
@@ -68,7 +66,7 @@ public partial class TestData
 
     public ReferenceDataCache ReferenceDataCache { get; }
 
-    private TestDataSyncConfiguration SyncConfiguration { get; }
+    private TestDataPersonDataSource PersonDataSource { get; }
 
     public static TestData CreateWithCustomTrnGeneration(
         IDbContextFactory<TrsDbContext> dbContextFactory,
@@ -76,9 +74,9 @@ public partial class TestData
         ReferenceDataCache referenceDataCache,
         IClock clock,
         Func<Task<string>> generateTrn,
-        TestDataSyncConfiguration syncConfiguration)
+        TestDataPersonDataSource personDataSource)
     {
-        return new TestData(dbContextFactory, organizationService, referenceDataCache, clock, generateTrn, syncConfiguration);
+        return new TestData(dbContextFactory, organizationService, referenceDataCache, clock, generateTrn, personDataSource);
     }
 
     public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)
@@ -339,36 +337,4 @@ public partial class TestData
     }
 }
 
-public sealed class TestDataSyncConfiguration
-{
-    private TestDataSyncConfiguration(bool syncEnabled, TrsDataSyncHelper? helper)
-    {
-        SyncEnabled = syncEnabled;
-        TrsDataSyncHelper = helper;
-    }
-
-    [MemberNotNullWhen(true, nameof(TrsDataSyncHelper))]
-    public bool SyncEnabled { get; }
-
-    public TrsDataSyncHelper? TrsDataSyncHelper { get; }
-
-    public static TestDataSyncConfiguration NoSync() => new(false, null);
-
-    public static TestDataSyncConfiguration Sync(TrsDataSyncHelper helper) => new(true, helper);
-
-    public async Task<bool> SyncIfEnabledAsync(Func<TrsDataSyncHelper, Task> action, bool? overrideSync = null)
-    {
-        if (overrideSync == true && !SyncEnabled)
-        {
-            throw new InvalidOperationException("TestData instance has not been configured to support syncing.");
-        }
-
-        if (SyncEnabled && overrideSync != false)
-        {
-            await action(TrsDataSyncHelper);
-            return true;
-        }
-
-        return false;
-    }
-}
+public enum TestDataPersonDataSource { Trs, CrmAndTrs }

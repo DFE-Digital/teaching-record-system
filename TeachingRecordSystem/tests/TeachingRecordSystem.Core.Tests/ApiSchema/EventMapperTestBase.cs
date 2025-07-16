@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema;
 
@@ -41,23 +40,13 @@ public class EventMapperFixture
         DbFixture = dbFixture;
         ReferenceDataCache = new ReferenceDataCache(crmQueryDispatcher, dbFixture.GetDbContextFactory());
 
-        var syncHelper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            organizationService,
-            ReferenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
-            configuration);
-
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
             organizationService,
             ReferenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(syncHelper));
+            TestDataPersonDataSource.CrmAndTrs);
 
         Services = serviceProvider;
     }

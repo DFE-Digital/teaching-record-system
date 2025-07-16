@@ -1,9 +1,5 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
@@ -18,23 +14,12 @@ public class OperationTestFixture
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        ICurrentUserProvider currentUserProvider,
-        IConfiguration configuration)
+        ICurrentUserProvider currentUserProvider)
     {
         _currentUserProvider = currentUserProvider;
         Clock = new TestableClock();
         Services = serviceProvider;
         DbFixture = dbFixture;
-
-        var syncHelper = new TrsDataSyncHelper(
-            DbFixture.GetDataSource(),
-            organizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            new NullLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
-            configuration);
 
         TestData = new(
             DbFixture.GetDbContextFactory(),
@@ -42,7 +27,7 @@ public class OperationTestFixture
             referenceDataCache,
             Clock,
             new FakeTrnGenerator(),
-            TestDataSyncConfiguration.Sync(syncHelper));
+            TestDataPersonDataSource.CrmAndTrs);
     }
 
     public TestableClock Clock { get; }
@@ -52,8 +37,6 @@ public class OperationTestFixture
     public DbFixture DbFixture { get; }
 
     public TestData TestData { get; }
-
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 
     public void EnsureApplicationUser()
     {

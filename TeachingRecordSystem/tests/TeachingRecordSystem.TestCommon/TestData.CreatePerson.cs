@@ -1,7 +1,6 @@
 using FakeXrmEasy.Extensions;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -9,6 +8,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -35,7 +35,6 @@ public partial class TestData
         private static readonly DateOnly _defaultEytsDate = new DateOnly(2023, 4, 13);
 
         private readonly ReferenceData _referenceData;
-        private bool? _syncEnabledOverride;
         private DateOnly? _dateOfBirth;
         private bool? _hasTrn;
         private string? _firstName;
@@ -58,6 +57,7 @@ public partial class TestData
         private int? _loginFailedCounter;
         private CreatePersonInductionBuilder? _inductionBuilder;
         private QtlsStatus? _qtlsStatus;
+        private TestDataPersonDataSource? _personDataSource;
 
         internal CreatePersonBuilder(ReferenceData referenceData)
         {
@@ -65,12 +65,6 @@ public partial class TestData
         }
 
         public Guid PersonId { get; } = Guid.NewGuid();
-
-        public CreatePersonBuilder WithSyncOverride(bool enabled)
-        {
-            _syncEnabledOverride = enabled;
-            return this;
-        }
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
@@ -396,6 +390,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithPersonDataSource(TestDataPersonDataSource personDataSource)
+        {
+            _personDataSource = personDataSource;
+            return this;
+        }
+
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
             var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
@@ -413,6 +413,9 @@ public partial class TestData
             var contact = new Contact()
             {
                 Id = PersonId,
+                CreatedOn = DateTime.UtcNow,  // FakeXrmEasy uses DateTime.UtcNow so we need to as well
+                ModifiedOn = DateTime.UtcNow,  // ditto
+                StateCode = ContactState.Active,
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
@@ -463,38 +466,41 @@ public partial class TestData
                 _trnToken = Guid.NewGuid().ToString();
             }
 
-            var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
-            txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
-
-            var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+            if ((_personDataSource ?? testData.PersonDataSource) is TestDataPersonDataSource.CrmAndTrs)
             {
-                ColumnSet = new(allColumns: true),
-                Target = PersonId.ToEntityReference(Contact.EntityLogicalName)
-            });
-
-            await txnRequestBuilder.ExecuteAsync();
-
-            // Read the contact record back (plugins may have added/amended data so our original record will be stale)
-            contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
-
-            var syncedPerson = await testData.SyncConfiguration.SyncIfEnabledAsync(
-                helper => helper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false),
-                _syncEnabledOverride);
+                testData.OrganizationService.Create(contact);
+            }
 
             var (mqs, alerts, person, routes, previousNames) = await testData.WithDbContextAsync(async dbContext =>
             {
-                if (!syncedPerson)
-                {
-                    if (_alertBuilders.Any() ||
-                        _mqBuilders.Any() ||
-                        _trnRequest is { WriteMetadata: true } ||
-                        _inductionBuilder != null)
-                    {
-                        throw new InvalidOperationException("Cannot write TRS-owned data unless sync is enabled.");
-                    }
+                var mappedPersonInfo = TrsDataSyncHelper.MapPersons([contact])[0];
 
-                    return default;
-                }
+                dbContext.Persons.Add(new Person
+                {
+                    PersonId = mappedPersonInfo.PersonId,
+                    CreatedOn = mappedPersonInfo.CreatedOn,
+                    UpdatedOn = mappedPersonInfo.UpdatedOn,
+                    Status = mappedPersonInfo.Status,
+                    MergedWithPersonId = null,
+                    Trn = mappedPersonInfo.Trn,
+                    FirstName = mappedPersonInfo.FirstName,
+                    MiddleName = mappedPersonInfo.MiddleName,
+                    LastName = mappedPersonInfo.LastName,
+                    DateOfBirth = mappedPersonInfo.DateOfBirth,
+                    EmailAddress = mappedPersonInfo.EmailAddress,
+                    MobileNumber = mappedPersonInfo.MobileNumber,
+                    NationalInsuranceNumber = mappedPersonInfo.NationalInsuranceNumber,
+                    DqtContactId = mappedPersonInfo.DqtContactId,
+                    DqtState = mappedPersonInfo.DqtState,
+                    DqtCreatedOn = mappedPersonInfo.DqtCreatedOn,
+                    DqtModifiedOn = mappedPersonInfo.DqtModifiedOn,
+                    DqtFirstName = mappedPersonInfo.DqtFirstName,
+                    DqtMiddleName = mappedPersonInfo.DqtMiddleName,
+                    DqtLastName = mappedPersonInfo.DqtLastName,
+                    Gender = mappedPersonInfo.Gender
+                });
+
+                await dbContext.SaveChangesAsync();
 
                 var person = await dbContext.Persons
                     .Include(p => p.Qualifications)

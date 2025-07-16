@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -8,7 +6,6 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -20,22 +17,11 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
-        IServiceProvider provider,
-        ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        IServiceProvider provider)
     {
         OrganizationService = provider.GetService<IOrganizationServiceAsync2>()!;
-        DbFixture = dbFixture!;
+        DbFixture = dbFixture;
         Clock = new();
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            OrganizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
-            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -43,7 +29,8 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
+
         Provider = provider;
         Job = ActivatorUtilities.CreateInstance<InductionStatusUpdatedSupportJob>(provider, Clock);
     }
@@ -53,8 +40,6 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
     public TestData TestData { get; }
 
     public TestableClock Clock { get; }
-
-    public TrsDataSyncHelper Helper { get; }
 
     public IServiceProvider Provider { get; }
 

@@ -49,6 +49,7 @@ public class IndexTests : TestBase
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithEmail((string?)email)
             .WithMobileNumber((string?)mobileNumber)
@@ -104,6 +105,7 @@ public class IndexTests : TestBase
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithEmail((string?)email)
             .WithMobileNumber((string?)mobileNumber)
@@ -145,7 +147,9 @@ public class IndexTests : TestBase
     public async Task Get_WithPersonIdForExistingPersonWithMissingProperties_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithoutTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(b => b
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+            .WithoutTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
 
@@ -170,6 +174,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithAlert(a => a.WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -186,7 +191,9 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasNoAlert_DoesNotShowAlertNotification()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+            .WithTrn());
         Debug.Assert(person.Alerts.Count == 0);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -204,6 +211,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithAlert(a => a.WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -221,7 +229,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.DqtNotes);
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
 
@@ -238,7 +246,7 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasNoProfessionalStatusDetails_NoSummaryCardShown()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -257,6 +265,7 @@ public class IndexTests : TestBase
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithQts(awardDate));
 
@@ -286,6 +295,7 @@ public class IndexTests : TestBase
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithQtls(awardDate));
 
@@ -315,6 +325,7 @@ public class IndexTests : TestBase
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, awardDate));
 
@@ -344,6 +355,7 @@ public class IndexTests : TestBase
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
 
@@ -373,6 +385,7 @@ public class IndexTests : TestBase
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus, awardDate));
 
@@ -408,8 +421,9 @@ public class IndexTests : TestBase
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 
-        var person = await TestData.CreatePersonAsync(p =>
-            p.WithQts());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+            .WithQts());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 

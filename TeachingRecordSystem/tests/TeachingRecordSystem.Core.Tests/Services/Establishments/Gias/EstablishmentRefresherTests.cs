@@ -1,9 +1,5 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Gias;
@@ -14,22 +10,10 @@ public class EstablishmentRefresherTests
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        FakeTrnGenerator trnGenerator)
     {
         DbFixture = dbFixture;
         Clock = new();
-
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            organizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IFileService>().Object,
-            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -37,7 +21,7 @@ public class EstablishmentRefresherTests
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
     }
 
     [Fact]
@@ -265,6 +249,4 @@ public class EstablishmentRefresherTests
     private TestData TestData { get; }
 
     private TestableClock Clock { get; }
-
-    public TrsDataSyncHelper Helper { get; }
 }

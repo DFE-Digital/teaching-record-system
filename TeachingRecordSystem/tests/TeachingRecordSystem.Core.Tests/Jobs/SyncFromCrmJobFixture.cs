@@ -38,7 +38,7 @@ public class SyncFromCrmJobFixture : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
 
         CrmServiceClientProvider = new TestCrmServiceClientProvider(organizationService);
     }

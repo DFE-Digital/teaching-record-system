@@ -14,7 +14,7 @@ public partial class TrsDataSyncHelperTests
     {
         // Arrange
         var contactId = Guid.NewGuid();
-        var contact = await CreatePersonEntity(contactId);
+        var contact = await CreateContactEntity(contactId);
 
         // Act
         await Helper.SyncPersonAsync(contact, syncAudit: false, ignoreInvalid: false);
@@ -28,13 +28,13 @@ public partial class TrsDataSyncHelperTests
     {
         // Arrange
         var contactId = Guid.NewGuid();
-        var existingEntity = await CreatePersonEntity(contactId);
+        var existingEntity = await CreateContactEntity(contactId);
 
         await Helper.SyncPersonAsync(existingEntity, syncAudit: false, ignoreInvalid: false);
         var expectedFirstSync = Clock.UtcNow;
 
         Clock.Advance();
-        var updatedEntity = await CreatePersonEntity(contactId, existingEntity);
+        var updatedEntity = await CreateContactEntity(contactId, existingEntity);
 
         // Act
         await Helper.SyncPersonAsync(updatedEntity, syncAudit: false, ignoreInvalid: false);
@@ -48,7 +48,7 @@ public partial class TrsDataSyncHelperTests
     {
         // Arrange
         var contactId = Guid.NewGuid();
-        var existingEntity = await CreatePersonEntity(contactId);
+        var existingEntity = await CreateContactEntity(contactId);
 
         await Helper.SyncPersonAsync(existingEntity, syncAudit: false, ignoreInvalid: false);
 
@@ -92,7 +92,7 @@ public partial class TrsDataSyncHelperTests
         });
     }
 
-    private async Task<Contact> CreatePersonEntity(
+    private async Task<Contact> CreateContactEntity(
         Guid contactId,
         Contact? existingContact = null)
     {

@@ -80,7 +80,7 @@ public class HostFixture : WebApplicationFactory<Program>
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
                     (IClock)new ForwardToTestScopedClock(),
-                    TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
+                    TestDataPersonDataSource.CrmAndTrs));
             services.AddFakeXrm();
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
