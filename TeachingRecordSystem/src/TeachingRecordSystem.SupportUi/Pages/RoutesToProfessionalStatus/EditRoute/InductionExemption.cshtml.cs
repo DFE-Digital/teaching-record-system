@@ -1,25 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
+public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string? PersonName { get; set; }
-    public Guid PersonId { get; private set; }
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-    public RouteToProfessionalStatusType Route { get; set; } = null!;
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromRoute]
-    public Guid QualificationId { get; set; }
+    public string PageTitle = "Edit induction exemption";
 
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]
@@ -55,35 +45,24 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
         }
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
+        await base.OnPageHandlerExecutingAsync(context);
 
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-        var professionalStatusFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        Route = professionalStatusFeature!.RouteToProfessionalStatus.RouteToProfessionalStatusType!;
-
-        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
-        || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
+        if (RouteType!.InductionExemptionRequired == FieldRequirement.NotApplicable ||
+            RouteType.InductionExemptionReason is not null && RouteType.InductionExemptionReason.RouteImplicitExemption)
         {
             context.Result = new BadRequestResult();
         }
-        return base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public string BackLink => FromCheckAnswers ?
-        linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+        LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
         JourneyInstance!.State.IsCompletingRoute ?
-            linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+            LinkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 }

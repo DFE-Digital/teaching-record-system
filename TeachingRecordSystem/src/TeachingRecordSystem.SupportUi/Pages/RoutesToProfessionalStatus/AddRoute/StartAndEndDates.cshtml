@@ -2,7 +2,7 @@
 
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.StartAndEndDateModel
 @{
-    ViewBag.Title = "Enter the route start and end dates";
+    ViewBag.Title = Model.PageHeading;
 }
 
 @section BeforeContent {
@@ -14,7 +14,9 @@
         <form action="@LinkGenerator.RouteAddStartAndEndDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-fieldset>
-                <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title (optional)</govuk-fieldset-legend>
+                <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
+                    @Model.PageHeading
+                </govuk-fieldset-legend>
                 <govuk-date-input asp-for="TrainingStartDate">
                     <govuk-date-input-fieldset>
                         <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />

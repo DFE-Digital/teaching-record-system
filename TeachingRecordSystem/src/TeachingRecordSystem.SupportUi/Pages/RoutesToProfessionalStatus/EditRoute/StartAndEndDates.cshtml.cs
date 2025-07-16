@@ -1,26 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class StartAndEndDateModel(
-    TrsLinkGenerator linkGenerator) : PageModel
+public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromRoute]
-    public Guid QualificationId { get; set; }
-
-    public string? PersonName { get; set; }
-
-    public Guid PersonId { get; set; }
-
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
     [Display(Name = "Route start date")]
@@ -31,6 +17,12 @@ public class StartAndEndDateModel(
     [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
+    public bool StartAndEndDatesRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingEndDateRequired, Status.GetEndDateRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the route start and end dates"
+       + (StartAndEndDatesRequired ? "" : " (optional)");
+
     public void OnGet()
     {
         TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
@@ -39,14 +31,29 @@ public class StartAndEndDateModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (StartAndEndDatesRequired)
+        {
+            if (TrainingStartDate is null)
+            {
+                ModelState.AddModelError(nameof(TrainingStartDate), "Enter a start date");
+            }
+
+            if (TrainingEndDate is null)
+            {
+                ModelState.AddModelError(nameof(TrainingEndDate), "Enter an end date");
+            }
+        }
+
         if (TrainingStartDate >= TrainingEndDate)
         {
             ModelState.AddModelError(nameof(TrainingEndDate), "End date must be after start date");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
+
         await JourneyInstance!.UpdateStateAsync(s =>
         {
             s.TrainingStartDate = TrainingStartDate;
@@ -56,26 +63,13 @@ public class StartAndEndDateModel(
         return Redirect(JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage() :
             FromCheckAnswers ?
-                linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+                LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     private string NextCompletingRoutePage()
     {
-        return linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
+        return LinkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
     }
 }
 

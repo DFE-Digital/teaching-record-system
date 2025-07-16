@@ -17,6 +17,12 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
     [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
+    public bool StartAndEndDatesRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingEndDateRequired, Status.GetEndDateRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the route start and end dates"
+       + (StartAndEndDatesRequired ? "" : " (optional)");
+
     public void OnGet()
     {
         TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
@@ -25,6 +31,19 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (StartAndEndDatesRequired)
+        {
+            if (TrainingStartDate is null)
+            {
+                ModelState.AddModelError(nameof(TrainingStartDate), "Enter a start date");
+            }
+
+            if (TrainingEndDate is null)
+            {
+                ModelState.AddModelError(nameof(TrainingEndDate), "Enter an end date");
+            }
+        }
+
         if (TrainingStartDate >= TrainingEndDate)
         {
             ModelState.AddModelError(nameof(TrainingEndDate), "End date must be after start date");

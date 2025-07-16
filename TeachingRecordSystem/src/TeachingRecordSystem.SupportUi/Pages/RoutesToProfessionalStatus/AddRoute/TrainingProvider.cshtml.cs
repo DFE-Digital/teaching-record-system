@@ -10,9 +10,11 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 {
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
-    public string PageHeading => "Enter the training provider for this route" + (!TrainingProviderRequired ? " (optional)" : "");
-    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
+    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
         == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the training provider for this route"
+        + (TrainingProviderRequired ? "" : " (optional)");
 
     [BindProperty]
     public Guid? TrainingProviderId { get; set; }

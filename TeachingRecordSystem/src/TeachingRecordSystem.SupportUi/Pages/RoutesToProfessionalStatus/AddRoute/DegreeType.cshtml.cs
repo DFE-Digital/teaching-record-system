@@ -10,12 +10,14 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 {
     public DegreeType[] DegreeTypes { get; set; } = [];
 
-    public string PageHeading => "Enter the degree type awarded as part of this route" + (!DegreeTypeRequired ? " (optional)" : "");
-    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(Route.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
-        == FieldRequirement.Mandatory;
-
     [BindProperty]
     public Guid? DegreeTypeId { get; set; }
+
+    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteType.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the degree type awarded as part of this route"
+       + (DegreeTypeRequired ? "" : " (optional)");
 
     public void OnGet()
     {
@@ -24,7 +26,7 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (DegreeTypeId is null && DegreeTypeRequired)
+        if (DegreeTypeRequired && DegreeTypeId is null)
         {
             ModelState.AddModelError("DegreeTypeId", "Select a degree type");
         }

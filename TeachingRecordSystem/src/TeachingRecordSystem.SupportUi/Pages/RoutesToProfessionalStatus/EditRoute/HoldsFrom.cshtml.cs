@@ -1,33 +1,21 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : PageModel
+public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+    : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromRoute]
-    public Guid QualificationId { get; set; }
-
-    public string? PersonName { get; set; }
-
-    public Guid PersonId { get; set; }
-
-    public RouteToProfessionalStatusType? RouteToProfessionalStatus { get; set; }
-
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Professional status date")]
-    [Required(ErrorMessage = "Enter a professional status date")]
-    [Display(Name = "Enter the professional status date")]
     public DateOnly? HoldsFrom { get; set; }
+
+    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the professional status date"
+       + (HoldsFromRequired ? "" : " (optional)");
 
     public void OnGet()
     {
@@ -36,10 +24,16 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (HoldsFromRequired && HoldsFrom is null)
+        {
+            ModelState.AddModelError(nameof(HoldsFrom), "Enter a professional status date");
+        }
+
         if (HoldsFrom > clock.Today)
         {
             ModelState.AddModelError(nameof(HoldsFrom), "Professional Status Date must not be in the future");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -48,8 +42,8 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
         var nextPage = JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage :
             FromCheckAnswers ?
-                linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+                LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
         if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
         {
@@ -76,44 +70,33 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
         return Redirect(nextPage);
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
+        await base.OnPageHandlerExecutingAsync(context);
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        var routeFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        RouteToProfessionalStatus = routeFeature.RouteToProfessionalStatus.RouteToProfessionalStatusType;
-        var inductionexemptionReason = RouteToProfessionalStatus!.InductionExemptionReason;
-        base.OnPageHandlerExecuting(context);
+        var inductionexemptionReason = RouteType!.InductionExemptionReason;
     }
 
     public string BackLink => FromCheckAnswers ?
-            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
-                linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
-                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+                LinkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
+                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
 
     private bool IsLastCompletingRoutePage()
     {
         if (JourneyInstance!.State.EditStatusState != null)
         {
-            if (QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.InductionExemptionRequired, JourneyInstance!.State.EditStatusState.Status.GetInductionExemptionRequirement())
+            if (QuestionDriverHelper.FieldRequired(RouteType!.InductionExemptionRequired, JourneyInstance!.State.EditStatusState.Status.GetInductionExemptionRequirement())
                 == FieldRequirement.NotApplicable)
             {
                 return true;
             }
             else
             {
-                return RouteToProfessionalStatus.InductionExemptionReason is not null &&
-                    RouteToProfessionalStatus.InductionExemptionReason.RouteImplicitExemption;
+                return RouteType.InductionExemptionReason is not null &&
+                    RouteType.InductionExemptionReason.RouteImplicitExemption;
             }
         }
         else
@@ -124,6 +107,6 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
 
     private string NextCompletingRoutePage =>
         IsLastCompletingRoutePage() ?
-            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
+            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
 }

@@ -18,7 +18,7 @@ public static partial class AssertEx
 
     public static void HtmlDocumentHasError(IHtmlDocument doc, string fieldName, string expectedMessage)
     {
-        var errorElementId = $"{fieldName}-error";
+        var errorElementId = $"{fieldName.Replace('.', '_')}-error";
         var errorElement = doc.GetElementById(errorElementId);
 
         if (errorElement == null)

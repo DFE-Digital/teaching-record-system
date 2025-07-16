@@ -38,7 +38,6 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
     public bool? FromCheckAnswers { get; set; }
 
     [FromQuery]
-
     public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }

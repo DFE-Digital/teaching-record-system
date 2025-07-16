@@ -5,6 +5,159 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false, true)]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, true)]
+    [InlineData("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, false, false)]
+    [InlineData("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, true, false)]
+    public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool statusEditedDuringCurrentJourney, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = startDate.AddMonths(1);
+        var holdsFrom = endDate.AddDays(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
+                .WithTrainingStartDate(startDate)
+                .WithTrainingEndDate(endDate)
+                .WithHoldsFrom(holdsFrom)
+                .WithTrainingSubjectIds(subjects)
+                .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                .WithDegreeTypeId(degreeType.DegreeTypeId)
+                .WithTrainingCountryId(country.CountryId)));
+
+        var builder = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithHoldsFrom(holdsFrom)
+            .WithTrainingSubjectIds(subjects)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithTrainingCountryId(country.CountryId);
+
+        if (statusEditedDuringCurrentJourney)
+        {
+            builder = builder.WithEditRouteStatusState(builder => builder
+                .WithStatus(status)
+                .WithEndDate(endDate));
+        }
+
+        var editRouteState = builder.Build();
+
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/start-and-end-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var heading = doc.QuerySelector("h1.govuk-fieldset__heading");
+        Assert.NotNull(heading);
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Contains("(optional)", heading.TrimmedText());
+        }
+        else
+        {
+            Assert.DoesNotContain("(optional)", heading.TrimmedText());
+        }
+    }
+
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false, true)]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true, true)]
+    [InlineData("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, false, false)]
+    [InlineData("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, true, false)]
+    public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool statusEditedDuringCurrentJourney, bool expectFieldsToBeOptional)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = startDate.AddMonths(1);
+        var holdsFrom = endDate.AddDays(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
+                .WithTrainingStartDate(startDate)
+                .WithTrainingEndDate(endDate)
+                .WithHoldsFrom(holdsFrom)
+                .WithTrainingSubjectIds(subjects)
+                .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                .WithDegreeTypeId(degreeType.DegreeTypeId)
+                .WithTrainingCountryId(country.CountryId)));
+
+        var builder = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithHoldsFrom(holdsFrom)
+            .WithTrainingSubjectIds(subjects)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithTrainingCountryId(country.CountryId);
+
+        if (statusEditedDuringCurrentJourney)
+        {
+            builder = builder.WithEditRouteStatusState(builder => builder
+                .WithStatus(status)
+                .WithEndDate(endDate));
+        }
+
+        var editRouteState = builder.Build();
+
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/start-and-end-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        if (expectFieldsToBeOptional)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingStartDate", "Enter a start date");
+            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "Enter an end date");
+        }
+    }
+
     [Fact]
     public async Task Get_ShowsPreviouslyStoredEntry()
     {
@@ -32,10 +185,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithTrainingEndDate(endDate)
             .Build();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            editRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/start-and-end-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -103,95 +253,6 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(startDate, journeyInstance.State.TrainingStartDate);
         Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
-    }
-
-    [Fact(Skip = "There are no routes with mandatory start and end dates at present")]
-    public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
-    {
-        // Arrange
-        var endDate = new DateOnly(2025, 01, 01);
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
-            .RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Mandatory && s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
-            .Value;
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithRouteToProfessionalStatus(r => r
-                .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(status)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            editRouteState
-            );
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/start-and-end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "TrainingEndDate.Day", $"{endDate:%d}" },
-                { "TrainingEndDate.Month", $"{endDate:%M}" },
-                { "TrainingEndDate.Year", $"{endDate:yyyy}" },
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingStartDate", "Enter a start date");
-    }
-
-    [Fact(Skip = "There are no routes with mandatory start and end dates at present")]
-    public async Task Post_WhenNoEndDateIsEntered_ReturnsError()
-    {
-        // Arrange
-        var startDate = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
-            .RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Mandatory && s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
-            .Value;
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithRouteToProfessionalStatus(r => r
-                .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(status)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .WithTrainingStartDate(startDate)
-            .Build();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            editRouteState
-            );
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/start-and-end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "TrainingStartDate.Day", $"{startDate:%d}" },
-                { "TrainingStartDate.Month", $"{startDate:%M}" },
-                { "TrainingStartDate.Year", $"{startDate:yyyy}" },
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "Enter an end date");
     }
 
     [Theory]

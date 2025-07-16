@@ -9,12 +9,14 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 {
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
-    public string PageHeading => "Enter the country associated with their route" + (!CountryRequired ? " (optional)" : "");
-    public bool CountryRequired => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement())
-        == FieldRequirement.Mandatory;
-
     [BindProperty]
     public string? TrainingCountryId { get; set; }
+
+    public bool CountryRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingCountryRequired, Status.GetCountryRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the country associated with their route"
+       + (CountryRequired ? "" : " (optional)");
 
     public void OnGet()
     {
@@ -23,7 +25,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (TrainingCountryId is null && CountryRequired)
+        if (CountryRequired && TrainingCountryId is null)
         {
             ModelState.AddModelError("TrainingCountryId", "Enter a country");
         }

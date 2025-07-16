@@ -35,6 +35,8 @@ public class ReferenceDataCache(
     private Task<TrainingProvider[]>? _trainingProvidersTask;
     private Task<DegreeType[]>? _degreeTypesTask;
 
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => dbContextFactory;
+
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValueAsync(string value)
     {
         var sanctionCodes = await EnsureSanctionCodesAsync();
@@ -473,11 +475,13 @@ public class ReferenceDataCache(
     private Task<RouteToProfessionalStatusType[]> EnsureRouteToProfessionalStatusTypesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _routesTypesTask,
-            async () =>
-            {
-                using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
-            });
+            InitializeRouteToProfessionalStatusTypesAsync);
+
+    protected async virtual Task<RouteToProfessionalStatusType[]> InitializeRouteToProfessionalStatusTypesAsync()
+    {
+        using var dbContext = dbContextFactory.CreateDbContext();
+        return await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
+    }
 
     private Task<Country[]> EnsureTrainingCountriesAsync() =>
         LazyInitializer.EnsureInitialized(

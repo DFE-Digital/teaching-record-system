@@ -18,7 +18,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -28,11 +28,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -162,11 +162,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
             .WithRouteType(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
 
-        var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -176,7 +176,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
             var location = response.Headers.Location?.OriginalString;
-            Assert.Equal($"/route/{qualificationid}/edit/{expectedRedirectPage}?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}", location);
+            Assert.Equal($"/route/{qualificationId}/edit/{expectedRedirectPage}?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}", location);
         }
         else
         {
@@ -193,7 +193,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -203,11 +203,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -236,7 +236,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -254,11 +254,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -300,7 +300,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(status.Value)
                 .WithHoldsFrom(endDate)));
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status.Value)
@@ -314,11 +314,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -346,7 +346,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.InTraining)
@@ -360,11 +360,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -390,7 +390,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -400,11 +400,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

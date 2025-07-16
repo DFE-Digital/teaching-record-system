@@ -71,7 +71,7 @@ public static class PageDriver
             AddRoutePage.Route => FieldRequirement.Mandatory,
             AddRoutePage.Status => FieldRequirement.Mandatory,
             AddRoutePage.StartAndEndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
-            AddRoutePage.HoldsFrom => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetAwardDateRequirement()),
+            AddRoutePage.HoldsFrom => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetHoldsFromDateRequirement()),
             AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
             AddRoutePage.TrainingProvider => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement()),
             AddRoutePage.DegreeType => QuestionDriverHelper.FieldRequired(Route.DegreeTypeRequired, Status.GetDegreeTypeRequirement()),

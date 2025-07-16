@@ -10,10 +10,6 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 {
     public DisplayInfo[] Subjects { get; set; } = [];
 
-    public string PageHeading => "Enter the subject they specialise in teaching" + (!SubjectSpecialismRequired ? " (optional)" : "");
-    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
-        == FieldRequirement.Mandatory;
-
     [BindProperty]
     public Guid? SubjectId1 { get; set; }
     [BindProperty]
@@ -22,6 +18,12 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     [BindProperty]
     [Display(Name = "Third subject (optional)")]
     public Guid? SubjectId3 { get; set; }
+
+    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the subject they specialise in teaching"
+        + (SubjectSpecialismRequired ? "" : " (optional)");
 
     public void OnGet()
     {

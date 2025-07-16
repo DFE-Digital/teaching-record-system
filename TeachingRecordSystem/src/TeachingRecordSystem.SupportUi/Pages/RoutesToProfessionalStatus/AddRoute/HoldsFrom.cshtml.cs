@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
@@ -9,9 +8,13 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Professional status date")]
-    [Required(ErrorMessage = "Enter the professional status date")]
-    [Display(Name = "Enter a professional status date")]
     public DateOnly? HoldsFrom { get; set; }
+
+    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
+        == FieldRequirement.Mandatory;
+
+    public string PageHeading => "Enter the professional status date"
+       + (HoldsFromRequired ? "" : " (optional)");
 
     public void OnGet()
     {
@@ -20,6 +23,11 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (HoldsFromRequired && HoldsFrom is null)
+        {
+            ModelState.AddModelError(nameof(HoldsFrom), "Enter a professional status date");
+        }
+
         if (HoldsFrom > clock.Today)
         {
             ModelState.AddModelError(nameof(HoldsFrom), "Professional status date must not be in the future");

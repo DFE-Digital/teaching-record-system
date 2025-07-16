@@ -24,6 +24,8 @@ public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refer
     [Display(Name = "Inactive route type")]
     public Guid? ArchivedRouteId { get; set; }
 
+    public string PageHeading => "Add route type";
+
     public void OnGet()
     {
         var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;

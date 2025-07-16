@@ -2,7 +2,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.DegreeTypeModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
-    ViewBag.Title = "Add degree type";
+    ViewBag.Title = Model.PageHeading;
 }
 
 @section Styles {
@@ -44,7 +44,9 @@
         <form action="@LinkGenerator.RouteAddDegreeType(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-select asp-for="DegreeTypeId" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true">@Model.PageHeading</govuk-select-label>
+                <govuk-select-label is-page-heading="true">
+                    @Model.PageHeading
+                </govuk-select-label>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var degreeType in Model.DegreeTypes)
                 {
