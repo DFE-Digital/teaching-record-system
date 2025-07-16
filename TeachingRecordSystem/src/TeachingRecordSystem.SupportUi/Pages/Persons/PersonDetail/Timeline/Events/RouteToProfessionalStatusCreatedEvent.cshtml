@@ -114,6 +114,12 @@
                 <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>
                 <govuk-summary-list-row-value data-testid="subjects"><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
             </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value use-empty-fallback data-testId="source-application-reference">
+                    @professionalStatus.SourceApplicationReference
+                </govuk-summary-list-row-value>
+            </govuk-summary-list-row>
         </govuk-summary-list>
         <govuk-details class="govuk-!-margin-bottom-2">
             <govuk-details-summary>Reason for change</govuk-details-summary>

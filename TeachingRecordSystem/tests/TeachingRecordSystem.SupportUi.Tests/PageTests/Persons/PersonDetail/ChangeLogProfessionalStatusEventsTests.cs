@@ -22,6 +22,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var ageRange = TrainingAgeSpecialismType.FoundationStage;
         var createdByUser = await TestData.CreateUserAsync();
+        var sourceApplicationReference = "TEST-REFERENCE";
 
         var person = await TestData.CreatePersonAsync(b => b
             .WithRouteToProfessionalStatus(q => q
@@ -34,7 +35,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
                 .WithTrainingAgeSpecialismType(ageRange)
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
-                .WithCreatedByUser(EventModels.RaisedByUserInfo.FromUserId(createdByUser.UserId))));
+                .WithCreatedByUser(EventModels.RaisedByUserInfo.FromUserId(createdByUser.UserId))
+                .WithSourceApplicationReference(sourceApplicationReference)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -62,6 +64,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(country.Name, timelineItem.GetElementByTestId("country")?.TrimmedText());
         Assert.Equal(ageRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TrimmedText());
         Assert.Equal($"{subjects.Single().Reference} - {subjects.Single().Name}", timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal(sourceApplicationReference, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
     }
 
     [Fact]
@@ -155,6 +158,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var oldDegreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var oldCountry = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var oldAgeRange = TrainingAgeSpecialismType.FoundationStage;
+        var oldExemptFromInduction = false;
+        var oldSourceApplicationReference = "TEST-REFERENCE";
         var holdsFrom = oldAwardDate.AddDays(1);
         var startDate = oldStartDate.AddDays(1);
         var endDate = oldEndDate.AddDays(1);
@@ -164,8 +169,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).Where(x => x.DegreeTypeId != oldDegreeType.DegreeTypeId).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Where(x => x.CountryId != oldCountry.CountryId).RandomOne();
         var ageRange = TrainingAgeSpecialismType.KeyStage1;
-        var oldExemptFromInduction = false;
         var exemptFromInduction = true;
+
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(q =>
@@ -181,6 +186,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithTrainingSubjectIds([oldSubject.TrainingSubjectId]);
                 q.WithTrainingAgeSpecialismType(oldAgeRange);
                 q.WithDegreeTypeId(oldDegreeType.DegreeTypeId);
+                q.WithSourceApplicationReference(oldSourceApplicationReference);
             }));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
@@ -239,6 +245,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(country.Name, timelineItem.GetElementByTestId("country")?.TrimmedText());
         Assert.Equal(ageRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TrimmedText());
         Assert.Equal($"{subject.Reference} - {subject.Name}", timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal(oldSourceApplicationReference, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
 
         Assert.Equal(oldAwardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-award-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("status"));
@@ -250,6 +257,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(oldCountry.Name, timelineItem.GetElementByTestId("old-country")?.TrimmedText());
         Assert.Equal(oldAgeRange.GetDisplayName(), timelineItem.GetElementByTestId("old-age-range-type")?.TrimmedText());
         Assert.Equal($"{oldSubject.Reference} - {oldSubject.Name}", timelineItem.GetElementByTestId("old-subjects")?.TrimmedText());
+        Assert.Equal(oldSourceApplicationReference, timelineItem.GetElementByTestId("old-source-application-reference")?.TrimmedText());
     }
 
     [Fact]
@@ -420,6 +428,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var ageRange = TrainingAgeSpecialismType.FoundationStage;
+        var sourceApplicationReference = "TEST-REFERENCE";
 
         var person = await TestData.CreatePersonAsync(b => b
             .WithRouteToProfessionalStatus(q =>
@@ -437,6 +446,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithTrainingAgeSpecialismType(ageRange);
                 q.WithDegreeTypeId(degreeType.DegreeTypeId);
                 q.WithInductionExemption(true);
+                q.WithSourceApplicationReference(sourceApplicationReference);
             }));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
@@ -485,6 +495,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(country.Name, timelineItem.GetElementByTestId("country")?.TrimmedText());
         Assert.Equal(ageRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TrimmedText());
         Assert.Equal($"{subjects.Single().Reference} - {subjects.Single().Name}", timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal(sourceApplicationReference, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
     }
 
     [Fact]
