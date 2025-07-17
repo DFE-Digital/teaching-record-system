@@ -223,6 +223,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<CapitaExportNewJob>(
+                    nameof(CapitaExportNewJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
