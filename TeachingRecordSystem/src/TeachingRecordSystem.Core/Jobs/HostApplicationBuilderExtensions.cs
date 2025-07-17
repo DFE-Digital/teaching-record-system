@@ -55,6 +55,7 @@ public static class HostApplicationBuilderExtensions
             builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
 
             builder.Services.AddTransient<QtsImporter>();
+            builder.Services.AddTransient<InductionImporter>();
 
             builder.Services.AddStartupTask(sp =>
             {
