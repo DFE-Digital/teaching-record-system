@@ -8,6 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(Policy = AuthorizationPolicies.NonPersonOrAlertDataView)]
+[AllowDeactivatedPerson]
 public class InductionModel(
     TrsDbContext dbContext,
     IClock clock,
@@ -58,6 +59,7 @@ public class InductionModel(
     public async Task OnGetAsync()
     {
         var person = await dbContext.Persons
+            .IgnoreQueryFilters()
             .Include(p => p.Qualifications)
             .SingleAsync(q => q.PersonId == PersonId);
 

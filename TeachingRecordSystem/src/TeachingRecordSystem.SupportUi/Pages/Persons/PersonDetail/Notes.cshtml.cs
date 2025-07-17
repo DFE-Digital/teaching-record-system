@@ -6,6 +6,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
+[AllowDeactivatedPerson]
 public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizationService) : PageModel
 {
     [FromRoute]

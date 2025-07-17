@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
+[AllowDeactivatedPerson]
 public class IndexModel(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
@@ -40,7 +41,9 @@ public class IndexModel(
 
     private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()
     {
-        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
+        var person = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .SingleAsync(p => p.PersonId == PersonId);
 
         var personProfessionalStatusInfo = new PersonProfessionalStatusInfo
         {
@@ -69,6 +72,7 @@ public class IndexModel(
         if (featureProvider.IsEnabled(FeatureNames.ContactsMigrated))
         {
             var person = await dbContext.Persons
+                .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(p => p.PersonId == PersonId);
 
             var previousNames = await dbContext.PreviousNames

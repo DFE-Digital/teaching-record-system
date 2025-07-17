@@ -10,6 +10,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
+[AllowDeactivatedPerson]
 public class ChangeHistoryModel(
     ICrmQueryDispatcher crmQueryDispatcher,
     TrsDbContext dbContext,

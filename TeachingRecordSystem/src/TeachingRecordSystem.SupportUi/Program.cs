@@ -109,6 +109,7 @@ builder.Services
         options.Filters.Add(new AuthorizeFilter(policy));
         options.Filters.Add(new CheckUserExistsFilter());
         options.Filters.Add(new NoCachePageFilter());
+        options.Filters.Add(new RequireActivePersonFilter());
 
         options.ModelBinderProviders.Insert(2, new DateOnlyModelBinderProvider());
     })

@@ -9,6 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(Policy = AuthorizationPolicies.AlertsView)]
+[AllowDeactivatedPerson]
 public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDataCache, IAuthorizationService authorizationService) : PageModel
 {
     [FromRoute]
