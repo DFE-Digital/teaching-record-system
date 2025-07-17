@@ -19,7 +19,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_NoSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
         Clock.UtcNow = dobChangeRequest.CreatedOn.ToUniversalTime().AddMinutes(1);  // CRM entity creations don't use IClock
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
@@ -39,7 +39,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_DateRequestedSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
         Clock.UtcNow = dobChangeRequest.CreatedOn.ToUniversalTime().AddMinutes(1);  // CRM entity creations don't use IClock
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
@@ -59,7 +59,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_TypeSortByQueryParam_ShowsTasksSortedByType()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
         Clock.UtcNow = dobChangeRequest.CreatedOn.ToUniversalTime().AddMinutes(1);  // CRM entity creations don't use IClock
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
@@ -79,7 +79,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_NoCategoriesSpecifiedAndNoFiltersApplied_ReturnsAllCategories()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
@@ -100,7 +100,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_NoCategoriesSpecifiedAndFiltersApplied_ReturnsNoResults()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
@@ -120,7 +120,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_CategoriesSpecified_ReturnsResultsMatchingCategoriesOnly()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
@@ -141,7 +141,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_ReferenceSpecified_ReturnsResultMatchingReferenceOnly()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);

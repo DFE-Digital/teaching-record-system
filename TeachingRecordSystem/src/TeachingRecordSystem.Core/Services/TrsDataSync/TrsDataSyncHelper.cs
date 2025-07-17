@@ -2594,7 +2594,7 @@ public class TrsDataSyncHelper(
         return (persons, events);
     }
 
-    private static List<PersonInfo> MapPersons(IEnumerable<Contact> contacts) => contacts
+    public static List<PersonInfo> MapPersons(IEnumerable<Contact> contacts) => contacts
         .Select(c => new PersonInfo()
         {
             PersonId = c.ContactId!.Value,
@@ -4232,7 +4232,7 @@ public class TrsDataSyncHelper(
         string UserName)
         where TEntity : Entity;
 
-    private record PersonInfo
+    public record PersonInfo
     {
         public required Guid PersonId { get; init; }
         public required DateTime? CreatedOn { get; init; }

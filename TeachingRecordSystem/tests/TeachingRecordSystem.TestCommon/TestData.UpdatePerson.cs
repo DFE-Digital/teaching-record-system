@@ -65,9 +65,10 @@ public partial class TestData
                 {
                     await testData.WithDbContextAsync(async dbContext =>
                     {
-                        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == _personId.Value);
+                        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId.Value);
                         var now = testData.Clock.UtcNow;
-                        person!.UpdateDetails(
+
+                        person.UpdateDetails(
                             _updatedName.Value.FirstName,
                             _updatedName.Value.MiddleName ?? string.Empty,
                             _updatedName.Value.LastName,
@@ -75,7 +76,7 @@ public partial class TestData
                             (EmailAddress?)person.EmailAddress,
                             (MobileNumber?)person.MobileNumber,
                             (NationalInsuranceNumber?)person.NationalInsuranceNumber,
-                            (Gender?)person.Gender,
+                            person.Gender,
                             nameChangeReason: "Test",
                             nameChangeEvidenceFile: null,
                             detailsChangeReason: "Test",
@@ -85,24 +86,22 @@ public partial class TestData
                             now,
                             out var updatedEvent);
 
-                        if (updatedEvent != null &&
+                        if (updatedEvent is not null &&
                             updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
                         {
                             dbContext.PreviousNames.Add(new PreviousName
                             {
                                 PreviousNameId = Guid.NewGuid(),
                                 PersonId = _personId.Value,
-                                FirstName = updatedEvent.OldDetails.FirstName ?? string.Empty,
-                                MiddleName = updatedEvent.OldDetails.MiddleName ?? string.Empty,
-                                LastName = updatedEvent.OldDetails.LastName ?? string.Empty,
+                                FirstName = updatedEvent.OldDetails.FirstName,
+                                MiddleName = updatedEvent.OldDetails.MiddleName,
+                                LastName = updatedEvent.OldDetails.LastName,
                                 CreatedOn = now,
                                 UpdatedOn = now
                             });
                         }
 
                         await dbContext.SaveChangesAsync();
-
-                        return;
                     });
                 }
                 else
@@ -117,9 +116,16 @@ public partial class TestData
                             LastName = _updatedName.Value.LastName
                         }
                     });
-                }
 
-                await testData.SyncConfiguration.SyncIfEnabledAsync(helper => helper.SyncPersonAsync(_personId.Value, syncAudit: true, ignoreInvalid: false));
+                    await testData.WithDbContextAsync(async dbContext =>
+                    {
+                        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId);
+                        person.FirstName = _updatedName.Value.FirstName;
+                        person.MiddleName = _updatedName.Value.MiddleName ?? "";
+                        person.LastName = _updatedName.Value.LastName;
+                        await dbContext.SaveChangesAsync();
+                    });
+                }
             }
         }
     }

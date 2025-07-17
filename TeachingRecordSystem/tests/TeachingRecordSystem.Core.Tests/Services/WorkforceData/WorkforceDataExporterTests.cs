@@ -1,12 +1,8 @@
 using Google.Apis.Upload;
 using Google.Cloud.Storage.V1;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Parquet.Serialization;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 
@@ -19,22 +15,10 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        FakeTrnGenerator trnGenerator)
     {
         DbFixture = dbFixture;
         Clock = new();
-
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            organizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IFileService>().Object,
-            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -42,7 +26,7 @@ public class WorkforceDataExporterTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
     }
 
     [Fact]
@@ -120,6 +104,4 @@ public class WorkforceDataExporterTests : IAsyncLifetime
     private TestData TestData { get; }
 
     private TestableClock Clock { get; }
-
-    private TrsDataSyncHelper Helper { get; }
 }

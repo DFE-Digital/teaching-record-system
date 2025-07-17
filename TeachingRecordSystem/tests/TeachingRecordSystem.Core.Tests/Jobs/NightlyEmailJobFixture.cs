@@ -1,9 +1,6 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -17,23 +14,12 @@ public class NightlyEmailJobFixture
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
         LoggerFactory = loggerFactory;
         Clock = new();
         LoggerFactory = loggerFactory;
-
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            organizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            Mock.Of<IFileService>(),
-            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -41,7 +27,7 @@ public class NightlyEmailJobFixture
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
 
         CrmServiceClientProvider = new TestCrmServiceClientProvider(organizationService);
     }
@@ -51,8 +37,6 @@ public class NightlyEmailJobFixture
     public DbFixture DbFixture { get; }
 
     public ILoggerFactory LoggerFactory { get; }
-
-    public TrsDataSyncHelper Helper { get; }
 
     public TestData TestData { get; }
 

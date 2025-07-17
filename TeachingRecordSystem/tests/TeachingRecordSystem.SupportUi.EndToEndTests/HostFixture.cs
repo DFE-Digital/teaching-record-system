@@ -78,7 +78,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton<CurrentUserProvider>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
                     services.AddSingleton<TestData>(
-                        sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
+                        sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataPersonDataSource.CrmAndTrs));
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
                     services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());

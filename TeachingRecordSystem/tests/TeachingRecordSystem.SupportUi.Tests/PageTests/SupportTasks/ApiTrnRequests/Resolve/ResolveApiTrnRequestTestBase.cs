@@ -27,6 +27,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         PersonMatchedAttribute differentAttribute)
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithNationalInsuranceNumber()
             .WithEmail(TestData.GenerateUniqueEmail()));

@@ -13,7 +13,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: null));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
@@ -31,7 +31,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
@@ -62,7 +62,7 @@ public class IndexTests : TestBase
     public async Task Get_WithTicketNumberForInactiveIncident_ReturnsBadRequest()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
@@ -85,7 +85,7 @@ public class IndexTests : TestBase
     public async Task Get_WithTicketNumberForActiveNameChangeIncident_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(
             b => b.WithCustomerId(createPersonResult.ContactId)
                 .WithNewFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
@@ -152,7 +152,7 @@ public class IndexTests : TestBase
     public async Task Get_WithTicketNumberForActiveDateOfBirthChangeIncident_RendersExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");

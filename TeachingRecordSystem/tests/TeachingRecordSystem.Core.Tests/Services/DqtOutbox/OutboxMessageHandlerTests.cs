@@ -239,7 +239,7 @@ public class OutboxMessageHandlerFixture
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(testDataSyncHelper));
+            TestDataPersonDataSource.CrmAndTrs);
 
         var services = new ServiceCollection()
             .AddSingleton<IClock>(Clock)

@@ -1,12 +1,8 @@
-using Azure.Storage.Blobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -18,21 +14,10 @@ public class QtsImporterTests : IAsyncLifetime
       IOrganizationServiceAsync2 organizationService,
       ReferenceDataCache referenceDataCache,
       FakeTrnGenerator trnGenerator,
-      IServiceProvider provider,
-      ILoggerFactory loggerFactory,
-      IConfiguration configuration)
+      IServiceProvider provider)
     {
         DbFixture = dbFixture;
         Clock = new();
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            organizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
-            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -40,8 +25,8 @@ public class QtsImporterTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
-        var blobServiceClient = new Mock<BlobServiceClient>();
+            TestDataPersonDataSource.CrmAndTrs);
+
         Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
     }
 
@@ -50,8 +35,6 @@ public class QtsImporterTests : IAsyncLifetime
     private TestData TestData { get; }
 
     private TestableClock Clock { get; }
-
-    public TrsDataSyncHelper Helper { get; }
 
     Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 

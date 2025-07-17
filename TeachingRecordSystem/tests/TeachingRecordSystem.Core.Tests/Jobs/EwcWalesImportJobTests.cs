@@ -1,13 +1,11 @@
 using System.Text;
 using Azure.Storage.Blobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -79,22 +77,11 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
-        IServiceProvider provider,
-        ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        IServiceProvider provider)
     {
         OrganizationService = provider.GetService<IOrganizationServiceAsync2>()!;
         DbFixture = dbFixture;
         Clock = new();
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            OrganizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
-            configuration);
 
         var blobServiceClient = new Mock<BlobServiceClient>();
         var qtsImporter = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
@@ -107,7 +94,8 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
+
         MessageSerializer = ActivatorUtilities.CreateInstance<MessageSerializer>(provider);
     }
 
@@ -116,8 +104,6 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
     public TestData TestData { get; }
 
     public TestableClock Clock { get; }
-
-    public TrsDataSyncHelper Helper { get; }
 
     public Mock<ILogger<EwcWalesImportJob>> Logger { get; }
 

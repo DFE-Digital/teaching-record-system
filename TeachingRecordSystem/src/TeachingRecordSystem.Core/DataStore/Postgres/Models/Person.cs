@@ -29,7 +29,7 @@ public class Person
     public string? EmailAddress { get; set; }
     public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
-    public Gender? Gender { get; private set; }
+    public Gender? Gender { get; set; }
     public InductionStatus InductionStatus { get; private set; }
     public InductionStatus InductionStatusWithoutExemption { get; private set; }
     public Guid[] InductionExemptionReasonIds { get; private set; } = [];

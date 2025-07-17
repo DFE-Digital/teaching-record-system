@@ -40,7 +40,7 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+            TestDataPersonDataSource.CrmAndTrs);
     }
 
     private DbFixture DbFixture { get; }

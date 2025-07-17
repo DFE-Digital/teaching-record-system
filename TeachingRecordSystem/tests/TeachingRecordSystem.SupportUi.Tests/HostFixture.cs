@@ -60,7 +60,7 @@ public class HostFixture : WebApplicationFactory<Program>
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
                     (IClock)new ForwardToTestScopedClock(),
-                    TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
+                    TestDataPersonDataSource.Trs));
             services.AddFakeXrm();
             services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
             services.AddSingleton<FakeTrnGenerator>();

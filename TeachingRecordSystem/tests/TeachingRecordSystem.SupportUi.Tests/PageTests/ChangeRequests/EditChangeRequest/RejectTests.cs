@@ -13,7 +13,7 @@ public class RejectTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: null));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/reject");
@@ -31,7 +31,7 @@ public class RejectTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/reject");
@@ -62,7 +62,7 @@ public class RejectTests : TestBase
     public async Task Get_WithTicketNumberForInactiveIncident_ReturnsBadRequest()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/reject");
@@ -78,7 +78,7 @@ public class RejectTests : TestBase
     public async Task Post_WhenRejectionReasonChoiceHasNoSelection_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")
@@ -99,7 +99,7 @@ public class RejectTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")
@@ -121,7 +121,7 @@ public class RejectTests : TestBase
     public async Task Post_WhenRejectionReasonChoiceIsNotChangeNoLongerRequired_RedirectsWithFlashMessage()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")
@@ -146,7 +146,7 @@ public class RejectTests : TestBase
     public async Task Post_WhenRejectionReasonChoiceIsChangeNoLongerRequired_RedirectsWithFlashMessage()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")

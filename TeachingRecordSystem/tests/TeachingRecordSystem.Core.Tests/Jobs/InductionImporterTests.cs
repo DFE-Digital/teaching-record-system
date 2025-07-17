@@ -1,12 +1,7 @@
-using Azure.Storage.Blobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -18,21 +13,10 @@ public class InductionImporterTests : IAsyncLifetime
       IOrganizationServiceAsync2 organizationService,
       ReferenceDataCache referenceDataCache,
       FakeTrnGenerator trnGenerator,
-      IServiceProvider provider,
-      ILoggerFactory loggerFactory,
-      IConfiguration configuration)
+      IServiceProvider provider)
     {
         DbFixture = dbFixture;
         Clock = new();
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            organizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
-            configuration);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -40,8 +24,8 @@ public class InductionImporterTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
-        var blobServiceClient = new Mock<BlobServiceClient>();
+            TestDataPersonDataSource.CrmAndTrs);
+
         Importer = ActivatorUtilities.CreateInstance<InductionImporter>(provider, Clock);
     }
     private DbFixture DbFixture { get; }
@@ -50,15 +34,11 @@ public class InductionImporterTests : IAsyncLifetime
 
     private TestableClock Clock { get; }
 
-    public TrsDataSyncHelper Helper { get; }
-
     Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
     public InductionImporter Importer { get; }
-
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 
     [Fact]
     public async Task Validate_MissingReferenceNumber_ReturnsError()
