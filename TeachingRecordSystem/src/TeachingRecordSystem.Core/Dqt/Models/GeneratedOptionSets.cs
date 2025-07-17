@@ -654,6 +654,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		Create = 1,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Create - AI assisted", 83)]
+		CreateAIassisted = 123,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deactivate", 5)]
 		Deactivate = 5,
 		
@@ -840,6 +844,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Update", 2)]
 		Update = 2,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Update - AI assisted", 84)]
+		UpdateAIassisted = 124,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Upsert", 74)]
@@ -3837,6 +3845,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Entra User", 0)]
 		EntraUser = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Impersonable Stub User", 2)]
+		ImpersonableStubUser = 2,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]

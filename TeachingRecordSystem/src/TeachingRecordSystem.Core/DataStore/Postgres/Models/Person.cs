@@ -64,6 +64,7 @@ public class Person
     public string? DqtLastName { get; set; }
     public DateTime? DqtInductionLastSync { get; set; }
     public DateTime? DqtInductionModifiedOn { get; set; }
+    public DateTime? CapitaTrnChangedOn { get; set; }
 
     public void UpdateDetails(
         string firstName,
