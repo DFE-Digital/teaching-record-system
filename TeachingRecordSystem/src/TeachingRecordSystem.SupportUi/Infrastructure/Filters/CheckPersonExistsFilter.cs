@@ -15,8 +15,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// <remarks>
 /// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the request is missing the personId route value.</para>
 /// <para>
-/// Returns a <see cref="StatusCodes.Status404NotFound"/> response if no person with the specified ID exists or if
-/// <paramref name="requireQts"/> is <c>true</c> and the person does not have QTS.
+/// Returns a <see cref="StatusCodes.Status404NotFound"/> response if no person with the specified ID exists.
 /// </para>
 /// <para>Assigns the <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
@@ -80,7 +79,8 @@ public class CheckPersonExistsFilter(
         await next();
 
         Task<Person?> GetPersonAsync() => dbContext.Persons
-            .FromSql($"select * from persons where person_id = {personId} and status = 0 for update")  // https://github.com/dotnet/efcore/issues/26042
+            .FromSql($"select * from persons where person_id = {personId} for update")  // https://github.com/dotnet/efcore/issues/26042
+            .IgnoreQueryFilters()
             .SingleOrDefaultAsync();
     }
 }
