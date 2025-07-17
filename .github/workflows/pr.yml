@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      project_dirs: ${{ steps.get_test_projects.outputs.project_dirs }}
+      project_short_names: ${{ steps.get_test_projects.outputs.project_short_names }}
 
     steps:
       - uses: actions/checkout@v4
@@ -103,18 +103,18 @@ jobs:
         id: get_test_projects
         run: |
           dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch main --dir ../ --target-glob "**/*Tests.csproj"
-          echo "project_dirs=$(cat ${{ runner.temp }}/test_projects.txt | xargs -n 1 dirname | xargs -n 1 basename | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
+          echo "project_short_names=$(cat ${{ runner.temp }}/test_projects.txt | xargs -n 1 dirname | xargs -n 1 basename | sed 's/^TeachingRecordSystem\.//g' | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
         working-directory: TeachingRecordSystem
 
   tests:
     name: Tests
     runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
     needs: [get_affected_projects]
-    if: needs.get_affected_projects.outputs.project_dirs != '[]'
+    if: needs.get_affected_projects.outputs.project_short_names != '[]'
     strategy:
       fail-fast: false
       matrix:
-        project_directory: ${{ fromJson(needs.get_affected_projects.outputs.project_dirs) }}
+        project_short_name: ${{ fromJson(needs.get_affected_projects.outputs.project_short_names) }}
 
     services:
       postgres:
@@ -171,22 +171,22 @@ jobs:
 
       - name: Build project
         run: dotnet build -c Release --no-restore
-        working-directory: TeachingRecordSystem/tests/${{ matrix.project_directory }}
+        working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.${{ matrix.project_short_name }}
 
       - name: Install Playwright if required
         run: |
           if [[ "$PROJECT_NAME" =~ .*EndToEndTests ]]; then
             pwsh ./bin/Release/net8.0/playwright.ps1 install chromium
           fi
-        working-directory: TeachingRecordSystem/tests/${{ matrix.project_directory }}
+        working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.${{ matrix.project_short_name }}
         env:
-          PROJECT_NAME: ${{ matrix.project_directory }}
+          PROJECT_NAME: ${{ matrix.project_short_name }}
 
       - name: Run tests
         uses: ./.github/workflows/actions/test
         with:
-          test_project_path: TeachingRecordSystem/tests/${{ matrix.project_directory }}
-          report_name: "${{ matrix.project_directory }} test results"
+          test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.${{ matrix.project_short_name }}
+          report_name: "${{ matrix.project_short_name }} test results"
           dotnet_test_args: >-
             --no-build
             -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
