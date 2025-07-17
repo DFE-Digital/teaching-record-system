@@ -2458,6 +2458,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string CreatedOn = "createdon";
 			public const string dfeta_AllowIDSignInWithProhibitions = "dfeta_allowidsigninwithprohibitions";
 			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
+			public const string dfeta_CapitaTRNChangedOn = "dfeta_capitatrnchangedon";
 			public const string dfeta_DateofDeath = "dfeta_dateofdeath";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_HUSID = "dfeta_husid";
@@ -2841,6 +2842,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_AllowPiiUpdatesFromRegister");
 				this.SetAttributeValue("dfeta_allowpiiupdatesfromregister", value);
 				this.OnPropertyChanged("dfeta_AllowPiiUpdatesFromRegister");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_capitatrnchangedon")]
+		public System.Nullable<System.DateTime> dfeta_CapitaTRNChangedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_capitatrnchangedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_CapitaTRNChangedOn");
+				this.SetAttributeValue("dfeta_capitatrnchangedon", value);
+				this.OnPropertyChanged("dfeta_CapitaTRNChangedOn");
 			}
 		}
 		
@@ -16582,7 +16603,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string modifiedby_plugintype = "modifiedby_plugintype";
 		}
 		
-		public const string AlternateKeys = "overwritetime,componentstate,plugintypeexportkey";
+		public const string AlternateKeys = "overwritetime,plugintypeexportkey,componentstate";
 		
 		/// <summary>
 		/// Default Constructor.
@@ -17423,8 +17444,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencingrole_parent_root_role = "role_parent_root_role";
 		}
 		
-		public const string AlternateKeys = "overwritetime,businessunitid,parentrootroleid,componentstate|componentstate,rolet" +
-			"emplateid,businessunitid,overwritetime";
+		public const string AlternateKeys = "overwritetime,businessunitid,componentstate,parentrootroleid|overwritetime,rolete" +
+			"mplateid,componentstate,businessunitid";
 		
 		/// <summary>
 		/// Default Constructor.
