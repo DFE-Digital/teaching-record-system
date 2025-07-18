@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.Core.Dqt.Models;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
-public enum ContactSearchSortByOption
+public enum PersonSearchSortByOption
 {
     [Display(Name = "Last name (A-Z)")]
     LastNameAscending,

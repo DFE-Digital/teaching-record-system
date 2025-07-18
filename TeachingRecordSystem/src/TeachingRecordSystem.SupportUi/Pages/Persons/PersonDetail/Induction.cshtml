@@ -10,6 +10,7 @@
 @section BeforeContent {
     <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)" data-testid="induction-backlink">Back to record</govuk-back-link>
 }
+
 @if (!string.IsNullOrEmpty(Model.StatusWarningMessage))
 {
     <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>

@@ -111,7 +111,6 @@ public class CommonPageTests : TestBase
     }
 
     [Theory]
-    [InlineData("/personal-details", "")]
     [InlineData("/create-reason", "/personal-details")]
     [InlineData("/check-answers", "/create-reason")]
     public async Task Get_BacklinkContainsExpected(string fromPage, string expectedBackPage)

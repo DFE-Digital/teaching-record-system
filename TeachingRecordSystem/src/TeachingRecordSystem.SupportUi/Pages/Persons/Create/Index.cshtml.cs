@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
-public partial class IndexModel() : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    public IActionResult OnGet()
-    {
-        return Page();
-    }
+    public IActionResult OnGet() => Redirect(linkGenerator.PersonCreatePersonalDetails());
 }

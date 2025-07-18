@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
@@ -22,7 +21,7 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
     public int? PageNumber { get; set; }
 
     [FromQuery]
-    public ContactSearchSortByOption? SortBy { get; set; }
+    public PersonSearchSortByOption? SortBy { get; set; }
 
     public MandatoryQualification[]? MandatoryQualifications { get; set; }
     public RouteToProfessionalStatus[]? ProfessionalStatuses { get; set; }

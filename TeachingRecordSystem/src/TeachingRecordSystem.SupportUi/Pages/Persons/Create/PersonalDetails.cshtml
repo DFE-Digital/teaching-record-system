@@ -1,7 +1,4 @@
 @page "/persons/create/personal-details"
-@using TeachingRecordSystem.SupportUi.Pages.Common;
-@using TeachingRecordSystem.SupportUi.Pages.Shared
-@using Microsoft.AspNetCore.Mvc.ModelBinding
 @model TeachingRecordSystem.SupportUi.Pages.Persons.Create.PersonalDetailsModel
 @{
     Layout = "_Layout";
@@ -9,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink" />
 }
 
 <div class="govuk-grid-row">

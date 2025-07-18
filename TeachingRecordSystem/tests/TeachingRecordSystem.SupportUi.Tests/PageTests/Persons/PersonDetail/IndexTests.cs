@@ -225,21 +225,21 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_DqtNotesTab_IsRendered()
+    public async Task Get_NotesTab_IsRendered()
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.DqtNotes);
         var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var noMandatoryQualifications = doc.GetElementByTestId("dqtnotes-tab");
-        Assert.NotNull(noMandatoryQualifications);
+        var notes = doc.GetElementByTestId("notes-tab");
+        Assert.NotNull(notes);
     }
 
     [Fact]

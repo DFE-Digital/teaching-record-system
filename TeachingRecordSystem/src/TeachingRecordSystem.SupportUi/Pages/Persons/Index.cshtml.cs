@@ -1,144 +1,200 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
+using Npgsql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
 [RedactParameters("Search")]
-public partial class IndexModel(TrsLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher) : PageModel
+public class IndexModel(
+    TrsDbContext dbContext,
+    TrsDataSyncHelper syncHelper,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
-    private const int MaxSearchResultCount = 500;
     private const int PageSize = 15;
 
-    [GeneratedRegex("^\\d{7}$")]
-    private static partial Regex TrnRegex();
-
     [BindProperty(SupportsGet = true)]
-    [Display(Name = "Search", Description = "TRN, name or date of birth, for example 4/3/1975")]
     public string? Search { get; set; }
 
     [BindProperty(SupportsGet = true)]
     [Display(Name = "Sort by")]
-    public ContactSearchSortByOption SortBy { get; set; }
+    public PersonSearchSortByOption? SortBy { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
-    public int[]? PaginationPages { get; set; }
+    [BindProperty(SupportsGet = true)]
+    public PersonStatus[]? Statuses { get; set; }
 
-    public int TotalKnownPages { get; set; }
+    public ResultPage<PersonInfo>? SearchResults { get; set; }
 
-    public bool DisplayPageNumbers { get; set; }
+    public PaginationViewModel? Pagination { get; set; }
 
-    public int? PreviousPage { get; set; }
-
-    public int? NextPage { get; set; }
-
-    public PersonInfo[]? SearchResults { get; set; }
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<object, int>>? Facets { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
-        PageNumber ??= 1;
+        Search = Search?.Trim() ?? string.Empty;
 
-        if (!string.IsNullOrEmpty(Search))
+        if (string.IsNullOrEmpty(Search))
         {
-            if (PageNumber < 1)
-            {
-                return BadRequest();
-            }
-
-            return await PerformSearchAsync();
+            return Redirect(linkGenerator.Index());
         }
 
-        return Page();
-    }
+        var sortBy = SortBy ??= PersonSearchSortByOption.LastNameAscending;
 
-    private async Task<IActionResult> PerformSearchAsync()
-    {
-        Contact[]? contacts = null;
+        var query = dbContext.Persons.IgnoreQueryFilters();
 
-        var columnSet = new ColumnSet(
-            Contact.Fields.dfeta_TRN,
-            Contact.Fields.BirthDate,
-            Contact.Fields.FirstName,
-            Contact.Fields.MiddleName,
-            Contact.Fields.LastName,
-            Contact.Fields.FullName,
-            Contact.Fields.dfeta_StatedFirstName,
-            Contact.Fields.dfeta_StatedMiddleName,
-            Contact.Fields.dfeta_StatedLastName,
-            Contact.Fields.dfeta_NINumber);
-
-        // Check if the search string is a date of birth, TRN or one or more names
-        if (DateOnly.TryParse(Search, EnGbCulture, out var dateOfBirth))
+        if (SearchTextIsDate(out var dateOfBirth))
         {
-            contacts = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
+            query = query.Where(p => p.DateOfBirth == dateOfBirth);
         }
-        else if (TrnRegex().IsMatch(Search!))
+        else if (SearchTextIsTrn())
         {
-            var contact = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactByTrnQuery(Search!, columnSet));
-            contacts = contact is not null ? [contact] : [];
+            query = query.Where(p => p.Trn == Search);
         }
         else
         {
-            contacts = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
+            var nameParts = Search.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (nameParts.Length > 0)
+            {
+                query = dbContext.Database.SqlQueryRaw<NameSearchQueryResult>(
+                        """
+                        select a.person_id from (
+                            select unnest(:names) collate "case_insensitive" as name
+                        ) x, person_search_attributes a
+                        where a.attribute_value = x.name
+                        and a.attribute_type in ('FirstName', 'MiddleName', 'LastName')
+                        group by a.person_id
+                        having count(distinct x.name) = array_length(:names, 1)
+                        """,
+                        parameters:
+                        [
+                            new NpgsqlParameter("names", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Varchar)
+                            {
+                                Value = nameParts
+                            }
+                        ])
+                    .Join(query, r => r.person_id, p => p.PersonId, (_, p) => p);
+            }
         }
-        Debug.Assert(contacts is not null);
 
-        TotalKnownPages = Math.Max((int)Math.Ceiling((decimal)contacts!.Length / PageSize), 1);
+        var groupedByStatus = await query
+            .Select(p => p)
+            .GroupBy(p => p.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToArrayAsync();
 
-        PreviousPage = PageNumber > 1 ? PageNumber - 1 : null;
-        NextPage = PageNumber < TotalKnownPages ? PageNumber + 1 : null;
-
-        if (contacts.Length < MaxSearchResultCount)
+        Facets = new Dictionary<string, IReadOnlyDictionary<object, int>>
         {
-            DisplayPageNumbers = true;
-            PaginationPages = Enumerable.Range(-2, 5).Select(offset => PageNumber!.Value + offset)
-                .Append(1)
-                .Append(TotalKnownPages)
-                .Where(page => page <= TotalKnownPages && page >= 1)
-                .Distinct()
-                .Order()
-                .ToArray();
-        }
+            [nameof(Statuses)] = groupedByStatus.ToDictionary(g => (object)g.Status, g => g.Count)
+        };
 
-        SearchResults = contacts
-            .Skip((PageNumber!.Value - 1) * PageSize)
-            .Take(PageSize)
-            .Select(MapContact)
-            .ToArray();
-
-        // if the page number is greater than the total number of pages, redirect to the first page
-        if (PageNumber > TotalKnownPages)
+        if (Statuses is [] or null)
         {
-            return Redirect(linkGenerator.Persons(search: Search));
+            Statuses = [PersonStatus.Active];
         }
+
+        if (Statuses?.Order().ToArray() is not [PersonStatus.Active, PersonStatus.Deactivated])
+        {
+            query = query.Where(p => Statuses!.Contains(p.Status));
+        }
+
+        var totalPersonCount = await query.CountAsync();
+
+        if (sortBy == PersonSearchSortByOption.LastNameAscending)
+        {
+            query = query.OrderBy(p => p.LastName);
+        }
+        else if (sortBy == PersonSearchSortByOption.LastNameDescending)
+        {
+            query = query.OrderByDescending(p => p.LastName);
+        }
+        else if (sortBy == PersonSearchSortByOption.FirstNameAscending)
+        {
+            query = query.OrderBy(p => p.FirstName);
+        }
+        else if (sortBy == PersonSearchSortByOption.FirstNameDescending)
+        {
+            query = query.OrderByDescending(p => p.FirstName);
+        }
+        else if (sortBy == PersonSearchSortByOption.DateOfBirthAscending)
+        {
+            query = query.OrderBy(p => p.DateOfBirth);
+        }
+        else
+        {
+            Debug.Assert(sortBy == PersonSearchSortByOption.DateOfBirthDescending);
+            query = query.OrderByDescending(p => p.DateOfBirth);
+        }
+
+        async Task AssignSearchResultsAsync() =>
+            SearchResults = await query
+                .Select(p => new PersonInfo
+                {
+                    PersonId = p.PersonId,
+                    FirstName = p.FirstName,
+                    MiddleName = p.MiddleName,
+                    LastName = p.LastName,
+                    DateOfBirth = p.DateOfBirth,
+                    Trn = p.Trn,
+                    NationalInsuranceNumber = p.NationalInsuranceNumber,
+                    PersonStatus = p.Status
+                })
+                .GetPageAsync(PageNumber, PageSize, totalPersonCount);
+
+        await AssignSearchResultsAsync();
+
+        // There's a chance that records haven't synced from DQT yet;
+        // if searching by TRN perform an on-demand sync to ensure the record can be gotten to.
+        if (SearchTextIsTrn() && SearchResults!.Count == 0)
+        {
+            var contact = await crmQueryDispatcher.ExecuteQueryAsync(
+                new GetContactByTrnQuery(
+                    Search,
+                    new(syncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames)));
+
+            if (contact is not null && await syncHelper.SyncPersonAsync(contact, syncAudit: false, ignoreInvalid: false))
+            {
+                await AssignSearchResultsAsync();
+            }
+        }
+
+        Pagination = PaginationViewModel.Create(
+            SearchResults!,
+            pageNumber => linkGenerator.Persons(Search, Statuses, SortBy, pageNumber));
 
         return Page();
-    }
 
-    private PersonInfo MapContact(Contact contact)
-    {
-        return new PersonInfo()
-        {
-            PersonId = contact.ContactId!.Value,
-            Name = contact.ResolveFullName(includeMiddleName: true),
-            DateOfBirth = contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
-            Trn = contact.dfeta_TRN,
-            NationalInsuranceNumber = contact.dfeta_NINumber
-        };
+        bool SearchTextIsDate(out DateOnly date) =>
+            DateOnly.TryParseExact(Search, UiDefaults.DateOnlyDisplayFormat, out date) ||
+            DateOnly.TryParseExact(Search, "d/M/yyyy", out date);
+
+        bool SearchTextIsTrn() => Search.Length == 7 && Search.All(Char.IsAsciiDigit);
     }
 
     public record PersonInfo
     {
-        public required Guid PersonId { get; set; }
-        public required string Name { get; init; }
+        public required Guid PersonId { get; init; }
+        public required string FirstName { get; init; }
+        public required string MiddleName { get; init; }
+        public required string LastName { get; init; }
         public required DateOnly? DateOfBirth { get; init; }
         public required string? Trn { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
+        public required PersonStatus PersonStatus { get; init; }
+
+        public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
     }
+
+#pragma warning disable IDE1006 // Naming Styles
+    private record NameSearchQueryResult(Guid person_id);
+#pragma warning restore IDE1006 // Naming Styles
 }

@@ -53,7 +53,7 @@
 
                 @if (FeatureProvider.IsEnabled(FeatureNames.DqtNotes))
                 {
-                    <li class="moj-sub-navigation__item" data-testid="dqtnotes-tab">
+                    <li class="moj-sub-navigation__item" data-testid="notes-tab">
                         <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Notes ? "page" : null)" href="@LinkGenerator.PersonNotes(personId)">Notes</a>
                     </li>
                 }

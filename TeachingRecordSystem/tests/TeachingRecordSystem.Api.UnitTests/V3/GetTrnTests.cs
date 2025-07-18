@@ -30,7 +30,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
             await DbFixture.WithDbContextAsync(dbContext =>
                 dbContext.Persons
                     .Where(p => p.PersonId == person.PersonId)
-                    .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Inactive)));
+                    .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
 
             var command = new GetTrnCommand(person.Trn!);
 
@@ -53,7 +53,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
                 dbContext.Persons
                     .Where(p => p.PersonId == person.PersonId)
                     .ExecuteUpdateAsync(u => u
-                        .SetProperty(p => p.Status, _ => PersonStatus.Inactive)
+                        .SetProperty(p => p.Status, _ => PersonStatus.Deactivated)
                         .SetProperty(p => p.MergedWithPersonId, _ => anotherPerson.PersonId)));
 
             var command = new GetTrnCommand(person.Trn!);

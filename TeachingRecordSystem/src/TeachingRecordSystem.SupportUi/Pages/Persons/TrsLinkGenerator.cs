@@ -1,12 +1,12 @@
-using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.SupportUi.Pages.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi;
 
 public partial class TrsLinkGenerator
 {
-    public string Persons(string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
-        GetRequiredPathByPage("/Persons/Index", routeValues: new { search, sortBy, pageNumber });
+    public string Persons(string? search = null, PersonStatus[]? statuses = null, PersonSearchSortByOption? sortBy = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/Index", routeValues: new { search, statuses, sortBy, pageNumber });
 
     public string PersonCreate() =>
         GetRequiredPathByPage("/Persons/Create/Index");
