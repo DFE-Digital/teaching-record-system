@@ -147,6 +147,9 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & (dry-run)");
                 recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & migrate");
 
+                recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob");
+                recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob (dry-run)");
+
                 recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
                     nameof(CpdInductionImporterJob),
                     job => job.ExecuteAsync(CancellationToken.None),
@@ -213,14 +216,9 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(new DateTime(2025, 6, 6, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<MigrateRoutesFromCrmJob>(
-                    nameof(MigrateRoutesFromCrmJob),
-                    job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<MigrateRoutesFromCrmJob>(
-                    $"{nameof(MigrateRoutesFromCrmJob)} (dry-run)",
-                    job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                recurringJobManager.AddOrUpdate<FixIncorrectOttRouteMigrationMappingsJob>(
+                    nameof(FixIncorrectOttRouteMigrationMappingsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
                 return Task.CompletedTask;

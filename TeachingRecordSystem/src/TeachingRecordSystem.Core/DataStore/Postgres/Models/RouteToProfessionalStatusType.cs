@@ -12,6 +12,7 @@ public class RouteToProfessionalStatusType
     public static Guid SchoolDirectTrainingProgrammeId { get; } = new("D9490E58-ACDC-4A38-B13E-5A5C21417737");
     public static Guid InternationalQualifiedTeacherStatusId { get; } = new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1");
     public static Guid NiRId { get; } = new("3604EF30-8F11-4494-8B52-A2F9C5371E03");
+    public static Guid OverseasTrainedTeacherProgrammeId { get; } = new("51756384-CFEA-4F63-80E5-F193686E0F71");
     public static Guid OverseasTrainedTeacherRecognitionId { get; } = new("CE61056E-E681-471E-AF48-5FFBF2653500");
     public static Guid QtlsAndSetMembershipId { get; } = new("BE6EAF8C-92DD-4EFF-AAD3-1C89C4BEC18C");
     public static Guid ScotlandRId { get; } = new("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB");
