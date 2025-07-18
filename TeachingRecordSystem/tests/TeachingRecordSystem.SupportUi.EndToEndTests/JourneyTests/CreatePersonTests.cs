@@ -17,7 +17,6 @@ public class CreatePersonTests : TestBase
         var page = await context.NewPageAsync();
 
         await page.GoToPersonCreatePageAsync();
-        await page.ClickButtonAsync("Add a record");
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.FillNameInputsAsync("Alfred", "The", "Great");
@@ -45,7 +44,6 @@ public class CreatePersonTests : TestBase
         var page = await context.NewPageAsync();
 
         await page.GoToPersonCreatePageAsync();
-        await page.ClickButtonAsync("Add a record");
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.FillNameInputsAsync("Alfred", "The", "Great");
@@ -65,9 +63,6 @@ public class CreatePersonTests : TestBase
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.AssertNameInputAsync("Alfred", "The", "Great");
-        await page.ClickBackLink();
-
-        await page.AssertOnPersonCreateIndexPageAsync();
     }
 
     [Fact]
@@ -79,7 +74,6 @@ public class CreatePersonTests : TestBase
         var page = await context.NewPageAsync();
 
         await page.GoToPersonCreatePageAsync();
-        await page.ClickButtonAsync("Add a record");
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.FillNameInputsAsync("Alfred", "The", "Great");
@@ -116,7 +110,6 @@ public class CreatePersonTests : TestBase
         var page = await context.NewPageAsync();
 
         await page.GoToPersonCreatePageAsync();
-        await page.ClickButtonAsync("Add a record");
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.FillNameInputsAsync("Alfred", "The", "Great");
@@ -149,8 +142,5 @@ public class CreatePersonTests : TestBase
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.AssertNameInputAsync("Alfred", "The", "Great");
-        await page.ClickBackLink();
-
-        await page.AssertOnPersonCreateIndexPageAsync();
     }
 }

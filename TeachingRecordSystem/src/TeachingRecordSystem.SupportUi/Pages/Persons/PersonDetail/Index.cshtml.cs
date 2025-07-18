@@ -23,7 +23,7 @@ public class IndexModel(
     public int? PageNumber { get; set; }
 
     [FromQuery]
-    public ContactSearchSortByOption? SortBy { get; set; }
+    public PersonSearchSortByOption? SortBy { get; set; }
 
     public PersonInfo? Person { get; set; }
 

@@ -1,48 +1,19 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons;
 
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
-    public async Task Get_WithNoQueryParameters_DisplaysSearchFormOnly()
+    public async Task Get_WithNoCriteria_RedirectsToIndex()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/persons");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        var searchForm = doc.GetElementByTestId("search-form");
-        Assert.NotNull(searchForm);
-        var searchResults = doc.GetElementByTestId("search-results");
-        Assert.Null(searchResults);
-        var sortByForm = doc.GetElementByTestId("search-sortby-form");
-        Assert.Null(searchResults);
-    }
-
-    [Fact]
-    public async Task Get_WithEmptySearchParameter_DisplaysSearchFormOnly()
-    {
-        // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search=");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        var searchForm = doc.GetElementByTestId("search-form");
-        Assert.NotNull(searchForm);
-        var searchResults = doc.GetElementByTestId("search-results");
-        Assert.Null(searchResults);
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -59,17 +30,11 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var searchForm = doc.GetElementByTestId("search-form");
-        Assert.NotNull(searchForm);
-
         var searchInput = doc.GetElementByLabel("Search");
         Assert.NotNull(searchInput);
-        Assert.Equal(search, searchInput!.GetAttribute("value"));
+        Assert.Equal(search, searchInput.GetAttribute("value"));
 
-        var searchResults = doc.GetElementByTestId("search-results");
-        Assert.NotNull(searchResults);
-
-        var noMatches = searchResults!.GetElementByTestId("no-matches");
+        var noMatches = doc.GetElementByTestId("no-matches");
         Assert.NotNull(noMatches);
     }
 
@@ -91,10 +56,7 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var searchResults = doc.GetElementByTestId("search-results");
-        Assert.NotNull(searchResults);
-
-        var dateOfBirthResults = searchResults!.GetAllElementsByTestId("date-of-birth");
+        var dateOfBirthResults = doc.GetAllElementsByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthResults);
         Assert.All(dateOfBirthResults.Select(r => r.TrimmedText()), t => Assert.Equal(search, t));
     }
@@ -117,10 +79,7 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var searchResults = doc.GetElementByTestId("search-results");
-        Assert.NotNull(searchResults);
-
-        var nameResults = searchResults!.GetAllElementsByTestId("name");
+        var nameResults = doc.GetAllElementsByTestId("name");
         Assert.NotNull(nameResults);
         Assert.All(nameResults.Select(r => r.TrimmedText()), t => Assert.Contains(search, t.ToLower()));
     }
@@ -142,10 +101,7 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var searchResults = doc.GetElementByTestId("search-results");
-        Assert.NotNull(searchResults);
-
-        var nameResults = searchResults!.GetAllElementsByTestId("trn");
+        var nameResults = doc.GetAllElementsByTestId("trn");
         Assert.Single(nameResults);
         Assert.Contains(search!, nameResults.Single().TrimmedText());
     }

@@ -28,7 +28,7 @@ public class ChangeHistoryModel(
     public int? PageNumber { get; set; }
 
     [FromQuery]
-    public ContactSearchSortByOption? SortBy { get; set; }
+    public PersonSearchSortByOption? SortBy { get; set; }
 
     public TimelineItem[]? TimelineItems { get; set; }
 

@@ -2600,7 +2600,7 @@ public class TrsDataSyncHelper(
             PersonId = c.ContactId!.Value,
             CreatedOn = c.CreatedOn!.Value,
             UpdatedOn = c.ModifiedOn!.Value,
-            Status = c.StateCode == ContactState.Active ? PersonStatus.Active : PersonStatus.Inactive,
+            Status = c.StateCode == ContactState.Active ? PersonStatus.Active : PersonStatus.Deactivated,
             MergedWithPersonId = c.dfeta_MergedWith?.Id,
             Trn = c.dfeta_TRN,
             FirstName = (c.HasStatedNames() ? c.dfeta_StatedFirstName : c.FirstName) ?? string.Empty,

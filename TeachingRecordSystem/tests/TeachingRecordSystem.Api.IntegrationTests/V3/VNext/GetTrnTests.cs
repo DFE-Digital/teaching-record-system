@@ -28,7 +28,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContextAsync(dbContext =>
             dbContext.Persons
                 .Where(p => p.PersonId == person.PersonId)
-                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Inactive)));
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/trns/{person.Trn}");
 
@@ -50,7 +50,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             dbContext.Persons
                 .Where(p => p.PersonId == person.PersonId)
                 .ExecuteUpdateAsync(u => u
-                    .SetProperty(p => p.Status, _ => PersonStatus.Inactive)
+                    .SetProperty(p => p.Status, _ => PersonStatus.Deactivated)
                     .SetProperty(p => p.MergedWithPersonId, _ => anotherPerson.PersonId)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/trns/{person.Trn}");

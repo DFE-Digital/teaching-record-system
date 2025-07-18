@@ -1,2 +1,32 @@
 @page ""
+@using Microsoft.AspNetCore.Authorization
+@using TeachingRecordSystem.SupportUi.Infrastructure.Security
+@inject IAuthorizationService AuthorizationService
 @model IndexModel
+@{
+    ViewBag.Title = "Records";
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-!-margin-bottom-6">
+    <form action="@LinkGenerator.Persons()" method="get" asp-antiforgery="false" data-testid="search-form">
+        <div class="moj-search trs-search govuk-!-margin-bottom-4">
+            <govuk-input name="Search" input-class="moj-search__input" data-testid="search-input" type="search" autocomplete="off">
+                <govuk-input-label class="moj-search__label">
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Search for a record</h2>
+                </govuk-input-label>
+                <govuk-input-hint class="moj-search__hint">
+                    For example TRN, name or date of birth
+                </govuk-input-hint>
+            </govuk-input>
+            <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
+        </div>
+    </form>
+</div>
+
+@if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated) && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
+{
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h2>
+    <govuk-button-link href="@LinkGenerator.PersonCreate()">Create a record</govuk-button-link>
+}

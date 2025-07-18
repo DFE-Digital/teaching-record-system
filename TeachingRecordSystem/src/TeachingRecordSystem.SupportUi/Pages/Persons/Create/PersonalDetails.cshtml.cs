@@ -56,10 +56,7 @@ public class PersonalDetailsModel(
     [Display(Name = "Gender (optional)")]
     public Gender? Gender { get; set; }
 
-    public string BackLink => GetPageLink(
-        FromCheckAnswers
-            ? CreateJourneyPage.CheckAnswers
-            : null);
+    public string BackLink => FromCheckAnswers ? GetPageLink(CreateJourneyPage.CheckAnswers) : LinkGenerator.Index();
 
     public string NextPage => GetPageLink(
         FromCheckAnswers

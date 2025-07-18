@@ -1,108 +1,92 @@
 @page "/persons"
-@using TeachingRecordSystem.Core.Dqt.Models;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.IndexModel
 @{
-    Layout = "Layout";
-    ViewBag.SelectedTab = PersonsSubNavigationTab.FindARecord;
     ViewBag.Title = "Find a record";
 }
 
-<div class="govuk-!-margin-bottom-6">
-    <form action="@LinkGenerator.Persons()" method="get" data-testid="search-form" asp-antiforgery="false">
-        <div class="moj-search trs-search govuk-!-margin-bottom-4">
-            <govuk-input asp-for="Search"
-                            input-class="moj-search__input"
-                            label-class="moj-search__label govuk-!-font-weight-bold"
-                            data-testid="search-input"
-                            type="search">
-                <govuk-input-hint class="moj-search__hint" />
-            </govuk-input>
-            <input type="hidden" asp-for="SortBy" />
-            <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
-        </div>
-    </form>
-    @if (!string.IsNullOrEmpty(Model.Search))
-    {
-        <form action="@LinkGenerator.Persons()" method="get" data-testid="search-sortby-form" asp-antiforgery="false">
-            <div class="moj-search trs-search govuk-!-margin-bottom-4">
-                <govuk-select asp-for="SortBy">
-                    <govuk-select-item value="@ContactSearchSortByOption.LastNameAscending">@ContactSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.LastNameDescending">@ContactSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameAscending">@ContactSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameDescending">@ContactSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthAscending">@ContactSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthDescending">@ContactSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
-                </govuk-select>
-                <input type="hidden" asp-for="Search" />
-                <govuk-button class="moj-search__button" type="submit">Apply</govuk-button>
-            </div>
-        </form>
-    }
-</div>
-@if (!string.IsNullOrEmpty(Model.Search))
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+@if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
 {
-    <div class="govuk-grid-row" data-testid="search-results">
-        <div class="govuk-grid-column-full">
-            <table class="govuk-table">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
-                        <th scope="col" class="govuk-table__header">Date of birth</th>
-                        <th scope="col" class="govuk-table__header">TRN</th>
-                        <th scope="col" class="govuk-table__header">National Insurance number</th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @if (Model.SearchResults is null || Model.SearchResults.Length == 0)
-                    {
-                        <tr class="govuk-table__row" data-testid="no-matches">
-                            <td class="govuk-table__cell" colspan="4">No matching records</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var personInfo in Model.SearchResults!)
-                        {
-                            <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
-                                <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></td>
-                                <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</td>
-                                <td class="govuk-table__cell" data-testid="trn" use-empty-fallback>@personInfo.Trn</td>
-                                <td class="govuk-table__cell" data-testid="nino" use-empty-fallback>@personInfo.NationalInsuranceNumber</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+    <govuk-button-link href="@LinkGenerator.PersonCreate()">Create a record</govuk-button-link>
+}
 
-            @if (Model.TotalKnownPages > 1)
-            {
-                <govuk-pagination>
-                    @if (Model.PreviousPage.HasValue)
-                    {
-                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" asp-route-sortby="@Model.SortBy" />
-                    }
+<div class="moj-filter-layout trs-filter-layout">
+    <div class="moj-filter-layout__filter">
+        <div class="moj-filter-layout__filter">
+            <div class="moj-filter">
+                <div class="moj-filter__header">
+                    <div class="moj-filter__header-title">
+                        <h2 class="govuk-heading-m">Filter</h2>
+                    </div>
+                </div>
 
-                    @if (Model.DisplayPageNumbers)
-                    {
-                        @for (int i = 0; i < Model.PaginationPages!.Length; i++)
-                        {
-                            var item = Model.PaginationPages[i];
+                <form method="get" class="moj-filter__options" asp-antiforgery="false">
+                    <govuk-input for="Search" label-class="govuk-label--s" spellcheck="false" />
 
-                            if (i > 0 && Model.PaginationPages[i - 1] != item - 1)
-                            {
-                                <govuk-pagination-ellipsis />
-                            }
+                    <govuk-checkboxes for="Statuses" class="govuk-checkboxes--small">
+                        <govuk-checkboxes-fieldset>
+                            <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s" />
+                            <govuk-checkboxes-item value="@PersonStatus.Active">
+                                @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Active, 0))
+                            </govuk-checkboxes-item>
+                            <govuk-checkboxes-item value="@PersonStatus.Deactivated">
+                                @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Deactivated, 0))
+                            </govuk-checkboxes-item>
+                        </govuk-checkboxes-fieldset>
+                    </govuk-checkboxes>
 
-                            <govuk-pagination-item asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@item" asp-route-sortby="@Model.SortBy" current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
-                        }
-                    }
+                    <govuk-select for="SortBy" label-class="govuk-label--s">
+                        <govuk-select-item value="@PersonSearchSortByOption.LastNameAscending">@PersonSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
+                        <govuk-select-item value="@PersonSearchSortByOption.LastNameDescending">@PersonSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
+                        <govuk-select-item value="@PersonSearchSortByOption.FirstNameAscending">@PersonSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
+                        <govuk-select-item value="@PersonSearchSortByOption.FirstNameDescending">@PersonSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
+                        <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthAscending">@PersonSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
+                        <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthDescending">@PersonSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
+                    </govuk-select>
 
-                    @if (Model.NextPage.HasValue)
-                    {
-                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" asp-route-sortby="@Model.SortBy" />
-                    }
-                </govuk-pagination>
-            }
+                    <div class="govuk-button-group">
+                        <govuk-button type="submit">Apply filters</govuk-button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-}
+
+    <div class="moj-filter-layout__content">
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
+                    <th scope="col" class="govuk-table__header">Date of birth</th>
+                    <th scope="col" class="govuk-table__header">TRN</th>
+                    <th scope="col" class="govuk-table__header">National Insurance number</th>
+                    <th scope="col" class="govuk-table__header">Record status</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if (Model.SearchResults?.Count == 0)
+                {
+                    <tr class="govuk-table__row" data-testid="no-matches">
+                        <td class="govuk-table__cell" colspan="5">No matching records</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var personInfo in Model.SearchResults!)
+                    {
+                        <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
+                            <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></td>
+                            <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</td>
+                            <td class="govuk-table__cell" data-testid="trn" use-empty-fallback>@personInfo.Trn</td>
+                            <td class="govuk-table__cell" data-testid="nino" use-empty-fallback>@personInfo.NationalInsuranceNumber</td>
+                            <td class="govuk-table__cell" data-testid="status">@personInfo.PersonStatus</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <partial name="_Pagination" model="@Model.Pagination" />
+    </div>
+</div>

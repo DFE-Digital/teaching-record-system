@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -43,18 +42,7 @@ public class CheckPersonExistsFilter(
         {
             // If person isn't in the TRS DB it may be because we haven't synced it yet..
 
-            var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(
-                new GetActiveContactDetailByIdQuery(
-                    personId,
-                    new ColumnSet(
-                        Contact.Fields.Id,
-                        Contact.Fields.FirstName,
-                        Contact.Fields.MiddleName,
-                        Contact.Fields.LastName,
-                        Contact.Fields.dfeta_StatedFirstName,
-                        Contact.Fields.dfeta_StatedLastName,
-                        Contact.Fields.dfeta_StatedMiddleName,
-                        Contact.Fields.dfeta_QTSDate)));
+            var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(personId, new ColumnSet()));
 
             if (dqtContact is not null)
             {

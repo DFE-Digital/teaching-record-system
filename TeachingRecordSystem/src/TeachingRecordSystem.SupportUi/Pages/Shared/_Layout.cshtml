@@ -3,6 +3,7 @@
 @inject IAuthorizationService AuthorizationService
 @{
     Layout = "_GovUkPageTemplate";
+    ViewBag.Title = ViewBag.Title + (ViewBag.Title is not null ? " - " : "") + "Teaching record system";
 }
 
 @section Head {
@@ -60,9 +61,10 @@
             @if (User.Identity?.IsAuthenticated == true && User.IsActiveTrsUser())
             {
                 <govuk-service-navigation-nav-item
-                    href="@LinkGenerator.Persons()"
-                    active="@(Context.Request.Path.StartsWithSegments("/persons"))">
-                    Find a record
+                    href="@LinkGenerator.Index()"
+                    active="@(Context.Request.Path.StartsWithSegments("/persons"))"
+                    current="@(Context.Request.Path == "/")">
+                    Records
                 </govuk-service-navigation-nav-item>
 
                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksView)).Succeeded)
