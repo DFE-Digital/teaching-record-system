@@ -211,22 +211,3 @@ jobs:
     name: Package application
     uses: ./.github/workflows/package.yml
     secrets: inherit
-
-  deploy_dev:
-    name: Deploy dev environment
-    runs-on: ubuntu-latest
-    needs: [lint, validate_terraform, tests, package]
-    if: always() && (needs.tests.result == 'success' || needs.tests.result == 'skipped')
-    environment: dev
-    concurrency: deploy_dev
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: ./.github/workflows/actions/deploy-aks-environment
-        id: deploy
-        with:
-          environment_name: dev
-          docker_image: ${{ needs.package.outputs.docker_image }}
-          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
