@@ -249,8 +249,8 @@ public class UsersTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var html = await AssertEx.HtmlResponseAsync(response);
-        var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""role""] + label");
-        var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""status""] + label");
+        var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""Role""] + label");
+        var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""Status""] + label");
 
         AssertElementsInnerTextContains(roleLabels, expectedRoleLabels);
         AssertElementsInnerTextContains(statusLabels, expectedStatusLabels);
@@ -351,8 +351,8 @@ public class UsersTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var html = await AssertEx.HtmlResponseAsync(response);
-        var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""role""] + label");
-        var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""status""] + label");
+        var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""Role""] + label");
+        var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""Status""] + label");
 
         AssertElementsInnerTextContains(roleLabels, expectedRoleLabels);
         AssertElementsInnerTextContains(statusLabels, expectedStatusLabels);
