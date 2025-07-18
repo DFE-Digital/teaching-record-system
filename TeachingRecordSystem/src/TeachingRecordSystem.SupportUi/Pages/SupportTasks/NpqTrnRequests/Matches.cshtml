@@ -1,0 +1,226 @@
+@page "/support-tasks/npq-trn-requests/{supportTaskReference}/matches/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.MatchesModel
+@{
+    ViewBag.Title = "Compare potential duplicate records";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" />
+}
+
+@functions {
+#pragma warning disable CS1998
+    private async Task RenderWithHighlightIfDifferent(string? value, bool different)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            value = UiDefaults.EmptyDisplayContent;
+        }
+
+        if (different)
+        {
+            <highlight>@value</highlight>
+        }
+        else
+        {
+            @value
+        }
+    }
+#pragma warning restore CS1998
+}
+
+<form action="@LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Support tasks</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half-from-desktop">
+            <govuk-inset-text class="govuk-!-margin-top-0">
+                Differences are <highlight>highlighted</highlight> in the existing record
+            </govuk-inset-text>
+
+            <govuk-summary-card data-testid="request">
+                <govuk-summary-card-title>
+                    @Model.SourceApplicationUserName request
+                </govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.FirstName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.MiddleName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.LastName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.EmailAddress</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.NationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+@*                     <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.Gender</govuk-summary-list-row-value>
+                    </govuk-summary-list-row> *@
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>TO DO</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half-from-desktop">
+            <h2 class="govuk-heading-m">Potential matches</h2>
+
+            @foreach (var match in Model.PotentialDuplicates!)
+            {
+                <govuk-summary-card data-testid="match">
+                    <govuk-summary-card-title>
+                        Record @match.Identifier
+                    </govuk-summary-card-title>
+                    <govuk-summary-card-actions>
+                        <govuk-summary-card-action href="@LinkGenerator.PersonDetail(match.PersonId)" target="_blank">
+                            View record (opens in a new tab)
+                        </govuk-summary-card-action>
+                    </govuk-summary-card-actions>
+                    <govuk-summary-list>
+                        @{
+                            var tags = new List<string>();
+
+                            if (match.HasActiveAlerts)
+                            {
+                                tags.Add("Alerts");
+                            }
+
+                            if (match.HasQts)
+                            {
+                                tags.Add("QTS");
+                            }
+
+                            if (match.HasEyts)
+                            {
+                                tags.Add("EYTS");
+                            }
+                        }
+                        @if (tags.Count > 0)
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value>
+                                    @foreach (var tag in tags)
+                                    {
+                                        <govuk-tag>@tag</govuk-tag>
+                                    }
+                                </govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{
+                                    await RenderWithHighlightIfDifferent(match.FirstName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName));
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{
+                                    await RenderWithHighlightIfDifferent(match.MiddleName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{
+                                    await RenderWithHighlightIfDifferent(match.LastName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName));
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{
+                                    await RenderWithHighlightIfDifferent(match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), !match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{
+                                    await RenderWithHighlightIfDifferent(match.EmailAddress, !match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{
+                                    await RenderWithHighlightIfDifferent(match.NationalInsuranceNumber, !match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        @* <govuk-summary-list-row> *@
+                        @*     <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key> *@
+                        @*     <govuk-summary-list-row-value use-empty-fallback>@match.Gender</govuk-summary-list-row-value> *@
+                        @* </govuk-summary-list-row> *@
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@match.Trn</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    </govuk-summary-list>
+                </govuk-summary-card>
+            }
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <govuk-radios asp-for="PersonId">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                        Select a record to merge the @Model.SourceApplicationUserName request into
+                    </govuk-radios-fieldset-legend>
+
+                    @foreach (var match in Model.PotentialDuplicates!)
+                    {
+                        <govuk-radios-item value="@match.PersonId">
+                            Record @match.Identifier
+                        </govuk-radios-item>
+                    }
+
+                    <govuk-radios-divider>or</govuk-radios-divider>
+
+                    <govuk-radios-item value="@NpqTrnRequestState.CreateNewRecordPersonIdSentinel">
+                        I want to create a new record from the @Model.SourceApplicationUserName request
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestMatchesCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+            </div>
+        </div>
+    </div>
+</form>
