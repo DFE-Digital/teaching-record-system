@@ -291,7 +291,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string LegacyEditUser(Guid userId) => GetRequiredPathByPage("/LegacyUsers/EditUser", routeValues: new { userId });
 
-    public string Users(int? pageNumber = null) => GetRequiredPathByPage("/Users/Index", routeValues: new { pageNumber });
+    public string Users(string? keywords = null, string? status = null, string? role = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Users/Index", routeValues: new { keywords, status, role, pageNumber });
 
     public string AddUser() => GetRequiredPathByPage("/Users/AddUser/Index");
 
