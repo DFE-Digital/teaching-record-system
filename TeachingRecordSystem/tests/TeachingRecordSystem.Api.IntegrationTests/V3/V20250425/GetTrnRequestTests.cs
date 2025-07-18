@@ -1,6 +1,5 @@
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -161,10 +160,6 @@ public class GetTrnRequestTests : TestBase
 
     private async Task<string> GetAccessYourTeachingQualificationsLinkAsync(string requestId)
     {
-        // We need Metadata in the DB to retrieve the TrnToken
-        await ProcessOutboxMessages<CreateContactQuery, Guid>(q => q.TrnRequestMetadataMessage);
-        await ProcessOutboxMessages<CreateDqtOutboxMessageQuery, Guid>(q => q.Message);
-
         var trnToken = await WithDbContextAsync(async dbContext =>
         {
             var metadata = await dbContext.TrnRequestMetadata.SingleAsync(r => r.ApplicationUserId == ApplicationUserId && r.RequestId == requestId);

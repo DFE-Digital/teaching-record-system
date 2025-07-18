@@ -14,7 +14,8 @@ public class TrnRequestService(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     IGetAnIdentityApiClient idApiClient,
-    IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor)
+    IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
+    IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
 {
     public async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
     {
@@ -32,7 +33,7 @@ public class TrnRequestService(
             new GetContactByTrnRequestIdQuery(crmTrnRequestId, new ColumnSet(Contact.Fields.ContactId, Contact.Fields.dfeta_TrnToken)));
 
         var dbTrnRequest = await dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == applicationUserId.ToString() && r.RequestId == requestId);
-        var metadata = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(r => r.ApplicationUserId == applicationUserId && r.RequestId == requestId);
+        var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
 
         Guid contactId;
 
@@ -78,7 +79,7 @@ public class TrnRequestService(
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_TrnToken)));
 
-        var result = new GetTrnRequestResult(applicationUserId, contact, metadata);
+        var result = new GetTrnRequestResult(contact, metadata);
 
         // If the request is Completed, ensure we've got a TRN and TRN token assigned to metadata
         if (result.IsCompleted)
@@ -98,18 +99,21 @@ public class TrnRequestService(
 
     public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId, string trn)
     {
-        var result = await GetTrnRequestInfoAsync(applicationUserId, requestId);
-        if (result is null)
+        var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
+
+        if (metadata is null)
         {
             throw new ArgumentException("TRN request does not exist.");
         }
 
-        await CreateContactFromTrnRequestAsync(result.Metadata, newContactId, trn);
+        await CreateContactFromTrnRequestAsync(metadata, newContactId, trn);
     }
 
     public async Task CreateContactFromTrnRequestAsync(TrnRequestMetadata requestData, Guid newContactId, string trn)
     {
-        await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
+        var allowPiiUpdates = trnRequestOptionsAccessor.Value.AllowContactPiiUpdatesFromUserIds.Contains(requestData.ApplicationUserId);
+
+        await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery
         {
             ContactId = newContactId,
             FirstName = requestData.FirstName!,
@@ -119,12 +123,13 @@ public class TrnRequestService(
             Gender = Contact_GenderCode.Notprovided, // TODO when we've sorted gender
             EmailAddress = requestData.EmailAddress,
             NationalInsuranceNumber = requestData.NationalInsuranceNumber,
-            ReviewTasks = [],
             ApplicationUserName = requestData.ApplicationUser!.Name,
             Trn = trn,
-            TrnRequestId = GetCrmTrnRequestId(requestData.ApplicationUserId, requestData.RequestId),
-            TrnRequestMetadataMessage = null,
-            AllowPiiUpdates = false
+            TrnRequestId = GetCrmTrnRequestId(requestData.ApplicationUserId,
+                requestData.RequestId),
+            AllowPiiUpdates = allowPiiUpdates,
+            ReviewTasks = [],
+            TrnRequestMetadataMessage = null
         });
     }
 
@@ -133,13 +138,14 @@ public class TrnRequestService(
         string requestId,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate)
     {
-        var result = await GetTrnRequestInfoAsync(applicationUserId, requestId);
-        if (result is null)
+        var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
+
+        if (metadata is null)
         {
             throw new ArgumentException("TRN request does not exist.");
         }
 
-        await UpdateContactFromTrnRequestAsync(result.Metadata, attributesToUpdate);
+        await UpdateContactFromTrnRequestAsync(metadata, attributesToUpdate);
     }
 
     public Task UpdateContactFromTrnRequestAsync(
@@ -182,4 +188,9 @@ public class TrnRequestService(
 
     public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>
         $"{currentApplicationUserId}::{requestId}";
+
+    private Task<TrnRequestMetadata?> GetRequestMetadataAsync(Guid applicationUserId, string requestId) =>
+        dbContext.TrnRequestMetadata
+            .Include(m => m.ApplicationUser)
+            .SingleOrDefaultAsync(r => r.ApplicationUserId == applicationUserId && r.RequestId == requestId);
 }

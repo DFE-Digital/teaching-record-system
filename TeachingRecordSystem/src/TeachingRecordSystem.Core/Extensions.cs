@@ -21,10 +21,6 @@ public static class Extensions
         {
             builder.Services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
         }
-        else
-        {
-            builder.Services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
-        }
 
         return builder;
     }

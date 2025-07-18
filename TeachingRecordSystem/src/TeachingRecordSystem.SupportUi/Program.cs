@@ -18,6 +18,7 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
@@ -159,7 +160,8 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 builder
     .AddBlobStorage()
     .AddTrsSyncHelper()
-    .AddIdentityApi();
+    .AddIdentityApi()
+    .AddTrnRequestService();
 
 builder.Services
     .AddTrsBaseServices()

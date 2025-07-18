@@ -34,7 +34,8 @@ public class HangfireBackgroundJobScheduler(IBackgroundJobClient jobClient, Npgs
 
             if (!await reader.ReadAsync(cancellationToken))
             {
-                throw new ArgumentException("Job does not exist.");
+                // Job doesn't exist (yet)
+                continue;
             }
 
             var stateName = reader.GetString(0);

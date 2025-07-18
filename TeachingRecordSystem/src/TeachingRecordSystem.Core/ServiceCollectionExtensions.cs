@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core;
 
@@ -14,8 +13,7 @@ public static partial class ServiceCollectionExtensions
             .AddSingleton<IClock, Clock>()
             .AddCrmQueries()
             .AddSingleton<PreviousNameHelper>()
-            .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
-            .AddTrnRequestService();
+            .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>();
     }
 
     public static IServiceCollection AddAccessYourTeachingQualificationsOptions(
