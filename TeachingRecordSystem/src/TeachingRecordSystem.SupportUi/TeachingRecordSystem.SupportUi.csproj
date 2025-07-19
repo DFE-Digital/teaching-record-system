@@ -8,9 +8,7 @@
   </PropertyGroup>
 
   <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">
-    <Copy SourceFiles="wwwroot/lib/govuk-frontend/govuk-frontend.min.js"
-          DestinationFolder="wwwroot"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="wwwroot/lib/govuk-frontend/govuk-frontend.min.js" DestinationFolder="wwwroot" SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>

@@ -563,19 +563,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(personAttributes.NationalInsuranceNumber, contact.dfeta_NINumber);
     }
 
-    private void AssertEventPersonAttributesMatchContact(
-        EventModels.TrnRequestPersonAttributes? personAttributes,
-        Contact contact)
-    {
-        Assert.NotNull(personAttributes);
-        Assert.Equal(personAttributes.FirstName, contact.FirstName);
-        Assert.Equal(personAttributes.MiddleName, contact.MiddleName);
-        Assert.Equal(personAttributes.LastName, contact.LastName);
-        Assert.Equal(personAttributes.DateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
-        Assert.Equal(personAttributes.EmailAddress, contact.EMailAddress1);
-        Assert.Equal(personAttributes.NationalInsuranceNumber, contact.dfeta_NINumber);
-    }
-
     private void AssertEventIsExpected(
         ApiTrnRequestSupportTaskUpdatedEvent @event,
         bool expectOldPersonAttributes,

@@ -327,6 +327,7 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
         {
             SupportTaskType.ConnectOneLoginUser => ConnectOneLoginUserSupportTask(supportTaskReference),
             SupportTaskType.ApiTrnRequest => ApiTrnRequestMatches(supportTaskReference),
+            SupportTaskType.NpqTrnRequest => NpqTrnRequestStartPage(supportTaskReference),
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 
@@ -341,6 +342,36 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string ApiTrnRequestMerge(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string NpqTrnRequestStartPage(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Index", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string NpqTrnRequestStartPageCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+    GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Index", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
+    public string NpqTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string NpqTrnRequestMatchesCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
+    public string NpqTrnRequestMerge(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string NpqTrnRequestMergeCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
+    public string NpqTrnRequestCheckAnswers(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string NpqTrnRequestCheckAnswersCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
+    public string NpqTrnRequestRejectionReason(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/RejectionReason", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string NpqTrnRequestRejectionReasonCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/RejectionReason", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
     public string IntegrationTransactions(IntegrationTransactionSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/SupportTasks/IntegrationTransactions/Index", routeValues: new { sortBy, sortDirection, pageNumber });

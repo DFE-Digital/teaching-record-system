@@ -1,0 +1,74 @@
+@page "/support-tasks/npq-trn-requests/{supportTaskReference}/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.CheckAnswersModel
+@{
+    ViewBag.Title = "Check details before updating record"; @* CML TODO - content conditional - updating or creating *@
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" />  @* CML TODO - backlink depends *@
+}
+
+<form action="@LinkGenerator.NpqTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Support tasks</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half-from-desktop">
+            <govuk-summary-card data-testid="request">
+                <govuk-summary-card-title>
+                    Details of the record
+                </govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.FirstName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.MiddleName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    @*                     <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Gender</govuk-summary-list-row-value>
+                    </govuk-summary-list-row> *@
+                    <govuk-summary-list-row>
+                        @* CML TODO - not shown on design, but normally would be part of CYA page *@
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>TO DO</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    @if (Model.Trn is not null)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                </govuk-summary-list>
+            </govuk-summary-card>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Confirm and update record</govuk-button> @* CML TODO next ticket update or create conditional content *@
+                <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestCheckAnswersCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+            </div>
+        </div>
+    </div>
+</form>
