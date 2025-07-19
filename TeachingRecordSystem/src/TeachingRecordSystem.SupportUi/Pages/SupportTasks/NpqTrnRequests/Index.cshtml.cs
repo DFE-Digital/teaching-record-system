@@ -2,22 +2,20 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
-public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    public string PersonName => string.Join(" ", SupportTask.TrnRequestMetadata!.Name);
+    public string PersonName => string.Join(" ", SupportTask!.TrnRequestMetadata!.Name);
 
-    public TrnRequestMetadata? RequestData { get; set; } // CML TODO - need this - this page needs the SupportTask, so it's part of that
-    public SupportTask SupportTask { get; set; } // CML TODO - need this? or use the getRequestData method below when needed?
+    public SupportTask? SupportTask { get; set; }
 
-    public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
+    public string SourceApplicationUserName => SupportTask!.TrnRequestMetadata!.ApplicationUser!.Name;
 
     [FromRoute]
-    public string SupportTaskReference { get; set; }
+    public required string SupportTaskReference { get; init; }
 
     [BindProperty]
     [Required(ErrorMessage = "Select yes if you want to create a record from this request")]
@@ -45,18 +43,16 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
         }
     }
 
-    public void OnPostCancel()
+    public IActionResult OnPostCancel()
     {
+        return Redirect(linkGenerator.SupportTasks());
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var supportTaskFeature = context.HttpContext.GetCurrentSupportTaskFeature();
         SupportTask = supportTaskFeature.SupportTask;
 
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        RequestData = supportTask.TrnRequestMetadata!;
-
-        await base.OnPageHandlerExecutionAsync(context, next);
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

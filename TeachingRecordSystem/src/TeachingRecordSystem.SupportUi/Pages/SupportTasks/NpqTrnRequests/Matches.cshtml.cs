@@ -9,7 +9,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Re
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
 [Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext, linkGenerator)
+public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -79,7 +79,7 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
 
         var matchedPersonIds = RequestData.Matches.MatchedRecords.Select(m => m.PersonId).ToArray();
 
-        PotentialDuplicates = (await dbContext.Persons
+        PotentialDuplicates = (await DbContext.Persons
                 .Where(p => matchedPersonIds.Contains(p.PersonId))
                 .Select(p => new PotentialDuplicate
                 {
