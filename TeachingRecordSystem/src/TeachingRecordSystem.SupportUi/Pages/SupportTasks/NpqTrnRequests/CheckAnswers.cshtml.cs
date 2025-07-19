@@ -2,19 +2,19 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NpqTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
 [Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance]
-public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : NpqTrnRequestPageModel(dbContext, linkGenerator)
+public class CheckAnswersModel(
+    TrsDbContext dbContext,
+    ITrnGenerator trnGenerator,
+    TrsLinkGenerator linkGenerator,
+    IClock clock) : NpqTrnRequestPageModel(dbContext)
 {
-    [FromRoute]
-    public string? SupportTaskReference { get; set; }
-    public Person SelectedPerson { get; set; }
-
     public string? SourceApplicationUserName { get; set; }
     public Guid? SourceApplicationUserId { get; set; }
 
@@ -50,7 +50,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
 
         //var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
-        EventModels.TrnRequestPersonAttributes? oldPersonAttributes;
+        //EventModels.TrnRequestPersonAttributes? oldPersonAttributes;
 
         // CMl TODO - check don't need this
         //async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
@@ -65,42 +65,42 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
 
         // CML TODO - Creating is the ticket after this one
         //string jobId;
-        //if (CreatingNewRecord)
-        //{
-        //    var newContactId = Guid.NewGuid();
-        //    requestData.ResolvedPersonId = newContactId;
-
-        //    var trn = await trnGenerator.GenerateTrnAsync();
-        //    var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
-        //    requestData.TrnToken = trnToken;
-
-        //    jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
-        //        trnRequestService => trnRequestService.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
-        //    selectedPersonAttributes = null;
-        //    oldPersonAttributes = null;
-        //}
-        //else
-        //{
-        Debug.Assert(state.PersonId is not null);
-        var existingContactId = state.PersonId!.Value;
-        requestData.ResolvedPersonId = existingContactId;
-
-        Debug.Assert(Trn is not null);
-        //requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
-
-        selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
-        var attributesToUpdate = GetAttributesToUpdate();
-
-        oldPersonAttributes = new EventModels.TrnRequestPersonAttributes()
+        if (CreatingNewRecord)
         {
-            FirstName = selectedPersonAttributes.FirstName,
-            MiddleName = selectedPersonAttributes.MiddleName,
-            LastName = selectedPersonAttributes.LastName,
-            DateOfBirth = selectedPersonAttributes.DateOfBirth,
-            EmailAddress = selectedPersonAttributes.EmailAddress,
-            NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber
-        };
-        //}
+            var newContactId = Guid.NewGuid();
+            requestData.ResolvedPersonId = newContactId;
+
+            var trn = await trnGenerator.GenerateTrnAsync();
+            //var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
+            //requestData.TrnToken = trnToken;
+
+            //jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
+            //    trnRequestService => trnRequestService.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
+            selectedPersonAttributes = null;
+            //oldPersonAttributes = null;
+        }
+        else
+        {
+            Debug.Assert(state.PersonId is not null);
+            var existingContactId = state.PersonId!.Value;
+            requestData.ResolvedPersonId = existingContactId;
+
+            Debug.Assert(Trn is not null);
+            //requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
+
+            selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
+            var attributesToUpdate = GetAttributesToUpdate();
+
+            //oldPersonAttributes = new EventModels.TrnRequestPersonAttributes()
+            //{
+            //    FirstName = selectedPersonAttributes.FirstName,
+            //    MiddleName = selectedPersonAttributes.MiddleName,
+            //    LastName = selectedPersonAttributes.LastName,
+            //    DateOfBirth = selectedPersonAttributes.DateOfBirth,
+            //    EmailAddress = selectedPersonAttributes.EmailAddress,
+            //    NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber
+            //};
+        }
 
         Debug.Assert(requestData.ResolvedPersonId is not null);
 
@@ -115,34 +115,34 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
         });
 
         // CML TODO updating the person here for now
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId);
+        var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId);
         if (person == null)
         {
             throw new ArgumentException("Person not found.");
         }
 
         person!.UpdateDetails(
-            firstName: FirstName,
-            middleName: MiddleName,
-            lastName: LastName,
+            firstName: FirstName ?? string.Empty,
+            middleName: MiddleName ?? string.Empty,
+            lastName: LastName ?? string.Empty,
             dateOfBirth: DateOfBirth,
-            emailAddress: TeachingRecordSystem.Core.EmailAddress.Parse(EmailAddress),
+            emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
             mobileNumber: null,
-            nationalInsuranceNumber: TeachingRecordSystem.Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber),
+            nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
             gender: Gender,
             nameChangeReason: null,
             nameChangeEvidenceFile: null,
             detailsChangeReason: null,
             detailsChangeReasonDetail: null,
             detailsChangeEvidenceFile: null,
-            SourceApplicationUserId,
+            SourceApplicationUserId!,
             clock.UtcNow,
             out var updatedEvent);
-        await dbContext.SaveChangesAsync();
+        await DbContext.SaveChangesAsync();
         if (updatedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await dbContext.SaveChangesAsync();
+            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await DbContext.SaveChangesAsync();
         }
 
         // This is a little ugly but pushing this into a partial and executing it here is tricky
@@ -162,7 +162,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
     {
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.ApiTrnRequests());
+        return Redirect(linkGenerator.SupportTasks());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -197,12 +197,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
         {
             Debug.Assert(state.PersonId is not null);
 
-            //if (Request.Method == HttpMethod.Get.Method)
-            //{
-            //    await this.TrySyncPersonAsync(personId);
-            //}
-
-            var selectedPerson = await dbContext.Persons
+            var selectedPerson = await DbContext.Persons
                 .Where(p => p.PersonId == state.PersonId)
                 .Select(p => new
                 {

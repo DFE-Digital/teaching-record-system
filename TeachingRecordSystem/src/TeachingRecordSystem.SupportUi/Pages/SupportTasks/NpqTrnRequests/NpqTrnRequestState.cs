@@ -1,6 +1,5 @@
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
-// CML TODO prob need most of this but I don't understand it yet - it's a copy of the API state
 public class NpqTrnRequestState : IRegisterJourney
 {
     public static Guid CreateNewRecordPersonIdSentinel => Guid.Empty;

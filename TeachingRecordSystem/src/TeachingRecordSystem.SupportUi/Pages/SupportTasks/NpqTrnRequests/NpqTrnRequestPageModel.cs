@@ -9,14 +9,15 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Np
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
-public abstract class NpqTrnRequestPageModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public abstract class NpqTrnRequestPageModel(TrsDbContext dbContext) : PageModel
 {
     public JourneyInstance<NpqTrnRequestState>? JourneyInstance { get; set; }
+    protected TrsDbContext DbContext => dbContext;
 
-    public SupportTask SupportTask { get; set; } // CML TODO - need this? or use the getRequestData method below when needed?
+    //public SupportTask SupportTask { get; set; } // CML TODO - need this? or use the getRequestData method below when needed?
 
     [FromRoute]
-    public string SupportTaskReference { get; set; }
+    public required string SupportTaskReference { get; init; }
 
     protected TrnRequestMetadata GetRequestData() // CML TODO decide whether to use this or Supportask above
     {
@@ -33,13 +34,13 @@ public abstract class NpqTrnRequestPageModel(TrsDbContext dbContext, TrsLinkGene
             return;
         }
 
-        SupportTask = supportTaskFeature.SupportTask;
+        //SupportTask = supportTaskFeature.SupportTask;
         base.OnPageHandlerExecuting(context);
     }
 
     protected async Task<NpqTrnRequestDataPersonAttributes> GetPersonAttributesAsync(Guid personId)
     {
-        var personAttributes = await dbContext.Persons
+        var personAttributes = await DbContext.Persons
             .Where(p => p.PersonId == personId)
             .Select(p => new
             {

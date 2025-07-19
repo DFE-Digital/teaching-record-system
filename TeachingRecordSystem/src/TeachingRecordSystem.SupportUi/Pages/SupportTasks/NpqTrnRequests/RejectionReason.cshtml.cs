@@ -6,9 +6,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
 [Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class RejectionReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext, linkGenerator)
+public class RejectionReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext)
 {
-    public string PersonName => string.Join(" ", SupportTask.TrnRequestMetadata!.Name);
+    public string PersonName => string.Join(" ", RequestData!.Name);
 
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -25,14 +25,15 @@ public class RejectionReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkG
         // stub page
     }
 
-    public void OnPostCancel()
+    public IActionResult OnPostCancel()
     {
         // stub page
+        return Redirect(linkGenerator.SupportTasks());
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         RequestData = GetRequestData();
-        await base.OnPageHandlerExecutionAsync(context, next);
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

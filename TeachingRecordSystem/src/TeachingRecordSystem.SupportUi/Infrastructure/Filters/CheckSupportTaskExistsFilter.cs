@@ -21,7 +21,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
         {
             currentSupportTaskQuery = currentSupportTaskQuery
                 .Include(t => t.TrnRequestMetadata)
-                .ThenInclude(m => m!.ApplicationUser); // CML TODO - different application user
+                .ThenInclude(m => m!.ApplicationUser); // CML TODO - different application user to be added through a ef core migration 
         }
 
         var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync();

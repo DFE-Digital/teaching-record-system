@@ -2,20 +2,16 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NpqTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
 [Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance]
-public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext, linkGenerator)
+public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext)
 {
-    public TrnRequestMetadata? RequestData => SupportTask.TrnRequestMetadata!; // CML TODO - need all of this?
+    //public TrnRequestMetadata? RequestData => GetRequestData().TrnRequestMetadata!; // CML TODO - need all of this?
 
-    [FromRoute]
-    public string? SupportTaskReference { get; set; }
-
-    public string? SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
+    public string? SourceApplicationUserName { get; set; }
 
     public PersonAttribute<string?>? FirstName { get; set; }
 
@@ -131,12 +127,6 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             return;
         }
 
-        // CML TODO - is this a DQT thing?
-        //if (Request.Method == HttpMethod.Get.Method)
-        //{
-        //    await this.TrySyncPersonAsync(personId);
-        //}
-
         var personAttributes = await GetPersonAttributesAsync(personId);
 
         var attributeMatches = GetPersonAttributeMatches(
@@ -176,6 +166,8 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+
+        SourceApplicationUserName = requestData.ApplicationUser!.Name;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
