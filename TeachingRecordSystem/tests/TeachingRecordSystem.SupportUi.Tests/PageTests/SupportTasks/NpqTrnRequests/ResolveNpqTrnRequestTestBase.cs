@@ -8,7 +8,7 @@ public abstract class ResolveNpqTrnRequestTestBase(HostFixture hostFixture) : Te
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
 
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
                 .WithMatchedRecords(matchedPerson.PersonId)
@@ -31,7 +31,7 @@ public abstract class ResolveNpqTrnRequestTestBase(HostFixture hostFixture) : Te
             .WithNationalInsuranceNumber()
             .WithEmail(TestData.GenerateUniqueEmail()));
 
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
                 .WithMatchedRecords(matchedPerson.PersonId)

@@ -55,6 +55,13 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
     public void OnGet()
     {
+        FirstNameSource = JourneyInstance!.State.FirstNameSource;
+        MiddleNameSource = JourneyInstance!.State.MiddleNameSource;
+        LastNameSource = JourneyInstance!.State.LastNameSource;
+        DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
+        EmailAddressSource = JourneyInstance!.State.EmailAddressSource;
+        NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
+        Comments = JourneyInstance!.State.Comments;
     }
 
     public async Task<IActionResult> OnPostAsync()
