@@ -23,5 +23,5 @@ public static class JourneyNames
     public const string ResolveApiTrnRequest = nameof(ResolveApiTrnRequest);
     public const string EditDetails = nameof(EditDetails);
     public const string CreatePerson = nameof(CreatePerson);
-    public const string NpqTrnRequest = nameof(NpqTrnRequest);
+    public const string ResolveNpqTrnRequest = nameof(ResolveNpqTrnRequest);
 }

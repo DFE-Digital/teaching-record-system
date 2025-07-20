@@ -1,12 +1,12 @@
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-public class NpqTrnRequestState : IRegisterJourney
+public class ResolveNpqTrnRequestState : IRegisterJourney
 {
     public static Guid CreateNewRecordPersonIdSentinel => Guid.Empty;
 
     public static JourneyDescriptor Journey { get; } = new(
-        JourneyNames.NpqTrnRequest,
-        typeof(NpqTrnRequestState),
+        JourneyNames.ResolveNpqTrnRequest,
+        typeof(ResolveNpqTrnRequestState),
         ["supportTaskReference"],
         appendUniqueKey: true);
 

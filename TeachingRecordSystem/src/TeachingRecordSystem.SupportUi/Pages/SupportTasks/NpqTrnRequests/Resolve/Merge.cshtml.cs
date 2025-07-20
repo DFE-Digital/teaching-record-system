@@ -2,12 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NpqTrnRequestState;
+using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-[Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance]
-public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext)
+[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
+public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     //public TrnRequestMetadata? RequestData => GetRequestData().TrnRequestMetadata!; // CML TODO - need all of this?
 
@@ -107,6 +107,12 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
         });
 
         return Redirect(linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+    }
+
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.SupportTasks());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

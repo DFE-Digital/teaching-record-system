@@ -1,5 +1,5 @@
 @page "/support-tasks/npq-trn-requests/{supportTaskReference}/matches/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.MatchesModel
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.MatchesModel
 @{
     ViewBag.Title = "Compare potential duplicate records";
 }
@@ -211,7 +211,7 @@
 
                     <govuk-radios-divider>or</govuk-radios-divider>
 
-                    <govuk-radios-item value="@NpqTrnRequestState.CreateNewRecordPersonIdSentinel">
+                    <govuk-radios-item value="@ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel">
                         I want to create a new record from the @Model.SourceApplicationUserName request
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
