@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
@@ -545,6 +546,51 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         Assert.NotNull(journeyInstance.State.EmailAddressSource);
         Assert.NotNull(journeyInstance.State.NationalInsuranceNumberSource);
         Assert.True(journeyInstance.State.PersonAttributeSourcesSet);
+    }
+
+    [Fact]
+    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var selectedPersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel;
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveNpqTrnRequestState
+            {
+                PersonId = selectedPersonId,
+                FirstNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                MiddleNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                LastNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                PersonAttributeSourcesSet = true
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/support-tasks", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     private Task<JourneyInstance<ResolveNpqTrnRequestState>> CreateJourneyInstance(
