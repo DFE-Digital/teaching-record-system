@@ -38,6 +38,9 @@ public class CheckAnswersModel(
 
     public string? Comments { get; set; }
 
+    public bool PersonNameChange { get; set; }
+    public bool PersonDetailsChange { get; set; }
+
     public void OnGet()
     {
     }
@@ -130,9 +133,9 @@ public class CheckAnswersModel(
             mobileNumber: null,
             nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
             gender: Gender,
-            nameChangeReason: null,
-            nameChangeEvidenceFile: null,
-            detailsChangeReason: null,
+            nameChangeReason: PersonNameChange ? "Updated person from NPQ TRN request" : null, // CML TODO - I just made this reason up
+            nameChangeEvidenceFile: null, // CML TODO - does this need to have the uploaded file from the Support task?
+            detailsChangeReason: PersonDetailsChange ? "Updated person from NPQ TRN request" : null, // CML TODO - I just made this reason up
             detailsChangeReasonDetail: null,
             detailsChangeEvidenceFile: null,
             SourceApplicationUserId!,
@@ -226,6 +229,12 @@ public class CheckAnswersModel(
         Comments = state.Comments;
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
         SourceApplicationUserId = requestData.ApplicationUser!.UserId;
+        PersonNameChange = state.FirstNameSource == PersonAttributeSource.TrnRequest ||
+                         state.MiddleNameSource == PersonAttributeSource.TrnRequest ||
+                         state.LastNameSource == PersonAttributeSource.TrnRequest;
+        PersonDetailsChange = state.DateOfBirthSource == PersonAttributeSource.TrnRequest ||
+                             state.EmailAddressSource == PersonAttributeSource.TrnRequest ||
+                             state.NationalInsuranceNumberSource == PersonAttributeSource.TrnRequest; // CML TODO - add gender
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
