@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.Matches;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-[Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext)
+[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
+public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -23,13 +24,14 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
 
     public void OnGet()
     {
+        PersonId = JourneyInstance!.State.PersonId;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         // Validate the submitted ID
         if (PersonId is Guid personId &&
-            (!PotentialDuplicates!.Any(d => d.PersonId == personId) && personId != ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel))
+            !PotentialDuplicates!.Any(d => d.PersonId == personId) && personId != ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel)
         {
             return BadRequest();
         }
@@ -57,13 +59,16 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
         });
 
         return Redirect(
-            PersonId == NpqTrnRequestState.CreateNewRecordPersonIdSentinel ?
+            PersonId == ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel ?
                 linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
                 linkGenerator.NpqTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
-    public void OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
+        await JourneyInstance!.DeleteAsync();
+
+        return Redirect(linkGenerator.SupportTasks());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

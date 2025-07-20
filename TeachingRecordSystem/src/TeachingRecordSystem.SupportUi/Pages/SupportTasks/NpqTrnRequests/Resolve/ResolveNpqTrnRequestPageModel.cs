@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NpqTrnRequestState;
+using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-public abstract class NpqTrnRequestPageModel(TrsDbContext dbContext) : PageModel
+public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : PageModel
 {
-    public JourneyInstance<NpqTrnRequestState>? JourneyInstance { get; set; }
+    public JourneyInstance<ResolveNpqTrnRequestState>? JourneyInstance { get; set; }
     protected TrsDbContext DbContext => dbContext;
 
     //public SupportTask SupportTask { get; set; } // CML TODO - need this? or use the getRequestData method below when needed?

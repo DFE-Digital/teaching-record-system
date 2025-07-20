@@ -4,16 +4,16 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NpqTrnRequestState;
+using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-[Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
-    IClock clock) : NpqTrnRequestPageModel(dbContext)
+    IClock clock) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public string? SourceApplicationUserName { get; set; }
     public Guid? SourceApplicationUserId { get; set; }
