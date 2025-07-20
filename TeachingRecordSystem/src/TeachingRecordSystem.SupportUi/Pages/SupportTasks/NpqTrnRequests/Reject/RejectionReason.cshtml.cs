@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
-[Journey(JourneyNames.NpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class RejectionReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : NpqTrnRequestPageModel(dbContext)
+[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
+public class RejectionReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public string PersonName => string.Join(" ", RequestData!.Name);
 

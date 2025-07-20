@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
 public enum RejectionReasonOption
 {

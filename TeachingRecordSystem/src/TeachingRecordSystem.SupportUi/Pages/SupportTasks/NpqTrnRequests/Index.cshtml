@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" /> @* CML TODO go back to ? - probably the list that the API requests go back to*@
+    <govuk-back-link href="@LinkGenerator.SupportTasks()" />
 }
 
 <form action="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" method="post">
@@ -28,7 +28,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Working in school or educational setting</govuk-summary-list-row-key>
