@@ -219,7 +219,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestMatchesCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestMatchesCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
             </div>
         </div>
     </div>
