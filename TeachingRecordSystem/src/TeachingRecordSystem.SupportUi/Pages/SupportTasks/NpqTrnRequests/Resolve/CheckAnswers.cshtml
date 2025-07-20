@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" />  @* CML TODO - backlink depends *@
+    <govuk-back-link href="@LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" />  @* CML TODO - backlink depends - matches or no matches*@
 }
 
 <form action="@LinkGenerator.NpqTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
@@ -47,15 +47,10 @@
                         <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    @*                     <govuk-summary-list-row>
+                    @*<govuk-summary-list-row>
                         <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.Gender</govuk-summary-list-row-value>
                     </govuk-summary-list-row> *@
-                    <govuk-summary-list-row>
-                        @* CML TODO - not shown on design, but normally would be part of CYA page *@
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>TO DO</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
                     @if (Model.Trn is not null)
                     {
                         <govuk-summary-list-row>
@@ -63,6 +58,10 @@
                             <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Comments</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
             <div class="govuk-button-group">
