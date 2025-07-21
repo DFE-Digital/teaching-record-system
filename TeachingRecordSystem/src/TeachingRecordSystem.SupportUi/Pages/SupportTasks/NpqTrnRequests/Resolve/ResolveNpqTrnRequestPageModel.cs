@@ -89,21 +89,6 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
 
         IEnumerable<PersonMatchedAttribute> Impl()
         {
-            if (state.FirstNameSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.FirstName;
-            }
-
-            if (state.MiddleNameSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.MiddleName;
-            }
-
-            if (state.LastNameSource is PersonAttributeSource.TrnRequest)
-            {
-                yield return PersonMatchedAttribute.LastName;
-            }
-
             if (state.DateOfBirthSource is PersonAttributeSource.TrnRequest)
             {
                 yield return PersonMatchedAttribute.DateOfBirth;
@@ -184,9 +169,9 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
 
             return new NpqTrnRequestDataPersonAttributes()
             {
-                FirstName = state.FirstNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.FirstName : trnRequestPersonAttributes.FirstName,
-                MiddleName = state.MiddleNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.MiddleName : trnRequestPersonAttributes.MiddleName,
-                LastName = state.LastNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.LastName : trnRequestPersonAttributes.LastName,
+                FirstName = selectedPersonAttributes.FirstName,
+                MiddleName = selectedPersonAttributes.MiddleName,
+                LastName = selectedPersonAttributes.LastName,
                 DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.DateOfBirth : trnRequestPersonAttributes.DateOfBirth,
                 EmailAddress = state.EmailAddressSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.EmailAddress : trnRequestPersonAttributes.EmailAddress,
                 NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.NationalInsuranceNumber : trnRequestPersonAttributes.NationalInsuranceNumber

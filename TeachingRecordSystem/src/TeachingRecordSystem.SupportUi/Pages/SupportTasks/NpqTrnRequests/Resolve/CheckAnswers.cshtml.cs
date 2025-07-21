@@ -124,27 +124,21 @@ public class CheckAnswersModel(
             throw new ArgumentException("Person not found.");
         }
 
-        person!.UpdateDetails(
-            firstName: FirstName ?? string.Empty,
-            middleName: MiddleName ?? string.Empty,
-            lastName: LastName ?? string.Empty,
+        // create new PersonUpdatedFromTrnRequestEvent - add all the metadata - 
+        person!.UpdateDetailsFromTrnRequest(
             dateOfBirth: DateOfBirth,
             emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
-            mobileNumber: null,
             nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
-            gender: Gender,
-            nameChangeReason: PersonNameChange ? "Updated person from NPQ TRN request" : null, // CML TODO - I just made this reason up
-            nameChangeEvidenceFile: null, // CML TODO - does this need to have the uploaded file from the Support task?
-            detailsChangeReason: PersonDetailsChange ? "Updated person from NPQ TRN request" : null, // CML TODO - I just made this reason up
-            detailsChangeReasonDetail: null, // CML TODO - should the comments from the page go in here?
-            detailsChangeEvidenceFile: null, // CML TODO - does this need to have the uploaded file from the Support task?
+            detailsChangeReasonDetail: Comments,
+            detailsChangeEvidenceFile: null, // requestData.UploadedEvidence, // TODO the uploaded file from the Support task
             SourceApplicationUserId!,
             clock.UtcNow,
-            out var updatedEvent);
+            requestData,
+            out var updateEvent);
         await DbContext.SaveChangesAsync();
-        if (updatedEvent is not null)
+        if (updateEvent is not null)
         {
-            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await DbContext.AddEventAndBroadcastAsync(updateEvent);
             await DbContext.SaveChangesAsync();
         }
 
@@ -187,10 +181,10 @@ public class CheckAnswersModel(
 
         if (state.PersonId == CreateNewRecordPersonIdSentinel)
         {
-            CreatingNewRecord = true;
             FirstName = requestData.FirstName;
             MiddleName = requestData.MiddleName;
             LastName = requestData.LastName;
+            CreatingNewRecord = true;
             DateOfBirth = requestData.DateOfBirth;
             EmailAddress = requestData.EmailAddress;
             NationalInsuranceNumber = requestData.NationalInsuranceNumber;
@@ -210,31 +204,23 @@ public class CheckAnswersModel(
                     p.DateOfBirth,
                     p.EmailAddress,
                     p.NationalInsuranceNumber,
-                    p.Gender,
                     p.Trn
                 })
                 .SingleAsync();
 
             CreatingNewRecord = false;
-            FirstName = state.FirstNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.FirstName : requestData.FirstName;
-            MiddleName = state.MiddleNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.MiddleName : requestData.MiddleName;
-            LastName = state.LastNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.LastName : requestData.LastName;
+            FirstName = selectedPerson.FirstName;
+            MiddleName = selectedPerson.MiddleName;
+            LastName = selectedPerson.LastName;
             DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.ExistingRecord ? selectedPerson.DateOfBirth : requestData.DateOfBirth;
             EmailAddress = state.EmailAddressSource == PersonAttributeSource.ExistingRecord ? selectedPerson.EmailAddress : requestData.EmailAddress;
             NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.ExistingRecord ? selectedPerson.NationalInsuranceNumber : requestData.NationalInsuranceNumber;
-            Gender = selectedPerson.Gender;
             Trn = selectedPerson.Trn;
         }
 
         Comments = state.Comments;
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
         SourceApplicationUserId = requestData.ApplicationUser!.UserId;
-        PersonNameChange = state.FirstNameSource == PersonAttributeSource.TrnRequest ||
-                         state.MiddleNameSource == PersonAttributeSource.TrnRequest ||
-                         state.LastNameSource == PersonAttributeSource.TrnRequest;
-        PersonDetailsChange = state.DateOfBirthSource == PersonAttributeSource.TrnRequest ||
-                             state.EmailAddressSource == PersonAttributeSource.TrnRequest ||
-                             state.NationalInsuranceNumberSource == PersonAttributeSource.TrnRequest; // CML TODO - add gender
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

@@ -12,9 +12,6 @@ public abstract class ResolveNpqTrnRequestTestBase(HostFixture hostFixture) : Te
             applicationUserId,
             t => t
                 .WithMatchedRecords(matchedPerson.PersonId)
-                .WithFirstName(TestData.GenerateChangedFirstName(matchedPerson.FirstName))
-                .WithMiddleName(TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
-                .WithLastName(TestData.GenerateChangedLastName(matchedPerson.LastName))
                 .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
@@ -35,18 +32,6 @@ public abstract class ResolveNpqTrnRequestTestBase(HostFixture hostFixture) : Te
             applicationUserId,
             t => t
                 .WithMatchedRecords(matchedPerson.PersonId)
-                .WithFirstName(
-                    differentAttribute != PersonMatchedAttribute.FirstName
-                        ? matchedPerson.FirstName
-                        : TestData.GenerateChangedFirstName(matchedPerson.FirstName))
-                .WithMiddleName(
-                    differentAttribute != PersonMatchedAttribute.MiddleName
-                        ? matchedPerson.MiddleName
-                        : TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
-                .WithLastName(
-                    differentAttribute != PersonMatchedAttribute.LastName
-                        ? matchedPerson.LastName
-                        : TestData.GenerateChangedLastName(matchedPerson.LastName))
                 .WithDateOfBirth(
                     differentAttribute != PersonMatchedAttribute.DateOfBirth
                         ? matchedPerson.DateOfBirth

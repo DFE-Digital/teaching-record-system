@@ -148,9 +148,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
             new ResolveNpqTrnRequestState
             {
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
-                FirstNameSource = PersonAttributeSource.TrnRequest,
-                MiddleNameSource = PersonAttributeSource.TrnRequest,
-                LastNameSource = PersonAttributeSource.TrnRequest,
                 DateOfBirthSource = PersonAttributeSource.TrnRequest,
                 EmailAddressSource = PersonAttributeSource.TrnRequest,
                 NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
@@ -186,9 +183,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
             new ResolveNpqTrnRequestState
             {
                 PersonId = matchedPerson.PersonId,
-                FirstNameSource = PersonAttributeSource.ExistingRecord,
-                MiddleNameSource = PersonAttributeSource.ExistingRecord,
-                LastNameSource = PersonAttributeSource.ExistingRecord,
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
@@ -297,9 +291,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
     }
 
     [Theory]
-    [InlineData(PersonMatchedAttribute.FirstName, "FirstNameSource", "Select a first name")]
-    [InlineData(PersonMatchedAttribute.MiddleName, "MiddleNameSource", "Select a middle name")]
-    [InlineData(PersonMatchedAttribute.LastName, "LastNameSource", "Select a last name")]
     [InlineData(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
     [InlineData(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
     [InlineData(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
@@ -369,9 +360,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
             supportTask.SupportTaskReference,
             matchedPerson.PersonId);
 
-        var firstNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var middleNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var lastNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
@@ -382,9 +370,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "FirstNameSource", firstNameSelection },
-                { "MiddleNameSource", middleNameSelection },
-                { "LastNameSource", lastNameSelection },
                 { "DateOfBirthSource", dateOfBirthSelection },
                 { "EmailAddressSource", emailAddressSelection },
                 { "NationalInsuranceNumberSource", nationalInsuranceNumberSelection },
@@ -401,9 +386,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(firstNameSelection, journeyInstance.State.FirstNameSource);
-        Assert.Equal(middleNameSelection, journeyInstance.State.MiddleNameSource);
-        Assert.Equal(lastNameSelection, journeyInstance.State.LastNameSource);
         Assert.Equal(dateOfBirthSelection, journeyInstance.State.DateOfBirthSource);
         Assert.Equal(emailAddressSelection, journeyInstance.State.EmailAddressSource);
         Assert.Equal(nationalInsuranceNumberSelection, journeyInstance.State.NationalInsuranceNumberSource);
@@ -422,9 +404,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
             supportTask.SupportTaskReference,
             matchedPerson.PersonId);
 
-        var firstNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var middleNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var lastNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
@@ -454,9 +433,6 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
 
     public static TheoryData<PersonMatchedAttribute, string> AttributesAndFieldsData { get; } = new()
     {
-        { PersonMatchedAttribute.FirstName, "FirstNameSource" },
-        { PersonMatchedAttribute.MiddleName, "MiddleNameSource" },
-        { PersonMatchedAttribute.LastName, "LastNameSource" },
         { PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource" },
         { PersonMatchedAttribute.EmailAddress, "EmailAddressSource" },
         { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource" }
