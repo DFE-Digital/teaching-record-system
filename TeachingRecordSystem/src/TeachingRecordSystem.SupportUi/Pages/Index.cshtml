@@ -7,14 +7,14 @@
     ViewBag.Title = "Records";
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<h2 class="govuk-heading-m">@ViewBag.Title</h2>
 
 <div class="govuk-!-margin-bottom-6">
     <form action="@LinkGenerator.Persons()" method="get" asp-antiforgery="false" data-testid="search-form">
         <div class="moj-search trs-search govuk-!-margin-bottom-4">
             <govuk-input name="Search" input-class="moj-search__input" data-testid="search-input" type="search" autocomplete="off">
                 <govuk-input-label class="moj-search__label">
-                    <h2 class="govuk-heading-s govuk-!-margin-bottom-0">Search for a record</h2>
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Search for a record</h3>
                 </govuk-input-label>
                 <govuk-input-hint class="moj-search__hint">
                     For example TRN, name or date of birth
@@ -29,4 +29,17 @@
 {
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h2>
     <govuk-button-link href="@LinkGenerator.PersonCreate()">Create a record</govuk-button-link>
+}
+
+@if (FeatureProvider.IsEnabled(FeatureNames.ApiTrnRequestsInTrs) && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
+{
+    <div class="trs-tile-section">
+        <h2 class="govuk-heading-m">TRN requests</h2>
+        <div class="trs-tile-row">
+            <a href="@LinkGenerator.ApiTrnRequests()" class="trs-tile">
+                <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ApiTrnRequest)</span>
+                <span class="trs-tile__title">Duplicates via API</span>
+            </a>
+        </div>
+    </div>
 }
