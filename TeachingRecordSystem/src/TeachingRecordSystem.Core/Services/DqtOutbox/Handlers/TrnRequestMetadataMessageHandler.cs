@@ -9,7 +9,7 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
     {
         if (!await dbContext.TrnRequestMetadata.AnyAsync(m => m.ApplicationUserId == message.ApplicationUserId && m.RequestId == message.RequestId))
         {
-            dbContext.TrnRequestMetadata.Add(new DataStore.Postgres.Models.TrnRequestMetadata
+            var trnRequestMetadata = new DataStore.Postgres.Models.TrnRequestMetadata
             {
                 ApplicationUserId = message.ApplicationUserId,
                 RequestId = message.RequestId,
@@ -33,9 +33,15 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
                 City = message.City,
                 Postcode = message.Postcode,
                 Country = message.Country,
-                TrnToken = message.TrnToken,
-                ResolvedPersonId = message.ResolvedPersonId
-            });
+                TrnToken = message.TrnToken
+            };
+
+            if (message.ResolvedPersonId is Guid personId)
+            {
+                trnRequestMetadata.SetResolvedPerson(personId);
+            }
+
+            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
             await dbContext.SaveChangesAsync();
         }
     }

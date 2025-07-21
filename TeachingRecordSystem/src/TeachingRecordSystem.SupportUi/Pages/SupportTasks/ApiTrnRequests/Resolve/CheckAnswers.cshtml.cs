@@ -72,7 +72,7 @@ public class CheckAnswers(
         if (CreatingNewRecord)
         {
             var newContactId = Guid.NewGuid();
-            requestData.ResolvedPersonId = newContactId;
+            requestData.SetResolvedPerson(newContactId);
 
             var trn = await trnGenerator.GenerateTrnAsync();
             var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
@@ -87,7 +87,7 @@ public class CheckAnswers(
         {
             Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
-            requestData.ResolvedPersonId = existingContactId;
+            requestData.SetResolvedPerson(existingContactId);
 
             Debug.Assert(Trn is not null);
             requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);

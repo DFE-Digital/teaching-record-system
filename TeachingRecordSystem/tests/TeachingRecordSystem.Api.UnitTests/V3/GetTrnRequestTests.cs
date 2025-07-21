@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -142,7 +141,7 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
 
             await base.DbFixture.WithDbContextAsync(async dbContext =>
             {
-                dbContext.TrnRequestMetadata.Add(new TrnRequestMetadata
+                var trnRequestMetadata = new TrnRequestMetadata
                 {
                     ApplicationUserId = applicationUserId,
                     RequestId = requestId,
@@ -164,10 +163,11 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
                     City = null,
                     Postcode = null,
                     Country = null,
-                    TrnToken = null,
-                    ResolvedPersonId = person.PersonId
-                });
+                    TrnToken = null
+                };
+                trnRequestMetadata.SetResolvedPerson(person.PersonId);
 
+                dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
                 await dbContext.SaveChangesAsync();
             });
 

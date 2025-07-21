@@ -26,8 +26,15 @@ public class TrnRequestMetadata
     public string? Postcode { get; init; }
     public string? Country { get; init; }
     public string? TrnToken { get; set; }
-    public Guid? ResolvedPersonId { get; set; }
+    public Guid? ResolvedPersonId { get; private set; }
+    public TrnRequestStatus Status { get; private set; } = TrnRequestStatus.Pending;
     public TrnRequestMatches? Matches { get; set; }
+
+    public void SetResolvedPerson(Guid personId, TrnRequestStatus requestStatus = TrnRequestStatus.Completed)
+    {
+        ResolvedPersonId = personId;
+        Status = requestStatus;
+    }
 }
 
 public record TrnRequestMatches
