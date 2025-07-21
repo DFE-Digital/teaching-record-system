@@ -27,15 +27,15 @@ erDiagram
   Educational-Establishment ::: TRS
   Provider-Type ::: TRS
 
+  Induction ::: TRS
   Induction-Status ::: TRS
   Induction-Exemption-Reason ::: TRS
   Induction-Period ::: CPD
-  National-Professional-Qualification ::: CPD
 
 
   Person ||--o{ Teaching-Alerts : "Can Have"
   Person ||--o{ National-Professional-Qualification : "Can Have"
-  Teaching-Alerts ||--o| Teaching-Sanction-Prohibition : "Can Result In"
+  Teaching-Alerts ||--o| Teaching-Sanction-Prohibition : "Reported as"
 
 
   Induction-Exemption-Reason||--o{ Induction-Status : "Affects"
@@ -43,7 +43,8 @@ erDiagram
   Route-to-a-Professional-Status ||--o| Induction-Exemption-Reason : "Might result in an"
   Person ||--o{ Induction-Exemption-Reason : "Can have an"
   Person ||--o{ Induction-Status : "Might need to complete an"
-  Induction-Period }o--o| Induction-Status : "contributes to"
+  Induction-Period }o--o| Induction : "Makes up"
+  Induction ||--|| Induction-Status : "contributes to"
 
 
 

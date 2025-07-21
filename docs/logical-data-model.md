@@ -15,21 +15,21 @@ erDiagram
 
   Induction-Exemption-Reason||--o{ Induction : "Affects"
 
-  Route-To-Professional-Status ||--o| Induction-Exemption-Reason : "Might result in an"
+  Route-to-a-Professional-Status ||--o| Induction-Exemption-Reason : "Might result in an"
   Person ||--o{ Induction-Exemption-Reason : "Can have an"
   Person ||--o{ Induction : "Might need to complete an"
 
 
 
   Person ||--o{ Teacher-training : "Can do"
-  Route-To-Professional-Status ||--o{ Teacher-training : "Might require"
+  Route-to-a-Professional-Status ||--o{ Teacher-training : "Might require"
 
 
   Person ||--o{ Recognition : "Might apply for"
-  Recognition ||--|| Route-To-Professional-Status : "Which is a"
+  Recognition ||--|| Route-to-a-Professional-Status : "Which is a"
 
   Person ||--o{ Equivalence : "Might be granted"
-  Equivalence ||--|| Route-To-Professional-Status : "Which is a"
+  Equivalence ||--|| Route-to-a-Professional-Status : "Which is a"
 
   Teacher-training ||--o{ Teaching-Qualification : "Can Lead To"
 
@@ -37,8 +37,8 @@ erDiagram
   Professional-Status |o--o{ Teaching-Qualification  : "Can be a"
 
 
-  Person ||--o{ Route-To-Professional-Status : "Could take a"
-  Route-To-Professional-Status ||--o| Professional-Status : "And obtain"
+  Person ||--o{ Route-to-a-Professional-Status : "Could take a"
+  Route-to-a-Professional-Status ||--o| Professional-Status : "And obtain"
   Person ||--o{ Professional-Status : "Can hold"
 
 
@@ -50,6 +50,4 @@ erDiagram
   Provider ||--|| Provider-Type : "has a"
 
   Teacher-training ||--o{ Provider : "With a"
-
-
 ```
