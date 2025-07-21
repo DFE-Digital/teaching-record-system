@@ -48,9 +48,6 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
 
             if (oldPersonId != PersonId)
             {
-                state.FirstNameSource = null;
-                state.MiddleNameSource = null;
-                state.LastNameSource = null;
                 state.DateOfBirthSource = null;
                 state.EmailAddressSource = null;
                 state.NationalInsuranceNumberSource = null;
