@@ -155,7 +155,6 @@ public partial class TestData
                 Postcode = null,
                 Country = null,
                 TrnToken = null,
-                ResolvedPersonId = null,
                 Matches = matches
             };
 

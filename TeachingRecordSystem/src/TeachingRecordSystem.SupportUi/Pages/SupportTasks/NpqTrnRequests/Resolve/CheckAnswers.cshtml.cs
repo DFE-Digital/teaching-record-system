@@ -70,8 +70,8 @@ public class CheckAnswersModel(
         //string jobId;
         if (CreatingNewRecord)
         {
-            var newContactId = Guid.NewGuid();
-            requestData.ResolvedPersonId = newContactId;
+            var newPersonId = Guid.NewGuid();
+            requestData.SetResolvedPerson(newPersonId);
 
             var trn = await trnGenerator.GenerateTrnAsync();
             //var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
@@ -86,7 +86,7 @@ public class CheckAnswersModel(
         {
             //Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
-            requestData.ResolvedPersonId = existingContactId;
+            requestData.SetResolvedPerson(existingContactId);
 
             //Debug.Assert(Trn is not null);
             //requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
