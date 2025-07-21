@@ -368,7 +368,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             Assert.Equal(matchedPerson.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
-            //Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken); // CML TODO what's the TRN token for?
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
@@ -383,6 +382,10 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         });
 
         // event is published
+        var expectedMetadata = EventModels.TrnRequestMetadata.FromModel(supportTask.TrnRequestMetadata!) with
+        {
+            ResolvedPersonId = matchedPerson.PersonId
+        };
         EventPublisher.AssertEventsSaved(e =>
         {
             // CML TODO - test all of this event 
@@ -391,8 +394,14 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(matchedPerson.PersonId, actualEvent.PersonId);
             Assert.Equal(matchedPerson.FirstName, actualEvent.Details.FirstName);
+            Assert.Equal(matchedPerson.MiddleName, actualEvent.Details.MiddleName);
+            Assert.Equal(matchedPerson.LastName, actualEvent.Details.LastName);
             Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, actualEvent.Details.EmailAddress);
+            Assert.Equal(matchedPerson.NationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
+            Assert.Equal(matchedPerson.DateOfBirth, actualEvent.Details.DateOfBirth);
             Assert.Equal(comments, actualEvent.DetailsChangeReasonDetail);
+            AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.TrnRequestMetadata);
+            // CML TODO check that event holds reference to the file-uploaded evidence
             Assert.Equal(PersonDetailsUpdatedFromTrnRequestEventChanges.EmailAddress, actualEvent.Changes);
         });
 
@@ -533,6 +542,18 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         Assert.Equal(personAttributes.DateOfBirth, expectedPersonAttributes.DateOfBirth);
         Assert.Equal(personAttributes.EmailAddress, expectedPersonAttributes.EmailAddress);
         Assert.Equal(personAttributes.NationalInsuranceNumber, expectedPersonAttributes.NationalInsuranceNumber);
+    }
+
+    private void AssertTrnRequestMetadataMatches(EventModels.TrnRequestMetadata expected, EventModels.TrnRequestMetadata actual)
+    {
+        Assert.Equal(expected.FirstName, actual.FirstName);
+        Assert.Equal(expected.MiddleName, actual.MiddleName);
+        Assert.Equal(expected.LastName, actual.LastName);
+        Assert.Equal(expected.EmailAddress, actual.EmailAddress);
+        Assert.Equal(expected.NationalInsuranceNumber, actual.NationalInsuranceNumber);
+        Assert.Equal(expected.DateOfBirth, actual.DateOfBirth);
+        Assert.Equal(expected.ResolvedPersonId, actual.ResolvedPersonId);
+        Assert.Equivalent(expected.Matches, actual.Matches);
     }
 
     public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
