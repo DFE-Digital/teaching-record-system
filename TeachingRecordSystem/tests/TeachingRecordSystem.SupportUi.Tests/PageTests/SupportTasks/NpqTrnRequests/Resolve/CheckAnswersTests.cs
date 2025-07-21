@@ -388,7 +388,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         };
         EventPublisher.AssertEventsSaved(e =>
         {
-            // CML TODO - test all of this event 
             var actualEvent = Assert.IsType<PersonDetailsUpdatedFromTrnRequestEvent>(e);
 
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
@@ -401,7 +400,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(matchedPerson.DateOfBirth, actualEvent.Details.DateOfBirth);
             Assert.Equal(comments, actualEvent.DetailsChangeReasonDetail);
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.TrnRequestMetadata);
-            // CML TODO check that event holds reference to the file-uploaded evidence
+            // CML TODO check that event holds reference to the file-uploaded evidence once I've added it
             Assert.Equal(PersonDetailsUpdatedFromTrnRequestEventChanges.EmailAddress, actualEvent.Changes);
         });
 
