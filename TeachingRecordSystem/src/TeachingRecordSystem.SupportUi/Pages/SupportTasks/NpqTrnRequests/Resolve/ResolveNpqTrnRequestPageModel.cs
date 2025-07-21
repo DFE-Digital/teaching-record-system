@@ -14,12 +14,10 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
     public JourneyInstance<ResolveNpqTrnRequestState>? JourneyInstance { get; set; }
     protected TrsDbContext DbContext => dbContext;
 
-    //public SupportTask SupportTask { get; set; } // CML TODO - need this? or use the getRequestData method below when needed?
-
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
-    protected TrnRequestMetadata GetRequestData() // CML TODO decide whether to use this or Supportask above
+    protected TrnRequestMetadata GetRequestData()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         return supportTask.TrnRequestMetadata!;
@@ -34,7 +32,6 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
             return;
         }
 
-        //SupportTask = supportTaskFeature.SupportTask;
         base.OnPageHandlerExecuting(context);
     }
 

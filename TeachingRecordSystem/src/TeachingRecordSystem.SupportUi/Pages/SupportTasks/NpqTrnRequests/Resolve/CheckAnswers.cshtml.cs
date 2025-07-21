@@ -84,11 +84,11 @@ public class CheckAnswersModel(
         }
         else
         {
-            Debug.Assert(state.PersonId is not null);
+            //Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
             requestData.ResolvedPersonId = existingContactId;
 
-            Debug.Assert(Trn is not null);
+            //Debug.Assert(Trn is not null);
             //requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
 
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
@@ -136,8 +136,8 @@ public class CheckAnswersModel(
             nameChangeReason: PersonNameChange ? "Updated person from NPQ TRN request" : null, // CML TODO - I just made this reason up
             nameChangeEvidenceFile: null, // CML TODO - does this need to have the uploaded file from the Support task?
             detailsChangeReason: PersonDetailsChange ? "Updated person from NPQ TRN request" : null, // CML TODO - I just made this reason up
-            detailsChangeReasonDetail: null,
-            detailsChangeEvidenceFile: null,
+            detailsChangeReasonDetail: null, // CML TODO - should the comments from the page go in here?
+            detailsChangeEvidenceFile: null, // CML TODO - does this need to have the uploaded file from the Support task?
             SourceApplicationUserId!,
             clock.UtcNow,
             out var updatedEvent);

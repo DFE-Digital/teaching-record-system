@@ -2,10 +2,14 @@
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.CheckAnswersModel
 @{
     ViewBag.Title = "Check details before updating record"; @* CML TODO - next ticket - content conditional - updating or creating *@
+
+    var backLink = Model.CreatingNewRecord @* CML TODO - backlink depends - matches or no matches*@
+        ? LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
+        : LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" />  @* CML TODO - backlink depends - matches or no matches*@
+    <govuk-back-link href="@backLink" />  
 }
 
 <form action="@LinkGenerator.NpqTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
@@ -22,6 +26,9 @@
                 <govuk-summary-card-title>
                     Details of the record
                 </govuk-summary-card-title>
+                <govuk-summary-card-actions>
+                    <govuk-summary-card-action href="@backLink" data-testid="change-link">Change</govuk-summary-card-action>
+                </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
@@ -65,7 +72,7 @@
                 </govuk-summary-list>
             </govuk-summary-card>
             <div class="govuk-button-group">
-                <govuk-button type="submit">Confirm and update record</govuk-button> @* CML TODO next ticket update or create conditional content *@
+                <govuk-button type="submit" data-testid="submit">Confirm and update record</govuk-button> @* CML TODO next ticket update or create conditional content *@
                 <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestCheckAnswersCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
