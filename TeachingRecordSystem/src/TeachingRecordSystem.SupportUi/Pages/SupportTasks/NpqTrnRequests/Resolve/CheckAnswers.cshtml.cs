@@ -51,106 +51,73 @@ public class CheckAnswersModel(
         var requestData = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
 
-        //var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
-        //EventModels.TrnRequestPersonAttributes? oldPersonAttributes;
-
-        // CMl TODO - check don't need this
-        //async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
-        //{
-        //    if (string.IsNullOrEmpty(requestData.EmailAddress))
-        //    {
-        //        return null;
-        //    }
-
-        //    return await trnRequestService.CreateTrnTokenAsync(trn, requestData.EmailAddress);
-        //}
 
         // CML TODO - Creating is the ticket after this one
-        //string jobId;
         if (CreatingNewRecord)
         {
             var newPersonId = Guid.NewGuid();
             requestData.SetResolvedPerson(newPersonId);
 
             var trn = await trnGenerator.GenerateTrnAsync();
-            //var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
-            //requestData.TrnToken = trnToken;
 
-            //jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
-            //    trnRequestService => trnRequestService.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
             selectedPersonAttributes = null;
-            //oldPersonAttributes = null;
         }
-        else
+        else // updating
         {
-            //Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
             requestData.SetResolvedPerson(existingContactId);
-
-            //Debug.Assert(Trn is not null);
-            //requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
 
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            //oldPersonAttributes = new EventModels.TrnRequestPersonAttributes()
-            //{
-            //    FirstName = selectedPersonAttributes.FirstName,
-            //    MiddleName = selectedPersonAttributes.MiddleName,
-            //    LastName = selectedPersonAttributes.LastName,
-            //    DateOfBirth = selectedPersonAttributes.DateOfBirth,
-            //    EmailAddress = selectedPersonAttributes.EmailAddress,
-            //    NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber
-            //};
-        }
+            Debug.Assert(requestData.ResolvedPersonId is not null);
 
-        Debug.Assert(requestData.ResolvedPersonId is not null);
+            var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
-        var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
+            supportTask.Status = SupportTaskStatus.Closed;
+            supportTask.UpdatedOn = clock.UtcNow;
+            supportTask.UpdateData<NpqTrnRequestData>(data => data with
+            {
+                ResolvedAttributes = resolvedPersonAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes
+            });
 
-        supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = clock.UtcNow;
-        supportTask.UpdateData<NpqTrnRequestData>(data => data with
-        {
-            ResolvedAttributes = resolvedPersonAttributes,
-            SelectedPersonAttributes = selectedPersonAttributes
-        });
+            // CML TODO updating the person here for now
+            var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId);
+            if (person == null)
+            {
+                throw new ArgumentException("Person not found.");
+            }
 
-        // CML TODO updating the person here for now
-        var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId);
-        if (person == null)
-        {
-            throw new ArgumentException("Person not found.");
-        }
-
-        // create new PersonUpdatedFromTrnRequestEvent - add all the metadata - 
-        person!.UpdateDetailsFromTrnRequest(
-            dateOfBirth: DateOfBirth,
-            emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
-            nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
-            detailsChangeReasonDetail: Comments,
-            detailsChangeEvidenceFile: null, // requestData.UploadedEvidence, // CML TODO the uploaded file from the Support task
-            SourceApplicationUserId!,
-            clock.UtcNow,
-            requestData,
-            out var updateEvent);
-        await DbContext.SaveChangesAsync();
-        if (updateEvent is not null)
-        {
-            await DbContext.AddEventAndBroadcastAsync(updateEvent);
+            // create new PersonUpdatedFromTrnRequestEvent - add all the metadata - 
+            person!.UpdateDetailsFromTrnRequest(
+                dateOfBirth: DateOfBirth,
+                emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
+                nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
+                detailsChangeReasonDetail: Comments,
+                detailsChangeEvidenceFile: null, // requestData.UploadedEvidence, // CML TODO the uploaded file from the Support task
+                SourceApplicationUserId!,
+                clock.UtcNow,
+                requestData,
+                out var updateEvent);
             await DbContext.SaveChangesAsync();
-        }
+            if (updateEvent is not null)
+            {
+                await DbContext.AddEventAndBroadcastAsync(updateEvent);
+                await DbContext.SaveChangesAsync();
+            }
 
-        // This is a little ugly but pushing this into a partial and executing it here is tricky
-        var flashMessageHtml =
-            $@"
+            // This is a little ugly but pushing this into a partial and executing it here is tricky
+            var flashMessageHtml =
+                $@"
             <a href=""{linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)}"" class=""govuk-link"">View record</a>
             ";
 
-        TempData.SetFlashSuccess(
-            $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
-            messageHtml: flashMessageHtml);
+            TempData.SetFlashSuccess(
+                $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
+                messageHtml: flashMessageHtml);
+        }
 
         return Redirect(linkGenerator.SupportTasks());
     }
