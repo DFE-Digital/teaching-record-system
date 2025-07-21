@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250721161658_TrnRequestMetadataStatusOptional")]
+    partial class TrnRequestMetadataStatusOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -19967,6 +19970,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_trn_request_metadata_application_users_application_user_id");
 
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "ResolvedPerson")
+                        .WithMany()
+                        .HasForeignKey("ResolvedPersonId")
+                        .HasConstraintName("fk_trn_request_metadata_persons_resolved_person_id");
+
                     b.OwnsOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches", "Matches", b1 =>
                         {
                             b1.Property<Guid>("TrnRequestMetadataApplicationUserId")
@@ -20017,6 +20025,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Matches");
+
+                    b.Navigation("ResolvedPerson");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.WebhookEndpoint", b =>

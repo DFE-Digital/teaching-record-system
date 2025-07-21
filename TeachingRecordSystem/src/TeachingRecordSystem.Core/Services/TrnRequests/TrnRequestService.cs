@@ -28,19 +28,36 @@ public class TrnRequestService(
 
     public async Task<GetTrnRequestResult?> GetTrnRequestInfoAsync(Guid applicationUserId, string requestId)
     {
-        var crmTrnRequestId = GetCrmTrnRequestId(applicationUserId, requestId);
-        var getContactByTrnRequestIdTask = crmQueryDispatcher.ExecuteQueryAsync(
-            new GetContactByTrnRequestIdQuery(crmTrnRequestId, new ColumnSet(Contact.Fields.ContactId, Contact.Fields.dfeta_TrnToken)));
+        // If we have a support task for this request, we don't need to check CRM and figure out its status here.
+        // This is a little clunky currently as we can't have an FK from TrnRequestMetadata.ResolvedPersonId to Person
+        // since the Person may not have synced from DQT into TRS yet.
+        var fromSupportTask = await dbContext.SupportTasks
+            .Include(t => t.TrnRequestMetadata)
+            .Select(t => t.TrnRequestMetadata!)
+            .SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId && m.RequestId == requestId);
 
-        var dbTrnRequest = await dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == applicationUserId.ToString() && r.RequestId == requestId);
+        if (fromSupportTask is not null)
+        {
+            var resolvedPersonTrn = await dbContext.Persons.Where(p => p.PersonId == fromSupportTask.ResolvedPersonId).Select(p => p.Trn).SingleAsync();
+            return new GetTrnRequestResult(fromSupportTask, resolvedPersonTrn);
+        }
+
+        // If we get here then there's no support task in TRS for this request, so it must be in CRM (or not exist at all).
+
         var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
-
-        Guid contactId;
 
         if (metadata is null)
         {
             return null;
         }
+
+        var crmTrnRequestId = GetCrmTrnRequestId(applicationUserId, requestId);
+        var getContactByTrnRequestIdTask = crmQueryDispatcher.ExecuteQueryAsync(
+            new GetContactByTrnRequestIdQuery(crmTrnRequestId, new ColumnSet(Contact.Fields.ContactId, Contact.Fields.dfeta_TrnToken)));
+
+        var dbTrnRequest = await dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == applicationUserId.ToString() && r.RequestId == requestId);
+
+        Guid contactId;
 
         if (metadata.ResolvedPersonId is Guid personId)
         {
@@ -79,22 +96,23 @@ public class TrnRequestService(
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_TrnToken)));
 
-        var result = new GetTrnRequestResult(contact, metadata);
+        // If the contact returned above has a TRN then the task has been resolved in CRM and this request is completed.
+        var completed = !string.IsNullOrEmpty(contact.dfeta_TRN);
 
-        // If the request is Completed, ensure we've got a TRN and TRN token assigned to metadata
-        if (result.IsCompleted)
+        // If the request is Completed, ensure we've got a TRN and TRN token assigned to metadata as well as the resolved person's ID.
+        if (completed)
         {
             if (metadata.TrnToken is null && metadata.EmailAddress is not null)
             {
-                metadata.TrnToken = await CreateTrnTokenAsync(result.Trn, metadata.EmailAddress);
+                metadata.TrnToken = await CreateTrnTokenAsync(contact.dfeta_TRN, metadata.EmailAddress);
             }
 
-            metadata.SetResolvedPerson(result.Contact.Id);
+            metadata.SetResolvedPerson(contact.Id);
 
             await dbContext.SaveChangesAsync();
         }
 
-        return result;
+        return new GetTrnRequestResult(metadata, contact.dfeta_TRN);
     }
 
     public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId, string trn)

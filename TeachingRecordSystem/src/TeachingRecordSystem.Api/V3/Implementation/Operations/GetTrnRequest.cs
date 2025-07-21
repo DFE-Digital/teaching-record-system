@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -19,7 +18,7 @@ public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentU
             return ApiError.TrnRequestDoesNotExist(command.RequestId);
         }
 
-        var contact = trnRequest.Contact;
+        var metadata = trnRequest.Metadata;
 
         return new TrnRequestInfo()
         {
@@ -28,19 +27,18 @@ public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentU
             Person = new TrnRequestInfoPerson()
 #pragma warning restore TRS0001
             {
-                // FUTURE - these values should be what was submitted in the original request
-                FirstName = contact.FirstName,
-                LastName = contact.LastName,
-                MiddleName = contact.MiddleName,
-                EmailAddress = contact.EMailAddress1,
-                NationalInsuranceNumber = contact.dfeta_NINumber,
-                DateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false)
+                FirstName = metadata.FirstName!,
+                LastName = metadata.LastName!,
+                MiddleName = metadata.MiddleName,
+                EmailAddress = metadata.EmailAddress,
+                NationalInsuranceNumber = metadata.NationalInsuranceNumber,
+                DateOfBirth = metadata.DateOfBirth
             },
-            Trn = trnRequest.Trn,
-            Status = trnRequest.IsCompleted ? TrnRequestStatus.Completed : TrnRequestStatus.Pending,
-            PotentialDuplicate = trnRequest.PotentialDuplicate,
-            AccessYourTeachingQualificationsLink = trnRequest.TrnToken is not null ?
-                trnRequestService.GetAccessYourTeachingQualificationsLink(trnRequest.TrnToken) :
+            Trn = trnRequest.ResolvedPersonTrn,
+            Status = metadata.Status ?? TrnRequestStatus.Pending,
+            PotentialDuplicate = metadata.PotentialDuplicate ?? false,
+            AccessYourTeachingQualificationsLink = metadata.TrnToken is string trnToken ?
+                trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) :
                 null
         };
     }

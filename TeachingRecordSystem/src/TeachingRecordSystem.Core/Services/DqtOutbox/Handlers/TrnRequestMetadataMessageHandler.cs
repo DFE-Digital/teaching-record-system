@@ -9,32 +9,7 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
     {
         if (!await dbContext.TrnRequestMetadata.AnyAsync(m => m.ApplicationUserId == message.ApplicationUserId && m.RequestId == message.RequestId))
         {
-            var trnRequestMetadata = new DataStore.Postgres.Models.TrnRequestMetadata
-            {
-                ApplicationUserId = message.ApplicationUserId,
-                RequestId = message.RequestId,
-                CreatedOn = message.CreatedOn,
-                IdentityVerified = message.IdentityVerified,
-                OneLoginUserSubject = message.OneLoginUserSubject,
-                EmailAddress = message.EmailAddress,
-                Name = message.Name,
-                FirstName = message.FirstName,
-                MiddleName = message.MiddleName,
-                LastName = message.LastName,
-                PreviousFirstName = message.PreviousFirstName,
-                PreviousLastName = message.PreviousLastName,
-                DateOfBirth = message.DateOfBirth,
-                PotentialDuplicate = message.PotentialDuplicate,
-                NationalInsuranceNumber = message.NationalInsuranceNumber,
-                Gender = message.Gender,
-                AddressLine1 = message.AddressLine1,
-                AddressLine2 = message.AddressLine2,
-                AddressLine3 = message.AddressLine3,
-                City = message.City,
-                Postcode = message.Postcode,
-                Country = message.Country,
-                TrnToken = message.TrnToken
-            };
+            var trnRequestMetadata = DataStore.Postgres.Models.TrnRequestMetadata.FromOutboxMessage(message);
 
             if (message.ResolvedPersonId is Guid personId)
             {
