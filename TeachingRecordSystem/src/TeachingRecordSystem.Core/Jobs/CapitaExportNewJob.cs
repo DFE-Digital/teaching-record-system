@@ -5,8 +5,6 @@ using Azure.Storage.Blobs;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Xrm.Sdk;
-using Parquet.Rows;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -20,6 +18,27 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
         var lastRunDate = await GetLastRunDateAsync();
         var persons = await GetNewPersonsAsync(lastRunDate);
 
+        // start job
+        var fileName = $"Reg01_DTR_{clock.UtcNow.ToString("yyyyMMdd")}_{clock.UtcNow.ToString("HHmmss")}_New.txt";
+        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        var integrationJob = new IntegrationTransaction()
+        {
+            IntegrationTransactionId = 0,
+            InterfaceType = IntegrationTransactionInterfaceType.CapitaExportNew,
+            ImportStatus = IntegrationTransactionImportStatus.InProgress,
+            TotalCount = 0,
+            SuccessCount = 0,
+            FailureCount = 0,
+            DuplicateCount = 0,
+            FileName = fileName,
+            CreatedDate = clock.UtcNow,
+            IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
+        };
+        dbContext.IntegrationTransactions.Add(integrationJob);
+        await dbContext.SaveChangesAsync();
+        var integrationId = integrationJob.IntegrationTransactionId;
+
+        // process file
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true);
         using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)))
@@ -32,6 +51,14 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
             }
         }
 
+        // mark job as complete
+        integrationJob.TotalCount = 0;
+        integrationJob.SuccessCount = 0;
+        integrationJob.FailureCount = 0;
+        integrationJob.DuplicateCount = 0;
+        integrationJob.ImportStatus = IntegrationTransactionImportStatus.Success;
+        await dbContext.SaveChangesAsync();
+        await txn.CommitAsync();
 
         // update last run date
         //if (item != null)
@@ -97,24 +124,22 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
         builder.Append(" "); //TODO: 1 if there is a previous last name or empty strng if not
 
 
-
-        ///*
-        // * Column 4:
-        // * Contains firstname and any middle names. 
-        // * If the record contains s previous surname the value '1' should appear before the First name. 
-        // * The surname should appear in Row 2.
-        // */
-        //string firstName = item.GetAttributeValue<string>(Person.Attributes.FirstName);
-        //string middleName = item.GetAttributeValue<string>(Person.Attributes.MiddleName);
-
-        //string name = string.Format("{0} {1}", firstName, middleName);
-        //if (!string.IsNullOrEmpty(name))
-        //    name = name.FixedLength(35, ' ', false, false);
-        //else
-        //    name = string.Empty.FixedLength(35, ' ', false, false);
-
-        //builder.AddCell(7, name);
-        //builder.Append(" ");
+        /*
+         * Column 4:
+         * Contains firstname and any middle names. 
+         * If the record contains s previous surname the value '1' should appear before the First name. 
+         * The surname should appear in Row 2.
+         */
+        string firstName = person.FirstName;
+        string middleName = person.MiddleName;
+        string name = new string(' ', 35);
+        if (!string.IsNullOrEmpty(string.Format("{0} {1}", firstName, middleName)))
+        {
+            var firstAndMiddleName = string.Format("{0} {1}", firstName, middleName);
+            name = firstAndMiddleName.Length > 35 ? firstAndMiddleName.Substring(0, 35) : firstAndMiddleName.PadRight(35, ' ');
+        }
+        builder.Append(name);
+        builder.Append(" ");
 
 
         /*
@@ -122,7 +147,6 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
          * Contains update code. This should always be 1018Z981 for row 1 of a record.
          */
         builder.Append("1018Z981");
-
 
         return builder.ToString();
     }
