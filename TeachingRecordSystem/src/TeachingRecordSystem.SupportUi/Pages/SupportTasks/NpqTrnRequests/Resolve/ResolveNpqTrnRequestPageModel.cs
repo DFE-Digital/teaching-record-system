@@ -26,11 +26,6 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var supportTaskFeature = context.HttpContext.GetCurrentSupportTaskFeature();
-        if (supportTaskFeature.SupportTask is not { SupportTaskType: SupportTaskType.NpqTrnRequest }) // CML TODO - dealt with by the filter?
-        {
-            context.Result = NotFound();
-            return;
-        }
 
         base.OnPageHandlerExecuting(context);
     }

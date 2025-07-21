@@ -1,11 +1,13 @@
 @page "/support-tasks/npq-trn-requests/{supportTaskReference}/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details before updating record"; @* CML TODO - next ticket - content conditional - updating or creating *@
+    ViewBag.Title = Model.CreatingNewRecord ? "Check details before creating record" : "Check details before updating record";
 
-    var backLink = Model.CreatingNewRecord @* CML TODO - backlink depends - matches or no matches*@
+    var backLink = Model.CreatingNewRecord 
+    @* CML TODO - backlink depends - matches or no matches*@
         ? LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
         : LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
+    var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update record";
 }
 
 @section BeforeContent {
@@ -72,7 +74,7 @@
                 </govuk-summary-list>
             </govuk-summary-card>
             <div class="govuk-button-group">
-                <govuk-button type="submit" data-testid="submit">Confirm and update record</govuk-button> @* CML TODO next ticket update or create conditional content *@
+                <govuk-button type="submit" data-testid="submit">@confirmButtonLabel</govuk-button> @* CML TODO next ticket update or create conditional content *@
                 <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestCheckAnswersCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>

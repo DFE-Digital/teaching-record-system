@@ -97,7 +97,6 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             return;
         }
 
-        // CML TODO - all this is copied from API - is the Redirect logic happening here instead of the page before?
         if (state.PersonId == CreateNewRecordPersonIdSentinel)
         {
             context.Result = Redirect(linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
