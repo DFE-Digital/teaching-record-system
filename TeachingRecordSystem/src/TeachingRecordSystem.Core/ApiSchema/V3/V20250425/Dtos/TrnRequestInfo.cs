@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
+using TrnRequestStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos.TrnRequestStatus;
 
 namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
 

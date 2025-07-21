@@ -88,7 +88,7 @@ public class TrnRequestService(
                 metadata.TrnToken = await CreateTrnTokenAsync(result.Trn, metadata.EmailAddress);
             }
 
-            metadata.ResolvedPersonId ??= result.Contact.Id;
+            metadata.SetResolvedPerson(result.Contact.Id);
 
             await dbContext.SaveChangesAsync();
         }
