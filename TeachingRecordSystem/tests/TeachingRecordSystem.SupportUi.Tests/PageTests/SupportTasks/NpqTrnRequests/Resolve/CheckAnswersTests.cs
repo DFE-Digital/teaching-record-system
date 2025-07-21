@@ -370,7 +370,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(matchedPerson.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
             //Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken); // CML TODO what's the TRN token for?
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
-            Assert.Equal(supportTaskData.ResolvedAttributes!.MiddleName, supportTask.TrnRequestMetadata!.MiddleName);
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
@@ -445,6 +444,62 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.DateOfBirth ? supportTask.TrnRequestMetadata!.DateOfBirth : matchedPerson.DateOfBirth, updatedPersonRecord.DateOfBirth);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress : matchedPerson.Email, updatedPersonRecord.EmailAddress);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? supportTask.TrnRequestMetadata!.NationalInsuranceNumber : matchedPerson.NationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
+        });
+    }
+
+    [Theory]
+    [MemberData(nameof(PersonAttributeInfoData))]
+    public async Task Post_UpdatingExistingRecord_UpdatesSupportTask(PersonAttributeInfo attributeSourcedFromRequestData)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            attributeSourcedFromRequestData.Attribute);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        var state = new ResolveNpqTrnRequestState()
+        {
+            PersonId = matchedPerson.PersonId,
+            PersonAttributeSourcesSet = true
+        };
+        SetPersonAttributeSourceStateToTrnRequest(state, attributeSourcedFromRequestData.Attribute);
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        // support task is updated
+        await WithDbContext(async dbContext =>
+        {
+            var updatedSupportTask = await dbContext
+                .SupportTasks
+                .Include(st => st.TrnRequestMetadata)
+                .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+            Assert.Equal(matchedPerson.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+            //Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken); // CML TODO what's the TRN token for?
+            var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
+            AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
+            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
+            {
+                FirstName = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.FirstName ? supportTask.TrnRequestMetadata!.FirstName! : matchedPerson.FirstName,
+                MiddleName = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.MiddleName ? supportTask.TrnRequestMetadata!.MiddleName! : matchedPerson.MiddleName,
+                LastName = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.LastName ? supportTask.TrnRequestMetadata!.LastName! : matchedPerson.LastName,
+                DateOfBirth = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.DateOfBirth ? supportTask.TrnRequestMetadata!.DateOfBirth! : matchedPerson.DateOfBirth,
+                EmailAddress = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress! : matchedPerson.Email,
+                NationalInsuranceNumber = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? supportTask.TrnRequestMetadata!.NationalInsuranceNumber! : matchedPerson.NationalInsuranceNumber
+            });
         });
     }
 
