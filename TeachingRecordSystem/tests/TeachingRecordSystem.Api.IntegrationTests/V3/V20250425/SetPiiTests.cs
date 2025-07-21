@@ -1,7 +1,6 @@
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt;
-using Gender = TeachingRecordSystem.Api.V3.Implementation.Dtos.Gender;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 

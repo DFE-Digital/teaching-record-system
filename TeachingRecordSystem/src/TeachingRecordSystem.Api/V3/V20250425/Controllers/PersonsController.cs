@@ -76,7 +76,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
             DateOfBirth = request.DateOfBirth,
             EmailAddresses = request.EmailAddress,
             NationalInsuranceNumber = request.NationalInsuranceNumber,
-            Gender = request.Gender is Gender gender ? mapper.Map<Implementation.Dtos.Gender>(gender) : null,
+            Gender = request.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null,
         };
 
         var result = await handler.HandleAsync(command);

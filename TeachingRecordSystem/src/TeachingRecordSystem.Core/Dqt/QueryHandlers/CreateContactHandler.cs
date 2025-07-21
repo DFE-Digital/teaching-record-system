@@ -74,7 +74,5 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         await requestBuilder.ExecuteAsync();
 
         return contactId;
-
-
     }
 }

@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
-public record GetTrnRequestResult(Guid ApplicationUserId, Contact Contact, TrnRequestMetadata Metadata)
+public record GetTrnRequestResult(Contact Contact, TrnRequestMetadata Metadata)
 {
     public string? Trn => Contact.dfeta_TRN;
     public bool PotentialDuplicate => Metadata.PotentialDuplicate == true;

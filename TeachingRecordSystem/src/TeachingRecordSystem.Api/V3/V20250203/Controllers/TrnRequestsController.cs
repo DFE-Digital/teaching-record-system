@@ -41,7 +41,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
             IdentityVerified = request.IdentityVerified,
             OneLoginUserSubject = request.OneLoginUserSubject,
-            Gender = request.Person.Gender is Gender gender ? mapper.Map<Implementation.Dtos.Gender>(gender) : null,
+            Gender = request.Person.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null
         };
 
         var result = await handler.HandleAsync(command);

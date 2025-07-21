@@ -31,7 +31,9 @@ using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.WebCommon;
@@ -194,12 +196,15 @@ public class Program
             .AddNameSynonyms()
             .AddDqtOutboxMessageSerializer()
             .AddWebhookOptions()
-            .AddTrsSyncHelper();
+            .AddTrsSyncHelper()
+            .AddTrnRequestService();
 
-        services.AddAccessYourTeachingQualificationsOptions(configuration, env);
-        services.AddTrsBaseServices();
-        services.AddFileService();
-        services.AddTransient<GetPersonHelper>();
+        services
+            .AddTrsBaseServices()
+            .AddAccessYourTeachingQualificationsOptions(configuration, env)
+            .AddFileService()
+            .AddTransient<GetPersonHelper>()
+            .AddPersonMatching();
 
         if (!env.IsUnitTests())
         {
