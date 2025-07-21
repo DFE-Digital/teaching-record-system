@@ -12,9 +12,9 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
 
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
-    public PersonAttributeSource? FirstNameSource { get; set; }
-    public PersonAttributeSource? MiddleNameSource { get; set; }
-    public PersonAttributeSource? LastNameSource { get; set; }
+    //public PersonAttributeSource? FirstNameSource => PersonAttributeSource.ExistingRecord;
+    //public PersonAttributeSource? MiddleNameSource => PersonAttributeSource.ExistingRecord;
+    //public PersonAttributeSource? LastNameSource => PersonAttributeSource.ExistingRecord;
     public PersonAttributeSource? DateOfBirthSource { get; set; }
     public PersonAttributeSource? EmailAddressSource { get; set; }
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }

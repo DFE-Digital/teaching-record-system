@@ -474,9 +474,6 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
             new ResolveNpqTrnRequestState
             {
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
-                FirstNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                MiddleNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                LastNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
@@ -495,9 +492,6 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance.State.FirstNameSource);
-        Assert.Null(journeyInstance.State.MiddleNameSource);
-        Assert.Null(journeyInstance.State.LastNameSource);
         Assert.Null(journeyInstance.State.DateOfBirthSource);
         Assert.Null(journeyInstance.State.EmailAddressSource);
         Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
@@ -518,9 +512,6 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
             new ResolveNpqTrnRequestState
             {
                 PersonId = selectedPersonId,
-                FirstNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                MiddleNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                LastNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
@@ -539,9 +530,6 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.NotNull(journeyInstance.State.FirstNameSource);
-        Assert.NotNull(journeyInstance.State.MiddleNameSource);
-        Assert.NotNull(journeyInstance.State.LastNameSource);
         Assert.NotNull(journeyInstance.State.DateOfBirthSource);
         Assert.NotNull(journeyInstance.State.EmailAddressSource);
         Assert.NotNull(journeyInstance.State.NationalInsuranceNumberSource);
@@ -562,9 +550,6 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
             new ResolveNpqTrnRequestState
             {
                 PersonId = selectedPersonId,
-                FirstNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                MiddleNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
-                LastNameSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,

@@ -9,33 +9,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resol
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
-    //public TrnRequestMetadata? RequestData => GetRequestData().TrnRequestMetadata!; // CML TODO - need all of this?
+    public string? PersonName { get; set; }
 
     public string? SourceApplicationUserName { get; set; }
-
-    public PersonAttribute<string?>? FirstName { get; set; }
-
-    public PersonAttribute<string?>? MiddleName { get; set; }
-
-    public PersonAttribute<string?>? LastName { get; set; }
 
     public PersonAttribute<DateOnly?>? DateOfBirth { get; set; }
 
     public PersonAttribute<string?>? EmailAddress { get; set; }
 
     public PersonAttribute<string?>? NationalInsuranceNumber { get; set; }
-
-    [BindProperty]
-    [Display(Name = "First name")]
-    public PersonAttributeSource? FirstNameSource { get; set; }
-
-    [BindProperty]
-    [Display(Name = "Middle name")]
-    public PersonAttributeSource? MiddleNameSource { get; set; }
-
-    [BindProperty]
-    [Display(Name = "Last name")]
-    public PersonAttributeSource? LastNameSource { get; set; }
 
     [BindProperty]
     [Display(Name = "Date of birth")]
@@ -55,9 +37,9 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
     public void OnGet()
     {
-        FirstNameSource = JourneyInstance!.State.FirstNameSource;
-        MiddleNameSource = JourneyInstance!.State.MiddleNameSource;
-        LastNameSource = JourneyInstance!.State.LastNameSource;
+        //FirstNameSource = JourneyInstance!.State.FirstNameSource;
+        //MiddleNameSource = JourneyInstance!.State.MiddleNameSource;
+        //LastNameSource = JourneyInstance!.State.LastNameSource;
         DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
         EmailAddressSource = JourneyInstance!.State.EmailAddressSource;
         NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
@@ -66,21 +48,6 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (FirstName!.Different && FirstNameSource is null)
-        {
-            ModelState.AddModelError(nameof(FirstNameSource), "Select a first name");
-        }
-
-        if (MiddleName!.Different && MiddleNameSource is null)
-        {
-            ModelState.AddModelError(nameof(MiddleNameSource), "Select a middle name");
-        }
-
-        if (LastName!.Different && LastNameSource is null)
-        {
-            ModelState.AddModelError(nameof(LastNameSource), "Select a last name");
-        }
-
         if (DateOfBirth!.Different && DateOfBirthSource is null)
         {
             ModelState.AddModelError(nameof(DateOfBirthSource), "Select a date of birth");
@@ -103,9 +70,6 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.FirstNameSource = FirstNameSource;
-            state.MiddleNameSource = MiddleNameSource;
-            state.LastNameSource = LastNameSource;
             state.DateOfBirthSource = DateOfBirthSource;
             state.EmailAddressSource = EmailAddressSource;
             state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
@@ -139,7 +103,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             context.Result = Redirect(linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
-
+        PersonName = string.Join(" ", requestData!.Name);
         var personAttributes = await GetPersonAttributesAsync(personId);
 
         var attributeMatches = GetPersonAttributeMatches(
@@ -149,21 +113,6 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             personAttributes.DateOfBirth,
             personAttributes.EmailAddress,
             personAttributes.NationalInsuranceNumber);
-
-        FirstName = new PersonAttribute<string?>(
-            personAttributes.FirstName,
-            requestData.FirstName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
-
-        MiddleName = new PersonAttribute<string?>(
-            personAttributes.MiddleName,
-            requestData.MiddleName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.MiddleName));
-
-        LastName = new PersonAttribute<string?>(
-            personAttributes.LastName,
-            requestData.LastName,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
             personAttributes.DateOfBirth,

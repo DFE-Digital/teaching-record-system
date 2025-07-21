@@ -319,7 +319,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
 
         var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
             applicationUser.UserId,
-            PersonMatchedAttribute.MiddleName);
+            PersonMatchedAttribute.EmailAddress);
         var requestData = supportTask.TrnRequestMetadata!;
 
         Clock.Advance();
@@ -331,7 +331,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             {
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true,
-                MiddleNameSource = PersonAttributeSource.TrnRequest,
+                EmailAddressSource = PersonAttributeSource.TrnRequest,
                 Comments = comments
             });
 
@@ -355,7 +355,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         {
             var updatedPersonRecord = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == matchedPerson.PersonId);
-            Assert.Equal(requestData.MiddleName, updatedPersonRecord.MiddleName);
+            Assert.Equal(requestData.EmailAddress, updatedPersonRecord.EmailAddress);
         });
 
         // support task is updated
@@ -374,10 +374,10 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
                 FirstName = matchedPerson.FirstName,
-                MiddleName = requestData.MiddleName!,
+                MiddleName = matchedPerson.MiddleName,
                 LastName = matchedPerson.LastName,
                 DateOfBirth = matchedPerson.DateOfBirth,
-                EmailAddress = matchedPerson.Email,
+                EmailAddress = requestData.EmailAddress,
                 NationalInsuranceNumber = matchedPerson.NationalInsuranceNumber
             });
         });
@@ -385,22 +385,22 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         // event is published
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<PersonDetailsUpdatedEvent>(e);
+            // CML TODO - test all of this event 
+            var actualEvent = Assert.IsType<PersonDetailsUpdatedFromTrnRequestEvent>(e);
 
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(matchedPerson.PersonId, actualEvent.PersonId);
             Assert.Equal(matchedPerson.FirstName, actualEvent.Details.FirstName);
-            Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, actualEvent.Details.MiddleName);
-            Assert.Equal("Updated person from NPQ TRN request", actualEvent.NameChangeReason);
-            Assert.Null(actualEvent.DetailsChangeReason);
-            Assert.Equal(PersonDetailsUpdatedEventChanges.MiddleName, actualEvent.Changes);
+            Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, actualEvent.Details.EmailAddress);
+            Assert.Equal(comments, actualEvent.DetailsChangeReasonDetail);
+            Assert.Equal(PersonDetailsUpdatedFromTrnRequestEventChanges.EmailAddress, actualEvent.Changes);
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"Records merged successfully for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
+            $"Records merged successfully for {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}");
     }
 
     [Theory]
@@ -438,9 +438,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         {
             var updatedPersonRecord = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == matchedPerson.PersonId);
-            Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.FirstName ? supportTask.TrnRequestMetadata!.FirstName : matchedPerson.FirstName, updatedPersonRecord.FirstName);
-            Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.MiddleName ? supportTask.TrnRequestMetadata!.MiddleName : matchedPerson.MiddleName, updatedPersonRecord.MiddleName);
-            Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.LastName ? supportTask.TrnRequestMetadata!.LastName : matchedPerson.LastName, updatedPersonRecord.LastName);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.DateOfBirth ? supportTask.TrnRequestMetadata!.DateOfBirth : matchedPerson.DateOfBirth, updatedPersonRecord.DateOfBirth);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress : matchedPerson.Email, updatedPersonRecord.EmailAddress);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? supportTask.TrnRequestMetadata!.NationalInsuranceNumber : matchedPerson.NationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
@@ -493,9 +490,9 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
-                FirstName = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.FirstName ? supportTask.TrnRequestMetadata!.FirstName! : matchedPerson.FirstName,
-                MiddleName = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.MiddleName ? supportTask.TrnRequestMetadata!.MiddleName! : matchedPerson.MiddleName,
-                LastName = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.LastName ? supportTask.TrnRequestMetadata!.LastName! : matchedPerson.LastName,
+                FirstName = matchedPerson.FirstName,
+                MiddleName = matchedPerson.MiddleName,
+                LastName = matchedPerson.LastName,
                 DateOfBirth = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.DateOfBirth ? supportTask.TrnRequestMetadata!.DateOfBirth! : matchedPerson.DateOfBirth,
                 EmailAddress = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress! : matchedPerson.Email,
                 NationalInsuranceNumber = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? supportTask.TrnRequestMetadata!.NationalInsuranceNumber! : matchedPerson.NationalInsuranceNumber
@@ -513,9 +510,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
 
     private static void SetPersonAttributeSourceStateToTrnRequest(ResolveNpqTrnRequestState state, PersonMatchedAttribute attribute)
     {
-        state.FirstNameSource = attribute is PersonMatchedAttribute.FirstName ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
-        state.MiddleNameSource = attribute is PersonMatchedAttribute.MiddleName ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
-        state.LastNameSource = attribute is PersonMatchedAttribute.LastName ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
@@ -526,9 +520,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         Person person)
     {
         Assert.NotNull(personAttributes);
-        Assert.Equal(personAttributes.FirstName, person.FirstName);
-        Assert.Equal(personAttributes.MiddleName, person.MiddleName);
-        Assert.Equal(personAttributes.LastName, person.LastName);
         Assert.Equal(personAttributes.DateOfBirth, person.DateOfBirth);
         Assert.Equal(personAttributes.EmailAddress, person.EmailAddress);
         Assert.Equal(personAttributes.NationalInsuranceNumber, person.NationalInsuranceNumber);
@@ -539,9 +530,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         NpqTrnRequestDataPersonAttributes expectedPersonAttributes)
     {
         Assert.NotNull(personAttributes);
-        Assert.Equal(personAttributes.FirstName, expectedPersonAttributes.FirstName);
-        Assert.Equal(personAttributes.MiddleName, expectedPersonAttributes.MiddleName);
-        Assert.Equal(personAttributes.LastName, expectedPersonAttributes.LastName);
         Assert.Equal(personAttributes.DateOfBirth, expectedPersonAttributes.DateOfBirth);
         Assert.Equal(personAttributes.EmailAddress, expectedPersonAttributes.EmailAddress);
         Assert.Equal(personAttributes.NationalInsuranceNumber, expectedPersonAttributes.NationalInsuranceNumber);
@@ -549,27 +537,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
 
     public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
     [
-        new(
-            PersonMatchedAttribute.FirstName,
-            "FirstName",
-            "First name",
-            d => d.FirstName,
-            p => p.FirstName
-        ),
-        new(
-            PersonMatchedAttribute.MiddleName,
-            "MiddleName",
-            "Middle name",
-            d => d.MiddleName,
-            p => p.MiddleName
-        ),
-        new(
-            PersonMatchedAttribute.LastName,
-            "LastName",
-            "Last name",
-            d => d.LastName,
-            p => p.LastName
-        ),
         new(
             PersonMatchedAttribute.DateOfBirth,
             "DateOfBirth",
