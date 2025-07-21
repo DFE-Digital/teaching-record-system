@@ -270,3 +270,42 @@
     margin-right: -15px !important;
   }
 }
+
+.trs-tile-section {
+  border-color: $govuk-border-colour;
+  border-style: solid;
+  border-width: 1px 0 1px 0;
+  padding: 30px 0;
+  margin: 15px 0;
+}
+
+.trs-tile-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));;
+  column-gap: 15px;
+}
+
+.trs-tile {
+  @include govuk-link-common;
+  background-color: $govuk-brand-colour;
+  color: govuk-colour("white");
+  display: block;
+  text-decoration: none;
+  padding: 15px;
+}
+
+.trs-tile__count {
+  @include govuk-font($size: 36, $weight: bold);
+  display: block;
+}
+
+.trs-tile__title {
+  @include govuk-font($size: 16);
+  display: block;
+  text-decoration: underline;
+  height: 40px;
+
+  :hover > & {
+    text-decoration-thickness: $govuk-link-hover-underline-thickness;
+  }
+}
