@@ -16,6 +16,28 @@ public partial class TestData
         return builder.ExecuteAsync(this);
     }
 
+    public Task<SupportTask> CreateApiTrnRequestSupportTaskAsync(
+        Guid applicationUserId,
+        Person matchedPerson,
+        Action<CreateApiTrnRequestSupportTaskBuilder>? configure = null)
+    {
+        return CreateApiTrnRequestSupportTaskAsync(
+            applicationUserId,
+            t =>
+            {
+                t
+                    .WithFirstName(matchedPerson.FirstName)
+                    .WithMiddleName(matchedPerson.MiddleName)
+                    .WithLastName(matchedPerson.LastName)
+                    .WithDateOfBirth(matchedPerson.DateOfBirth!.Value)
+                    .WithNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber)
+                    .WithEmailAddress(matchedPerson.EmailAddress)
+                    .WithResolvedPersonId(matchedPerson.PersonId);
+
+                configure?.Invoke(t);
+            });
+    }
+
     public class CreateApiTrnRequestSupportTaskBuilder(Guid applicationUserId)
     {
         private Option<string> _requestId;
@@ -27,7 +49,9 @@ public partial class TestData
         private Option<string?> _nationalInsuranceNumber;
         private Option<TrnRequestMatchedRecord[]> _matchedRecords;
         private Option<SupportTaskStatus> _status;
-        public Option<DateTime> _createdOn;
+        private Option<DateTime> _createdOn;
+        private Option<TrnRequestStatus> _trnRequestStatus;
+        private Option<Guid?> _resolvedPersonId;
 
         public CreateApiTrnRequestSupportTaskBuilder WithFirstName(string firstName)
         {
@@ -68,7 +92,6 @@ public partial class TestData
         public CreateApiTrnRequestSupportTaskBuilder WithMatchedRecords(params Guid[] personIds)
         {
             _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedRecord() { PersonId = id }).ToArray());
-
             return this;
         }
 
@@ -81,6 +104,18 @@ public partial class TestData
         public CreateApiTrnRequestSupportTaskBuilder WithCreatedOn(DateTime created)
         {
             _createdOn = Option.Some(DateTime.SpecifyKind(created, DateTimeKind.Utc));
+            return this;
+        }
+
+        public CreateApiTrnRequestSupportTaskBuilder WithResolvedPersonId(Guid? personId)
+        {
+            _resolvedPersonId = Option.Some(personId);
+            return this;
+        }
+
+        public CreateApiTrnRequestSupportTaskBuilder WithTrnRequestStatus(TrnRequestStatus status)
+        {
+            _trnRequestStatus = Option.Some(status);
             return this;
         }
 
@@ -157,6 +192,11 @@ public partial class TestData
                 TrnToken = null,
                 Matches = matches
             };
+
+            if (_resolvedPersonId.ValueOrDefault() is Guid personId)
+            {
+                metadata.SetResolvedPerson(personId, _trnRequestStatus.ValueOr(TrnRequestStatus.Completed));
+            }
 
             var status = _status.ValueOr(() => SupportTaskStatus.Open);
 

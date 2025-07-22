@@ -1,0 +1,114 @@
+@page "/support-tasks/manual-checks-needed/{supportTaskReference}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index
+@{
+    ViewBag.Title = "Review TRN request";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.TrnRequestManualChecksNeeded()"/>
+}
+
+<form action="@LinkGenerator.ResolveTrnRequestManualChecksNeeded(Model.SupportTaskReference!)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Support tasks</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-warning-text>
+                @{
+                    var recordFlagsText = new (bool HasFlag, string Text)[]
+                    {
+                        (Model.HasOpenAlerts, "an alert"),
+                        (Model.HasQts, "QTS"),
+                        (Model.HasEyts, "EYTS")
+                    };
+                    var flagsDescription = recordFlagsText.Where(t => t.HasFlag).Select(t => t.Text).ToCommaSeparatedString();
+                }
+                This request matches a record with <span data-testid="flags-description">@flagsDescription</span>.
+                Make sure you’ve completed any checks outside this service before continuing.
+            </govuk-warning-text>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half-from-desktop">
+            <govuk-summary-card>
+                <govuk-summary-card-title>TRN request</govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.FirstName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.MiddleName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Flag@(Model.FlagCount != 1 ? "s" : "")</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            <ul class="govuk-list">
+                                @if (Model.HasOpenAlerts)
+                                {
+                                    <li>
+                                        <a href="@LinkGenerator.PersonAlerts(Model.PersonId)" class="govuk-link" target="_blank">
+                                            @Model.OpenAlertsCount open alert@(Model.OpenAlertsCount != 1 ? "s" : "")
+                                        </a>
+                                    </li>
+                                }
+                                @if (Model.HasQts)
+                                {
+                                    <li>
+                                        <a href="@LinkGenerator.PersonDetail(Model.PersonId)" class="govuk-link" target="_blank">
+                                            Holds QTS
+                                        </a>
+                                    </li>
+                                }
+                                @if (Model.HasEyts)
+                                {
+                                    <li>
+                                        <a href="@LinkGenerator.PersonDetail(Model.PersonId)" class="govuk-link" target="_blank">
+                                            Holds EYTS
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <govuk-radios for="ChecksCompleted">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-item value="@true">Yes</govuk-radios-item>
+                    <govuk-radios-item value="@false">No</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Confirm</govuk-button>
+                <govuk-button-link href="@LinkGenerator.TrnRequestManualChecksNeeded()" class="govuk-button--secondary">Cancel</govuk-button-link>
+            </div>
+        </div>
+    </div>
+</form>
