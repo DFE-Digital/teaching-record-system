@@ -427,7 +427,7 @@ public partial class TestData
                 dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
                 dfeta_TrnToken = _trnToken,
                 dfeta_SlugId = _slugId,
-                dfeta_loginfailedcounter = _loginFailedCounter,
+                dfeta_loginfailedcounter = _loginFailedCounter
             };
 
             // The conditional is to work around issue in CRM where an explicit `null` TRN breaks a plugin
