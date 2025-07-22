@@ -1,5 +1,4 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
-using Xunit.DependencyInjection;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
