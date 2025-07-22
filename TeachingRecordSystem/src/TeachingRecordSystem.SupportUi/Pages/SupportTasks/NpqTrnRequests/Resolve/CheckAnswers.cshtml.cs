@@ -53,9 +53,10 @@ public class CheckAnswersModel(
 
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
 
-        // CML TODO - Creating is the ticket after this one
+
         if (CreatingNewRecord)
         {
+            // CML TODO - Creating is the ticket after this one - this is not complete
             var newPersonId = Guid.NewGuid();
             requestData.SetResolvedPerson(newPersonId);
 
@@ -83,20 +84,22 @@ public class CheckAnswersModel(
                 SelectedPersonAttributes = selectedPersonAttributes
             });
 
-            // CML TODO updating the person here for now
+            // update the person
             var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId);
             if (person == null)
             {
                 throw new ArgumentException("Person not found.");
             }
 
-            // create new PersonUpdatedFromTrnRequestEvent - add all the metadata - 
+            // create new PersonUpdatedFromTrnRequestEvent
             person!.UpdateDetailsFromTrnRequest(
                 dateOfBirth: DateOfBirth,
                 emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
                 nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
                 detailsChangeReasonDetail: Comments,
-                detailsChangeEvidenceFile: null, // requestData.UploadedEvidence, // CML TODO the uploaded file from the Support task
+                detailsChangeEvidenceFile: requestData.NpqEvidenceFileId is Guid fileId ?
+                    new Core.Events.Models.File() { FileId = fileId, Name = requestData.NpqEvidenceFileName! } : // CML TODO IS ! THIS SAFE?
+                    null,
                 SourceApplicationUserId!,
                 clock.UtcNow,
                 requestData,

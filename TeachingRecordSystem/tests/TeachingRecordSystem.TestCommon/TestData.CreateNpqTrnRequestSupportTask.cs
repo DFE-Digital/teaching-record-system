@@ -26,7 +26,49 @@ public partial class TestData
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
         private Option<TrnRequestMatchedRecord[]> _matchedRecords;
+        private Option<string> _npqApplicationId;
+        private Option<bool> _npqIsInEducationalSetting;
+        private Option<string> _npqName;
+        private Option<string> _npqTrainingProvider;
+        private Option<Guid> _npqEvidenceFileId;
+        private Option<string> _npqEvidenceFileName;
         private Option<SupportTaskStatus> _status;
+
+        public CreateNpqTrnRequestSupportTaskBuilder WithNpqApplicationId(string npqApplicationId)
+        {
+            _npqApplicationId = Option.Some(npqApplicationId);
+            return this;
+        }
+
+        public CreateNpqTrnRequestSupportTaskBuilder WithNpqIsInEducationalSetting(bool isInEducationalSetting)
+        {
+            _npqIsInEducationalSetting = Option.Some(isInEducationalSetting);
+            return this;
+        }
+
+        public CreateNpqTrnRequestSupportTaskBuilder WithNpqName(string npqName)
+        {
+            _npqName = Option.Some(npqName);
+            return this;
+        }
+
+        public CreateNpqTrnRequestSupportTaskBuilder WithNpqTrainingProvider(string npqTrainingProvider)
+        {
+            _npqTrainingProvider = Option.Some(npqTrainingProvider);
+            return this;
+        }
+
+        public CreateNpqTrnRequestSupportTaskBuilder WithNpqEvidenceFileId(Guid npqEvidenceFileId)
+        {
+            _npqEvidenceFileId = Option.Some(npqEvidenceFileId);
+            return this;
+        }
+
+        public CreateNpqTrnRequestSupportTaskBuilder WithNpqEvidenceFileName(string npqEvidenceFileName)
+        {
+            _npqEvidenceFileName = Option.Some(npqEvidenceFileName);
+            return this;
+        }
         public Option<DateTime> _createdOn;
 
         public CreateNpqTrnRequestSupportTaskBuilder WithFirstName(string firstName)
@@ -94,6 +136,12 @@ public partial class TestData
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
+            var npqApplicationId = _npqApplicationId.ValueOr(testData.GenerateEstablishmentUrn().ToString()); // CML TODO - a realistic NPQ application ID should be used here
+            var npqIsInEducationalSetting = _npqIsInEducationalSetting.ValueOr(Faker.Boolean.Random);
+            var npqName = _npqName.ValueOr(Faker.Name.Last);
+            var npqTrainingProvider = _npqTrainingProvider.ValueOr(Faker.Company.Name);
+            var npqEvidenceFileId = _npqEvidenceFileId.ValueOr(Guid.NewGuid);
+            var npqEvidenceFileName = _npqEvidenceFileName.ValueOr("Filename1.txt");
 
             var matchedRecords = _matchedRecords.ValueOrDefault();
 
@@ -155,7 +203,13 @@ public partial class TestData
                 Postcode = null,
                 Country = null,
                 TrnToken = null,
-                Matches = matches
+                Matches = matches,
+                NpqApplicationId = npqApplicationId,
+                NpqEvidenceFileId = npqEvidenceFileId,
+                NpqEvidenceFileName = npqEvidenceFileName,
+                NpqName = npqName,
+                NpqTrainingProvider = npqTrainingProvider,
+                NpqWorkingInEducationalSetting = npqIsInEducationalSetting
             };
 
             var status = _status.ValueOr(() => SupportTaskStatus.Open);
