@@ -12,6 +12,8 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 {
     public const string JobSchedule = "0 3 * * *";
     public const string LastRunDateKey = "LastRunDate";
+    public const string StorageContainer = "integration-transactions";
+    public const string EXPORTS_FOLDER = "capita/exports";
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -38,27 +40,90 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
         await dbContext.SaveChangesAsync();
         var integrationId = integrationJob.IntegrationTransactionId;
 
+        // running counts for job
+        var totalRowCount = 0;
+        var successCount = 0;
+        var duplicateRowCount = 0;
+        var failureRowCount = 0;
+        var failureMessage = new StringBuilder();
+
         // process file
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true);
         using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)))
         {
-            //write header
-            foreach (var person in persons)
+            try
             {
-                var row = GetPersonAsStringRow(person);
-                csvWriter.WriteRecord(row);
+                //write header
+                foreach (var person in persons)
+                {
+                    // Existing name row
+                    var row = GetNewPersonAsStringRow(person);
+                    csvWriter.WriteRecord(row);
+
+                    // write exported row to integrationtransactionrecord
+                    integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
+                    {
+                        IntegrationTransactionRecordId = 0,
+                        CreatedDate = clock.UtcNow,
+                        RowData = row,
+                        Status = IntegrationTransactionRecordStatus.Success,
+                        PersonId = person.PersonId,
+                        FailureMessage = null,
+                        Duplicate = null,
+                        HasActiveAlert = null
+                    });
+                    totalRowCount++;
+
+                    // if there is a previous last name, append another row
+                    if (person.PreviousNames?.Where(X => X.LastName != person.LastName).Count() > 0)
+                    {
+                        var previousNameRow = GetNewPersonWithPreviousLastNameAsStringRow(person);
+                        csvWriter.WriteRecord(previousNameRow);
+
+                        // write exported previous name row to integrationtransactionrecord
+                        integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
+                        {
+                            IntegrationTransactionRecordId = 0,
+                            CreatedDate = clock.UtcNow,
+                            RowData = previousNameRow,
+                            Status = IntegrationTransactionRecordStatus.Success,
+                            PersonId = person.PersonId,
+                            FailureMessage = null,
+                            Duplicate = null,
+                            HasActiveAlert = null
+                        });
+                        totalRowCount++;
+                    }
+
+                    //update IntegrationTransaction so that it's always up to date with counts of rows
+                    integrationJob.TotalCount = totalRowCount;
+                    integrationJob.FailureCount = failureRowCount;
+                    integrationJob.SuccessCount = successCount;
+                    integrationJob.DuplicateCount = duplicateRowCount;
+                    await dbContext.SaveChangesAsync();
+
+                }
+                streamWriter.Flush();
+
+                // upload file contents to storage container
+                memoryStream.Position = 0;
+                await UploadFileAsync(memoryStream, fileName);
+            }
+            catch (Exception e)
+            {
+                failureRowCount++;
+                logger.LogError(e.ToString());
             }
         }
 
         // mark job as complete
-        integrationJob.TotalCount = 0;
-        integrationJob.SuccessCount = 0;
-        integrationJob.FailureCount = 0;
-        integrationJob.DuplicateCount = 0;
+        integrationJob.TotalCount = totalRowCount;
+        integrationJob.SuccessCount = successCount;
+        integrationJob.FailureCount = failureRowCount;
+        integrationJob.DuplicateCount = duplicateRowCount;
         integrationJob.ImportStatus = IntegrationTransactionImportStatus.Success;
-        await dbContext.SaveChangesAsync();
-        await txn.CommitAsync();
+
 
         // update last run date
         //if (item != null)
@@ -69,9 +134,94 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
         //    };
         //}
         //await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
+        await txn.CommitAsync();
     }
 
-    public string GetPersonAsStringRow(Person person)
+    public async Task UploadFileAsync(Stream fileContentStream, string fileName)
+    {
+        // Get the container client
+        var containerClient = blobServiceClient!.GetBlobContainerClient(StorageContainer);
+        await containerClient.CreateIfNotExistsAsync();
+
+        var targetFileName = $"{EXPORTS_FOLDER}/{fileName}";
+
+        // Get the blob client for the target file
+        var blobClient = containerClient.GetBlobClient(targetFileName);
+
+        // Upload the stream
+        await blobClient.UploadAsync(fileContentStream, overwrite: true);
+    }
+
+    /// <summary>
+    /// Returns a string representation of a person who has a previous last name
+    ///
+    /// Always row2, accompanied with a row1 of the current persons name
+    /// </summary>
+    /// <param name="person"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public string GetNewPersonWithPreviousLastNameAsStringRow(Person person)
+    {
+        var events = dbContext.Events
+            .Where(x => x.PersonId == person.PersonId && x.EventName == nameof(PersonDetailsUpdatedEvent))
+            .OrderByDescending(x => x.Inserted)
+            .AsEnumerable(); // forces client-side execution
+
+        var nameChangeEvent = events
+            .Select(e => (PersonDetailsUpdatedEvent)EventBase.Deserialize(e.Payload, nameof(PersonDetailsUpdatedEvent)))
+            .Where(x => x.Changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName))
+            .FirstOrDefault();
+
+        var builder = new StringBuilder();
+        var previousName = nameChangeEvent?.OldDetails.LastName;
+
+        if (string.IsNullOrEmpty(person.Trn))
+            throw new Exception("Person does not have a trn");
+
+        if (string.IsNullOrEmpty(previousName))
+            throw new Exception($"Previous name not found in {nameof(PersonDetailsUpdatedEvent)} events.");
+
+        var gender = " ";
+        if (person.Gender.HasValue && (person.Gender == Gender.Male || person.Gender == Gender.Female))
+        {
+            gender = ((int)person.Gender.Value).ToString();
+        }
+
+        /*
+         * Row 2, Column 1:
+         * Contains a concatination of the the TRN and gender. 
+         * Gender should be suffixed onto the end of the TRN using the values 1 and 2 (1 = male, 2 = female)
+         */
+        builder.Append(person.Trn);
+        builder.Append(gender);
+        builder.Append(new string(' ', 9));
+
+        /*
+         * Row 2, Column 2:
+         * Contains previous surname
+         */
+        var previousLastName = new string(' ', 54);
+        if (!string.IsNullOrEmpty(previousName))
+        {
+            var lastName = previousName;
+            previousLastName = lastName.Length > 54 ? lastName.Substring(0, 54) : lastName.PadRight(54, ' ');
+        }
+        builder.Append(previousLastName);
+        builder.Append(new string(' ', 7));
+
+
+        /*
+         * Row 2, Column 3:
+         * Contains update code. This should always be 2018Z981 for row 1 of a record.
+         */
+        builder.Append("2018Z981");
+
+        return builder.ToString();
+    }
+
+
+    public string GetNewPersonAsStringRow(Person person)
     {
         var builder = new StringBuilder();
 
@@ -80,7 +230,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
         // ssis job either puts gender as 1,2 or a padded empty string
         var gender = " ";
-        if(person.Gender.HasValue && (person.Gender == Gender.Male || person.Gender == Gender.Female))
+        if (person.Gender.HasValue && (person.Gender == Gender.Male || person.Gender == Gender.Female))
         {
             gender = ((int)person.Gender.Value).ToString();
         }
@@ -171,7 +321,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
     public async Task<List<Person>> GetNewPersonsAsync(DateTime? lastRunDate)
     {
-        var persons = await dbContext.Persons.Where(x => x.CapitaTrnChangedOn > lastRunDate && x.Trn != null).ToListAsync();
+        var persons = await dbContext.Persons.Include(x => x.PreviousNames).Where(x => x.CapitaTrnChangedOn > lastRunDate && x.Trn != null).ToListAsync();
         return persons;
     }
 }
