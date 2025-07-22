@@ -363,10 +363,12 @@ public class SignInJourneyHelper(
             return null;
         }
 
-        if (!trnRequest.IsCompleted)
+        if (trnRequest.Metadata.Status is not TrnRequestStatus.Completed)
         {
             return null;
         }
+        Debug.Assert(trnRequest.Metadata.ResolvedPersonId.HasValue);
+        Debug.Assert(trnRequest.ResolvedPersonTrn is not null);
 
         oneLoginUser.SetVerified(
             verifiedOn: trnRequestMetadata.CreatedOn,
@@ -376,11 +378,11 @@ public class SignInJourneyHelper(
             verifiedDatesOfBirth: [trnRequestMetadata.DateOfBirth]);
 
         oneLoginUser.SetMatched(
-            trnRequest.Contact.Id,
+            trnRequest.Metadata.ResolvedPersonId!.Value,
             route: OneLoginUserMatchRoute.TrnRequest,
             matchedAttributes: null);
 
-        return new(trnRequest.Contact.dfeta_TRN);
+        return new(trnRequest.ResolvedPersonTrn!);
     }
 
     public void Complete(SignInJourneyState state, string trn)

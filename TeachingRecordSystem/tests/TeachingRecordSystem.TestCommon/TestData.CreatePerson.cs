@@ -623,9 +623,10 @@ public partial class TestData
                         EmailAddress = _email,
                         Name = [firstName, lastName],
                         FirstName = firstName,
-                        MiddleName = "",
+                        MiddleName = middleName,
                         LastName = lastName,
                         DateOfBirth = dateOfBirth,
+                        NationalInsuranceNumber = _nationalInsuranceNumber,
                         TrnToken = _trnToken,
                         PotentialDuplicate = trnRequest.PotentialDuplicate ?? _hasTrn != true
                     });
