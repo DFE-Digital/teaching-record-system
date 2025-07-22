@@ -63,7 +63,7 @@ public class IndexModel(
         Task<SupportTaskInfo[]> GetTrsSupportTasksAsync() =>
             dbContext.SupportTasks
                 .Where(t => t.Status == SupportTaskStatus.Open)
-                .Select(t => new SupportTaskInfo(t.SupportTaskReference, t.SupportTaskType, t.SupportTaskType.GetTitle(), t.CreatedOn.ToLocal()))
+                .Select(t => new SupportTaskInfo(t.SupportTaskReference, t.SupportTaskType, t.SupportTaskType.GetTitle(), t.CreatedOn.ToGmt()))
                 .ToArrayAsync();
 
         async Task<SupportTaskInfo[]> GetCrmSupportTasksAsync()
@@ -94,7 +94,7 @@ public class IndexModel(
                         i.TicketNumber,
                         supportTaskType,
                         supportTaskTypeTitle,
-                        i.CreatedOn!.Value.ToLocal());
+                        i.CreatedOn!.Value.ToGmt());
                 })
                 .ToArray();
 
