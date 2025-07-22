@@ -38,6 +38,16 @@ public class TrnRequestMetadata
         Status = requestStatus;
     }
 
+    public void SetCompleted()
+    {
+        if (ResolvedPersonId is null)
+        {
+            throw new InvalidOperationException($"{nameof(ResolvedPersonId)} is not set.");
+        }
+
+        Status = TrnRequestStatus.Completed;
+    }
+
     public static TrnRequestMetadata FromOutboxMessage(TrnRequestMetadataMessage message) =>
         new()
         {

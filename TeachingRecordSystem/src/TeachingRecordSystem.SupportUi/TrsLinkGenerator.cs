@@ -327,6 +327,7 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
         {
             SupportTaskType.ConnectOneLoginUser => ConnectOneLoginUserSupportTask(supportTaskReference),
             SupportTaskType.ApiTrnRequest => ApiTrnRequestMatches(supportTaskReference),
+            SupportTaskType.TrnRequestManualChecksNeeded => ResolveTrnRequestManualChecksNeeded(supportTaskReference),
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 
@@ -362,6 +363,14 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string ConnectOneLoginUserSupportTaskConnect(string supportTaskReference, string trn) =>
         GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Connect", routeValues: new { supportTaskReference, trn });
+
+    public string TrnRequestManualChecksNeeded() => GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Index");
+
+    public string ResolveTrnRequestManualChecksNeeded(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Resolve/Index", routeValues: new { supportTaskReference });
+
+    public string ResolveTrnRequestManualChecksNeededConfirm(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Resolve/Confirm", routeValues: new { supportTaskReference });
 
     private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {

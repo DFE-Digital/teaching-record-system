@@ -92,6 +92,7 @@ public class SupportTask
     {
         SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
         SupportTaskType.ApiTrnRequest => typeof(ApiTrnRequestData),
+        SupportTaskType.TrnRequestManualChecksNeeded => typeof(TrnRequestManualChecksNeededData),
         _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
     };
 

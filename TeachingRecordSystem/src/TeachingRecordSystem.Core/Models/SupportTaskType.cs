@@ -12,6 +12,8 @@ public enum SupportTaskType
     ChangeDateOfBirthRequest = 3,
     [SupportTaskTypeInfo("TRN request from API", SupportTaskCategory.TrnRequests)]
     ApiTrnRequest = 4,
+    [SupportTaskTypeInfo("Manual checks needed", SupportTaskCategory.TrnRequests)]
+    TrnRequestManualChecksNeeded = 6
 }
 
 public static class SupportTaskTypeRegistry
