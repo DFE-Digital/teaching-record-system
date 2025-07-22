@@ -184,7 +184,7 @@ public class IndexTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetElementByTestId("OpenAlertNotification"));
+        Assert.NotNull(doc.GetElementByTestId("open-alert-notification"));
     }
 
     [Fact]
@@ -203,7 +203,7 @@ public class IndexTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("OpenAlertNotification"));
+        Assert.Null(doc.GetElementByTestId("open-alert-notification"));
     }
 
     [Fact]
@@ -221,7 +221,7 @@ public class IndexTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("OpenAlertNotification"));
+        Assert.Null(doc.GetElementByTestId("open-alert-notification"));
     }
 
     [Fact]
@@ -440,6 +440,121 @@ public class IndexTests : TestBase
         else
         {
             Assert.Null(changeDetailsLink);
+        }
+    }
+
+    [Fact]
+    public async Task Get_ContactsNotMigrated_DoesNotShowMergeButton()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("merge-button"));
+    }
+
+    [Fact]
+    public async Task Get_PersonIsDeactivated_DoesNotShowMergeButton()
+    {
+        // Arrange
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("merge-button"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasOpenAlert_DoesNotShowMergeButton()
+    {
+        // Arrange
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("merge-button"));
+    }
+
+    [Fact]
+    public async Task Get_PersonDoesNotHaveOpenAlert_ShowsMergeButton()
+    {
+        // Arrange
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetElementByTestId("merge-button"));
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.InProgress, false)]
+    [InlineData(InductionStatus.Passed, false)]
+    [InlineData(InductionStatus.Failed, false)]
+    [InlineData(InductionStatus.None, true)]
+    [InlineData(InductionStatus.Exempt, true)]
+    [InlineData(InductionStatus.FailedInWales, true)]
+    [InlineData(InductionStatus.RequiredToComplete, true)]
+    public async Task Get_PersonWithInductionStatus_ShowsMergeButtonAsExpected(InductionStatus status, bool expectMergeButtonToBeShown)
+    {
+        // Arrange
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithInductionStatus(i => i
+                .WithStatus(status)
+                .WithStartDate(new DateOnly(2024, 1, 1))
+                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        if (expectMergeButtonToBeShown)
+        {
+            Assert.NotNull(doc.GetElementByTestId("merge-button"));
+        }
+        else
+        {
+            Assert.Null(doc.GetElementByTestId("merge-button"));
         }
     }
 }

@@ -5,6 +5,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Person
 {
+    public const int TrnExactLength = 7;
     public const int FirstNameMaxLength = 100;
     public const int MiddleNameMaxLength = 100;
     public const int LastNameMaxLength = 100;

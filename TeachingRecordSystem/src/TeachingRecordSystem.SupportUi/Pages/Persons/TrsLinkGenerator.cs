@@ -91,4 +91,13 @@ public partial class TrsLinkGenerator
 
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
+
+    public string PersonMergeEnterTrn(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/Persons/Merge/EnterTrn", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string PersonMergeCompareMatchingRecords(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/Persons/Merge/CompareMatchingRecords", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string PersonMergeCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Persons/Merge/EnterTrn", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 }
