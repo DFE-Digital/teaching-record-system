@@ -540,7 +540,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
-        tidiesvar applicationUser = await TestData.CreateApplicationUserAsync();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
         var selectedPersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel;
