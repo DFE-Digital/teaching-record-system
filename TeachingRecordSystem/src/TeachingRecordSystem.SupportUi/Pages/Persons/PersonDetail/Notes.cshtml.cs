@@ -29,7 +29,7 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
                 x.NoteId,
                 string.Empty,
                 await x.GetNoteTextWithoutHtmlAsync(),
-                x.CreatedOn.ToLocal(),
+                x.CreatedOn.ToGmt(),
                 x.FileName,
                 x.OriginalFileName,
                 x.CreatedByDqtUserName

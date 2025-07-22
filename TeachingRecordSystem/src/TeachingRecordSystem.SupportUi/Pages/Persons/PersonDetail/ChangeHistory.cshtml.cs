@@ -138,15 +138,15 @@ public class ChangeHistoryModel(
         var allResults = notesResult
             .Annotations.Select(n => (TimelineItem)new TimelineItem<Annotation>(
                 TimelineItemType.Annotation,
-                n.ModifiedOn!.Value.ToLocal(),
+                n.ModifiedOn!.Value.ToGmt(),
                 n))
             .Concat(notesResult.IncidentResolutions.Select(r => new TimelineItem<(IncidentResolution, Incident)>(
                 TimelineItemType.IncidentResolution,
-                r.Resolution.ModifiedOn!.Value.ToLocal(),
+                r.Resolution.ModifiedOn!.Value.ToGmt(),
                 r)))
             .Concat(notesResult.Tasks.Select(t => new TimelineItem<CrmTask>(
                 TimelineItemType.Task,
-                t.ModifiedOn!.Value.ToLocal(),
+                t.ModifiedOn!.Value.ToGmt(),
                 t)))
             .Concat(eventsWithUser.Select(MapTimelineEvent))
             .OrderByDescending(i => i.Timestamp)
@@ -197,7 +197,7 @@ public class ChangeHistoryModel(
         var timelineEventType = typeof(TimelineEvent<>).MakeGenericType(@event.GetType()!);
         var timelineEvent = (TimelineEvent)Activator.CreateInstance(timelineEventType, @event, raisedByUser, applicationUser)!;
         var timelineItemType = typeof(TimelineItem<>).MakeGenericType(timelineEventType);
-        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, timelineEvent.Event.CreatedUtc.ToLocal(), timelineEvent)!;
+        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, timelineEvent.Event.CreatedUtc.ToGmt(), timelineEvent)!;
     }
 
     /// <summary>
