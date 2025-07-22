@@ -32,19 +32,32 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Working in school or educational setting</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>TO DO</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@(Model.NpqWorkingInEducationalSetting.HasValue ? Model.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>NPQ application ID</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>TO DO</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqApplicationId</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NPQ name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqName</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>NPQ training provider</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>TO DO</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqTrainingProvider</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>TO DO</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="evidence">
+                            @if (Model.NpqEvidenceFileId is not null)
+                            {
+                                <a href="@Model.NpqEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="evidence-link">@($"{Model.NpqEvidenceFileName} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>

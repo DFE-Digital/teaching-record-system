@@ -29,6 +29,13 @@ public class TrnRequestMetadata
     public Guid? ResolvedPersonId { get; private set; }
     public TrnRequestStatus Status { get; private set; } = TrnRequestStatus.Pending;
     public TrnRequestMatches? Matches { get; set; }
+    public bool? NpqWorkingInEducationalSetting { get; init; }
+    public string? NpqApplicationId { get; init; }
+    public string? NpqName { get; init; }
+    public string? NpqTrainingProvider { get; init; }
+
+    public Guid? NpqEvidenceFileId { get; init; }
+    public string? NpqEvidenceFileName { get; init; }
 
     public void SetResolvedPerson(Guid personId, TrnRequestStatus requestStatus = TrnRequestStatus.Completed)
     {
