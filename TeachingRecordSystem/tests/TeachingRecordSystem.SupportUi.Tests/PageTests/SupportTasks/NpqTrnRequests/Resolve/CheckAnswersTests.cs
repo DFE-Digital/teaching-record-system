@@ -400,7 +400,8 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(matchedPerson.DateOfBirth, actualEvent.Details.DateOfBirth);
             Assert.Equal(comments, actualEvent.DetailsChangeReasonDetail);
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.TrnRequestMetadata);
-            // CML TODO check that event holds reference to the file-uploaded evidence once I've added it
+            Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileId, actualEvent.DetailsChangeEvidenceFile?.FileId);
+            Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileName, actualEvent.DetailsChangeEvidenceFile?.Name);
             Assert.Equal(PersonDetailsUpdatedFromTrnRequestEventChanges.EmailAddress, actualEvent.Changes);
         });
 
@@ -493,7 +494,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             Assert.Equal(matchedPerson.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
-            //Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken); // CML TODO what's the TRN token for?
+            //Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken); // CML TODO I don't think I need this TRN token?
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()

@@ -98,7 +98,7 @@ public class CheckAnswersModel(
                 nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
                 detailsChangeReasonDetail: Comments,
                 detailsChangeEvidenceFile: requestData.NpqEvidenceFileId is Guid fileId ?
-                    new Core.Events.Models.File() { FileId = fileId, Name = requestData.NpqEvidenceFileName! } : // CML TODO IS ! THIS SAFE?
+                    new Core.Events.Models.File() { FileId = fileId, Name = requestData.NpqEvidenceFileName! } :
                     null,
                 SourceApplicationUserId!,
                 clock.UtcNow,
