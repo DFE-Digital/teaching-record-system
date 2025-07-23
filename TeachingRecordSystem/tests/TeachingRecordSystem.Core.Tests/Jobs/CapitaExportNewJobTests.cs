@@ -1,4 +1,6 @@
+using Azure;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,72 +34,84 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
 
     private Mock<BlobServiceClient> BlobServiceClient => Fixture.BlobServiceClient;
 
-
     [Fact]
-    public async Task GetPersons_CreatedAferLastRunDate_ReturnsExpectedRecords()
+    public async Task GetNewPersons_CreatedAferLastRunDate_ReturnsExpectedRecords()
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
-            x.WithTrn();
-        });
-        var person2 = await TestData.CreatePersonAsync(x =>
-        {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddHours(4));
-            x.WithTrn();
-        });
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            await dbContext.JobMetadata.Where(x => x.JobName == nameof(CapitaExportNewJob)).ExecuteDeleteAsync();
+            var jobMetaData = new JobMetadata()
+            {
+                JobName = nameof(CapitaExportNewJob),
+                Metadata = new Dictionary<string, object>
+                {
+                    {"LastRunDate", Clock.UtcNow.AddDays(-1) }
+                }
+            };
+            dbContext.JobMetadata.Add(jobMetaData);
+            await dbContext.SaveChangesAsync();
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+            });
+            var person2 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+            });
 
-        // Act
-        var newPersons = await Job.GetNewPersonsAsync(lastRunDate);
+            // Act
+            var newPersons = await Job.GetNewPersonsAsync(lastRunDate);
 
-        // Assert
-        Assert.Contains(newPersons, p => p.Trn == person1.Trn);
-        Assert.Contains(newPersons, p => p.Trn == person2.Trn);
+            // Assert
+            Assert.Contains(newPersons, p => p.Trn == person1.Trn);
+            Assert.Contains(newPersons, p => p.Trn == person2.Trn);
+        });
     }
 
     [Fact]
-    public async Task GetPersons_NoRecordsCreatedAfterLastRunDate_ReturnsExpectedRecords()
+    public async Task GetNewPersons_NoRecordsCreatedAfterLastRunDate_ReturnsExpectedRecords()
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            // before last run date
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(-3));
-            x.WithTrn();
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            var lastRunDate = Clock.UtcNow.AddDays(1);
+
+            // Act
+            var newPersons = await Job.GetNewPersonsAsync(lastRunDate);
+
+            // Assert
+            Assert.Empty(newPersons);
         });
-
-        // Act
-        var newPersons = await Job.GetNewPersonsAsync(lastRunDate);
-
-        // Assert
-        Assert.Empty(newPersons);
     }
 
     [Fact]
-    public async Task GetPersons_CreatedAferLastRunDateWithoutTrn_ReturnsExpectedRecords()
+    public async Task GetNewPersons_CreatedAferLastRunDateWithoutTrn_ReturnsExpectedRecords()
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
-        });
-        var person2 = await TestData.CreatePersonAsync(x =>
-        {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddHours(4));
-        });
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var person1 = await TestData.CreatePersonAsync();
+            var person2 = await TestData.CreatePersonAsync();
 
-        // Act
-        var newPersons = await Job.GetNewPersonsAsync(lastRunDate);
 
-        // Assert
-        Assert.Empty(newPersons);
+            // Act
+            var newPersons = await Job.GetNewPersonsAsync(lastRunDate);
+
+            // Assert
+            Assert.Empty(newPersons);
+        });
     }
 
     [Theory]
@@ -107,26 +121,83 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
     [InlineData(Gender.NotAvailable, " ")]
     public async Task GetNewPersonAsStringRow_ValidPersonWithGender_ReturnsExpectedContent(Gender gender, string expectedGenderCode)
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
-            x.WithTrn();
-            x.WithGender(gender);
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithGender(gender);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+
+            // Act
+            var rowString = Job.GetNewPersonAsStringRow(trsPerson, false);
+
+            // Assert
+            var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35, ' ');
+            var expectedRowString = $"{trsPerson.Trn}" +
+                $"{expectedGenderCode}" +
+                $"{new string(' ', 9)}" +
+                $"{trsPerson.DateOfBirth!.Value.ToString("ddMMyy")}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.LastName.PadRight(17, ' ')}" +
+                $"{new string(' ', 1)}" +
+                $"{name}" +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+            Assert.NotNull(rowString);
+            Assert.Equal(expectedRowString, rowString);
+            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
-        var trsPerson = await DbFixture.WithDbContextAsync(async dbContext => await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId));
+    }
 
-        // Act
-        var rowString = Job.GetNewPersonAsStringRow(trsPerson);
+    [Theory]
+    [InlineData(Gender.Male, "1")]
+    [InlineData(Gender.Female, "2")]
+    public async Task GetNewPersonAsStringRow_ValidPersonWithPreviousName_ReturnsExpectedContent(Gender gender, string expectedGenderCode)
+    {
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var newLastName = Faker.Name.Last();
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithGender(gender);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+            trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, trsPerson.DateOfBirth, null, null, null, gender, "testing", null, "testing", null, null, SystemUser.SystemUserId, Clock.UtcNow, out var @nameChangeEvent);
+            await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+            await dbContext.SaveChangesAsync();
 
-        // Assert
-        var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35, ' ');
-        var expectedRowString = $"{trsPerson.Trn}{expectedGenderCode}{new string(' ', 9)}{trsPerson.DateOfBirth!.Value.ToString("ddMMyy")}{new string(' ', 1)}{trsPerson.LastName.PadRight(17, ' ')}{new string(' ', 1)}{name}{new string(' ', 1)}{"1018Z981"}";
-        Assert.NotNull(rowString);
-        Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+            // Act
+            var rowString = Job.GetNewPersonAsStringRow(trsPerson, true);
+
+            // Assert
+            var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35, ' ');
+            var expectedRowString = $"{trsPerson.Trn}" +
+                $"{expectedGenderCode}" +
+                $"{new string(' ', 9)}" +
+                $"{trsPerson.DateOfBirth!.Value.ToString("ddMMyy")}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.LastName.PadRight(17, ' ')}" +
+                $"{new string('1', 1)}" + //1 if has a previous name
+                $"{name}" +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+            Assert.NotNull(rowString);
+            Assert.Equal(expectedRowString, rowString);
+            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        });
     }
 
     [Theory]
@@ -134,111 +205,162 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
     [InlineData("superduperlonglengthlastname")]
     public async Task GetNewPersonAsStringRow_LastNameLengths_ReturnsExpectedContent(string lastName)
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        Gender gender = Gender.Male;
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
-            x.WithTrn();
-            x.WithGender(gender);
-            x.WithLastName(lastName);
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            Gender gender = Gender.Male;
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithGender(gender);
+                x.WithLastName(lastName);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+
+            // Act
+            var rowString = Job.GetNewPersonAsStringRow(trsPerson, false);
+
+            // Assert
+            var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35, ' ');
+            var expectedLastName = trsPerson.LastName.Length > 17 ? trsPerson.LastName.Substring(0, 17) : trsPerson.LastName.PadRight(17, ' ');
+            var expectedRowString = $"{trsPerson.Trn}" +
+                $"{(int)gender}" +
+                $"{new string(' ', 9)}" +
+                $"{trsPerson.DateOfBirth!.Value.ToString("ddMMyy")}" +
+                $"{new string(' ', 1)}" +
+                $"{expectedLastName}" +
+                $"{new string(' ', 1)}" +
+                $"{name}{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+            Assert.NotNull(rowString);
+            Assert.Equal(expectedRowString, rowString);
+            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
-        var trsPerson = await DbFixture.WithDbContextAsync(async dbContext => await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId));
-
-        // Act
-        var rowString = Job.GetNewPersonAsStringRow(trsPerson);
-
-        // Assert
-        var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35, ' ');
-        var expectedLastName = trsPerson.LastName.Length > 17 ? trsPerson.LastName.Substring(0, 17) : trsPerson.LastName.PadRight(17, ' ');
-        var expectedRowString = $"{trsPerson.Trn}{(int)gender}{new string(' ', 9)}{trsPerson.DateOfBirth!.Value.ToString("ddMMyy")}{new string(' ', 1)}{expectedLastName}{new string(' ', 1)}{name}{new string(' ', 1)}{"1018Z981"}";
-        Assert.NotNull(rowString);
-        Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
     }
 
     [Fact]
     public async Task GetNewPersonAsStringRow_ValidPersonWithoutDateOfBirth_ReturnsExpectedContent()
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
-            x.WithTrn();
-            x.WithGender(Gender.Male);
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithGender(Gender.Male);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+            trsPerson.DateOfBirth = null;
+
+            // Act
+            var rowString = Job.GetNewPersonAsStringRow(trsPerson, false);
+
+            // Assert
+            var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35, ' ');
+            var expectedRowString = $"{trsPerson.Trn}" +
+                $"{(int)Gender.Male}" +
+                $"{new string(' ', 9)}" +
+                $"{new string(' ', 6)}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.LastName.PadRight(17, ' ')}" +
+                $"{new string(' ', 1)}" +
+                $"{name}" +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+            Assert.NotNull(rowString);
+            Assert.Equal(expectedRowString, rowString);
+            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
-        var trsPerson = await DbFixture.WithDbContextAsync(async dbContext => await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId));
-        trsPerson.DateOfBirth = null;
-
-        // Act
-        var rowString = Job.GetNewPersonAsStringRow(trsPerson);
-
-        // Assert
-        var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35, ' ');
-        var expectedRowString = $"{trsPerson.Trn}{(int)Gender.Male}{new string(' ', 9)}{new string(' ', 6)}{new string(' ', 1)}{trsPerson.LastName.PadRight(17, ' ')}{new string(' ', 1)}{name}{new string(' ', 1)}{"1018Z981"}";
-        Assert.NotNull(rowString);
-        Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
     }
 
     [Fact]
     public async Task GetNewPersonAsStringRow_ValidPersonWithoutMiddleName_ReturnsExpectedContent()
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
-            x.WithTrn();
-            x.WithGender(Gender.Male);
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithGender(Gender.Male);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+
+            trsPerson.DateOfBirth = null;
+            trsPerson.MiddleName = string.Empty;
+
+            // Act
+            var rowString = Job.GetNewPersonAsStringRow(trsPerson, false);
+
+            // Assert
+            var name = $"{trsPerson.FirstName}".PadRight(35, ' ');
+            var expectedRowString = $"{trsPerson.Trn}" +
+                $"{(int)Gender.Male}" +
+                $"{new string(' ', 9)}" +
+                $"{new string(' ', 6)}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.LastName.PadRight(17, ' ')}" +
+                $"{new string(' ', 1)}" +
+                $"{name}" +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+            Assert.NotNull(rowString);
+            Assert.Equal(expectedRowString, rowString);
+            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
-        var trsPerson = await DbFixture.WithDbContextAsync(async dbContext => await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId));
-
-        trsPerson.DateOfBirth = null;
-        trsPerson.MiddleName = string.Empty;
-
-        // Act
-        var rowString = Job.GetNewPersonAsStringRow(trsPerson);
-
-        // Assert
-        var name = $"{trsPerson.FirstName}".PadRight(35, ' ');
-        var expectedRowString = $"{trsPerson.Trn}{(int)Gender.Male}{new string(' ', 9)}{new string(' ', 6)}{new string(' ', 1)}{trsPerson.LastName.PadRight(17, ' ')}{new string(' ', 1)}{name}{new string(' ', 1)}{"1018Z981"}";
-        Assert.NotNull(rowString);
-        Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
     }
 
     [Fact]
     public async Task GetNewPersonAsStringRow_ValidPersonWithoutMiddleName_ReturnsExpectedTrimmedMiddleName()
     {
-        // Arrange
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync());
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
-        var person1 = await TestData.CreatePersonAsync(x =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
-            x.WithTrn();
-            x.WithGender(Gender.Male);
+            // Arrange
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            var lastRunDate = DateTime.UtcNow.AddDays(-2);
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithGender(Gender.Male);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+
+            trsPerson.DateOfBirth = null;
+            trsPerson.MiddleName = new string('c', 40);
+
+            // Act
+            var rowString = Job.GetNewPersonAsStringRow(trsPerson, false);
+
+            // Assert
+            var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".Substring(0, 35); //Name is trimmed to 35 chars
+            var expectedRowString = $"{trsPerson.Trn}" +
+                $"{(int)Gender.Male}" +
+                $"{new string(' ', 9)}" +
+                $"{new string(' ', 6)}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.LastName.PadRight(17, ' ')}" +
+                $"{new string(' ', 1)}" +
+                $"{name}" +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+            Assert.NotNull(rowString);
+            Assert.Equal(expectedRowString, rowString);
+            Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
-        var trsPerson = await DbFixture.WithDbContextAsync(async dbContext => await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId));
-
-        trsPerson.DateOfBirth = null;
-        trsPerson.MiddleName = new string('c', 40);
-
-        // Act
-        var rowString = Job.GetNewPersonAsStringRow(trsPerson);
-
-        // Assert
-        var name = $"{trsPerson.FirstName} {trsPerson.MiddleName}".Substring(0, 35); //Name is trimmed to 35 chars
-        var expectedRowString = $"{trsPerson.Trn}{(int)Gender.Male}{new string(' ', 9)}{new string(' ', 6)}{new string(' ', 1)}{trsPerson.LastName.PadRight(17, ' ')}{new string(' ', 1)}{name}{new string(' ', 1)}{"1018Z981"}";
-        Assert.NotNull(rowString);
-        Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
     }
 
     [Theory]
@@ -246,16 +368,18 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
     [InlineData(Gender.Female)]
     public async Task GetNewPersonWithPreviousLastNameAsStringRow_WithValidPreviousName_ReturnsExpectedContent(Gender gender)
     {
+
         // Arrange
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var newLastName = Faker.Name.Last();
             var originalastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
             {
-                x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
                 x.WithTrn();
                 x.WithGender(gender);
                 x.WithLastName(originalastName);
@@ -269,7 +393,12 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             var rowString = Job.GetNewPersonWithPreviousLastNameAsStringRow(trsPerson);
 
             // Assert
-            var expectedRow = $"{trsPerson.Trn}{(int)gender}{new string(' ', 9)}{originalastName.PadRight(54, ' ')}{new string(' ', 7)}{"2018Z981"}";
+            var expectedRow = $"{trsPerson.Trn}" +
+                $"{(int)gender}" +
+                $"{new string(' ', 9)}" +
+                $"{originalastName.PadRight(54, ' ')}" +
+                $"{new string(' ', 7)}" +
+                $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
             Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
@@ -281,14 +410,15 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var previousNameCreatedOn = Clock.UtcNow.AddHours(-1);
             var newLastName = Faker.Name.Last();
             var originalastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
             {
-                x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
                 x.WithTrn();
                 x.WithLastName(originalastName);
             });
@@ -302,7 +432,12 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             var rowString = Job.GetNewPersonWithPreviousLastNameAsStringRow(trsPerson);
 
             // Assert
-            var expectedRow = $"{trsPerson.Trn}{new string(' ', 1)}{new string(' ', 9)}{originalastName.PadRight(54, ' ')}{new string(' ', 7)}{"2018Z981"}";
+            var expectedRow = $"{trsPerson.Trn}" +
+                $"{new string(' ', 1)}" +
+                $"{new string(' ', 9)}" +
+                $"{originalastName.PadRight(54, ' ')}" +
+                $"{new string(' ', 7)}" +
+                $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
             Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
@@ -314,13 +449,14 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var newLastName = new string('x', 60);
             var originalastName = new string('a', 75);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
-                x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
                 x.WithTrn();
                 x.WithLastName(originalastName);
             });
@@ -333,7 +469,12 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             var rowString = Job.GetNewPersonWithPreviousLastNameAsStringRow(trsPerson);
 
             // Assert
-            var expectedRow = $"{trsPerson.Trn}{new string(' ', 1)}{new string(' ', 9)}{person1.LastName.Substring(0, 54)}{new string(' ', 7)}{"2018Z981"}";
+            var expectedRow = $"{trsPerson.Trn}" +
+                $"{new string(' ', 1)}" +
+                $"{new string(' ', 9)}" +
+                $"{person1.LastName.Substring(0, 54)}" +
+                $"{new string(' ', 7)}" +
+                $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
             Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
@@ -345,7 +486,9 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn != null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = Clock.UtcNow.AddDays(-2);
             var updateLastName1 = Faker.Name.Last();
             var updateLastName2 = Faker.Name.Last();
@@ -353,7 +496,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             var originalastName = new string('a', 75);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
-                x.WithCapitaTrnChangedOn(lastRunDate.AddDays(1));
                 x.WithTrn();
                 x.WithLastName(originalastName);
             });
@@ -376,11 +518,327 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             var rowString = Job.GetNewPersonWithPreviousLastNameAsStringRow(trsPerson);
 
             // Assert
-            var expectedRow = $"{trsPerson.Trn}{new string(' ', 1)}{new string(' ', 9)}{updateLastName2.PadRight(54, ' ')}{new string(' ', 7)}{"2018Z981"}";
+            var expectedRow = $"{trsPerson.Trn}" +
+                $"{new string(' ', 1)}" +
+                $"{new string(' ', 9)}" +
+                $"{updateLastName2.PadRight(54, ' ')}" +
+                $"{new string(' ', 7)}" +
+                $"{"2018Z981"}";
             Assert.Equal(expectedRow, rowString);
             Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
         });
     }
+
+    [Fact]
+    public async Task Execute_NewRecordWithNoPreviousName_ReturnsExpectedContent()
+    {
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            // Arrange
+            await dbContext.JobMetadata.Where(x => x.JobName == nameof(CapitaExportNewJob)).ExecuteDeleteAsync();
+            var expectedTotalRowCount = 1;
+            var expectedTotalSuccessCount = 1;
+            var expectedFailureCount = 0;
+            var expectedDuplicateCount = 0;
+            var jobMetaData = new JobMetadata()
+            {
+                JobName = nameof(CapitaExportNewJob),
+                Metadata = new Dictionary<string, object>
+                {
+                    {"LastRunDate", Clock.UtcNow.AddDays(-1) }
+                }
+            };
+            dbContext.JobMetadata.Add(jobMetaData);
+            await dbContext.SaveChangesAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+
+
+            var lastRunDate = Clock.UtcNow.AddDays(-2);
+            var originalastName = Faker.Name.Last();
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithLastName(originalastName);
+                x.WithGender(Gender.Male);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+            await dbContext.SaveChangesAsync();
+
+            // Act
+            var integrationTransactionJobId = await Job.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            var integrationTransaction = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleAsync(x => x.IntegrationTransactionId == integrationTransactionJobId);
+            var expectedRowContent = $"{trsPerson.Trn}" +
+                $"{(int)trsPerson.Gender!}" +
+                $"{new string(' ', 9)}" +
+                $"{trsPerson.DateOfBirth!.Value.ToString("ddMMyy")}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.LastName.PadRight(17)}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35) +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+            Assert.NotNull(integrationTransaction);
+            Assert.Equal(IntegrationTransactionImportStatus.Success, integrationTransaction.ImportStatus);
+            Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+            Assert.Equal(expectedTotalSuccessCount, integrationTransaction.SuccessCount);
+            Assert.Equal(expectedFailureCount, integrationTransaction.FailureCount);
+            Assert.Equal(expectedDuplicateCount, integrationTransaction.DuplicateCount);
+            Assert.NotEmpty(integrationTransaction.FileName);
+            Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, record =>
+            {
+                Assert.Null(record.FailureMessage);
+                Assert.Equal(person1.PersonId, record.PersonId);
+                Assert.Null(record.Duplicate);
+                Assert.Equal(EXPECTED_ROW_LENGTH, record.RowData.Length);
+                Assert.Equal(expectedRowContent, record.RowData);
+                Assert.Equal(IntegrationTransactionRecordStatus.Success, record.Status);
+
+                return true;
+            });
+        });
+    }
+
+    [Fact]
+    public async Task Execute_WithNoNewRecords_ReturnsExpectedContent()
+    {
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            // Arrange
+            await dbContext.JobMetadata.Where(x => x.JobName == nameof(CapitaExportNewJob)).ExecuteDeleteAsync();
+            var expectedTotalRowCount = 0;
+            var expectedTotalSuccessCount = 0;
+            var expectedFailureCount = 0;
+            var expectedDuplicateCount = 0;
+            var jobMetaData = new JobMetadata()
+            {
+                JobName = nameof(CapitaExportNewJob),
+                Metadata = new Dictionary<string, object>
+                {
+                    {"LastRunDate", Clock.UtcNow.AddDays(-1) }
+                }
+            };
+            dbContext.JobMetadata.Add(jobMetaData);
+            await dbContext.SaveChangesAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            var lastRunDate = Clock.UtcNow.AddDays(-2);
+            var originalastName = Faker.Name.Last();
+            await dbContext.SaveChangesAsync();
+
+            // Act
+            var integrationTransactionJobId = await Job.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            var integrationTransaction = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleAsync(x => x.IntegrationTransactionId == integrationTransactionJobId);
+            Assert.NotNull(integrationTransaction);
+            Assert.Equal(IntegrationTransactionImportStatus.Success, integrationTransaction.ImportStatus);
+            Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+            Assert.Equal(expectedTotalSuccessCount, integrationTransaction.SuccessCount);
+            Assert.Equal(expectedFailureCount, integrationTransaction.FailureCount);
+            Assert.Equal(expectedDuplicateCount, integrationTransaction.DuplicateCount);
+            Assert.NotEmpty(integrationTransaction.FileName);
+            Assert.Empty(integrationTransaction.IntegrationTransactionRecords!);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_NewRecordWithPreviousName_ReturnsExpectedContent()
+    {
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            // Arrange
+            await dbContext.JobMetadata.Where(x => x.JobName == nameof(CapitaExportNewJob)).ExecuteDeleteAsync();
+            var expectedTotalRowCount = 2;
+            var expectedTotalSuccessCount = 2;
+            var expectedFailureCount = 0;
+            var expectedDuplicateCount = 0;
+            var updateLastName = Faker.Name.Last();
+            var jobMetaData = new JobMetadata()
+            {
+                JobName = nameof(CapitaExportNewJob),
+                Metadata = new Dictionary<string, object>
+                {
+                    {"LastRunDate", Clock.UtcNow.AddDays(-2) }
+                }
+            };
+            dbContext.JobMetadata.Add(jobMetaData);
+            await dbContext.SaveChangesAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+
+
+            var lastRunDate = Clock.UtcNow.AddDays(-2);
+            var originalastName = Faker.Name.Last();
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithLastName(originalastName);
+                x.WithGender(Gender.Male);
+            });
+            var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+            trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName, person1.DateOfBirth, null, null, null, person1.Gender, "testing", null, "testing", null, null, SystemUser.SystemUserId, Clock.UtcNow.AddDays(-1), out var @nameChangeEvent1);
+            await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
+            await dbContext.SaveChangesAsync();
+
+            // Act
+            var integrationTransactionJobId = await Job.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            var integrationTransaction = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleAsync(x => x.IntegrationTransactionId == integrationTransactionJobId);
+            var expectedNewRowContent = $"{trsPerson.Trn}" +
+                $"{(int)trsPerson.Gender!}" +
+                $"{new string(' ', 9)}" +
+                $"{trsPerson.DateOfBirth!.Value.ToString("ddMMyy")}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson.LastName.PadRight(17)}" +
+                $"{new string('1', 1)}" +
+                $"{trsPerson.FirstName} {trsPerson.MiddleName}".PadRight(35) +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+
+            var expectedNameChangeRow = $"{trsPerson.Trn}" +
+                $"{(int)trsPerson.Gender}" +
+                $"{new string(' ', 9)}" +
+                $"{originalastName.PadRight(54, ' ')}" +
+                $"{new string(' ', 7)}" +
+                $"{"2018Z981"}";
+
+            Assert.NotNull(integrationTransaction);
+            Assert.Equal(IntegrationTransactionImportStatus.Success, integrationTransaction.ImportStatus);
+            Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+            Assert.Equal(expectedTotalSuccessCount, integrationTransaction.SuccessCount);
+            Assert.Equal(expectedFailureCount, integrationTransaction.FailureCount);
+            Assert.Equal(expectedDuplicateCount, integrationTransaction.DuplicateCount);
+            Assert.NotEmpty(integrationTransaction.FileName);
+            Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent, trsPerson));
+            Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow, trsPerson));
+        });
+    }
+
+    [Fact]
+    public async Task Execute_MultipleNewRecordsMultiplePreviousNames_ReturnsExpectedContent()
+    {
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            // Arrange
+            await dbContext.JobMetadata.Where(x => x.JobName == nameof(CapitaExportNewJob)).ExecuteDeleteAsync();
+            var expectedTotalRowCount = 4;
+            var expectedTotalSuccessCount = 4;
+            var expectedFailureCount = 0;
+            var expectedDuplicateCount = 0;
+
+
+            var jobMetaData = new JobMetadata()
+            {
+                JobName = nameof(CapitaExportNewJob),
+                Metadata = new Dictionary<string, object>
+                {
+                    {"LastRunDate", Clock.UtcNow.AddDays(-2) }
+                }
+            };
+            dbContext.JobMetadata.Add(jobMetaData);
+            await dbContext.SaveChangesAsync();
+            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
+            await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
+            var lastRunDate = Clock.UtcNow.AddDays(-2);
+
+            var originalastName1 = Faker.Name.Last();
+            var updateLastName1 = Faker.Name.Last();
+            var person1 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithLastName(originalastName1);
+                x.WithGender(Gender.Male);
+            });
+
+            var originalastName2 = Faker.Name.Last();
+            var updateLastName2 = Faker.Name.Last();
+            var person2 = await TestData.CreatePersonAsync(x =>
+            {
+                x.WithTrn();
+                x.WithLastName(originalastName2);
+                x.WithGender(Gender.Male);
+            });
+            var trsPerson1 = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
+            var trsPerson2 = await dbContext.Persons.FirstAsync(x => x.PersonId == person2.PersonId);
+            trsPerson1.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName1, person1.DateOfBirth, null, null, null, person1.Gender, "testing", null, "testing", null, null, SystemUser.SystemUserId, Clock.UtcNow.AddDays(-1), out var @nameChangeEvent1);
+            trsPerson2.UpdateDetails(person2.FirstName, person2.MiddleName, updateLastName2, person2.DateOfBirth, null, null, null, person2.Gender, "testing", null, "testing", null, null, SystemUser.SystemUserId, Clock.UtcNow.AddDays(-1), out var @nameChangeEvent2);
+            await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
+            await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent2!);
+            await dbContext.SaveChangesAsync();
+
+            // Act
+            var integrationTransactionJobId = await Job.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            var integrationTransaction = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleAsync(x => x.IntegrationTransactionId == integrationTransactionJobId);
+            var expectedNewRowContent1 = $"{trsPerson1.Trn}" +
+                $"{(int)trsPerson1.Gender!}" +
+                $"{new string(' ', 9)}" +
+                $"{trsPerson1.DateOfBirth!.Value.ToString("ddMMyy")}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson1.LastName.PadRight(17)}" +
+                $"{new string('1', 1)}" +
+                $"{trsPerson1.FirstName} {trsPerson1.MiddleName}".PadRight(35) +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+
+            var expectedNameChangeRow1 = $"{trsPerson1.Trn}" +
+                $"{(int)trsPerson1.Gender}" +
+                $"{new string(' ', 9)}" +
+                $"{originalastName1.PadRight(54, ' ')}" +
+                $"{new string(' ', 7)}" +
+                $"{"2018Z981"}";
+
+            var expectedNewRowContent2 = $"{trsPerson2.Trn}" +
+                $"{(int)trsPerson2.Gender!}" +
+                $"{new string(' ', 9)}" +
+                $"{trsPerson2.DateOfBirth!.Value.ToString("ddMMyy")}" +
+                $"{new string(' ', 1)}" +
+                $"{trsPerson2.LastName.PadRight(17)}" +
+                $"{new string('1', 1)}" +
+                $"{trsPerson2.FirstName} {trsPerson2.MiddleName}".PadRight(35) +
+                $"{new string(' ', 1)}" +
+                $"{"1018Z981"}";
+
+            var expectedNameChangeRow2 = $"{trsPerson2.Trn}" +
+                $"{(int)trsPerson2.Gender}" +
+                $"{new string(' ', 9)}" +
+                $"{originalastName2.PadRight(54, ' ')}" +
+                $"{new string(' ', 7)}" +
+                $"{"2018Z981"}";
+
+            Assert.NotNull(integrationTransaction);
+            Assert.Equal(IntegrationTransactionImportStatus.Success, integrationTransaction.ImportStatus);
+            Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+            Assert.Equal(expectedTotalSuccessCount, integrationTransaction.SuccessCount);
+            Assert.Equal(expectedFailureCount, integrationTransaction.FailureCount);
+            Assert.Equal(expectedDuplicateCount, integrationTransaction.DuplicateCount);
+            Assert.NotEmpty(integrationTransaction.FileName);
+            Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent1, trsPerson1));
+            Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow1, trsPerson1));
+            Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNewRowContent2, trsPerson2));
+            Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, r => MatchesExpectedRowData(r, expectedNameChangeRow2, trsPerson2));
+        });
+    }
+
+    bool MatchesExpectedRowData(IntegrationTransactionRecord record, string expectedRowData, Person person) =>
+        record.PersonId == person.PersonId &&
+        record.FailureMessage == null &&
+        record.Duplicate == null &&
+        record.RowData != null &&
+        record.RowData.Length == EXPECTED_ROW_LENGTH &&
+        record.RowData == expectedRowData &&
+        record.Status == IntegrationTransactionRecordStatus.Success;
+
+    //FileName
 }
 
 public class CapitaExportNewJobFixture : IAsyncLifetime
@@ -407,7 +865,33 @@ public class CapitaExportNewJobFixture : IAsyncLifetime
             configuration);
 
         Logger = new Mock<ILogger<CapitaExportNewJob>>();
-        Job = ActivatorUtilities.CreateInstance<CapitaExportNewJob>(provider, BlobServiceClient.Object, Logger.Object, Clock);
+
+        var blobServiceClientMock = new Mock<BlobServiceClient>();
+        var blobContainerClientMock = new Mock<BlobContainerClient>();
+        var blobClientMock = new Mock<BlobClient>();
+        blobServiceClientMock
+            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
+            .Returns(blobContainerClientMock.Object);
+
+
+        blobContainerClientMock
+            .Setup(c => c.CreateIfNotExistsAsync(
+                PublicAccessType.None,
+                null,
+                null,
+                It.IsAny<CancellationToken>()
+            ))
+            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+
+        blobContainerClientMock
+            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
+            .Returns(blobClientMock.Object);
+
+        blobClientMock
+            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+
+        Job = ActivatorUtilities.CreateInstance<CapitaExportNewJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock);
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
             OrganizationService,
@@ -439,3 +923,4 @@ public class CapitaExportNewJobFixture : IAsyncLifetime
 
     public Mock<BlobServiceClient> BlobServiceClient { get; } = new Mock<BlobServiceClient>();
 }
+

@@ -15,7 +15,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
     public const string StorageContainer = "integration-transactions";
     public const string EXPORTS_FOLDER = "capita/exports";
 
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    public async Task<long> ExecuteAsync(CancellationToken cancellationToken)
     {
         var lastRunDate = await GetLastRunDateAsync();
         var persons = await GetNewPersonsAsync(lastRunDate);
@@ -57,11 +57,14 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
                 //write header
                 foreach (var person in persons)
                 {
-                    // Existing name row
-                    var row = GetNewPersonAsStringRow(person);
-                    csvWriter.WriteRecord(row);
+                    var previousNameRow = GetNewPersonWithPreviousLastNameAsStringRow(person);
+                    var hasPreviousLastName = !string.IsNullOrEmpty(previousNameRow);
 
-                    // write exported row to integrationtransactionrecord
+                    // Existing name row
+                    var row = GetNewPersonAsStringRow(person, hasPreviousLastName);
+                    csvWriter.WriteField(row);
+
+                    // write current person exported row to integrationtransactionrecord
                     integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                     {
                         IntegrationTransactionRecordId = 0,
@@ -74,14 +77,15 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
                         HasActiveAlert = null
                     });
                     totalRowCount++;
+                    successCount++;
 
                     // if there is a previous last name, append another row
-                    if (person.PreviousNames?.Where(X => X.LastName != person.LastName).Count() > 0)
-                    {
-                        var previousNameRow = GetNewPersonWithPreviousLastNameAsStringRow(person);
-                        csvWriter.WriteRecord(previousNameRow);
 
-                        // write exported previous name row to integrationtransactionrecord
+                    if (!string.IsNullOrEmpty(previousNameRow))
+                    {
+                        csvWriter.WriteField(previousNameRow);
+
+                        // write person previous name exported row to integrationtransactionrecord
                         integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                         {
                             IntegrationTransactionRecordId = 0,
@@ -94,6 +98,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
                             HasActiveAlert = null
                         });
                         totalRowCount++;
+                        successCount++;
                     }
 
                     //update IntegrationTransaction so that it's always up to date with counts of rows
@@ -136,6 +141,8 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
         //await dbContext.SaveChangesAsync();
         await dbContext.SaveChangesAsync();
         await txn.CommitAsync();
+
+        return integrationJob.IntegrationTransactionId;
     }
 
     public async Task UploadFileAsync(Stream fileContentStream, string fileName)
@@ -175,6 +182,9 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
         var builder = new StringBuilder();
         var previousName = nameChangeEvent?.OldDetails.LastName;
+
+        if (string.IsNullOrEmpty(previousName))
+            return string.Empty;
 
         if (string.IsNullOrEmpty(person.Trn))
             throw new Exception("Person does not have a trn");
@@ -221,7 +231,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
     }
 
 
-    public string GetNewPersonAsStringRow(Person person)
+    public string GetNewPersonAsStringRow(Person person, bool hasPreviousLastName)
     {
         var builder = new StringBuilder();
 
@@ -271,8 +281,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
             lastName = personLastName.Length > 17 ? personLastName.Substring(0, 17) : personLastName.PadRight(17, ' ');
         }
         builder.Append(lastName);
-        builder.Append(" "); //TODO: 1 if there is a previous last name or empty strng if not
-
+        builder.Append(hasPreviousLastName == true ? "1" : " ");
 
         /*
          * Column 4:
@@ -321,7 +330,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
     public async Task<List<Person>> GetNewPersonsAsync(DateTime? lastRunDate)
     {
-        var persons = await dbContext.Persons.Include(x => x.PreviousNames).Where(x => x.CapitaTrnChangedOn > lastRunDate && x.Trn != null).ToListAsync();
+        var persons = await dbContext.Persons.Where(x => x.CreatedOn > lastRunDate && x.Trn != null && x.CapitaTrnChangedOn == null).ToListAsync();
         return persons;
     }
 }
