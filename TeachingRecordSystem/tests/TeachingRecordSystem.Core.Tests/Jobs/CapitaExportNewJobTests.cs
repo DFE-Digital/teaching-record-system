@@ -593,7 +593,8 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
                 Assert.Null(record.FailureMessage);
                 Assert.Equal(person1.PersonId, record.PersonId);
                 Assert.Null(record.Duplicate);
-                Assert.Equal(EXPECTED_ROW_LENGTH, record.RowData.Length);
+                Assert.NotNull(record.RowData);
+                Assert.Equal(EXPECTED_ROW_LENGTH, record.RowData!.Length);
                 Assert.Equal(expectedRowContent, record.RowData);
                 Assert.Equal(IntegrationTransactionRecordStatus.Success, record.Status);
 
