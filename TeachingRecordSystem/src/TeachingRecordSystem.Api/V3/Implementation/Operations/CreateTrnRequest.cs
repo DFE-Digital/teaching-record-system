@@ -91,47 +91,62 @@ public class CreateTrnRequestHandler(
 
         var matchResult = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
 
-        Guid? resolvedPersonId = null;
         string? trn = null;
 
         string? jobId = null;
 
         if (matchResult.Outcome is TrnRequestMatchResultOutcome.DefiniteMatch)
         {
-            resolvedPersonId = matchResult.PersonId;
             trn = matchResult.Trn;
+
+            var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(matchResult.PersonId, currentApplicationUserId);
+            if (furtherChecksNeeded)
+            {
+                var supportTask = PostgresModels.SupportTask.Create(
+                    SupportTaskType.TrnRequestManualChecksNeeded,
+                    new TrnRequestManualChecksNeededData(),
+                    matchResult.PersonId,
+                    command.OneLoginUserSubject,
+                    currentApplicationUserId,
+                    command.RequestId,
+                    createdBy: currentApplicationUserId,
+                    clock.UtcNow,
+                    out var createdEvent);
+
+                dbContext.SupportTasks.Add(supportTask);
+                await dbContext.AddEventAndBroadcastAsync(createdEvent);
+            }
+
+            trnRequestMetadata.SetResolvedPerson(matchResult.PersonId, furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed);
         }
         else if (matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches)
         {
-            var supportTask = new PostgresModels.SupportTask()
-            {
-                SupportTaskReference = PostgresModels.SupportTask.GenerateSupportTaskReference(),
-                CreatedOn = clock.UtcNow,
-                UpdatedOn = clock.UtcNow,
-                SupportTaskType = SupportTaskType.ApiTrnRequest,
-                Status = SupportTaskStatus.Open,
-                OneLoginUserSubject = command.OneLoginUserSubject,
-                PersonId = null,
-                TrnRequestApplicationUserId = currentApplicationUserId,
-                TrnRequestId = command.RequestId,
-                TrnRequestMetadata = trnRequestMetadata,
-                Data = new ApiTrnRequestData()
-            };
+            var supportTask = PostgresModels.SupportTask.Create(
+                SupportTaskType.ApiTrnRequest,
+                new ApiTrnRequestData(),
+                personId: null,
+                command.OneLoginUserSubject,
+                currentApplicationUserId,
+                command.RequestId,
+                createdBy: currentApplicationUserId,
+                clock.UtcNow,
+                out var createdEvent);
 
             dbContext.SupportTasks.Add(supportTask);
+            await dbContext.AddEventAndBroadcastAsync(createdEvent);
         }
         else
         {
             Debug.Assert(matchResult.Outcome is TrnRequestMatchResultOutcome.NoMatches);
 
             trn = await trnGenerationApiClient.GenerateTrnAsync();
-            resolvedPersonId = Guid.NewGuid();
+            var newContactId = Guid.NewGuid();
+            trnRequestMetadata.SetResolvedPerson(newContactId);
 
-            Debug.Assert(resolvedPersonId is not null);
             Debug.Assert(trn is not null);
 
             jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
-                h => h.CreateContactFromTrnRequestAsync(currentApplicationUserId, command.RequestId, resolvedPersonId.Value, trn));
+                h => h.CreateContactFromTrnRequestAsync(currentApplicationUserId, command.RequestId, newContactId, trn));
         }
 
         var trnToken = emailAddress is not null && trn is not null ? await trnRequestService.CreateTrnTokenAsync(trn, emailAddress) : null;
@@ -139,10 +154,6 @@ public class CreateTrnRequestHandler(
 
         trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches;
         trnRequestMetadata.TrnToken = trnToken;
-        if (resolvedPersonId is not null)
-        {
-            trnRequestMetadata.SetResolvedPerson(resolvedPersonId.Value);
-        }
 
         trnRequestMetadata.Matches = new PostgresModels.TrnRequestMatches()
         {
@@ -174,7 +185,7 @@ public class CreateTrnRequestHandler(
                 .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing | ConfigureAwaitOptions.ContinueOnCapturedContext);
         }
 
-        var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
+        var status = trnRequestMetadata.Status!.Value;
 
         return new TrnRequestInfo()
         {
@@ -189,10 +200,11 @@ public class CreateTrnRequestHandler(
                 DateOfBirth = command.DateOfBirth,
                 NationalInsuranceNumber = command.NationalInsuranceNumber
             },
-            Trn = trn,
+#pragma warning restore TRS0001
+            Trn = status is TrnRequestStatus.Completed ? trn : null,
             Status = status,
             PotentialDuplicate = trnRequestMetadata.PotentialDuplicate!.Value,
-            AccessYourTeachingQualificationsLink = aytqLink
+            AccessYourTeachingQualificationsLink = status is TrnRequestStatus.Completed ? aytqLink : null
         };
 
         static string[] GetNonEmptyValues(params string?[] values)
@@ -304,6 +316,7 @@ public class CreateTrnRequestHandler(
             return new TrnRequestInfo()
             {
                 RequestId = command.RequestId,
+#pragma warning disable TRS0001
                 Person = new TrnRequestInfoPerson()
                 {
                     FirstName = command.FirstName,
@@ -313,6 +326,7 @@ public class CreateTrnRequestHandler(
                     DateOfBirth = command.DateOfBirth,
                     NationalInsuranceNumber = command.NationalInsuranceNumber
                 },
+#pragma warning restore TRS0001
                 Trn = singleMatchOnNinoAndDob.Trn,
                 Status = TrnRequestStatus.Completed,
                 PotentialDuplicate = false,
@@ -382,6 +396,7 @@ public class CreateTrnRequestHandler(
         return new TrnRequestInfo()
         {
             RequestId = command.RequestId,
+#pragma warning disable TRS0001
             Person = new TrnRequestInfoPerson()
             {
                 FirstName = command.FirstName,
@@ -391,6 +406,7 @@ public class CreateTrnRequestHandler(
                 DateOfBirth = command.DateOfBirth,
                 NationalInsuranceNumber = command.NationalInsuranceNumber
             },
+#pragma warning restore TRS0001
             Trn = trn,
             Status = status,
             PotentialDuplicate = potentialDuplicate,

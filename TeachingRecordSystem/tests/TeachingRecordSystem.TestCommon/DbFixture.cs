@@ -40,6 +40,7 @@ public class DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
         WithDbContextAsync(dbContext =>
             dbContext.Database.ExecuteSqlAsync(
                 $"""
+                 delete from support_tasks where person_id is not null;
                  update persons set merged_with_person_id = null;
                  delete from persons;
                  """));

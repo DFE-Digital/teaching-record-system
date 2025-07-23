@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
@@ -16,6 +17,7 @@ public class TestScopedServices
         GetAnIdentityApiClient = new();
         EventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
+        TrnRequestOptions = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -52,4 +54,6 @@ public class TestScopedServices
     public CaptureEventObserver EventObserver { get; }
 
     public TestableFeatureProvider FeatureProvider { get; }
+
+    public TrnRequestOptions TrnRequestOptions { get; }
 }

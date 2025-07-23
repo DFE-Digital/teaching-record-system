@@ -21,12 +21,48 @@ public class SupportTask
     public Guid? PersonId { get; init; }
     public Guid? TrnRequestApplicationUserId { get; init; }
     public string? TrnRequestId { get; init; }
-    public TrnRequestMetadata? TrnRequestMetadata { get; set; }
+    public TrnRequestMetadata? TrnRequestMetadata { get; }
 
     public required object Data
     {
         get => JsonSerializer.Deserialize(_data, GetDataType(), SerializerOptions)!;
         init => _data = JsonSerializer.SerializeToDocument(value, GetDataType(), SerializerOptions);
+    }
+
+    public static SupportTask Create(
+        SupportTaskType supportTaskType,
+        object data,
+        Guid? personId,
+        string? oneLoginUserSubject,
+        Guid? trnRequestApplicationUserId,
+        string? trnRequestId,
+        EventModels.RaisedByUserInfo createdBy,
+        DateTime now,
+        out SupportTaskCreatedEvent createdEvent)
+    {
+        var task = new SupportTask
+        {
+            SupportTaskReference = GenerateSupportTaskReference(),
+            CreatedOn = now,
+            UpdatedOn = now,
+            SupportTaskType = supportTaskType,
+            Status = SupportTaskStatus.Open,
+            Data = data,
+            PersonId = personId,
+            OneLoginUserSubject = oneLoginUserSubject,
+            TrnRequestApplicationUserId = trnRequestApplicationUserId,
+            TrnRequestId = trnRequestId
+        };
+
+        createdEvent = new SupportTaskCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = createdBy,
+            SupportTask = EventModels.SupportTask.FromModel(task)
+        };
+
+        return task;
     }
 
     public static string GenerateSupportTaskReference()

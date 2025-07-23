@@ -37,7 +37,7 @@ public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentU
             Trn = trnRequest.ResolvedPersonTrn,
             Status = metadata.Status ?? TrnRequestStatus.Pending,
             PotentialDuplicate = metadata.PotentialDuplicate ?? false,
-            AccessYourTeachingQualificationsLink = metadata.TrnToken is string trnToken ?
+            AccessYourTeachingQualificationsLink = metadata is { TrnToken: string trnToken, Status: TrnRequestStatus.Completed } ?
                 trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) :
                 null
         };

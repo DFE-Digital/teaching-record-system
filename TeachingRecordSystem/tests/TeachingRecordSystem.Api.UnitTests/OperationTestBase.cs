@@ -2,6 +2,7 @@ using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
@@ -38,6 +39,8 @@ public abstract class OperationTestBase
     public CaptureEventObserver EventObserver => _testServices.EventObserver;
 
     public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
+
+    public TrnRequestOptions TrnRequestOptions => _testServices.TrnRequestOptions;
 
     public T AssertSuccess<T>(ApiResult<T> result) where T : notnull
     {

@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
@@ -72,6 +74,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.RemoveAll<ReferenceDataCache>();
             services.AddSingleton<ReferenceDataCache, TestReferenceDataCache>();
             services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
+            services.AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions));
         });
     }
 

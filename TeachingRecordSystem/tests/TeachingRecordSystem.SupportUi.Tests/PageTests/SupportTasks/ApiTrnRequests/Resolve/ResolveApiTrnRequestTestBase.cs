@@ -24,13 +24,22 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
 
     protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithSingleDifferenceToMatch(
         Guid applicationUserId,
-        PersonMatchedAttribute differentAttribute)
+        PersonMatchedAttribute differentAttribute,
+        bool matchedPersonHasFlags = false)
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn()
-            .WithNationalInsuranceNumber()
-            .WithEmail(TestData.GenerateUniqueEmail()));
+        var matchedPerson = await TestData.CreatePersonAsync(p =>
+        {
+            p
+                .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+                .WithTrn()
+                .WithNationalInsuranceNumber()
+                .WithEmail(TestData.GenerateUniqueEmail());
+
+            if (matchedPersonHasFlags)
+            {
+                p.WithQts().WithEyts().WithAlert();
+            }
+        });
 
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUserId,
