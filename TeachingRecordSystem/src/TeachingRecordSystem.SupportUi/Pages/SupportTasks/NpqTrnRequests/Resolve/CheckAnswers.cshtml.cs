@@ -107,8 +107,8 @@ public class CheckAnswersModel(
             if (updateEvent is not null)
             {
                 await DbContext.AddEventAndBroadcastAsync(updateEvent);
-                await DbContext.SaveChangesAsync();
             }
+            await DbContext.SaveChangesAsync(); // save the changes to support task, whether or not person was updated
 
             // This is a little ugly but pushing this into a partial and executing it here is tricky
             var flashMessageHtml =
