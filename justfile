@@ -23,8 +23,9 @@ restore:
   @dotnet restore --locked-mode
 
 # Install Playwright
+[working-directory: 'tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests']
 install-playwright:
-  @cd {{"tests" / "TeachingRecordSystem.AuthorizeAccess.EndToEndTests"}} && pwsh bin/Debug/net8.0/playwright.ps1 install chromium
+  @pwsh bin/Debug/net8.0/playwright.ps1 install chromium
 
 # Run the trscli
 cli *ARGS:
@@ -69,32 +70,39 @@ format-changed:
   }
 
 # Run the EF Core Command-line Tools for the Core project
+[working-directory: 'src/TeachingRecordSystem.Core']
 ef *ARGS:
-  @cd {{"src" / "TeachingRecordSystem.Core"}} && dotnet dotnet-ef {{ARGS}}
+  @dotnet dotnet-ef {{ARGS}}
 
 # Run the API project in Development mode
+[working-directory: 'src/TeachingRecordSystem.Api']
 run-api:
-  @cd {{"src" / "TeachingRecordSystem.Api"}} && dotnet run
+  @dotnet run
 
 # Run the API project in Development mode and watch for file changes
+[working-directory: 'src/TeachingRecordSystem.Api']
 watch-api:
-  @cd {{"src" / "TeachingRecordSystem.Api"}} && dotnet watch
+  @dotnet watch
 
 # Run the AuthorizeAccess project in Development mode and watch for file changes
+[working-directory: 'src/TeachingRecordSystem.AuthorizeAccess']
 watch-authz:
-  @cd {{"src" / "TeachingRecordSystem.AuthorizeAccess"}} && dotnet watch
+  @dotnet watch
 
 # Run the UI project in Development mode and watch for file changes
+[working-directory: 'src/TeachingRecordSystem.SupportUi']
 watch-ui:
-  @cd {{"src" / "TeachingRecordSystem.SupportUi"}} && dotnet watch
+  @dotnet watch
 
 # Watch for file changes and compile any SASS files that have changed
+[working-directory: 'src/TeachingRecordSystem.SupportUi']
 watch-ui-sass:
-  @cd {{"src" / "TeachingRecordSystem.SupportUi"}} && dotnet watch msbuild /t:DartSass_Build
+  @dotnet watch msbuild /t:DartSass_Build
 
 # Run the Worker project in Development mode and watch for file changes
+[working-directory: 'src/TeachingRecordSystem.Worker']
 watch-worker:
-  @cd {{"src" / "TeachingRecordSystem.Worker"}} && dotnet watch
+  @dotnet watch
 
 # Build the Docker image
 docker-build *ARGS: restore
@@ -109,8 +117,9 @@ set-secret key value:
 set-tests-secret key value:
   @dotnet user-secrets set "{{key}}" "{{value}}" --id {{test-user-secrets-id}}
 
+[working-directory: 'src/TeachingRecordSystem.Cli']
 create-admin email name:
-  @cd {{"src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
+  @dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
 
 [working-directory: '..']
 make *ARGS:
