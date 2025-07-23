@@ -1,0 +1,137 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<NpqTrnRequestSupportTaskCreatedPersonEvent>>
+@{
+    var applicationUser = Model.ItemModel.ApplicationUser;
+    var updatedEvent = Model.ItemModel.Event;
+    var requestData = updatedEvent.RequestData;
+    var requestDataName = StringHelper.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName);
+    var evidenceFile = requestData.NpqEvidenceFileName;
+    var evidenceFileUrl = requestData.NpqEvidenceFileId is not null ? await FileService.GetFileUrlAsync(requestData.NpqEvidenceFileId!.Value, TimeSpan.FromMinutes(15)) : null;
+}
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-details-updated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">TRN request from @(applicationUser?.Name ?? "unknown source") - records merged</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <div data-testid="details">
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@requestData.FirstName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@requestData.MiddleName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@requestData.LastName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@requestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@requestData.EmailAddress</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@requestData.NationalInsuranceNumber</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+        </div>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>Created person record during task resolution</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.Comments</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{requestData.NpqEvidenceFileName} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="request-data">
+            <govuk-details-summary>TRN request data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Source</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (applicationUser is not null)
+                            {
+                                <colored-tag>@applicationUser.ShortName</colored-tag>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Request ID</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@requestData.RequestId</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Created on</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@requestData.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>
+                            @if (!string.IsNullOrWhiteSpace(requestDataName))
+                            {
+                                <multi-line-text text="@requestDataName" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@requestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@requestData.EmailAddress</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@requestData.NationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>
+

@@ -33,6 +33,13 @@ public partial class TestData
         private Option<Guid> _npqEvidenceFileId;
         private Option<string> _npqEvidenceFileName;
         private Option<SupportTaskStatus> _status;
+        private bool _withMatches = true;
+
+        public CreateNpqTrnRequestSupportTaskBuilder WithMatches(bool withMatches = true)
+        {
+            _withMatches = withMatches;
+            return this;
+        }
 
         public CreateNpqTrnRequestSupportTaskBuilder WithNpqApplicationId(string npqApplicationId)
         {
@@ -109,6 +116,10 @@ public partial class TestData
 
         public CreateNpqTrnRequestSupportTaskBuilder WithMatchedRecords(params Guid[] personIds)
         {
+            if (_withMatches is false)
+            {
+                throw new InvalidOperationException("WithMatchedRecords cannot be called when WithMatches is false.");
+            }
             _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedRecord() { PersonId = id }).ToArray());
 
             return this;
@@ -145,7 +156,7 @@ public partial class TestData
 
             var matchedRecords = _matchedRecords.ValueOrDefault();
 
-            if (matchedRecords is null)
+            if (_withMatches && matchedRecords is null)
             {
                 // Matches wasn't explicitly specified; create two person records that match details in this request
 
@@ -176,7 +187,7 @@ public partial class TestData
 
             var matches = new TrnRequestMatches() { MatchedRecords = matchedRecords };
 
-            var potentialDuplicate = matchedRecords.Length > 0;
+            var potentialDuplicate = matchedRecords?.Length > 0;
 
             var metadata = new TrnRequestMetadata
             {

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
@@ -19,6 +20,8 @@ public class CheckAnswersModel(
     public Guid? SourceApplicationUserId { get; set; }
 
     public bool CreatingNewRecord { get; set; }
+
+    public bool? PotentialDuplicate { get; set; }
 
     public string? FirstName { get; set; }
 
@@ -57,14 +60,49 @@ public class CheckAnswersModel(
 
         if (CreatingNewRecord)
         {
-            // CML TODO - Creating is the ticket after this one - this is not complete
             var newPersonId = Guid.NewGuid();
             requestData.SetResolvedPerson(newPersonId);
 
             var trn = await trnGenerator.GenerateTrnAsync();
-
+            var person = Person.Create(
+                trn,
+                requestData.FirstName ?? string.Empty,
+                requestData.MiddleName ?? string.Empty,
+                requestData.LastName ?? string.Empty,
+                requestData.DateOfBirth,
+                requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
+                requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
+                clock.UtcNow);
             selectedPersonAttributes = null;
             oldPersonAttributes = null;
+            DbContext.Add(person);
+
+            var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
+
+            supportTask.Status = SupportTaskStatus.Closed;
+            supportTask.UpdatedOn = clock.UtcNow;
+            supportTask.UpdateData<NpqTrnRequestData>(data => data with
+            {
+                ResolvedAttributes = resolvedPersonAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes
+            });
+
+            var @event = new NpqTrnRequestSupportTaskCreatedPersonEvent()
+            {
+                PersonId = requestData.ResolvedPersonId!.Value,
+                PersonDetails = EventModels.PersonDetails.FromModel(person),
+                SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                OldSupportTask = oldSupportTaskEventModel,
+                RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+                Comments = Comments,
+                EventId = Guid.NewGuid(),
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = User.GetUserId()
+            };
+
+            await DbContext.AddEventAndBroadcastAsync(@event);
+
+            await DbContext.SaveChangesAsync();
         }
         else // updating
         {
@@ -96,60 +134,60 @@ public class CheckAnswersModel(
                 emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
                 nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
                 clock.UtcNow);
-        }
-        Debug.Assert(requestData.ResolvedPersonId is not null);
 
-        var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
+            Debug.Assert(requestData.ResolvedPersonId is not null);
 
-        supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = clock.UtcNow;
-        supportTask.UpdateData<NpqTrnRequestData>(data => data with
-        {
-            ResolvedAttributes = resolvedPersonAttributes,
-            SelectedPersonAttributes = selectedPersonAttributes
-        });
+            var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
-        var changes = NpqTrnRequestSupportTaskUpdatedEventChanges.Status |
-                (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
-                (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
-                (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0);
-
-        var @event = new NpqTrnRequestSupportTaskUpdatedEvent()
-        {
-            PersonId = requestData.ResolvedPersonId!.Value,
-            SupportTask = EventModels.SupportTask.FromModel(supportTask),
-            OldSupportTask = oldSupportTaskEventModel,
-            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
-            Changes = changes,
-            PersonAttributes = new EventModels.TrnRequestPersonAttributes()
+            supportTask.Status = SupportTaskStatus.Closed;
+            supportTask.UpdatedOn = clock.UtcNow;
+            supportTask.UpdateData<NpqTrnRequestData>(data => data with
             {
-                FirstName = resolvedPersonAttributes.FirstName,
-                MiddleName = resolvedPersonAttributes.MiddleName,
-                LastName = resolvedPersonAttributes.LastName,
-                DateOfBirth = resolvedPersonAttributes.DateOfBirth,
-                EmailAddress = resolvedPersonAttributes.EmailAddress,
-                NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber
-            },
-            OldPersonAttributes = oldPersonAttributes,
-            Comments = Comments,
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = User.GetUserId()
-        };
-        await DbContext.AddEventAndBroadcastAsync(@event);
+                ResolvedAttributes = resolvedPersonAttributes,
+                SelectedPersonAttributes = selectedPersonAttributes
+            });
+
+            var changes = NpqTrnRequestSupportTaskUpdatedEventChanges.Status |
+                    (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
+                    (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
+                    (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0);
+
+            var @event = new NpqTrnRequestSupportTaskUpdatedEvent()
+            {
+                PersonId = requestData.ResolvedPersonId!.Value,
+                SupportTask = EventModels.SupportTask.FromModel(supportTask),
+                OldSupportTask = oldSupportTaskEventModel,
+                RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+                Changes = changes,
+                PersonAttributes = new EventModels.TrnRequestPersonAttributes()
+                {
+                    FirstName = resolvedPersonAttributes.FirstName,
+                    MiddleName = resolvedPersonAttributes.MiddleName,
+                    LastName = resolvedPersonAttributes.LastName,
+                    DateOfBirth = resolvedPersonAttributes.DateOfBirth,
+                    EmailAddress = resolvedPersonAttributes.EmailAddress,
+                    NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber
+                },
+                OldPersonAttributes = oldPersonAttributes,
+                Comments = Comments,
+                EventId = Guid.NewGuid(),
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = User.GetUserId()
+            };
+            await DbContext.AddEventAndBroadcastAsync(@event);
+        }
 
         await DbContext.SaveChangesAsync();
-
         // This is a little ugly but pushing this into a partial and executing it here is tricky
         var flashMessageHtml =
             $@"
             <a href=""{linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)}"" class=""govuk-link"">View record</a>
             ";
 
+        var message = CreatingNewRecord ? "Record created for" : "Records merged successfully for";
         TempData.SetFlashSuccess(
-            $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
+            $"{message} {FirstName} {MiddleName} {LastName}",
             messageHtml: flashMessageHtml);
-
         return Redirect(linkGenerator.SupportTasks());
     }
 
@@ -219,7 +257,7 @@ public class CheckAnswersModel(
         Comments = state.Comments;
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
         SourceApplicationUserId = requestData.ApplicationUser!.UserId;
-
+        PotentialDuplicate = requestData.PotentialDuplicate;
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

@@ -3,10 +3,10 @@
 @{
     ViewBag.Title = Model.CreatingNewRecord ? "Check details before creating record" : "Check details before updating record";
 
-    var backLink = Model.CreatingNewRecord 
-    @* CML TODO - backlink depends - matches or no matches*@
-        ? LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
-        : LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
+    var backLink = Model.CreatingNewRecord && (Model.PotentialDuplicate ?? false) ?
+@* CML TODO - backlink depends - matches or no matches*@
+        LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
     var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update record";
 }
 
@@ -56,10 +56,6 @@
                         <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    @*<govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.Gender</govuk-summary-list-row-value>
-                    </govuk-summary-list-row> *@
                     @if (Model.Trn is not null)
                     {
                         <govuk-summary-list-row>
