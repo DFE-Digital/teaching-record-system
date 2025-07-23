@@ -53,7 +53,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
         if (CreateRecord)
         {
-            // CML TODO later this will conditionally redirect to the matches page or the create new record page if there are no matches
+            // CML TODO - next ticket - this will conditionally redirect to the matches page or the create new record page if there are no matches
             return Redirect(linkGenerator.NpqTrnRequestMatches(SupportTaskReference));
         }
         else

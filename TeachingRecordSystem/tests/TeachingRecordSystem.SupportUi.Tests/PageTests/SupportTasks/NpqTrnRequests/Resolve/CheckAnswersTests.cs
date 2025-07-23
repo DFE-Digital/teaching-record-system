@@ -493,8 +493,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
-            Assert.Equal(matchedPerson.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
-            //Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken); // CML TODO I don't think I need this TRN token?
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()

@@ -104,7 +104,6 @@ public class CheckAnswersModel(
                 clock.UtcNow,
                 requestData,
                 out var updateEvent);
-            await DbContext.SaveChangesAsync();
             if (updateEvent is not null)
             {
                 await DbContext.AddEventAndBroadcastAsync(updateEvent);
