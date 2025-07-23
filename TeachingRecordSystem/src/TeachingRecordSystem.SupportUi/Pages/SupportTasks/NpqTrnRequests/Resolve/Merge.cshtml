@@ -73,7 +73,7 @@
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" />
                             <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.EmailAddress!.Different)">
-                                @(Model.EmailAddress!.TrnRequestValue ?? UiDefaults.EmptyDisplayContent)
+                                @(Model.EmailAddress!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
                             <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.EmailAddress!.Different)">
                                 @{
@@ -91,7 +91,7 @@
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" />
                             <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.NationalInsuranceNumber!.Different)">
-                                @(Model.NationalInsuranceNumber!.TrnRequestValue ?? UiDefaults.EmptyDisplayContent)
+                                @(Model.NationalInsuranceNumber!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
                             <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.NationalInsuranceNumber!.Different)">
                                 @{
