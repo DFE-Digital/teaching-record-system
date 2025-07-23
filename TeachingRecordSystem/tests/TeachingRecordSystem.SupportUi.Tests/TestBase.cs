@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -69,6 +70,8 @@ public abstract class TestBase : IDisposable
     public Mock<IFileService> FileServiceMock => _testServices.BlobStorageFileServiceMock;
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
+
+    public TrnRequestOptions TrnRequestOptions => _testServices.TrnRequestOptions;
 
     public async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
             string journeyName,

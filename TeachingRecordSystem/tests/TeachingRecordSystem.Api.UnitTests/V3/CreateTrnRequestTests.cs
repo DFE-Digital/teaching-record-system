@@ -293,6 +293,110 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         });
 
     [Fact]
+    public Task HandleAsync_DefiniteMatchWithPersonDoesNotRequireFurthersChecks_ReturnsTrn() =>
+        WithHandler<CreateTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
+                CurrentUserProvider.GetCurrentApplicationUser().UserId
+            ];
+
+            var dateOfBirth = new DateOnly(1990, 01, 01);
+            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+            var matchedPerson = await TestData.CreatePersonAsync(p => p
+                .WithTrn()
+                .WithDateOfBirth(dateOfBirth)
+                .WithNationalInsuranceNumber(nationalInsuranceNumber));
+            Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+
+            var command = CreateCommand() with
+            {
+                DateOfBirth = dateOfBirth,
+                NationalInsuranceNumber = nationalInsuranceNumber
+            };
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var success = AssertSuccess(result);
+
+            Assert.Equal(command.RequestId, success.RequestId);
+            Assert.Equal(TrnRequestStatus.Completed, success.Status);
+            Assert.NotNull(success.Trn);
+            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
+
+            await DbFixture.WithDbContextAsync(async dbContext =>
+            {
+                var metadata = await dbContext.TrnRequestMetadata
+                    .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+                Assert.Equal(TrnRequestStatus.Completed, metadata.Status);
+                Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
+
+                var supportTasks = await dbContext.SupportTasks
+                    .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
+                        t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                        t.TrnRequestMetadata!.RequestId == command.RequestId)
+                    .ToArrayAsync();
+
+                Assert.Empty(supportTasks);
+            });
+        });
+
+    [Fact]
+    public Task HandleAsync_DefiniteMatchWithPersonDoesRequireFurthersChecks_CreatesSupportTaskAndDoesNotReturnTrn() =>
+        WithHandler<CreateTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
+                CurrentUserProvider.GetCurrentApplicationUser().UserId
+            ];
+
+            var dateOfBirth = new DateOnly(1990, 01, 01);
+            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+            var matchedPerson = await TestData.CreatePersonAsync(p => p
+                .WithTrn()
+                .WithDateOfBirth(dateOfBirth)
+                .WithNationalInsuranceNumber(nationalInsuranceNumber)
+                .WithAlert());
+
+            var command = CreateCommand() with
+            {
+                DateOfBirth = dateOfBirth,
+                NationalInsuranceNumber = nationalInsuranceNumber
+            };
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var success = AssertSuccess(result);
+
+            Assert.Equal(command.RequestId, success.RequestId);
+            Assert.Equal(TrnRequestStatus.Pending, success.Status);
+            Assert.Null(success.Trn);
+            Assert.Null(success.AccessYourTeachingQualificationsLink);
+
+            await DbFixture.WithDbContextAsync(async dbContext =>
+            {
+                var metadata = await dbContext.TrnRequestMetadata
+                    .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+                Assert.Equal(TrnRequestStatus.Pending, metadata.Status);
+                Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
+
+                var supportTasks = await dbContext.SupportTasks
+                    .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
+                        t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                        t.TrnRequestMetadata!.RequestId == command.RequestId)
+                    .ToArrayAsync();
+
+                Assert.NotEmpty(supportTasks);
+            });
+        });
+
+    [Fact]
     public Task HandleAsync_NoMatches_CreatesContactWithTrnButNoSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {

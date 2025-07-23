@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
@@ -87,7 +88,25 @@ public class CheckAnswers(
         {
             Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
-            requestData.SetResolvedPerson(existingContactId);
+            var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(existingContactId, requestData.ApplicationUserId);
+            requestData.SetResolvedPerson(existingContactId, furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed);
+
+            if (furtherChecksNeeded)
+            {
+                var furtherChecksSupportTask = SupportTask.Create(
+                    SupportTaskType.TrnRequestManualChecksNeeded,
+                    new TrnRequestManualChecksNeededData(),
+                    existingContactId,
+                    requestData.OneLoginUserSubject,
+                    requestData.ApplicationUserId,
+                    requestData.RequestId,
+                    User.GetUserId(),
+                    clock.UtcNow,
+                    out var furtherChecksSupportTaskCreatedEvent);
+
+                DbContext.SupportTasks.Add(furtherChecksSupportTask);
+                await DbContext.AddEventAndBroadcastAsync(furtherChecksSupportTaskCreatedEvent);
+            }
 
             Debug.Assert(Trn is not null);
             requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);

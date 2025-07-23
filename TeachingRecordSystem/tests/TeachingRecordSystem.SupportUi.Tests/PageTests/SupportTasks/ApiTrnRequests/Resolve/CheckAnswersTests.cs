@@ -532,6 +532,94 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         }
     }
 
+    [Fact]
+    public async Task Post_UpdatingExistingRecordAndMatchedRecordDoesNotRequireFurtherChecks_SetsTrnRequestToCompleted()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [applicationUser.UserId];
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            PersonMatchedAttribute.MiddleName,
+            matchedPersonHasFlags: false);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        Clock.Advance();
+
+        var comments = Faker.Lorem.Paragraph();
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = true,
+                MiddleNameSource = PersonAttributeSource.TrnRequest,
+                Comments = comments
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var updatedTrnRequestMetadata = await WithDbContext(dbContext =>
+            dbContext.TrnRequestMetadata.SingleAsync(t => t.RequestId == requestData.RequestId));
+        Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequestMetadata.Status);
+
+        var furtherChecksRequiredTasks = await WithDbContext(dbContext =>
+            dbContext.SupportTasks.Where(t =>
+                t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded && t.TrnRequestId == requestData.RequestId).ToArrayAsync());
+        Assert.Empty(furtherChecksRequiredTasks);
+    }
+
+    [Fact]
+    public async Task Post_UpdatingExistingRecordAndMatchedRecordDoesRequireFurtherChecks_CreatesSupportTaskAndKeepsTrnRequestPending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [applicationUser.UserId];
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            PersonMatchedAttribute.MiddleName,
+            matchedPersonHasFlags: true);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        Clock.Advance();
+
+        var comments = Faker.Lorem.Paragraph();
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = true,
+                MiddleNameSource = PersonAttributeSource.TrnRequest,
+                Comments = comments
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var updatedTrnRequestMetadata = await WithDbContext(dbContext =>
+            dbContext.TrnRequestMetadata.SingleAsync(t => t.RequestId == requestData.RequestId));
+        Assert.Equal(TrnRequestStatus.Pending, updatedTrnRequestMetadata.Status);
+
+        var furtherChecksRequiredTasks = await WithDbContext(dbContext =>
+            dbContext.SupportTasks.Where(t =>
+                t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded && t.TrnRequestId == requestData.RequestId).ToArrayAsync());
+        Assert.NotEmpty(furtherChecksRequiredTasks);
+    }
+
     private Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(
         string supportTaskReference,
         ResolveApiTrnRequestState state) =>

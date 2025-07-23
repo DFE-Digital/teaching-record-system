@@ -1,6 +1,7 @@
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -27,6 +28,7 @@ public class TestScopedServices
             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
         GetAnIdentityApiClientMock = new();
+        TrnRequestOptions = new TrnRequestOptions();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -55,4 +57,6 @@ public class TestScopedServices
     public Mock<IFileService> BlobStorageFileServiceMock { get; }
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
+
+    public TrnRequestOptions TrnRequestOptions { get; }
 }

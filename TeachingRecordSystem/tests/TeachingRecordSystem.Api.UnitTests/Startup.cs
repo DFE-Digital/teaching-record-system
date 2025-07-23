@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -62,7 +63,8 @@ public class Startup
                     .AddTransient<GetPersonHelper>()
                     .AddPersonMatching()
                     .AddTrnRequestService(context.Configuration)
-                    .AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
+                    .AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>()
+                    .AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions));
             });
     }
 

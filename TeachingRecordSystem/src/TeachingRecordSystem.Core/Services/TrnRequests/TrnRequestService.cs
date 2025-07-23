@@ -115,6 +115,26 @@ public class TrnRequestService(
         return new GetTrnRequestResult(metadata, contact.dfeta_TRN);
     }
 
+    public async Task<bool> RequiresFurtherChecksNeededSupportTaskAsync(Guid personId, Guid trnRequestApplicationUserId)
+    {
+        if (!trnRequestOptionsAccessor.Value.FlagFurtherChecksRequiredFromUserIds.Contains(trnRequestApplicationUserId))
+        {
+            return false;
+        }
+
+        var personFlags = await dbContext.Persons
+            .Where(p => p.PersonId == personId)
+            .Select(p => new { HasQts = p.QtsDate != null, HasEyts = p.EytsDate != null, HasOpenAlert = p.Alerts!.Any(a => a.IsOpen) })
+            .SingleAsync();
+
+        if (personFlags is { HasQts: false, HasEyts: false, HasOpenAlert: false })
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId, string trn)
     {
         var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
@@ -194,7 +214,7 @@ public class TrnRequestService(
                 PersonMatchedAttribute.FirstName => query with { FirstName = Option.Some(requestData.FirstName!) },
                 PersonMatchedAttribute.MiddleName => query with { MiddleName = Option.Some(requestData.MiddleName!) },
                 PersonMatchedAttribute.LastName => query with { LastName = Option.Some(requestData.LastName!) },
-                PersonMatchedAttribute.DateOfBirth => query with { DateOfBirth = Option.Some(requestData.DateOfBirth!) },
+                PersonMatchedAttribute.DateOfBirth => query with { DateOfBirth = Option.Some(requestData.DateOfBirth) },
                 PersonMatchedAttribute.EmailAddress => query with { EmailAddress = Option.Some(requestData.EmailAddress) },
                 PersonMatchedAttribute.NationalInsuranceNumber => query with { NationalInsuranceNumber = Option.Some(requestData.NationalInsuranceNumber) },
                 _ => throw new NotImplementedException()

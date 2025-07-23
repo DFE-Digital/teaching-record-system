@@ -200,27 +200,30 @@ public partial class TestData
 
             var status = _status.ValueOr(() => SupportTaskStatus.Open);
 
-            var task = new SupportTask
-            {
-                SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
-                CreatedOn = createdOn,
-                UpdatedOn = createdOn,
-                SupportTaskType = SupportTaskType.ApiTrnRequest,
-                Status = status,
-                Data = new ApiTrnRequestData(),
-                TrnRequestApplicationUserId = applicationUserId,
-                TrnRequestId = trnRequestId,
-                TrnRequestMetadata = metadata
-            };
+            var task = SupportTask.Create(
+                SupportTaskType.ApiTrnRequest,
+                new ApiTrnRequestData(),
+                personId: null,
+                oneLoginUserSubject: null,
+                applicationUserId,
+                trnRequestId,
+                SystemUser.SystemUserId,
+                createdOn,
+                out var createdEvent);
+            task.Status = status;
 
-            await testData.WithDbContextAsync(async dbContext =>
+            return await testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.TrnRequestMetadata.Add(metadata);
                 dbContext.SupportTasks.Add(task);
+                dbContext.AddEventWithoutBroadcast(createdEvent);
                 await dbContext.SaveChangesAsync();
-            });
 
-            return task;
+                // Re-query what we've just added so we return a SupportTask with TrnRequestMetadata populated
+                return await dbContext.SupportTasks
+                    .Include(t => t.TrnRequestMetadata)
+                    .SingleAsync(t => t.SupportTaskReference == task.SupportTaskReference);
+            });
         }
     }
 }
