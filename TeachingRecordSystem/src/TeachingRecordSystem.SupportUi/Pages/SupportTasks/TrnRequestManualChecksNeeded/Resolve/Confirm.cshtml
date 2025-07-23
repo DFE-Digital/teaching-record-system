@@ -1,0 +1,23 @@
+@page "/support-tasks/manual-checks-needed/{supportTaskReference}/confirm"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Confirm
+@{
+    ViewBag.Title = "Confirm you’ve completed the checks";
+}
+
+<form>
+    <govuk-panel class="trs-blue-panel">
+        <govuk-panel-title>@ViewBag.Title</govuk-panel-title>
+        <govuk-panel-body>
+            <p class="govuk-body">
+                By continuing, you confirm that all checks needed outside this service are complete.
+            </p>
+
+            <div class="govuk-button-group govuk-!-margin-bottom-0">
+                <govuk-button type="submit" class="govuk-button--inverse">Continue</govuk-button>
+                <a href="@LinkGenerator.ResolveTrnRequestManualChecksNeeded(Model.SupportTaskReference!)" class="trs-button--link">
+                    Go back to the TRN request
+                </a>
+            </div>
+        </govuk-panel-body>
+    </govuk-panel>
+</form>

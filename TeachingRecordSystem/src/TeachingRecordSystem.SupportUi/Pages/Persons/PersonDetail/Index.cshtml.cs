@@ -13,6 +13,8 @@ public class IndexModel(
     PreviousNameHelper previousNameHelper,
     IFeatureProvider featureProvider) : PageModel
 {
+    private static readonly InductionStatus[] _invalidInductionStatusesForMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
+
     [FromRoute]
     public Guid PersonId { get; set; }
 
@@ -31,12 +33,17 @@ public class IndexModel(
 
     public bool HasOpenAlert { get; set; }
 
+    public bool ShowMergeButton { get; set; }
+
     public async Task OnGetAsync()
     {
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
 
         Person = await BuildPersonInfoAsync();
         PersonProfessionalStatus = await BuildPersonStatusInfoAsync();
+
+        ShowMergeButton = !HasOpenAlert && Person!.IsActive &&
+            (PersonProfessionalStatus is not PersonProfessionalStatusInfo professionalStatus || !_invalidInductionStatusesForMerge.Contains(professionalStatus.InductionStatus));
     }
 
     private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()
@@ -92,7 +99,8 @@ public class IndexModel(
                 HasActiveAlert = hasActiveAlert,
                 PreviousNames = previousNames
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
-                    .ToArray()
+                    .ToArray(),
+                IsActive = person.Status == PersonStatus.Active
             };
         }
         else
@@ -113,7 +121,8 @@ public class IndexModel(
                         Contact.Fields.EMailAddress1,
                         Contact.Fields.MobilePhone,
                         Contact.Fields.dfeta_NINumber,
-                        Contact.Fields.GenderCode)));
+                        Contact.Fields.GenderCode,
+                        Contact.Fields.StatusCode)));
             var contact = contactDetail!.Contact;
 
             return new PersonInfo()
@@ -128,7 +137,8 @@ public class IndexModel(
                 HasActiveAlert = hasActiveAlert,
                 PreviousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
-                    .ToArray()
+                    .ToArray(),
+                IsActive = contact.StatusCode == Contact_StatusCode.Alive
             };
         }
     }
@@ -144,6 +154,7 @@ public class IndexModel(
         public required Gender? Gender { get; init; }
         public required bool HasActiveAlert { get; init; }
         public required string[] PreviousNames { get; init; }
+        public required bool IsActive { get; init; }
     }
 
     public record PersonProfessionalStatusInfo
