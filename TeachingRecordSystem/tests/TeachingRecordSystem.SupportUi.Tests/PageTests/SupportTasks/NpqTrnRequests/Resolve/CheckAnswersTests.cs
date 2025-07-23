@@ -391,9 +391,9 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskUpdatedEvent>(e);
             AssertEventIsExpected(actualEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
 
-            //AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.TrnRequestMetadata);
-            //Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileId, actualEvent.DetailsChangeEvidenceFile?.FileId);
-            //Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileName, actualEvent.DetailsChangeEvidenceFile?.Name);
+            AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
+            Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
+            Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileName, actualEvent.RequestData?.NpqEvidenceFileName);
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
