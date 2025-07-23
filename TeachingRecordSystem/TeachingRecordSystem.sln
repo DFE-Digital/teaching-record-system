@@ -280,7 +280,7 @@ Global
 		{6AC91DA6-EBC0-4820-AD1C-2137A4188F57}.Release|x64.Build.0 = Release|Any CPU
 		{6AC91DA6-EBC0-4820-AD1C-2137A4188F57}.Release|x86.ActiveCfg = Release|Any CPU
 		{6AC91DA6-EBC0-4820-AD1C-2137A4188F57}.Release|x86.Build.0 = Release|Any CPU
-EndGlobalSection
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
