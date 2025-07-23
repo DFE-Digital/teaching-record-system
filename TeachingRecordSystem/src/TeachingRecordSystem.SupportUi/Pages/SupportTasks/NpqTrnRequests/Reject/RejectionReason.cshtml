@@ -1,0 +1,39 @@
+@page "/support-tasks/npq-trn-requests/{supportTaskReference}/rejection-reason/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject.RejectionReasonModel
+@{
+    ViewBag.Title = "Compare potential duplicate records";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">TRN request - @Model.PersonName</span>
+            <govuk-radios asp-for="RejectionReason" data-testid="reason-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
+                    <govuk-radios-item value="@RejectionReasonOption.EvidenceDoesNotMatch">
+                        @RejectionReasonOption.EvidenceDoesNotMatch.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@RejectionReasonOption.InsufficientEvidence">
+                        @RejectionReasonOption.InsufficientEvidence.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@RejectionReasonOption.NpqDetailsDoNotMatch">
+                        @RejectionReasonOption.NpqDetailsDoNotMatch.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@RejectionReasonOption.AnotherReason">
+                        @RejectionReasonOption.AnotherReason.GetDisplayName()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.NpqTrnRequestRejectionReasonCancel(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

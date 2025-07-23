@@ -24,4 +24,5 @@ public static class JourneyNames
     public const string EditDetails = nameof(EditDetails);
     public const string CreatePerson = nameof(CreatePerson);
     public const string MergePerson = nameof(MergePerson);
+    public const string ResolveNpqTrnRequest = nameof(ResolveNpqTrnRequest);
 }
