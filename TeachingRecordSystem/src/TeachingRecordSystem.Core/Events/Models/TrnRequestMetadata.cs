@@ -29,6 +29,12 @@ public record TrnRequestMetadata
     public required string? TrnToken { get; set; }
     public required Guid? ResolvedPersonId { get; set; }
     public required TrnRequestMatches? Matches { get; set; }
+    public required bool? NpqWorkingInEducationalSetting { get; init; }
+    public required string? NpqApplicationId { get; init; }
+    public required string? NpqName { get; init; }
+    public required string? NpqTrainingProvider { get; init; }
+    public required Guid? NpqEvidenceFileId { get; init; }
+    public required string? NpqEvidenceFileName { get; init; }
 
     public static TrnRequestMetadata FromModel(Core.DataStore.Postgres.Models.TrnRequestMetadata model) =>
         new()
@@ -67,7 +73,13 @@ public record TrnRequestMetadata
                         })
                         .AsList()
                 } :
-                null
+                null,
+            NpqApplicationId = model.NpqApplicationId,
+            NpqEvidenceFileId = model.NpqEvidenceFileId,
+            NpqEvidenceFileName = model.NpqEvidenceFileName,
+            NpqName = model.NpqName,
+            NpqTrainingProvider = model.NpqTrainingProvider,
+            NpqWorkingInEducationalSetting = model.NpqWorkingInEducationalSetting
         };
 }
 

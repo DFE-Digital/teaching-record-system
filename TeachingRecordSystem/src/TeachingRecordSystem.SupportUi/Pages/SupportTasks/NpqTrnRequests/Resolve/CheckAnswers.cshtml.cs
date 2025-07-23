@@ -51,8 +51,9 @@ public class CheckAnswersModel(
         var requestData = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
 
+        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
-
+        EventModels.TrnRequestPersonAttributes? oldPersonAttributes;
 
         if (CreatingNewRecord)
         {
@@ -63,6 +64,7 @@ public class CheckAnswersModel(
             var trn = await trnGenerator.GenerateTrnAsync();
 
             selectedPersonAttributes = null;
+            oldPersonAttributes = null;
         }
         else // updating
         {
@@ -72,17 +74,15 @@ public class CheckAnswersModel(
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            Debug.Assert(requestData.ResolvedPersonId is not null);
-
-            var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
-
-            supportTask.Status = SupportTaskStatus.Closed;
-            supportTask.UpdatedOn = clock.UtcNow;
-            supportTask.UpdateData<NpqTrnRequestData>(data => data with
+            oldPersonAttributes = new EventModels.TrnRequestPersonAttributes()
             {
-                ResolvedAttributes = resolvedPersonAttributes,
-                SelectedPersonAttributes = selectedPersonAttributes
-            });
+                FirstName = selectedPersonAttributes.FirstName,
+                MiddleName = selectedPersonAttributes.MiddleName,
+                LastName = selectedPersonAttributes.LastName,
+                DateOfBirth = selectedPersonAttributes.DateOfBirth,
+                EmailAddress = selectedPersonAttributes.EmailAddress,
+                NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber
+            };
 
             // update the person
             var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId);
@@ -91,35 +91,64 @@ public class CheckAnswersModel(
                 throw new ArgumentException("Person not found.");
             }
 
-            // create new PersonUpdatedFromTrnRequestEvent
             person!.UpdateDetailsFromTrnRequest(
                 dateOfBirth: DateOfBirth,
                 emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
                 nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
-                detailsChangeReasonDetail: Comments,
-                detailsChangeEvidenceFile: requestData.NpqEvidenceFileId is Guid fileId ?
-                    new Core.Events.Models.File() { FileId = fileId, Name = requestData.NpqEvidenceFileName! } :
-                    null,
-                SourceApplicationUserId!,
-                clock.UtcNow,
-                requestData,
-                out var updateEvent);
-            if (updateEvent is not null)
-            {
-                await DbContext.AddEventAndBroadcastAsync(updateEvent);
-            }
-            await DbContext.SaveChangesAsync(); // save the changes to support task, whether or not person was updated
+                clock.UtcNow);
+        }
+        Debug.Assert(requestData.ResolvedPersonId is not null);
 
-            // This is a little ugly but pushing this into a partial and executing it here is tricky
-            var flashMessageHtml =
-                $@"
+        var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
+
+        supportTask.Status = SupportTaskStatus.Closed;
+        supportTask.UpdatedOn = clock.UtcNow;
+        supportTask.UpdateData<NpqTrnRequestData>(data => data with
+        {
+            ResolvedAttributes = resolvedPersonAttributes,
+            SelectedPersonAttributes = selectedPersonAttributes
+        });
+
+        var changes = NpqTrnRequestSupportTaskUpdatedEventChanges.Status |
+                (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
+                (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
+                (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0);
+
+        var @event = new NpqTrnRequestSupportTaskUpdatedEvent()
+        {
+            PersonId = requestData.ResolvedPersonId!.Value,
+            SupportTask = EventModels.SupportTask.FromModel(supportTask),
+            OldSupportTask = oldSupportTaskEventModel,
+            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+            Changes = changes,
+            PersonAttributes = new EventModels.TrnRequestPersonAttributes()
+            {
+                FirstName = resolvedPersonAttributes.FirstName,
+                MiddleName = resolvedPersonAttributes.MiddleName,
+                LastName = resolvedPersonAttributes.LastName,
+                DateOfBirth = resolvedPersonAttributes.DateOfBirth,
+                EmailAddress = resolvedPersonAttributes.EmailAddress,
+                NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber
+            },
+            OldPersonAttributes = oldPersonAttributes,
+            Comments = Comments,
+            EventId = Guid.NewGuid(),
+            CreatedUtc = clock.UtcNow,
+            RaisedBy = User.GetUserId()
+        };
+        await DbContext.AddEventAndBroadcastAsync(@event);
+
+        await DbContext.SaveChangesAsync();
+
+        // This is a little ugly but pushing this into a partial and executing it here is tricky
+        var flashMessageHtml =
+            $@"
             <a href=""{linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)}"" class=""govuk-link"">View record</a>
             ";
 
-            TempData.SetFlashSuccess(
-                $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
-                messageHtml: flashMessageHtml);
-        }
+        TempData.SetFlashSuccess(
+            $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
+            messageHtml: flashMessageHtml);
 
         return Redirect(linkGenerator.SupportTasks());
     }
