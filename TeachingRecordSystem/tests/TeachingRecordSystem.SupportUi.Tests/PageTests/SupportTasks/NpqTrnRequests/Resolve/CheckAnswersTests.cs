@@ -388,21 +388,12 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         };
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<PersonDetailsUpdatedFromTrnRequestEvent>(e);
+            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskUpdatedEvent>(e);
+            AssertEventIsExpected(actualEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
 
-            Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
-            Assert.Equal(matchedPerson.PersonId, actualEvent.PersonId);
-            Assert.Equal(matchedPerson.FirstName, actualEvent.Details.FirstName);
-            Assert.Equal(matchedPerson.MiddleName, actualEvent.Details.MiddleName);
-            Assert.Equal(matchedPerson.LastName, actualEvent.Details.LastName);
-            Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, actualEvent.Details.EmailAddress);
-            Assert.Equal(matchedPerson.NationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
-            Assert.Equal(matchedPerson.DateOfBirth, actualEvent.Details.DateOfBirth);
-            Assert.Equal(comments, actualEvent.DetailsChangeReasonDetail);
-            AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.TrnRequestMetadata);
-            Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileId, actualEvent.DetailsChangeEvidenceFile?.FileId);
-            Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileName, actualEvent.DetailsChangeEvidenceFile?.Name);
-            Assert.Equal(PersonDetailsUpdatedFromTrnRequestEventChanges.EmailAddress, actualEvent.Changes);
+            //AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.TrnRequestMetadata);
+            //Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileId, actualEvent.DetailsChangeEvidenceFile?.FileId);
+            //Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileName, actualEvent.DetailsChangeEvidenceFile?.Name);
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
@@ -530,6 +521,31 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         Assert.Equal(personAttributes.DateOfBirth, person.DateOfBirth);
         Assert.Equal(personAttributes.EmailAddress, person.EmailAddress);
         Assert.Equal(personAttributes.NationalInsuranceNumber, person.NationalInsuranceNumber);
+    }
+
+    private void AssertEventIsExpected(
+        NpqTrnRequestSupportTaskUpdatedEvent @event,
+        bool expectOldPersonAttributes,
+        Guid expectedPersonId,
+        string? comments)
+    {
+        Assert.Equal(expectedPersonId, @event.PersonId);
+        Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
+        Assert.True(@event.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.Status));
+
+        Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
+        Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);
+
+        if (expectOldPersonAttributes)
+        {
+            Assert.NotNull(@event.OldPersonAttributes);
+        }
+        else
+        {
+            Assert.Null(@event.OldPersonAttributes);
+        }
+
+        Assert.Equal(comments, @event.Comments);
     }
 
     private void AssertPersonAttributesMatch(

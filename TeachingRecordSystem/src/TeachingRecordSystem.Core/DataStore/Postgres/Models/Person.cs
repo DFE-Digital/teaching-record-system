@@ -133,12 +133,7 @@ public class Person
             DateOnly? dateOfBirth,
             EmailAddress? emailAddress,
             NationalInsuranceNumber? nationalInsuranceNumber,
-            string? detailsChangeReasonDetail,
-            EventModels.File? detailsChangeEvidenceFile,
-            EventModels.RaisedByUserInfo updatedBy,
-            DateTime now,
-            TrnRequestMetadata trnRequestMetadata,
-            out PersonDetailsUpdatedFromTrnRequestEvent? @event)
+            DateTime now)
     {
         var oldDetails = EventModels.PersonDetails.FromModel(this);
 
@@ -146,31 +141,6 @@ public class Person
         EmailAddress = (string?)emailAddress;
         NationalInsuranceNumber = (string?)nationalInsuranceNumber;
         UpdatedOn = now;
-
-        var changes = PersonDetailsUpdatedFromTrnRequestEventChanges.None |
-            (DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedFromTrnRequestEventChanges.DateOfBirth : 0) |
-            (EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedFromTrnRequestEventChanges.EmailAddress : 0) |
-            (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedFromTrnRequestEventChanges.NationalInsuranceNumber : 0);
-
-        if (changes == PersonDetailsUpdatedFromTrnRequestEventChanges.None)
-        {
-            @event = null;
-            return;
-        }
-
-        @event = new PersonDetailsUpdatedFromTrnRequestEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Details = EventModels.PersonDetails.FromModel(this),
-            OldDetails = oldDetails,
-            DetailsChangeReasonDetail = detailsChangeReasonDetail,
-            DetailsChangeEvidenceFile = detailsChangeEvidenceFile,
-            Changes = changes,
-            TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata)
-        };
     }
 
 

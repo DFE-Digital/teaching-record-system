@@ -100,7 +100,6 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             context.Result = Redirect(linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
-        PersonName = string.Join(" ", requestData!.Name);
         var personAttributes = await GetPersonAttributesAsync(personId);
 
         var attributeMatches = GetPersonAttributeMatches(
@@ -125,6 +124,8 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+
+        PersonName = StringHelper.JoinNonEmpty(' ', new string[] { personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName });
 
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
 

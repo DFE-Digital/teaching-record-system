@@ -119,6 +119,12 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             TrnToken = null,
             ResolvedPersonId = null,
             Matches = null,
+            NpqApplicationId = null,
+            NpqEvidenceFileId = null,
+            NpqEvidenceFileName = null,
+            NpqName = null,
+            NpqTrainingProvider = null,
+            NpqWorkingInEducationalSetting = null
         };
 
         var updatedEvent = new ApiTrnRequestSupportTaskUpdatedEvent
