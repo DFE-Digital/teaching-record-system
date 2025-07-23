@@ -33,7 +33,7 @@
 <form action="@LinkGenerator.ApiTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <span class="govuk-caption-l">Support tasks</span>
     <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-    
+
     <div style="display: flex">
         <div class="govuk-heading-m govuk-!-width-one-half">
             @Model.SourceApplicationUserName API request
@@ -63,14 +63,14 @@
                     </govuk-radios>
                 </td>
             </tr>
-            
+
             <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
                     <govuk-radios asp-for="MiddleNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
                             <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.MiddleName!.Different)">
-                                @(Model.MiddleName!.TrnRequestValue ?? UiDefaults.EmptyDisplayContent)
+                                @(Model.MiddleName!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
                             <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.MiddleName!.Different)">
                                 @{ await RenderWithHighlightIfDifferent(Model.MiddleName!.ExistingRecordValue, Model.MiddleName.Different); }
@@ -79,14 +79,14 @@
                     </govuk-radios>
                 </td>
             </tr>
-            
+
             <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
                     <govuk-radios asp-for="LastNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
                             <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.LastName!.Different)">
-                                @(Model.LastName!.TrnRequestValue ?? UiDefaults.EmptyDisplayContent)
+                                @(Model.LastName!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
                             <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.LastName!.Different)">
                                 @{ await RenderWithHighlightIfDifferent(Model.LastName!.ExistingRecordValue, Model.LastName.Different); }
@@ -95,7 +95,7 @@
                     </govuk-radios>
                 </td>
             </tr>
-            
+
             <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
                     <govuk-radios asp-for="DateOfBirthSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
@@ -111,14 +111,14 @@
                     </govuk-radios>
                 </td>
             </tr>
-            
+
             <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
                     <govuk-radios asp-for="EmailAddressSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
                             <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.EmailAddress!.Different)">
-                                @(Model.EmailAddress!.TrnRequestValue ?? UiDefaults.EmptyDisplayContent)
+                                @(Model.EmailAddress!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
                             <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.EmailAddress!.Different)">
                                 @{ await RenderWithHighlightIfDifferent(Model.EmailAddress!.ExistingRecordValue, Model.EmailAddress.Different); }
@@ -127,14 +127,14 @@
                     </govuk-radios>
                 </td>
             </tr>
-            
+
             <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
                     <govuk-radios asp-for="NationalInsuranceNumberSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
                             <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.NationalInsuranceNumber!.Different)">
-                                @(Model.NationalInsuranceNumber!.TrnRequestValue ?? UiDefaults.EmptyDisplayContent)
+                                @(Model.NationalInsuranceNumber!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
                             <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.NationalInsuranceNumber!.Different)">
                                 @{ await RenderWithHighlightIfDifferent(Model.NationalInsuranceNumber!.ExistingRecordValue, Model.NationalInsuranceNumber.Different); }
@@ -145,17 +145,17 @@
             </tr>
         </tbody>
     </table>
-    
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <govuk-textarea asp-for="Comments" label-class="govuk-label--s" />
-    
+
             <p class="govuk-body govuk-!-font-size-24 govuk-!-font-weight-bold">Do you want to use these details in the primary record?</p>
-    
+
             <govuk-warning-text>
                 The secondary record will be deactivated once it’s merged with the primary record, but you’ll still be able to view it.
             </govuk-warning-text>
-    
+
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
                 <govuk-button type="submit" formaction="@LinkGenerator.ApiTrnRequestMergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>

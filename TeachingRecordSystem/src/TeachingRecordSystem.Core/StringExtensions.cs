@@ -17,4 +17,9 @@ public static class StringExtensions
 
         return $"{article} {text}";
     }
+
+    public static string? ToNullIfEmpty(this string? text)
+    {
+        return string.IsNullOrEmpty(text) ? null : text;
+    }
 }
