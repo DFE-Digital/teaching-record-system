@@ -135,8 +135,6 @@ public class Person
             NationalInsuranceNumber? nationalInsuranceNumber,
             DateTime now)
     {
-        var oldDetails = EventModels.PersonDetails.FromModel(this);
-
         DateOfBirth = dateOfBirth;
         EmailAddress = (string?)emailAddress;
         NationalInsuranceNumber = (string?)nationalInsuranceNumber;
