@@ -22,6 +22,6 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                 command.DateOfBirth,
                 ContactColumnSet));
 
-        return await CreateResultAsync(matched);
+        return await CreateResultAsync(matched.Select(c => c.Id).AsReadOnly());
     }
 }
