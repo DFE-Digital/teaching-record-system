@@ -92,15 +92,18 @@ public partial class TrsLinkGenerator
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
 
-    public string PersonMergeEnterTrn(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/Persons/Merge/EnterTrn", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string PersonManualMergeEnterTrn(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/EnterTrn", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string PersonMergeCompareMatchingRecords(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/Persons/Merge/CompareMatchingRecords", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string PersonManualMergeMatches(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/Matches", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string PersonMergeSelectDetailsToMerge(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/Persons/Merge/SelectDetailsToMerge", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string PersonManualMergeMerge(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/Merge", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string PersonMergeCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
-        GetRequiredPathByPage("/Persons/Merge/EnterTrn", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string PersonManualMergeCheckAnswers(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string PersonManualMergeCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/EnterTrn", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 }

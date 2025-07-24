@@ -6,18 +6,16 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
-[Journey(JourneyNames.MergePerson), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.ManualMergePerson), ActivatesJourney, RequireJourneyInstance]
 public class EnterTrnModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    private static readonly InductionStatus[] _invalidInductionStatusesForMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
-
     public string? ThisTrn { get; set; }
 
     [Display(Name = "Enter the TRN of the other record you want to merge")]
@@ -46,13 +44,9 @@ public class EnterTrnModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var personA = (await DbContext.Persons
-            .SingleOrDefaultAsync(p =>
-                p.PersonId == JourneyInstance!.State.PersonAId &&
-                !p.Alerts!.Any(a => a.IsOpen) &&
-                !_invalidInductionStatusesForMerge.Contains(p.InductionStatus)));
+        var potentialDuplicates = await GetPotentialDuplicatesAsync(JourneyInstance!.State.PersonAId!.Value);
 
-        if (personA is null)
+        if (potentialDuplicates.Any(p => p.IsInvalid))
         {
             return BadRequest();
         }
@@ -89,7 +83,7 @@ public class EnterTrnModel(
                 state.PersonBTrn = otherPerson.Trn;
             });
 
-            return Redirect(GetPageLink(MergeJourneyPage.CompareMatchingRecords));
+            return Redirect(GetPageLink(ManualMergeJourneyPage.Matches));
         }
     }
 }
