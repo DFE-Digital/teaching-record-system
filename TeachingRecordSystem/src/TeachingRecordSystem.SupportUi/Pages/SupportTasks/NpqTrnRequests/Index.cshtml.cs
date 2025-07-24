@@ -45,7 +45,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         {
             return (SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?? false) ?
                Redirect(linkGenerator.NpqTrnRequestMatches(SupportTaskReference)) :
-               Redirect(linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference));
+               Redirect(linkGenerator.NpqTrnRequestNoMatchesCheckAnswers(SupportTaskReference));
         }
         else
         {

@@ -63,7 +63,7 @@ public record TrnRequestMetadata
             Country = model.Country,
             TrnToken = model.TrnToken,
             ResolvedPersonId = model.ResolvedPersonId,
-            Matches = model.Matches is not null ?
+            Matches = model.Matches is not null && model.Matches.MatchedRecords is not null ?
                 new TrnRequestMatches()
                 {
                     MatchedRecords = model.Matches.MatchedRecords

@@ -374,6 +374,12 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string NpqTrnRequestRejectionReasonCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/RejectionReason", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
+    public string NpqTrnRequestNoMatchesCheckAnswers(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/NoMatches/CheckAnswers", routeValues: new { supportTaskReference });
+
+    public string NpqTrnRequestNoMatchesCheckAnswersCancel(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/NoMatches/CheckAnswers", routeValues: new { supportTaskReference }, handler: "Cancel");
+
     public string IntegrationTransactions(IntegrationTransactionSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/SupportTasks/IntegrationTransactions/Index", routeValues: new { sortBy, sortDirection, pageNumber });
 

@@ -606,7 +606,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         var nextPageDoc = await nextPage.GetDocumentAsync();
         var linkToPersonRecord = GetLinkToPersonFromBanner(nextPageDoc);
         Assert.NotNull(linkToPersonRecord);
-        var personId = new Guid(linkToPersonRecord!.Substring("/persons/".Length));
+        var personId = Guid.Parse(linkToPersonRecord!.Substring("/persons/".Length));
 
         // person record is updated
         await WithDbContext(async dbContext =>
