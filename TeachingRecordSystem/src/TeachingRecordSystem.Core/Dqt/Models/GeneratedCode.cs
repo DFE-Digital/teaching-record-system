@@ -4419,8 +4419,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string CreatedBy = "createdby";
 			public const string CreatedOn = "createdon";
 			public const string dfeta_changedfield = "dfeta_changedfield";
+			public const string dfeta_Event = "dfeta_event";
 			public const string dfeta_NewValue = "dfeta_newvalue";
 			public const string dfeta_OldValue = "dfeta_oldvalue";
 			public const string dfeta_Person = "dfeta_person";
@@ -4478,6 +4480,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Unique identifier of the user who created the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
@@ -4514,6 +4536,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_changedfield");
 				this.SetAttributeValue("dfeta_changedfield", value);
 				this.OnPropertyChanged("dfeta_changedfield");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_event")]
+		public virtual dfeta_businesseventaudit_dfeta_Event? dfeta_Event
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_businesseventaudit_dfeta_Event?)(EntityOptionSetEnum.GetEnum(this, "dfeta_event")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Event");
+				this.SetAttributeValue("dfeta_event", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_Event");
 			}
 		}
 		
@@ -16582,7 +16624,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string modifiedby_plugintype = "modifiedby_plugintype";
 		}
 		
-		public const string AlternateKeys = "overwritetime,componentstate,plugintypeexportkey";
+		public const string AlternateKeys = "overwritetime,plugintypeexportkey,componentstate";
 		
 		/// <summary>
 		/// Default Constructor.
@@ -17423,8 +17465,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencingrole_parent_root_role = "role_parent_root_role";
 		}
 		
-		public const string AlternateKeys = "overwritetime,businessunitid,parentrootroleid,componentstate|componentstate,rolet" +
-			"emplateid,businessunitid,overwritetime";
+		public const string AlternateKeys = "overwritetime,businessunitid,componentstate,parentrootroleid|overwritetime,rolete" +
+			"mplateid,componentstate,businessunitid";
 		
 		/// <summary>
 		/// Default Constructor.

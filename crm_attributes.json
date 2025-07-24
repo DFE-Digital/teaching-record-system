@@ -87,11 +87,13 @@
     "dfeta_mergedwith"
   ],
   "dfeta_businesseventaudit":[
+    "createdby",
     "createdon",
     "dfeta_changedfield",
     "dfeta_newvalue",
     "dfeta_oldvalue",
     "dfeta_person",
+    "dfeta_event",
     "statecode"
   ],
   "dfeta_country": [

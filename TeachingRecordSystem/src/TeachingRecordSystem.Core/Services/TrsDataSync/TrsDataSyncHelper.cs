@@ -16,6 +16,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
+using DqtSystemUser = TeachingRecordSystem.Core.Dqt.Models.SystemUser;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -2853,6 +2854,136 @@ public class TrsDataSyncHelper(
             InductionStatus = inductionStatusOption,
             InductionExemptionReason = inductionExemptionReasonOption
         };
+    }
+
+    public async Task SyncQtsIttBusinessEventAuditsAsync(
+        IEnumerable<dfeta_businesseventaudit> businessEventAudits,
+        bool dryRun,
+        DateTime crmDateFormatChangeDate,
+        CancellationToken cancellationToken)
+    {
+        var events = MapQtsIttBusinessEventAudits(businessEventAudits, crmDateFormatChangeDate);
+        await BulkSaveEventsAsync(events, "events_qts_itt_audit", dryRun, cancellationToken);
+    }
+
+    private IReadOnlyCollection<EventBase> MapQtsIttBusinessEventAudits(
+        IEnumerable<dfeta_businesseventaudit> businessEventAudits,
+        DateTime crmDateFormatChangeDate)
+    {
+        var events = new List<EventBase>();
+        foreach (var businessEventAudit in businessEventAudits)
+        {
+            var createdByUser = businessEventAudit.Extract<DqtSystemUser>($"{DqtSystemUser.EntityLogicalName}_createdby", DqtSystemUser.PrimaryIdAttribute);
+            var raisedBy = EventModels.RaisedByUserInfo.FromDqtUser(createdByUser.Id, createdByUser.FullName);
+            EventBase? trsEvent = null;
+            if (businessEventAudit.dfeta_changedfield == "Result")
+            {
+                trsEvent = MapIttBusinessEventAudit(businessEventAudit, raisedBy);
+            }
+            else if (businessEventAudit.dfeta_changedfield is "Early Years Teacher Status" or "EYTS Date" or "QTS Date" or "Teacher Status")
+            {
+                trsEvent = MapQtsBusinessEventAudit(businessEventAudit, raisedBy, crmDateFormatChangeDate);
+            }
+
+            if (trsEvent is not null)
+            {
+                events.Add(trsEvent);
+            }
+        }
+
+        return events;
+
+        EventBase MapIttBusinessEventAudit(dfeta_businesseventaudit businessEventAudit, EventModels.RaisedByUserInfo raisedBy) => businessEventAudit.dfeta_Event == dfeta_businesseventaudit_dfeta_Event.Create
+            ? new DqtInitialTeacherTrainingCreatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = businessEventAudit.CreatedOn!.Value,
+                RaisedBy = raisedBy,
+                PersonId = businessEventAudit.dfeta_Person.Id,
+                InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+                {
+                    Result = businessEventAudit.dfeta_NewValue
+                }
+            }
+            : new DqtInitialTeacherTrainingUpdatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = businessEventAudit.CreatedOn!.Value,
+                RaisedBy = raisedBy,
+                PersonId = businessEventAudit.dfeta_Person.Id,
+                InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+                {
+                    Result = businessEventAudit.dfeta_NewValue
+                },
+                OldInitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+                {
+                    Result = businessEventAudit.dfeta_OldValue
+                },
+                Changes = DqtInitialTeacherTrainingUpdatedEventChanges.Result
+            };
+
+        EventBase MapQtsBusinessEventAudit(dfeta_businesseventaudit businessEventAudit, EventModels.RaisedByUserInfo raisedBy, DateTime crmDateFormatChangeDate)
+        {
+            var crmDateFormat = businessEventAudit.CreatedOn >= crmDateFormatChangeDate ? "M/d/yyyy" : "dd/MM/yyyy";
+
+            return
+                businessEventAudit.dfeta_Event == dfeta_businesseventaudit_dfeta_Event.Create
+                ? new DqtQtsRegistrationCreatedEvent()
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = businessEventAudit.CreatedOn!.Value,
+                    RaisedBy = raisedBy,
+                    PersonId = businessEventAudit.dfeta_Person.Id,
+                    QtsRegistration = new EventModels.DqtQtsRegistration()
+                    {
+                        QtsDate = businessEventAudit.dfeta_changedfield == "QTS Date" ? !string.IsNullOrEmpty(businessEventAudit.dfeta_NewValue) ? DateOnly.ParseExact(businessEventAudit.dfeta_NewValue, crmDateFormat) : null : null,
+                        EytsDate = businessEventAudit.dfeta_changedfield == "EYTS Date" ? !string.IsNullOrEmpty(businessEventAudit.dfeta_NewValue) ? DateOnly.ParseExact(businessEventAudit.dfeta_NewValue, crmDateFormat) : null : null,
+                        TeacherStatusName = businessEventAudit.dfeta_changedfield == "Teacher Status" ? businessEventAudit.dfeta_NewValue : null,
+                        EarlyYearsStatusName = businessEventAudit.dfeta_changedfield == "Early Years Teacher Status" ? businessEventAudit.dfeta_NewValue : null
+                    }
+                }
+                : new DqtQtsRegistrationUpdatedEvent()
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = businessEventAudit.CreatedOn!.Value,
+                    RaisedBy = raisedBy,
+                    PersonId = businessEventAudit.dfeta_Person.Id,
+                    QtsRegistration = new EventModels.DqtQtsRegistration()
+                    {
+                        QtsDate = businessEventAudit.dfeta_changedfield == "QTS Date" ? !string.IsNullOrEmpty(businessEventAudit.dfeta_NewValue) ? DateOnly.ParseExact(businessEventAudit.dfeta_NewValue, crmDateFormat) : null : null,
+                        EytsDate = businessEventAudit.dfeta_changedfield == "EYTS Date" ? !string.IsNullOrEmpty(businessEventAudit.dfeta_NewValue) ? DateOnly.ParseExact(businessEventAudit.dfeta_NewValue, crmDateFormat) : null : null,
+                        TeacherStatusName = businessEventAudit.dfeta_changedfield == "Teacher Status" ? businessEventAudit.dfeta_NewValue : null,
+                        EarlyYearsStatusName = businessEventAudit.dfeta_changedfield == "Early Years Teacher Status" ? businessEventAudit.dfeta_NewValue : null
+                    },
+                    OldQtsRegistration = new EventModels.DqtQtsRegistration()
+                    {
+                        QtsDate = businessEventAudit.dfeta_changedfield == "QTS Date" ? !string.IsNullOrEmpty(businessEventAudit.dfeta_OldValue) ? DateOnly.ParseExact(businessEventAudit.dfeta_OldValue, crmDateFormat) : null : null,
+                        EytsDate = businessEventAudit.dfeta_changedfield == "EYTS Date" ? !string.IsNullOrEmpty(businessEventAudit.dfeta_OldValue) ? DateOnly.ParseExact(businessEventAudit.dfeta_OldValue, crmDateFormat) : null : null,
+                        TeacherStatusName = businessEventAudit.dfeta_changedfield == "Teacher Status" ? businessEventAudit.dfeta_OldValue : null,
+                        EarlyYearsStatusName = businessEventAudit.dfeta_changedfield == "Early Years Teacher Status" ? businessEventAudit.dfeta_OldValue : null
+                    },
+                    Changes = DqtQtsRegistrationUpdatedEventChanges.QtsDate
+                };
+        }
+    }
+
+    private async Task BulkSaveEventsAsync(
+        IReadOnlyCollection<EventBase> events,
+        string tempTableSuffix,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await txn.SaveEventsAsync(events, tempTableSuffix, clock, cancellationToken, timeoutSeconds: 120);
+        if (!dryRun)
+        {
+            await txn.CommitAsync(cancellationToken);
+        }
+        else
+        {
+            await txn.RollbackAsync(cancellationToken);
+        }
     }
 
     public async Task MigrateIttAndQtsRegistrationsAsync(
