@@ -40,6 +40,10 @@
                 <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ApiTrnRequest)</span>
                 <span class="trs-tile__title">Duplicates via API</span>
             </a>
+            <a href="@LinkGenerator.SupportTasks(new SupportTaskCategory[]{SupportTaskCategory.TrnRequests})" class="trs-tile">
+                <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.NpqTrnRequest)</span>
+                <span class="trs-tile__title">NPQ TRN requests</span>
+            </a>
             <a href="@LinkGenerator.TrnRequestManualChecksNeeded()" class="trs-tile">
                 <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TrnRequestManualChecksNeeded)</span>
                 <span class="trs-tile__title">Matched records:<br/>manual checks needed</span>

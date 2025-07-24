@@ -66,7 +66,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
         var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
-        //var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+
         var request = new HttpRequestMessage(
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}")
@@ -83,7 +83,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/no-matches/check-answers",
             response.Headers.Location?.OriginalString);
     }
 
