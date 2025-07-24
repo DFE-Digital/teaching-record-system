@@ -13,6 +13,7 @@ erDiagram
 
   Teaching-Alerts ::: TRS
   Teaching-Sanction-Prohibition ::: TMU
+  Section-128-Sanction ::: TMU
 
   Professional-Status ::: TRS
   Route-to-a-Professional-Status ::: TRS
@@ -36,6 +37,7 @@ erDiagram
   Person ||--o{ Teaching-Alerts : "Can Have"
   Person ||--o{ National-Professional-Qualification : "Can Have"
   Teaching-Alerts ||--o| Teaching-Sanction-Prohibition : "Reported as"
+  Teaching-Alerts ||--o| Section-128-Sanction : "Could be a"
 
 
   Induction-Exemption-Reason||--o{ Induction-Status : "Affects"
