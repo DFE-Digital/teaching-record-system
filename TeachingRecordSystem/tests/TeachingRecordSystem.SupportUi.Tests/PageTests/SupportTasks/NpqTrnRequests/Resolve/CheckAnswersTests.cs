@@ -225,7 +225,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
+    public async Task Get_UpdatingExistingRecord_HasBackLinkToMergePageAndChangeLinkToMatchPage()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -241,6 +241,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             });
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -252,7 +253,72 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedBackLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_CreatingNewRecord_RequestHasMatches_HasBackLinkAndChangeLinkToMatchPage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveNpqTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel,
+                PersonAttributeSourcesSet = true,
+
+            });
+
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_CreatingNewRecord_RequestHasNoMatches_HasBackLinkToStartAndChangeLinkNotShown()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await new TestData.CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+            .WithMatches(false)
+            .ExecuteAsync(TestData);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveNpqTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel
+            });
+
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+        Assert.Null(doc.GetElementByTestId("change-link"));
     }
 
     [Fact]
@@ -312,7 +378,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventAndRedirects()
+    public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -401,6 +467,9 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
             $"Records merged successfully for {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}");
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
     }
 
     [Theory]

@@ -30,18 +30,8 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     [Required(ErrorMessage = "Select yes if you want to create a record from this request")]
     public bool CreateRecord { get; set; }
 
-    public async Task OnGetAsync()
+    public void OnGet()
     {
-        NpqWorkingInEducationalSetting = SupportTask!.TrnRequestMetadata?.NpqWorkingInEducationalSetting;
-        NpqApplicationId = SupportTask.TrnRequestMetadata?.NpqApplicationId;
-        NpqName = SupportTask.TrnRequestMetadata?.NpqName;
-        NpqTrainingProvider = SupportTask.TrnRequestMetadata?.NpqTrainingProvider;
-        NpqEvidenceFileId = SupportTask.TrnRequestMetadata?.NpqEvidenceFileId;
-        NpqEvidenceFileName = SupportTask.TrnRequestMetadata?.NpqEvidenceFileName;
-
-        NpqEvidenceFileUrl = NpqEvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
-            null;
     }
 
     public IActionResult OnPost()
@@ -68,11 +58,22 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         return Redirect(linkGenerator.SupportTasks());
     }
 
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var supportTaskFeature = context.HttpContext.GetCurrentSupportTaskFeature();
         SupportTask = supportTaskFeature.SupportTask;
 
-        return base.OnPageHandlerExecutionAsync(context, next);
+        NpqWorkingInEducationalSetting = SupportTask!.TrnRequestMetadata?.NpqWorkingInEducationalSetting;
+        NpqApplicationId = SupportTask.TrnRequestMetadata?.NpqApplicationId;
+        NpqName = SupportTask.TrnRequestMetadata?.NpqName;
+        NpqTrainingProvider = SupportTask.TrnRequestMetadata?.NpqTrainingProvider;
+        NpqEvidenceFileId = SupportTask.TrnRequestMetadata?.NpqEvidenceFileId;
+        NpqEvidenceFileName = SupportTask.TrnRequestMetadata?.NpqEvidenceFileName;
+
+        NpqEvidenceFileUrl = NpqEvidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

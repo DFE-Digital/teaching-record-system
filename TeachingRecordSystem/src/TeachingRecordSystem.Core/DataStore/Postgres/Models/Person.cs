@@ -728,6 +728,8 @@ public class Person
             MiddleName = middleName,
             LastName = lastName,
             DateOfBirth = dateOfBirth,
+            EmailAddress = (string?)emailAddress,
+            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
             CreatedOn = now,
             UpdatedOn = now
         };

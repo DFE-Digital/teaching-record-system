@@ -344,11 +344,11 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string ApiTrnRequestMerge(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string NpqTrnRequestStartPage(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Index", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+    public string NpqTrnRequestStartPage(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Index", routeValues: new { supportTaskReference });
 
-    public string NpqTrnRequestStartPageCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-    GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Index", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+    public string NpqTrnRequestStartPageCancel(string supportTaskReference) =>
+    GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Index", routeValues: new { supportTaskReference }, handler: "Cancel");
 
     public string NpqTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);

@@ -3,10 +3,11 @@
 @{
     ViewBag.Title = Model.CreatingNewRecord ? "Check details before creating record" : "Check details before updating record";
 
-    var backLink = Model.CreatingNewRecord && (Model.PotentialDuplicate ?? false) ?
-@* CML TODO - backlink depends - matches or no matches*@
-        LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
+    var backLink = (Model.PotentialDuplicate ?? false) ?
+        Model.CreatingNewRecord ?
+            LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+            LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference!);
     var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update record";
 }
 
@@ -28,9 +29,12 @@
                 <govuk-summary-card-title>
                     Details of the record
                 </govuk-summary-card-title>
-                <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@backLink" data-testid="change-link">Change</govuk-summary-card-action>
-                </govuk-summary-card-actions>
+                @if (Model.PotentialDuplicate ?? false)
+                {
+                    <govuk-summary-card-actions>
+                        <govuk-summary-card-action href="@LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" data-testid="change-link">Change</govuk-summary-card-action>
+                    </govuk-summary-card-actions>
+                }
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>

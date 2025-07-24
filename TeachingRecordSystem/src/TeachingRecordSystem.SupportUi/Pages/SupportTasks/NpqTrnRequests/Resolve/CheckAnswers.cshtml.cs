@@ -60,9 +60,6 @@ public class CheckAnswersModel(
 
         if (CreatingNewRecord)
         {
-            var newPersonId = Guid.NewGuid();
-            requestData.SetResolvedPerson(newPersonId);
-
             var trn = await trnGenerator.GenerateTrnAsync();
             var person = Person.Create(
                 trn,
@@ -73,6 +70,7 @@ public class CheckAnswersModel(
                 requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
                 requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
                 clock.UtcNow);
+            requestData.SetResolvedPerson(person.PersonId);
             selectedPersonAttributes = null;
             oldPersonAttributes = null;
             DbContext.Add(person);
@@ -188,6 +186,8 @@ public class CheckAnswersModel(
         TempData.SetFlashSuccess(
             $"{message} {FirstName} {MiddleName} {LastName}",
             messageHtml: flashMessageHtml);
+
+        await JourneyInstance!.CompleteAsync();
         return Redirect(linkGenerator.SupportTasks());
     }
 
