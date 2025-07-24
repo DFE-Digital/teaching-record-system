@@ -231,6 +231,12 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<ClearTsPersonIdsJob>(
+                    nameof(ClearTsPersonIdsJob),
+                    job => job.Execute(CancellationToken.None),
+                    Cron.Never);
+
+
                 return Task.CompletedTask;
             });
         }
