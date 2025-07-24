@@ -1,5 +1,7 @@
 set windows-shell := ["powershell.exe", "-nop", "-c"]
 
+export DOTNET_WATCH_SUPPRESS_MSBUILD_INCREMENTALISM := 'true'
+
 shebang := if os() == 'windows' {
   'dotnet pwsh -nop'
 } else {
@@ -97,7 +99,7 @@ watch-ui:
 # Watch for file changes and compile any SASS files that have changed
 [working-directory: 'src/TeachingRecordSystem.SupportUi']
 watch-ui-sass:
-  @dotnet watch msbuild /t:DartSass_Build
+  @sass wwwroot/Styles/site.scss wwwroot/Styles/site.css --watch
 
 # Run the Worker project in Development mode and watch for file changes
 [working-directory: 'src/TeachingRecordSystem.Worker']
