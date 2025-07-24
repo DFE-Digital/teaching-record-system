@@ -822,9 +822,9 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>,
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public async Task InitializeAsync() => await DbFixture.DbHelper.ResetSchemaAsync();
 
-    public async Task DisposeAsync() => await DbFixture.DbHelper.ClearDataAsync();
+    public Task DisposeAsync() => Task.CompletedTask;
 }
 
 public class CapitaExportNewJobFixture : IAsyncLifetime
@@ -897,7 +897,7 @@ public class CapitaExportNewJobFixture : IAsyncLifetime
 
     public Mock<ILogger<CapitaExportNewJob>> Logger { get; }
 
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
+    Task IAsyncLifetime.InitializeAsync() => Task.CompletedTask;
 
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
