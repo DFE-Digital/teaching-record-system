@@ -7,12 +7,12 @@
 
 <govuk-button-link href="@LinkGenerator.AddUser()" data-testid="add-user">Add a new user</govuk-button-link>
 
-<div class="moj-filter-layout trs-filter-layout">
-    <div class="moj-filter-layout__filter">
-        <partial name="_Filters" model="@Model.Filters" />
-    </div>
+<filter-layout>
+    <filter-layout-filter>
+        <partial name="_Filters" model="@Model.Filters"/>
+    </filter-layout-filter>
 
-    <div class="moj-filter-layout__content">
+    <filter-layout-content>
         @if (Model.HasUsers)
         {
             <ol class="trs-search-results">
@@ -29,5 +29,5 @@
         }
 
         <partial name="_Pagination" model="@Model.Pagination" />
-    </div>
-</div>
+    </filter-layout-content>
+</filter-layout>
