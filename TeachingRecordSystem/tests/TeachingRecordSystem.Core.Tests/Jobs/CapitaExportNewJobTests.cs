@@ -824,7 +824,7 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>,
 
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public async Task DisposeAsync() =>  await DbFixture.DbHelper.ClearDataAsync();
+    public async Task DisposeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 }
 
 public class CapitaExportNewJobFixture : IAsyncLifetime
