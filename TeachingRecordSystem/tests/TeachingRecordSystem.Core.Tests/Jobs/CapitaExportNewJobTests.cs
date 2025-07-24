@@ -532,6 +532,8 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
     [Fact]
     public async Task Execute_NewRecordWithNoPreviousName_ReturnsExpectedContent()
     {
+        await DbFixture.DbHelper.ClearDataAsync();
+
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
@@ -912,7 +914,7 @@ public class CapitaExportNewJobFixture : IAsyncLifetime
 
     public Mock<ILogger<CapitaExportNewJob>> Logger { get; }
 
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.ExecuteDeleteAsync());
+    Task IAsyncLifetime.InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
 
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
