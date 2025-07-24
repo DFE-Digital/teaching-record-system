@@ -13,7 +13,7 @@ using Xunit.DependencyInjection;
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [DisableParallelization()]
-public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
+public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>, IAsyncLifetime
 {
     public CapitaExportNewJobTests(CapitaExportNewJobFixture fixture)
     {
@@ -32,7 +32,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
 
     private const int EXPECTED_ROW_LENGTH = 86;
 
-    private Mock<BlobServiceClient> BlobServiceClient => Fixture.BlobServiceClient;
 
     [Fact]
     public async Task GetNewPersons_CreatedAferLastRunDate_ReturnsExpectedRecords()
@@ -42,7 +41,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             await dbContext.JobMetadata.Where(x => x.JobName == nameof(CapitaExportNewJob)).ExecuteDeleteAsync();
             var jobMetaData = new JobMetadata()
             {
@@ -81,7 +79,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = Clock.UtcNow.AddDays(1);
 
             // Act
@@ -100,7 +97,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync();
             var person2 = await TestData.CreatePersonAsync();
@@ -126,7 +122,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
@@ -166,7 +161,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var newLastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
@@ -210,7 +204,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             Gender gender = Gender.Male;
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync(x =>
@@ -250,7 +243,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
@@ -289,7 +281,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
@@ -330,7 +321,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var person1 = await TestData.CreatePersonAsync(x =>
             {
@@ -374,7 +364,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
         {
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var newLastName = Faker.Name.Last();
             var originalastName = Faker.Name.Last();
@@ -412,7 +401,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var previousNameCreatedOn = Clock.UtcNow.AddHours(-1);
             var newLastName = Faker.Name.Last();
@@ -451,7 +439,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = DateTime.UtcNow.AddDays(-2);
             var newLastName = new string('x', 60);
             var originalastName = new string('a', 75);
@@ -488,7 +475,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             // Arrange
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             var lastRunDate = Clock.UtcNow.AddDays(-2);
             var updateLastName1 = Faker.Name.Last();
             var updateLastName2 = Faker.Name.Last();
@@ -552,11 +538,8 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             };
             dbContext.JobMetadata.Add(jobMetaData);
             await dbContext.SaveChangesAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
-
-
             var lastRunDate = Clock.UtcNow.AddDays(-2);
             var originalastName = Faker.Name.Last();
             var person1 = await TestData.CreatePersonAsync(x =>
@@ -671,7 +654,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             };
             dbContext.JobMetadata.Add(jobMetaData);
             await dbContext.SaveChangesAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
 
@@ -747,7 +729,6 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
             };
             dbContext.JobMetadata.Add(jobMetaData);
             await dbContext.SaveChangesAsync();
-            await dbContext.Persons.Where(x => x.CapitaTrnChangedOn == null).ExecuteDeleteAsync();
             await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
             await dbContext.IntegrationTransactions.ExecuteDeleteAsync();
             var lastRunDate = Clock.UtcNow.AddDays(-2);
@@ -841,7 +822,9 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
-    //FileName
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync() =>  await DbFixture.DbHelper.ClearDataAsync();
 }
 
 public class CapitaExportNewJobFixture : IAsyncLifetime
