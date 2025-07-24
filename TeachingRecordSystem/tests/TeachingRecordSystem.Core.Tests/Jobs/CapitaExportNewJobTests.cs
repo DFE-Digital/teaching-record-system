@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-[CollectionDefinition(nameof(CapitaExportNewJobTests), DisableParallelization = true)]
+[Collection(nameof(DisableParallelization))]
 public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>, IAsyncLifetime
 {
     public CapitaExportNewJobTests(CapitaExportNewJobFixture fixture)
