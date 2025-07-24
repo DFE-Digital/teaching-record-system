@@ -125,7 +125,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             requestData.NationalInsuranceNumber,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
 
-        PersonName = StringHelper.JoinNonEmpty(' ', new string[] { personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName });
+        PersonName = StringHelper.JoinNonEmpty(' ', new string?[] { personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName });
 
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
 

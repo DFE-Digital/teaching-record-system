@@ -710,6 +710,33 @@ public class Person
         return person;
     }
 
+    public static Person Create(
+        string trn,
+        string firstName,
+        string middleName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        EmailAddress? emailAddress,
+        NationalInsuranceNumber? nationalInsuranceNumber,
+        DateTime now)
+    {
+        var person = new Person
+        {
+            PersonId = Guid.NewGuid(),
+            Trn = trn,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = (string?)emailAddress,
+            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
+            CreatedOn = now,
+            UpdatedOn = now
+        };
+
+        return person;
+    }
+
     private static void AssertInductionChangeIsValid(
         InductionStatus status,
         DateOnly? startDate,

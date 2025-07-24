@@ -1,7 +1,9 @@
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
+using Xunit.Sdk;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
@@ -225,7 +227,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
+    public async Task Get_UpdatingExistingRecord_HasBackLinkToMergePageAndChangeLinkToMatchPage()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -241,6 +243,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             });
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -252,7 +255,72 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedBackLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_CreatingNewRecord_RequestHasMatches_HasBackLinkAndChangeLinkToMatchPage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveNpqTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel,
+                PersonAttributeSourcesSet = true,
+
+            });
+
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_CreatingNewRecord_RequestHasNoMatches_HasBackLinkToStartAndChangeLinkNotShown()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await new TestData.CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+            .WithMatches(false)
+            .ExecuteAsync(TestData);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveNpqTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel
+            });
+
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+        Assert.Null(doc.GetElementByTestId("change-link"));
     }
 
     [Fact]
@@ -312,7 +380,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventAndRedirects()
+    public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -389,7 +457,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         EventPublisher.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskUpdatedEvent>(e);
-            AssertEventIsExpected(actualEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
+            AssertPersonUpdatedEventIsExpected(actualEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
@@ -401,6 +469,9 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
             $"Records merged successfully for {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}");
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
     }
 
     [Theory]
@@ -498,6 +569,114 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         });
     }
 
+    [Fact]
+    public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var requestMetadata = supportTask.TrnRequestMetadata;
+        Assert.NotNull(requestMetadata);
+        var comments = Faker.Lorem.Paragraph();
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveNpqTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel,
+                PersonAttributeSourcesSet = true,
+                Comments = comments
+            });
+
+        EventPublisher.Clear();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+
+        // redirect
+        Assert.Equal("/support-tasks", response.Headers.Location?.OriginalString);
+
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        var linkToPersonRecord = GetLinkToPersonFromBanner(nextPageDoc);
+        Assert.NotNull(linkToPersonRecord);
+        var personId = new Guid(linkToPersonRecord!.Substring("/persons/".Length));
+
+        // person record is updated
+        await WithDbContext(async dbContext =>
+        {
+            var person = await dbContext.Persons
+                .SingleAsync(p => p.PersonId == personId);
+            Assert.Equal(person.FirstName, requestMetadata.FirstName);
+            Assert.Equal(person.MiddleName, requestMetadata.MiddleName);
+            Assert.Equal(person.LastName, requestMetadata.LastName);
+            Assert.Equal(person.DateOfBirth, requestMetadata.DateOfBirth);
+            Assert.Equal(person.EmailAddress, requestMetadata.EmailAddress);
+            Assert.Equal(person.NationalInsuranceNumber, requestMetadata.NationalInsuranceNumber);
+        });
+
+        // support task is updated
+        await WithDbContext(async dbContext =>
+        {
+            var updatedSupportTask = await dbContext
+                .SupportTasks
+                .Include(st => st.TrnRequestMetadata)
+                .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+            Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
+            Assert.Equal(personId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+            var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
+            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
+            {
+                FirstName = requestMetadata.FirstName!,
+                MiddleName = requestMetadata.MiddleName,
+                LastName = requestMetadata.LastName!,
+                DateOfBirth = requestMetadata.DateOfBirth,
+                EmailAddress = requestMetadata.EmailAddress,
+                NationalInsuranceNumber = requestMetadata.NationalInsuranceNumber
+            });
+        });
+
+        // event is published
+        var expectedMetadata = EventModels.TrnRequestMetadata.FromModel(requestMetadata) with
+        {
+            ResolvedPersonId = personId
+        };
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskCreatedPersonEvent>(e);
+            AssertCreatedPersonEventIsExpected(actualEvent, expectedPersonId: personId);
+
+            AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
+            Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
+            Assert.Equal(requestMetadata.NpqEvidenceFileName, actualEvent.RequestData?.NpqEvidenceFileName);
+            Assert.Equal(comments, actualEvent.Comments);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
+    }
+
+    public string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
+    {
+        var banner = doc.GetElementsByClassName("govuk-notification-banner--success").SingleOrDefault();
+
+        if (banner is null)
+        {
+            throw new XunitException("No notification banner found.");
+        }
+        var link = banner.QuerySelector(".govuk-link");
+
+        var href = link?.GetAttribute("href");
+        return href;
+    }
+
     private Task<JourneyInstance<ResolveNpqTrnRequestState>> CreateJourneyInstance(
         string supportTaskReference,
         ResolveNpqTrnRequestState state) =>
@@ -523,7 +702,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         Assert.Equal(personAttributes.NationalInsuranceNumber, person.NationalInsuranceNumber);
     }
 
-    private void AssertEventIsExpected(
+    private void AssertPersonUpdatedEventIsExpected(
         NpqTrnRequestSupportTaskUpdatedEvent @event,
         bool expectOldPersonAttributes,
         Guid expectedPersonId,
@@ -546,6 +725,16 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         }
 
         Assert.Equal(comments, @event.Comments);
+    }
+
+    private void AssertCreatedPersonEventIsExpected(
+    NpqTrnRequestSupportTaskCreatedPersonEvent @event,
+    Guid expectedPersonId)
+    {
+        Assert.Equal(expectedPersonId, @event.PersonId);
+        Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
+        Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
+        Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);
     }
 
     private void AssertPersonAttributesMatch(

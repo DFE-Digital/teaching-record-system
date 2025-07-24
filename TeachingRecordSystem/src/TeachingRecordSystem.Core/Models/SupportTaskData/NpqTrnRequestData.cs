@@ -9,7 +9,7 @@ public record NpqTrnRequestData
 public record NpqTrnRequestDataPersonAttributes
 {
     public required string FirstName { get; init; }
-    public required string MiddleName { get; init; }
+    public required string? MiddleName { get; init; }
     public required string LastName { get; init; }
     public required DateOnly? DateOfBirth { get; init; }
     public required string? EmailAddress { get; init; }

@@ -103,7 +103,7 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
 
     protected IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeMatches(
     string firstName,
-    string middleName,
+    string? middleName,
     string lastName,
     DateOnly? dateOfBirth,
     string? emailAddress,

@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
+using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests;
 
@@ -32,7 +33,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
     }
 
     [Fact]
-    public async Task Post_CreateNewRecord_RedirectsToExpected()
+    public async Task Post_CreateARecordSelected_HasMatches_RedirectsToExpected()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -54,6 +55,35 @@ public class IndexTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches",
+            response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_CreateARecordSelected_NoMatches_RedirectsToExpected()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+            .WithMatches(false)
+            .ExecuteAsync(TestData);
+        //var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["CreateRecord"] = "true"
+            })
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers",
             response.Headers.Location?.OriginalString);
     }
 
