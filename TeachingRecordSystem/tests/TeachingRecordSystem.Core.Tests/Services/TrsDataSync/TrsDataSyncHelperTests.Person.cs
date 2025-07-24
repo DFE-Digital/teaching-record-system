@@ -109,7 +109,7 @@ public partial class TrsDataSyncHelperTests
         var nino = Faker.Identification.UkNationalInsuranceNumber();
         var qtsDate = Clock.Today.AddDays(-40);
         var eytsDate = Clock.Today.AddDays(-30);
-        var capitaTrnUpdatedOn = Clock.Today.AddDays(-10);
+        var capitaTrnUpdatedOn = Clock.UtcNow;
 
         var newContact = existingContact?.Clone<Contact>() ?? new()
         {
@@ -129,7 +129,7 @@ public partial class TrsDataSyncHelperTests
         newContact.dfeta_NINumber = nino;
         newContact.dfeta_QTSDate = qtsDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
         newContact.dfeta_EYTSDate = eytsDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
-        newContact.dfeta_CapitaTRNChangedOn = capitaTrnUpdatedOn.ToDateTimeWithDqtBstFix(isLocalTime: true);
+        newContact.dfeta_CapitaTRNChangedOn = capitaTrnUpdatedOn;
 
         return newContact;
     }

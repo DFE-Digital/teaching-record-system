@@ -8,11 +8,10 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using Xunit.DependencyInjection;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-[DisableParallelization()]
+[CollectionDefinition(nameof(CapitaExportNewJobTests), DisableParallelization = true)]
 public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>, IAsyncLifetime
 {
     public CapitaExportNewJobTests(CapitaExportNewJobFixture fixture)
@@ -822,7 +821,7 @@ public class CapitaExportNewJobTests : IClassFixture<CapitaExportNewJobFixture>,
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
-    public async Task InitializeAsync() => await DbFixture.DbHelper.ResetSchemaAsync();
+    public async Task InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
     public Task DisposeAsync() => Task.CompletedTask;
 }

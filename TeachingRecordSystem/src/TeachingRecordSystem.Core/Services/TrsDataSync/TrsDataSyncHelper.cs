@@ -2283,7 +2283,7 @@ public class TrsDataSyncHelper(
             "dqt_first_name",
             "dqt_middle_name",
             "dqt_last_name",
-            "capita_trn_updated_on"
+            "capita_trn_changed_on"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
