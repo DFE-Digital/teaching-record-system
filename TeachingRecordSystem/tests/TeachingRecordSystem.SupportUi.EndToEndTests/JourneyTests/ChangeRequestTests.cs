@@ -28,9 +28,7 @@ public class ChangeRequestTests : TestBase
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToHomePageAsync();
-
-        await page.ClickSupportTasksLinkInNavigationBarAsync();
+        await page.GotoAsync("/support-tasks");
 
         await page.AssertOnSupportTasksPageAsync();
 
@@ -70,9 +68,7 @@ public class ChangeRequestTests : TestBase
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToHomePageAsync();
-
-        await page.ClickSupportTasksLinkInNavigationBarAsync();
+        await page.GotoAsync("/support-tasks");
 
         await page.AssertOnSupportTasksPageAsync();
 
@@ -114,11 +110,7 @@ public class ChangeRequestTests : TestBase
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToHomePageAsync();
-
-        await page.ClickSupportTasksLinkInNavigationBarAsync();
-
-        await page.AssertOnSupportTasksPageAsync();
+        await page.GotoAsync("/support-tasks");
 
         await page.ClickCaseReferenceLinkChangeRequestsPageAsync(caseReference);
 

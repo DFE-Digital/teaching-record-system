@@ -113,11 +113,6 @@ public static class PageExtensions
         await page.GetByTestId($"view-alert-link-{alertId}").ClickAsync();
     }
 
-    public static async Task ClickSupportTasksLinkInNavigationBarAsync(this IPage page)
-    {
-        await page.ClickAsync("a:text-is('Support tasks')");
-    }
-
     public static async Task AssertOnSupportTasksPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync("/support-tasks");

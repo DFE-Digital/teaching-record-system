@@ -60,22 +60,6 @@
         <govuk-service-navigation-nav>
             @if (User.Identity?.IsAuthenticated == true && User.IsActiveTrsUser())
             {
-                <govuk-service-navigation-nav-item
-                    href="@LinkGenerator.Index()"
-                    active="@(Context.Request.Path.StartsWithSegments("/persons"))"
-                    current="@(Context.Request.Path == "/")">
-                    Records
-                </govuk-service-navigation-nav-item>
-
-                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksView)).Succeeded)
-                {
-                    <govuk-service-navigation-nav-item
-                        href="@LinkGenerator.SupportTasks()"
-                        active="@(Context.Request.Path.StartsWithSegments("/support-tasks") || Context.Request.Path.StartsWithSegments("/change-requests"))">
-                        Support tasks
-                    </govuk-service-navigation-nav-item>
-                }
-
                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
                 {
                     if (FeatureProvider.IsEnabled(FeatureNames.NewUserRoles))
