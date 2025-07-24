@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
@@ -19,12 +20,14 @@ public class EnterTrnTests : TestBase
     [Fact]
     public async Task Get_PopulatesThisTrnFromPersonRecord()
     {
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -41,15 +44,48 @@ public class EnterTrnTests : TestBase
     }
 
     [Fact]
+    public async Task Get_OtherTrnAlreadyEntered_ShowsOtherTrn()
+    {
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            new MergeStateBuilder()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var otherTrn = doc.GetChildElementOfTestId<IHtmlInputElement>("other-trn", "input");
+        Assert.NotNull(otherTrn);
+        Assert.Equal(personB.Trn, otherTrn.Value);
+    }
+
+    [Fact]
     public async Task Post_OtherTrnMissing_ShowsPageError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -72,12 +108,14 @@ public class EnterTrnTests : TestBase
     public async Task Post_OtherTrnNotNumeric_ShowsPageError(string trn)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -100,12 +138,14 @@ public class EnterTrnTests : TestBase
     public async Task Post_OtherTrnNot7DigitsLong_ShowsPageError(string trn)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -126,12 +166,14 @@ public class EnterTrnTests : TestBase
     public async Task Post_OtherTrnSameAsThisTrn_ShowsPageError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -152,14 +194,16 @@ public class EnterTrnTests : TestBase
     public async Task Post_OtherTrnDoesNotBelongToPerson_ShowsPageError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var newTrn = await TestData.GenerateTrnAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -180,26 +224,31 @@ public class EnterTrnTests : TestBase
     public async Task Post_OtherTrnBelongsToDeactivatedPerson_ShowsPageError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
-        var otherPerson = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.Attach(otherPerson.Person);
-            otherPerson.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personB.Person);
+            personB.Person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            personA.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(personA)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePostRequestContentBuilder()
-                .WithOtherTrn(otherPerson.Trn)
+                .WithOtherTrn(personB.Trn)
                 .BuildFormUrlEncoded()
         };
 
@@ -211,22 +260,139 @@ public class EnterTrnTests : TestBase
     }
 
     [Fact]
+    public async Task Post_PersonAIsDeactivated_ReturnsBadRequest()
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(personA.Person);
+            personA.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            new MergeStateBuilder()
+                .WithInitializedState(personA)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePostRequestContentBuilder()
+                .WithOtherTrn(personB.Trn)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest()
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn()
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            new MergeStateBuilder()
+                .WithInitializedState(personA)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePostRequestContentBuilder()
+                .WithOtherTrn(personB.Trn)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
+    public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn()
+            .WithInductionStatus(i => i
+                .WithStatus(status)
+                .WithStartDate(new DateOnly(2024, 1, 1))
+                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            new MergeStateBuilder()
+                .WithInitializedState(personA)
+                .Build());
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePostRequestContentBuilder()
+                .WithOtherTrn(personB.Trn)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Post_PersistsDetailsAndRedirectsToNextPage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
-        var otherPerson = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            personA.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(personA)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePostRequestContentBuilder()
-                .WithOtherTrn(otherPerson.Trn)
+                .WithOtherTrn(personB.Trn)
                 .BuildFormUrlEncoded()
         };
 
@@ -234,13 +400,14 @@ public class EnterTrnTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(otherPerson.Trn, journeyInstance.State.OtherTrn);
+        AssertEx.ResponseIsRedirectTo(response,
+            $"/persons/{personA.PersonId}/merge/compare-matching-records?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var location = response.Headers.Location?.OriginalString;
-        var expectedUrl = $"/persons/{person.PersonId}/merge/compare-matching-records?{journeyInstance.GetUniqueIdQueryParameter()}";
-        Assert.Equal(expectedUrl, location);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(personA.PersonId, journeyInstance.State.PersonAId);
+        Assert.Equal(personA.Trn, journeyInstance.State.PersonATrn);
+        Assert.Equal(personB.PersonId, journeyInstance.State.PersonBId);
+        Assert.Equal(personB.Trn, journeyInstance.State.PersonBTrn);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergeState>? journeyInstance = null) =>

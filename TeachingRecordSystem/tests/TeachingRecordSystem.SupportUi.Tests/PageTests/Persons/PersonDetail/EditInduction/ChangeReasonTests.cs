@@ -240,19 +240,19 @@ public class ChangeReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await AssertEx.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
-        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
+        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
-        Assert.Equal("validfile.png", GetHiddenInputValue(html, "EvidenceFileName"));
-        Assert.Equal("1.2 KB", GetHiddenInputValue(html, "EvidenceFileSizeDescription"));
-        Assert.Equal(expectedFileUrl, GetHiddenInputValue(html, "UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("EvidenceFileId"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue("EvidenceFileName"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue("EvidenceFileSizeDescription"));
+        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
     }
 
     [Fact]
@@ -282,18 +282,18 @@ public class ChangeReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await AssertEx.HtmlResponseAsync(response, 400);
 
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
-        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
+        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal("http://test.com/file", link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
-        Assert.Equal("testfile.jpg", GetHiddenInputValue(html, "EvidenceFileName"));
-        Assert.Equal("3 KB", GetHiddenInputValue(html, "EvidenceFileSizeDescription"));
-        Assert.Equal("http://test.com/file", GetHiddenInputValue(html, "UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("EvidenceFileId"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue("EvidenceFileName"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue("EvidenceFileSizeDescription"));
+        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
     }
 
     [Fact]

@@ -20,36 +20,26 @@ public abstract class CommonJourneyPage(
     [FromRoute]
     public Guid PersonId { get; set; }
 
-    public string? ThisTrn { get; set; }
-
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
 
-    protected string GetPageLink(MergeJourneyPage? pageName)
+    public string CancelLink => LinkGenerator.PersonMergeCancel(PersonId, JourneyInstance!.InstanceId);
+
+    public string GetPageLink(MergeJourneyPage? pageName)
     {
         return pageName switch
         {
             MergeJourneyPage.EnterTrn => LinkGenerator.PersonMergeEnterTrn(PersonId, JourneyInstance!.InstanceId),
             MergeJourneyPage.CompareMatchingRecords => LinkGenerator.PersonMergeCompareMatchingRecords(PersonId, JourneyInstance!.InstanceId),
+            MergeJourneyPage.SelectDetailsToMerge => LinkGenerator.PersonMergeSelectDetailsToMerge(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonDetail(PersonId)
         };
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(GetPageLink(null));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
-
-        JourneyInstance!.State.EnsureInitialized();
-
-        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
-        ThisTrn = person.Trn;
 
         OnPageHandlerExecuting(context);
         await OnPageHandlerExecutingAsync(context);
@@ -61,9 +51,17 @@ public abstract class CommonJourneyPage(
         }
     }
 
-    protected virtual Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
-        => Task.CompletedTask;
+    protected virtual async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    {
+        await JourneyInstance!.State.EnsureInitializedAsync(PersonId, async () => (await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId)).Trn);
+    }
 
     protected virtual Task OnPageHandlerExecutedAsync(PageHandlerExecutedContext context)
         => Task.CompletedTask;
+
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(GetPageLink(null));
+    }
 }

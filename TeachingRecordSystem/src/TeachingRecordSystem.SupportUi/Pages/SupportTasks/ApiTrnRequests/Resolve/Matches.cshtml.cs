@@ -100,7 +100,9 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
                     Trn = p.Trn!,
                     HasQts = p.QtsDate != null,
                     HasEyts = p.EytsDate != null,
-                    HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
+                    ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen),
+                    InductionStatus = p.InductionStatus,
+                    Status = p.Status
                 })
                 .ToArrayAsync())
             // matchedPersonIds is ordered by best match first; ensure we maintain that order
@@ -135,7 +137,9 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
         // TODO Gender
         public required bool HasQts { get; init; }
         public required bool HasEyts { get; init; }
-        public required bool HasActiveAlerts { get; init; }
+        public required int ActiveAlertCount { get; init; }
+        public required InductionStatus InductionStatus { get; init; }
+        public required PersonStatus Status { get; init; }
         public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
     }
 }

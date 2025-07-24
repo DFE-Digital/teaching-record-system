@@ -323,3 +323,21 @@
     color: govuk-colour("white") !important;
   }
 }
+
+.trs-potential-duplicates {
+  @include govuk-media-query($from: desktop) {
+    display: flex;
+    flex-flow: wrap;
+  }
+
+  .trs-potential-duplicates--item {
+    @include govuk-media-query($from: desktop) {
+      box-sizing: border-box;
+      flex: 0 0 calc(50% - 15px);
+
+      &:nth-child(2n) {
+        margin-left: 30px;
+      }
+    }
+  }
+}

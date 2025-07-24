@@ -25,16 +25,23 @@ public class CommonPageTests : TestBase
         TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
 
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            personA.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
                 .Build());
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, page, journeyInstance));
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
         var response = await HttpClient.SendAsync(request);
 
         // Assert
@@ -48,17 +55,23 @@ public class CommonPageTests : TestBase
     [InlineData("compare-matching-records", "enter-trn")]
     public async Task Get_BacklinkLinksToExpected(string page, string? expectedPage)
     {
-        var person = await TestData.CreatePersonAsync();
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            personA.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, page, journeyInstance));
-
         // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
         var response = await HttpClient.SendAsync(request);
 
         // Assert
@@ -66,7 +79,7 @@ public class CommonPageTests : TestBase
         var document = await response.GetDocumentAsync();
         var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
         Assert.NotNull(backlink);
-        var expectedBackLink = $"/persons/{person.PersonId}";
+        var expectedBackLink = $"/persons/{personA.PersonId}";
         if (expectedPage is not null)
         {
             expectedBackLink += "/merge/" + expectedPage;
@@ -80,17 +93,23 @@ public class CommonPageTests : TestBase
     public async Task Get_ContinueAndCancelButtons_ExistOnPage(string page)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            personA.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, page, journeyInstance));
-
         // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
         var response = await HttpClient.SendAsync(request);
 
         // Assert
@@ -109,16 +128,23 @@ public class CommonPageTests : TestBase
     public async Task Post_Cancel_RedirectsToPersonDetailPage(string page)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            personA.PersonId,
             new MergeStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
                 .Build());
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, page, journeyInstance));
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
         var response = await HttpClient.SendAsync(request);
 
         // Assert
@@ -130,9 +156,7 @@ public class CommonPageTests : TestBase
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
         // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/persons/{person.PersonId}", location);
+        AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, string page, JourneyInstance<MergeState>? journeyInstance = null) =>

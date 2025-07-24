@@ -97,7 +97,9 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
                     Trn = p.Trn!,
                     HasQts = p.QtsDate != null,
                     HasEyts = p.EytsDate != null,
-                    HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
+                    ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen),
+                    InductionStatus = p.InductionStatus,
+                    Status = p.Status
                 })
                 .ToArrayAsync())
             // matchedPersonIds is ordered by best match first; ensure we maintain that order

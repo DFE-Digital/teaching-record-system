@@ -109,11 +109,11 @@ public class NameChangeReasonTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var reasonChoiceSelection = GetChildElementsOfTestId<IHtmlInputElement>(doc, "change-reason-options", "input[type='radio']")
+        var reasonChoiceSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("change-reason-options", "input[type='radio']")
             .Single(i => i.IsChecked == true).Value;
         Assert.Equal(reasonChoice.ToString(), reasonChoiceSelection);
 
-        var uploadEvidenceChoices = GetChildElementsOfTestId<IHtmlInputElement>(doc, "upload-evidence-options", "input[type='radio']")
+        var uploadEvidenceChoices = doc.GetChildElementsOfTestId<IHtmlInputElement>("upload-evidence-options", "input[type='radio']")
             .Single(i => i.IsChecked == true).Value;
         Assert.Equal(true.ToString(), uploadEvidenceChoices);
 
@@ -121,10 +121,10 @@ public class NameChangeReasonTests : TestBase
         Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(doc, nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
-        Assert.Equal("evidence.jpg", GetHiddenInputValue(doc, nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
-        Assert.Equal("1.2 KB", GetHiddenInputValue(doc, nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, GetHiddenInputValue(doc, nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
+        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
+        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
     }
 
     [Fact]
@@ -287,19 +287,19 @@ public class NameChangeReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await AssertEx.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
-        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
+        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
-        Assert.Equal("validfile.png", GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
-        Assert.Equal("1.2 KB", GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
+        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
     }
 
     [Fact]
@@ -332,18 +332,18 @@ public class NameChangeReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await AssertEx.HtmlResponseAsync(response, 400);
 
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
-        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
+        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal("http://test.com/file", link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
-        Assert.Equal("testfile.jpg", GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
-        Assert.Equal("3 KB", GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
-        Assert.Equal("http://test.com/file", GetHiddenInputValue(html, nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
+        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
     }
 
     [Fact]
