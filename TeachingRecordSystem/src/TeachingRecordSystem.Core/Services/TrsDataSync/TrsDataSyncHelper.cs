@@ -2282,7 +2282,8 @@ public class TrsDataSyncHelper(
             "dqt_modified_on",
             "dqt_first_name",
             "dqt_middle_name",
-            "dqt_last_name"
+            "dqt_last_name",
+            "capita_trn_changed_on"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -2325,7 +2326,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.MobilePhone,
             Contact.Fields.GenderCode,
             Contact.Fields.dfeta_InductionStatus,
-            Contact.Fields.dfeta_MergedWith
+            Contact.Fields.dfeta_MergedWith,
+            Contact.Fields.dfeta_CapitaTRNChangedOn
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -2351,6 +2353,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(person.CapitaTrnUpdatedOn, NpgsqlDbType.TimestampTz);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -2617,7 +2620,8 @@ public class TrsDataSyncHelper(
             DqtModifiedOn = c.ModifiedOn!.Value,
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
-            DqtLastName = c.LastName ?? string.Empty
+            DqtLastName = c.LastName ?? string.Empty,
+            CapitaTrnUpdatedOn = c.dfeta_CapitaTRNChangedOn
         })
         .ToList();
 
@@ -4255,6 +4259,7 @@ public class TrsDataSyncHelper(
         public required string? DqtFirstName { get; init; }
         public required string? DqtMiddleName { get; init; }
         public required string? DqtLastName { get; init; }
+        public required DateTime? CapitaTrnUpdatedOn { get; init; }
     }
 
     private record InductionInfo

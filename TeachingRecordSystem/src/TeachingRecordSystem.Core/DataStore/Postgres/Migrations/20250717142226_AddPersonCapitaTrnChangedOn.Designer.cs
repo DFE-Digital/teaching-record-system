@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250717142226_AddPersonCapitaTrnChangedOn")]
+    partial class AddPersonCapitaTrnChangedOn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -5033,7 +5036,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         {
                             RouteToProfessionalStatusTypeId = new Guid("8f5c0431-d006-4eda-9336-16dfc6a26a78"),
                             DegreeTypeRequired = 0,
-                            HoldsFromRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = false,
                             Name = "EYPS",
@@ -5049,7 +5052,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         {
                             RouteToProfessionalStatusTypeId = new Guid("eba0b7ae-cbce-44d5-a56f-988d69b03001"),
                             DegreeTypeRequired = 0,
-                            HoldsFromRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = false,
                             Name = "EYPS ITT Migrated",
@@ -5069,7 +5072,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = false,
                             Name = "EYTS ITT Migrated",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 2,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -19210,30 +19213,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("national_insurance_number");
 
-                    b.Property<string>("NpqApplicationId")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_application_id");
-
-                    b.Property<Guid?>("NpqEvidenceFileId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("npq_evidence_file_id");
-
-                    b.Property<string>("NpqEvidenceFileName")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_evidence_file_name");
-
-                    b.Property<string>("NpqName")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_name");
-
-                    b.Property<string>("NpqTrainingProvider")
-                        .HasColumnType("text")
-                        .HasColumnName("npq_training_provider");
-
-                    b.Property<bool?>("NpqWorkingInEducationalSetting")
-                        .HasColumnType("boolean")
-                        .HasColumnName("npq_working_in_educational_setting");
-
                     b.Property<string>("OneLoginUserSubject")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -19258,10 +19237,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<Guid?>("ResolvedPersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("resolved_person_id");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
 
                     b.Property<string>("TrnToken")
                         .HasColumnType("text")

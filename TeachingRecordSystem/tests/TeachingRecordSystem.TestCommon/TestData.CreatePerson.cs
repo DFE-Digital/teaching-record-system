@@ -58,6 +58,7 @@ public partial class TestData
         private CreatePersonInductionBuilder? _inductionBuilder;
         private QtlsStatus? _qtlsStatus;
         private TestDataPersonDataSource? _personDataSource;
+        private DateTime? _capitaTrnChangedOn;
 
         internal CreatePersonBuilder(ReferenceData referenceData)
         {
@@ -396,6 +397,17 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithCapitaTrnChangedOn(DateTime? capitaTrnChangedOn)
+        {
+            if (_capitaTrnChangedOn is not null && _capitaTrnChangedOn != capitaTrnChangedOn)
+            {
+                throw new InvalidOperationException("WithCapitaTrnChangedOn cannot be changed after it's set.");
+            }
+
+            _capitaTrnChangedOn = capitaTrnChangedOn;
+            return this;
+        }
+
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
             var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
@@ -427,7 +439,8 @@ public partial class TestData
                 dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
                 dfeta_TrnToken = _trnToken,
                 dfeta_SlugId = _slugId,
-                dfeta_loginfailedcounter = _loginFailedCounter
+                dfeta_loginfailedcounter = _loginFailedCounter,
+                dfeta_CapitaTRNChangedOn = _capitaTrnChangedOn
             };
 
             // The conditional is to work around issue in CRM where an explicit `null` TRN breaks a plugin
@@ -497,7 +510,8 @@ public partial class TestData
                     DqtFirstName = mappedPersonInfo.DqtFirstName,
                     DqtMiddleName = mappedPersonInfo.DqtMiddleName,
                     DqtLastName = mappedPersonInfo.DqtLastName,
-                    Gender = mappedPersonInfo.Gender
+                    Gender = mappedPersonInfo.Gender,
+                    CapitaTrnChangedOn = mappedPersonInfo.CapitaTrnUpdatedOn
                 });
 
                 await dbContext.SaveChangesAsync();

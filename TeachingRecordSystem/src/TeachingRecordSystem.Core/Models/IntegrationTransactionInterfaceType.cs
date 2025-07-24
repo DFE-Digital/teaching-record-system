@@ -7,5 +7,9 @@ public enum IntegrationTransactionInterfaceType
 {
     [Description("EWC Wales")]
     [Display(Name = "EWC Wales")]
-    EwcWales = 1
+    EwcWales = 1,
+
+    [Description("Capita Export New")]
+    [Display(Name = "Capita Export New")]
+    CapitaExportNew = 2
 }
