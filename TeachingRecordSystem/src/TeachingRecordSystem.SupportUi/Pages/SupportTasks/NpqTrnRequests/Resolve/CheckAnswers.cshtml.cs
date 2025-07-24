@@ -121,11 +121,8 @@ public class CheckAnswersModel(
             };
 
             // update the person
-            var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId);
-            if (person == null)
-            {
-                throw new ArgumentException("Person not found.");
-            }
+            var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == requestData.ResolvedPersonId)
+                ?? throw new ArgumentException("Person not found.");
 
             person!.UpdateDetailsFromTrnRequest(
                 dateOfBirth: DateOfBirth,
