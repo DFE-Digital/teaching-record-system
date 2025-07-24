@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <form asp-antiforgery="false" method="get" class="moj-filter__options">
+    <div class="moj-filter__options">
         @foreach (var filter in Model.Filters)
         {
             if (filter is TextSearchFilterViewModel textSearch)
@@ -22,7 +22,7 @@
 
         <div class="govuk-button-group">
             <govuk-button type="submit">@Model.SubmitButtonText</govuk-button>
-            <a class="govuk-link govuk-link--no-visited-state" href=@Model.ClearUrl>Clear filters</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="@Model.ClearUrl">Clear filters</a>
         </div>
-    </form>
+    </div>
 </div>

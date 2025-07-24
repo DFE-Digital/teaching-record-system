@@ -11,49 +11,41 @@
     <govuk-button-link href="@LinkGenerator.PersonCreate()">Create a record</govuk-button-link>
 }
 
-<div class="moj-filter-layout trs-filter-layout">
-    <div class="moj-filter-layout__filter">
-        <div class="moj-filter-layout__filter">
-            <div class="moj-filter">
-                <div class="moj-filter__header">
-                    <div class="moj-filter__header-title">
-                        <h2 class="govuk-heading-m">Filter</h2>
-                    </div>
+<filter-layout>
+    <filter-layout-filter>
+        <filter>
+            <filter-options>
+                <govuk-input for="Search" label-class="govuk-label--s" spellcheck="false" />
+
+                <govuk-checkboxes for="Statuses" class="govuk-checkboxes--small">
+                    <govuk-checkboxes-fieldset>
+                        <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s" />
+                        <govuk-checkboxes-item value="@PersonStatus.Active">
+                            @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Active, 0))
+                        </govuk-checkboxes-item>
+                        <govuk-checkboxes-item value="@PersonStatus.Deactivated">
+                            @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Deactivated, 0))
+                        </govuk-checkboxes-item>
+                    </govuk-checkboxes-fieldset>
+                </govuk-checkboxes>
+
+                <govuk-select for="SortBy" label-class="govuk-label--s">
+                    <govuk-select-item value="@PersonSearchSortByOption.LastNameAscending">@PersonSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@PersonSearchSortByOption.LastNameDescending">@PersonSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@PersonSearchSortByOption.FirstNameAscending">@PersonSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@PersonSearchSortByOption.FirstNameDescending">@PersonSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthAscending">@PersonSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthDescending">@PersonSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
+                </govuk-select>
+
+                <div class="govuk-button-group">
+                    <govuk-button type="submit">Apply filters</govuk-button>
                 </div>
+            </filter-options>
+        </filter>
+    </filter-layout-filter>
 
-                <form method="get" class="moj-filter__options" asp-antiforgery="false">
-                    <govuk-input for="Search" label-class="govuk-label--s" spellcheck="false" />
-
-                    <govuk-checkboxes for="Statuses" class="govuk-checkboxes--small">
-                        <govuk-checkboxes-fieldset>
-                            <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s" />
-                            <govuk-checkboxes-item value="@PersonStatus.Active">
-                                @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Active, 0))
-                            </govuk-checkboxes-item>
-                            <govuk-checkboxes-item value="@PersonStatus.Deactivated">
-                                @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.Statuses)].GetValueOrDefault(PersonStatus.Deactivated, 0))
-                            </govuk-checkboxes-item>
-                        </govuk-checkboxes-fieldset>
-                    </govuk-checkboxes>
-
-                    <govuk-select for="SortBy" label-class="govuk-label--s">
-                        <govuk-select-item value="@PersonSearchSortByOption.LastNameAscending">@PersonSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
-                        <govuk-select-item value="@PersonSearchSortByOption.LastNameDescending">@PersonSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
-                        <govuk-select-item value="@PersonSearchSortByOption.FirstNameAscending">@PersonSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
-                        <govuk-select-item value="@PersonSearchSortByOption.FirstNameDescending">@PersonSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
-                        <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthAscending">@PersonSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
-                        <govuk-select-item value="@PersonSearchSortByOption.DateOfBirthDescending">@PersonSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
-                    </govuk-select>
-
-                    <div class="govuk-button-group">
-                        <govuk-button type="submit">Apply filters</govuk-button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="moj-filter-layout__content">
+    <filter-layout-content>
         <table class="govuk-table">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
@@ -88,5 +80,5 @@
         </table>
 
         <partial name="_Pagination" model="@Model.Pagination" />
-    </div>
-</div>
+    </filter-layout-content>
+</filter-layout>
