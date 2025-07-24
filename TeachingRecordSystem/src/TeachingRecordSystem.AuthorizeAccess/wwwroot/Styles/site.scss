@@ -1,3 +1,6 @@
+@import "/Inter/inter.css";
+$govuk-font-family: 'Inter', Arial, sans-serif;
+
 @import '../lib/govuk-frontend/index';
 @import './service-header-no-imports.scss';
 @import './Components/interruption-card.scss';
