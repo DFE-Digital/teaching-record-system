@@ -40,7 +40,9 @@ public partial class TestData
         private string? _firstName;
         private string? _middleName;
         private string? _lastName;
+        private bool? _hasEmail;
         private string? _email;
+        private bool? _hasMobileNumber;
         private string? _mobileNumber;
         private bool? _hasNationalInsuranceNumber;
         private string? _nationalInsuranceNumber;
@@ -90,14 +92,40 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithEmail(bool hasEmail = true)
+        {
+            _hasEmail = hasEmail;
+
+            if (_hasEmail is false)
+            {
+                _email = null;
+            }
+
+            return this;
+        }
+
         public CreatePersonBuilder WithEmail(string? email)
         {
+            _hasEmail = email != null;
             _email = email;
+            return this;
+        }
+
+        public CreatePersonBuilder WithMobileNumber(bool hasMobileNumber = true)
+        {
+            _hasMobileNumber = hasMobileNumber;
+
+            if (_hasMobileNumber is false)
+            {
+                _mobileNumber = null;
+            }
+
             return this;
         }
 
         public CreatePersonBuilder WithMobileNumber(string? mobileNumber)
         {
+            _hasMobileNumber = mobileNumber != null;
             _mobileNumber = mobileNumber;
             return this;
         }
@@ -436,14 +464,14 @@ public partial class TestData
                 contact.dfeta_TRN = trn;
             }
 
-            if (_email is not null)
+            if (_hasEmail ?? false)
             {
-                contact.EMailAddress1 = _email;
+                contact.EMailAddress1 = _email ?? testData.GenerateUniqueEmail();
             }
 
-            if (_mobileNumber is not null)
+            if (_hasMobileNumber ?? false)
             {
-                contact.MobilePhone = _mobileNumber;
+                contact.MobilePhone = _mobileNumber ?? testData.GenerateUniqueMobileNumber();
             }
 
             if (_hasNationalInsuranceNumber ?? false)
@@ -664,8 +692,8 @@ public partial class TestData
                 StatedFirstName = statedFirstName,
                 StatedMiddleName = statedMiddleName,
                 StatedLastName = lastName,
-                Email = _email,
-                MobileNumber = _mobileNumber,
+                Email = contact.EMailAddress1,
+                MobileNumber = contact.MobilePhone,
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 Gender = contact.GenderCode.ToGender(),
                 QtsDate = person?.QtsDate,

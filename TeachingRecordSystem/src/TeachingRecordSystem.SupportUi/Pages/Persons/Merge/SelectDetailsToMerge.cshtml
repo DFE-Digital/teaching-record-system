@@ -1,0 +1,24 @@
+@page "/persons/{personId}/merge/select-details-to-merge"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.Merge.SelectDetailsToMergeModel
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Select the details to merge into the primary record";
+}
+
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full-from-desktop">
+        <span class="govuk-caption-l">Support tasks</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <form action="@Model.GetPageLink(MergeJourneyPage.SelectDetailsToMerge)" method="post" data-testid="submit-form">
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+                <govuk-button formaction="@Model.CancelLink" class="govuk-button--secondary" type="submit" data-testid="cancel-button">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Xunit;
 
 namespace TeachingRecordSystem.UiTestCommon;
 
@@ -101,4 +102,31 @@ public static class AngleSharpExtensions
     }
 
     public static string TrimmedText(this INode node) => node.Text().Trim();
+
+    public static T GetChildElementOfTestId<T>(this IHtmlDocument doc, string testId, string childSelector) where T : IElement
+    {
+        var parent = doc.GetElementByTestId(testId);
+        Assert.NotNull(parent);
+        var child = parent.QuerySelector(childSelector);
+        Assert.NotNull(child);
+        Assert.IsAssignableFrom<T>(child);
+        return (T)child;
+    }
+
+    public static IEnumerable<T> GetChildElementsOfTestId<T>(this IHtmlDocument doc, string testId, string childSelector) where T : IElement
+    {
+        var parent = doc.GetElementByTestId(testId);
+        Assert.NotNull(parent);
+        var children = parent.QuerySelectorAll(childSelector);
+        Assert.All(children, c => Assert.IsAssignableFrom<T>(c));
+        return children.Cast<T>();
+    }
+
+    public static string GetHiddenInputValue(this IHtmlDocument doc, string name)
+    {
+        var element = doc.QuerySelector($@"input[type=""hidden""][name=""{name}""]");
+        var input = Assert.IsAssignableFrom<IHtmlInputElement>(element);
+
+        return input.Value;
+    }
 }

@@ -9,14 +9,126 @@
     <govuk-back-link data-testid="back-link" href="@Model.BackLink" />
 }
 
+@functions {
+#pragma warning disable CS1998
+    private async Task RenderWithHighlightIfDifferent(string? value, bool different)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            value = UiDefaults.EmptyDisplayContent;
+        }
+
+        if (different)
+        {
+            <highlight>@value</highlight>
+        }
+        else
+        {
+            @value
+        }
+    }
+#pragma warning restore CS1998
+}
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
+        <span class="govuk-caption-l">Support tasks</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form action="@LinkGenerator.PersonMergeEnterTrn(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post" data-testid="submit-form">
+        @if (Model.CannotMergeReason is not null)
+        {
+            <govuk-warning-text icon-fallback-text="Warning" data-testid="warning-text">
+                @(Model.CannotMergeReason) Refer this to the Teaching Regulation Agency (TRA).
+            </govuk-warning-text>
+        }
+
+        <div class="trs-potential-duplicates">
+            @foreach (var (match, i) in Model.PotentialDuplicates!.Select((match, i) => (match, i)))
+            {
+                <govuk-summary-card data-testid="record-@match.Identifier.ToString().ToLower()" class="trs-potential-duplicates--item">
+                    <govuk-summary-card-title>
+                        TRN @match.Trn
+                    </govuk-summary-card-title>
+                    <govuk-summary-card-actions>
+                        <govuk-summary-card-action href="@LinkGenerator.PersonDetail(match.PersonId)" target="_blank">
+                            View record (opens in a new tab)
+                        </govuk-summary-card-action>
+                    </govuk-summary-card-actions>
+                    <govuk-summary-list>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfDifferent(match.FirstName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName)); }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfDifferent(match.MiddleName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName)); }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfDifferent(match.LastName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)); }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfDifferent(match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), !match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)); }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfDifferent(match.EmailAddress, !match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)); }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfDifferent(match.NationalInsuranceNumber, !match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)); }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@match.Trn</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        @if (match.ActiveAlertCount > 0)
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Alerts</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value><a href="@LinkGenerator.PersonAlerts(match.PersonId)" target="_blank">(@match.ActiveAlertCount) open alert@(match.ActiveAlertCount == 1 ? "" : "s") (opens in a new tab)</a></govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                    </govuk-summary-list>
+                </govuk-summary-card>
+            }
+        </div>
+
+        <form action="@Model.GetPageLink(MergeJourneyPage.CompareMatchingRecords)" method="post" data-testid="submit-form">
+            @if (Model.CannotMergeReason is null)
+            {
+                <govuk-radios asp-for="PrimaryRecordId" data-testid="primary-record-options">
+                    <govuk-radios-fieldset>
+                        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                        @foreach (var match in Model.PotentialDuplicates!)
+                        {
+                            <govuk-radios-item value="@match.PersonId">
+                                TRN @match.Trn
+                            </govuk-radios-item>
+                        }
+                    </govuk-radios-fieldset>
+                </govuk-radios>
+            }
+
             <div class="govuk-button-group">
-                <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.PersonMergeCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit" data-testid="cancel-button">Cancel and return to record</govuk-button>
+                @if (Model.CannotMergeReason is null)
+                {
+                    <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+                }
+                <govuk-button formaction="@Model.CancelLink" class="govuk-button--secondary" type="submit" data-testid="cancel-button">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

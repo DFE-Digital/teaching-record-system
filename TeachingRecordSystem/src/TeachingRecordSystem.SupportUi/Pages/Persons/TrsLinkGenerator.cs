@@ -98,6 +98,9 @@ public partial class TrsLinkGenerator
     public string PersonMergeCompareMatchingRecords(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/Persons/Merge/CompareMatchingRecords", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
+    public string PersonMergeSelectDetailsToMerge(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/Persons/Merge/SelectDetailsToMerge", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
     public string PersonMergeCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Persons/Merge/EnterTrn", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 }

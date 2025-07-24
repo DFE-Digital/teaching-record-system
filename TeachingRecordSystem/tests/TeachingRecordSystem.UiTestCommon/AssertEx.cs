@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using TeachingRecordSystem.Core.Services.Files;
 using Xunit;
@@ -9,6 +10,13 @@ namespace TeachingRecordSystem.UiTestCommon;
 
 public static partial class AssertEx
 {
+    public static void ResponseIsRedirectTo(HttpResponseMessage response, string expectedUrl)
+    {
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+        Assert.Equal(expectedUrl, location);
+    }
+
     public static async Task<IHtmlDocument> HtmlResponseAsync(HttpResponseMessage response, int expectedStatusCode = 200)
     {
         Assert.Equal(expectedStatusCode, (int)response.StatusCode);
@@ -173,6 +181,23 @@ public static partial class AssertEx
     public static void AssertRowDoesNotExist(this IHtmlDocument doc, string containerTestId, string keyContent)
     {
         doc.AssertRowDoesNotExistCore(containerTestId, keyContent);
+    }
+
+    public static void AssertMatchRowHasExpectedHighlight(this IHtmlDocument doc, string detailsId, string summaryListKey, bool expectHighlight)
+    {
+        var details = doc.GetAllElementsByTestId(detailsId).First();
+        var valueElement = details.GetSummaryListValueElementForKey(summaryListKey);
+        Assert.NotNull(valueElement);
+        var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
+
+        if (expectHighlight)
+        {
+            Assert.NotNull(highlightElement);
+        }
+        else
+        {
+            Assert.Null(highlightElement);
+        }
     }
 
     public static void AssertChangeLinkExists(this IHtmlDocument doc, string keyContent)

@@ -63,14 +63,14 @@ public class PersonalDetailsTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var firstName = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-first-name", "input");
-        var middleName = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-middle-name", "input");
-        var lastName = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-last-name", "input");
-        var dateOfBirth = GetChildElementsOfTestId<IHtmlInputElement>(doc, "edit-details-date-of-birth", "input");
-        var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
-        var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
-        var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
-        var genderSelection = GetChildElementsOfTestId<IHtmlInputElement>(doc, "edit-details-gender-options", "input[type='radio']")
+        var firstName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-first-name", "input");
+        var middleName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-middle-name", "input");
+        var lastName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-last-name", "input");
+        var dateOfBirth = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-date-of-birth", "input");
+        var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
+        var mobileNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-mobile-number", "input");
+        var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
+        var genderSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']")
             .Single(i => i.IsChecked == true);
 
         Assert.Equal("Alfred", firstName.Value.Trim());

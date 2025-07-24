@@ -20,7 +20,8 @@ public class ResolveApiTrnRequestState : IRegisterJourney
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
     public string? Comments { get; set; }
 
-    public enum PersonAttributeSource
+    public enum
+        PersonAttributeSource
     {
         ExistingRecord = 0,
         TrnRequest = 1

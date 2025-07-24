@@ -100,7 +100,7 @@
                         @{
                             var tags = new List<string>();
 
-                            if (match.HasActiveAlerts)
+                            if (match.ActiveAlertCount > 0)
                             {
                                 tags.Add("Alerts");
                             }
