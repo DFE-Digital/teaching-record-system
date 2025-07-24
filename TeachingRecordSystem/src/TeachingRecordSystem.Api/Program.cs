@@ -11,7 +11,6 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.Endpoints;
-using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
@@ -252,7 +251,6 @@ public class Program
             return next();
         });
 
-        app.MapWebHookEndpoints();
         app.MapWebhookJwks();
 
         app.MapControllers();

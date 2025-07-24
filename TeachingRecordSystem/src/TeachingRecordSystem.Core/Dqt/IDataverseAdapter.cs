@@ -22,8 +22,6 @@ public interface IDataverseAdapter
 
     Task<Contact[]> FindTeachersStrictAsync(FindTeachersQuery query);
 
-    Task UpdateTeacherIdentityInfoAsync(UpdateTeacherIdentityInfoCommand command);
-
     Task<Account[]> GetIttProviderOrganizationsByNameAsync(string ukprn, string[] columnNames, bool activeOnly);
 
     Task<Account[]> GetIttProviderOrganizationsByUkprnAsync(string ukprn, string[] columnNames, bool activeOnly);
@@ -33,6 +31,4 @@ public interface IDataverseAdapter
     Task<bool> UnlockTeacherRecordAsync(Guid teacherId);
 
     Task<Incident[]> GetIncidentsByContactIdAsync(Guid contactId, IncidentState? state, string[] columnNames);
-
-    Task ClearTeacherIdentityInfoAsync(Guid identityUserId, DateTime updateTimeUtc);
 }
