@@ -1257,18 +1257,6 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public Task UpdateTeacherIdentityInfoAsync(UpdateTeacherIdentityInfoCommand command)
-    {
-        return _service.UpdateAsync(new Contact()
-        {
-            Id = command.TeacherId,
-            dfeta_TSPersonID = command.IdentityUserId.ToString(),
-            EMailAddress1 = command.EmailAddress,
-            MobilePhone = command.MobilePhone,
-            dfeta_LastIdentityUpdate = command.UpdateTimeUtc
-        });
-    }
-
     public Task<Subject> GetSubjectByTitleAsync(string title) => GetSubjectByTitleAsync(title, requestBuilder: null);
 
     public async Task<Subject> GetSubjectByTitleAsync(string title, RequestBuilder requestBuilder)
