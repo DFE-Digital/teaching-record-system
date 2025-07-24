@@ -32,10 +32,6 @@ public class CheckAnswersModel(
 
     public string? NationalInsuranceNumber { get; set; }
 
-    public Gender? Gender { get; set; }
-
-    public string? Trn { get; set; }
-
     public bool PersonNameChange { get; set; }
     public bool PersonDetailsChange { get; set; }
 
@@ -130,7 +126,6 @@ public class CheckAnswersModel(
         DateOfBirth = requestData.DateOfBirth;
         EmailAddress = requestData.EmailAddress;
         NationalInsuranceNumber = requestData.NationalInsuranceNumber;
-        Trn = null;
         SupportTaskReference = supportTask.SupportTaskReference;
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
         SourceApplicationUserId = requestData.ApplicationUser!.UserId;

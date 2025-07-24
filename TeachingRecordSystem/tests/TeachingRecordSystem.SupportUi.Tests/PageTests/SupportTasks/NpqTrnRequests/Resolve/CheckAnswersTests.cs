@@ -292,38 +292,6 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Get_CreatingNewRecord_RequestHasNoMatches_HasBackLinkToStartAndChangeLinkNotShown()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var supportTask = await new TestData.CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
-            .WithMatches(false)
-            .ExecuteAsync(TestData);
-
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
-            {
-                PersonId = CreateNewRecordPersonIdSentinel
-            });
-
-        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}";
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Null(doc.GetElementByTestId("change-link"));
-    }
-
-    [Fact]
     public async Task Post_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange

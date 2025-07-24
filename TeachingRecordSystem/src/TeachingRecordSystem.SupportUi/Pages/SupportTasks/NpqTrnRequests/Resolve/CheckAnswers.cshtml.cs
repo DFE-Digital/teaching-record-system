@@ -35,8 +35,6 @@ public class CheckAnswersModel(
 
     public string? NationalInsuranceNumber { get; set; }
 
-    public Gender? Gender { get; set; }
-
     public string? Trn { get; set; }
 
     public string? Comments { get; set; }

@@ -3,11 +3,9 @@
 @{
     ViewBag.Title = Model.CreatingNewRecord ? "Check details before creating record" : "Check details before updating record";
 
-    var backLink = (Model.PotentialDuplicate ?? false) ?
-        Model.CreatingNewRecord ?
+    var backLink = Model.CreatingNewRecord ?
             LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-            LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference!);
+            LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
     var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update record";
 }
 
@@ -29,12 +27,9 @@
                 <govuk-summary-card-title>
                     Details of the record
                 </govuk-summary-card-title>
-                @if (Model.PotentialDuplicate ?? false)
-                {
-                    <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" data-testid="change-link">Change</govuk-summary-card-action>
-                    </govuk-summary-card-actions>
-                }
+                <govuk-summary-card-actions>
+                    <govuk-summary-card-action href="@LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" data-testid="change-link">Change</govuk-summary-card-action>
+                </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
