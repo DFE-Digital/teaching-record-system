@@ -1,0 +1,90 @@
+@using TeachingRecordSystem.Core.Events
+@model TimelineItem<TimelineEvent<DqtQtsRegistrationUpdatedEvent>>
+@{
+    var dqtUpdatedEvent = Model.ItemModel.Event;
+    var qts = dqtUpdatedEvent.QtsRegistration;
+    var oldQts = dqtUpdatedEvent.OldQtsRegistration;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-dqt-qts-updated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">DQT QTS registration updated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Teacher status name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="teacher-status-name" use-empty-fallback>@qts?.TeacherStatusName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+            @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Early years status name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="early-years-status-name" use-empty-fallback>@qts?.EarlyYearsStatusName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+            @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.QtsDate))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@qts?.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+            @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EytsDate))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@qts?.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+        </govuk-summary-list>
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Teacher status name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-teacher-status-name" use-empty-fallback>@oldQts?.TeacherStatusName</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+
+                    @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Early years status name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-early-years-status-name" use-empty-fallback>@oldQts?.EarlyYearsStatusName</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+
+                    @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.QtsDate))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@oldQts?.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+
+                    @if (dqtUpdatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EytsDate))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@oldQts?.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>

@@ -82,7 +82,11 @@ public class ChangeHistoryModel(
             nameof(RouteToProfessionalStatusDeletedEvent),
             nameof(RouteToProfessionalStatusMigratedEvent),
             nameof(ApiTrnRequestSupportTaskUpdatedEvent),
-            nameof(NpqTrnRequestSupportTaskUpdatedEvent)
+            nameof(NpqTrnRequestSupportTaskUpdatedEvent),
+            nameof(DqtInitialTeacherTrainingCreatedEvent),
+            nameof(DqtInitialTeacherTrainingUpdatedEvent),
+            nameof(DqtQtsRegistrationCreatedEvent),
+            nameof(DqtQtsRegistrationUpdatedEvent)
         };
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();
