@@ -854,4 +854,279 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(populateOptional ? dqtAgeRangeTo.ToString() : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-age-range-to")?.TrimmedText());
         Assert.Equal(populateOptional ? $"{ittSubject1!.dfeta_Value} - {ittSubject1!.dfeta_name}{ittSubject2!.dfeta_Value} - {ittSubject2!.dfeta_name}{ittSubject3!.dfeta_Value} - {ittSubject3!.dfeta_name}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-subjects")?.TrimmedText());
     }
+
+    [Fact]
+    public async Task DqtInitialTeacherTrainingCreatedEvent_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var ittResult = dfeta_ITTResult.InTraining;
+        var createdByUser = await TestData.CreateUserAsync();
+
+        var createdEvent = new DqtInitialTeacherTrainingCreatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            {
+                Result = ittResult.ToString()
+            }
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(createdEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-dqt-itt-created-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        Assert.Equal(ittResult.ToString(), timelineItem.GetElementByTestId("itt-result")?.TrimmedText());
+    }
+
+    [Fact]
+    public async Task DqtInitialTeacherTrainingUpdatedEvent_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var ittResult = dfeta_ITTResult.Pass;
+        var oldIttResult = dfeta_ITTResult.InTraining;
+        var createdByUser = await TestData.CreateUserAsync();
+
+        var updatedEvent = new DqtInitialTeacherTrainingUpdatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            {
+                Result = ittResult.ToString()
+            },
+            OldInitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            {
+                Result = oldIttResult.ToString()
+            },
+            Changes = DqtInitialTeacherTrainingUpdatedEventChanges.Result
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-dqt-itt-updated-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        Assert.Equal(ittResult.ToString(), timelineItem.GetElementByTestId("itt-result")?.TrimmedText());
+        Assert.Equal(oldIttResult.ToString(), timelineItem.GetElementByTestId("old-itt-result")?.TrimmedText());
+    }
+
+    [Theory]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.QtsDate)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EytsDate)]
+    public async Task DqtQtsRegistrationCreatedEvent_RendersExpectedContent(DqtQtsRegistrationUpdatedEventChanges changes)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var teacherStatusName = "Trainee teacher";
+        var earlyYearsStatusName = "Early Years Trainee";
+        var qtsDate = Clock.Today.AddDays(-100);
+        var eytsDate = Clock.Today.AddDays(-50);
+        var createdByUser = await TestData.CreateUserAsync();
+
+        var createdEvent = new DqtQtsRegistrationCreatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            QtsRegistration = new EventModels.DqtQtsRegistration()
+            {
+                TeacherStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue ? teacherStatusName : null,
+                EarlyYearsStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue ? earlyYearsStatusName : null,
+                QtsDate = changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate ? qtsDate : null,
+                EytsDate = changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate ? eytsDate : null
+            }
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(createdEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-dqt-qts-created-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)
+        {
+            Assert.Equal(teacherStatusName, timelineItem.GetElementByTestId("teacher-status-name")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("teacher-status-name"));
+        }
+
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)
+        {
+            Assert.Equal(earlyYearsStatusName, timelineItem.GetElementByTestId("early-years-status-name")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("early-years-status-name"));
+        }
+
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate)
+        {
+            Assert.Equal(qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("qts-date"));
+        }
+
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate)
+        {
+            Assert.Equal(eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
+        }
+    }
+
+    [Theory]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.QtsDate)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EytsDate)]
+    public async Task DqtQtsRegistrationUpdatedEvent_RendersExpectedContent(DqtQtsRegistrationUpdatedEventChanges changes)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oldTeacherStatusName = "Trainee teacher";
+        var oldEarlyYearsStatusName = "Early Years Trainee";
+        var oldQtsDate = Clock.Today.AddDays(-100);
+        var oldEytsDate = Clock.Today.AddDays(-50);
+        var teacherStatusName = "Qualified Teacher (trained)";
+        var earlyYearsStatusName = "Early Years Teacher Status";
+        var qtsDate = oldQtsDate.AddDays(1);
+        var eytsDate = oldEytsDate.AddDays(1);
+        var createdByUser = await TestData.CreateUserAsync();
+
+        var updatedEvent = new DqtQtsRegistrationUpdatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            QtsRegistration = new EventModels.DqtQtsRegistration()
+            {
+                TeacherStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue ? teacherStatusName : null,
+                EarlyYearsStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue ? earlyYearsStatusName : null,
+                QtsDate = changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate ? qtsDate : null,
+                EytsDate = changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate ? eytsDate : null
+            },
+            OldQtsRegistration = new EventModels.DqtQtsRegistration()
+            {
+                TeacherStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue ? oldTeacherStatusName : null,
+                EarlyYearsStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue ? oldEarlyYearsStatusName : null,
+                QtsDate = changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate ? oldQtsDate : null,
+                EytsDate = changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate ? oldEytsDate : null
+            },
+            Changes = changes
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-dqt-qts-updated-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)
+        {
+            Assert.Equal(teacherStatusName, timelineItem.GetElementByTestId("teacher-status-name")?.TrimmedText());
+            Assert.Equal(oldTeacherStatusName, timelineItem.GetElementByTestId("old-teacher-status-name")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("teacher-status-name"));
+            Assert.Null(timelineItem.GetElementByTestId("old-teacher-status-name"));
+        }
+
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)
+        {
+            Assert.Equal(earlyYearsStatusName, timelineItem.GetElementByTestId("early-years-status-name")?.TrimmedText());
+            Assert.Equal(oldEarlyYearsStatusName, timelineItem.GetElementByTestId("old-early-years-status-name")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("early-years-status-name"));
+            Assert.Null(timelineItem.GetElementByTestId("old-early-years-status-name"));
+        }
+
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate)
+        {
+            Assert.Equal(qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+            Assert.Equal(oldQtsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("qts-date"));
+            Assert.Null(timelineItem.GetElementByTestId("old-qts-date"));
+        }
+
+        if (changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate)
+        {
+            Assert.Equal(eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+            Assert.Equal(oldEytsDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
+            Assert.Null(timelineItem.GetElementByTestId("old-eyts-date"));
+        }
+    }
 }

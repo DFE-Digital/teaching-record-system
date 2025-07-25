@@ -1,0 +1,36 @@
+@using TeachingRecordSystem.Core.Events
+@model TimelineItem<TimelineEvent<DqtInitialTeacherTrainingUpdatedEvent>>
+@{
+    var dqtUpdatedEvent = Model.ItemModel.Event;
+    var itt = dqtUpdatedEvent.InitialTeacherTraining;
+    var oldItt = dqtUpdatedEvent.OldInitialTeacherTraining;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-dqt-itt-updated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">DQT initial teacher training updated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="itt-result" use-empty-fallback>@itt?.Result</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="old-itt-result" use-empty-fallback>@oldItt?.Result</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>
