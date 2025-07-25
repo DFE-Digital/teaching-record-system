@@ -276,7 +276,7 @@
   border-style: solid;
   border-width: 1px 0 1px 0;
   padding: 30px 0;
-  margin: 15px 0;
+  margin-top: -1px; // to overlap the border with the previous section
 }
 
 .trs-tile-row {
@@ -287,11 +287,17 @@
 
 .trs-tile {
   @include govuk-link-common;
-  background-color: $govuk-brand-colour;
-  color: govuk-colour("white");
+  background-color: govuk-colour("light-grey");
+  color: govuk-colour("black");
   display: block;
   text-decoration: none;
   padding: 20px;
+  height: 80px;
+
+  &:has(.trs-tile__count) {
+    background-color: $govuk-brand-colour;
+    color: govuk-colour("white");
+  }
 }
 
 .trs-tile__count {
@@ -303,7 +309,6 @@
   @include govuk-font($size: 16);
   display: block;
   text-decoration: underline;
-  height: 40px;
 
   :hover > & {
     text-decoration-thickness: $govuk-link-hover-underline-thickness;
