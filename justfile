@@ -1,6 +1,8 @@
 set windows-shell := ["powershell.exe", "-nop", "-c"]
 
 export DOTNET_WATCH_SUPPRESS_MSBUILD_INCREMENTALISM := 'true'
+export DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER := 'true'
+export DOTNET_WATCH_RESTART_ON_RUDE_EDIT := 'true'
 
 shebang := if os() == 'windows' {
   'dotnet pwsh -nop'
