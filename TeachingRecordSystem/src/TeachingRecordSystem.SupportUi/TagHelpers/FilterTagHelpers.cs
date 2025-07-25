@@ -10,24 +10,11 @@ namespace TeachingRecordSystem.SupportUi.TagHelpers;
 [OutputElementHint("div")]
 public class FilterLayoutTagHelper : TagHelper
 {
-    [HtmlAttributeName("form-action")]
-    public string? FormAction { get; set; }
-
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        var formTag = new TagBuilder("form");
-        formTag.Attributes.Add("method", "get");
-        if (FormAction is not null)
-        {
-            formTag.Attributes.Add("action", FormAction);
-        }
-        output.PreContent.AppendHtml(formTag.RenderStartTag());
-
         output.TagName = "div";
         output.AddClass("moj-filter-layout", HtmlEncoder.Default);
         output.AddClass("trs-filter-layout", HtmlEncoder.Default);
-
-        output.PostContent.AppendHtml(formTag.RenderEndTag());
     }
 }
 
@@ -43,12 +30,22 @@ public class FilterLayoutFilterTagHelper : TagHelper
 }
 
 [HtmlTargetElement("filter", ParentTag = "filter-layout-filter")]
-[RestrictChildren("filter-options")]
 [OutputElementHint("div")]
 public class FilterTagHelper : TagHelper
 {
+    [HtmlAttributeName("form-action")]
+    public string? FormAction { get; set; }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+        var formTag = new TagBuilder("form");
+        formTag.Attributes.Add("method", "get");
+        if (FormAction is not null)
+        {
+            formTag.Attributes.Add("action", FormAction);
+        }
+        output.PreContent.AppendHtml(formTag.RenderStartTag());
+
         output.TagName = "div";
         output.AddClass("moj-filter", HtmlEncoder.Default);
 
@@ -62,6 +59,8 @@ public class FilterTagHelper : TagHelper
             """);
 
         output.Content.AppendHtml(await output.GetChildContentAsync());
+
+        output.PostContent.AppendHtml(formTag.RenderEndTag());
     }
 }
 

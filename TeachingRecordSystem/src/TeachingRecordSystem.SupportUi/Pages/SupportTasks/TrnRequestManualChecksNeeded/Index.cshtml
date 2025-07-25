@@ -1,4 +1,109 @@
 @page "/support-tasks/manual-checks-needed"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded.Index
+@{
+    ViewBag.Title = "Matched records: manual checks needed";
+}
 
-@* Nothing to see here yet *@
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">Support tasks</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    </div>
+    <div class="govuk-grid-column-full-from-desktop">
+        <p class="govuk-body">
+            These TRN requests match existing records with QTS, EYTS or an alert.
+            You’ll need to do further checks outside this service before completing each request.
+        </p>
+    </div>
+    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        <filter-layout>
+            <filter-layout-filter>
+                <filter>
+                    <input type="hidden" asp-for="@Model.SortBy" />
+                    <input type="hidden" asp-for="@Model.SortDirection" />
+                    @* This flag is so we can track when the filters have been applied vs a fresh page load *@
+                    <input type="hidden" name="_f" value="true" />
+
+                    <filter-options>
+                        <govuk-input for="Search" label-class="govuk-label--s" spellcheck="false" type="search"/>
+
+                        @if (Model.Facets![nameof(Model.Sources)].Count > 0)
+                        {
+                            <govuk-checkboxes for="Sources" class="govuk-checkboxes--small">
+                                <govuk-checkboxes-fieldset>
+                                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s"/>
+                                    @foreach (var source in Model.Facets![nameof(Model.Sources)].Keys.Cast<Index.Source>().OrderBy(u => u.UserName))
+                                    {
+                                        <govuk-checkboxes-item value="@source.UserId">
+                                            @source.UserName (@Model.Facets![nameof(Model.Sources)][source])
+                                        </govuk-checkboxes-item>
+                                    }
+                                </govuk-checkboxes-fieldset>
+                            </govuk-checkboxes>
+                        }
+
+                        <div class="govuk-button-group">
+                            <govuk-button type="submit">Apply filters</govuk-button>
+                            <a class="govuk-link govuk-link--no-visited-state" href="@LinkGenerator.TrnRequestManualChecksNeeded()">Clear filters</a>
+                        </div>
+                    </filter-options>
+                </filter>
+            </filter-layout-filter>
+
+            <filter-layout-content>
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.Name ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.TrnRequestManualChecksNeeded(search: Model.Search, TrnRequestManualChecksNeededSortByOption.Name, direction))">
+                                Name
+                            </th>
+                            <th scope="col" class="govuk-table__header"
+                                sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.DateCreated ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.TrnRequestManualChecksNeeded(search: Model.Search, TrnRequestManualChecksNeededSortByOption.DateCreated, direction))">
+                                Date created
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.DateOfBirth ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.TrnRequestManualChecksNeeded(search: Model.Search, TrnRequestManualChecksNeededSortByOption.DateOfBirth, direction))">
+                                Date of birth
+                            </th>
+                            <th scope="col" class="govuk-table__header trs-!-width-150"
+                                sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.Source ? Model.SortDirection : null)"
+                                link-template="@(direction => LinkGenerator.TrnRequestManualChecksNeeded(search: Model.Search, TrnRequestManualChecksNeededSortByOption.Source, direction))">
+                                Source
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        @if (Model.Results!.Count == 0)
+                        {
+                            <tr class="govuk-table__row" data-testid="no-tasks-message">
+                                <td class="govuk-table__cell" colspan="4">No TRN requests with manual checks needed found</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var result in Model.Results)
+                            {
+                                <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                                    <th scope="row" class="govuk-table__header" data-testid="name">
+                                        <a href="@LinkGenerator.ApiTrnRequestMatches(result.SupportTaskReference)" class="govuk-link">
+                                            @result.FirstName @result.MiddleName @result.LastName
+                                        </a>
+                                    </th>
+                                    <td class="govuk-table__cell" data-testid="created-on">@result.CreatedOn.ToGmt().ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                                    <td class="govuk-table__cell" data-testid="date-of-birth">@result.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                                    <td class="govuk-table__cell" data-testid="source"><colored-tag>@result.Source</colored-tag></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </filter-layout-content>
+        </filter-layout>
+
+        <partial name="_Pagination" model=@Model.Pagination/>
+    </div>
+</div>
