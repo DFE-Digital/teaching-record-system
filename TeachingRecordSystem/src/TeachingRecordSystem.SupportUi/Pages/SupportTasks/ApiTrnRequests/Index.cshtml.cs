@@ -49,6 +49,8 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
         var sortBy = SortBy ??= ApiTrnRequestsSortByOption.RequestedOn;
 
         var tasks = dbContext.SupportTasks
+            .Include(t => t.TrnRequestMetadata)
+            .ThenInclude(m => m!.ApplicationUser)
             .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status == SupportTaskStatus.Open);
 
         Search = Search?.Trim() ?? string.Empty;
@@ -98,8 +100,6 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
         }
 
         Results = await tasks
-            .Include(t => t.TrnRequestMetadata)
-            .ThenInclude(m => m!.ApplicationUser)
             .Select(t => new Result(
                 t.SupportTaskReference,
                 t.TrnRequestMetadata!.FirstName!,

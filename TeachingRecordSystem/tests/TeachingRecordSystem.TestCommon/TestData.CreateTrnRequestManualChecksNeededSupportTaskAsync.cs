@@ -8,7 +8,8 @@ public partial class TestData
     public Task<SupportTask> CreateTrnRequestManualChecksNeededSupportTaskAsync(
         Guid trnRequestApplicationUserId,
         string trnRequestId,
-        SupportTaskStatus status = SupportTaskStatus.Open)
+        SupportTaskStatus status = SupportTaskStatus.Open,
+        DateTime? createdOn = null)
     {
         return WithDbContextAsync(async dbContext =>
         {
@@ -20,7 +21,7 @@ public partial class TestData
                 trnRequestApplicationUserId,
                 trnRequestId,
                 SystemUser.SystemUserId,
-                Clock.UtcNow,
+                createdOn ?? Clock.UtcNow,
                 out var createdEvent);
             task.Status = status;
 
@@ -31,6 +32,7 @@ public partial class TestData
             // Re-query what we've just added so we return a SupportTask with TrnRequestMetadata populated
             return await dbContext.SupportTasks
                 .Include(t => t.TrnRequestMetadata)
+                .ThenInclude(m => m!.ApplicationUser)
                 .SingleAsync(t => t.SupportTaskReference == task.SupportTaskReference);
         });
     }

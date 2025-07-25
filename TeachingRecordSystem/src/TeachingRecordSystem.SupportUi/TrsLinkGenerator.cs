@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -401,7 +402,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string ConnectOneLoginUserSupportTaskConnect(string supportTaskReference, string trn) =>
         GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Connect", routeValues: new { supportTaskReference, trn });
 
-    public string TrnRequestManualChecksNeeded() => GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Index");
+    public string TrnRequestManualChecksNeeded(string? search = null, TrnRequestManualChecksNeededSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Index", routeValues: new { search, sortBy, sortDirection, pageNumber });
 
     public string ResolveTrnRequestManualChecksNeeded(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Resolve/Index", routeValues: new { supportTaskReference });
