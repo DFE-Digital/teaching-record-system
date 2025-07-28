@@ -48,7 +48,7 @@ resource "azurerm_postgresql_flexible_server_configuration" "wal_level" {
 resource "azurerm_postgresql_flexible_server_configuration" "shared_preload_libraries" {
   name      = "shared_preload_libraries"
   server_id = module.postgres.azure_server_id
-  value     = "pg_cron,pg_stat_statements${var.postgres_enable_high_availability ? ",pg_failover_slots" : ""}"
+  value     = "pg_cron,pg_stat_statements"
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "hot_standby_feedback" {
