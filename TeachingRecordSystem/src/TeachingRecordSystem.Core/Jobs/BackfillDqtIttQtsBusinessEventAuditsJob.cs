@@ -100,11 +100,11 @@ public class BackfillDqtIttQtsBusinessEventAuditsJob(
             var result = await resiliencePipeline.ExecuteAsync(async _ => await QueryAsync());
 
             // For some reason the date format in dfeta_businesseventaudit changes over the years from dd/MM/yyyy to M/d/yyyy in BUILD and PROD but not PRE-PROD!
-            if (serviceClient.ConnectedOrgUniqueName == "ent-dqt-prod")
+            if (serviceClient.ConnectedOrgFriendlyName == "Ent DQT Prod")
             {
                 crmDateFormatChangeDate = new DateTime(2021, 01, 30);
             }
-            else if (serviceClient.ConnectedOrgUniqueName == "ent-dqt-build")
+            else if (serviceClient.ConnectedOrgFriendlyName == "Ent DQT Build")
             {
                 crmDateFormatChangeDate = new DateTime(2019, 04, 04);
             }
