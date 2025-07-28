@@ -10,7 +10,6 @@ public class EditDetailsStateBuilder
     public string LastName { get; set; } = "";
     public DateOnly? DateOfBirth { get; set; }
     public string? EmailAddress { get; set; }
-    public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
 
@@ -19,7 +18,6 @@ public class EditDetailsStateBuilder
     public string OriginalLastName { get; set; } = "";
     public DateOnly? OriginalDateOfBirth { get; set; }
     public string? OriginalEmailAddress { get; set; }
-    public string? OriginalMobileNumber { get; set; }
     public string? OriginalNationalInsuranceNumber { get; set; }
     public Gender? OriginalGender { get; set; }
 
@@ -46,7 +44,6 @@ public class EditDetailsStateBuilder
         LastName = person.LastName;
         DateOfBirth = person.DateOfBirth;
         EmailAddress = person.Email;
-        MobileNumber = person.MobileNumber;
         NationalInsuranceNumber = person.NationalInsuranceNumber;
         Gender = person.Gender;
 
@@ -55,7 +52,6 @@ public class EditDetailsStateBuilder
         OriginalLastName = person.LastName;
         OriginalDateOfBirth = person.DateOfBirth;
         OriginalEmailAddress = person.Email;
-        OriginalMobileNumber = person.MobileNumber;
         OriginalNationalInsuranceNumber = person.NationalInsuranceNumber;
         OriginalGender = person.Gender;
 
@@ -79,12 +75,6 @@ public class EditDetailsStateBuilder
     public EditDetailsStateBuilder WithEmail(string? emailAddress)
     {
         EmailAddress = emailAddress;
-        return this;
-    }
-
-    public EditDetailsStateBuilder WithMobileNumber(string? mobileNumber)
-    {
-        MobileNumber = mobileNumber;
         return this;
     }
 
@@ -146,7 +136,6 @@ public class EditDetailsStateBuilder
             LastName = LastName,
             DateOfBirth = DateOfBirth,
             EmailAddress = EditDetailsFieldState<Core.EmailAddress>.FromRawValue(EmailAddress),
-            MobileNumber = EditDetailsFieldState<Core.MobileNumber>.FromRawValue(MobileNumber),
             NationalInsuranceNumber = EditDetailsFieldState<Core.NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
             Gender = Gender,
 
@@ -155,7 +144,6 @@ public class EditDetailsStateBuilder
             OriginalLastName = OriginalLastName,
             OriginalDateOfBirth = OriginalDateOfBirth,
             OriginalEmailAddress = EditDetailsFieldState<Core.EmailAddress>.FromRawValue(OriginalEmailAddress),
-            OriginalMobileNumber = EditDetailsFieldState<Core.MobileNumber>.FromRawValue(OriginalMobileNumber),
             OriginalNationalInsuranceNumber = EditDetailsFieldState<Core.NationalInsuranceNumber>.FromRawValue(OriginalNationalInsuranceNumber),
             OriginalGender = OriginalGender,
 

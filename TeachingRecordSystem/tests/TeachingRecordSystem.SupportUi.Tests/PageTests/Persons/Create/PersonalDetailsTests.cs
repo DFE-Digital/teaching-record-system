@@ -51,7 +51,6 @@ public class PersonalDetailsTests : TestBase
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
-                .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Female)
                 .Build());
@@ -81,7 +80,6 @@ public class PersonalDetailsTests : TestBase
             month => Assert.Equal("2", month.Value.Trim()),
             year => Assert.Equal("1980", year.Value.Trim()));
         Assert.Equal("test@test.com", emailAddress.Value.Trim());
-        Assert.Equal("07891234567", mobileNumber.Value.Trim());
         Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
         Assert.Equal("Female", genderSelection.Value.Trim());
     }
@@ -393,56 +391,6 @@ public class PersonalDetailsTests : TestBase
     }
 
     [Theory]
-    [InlineData("test", false)]
-    [InlineData("07891 234567", true)]
-    [InlineData("08891 234567", false)]
-    [InlineData("44 7891 234567", true)]
-    [InlineData("44 6891 234567", false)]
-    [InlineData("37 9891 234567", false)]
-    [InlineData("20 12345", false)]
-    [InlineData("20 123456", true)]
-    [InlineData("20 1234567891234", true)]
-    [InlineData("20 12345678912345", false)]
-    // Ignore whitespace and symbols
-    [InlineData("(07891) 234567", true)]
-    [InlineData("+44 78-91-23-45-67", true)]
-    [InlineData("   (078 91) 234 567   ", true)]
-    [InlineData("07891234567", true)]
-    [InlineData("447891234567", true)]
-    public async Task Post_ValidatesMobileNumber_ShowsPageErrorIfInvalid(string mobileNumber, bool shouldBeValid)
-    {
-        // Arrange
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            new CreateStateBuilder()
-                .WithInitializedState()
-                .Build());
-
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
-        {
-            Content = new CreatePostRequestContentBuilder()
-                .WithFirstName("Alfred")
-                .WithMiddleName("The")
-                .WithLastName("Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithMobileNumber(mobileNumber)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(postRequest);
-
-        // Assert
-        if (shouldBeValid)
-        {
-            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        }
-        else
-        {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.MobileNumber), "Enter a valid UK or international mobile phone number");
-        }
-    }
-
-    [Theory]
     // https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
     // A NINO is made up of 2 letters, 6 numbers and a final letter, which is always A, B, C, or D.
     [InlineData("test", false)]
@@ -597,7 +545,6 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("Person", journeyInstance.State.LastName);
         Assert.Equal(DateOnly.Parse("2 Mar 1981"), journeyInstance.State.DateOfBirth);
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
-        Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
         Assert.Equal(Gender.Other, journeyInstance.State.Gender);
     }

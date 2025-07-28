@@ -78,8 +78,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
                 DateOfBirth = p.DateOfBirth,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,
                 Gender = null,  // Not shown
-                Email = p.EmailAddress,
-                MobileNumber = null  // Not shown
+                Email = p.EmailAddress
             })
             .SingleOrDefaultAsync();
 

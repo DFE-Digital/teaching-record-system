@@ -43,10 +43,6 @@ public class PersonalDetailsModel(
     public DateOnly? DateOfBirth { get; set; }
 
     [BindProperty]
-    [Display(Name = "Mobile number (optional)")]
-    public string? MobileNumber { get; set; }
-
-    [BindProperty]
     [Display(Name = "Email address (optional)")]
     [MaxLength(Person.EmailAddressMaxLength, ErrorMessage = $"Person\u2019s email address must be 100 characters or less")]
     public string? EmailAddress { get; set; }
@@ -67,7 +63,6 @@ public class PersonalDetailsModel(
     public bool OtherDetailsChanged =>
         DateOfBirth != JourneyInstance!.State.OriginalDateOfBirth ||
         EditDetailsFieldState<EmailAddress>.FromRawValue(EmailAddress) != JourneyInstance!.State.OriginalEmailAddress ||
-        EditDetailsFieldState<MobileNumber>.FromRawValue(MobileNumber) != JourneyInstance!.State.OriginalMobileNumber ||
         EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber) != JourneyInstance!.State.OriginalNationalInsuranceNumber ||
         Gender != JourneyInstance!.State.OriginalGender;
 
@@ -95,7 +90,6 @@ public class PersonalDetailsModel(
         LastName = JourneyInstance.State.LastName;
         DateOfBirth = JourneyInstance.State.DateOfBirth;
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed?.ToDisplayString() ?? JourneyInstance.State.EmailAddress.Raw;
-        MobileNumber = JourneyInstance.State.MobileNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.MobileNumber.Raw;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.NationalInsuranceNumber.Raw;
         Gender = JourneyInstance.State.Gender;
 
@@ -127,12 +121,6 @@ public class PersonalDetailsModel(
             ModelState.AddModelError(nameof(NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
         }
 
-        MobileNumber? mobileNumber = null;
-        if (MobileNumber is not null && !Core.MobileNumber.TryParse(MobileNumber, out mobileNumber))
-        {
-            ModelState.AddModelError(nameof(MobileNumber), "Enter a valid UK or international mobile phone number");
-        }
-
         EmailAddress? emailAddress = null;
         if (EmailAddress is not null && !Core.EmailAddress.TryParse(EmailAddress, out emailAddress))
         {
@@ -153,7 +141,6 @@ public class PersonalDetailsModel(
             state.LastName = LastName ?? "";
             state.DateOfBirth = DateOfBirth;
             state.EmailAddress = new(EmailAddress ?? "", emailAddress);
-            state.MobileNumber = new(MobileNumber ?? "", mobileNumber);
             state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", nationalInsuranceNumber);
             state.Gender = Gender;
 

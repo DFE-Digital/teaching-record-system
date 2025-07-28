@@ -22,9 +22,8 @@ public enum PersonDetailsUpdatedEventChanges
     LastName = 1 << 2,
     DateOfBirth = 1 << 3,
     EmailAddress = 1 << 4,
-    MobileNumber = 1 << 5,
     NationalInsuranceNumber = 1 << 6,
     Gender = 1 << 7,
     NameChange = FirstName | MiddleName | LastName,
-    OtherThanNameChange = DateOfBirth | EmailAddress | MobileNumber | NationalInsuranceNumber | Gender
+    OtherThanNameChange = DateOfBirth | EmailAddress | NationalInsuranceNumber | Gender
 }

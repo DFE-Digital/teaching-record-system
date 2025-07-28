@@ -25,7 +25,6 @@
         <govuk-error-summary-item for="LastName" />
         <govuk-error-summary-item for="DateOfBirth" />
         <govuk-error-summary-item for="EmailAddress" />
-        <govuk-error-summary-item for="MobileNumber" />
         <govuk-error-summary-item for="NationalInsuranceNumber" />
         <govuk-error-summary-item for="Gender" />
     </govuk-error-summary>
@@ -52,8 +51,6 @@
 
             <govuk-input asp-for="EmailAddress" type="email" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-email-address"/>
 
-            <govuk-input asp-for="MobileNumber" type="tel" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-mobile-number"/>
-
             <govuk-input asp-for="NationalInsuranceNumber" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-national-insurance-number">
                 <govuk-input-hint>For example, &lsquo;QQ 12 34 56 C&rsquo;</govuk-input-hint>
             </govuk-input>
@@ -70,7 +67,7 @@
                     <govuk-radios-item value="@Gender.Other">
                         @Gender.Other.GetDisplayName()
                     </govuk-radios-item>
-                    @* We only allow NotAvailable if it's a pre-existing value on the Person record *@ 
+                    @* We only allow NotAvailable if it's a pre-existing value on the Person record *@
                     @if (Model.Gender == Gender.NotAvailable)
                     {
                         <govuk-radios-item value="@Gender.NotAvailable">

@@ -16,7 +16,6 @@ public class EditDetailsState : IRegisterJourney
     public string OriginalLastName { get; set; } = "";
     public DateOnly? OriginalDateOfBirth { get; set; }
     public EditDetailsFieldState<EmailAddress> OriginalEmailAddress { get; set; } = new("", null);
-    public EditDetailsFieldState<MobileNumber> OriginalMobileNumber { get; set; } = new("", null);
     public EditDetailsFieldState<NationalInsuranceNumber> OriginalNationalInsuranceNumber { get; set; } = new("", null);
     public Gender? OriginalGender { get; set; }
 
@@ -25,7 +24,6 @@ public class EditDetailsState : IRegisterJourney
     public string LastName { get; set; } = "";
     public DateOnly? DateOfBirth { get; set; }
     public EditDetailsFieldState<EmailAddress> EmailAddress { get; set; } = new("", null);
-    public EditDetailsFieldState<MobileNumber> MobileNumber { get; set; } = new("", null);
     public EditDetailsFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new("", null);
     public Gender? Gender { get; set; }
 
@@ -54,7 +52,6 @@ public class EditDetailsState : IRegisterJourney
     public bool OtherDetailsChanged =>
         DateOfBirth != OriginalDateOfBirth ||
         EmailAddress != OriginalEmailAddress ||
-        MobileNumber != OriginalMobileNumber ||
         NationalInsuranceNumber != OriginalNationalInsuranceNumber ||
         Gender != OriginalGender;
 
@@ -98,7 +95,6 @@ public class EditDetailsState : IRegisterJourney
         OriginalLastName = person.LastName;
         OriginalDateOfBirth = person.DateOfBirth;
         OriginalEmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(person.EmailAddress);
-        OriginalMobileNumber = EditDetailsFieldState<MobileNumber>.FromRawValue(person.MobileNumber);
         OriginalNationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(person.NationalInsuranceNumber);
         OriginalGender = person.Gender;
 
@@ -107,7 +103,6 @@ public class EditDetailsState : IRegisterJourney
         LastName = OriginalLastName;
         DateOfBirth = OriginalDateOfBirth;
         EmailAddress = OriginalEmailAddress;
-        MobileNumber = OriginalMobileNumber;
         NationalInsuranceNumber = OriginalNationalInsuranceNumber;
         Gender = OriginalGender;
 

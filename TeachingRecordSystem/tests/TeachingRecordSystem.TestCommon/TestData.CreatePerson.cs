@@ -42,8 +42,6 @@ public partial class TestData
         private string? _lastName;
         private bool? _hasEmail;
         private string? _email;
-        private bool? _hasMobileNumber;
-        private string? _mobileNumber;
         private bool? _hasNationalInsuranceNumber;
         private string? _nationalInsuranceNumber;
         private bool? _hasGender;
@@ -108,25 +106,6 @@ public partial class TestData
         {
             _hasEmail = email != null;
             _email = email;
-            return this;
-        }
-
-        public CreatePersonBuilder WithMobileNumber(bool hasMobileNumber = true)
-        {
-            _hasMobileNumber = hasMobileNumber;
-
-            if (_hasMobileNumber is false)
-            {
-                _mobileNumber = null;
-            }
-
-            return this;
-        }
-
-        public CreatePersonBuilder WithMobileNumber(string? mobileNumber)
-        {
-            _hasMobileNumber = mobileNumber != null;
-            _mobileNumber = mobileNumber;
             return this;
         }
 
@@ -469,11 +448,6 @@ public partial class TestData
                 contact.EMailAddress1 = _email ?? testData.GenerateUniqueEmail();
             }
 
-            if (_hasMobileNumber ?? false)
-            {
-                contact.MobilePhone = _mobileNumber ?? testData.GenerateUniqueMobileNumber();
-            }
-
             if (_hasNationalInsuranceNumber ?? false)
             {
                 contact.dfeta_NINumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
@@ -516,7 +490,6 @@ public partial class TestData
                     LastName = mappedPersonInfo.LastName,
                     DateOfBirth = mappedPersonInfo.DateOfBirth,
                     EmailAddress = mappedPersonInfo.EmailAddress,
-                    MobileNumber = mappedPersonInfo.MobileNumber,
                     NationalInsuranceNumber = mappedPersonInfo.NationalInsuranceNumber,
                     DqtContactId = mappedPersonInfo.DqtContactId,
                     DqtState = mappedPersonInfo.DqtState,
@@ -693,7 +666,6 @@ public partial class TestData
                 StatedMiddleName = statedMiddleName,
                 StatedLastName = lastName,
                 Email = contact.EMailAddress1,
-                MobileNumber = contact.MobilePhone,
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 Gender = contact.GenderCode.ToGender(),
                 QtsDate = person?.QtsDate,
@@ -1161,7 +1133,6 @@ public partial class TestData
         public required string StatedMiddleName { get; init; }
         public required string StatedLastName { get; init; }
         public required string? Email { get; init; }
-        public required string? MobileNumber { get; init; }
         public required Gender? Gender { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required DateOnly? QtsDate { get; init; }

@@ -23,7 +23,6 @@ public class CheckAnswersModel(
     public string? LastName { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public EmailAddress? EmailAddress { get; set; }
-    public MobileNumber? MobileNumber { get; set; }
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
@@ -68,7 +67,6 @@ public class CheckAnswersModel(
             LastName ?? string.Empty,
             DateOfBirth,
             EmailAddress,
-            MobileNumber,
             NationalInsuranceNumber,
             Gender,
             NameChangeReason?.GetDisplayName(),
@@ -142,7 +140,6 @@ public class CheckAnswersModel(
         MiddleName = JourneyInstance.State.MiddleName;
         LastName = JourneyInstance.State.LastName;
         DateOfBirth = JourneyInstance.State.DateOfBirth;
-        MobileNumber = JourneyInstance.State.MobileNumber.Parsed;
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
         Gender = JourneyInstance.State.Gender;

@@ -80,7 +80,6 @@ public class PersonalDetailsTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
-            .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Female));
 
@@ -103,7 +102,6 @@ public class PersonalDetailsTests : TestBase
         var lastName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-last-name", "input");
         var dateOfBirth = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-date-of-birth", "input");
         var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
-        var mobileNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-mobile-number", "input");
         var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
         var genderSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']")
             .Single(i => i.IsChecked == true);
@@ -116,7 +114,6 @@ public class PersonalDetailsTests : TestBase
             month => Assert.Equal("2", month.Value.Trim()),
             year => Assert.Equal("1980", year.Value.Trim()));
         Assert.Equal("test@test.com", emailAddress.Value.Trim());
-        Assert.Equal("07891234567", mobileNumber.Value.Trim());
         Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
         Assert.Equal("Female", genderSelection.Value.Trim());
     }
@@ -126,7 +123,6 @@ public class PersonalDetailsTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithMobileNumber("invalid")
             .WithEmail("invalid")
             .WithNationalInsuranceNumber("invalid"));
 
@@ -144,12 +140,10 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)redirectResponse.StatusCode);
 
         var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
-        var mobileNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-mobile-number", "input");
         var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
         var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
 
         // Mobile number is normalized during TRS Sync process so invalid numbers are converted to null
-        Assert.Equal("", mobileNumber.Value.Trim());
         Assert.Equal("invalid", emailAddress.Value.Trim());
         Assert.Equal("invalid", nationalInsuranceNumber.Value.Trim());
     }
@@ -166,7 +160,6 @@ public class PersonalDetailsTests : TestBase
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
-                .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Other)
                 .Build());
@@ -183,7 +176,6 @@ public class PersonalDetailsTests : TestBase
         var lastName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-last-name", "input");
         var dateOfBirth = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-date-of-birth", "input");
         var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
-        var mobileNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-mobile-number", "input");
         var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
         var genderSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']")
             .Single(i => i.IsChecked == true);
@@ -196,7 +188,6 @@ public class PersonalDetailsTests : TestBase
             month => Assert.Equal("2", month.Value.Trim()),
             year => Assert.Equal("1980", year.Value.Trim()));
         Assert.Equal("test@test.com", emailAddress.Value.Trim());
-        Assert.Equal("07891234567", mobileNumber.Value.Trim());
         Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
         Assert.Equal("Other", genderSelection.Value.Trim());
     }
@@ -562,58 +553,6 @@ public class PersonalDetailsTests : TestBase
     }
 
     [Theory]
-    [InlineData("test", false)]
-    [InlineData("07891 234567", true)]
-    [InlineData("08891 234567", false)]
-    [InlineData("44 7891 234567", true)]
-    [InlineData("44 6891 234567", false)]
-    [InlineData("37 9891 234567", false)]
-    [InlineData("20 12345", false)]
-    [InlineData("20 123456", true)]
-    [InlineData("20 1234567891234", true)]
-    [InlineData("20 12345678912345", false)]
-    // Ignore whitespace and symbols
-    [InlineData("(07891) 234567", true)]
-    [InlineData("+44 78-91-23-45-67", true)]
-    [InlineData("   (078 91) 234 567   ", true)]
-    [InlineData("07891234567", true)]
-    [InlineData("447891234567", true)]
-    public async Task Post_ValidatesMobileNumber_ShowsPageErrorIfInvalid(string mobileNumber, bool shouldBeValid)
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .Build());
-
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
-        {
-            Content = new EditDetailsPostRequestContentBuilder()
-                .WithFirstName("Alfred")
-                .WithMiddleName("The")
-                .WithLastName("Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithMobileNumber(mobileNumber)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(postRequest);
-
-        // Assert
-        if (shouldBeValid)
-        {
-            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        }
-        else
-        {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.MobileNumber), "Enter a valid UK or international mobile phone number");
-        }
-    }
-
-    [Theory]
     // https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
     // A NINO is made up of 2 letters, 6 numbers and a final letter, which is always A, B, C, or D.
     [InlineData("test", false)]
@@ -749,7 +688,6 @@ public class PersonalDetailsTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
-            .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Male));
 
@@ -790,7 +728,6 @@ public class PersonalDetailsTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
-            .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.NotAvailable));
 
@@ -831,7 +768,6 @@ public class PersonalDetailsTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
-            .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Male));
 
@@ -874,7 +810,6 @@ public class PersonalDetailsTests : TestBase
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
-                .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Male)
                 .Build());
@@ -903,7 +838,6 @@ public class PersonalDetailsTests : TestBase
         Assert.Equal("Person", journeyInstance.State.LastName);
         Assert.Equal(DateOnly.Parse("2 Mar 1981"), journeyInstance.State.DateOfBirth);
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
-        Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
         Assert.Equal(Gender.Other, journeyInstance.State.Gender);
     }
@@ -918,7 +852,6 @@ public class PersonalDetailsTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("original@email.com")
-            .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Female));
 
@@ -932,7 +865,6 @@ public class PersonalDetailsTests : TestBase
                 .WithName("Megan", "Thee", "Stallion")
                 .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
                 .WithEmail("new@email.com")
-                .WithMobileNumber("447987654321")
                 .WithNationalInsuranceNumber("AB654321D")
                 .WithGender(Gender.Other)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
@@ -971,7 +903,6 @@ public class PersonalDetailsTests : TestBase
 
         Assert.Equal(DateOnly.Parse("3 Aug 1999"), journeyInstance.State.DateOfBirth);
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
-        Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
         Assert.Equal(Gender.Other, journeyInstance.State.Gender);
         Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
@@ -992,7 +923,6 @@ public class PersonalDetailsTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("original@email.com")
-            .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 
@@ -1006,7 +936,6 @@ public class PersonalDetailsTests : TestBase
                 .WithName("Megan", "Thee", "Stallion")
                 .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
                 .WithEmail("new@email.com")
-                .WithMobileNumber("447987654321")
                 .WithNationalInsuranceNumber("AB654321D")
                 .WithGender(Gender.Female)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
@@ -1045,7 +974,6 @@ public class PersonalDetailsTests : TestBase
 
         Assert.Equal(DateOnly.Parse("1 Feb 1980"), journeyInstance.State.DateOfBirth);
         Assert.Equal("original@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
-        Assert.Equal("447891234567", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB123456C", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
         Assert.Null(journeyInstance.State.OtherDetailsChangeReason);
         Assert.Null(journeyInstance.State.OtherDetailsChangeReasonDetail);

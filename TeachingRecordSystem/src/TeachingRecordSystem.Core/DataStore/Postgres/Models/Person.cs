@@ -11,7 +11,6 @@ public class Person
     public const int LastNameMaxLength = 100;
     public const int EmailAddressMaxLength = 100;
     public const int NationalInsuranceNumberMaxLength = 9;
-    public const int MobileNumberMaxLength = 15;
 
     public static DateOnly EarliestInductionStartDate => new(1999, 5, 7);
 
@@ -28,7 +27,6 @@ public class Person
     public required string LastName { get; set; }
     public required DateOnly? DateOfBirth { get; set; }  // A few DQT records in prod have a null DOB
     public string? EmailAddress { get; set; }
-    public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
     public InductionStatus InductionStatus { get; private set; }
@@ -72,7 +70,6 @@ public class Person
         string lastName,
         DateOnly? dateOfBirth,
         EmailAddress? emailAddress,
-        MobileNumber? mobileNumber,
         NationalInsuranceNumber? nationalInsuranceNumber,
         Gender? gender,
         string? nameChangeReason,
@@ -90,7 +87,6 @@ public class Person
         MiddleName = middleName;
         LastName = lastName;
         DateOfBirth = dateOfBirth;
-        MobileNumber = (string?)mobileNumber;
         EmailAddress = (string?)emailAddress;
         NationalInsuranceNumber = (string?)nationalInsuranceNumber;
         Gender = gender;
@@ -102,7 +98,6 @@ public class Person
             (LastName != oldDetails.LastName ? PersonDetailsUpdatedEventChanges.LastName : 0) |
             (DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
             (EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
-            (MobileNumber != oldDetails.MobileNumber ? PersonDetailsUpdatedEventChanges.MobileNumber : 0) |
             (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
             (Gender != oldDetails.Gender ? PersonDetailsUpdatedEventChanges.Gender : 0);
 
@@ -669,7 +664,6 @@ public class Person
         string lastName,
         DateOnly? dateOfBirth,
         EmailAddress? emailAddress,
-        MobileNumber? mobileNumber,
         NationalInsuranceNumber? nationalInsuranceNumber,
         Gender? gender,
         string? createReason,
@@ -687,7 +681,6 @@ public class Person
             MiddleName = middleName,
             LastName = lastName,
             DateOfBirth = dateOfBirth,
-            MobileNumber = (string?)mobileNumber,
             EmailAddress = (string?)emailAddress,
             NationalInsuranceNumber = (string?)nationalInsuranceNumber,
             Gender = gender,

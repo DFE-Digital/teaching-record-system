@@ -10,14 +10,11 @@
     var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
         ? parsedEmail.ToDisplayString()
         : details.EmailAddress;
-    var mobile = MobileNumber.TryParse(details.MobileNumber, out var parsedMobile)
-        ? parsedMobile.ToDisplayString()
-        : details.MobileNumber;
     var nino = NationalInsuranceNumber.TryParse(details.NationalInsuranceNumber, out var parsedNino)
         ? parsedNino.ToDisplayString()
         : details.NationalInsuranceNumber;
-    var evidenceFileUrl = updatedEvent.EvidenceFile is not null 
-        ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) 
+    var evidenceFileUrl = updatedEvent.EvidenceFile is not null
+        ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15))
         : null;
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-created-event">
@@ -44,13 +41,6 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback>@email</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
-                    @if (mobile is not null)
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@mobile</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
                     @if (nino is not null)

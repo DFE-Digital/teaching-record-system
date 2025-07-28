@@ -82,7 +82,6 @@ public class CommonPageTests : TestBase
         var lastName = "Great";
         var dateOfBirth = DateOnly.Parse("1 Feb 1980");
         var emailAddress = "some@email-address.com";
-        var mobileNumber = "07891234567";
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new CreateStateBuilder()
@@ -94,7 +93,6 @@ public class CommonPageTests : TestBase
                 .WithName(firstName, middleName, lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithEmail(emailAddress)
-                .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber);
         }
 
@@ -129,7 +127,6 @@ public class CommonPageTests : TestBase
         var lastName = "Great";
         var dateOfBirth = DateOnly.Parse("1 Feb 1980");
         var emailAddress = "some@email-address.com";
-        var mobileNumber = "07891234567";
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new CreateStateBuilder()
@@ -137,7 +134,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithCreateReasonChoice(CreateReasonOption.MandatoryQualification)
             .WithUploadEvidenceChoice(false);
@@ -175,7 +171,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithCreateReasonChoice(CreateReasonOption.MandatoryQualification)
             .WithUploadEvidenceChoice(false);
@@ -290,7 +285,6 @@ public class CommonPageTests : TestBase
         var lastName = "Great";
         var dateOfBirth = DateOnly.Parse("1 Feb 1980");
         var emailAddress = "some@email-address.com";
-        var mobileNumber = "07891234567";
         var nationalInsuranceNumber = "AB123456D";
 
         var state = new CreateStateBuilder()
@@ -298,7 +292,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithCreateReasonChoice(CreateReasonOption.MandatoryQualification)
             .WithUploadEvidenceChoice(false);
@@ -335,7 +328,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithCreateReasonChoice(CreateReasonOption.MandatoryQualification)
             .WithUploadEvidenceChoice(false);

@@ -9,7 +9,6 @@ public class CreateStateBuilder
     public string LastName { get; set; } = "";
     public DateOnly? DateOfBirth { get; set; }
     public string? EmailAddress { get; set; }
-    public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
 
@@ -46,12 +45,6 @@ public class CreateStateBuilder
     public CreateStateBuilder WithEmail(string? emailAddress)
     {
         EmailAddress = emailAddress;
-        return this;
-    }
-
-    public CreateStateBuilder WithMobileNumber(string? mobileNumber)
-    {
-        MobileNumber = mobileNumber;
         return this;
     }
 
@@ -95,7 +88,6 @@ public class CreateStateBuilder
             LastName = LastName,
             DateOfBirth = DateOfBirth,
             EmailAddress = CreateFieldState<EmailAddress>.FromRawValue(EmailAddress),
-            MobileNumber = CreateFieldState<MobileNumber>.FromRawValue(MobileNumber),
             NationalInsuranceNumber = CreateFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
             Gender = Gender,
 

@@ -94,7 +94,6 @@ public class IndexModel(
                 Trn = person.Trn,
                 NationalInsuranceNumber = person.NationalInsuranceNumber,
                 Email = person.EmailAddress,
-                MobileNumber = person.MobileNumber,
                 Gender = person.Gender,
                 HasActiveAlert = hasActiveAlert,
                 PreviousNames = previousNames
@@ -132,7 +131,6 @@ public class IndexModel(
                 Trn = contact.dfeta_TRN,
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 Email = contact.EMailAddress1,
-                MobileNumber = contact.MobilePhone,
                 Gender = contact.GenderCode.ToGender(),
                 HasActiveAlert = hasActiveAlert,
                 PreviousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
@@ -150,7 +148,6 @@ public class IndexModel(
         public required string? Trn { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required string? Email { get; init; }
-        public required string? MobileNumber { get; init; }
         public required Gender? Gender { get; init; }
         public required bool HasActiveAlert { get; init; }
         public required string[] PreviousNames { get; init; }

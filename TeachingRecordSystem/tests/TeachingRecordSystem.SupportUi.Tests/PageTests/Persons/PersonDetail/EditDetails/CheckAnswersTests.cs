@@ -91,7 +91,6 @@ public class CheckAnswersTests : TestBase
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
-                .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Male)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
@@ -111,7 +110,6 @@ public class CheckAnswersTests : TestBase
         doc.AssertRow("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
         doc.AssertRow("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
         doc.AssertRow("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
-        doc.AssertRow("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
         doc.AssertRow("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
         doc.AssertRow("Gender", v => Assert.Equal("Male", v.TrimmedText()));
     }
@@ -145,7 +143,6 @@ public class CheckAnswersTests : TestBase
 
         doc.AssertRow("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
         doc.AssertRow("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRow("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertRow("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
@@ -351,10 +348,9 @@ public class CheckAnswersTests : TestBase
     [InlineData(PersonDetailsUpdatedEventChanges.LastName)]
     [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth)]
     [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress)]
-    [InlineData(PersonDetailsUpdatedEventChanges.MobileNumber)]
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
     [InlineData(PersonDetailsUpdatedEventChanges.Gender)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
     public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonDetailsUpdatedEventChanges changes)
     {
         // Arrange
@@ -364,7 +360,6 @@ public class CheckAnswersTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("test@test.com")
-            .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 
@@ -373,7 +368,6 @@ public class CheckAnswersTests : TestBase
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Person" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : person.DateOfBirth;
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.Email;
-        var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "447654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -387,7 +381,6 @@ public class CheckAnswersTests : TestBase
                 .WithName(firstName, middleName, lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithEmail(emailAddress)
-                .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithGender(gender)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
@@ -420,7 +413,6 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(lastName, updatedPersonRecord.LastName);
             Assert.Equal(dateOfBirth, updatedPersonRecord.DateOfBirth);
             Assert.Equal(emailAddress, updatedPersonRecord.EmailAddress);
-            Assert.Equal(mobileNumber, updatedPersonRecord.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
             Assert.Equal(gender, updatedPersonRecord.Gender);
         });
@@ -438,7 +430,6 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(lastName, actualEvent.Details.LastName);
             Assert.Equal(dateOfBirth, actualEvent.Details.DateOfBirth);
             Assert.Equal(emailAddress, actualEvent.Details.EmailAddress);
-            Assert.Equal(mobileNumber, actualEvent.Details.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
             Assert.Equal(gender, actualEvent.Details.Gender);
             Assert.Equal("Correcting an error", actualEvent.NameChangeReason);
