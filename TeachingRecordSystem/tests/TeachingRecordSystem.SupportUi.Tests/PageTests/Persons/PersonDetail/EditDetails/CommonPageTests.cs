@@ -90,7 +90,6 @@ public class CommonPageTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
-            .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Other));
 
@@ -99,7 +98,6 @@ public class CommonPageTests : TestBase
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
-        var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -108,7 +106,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithGender(gender);
 
@@ -159,7 +156,6 @@ public class CommonPageTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
-            .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Male));
 
@@ -168,7 +164,6 @@ public class CommonPageTests : TestBase
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
-        var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -177,7 +172,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber);
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
@@ -217,7 +211,6 @@ public class CommonPageTests : TestBase
     // Edit details (other details changes only): redirects to change reason page
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
@@ -234,21 +227,18 @@ public class CommonPageTests : TestBase
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
     [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     // Change reason (other details changes only): redirects to check answers page
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
     // Change reason (name and other details changes): redirects to check answers page
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.MobileNumber, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
     [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
@@ -261,7 +251,6 @@ public class CommonPageTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
-            .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Other));
 
@@ -270,7 +259,6 @@ public class CommonPageTests : TestBase
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
-        var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -279,7 +267,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithGender(gender);
 
@@ -306,7 +293,6 @@ public class CommonPageTests : TestBase
                     .WithLastName(lastName)
                     .WithDateOfBirth(dateOfBirth)
                     .WithEmailAddress(emailAddress)
-                    .WithMobileNumber(mobileNumber)
                     .WithNationalInsuranceNumber(nationalInsuranceNumber)
                     .WithGender(gender)
                     .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
@@ -431,7 +417,6 @@ public class CommonPageTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
-            .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Female));
 
@@ -440,7 +425,6 @@ public class CommonPageTests : TestBase
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
         var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
-        var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Other : person.Gender;
 
@@ -449,7 +433,6 @@ public class CommonPageTests : TestBase
             .WithName(firstName, middleName, lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(emailAddress)
-            .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber(nationalInsuranceNumber)
             .WithGender(gender);
 
@@ -511,7 +494,6 @@ public class CommonPageTests : TestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
             .WithEmail("some@email-address.com")
-            .WithMobileNumber("07891234567")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Female));
 
@@ -520,7 +502,6 @@ public class CommonPageTests : TestBase
         var originalLastName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var originalDateOfBirth = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
         var originalEmailAddress = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
-        var originalMobileNumber = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var originalNationalInsuranceNumber = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var originalGender = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
 
@@ -529,7 +510,6 @@ public class CommonPageTests : TestBase
         var newLastName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var newDateOfBirth = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
         var newEmailAddress = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
-        var newMobileNumber = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "07654321987" : person.MobileNumber;
         var newNationalInsuranceNumber = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var newGender = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
 
@@ -538,7 +518,6 @@ public class CommonPageTests : TestBase
             .WithName(originalFirstName, originalMiddleName, originalLastName)
             .WithDateOfBirth(originalDateOfBirth)
             .WithEmail(originalEmailAddress)
-            .WithMobileNumber(originalMobileNumber)
             .WithNationalInsuranceNumber(originalNationalInsuranceNumber)
             .WithGender(originalGender);
 
@@ -565,7 +544,6 @@ public class CommonPageTests : TestBase
                 .WithLastName(newLastName)
                 .WithDateOfBirth(newDateOfBirth)
                 .WithEmailAddress(newEmailAddress)
-                .WithMobileNumber(newMobileNumber)
                 .WithNationalInsuranceNumber(newNationalInsuranceNumber)
                 .WithGender(newGender)
                 .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)

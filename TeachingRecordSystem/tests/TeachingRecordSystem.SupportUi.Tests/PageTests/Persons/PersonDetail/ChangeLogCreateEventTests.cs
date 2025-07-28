@@ -28,7 +28,6 @@ public class ChangeLogCreateEventTests : TestBase
         string lastName = "Great";
         DateOnly? dateOfBirth = Clock.Today.AddYears(-30);
         string? emailAddress = "old@email-address.com";
-        string? mobileNumber = "07654321098";
         string? nationalInsuranceNumber = "AB 12 34 56 D";
         Gender? gender = Gender.Female;
 
@@ -47,7 +46,6 @@ public class ChangeLogCreateEventTests : TestBase
             LastName = lastName,
             DateOfBirth = dateOfBirth,
             EmailAddress = emailAddress,
-            MobileNumber = mobileNumber,
             NationalInsuranceNumber = nationalInsuranceNumber,
             Gender = gender
         };
@@ -86,7 +84,6 @@ public class ChangeLogCreateEventTests : TestBase
         doc.AssertRow("details", "Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TrimmedText()));
         doc.AssertRow("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
         doc.AssertRow("details", "Email address", v => Assert.Equal(emailAddress, v.TrimmedText()));
-        doc.AssertRow("details", "Mobile number", v => Assert.Equal(mobileNumber, v.TrimmedText()));
         doc.AssertRow("details", "National Insurance number", v => Assert.Equal(nationalInsuranceNumber, v.TrimmedText()));
         doc.AssertRow("details", "Gender", v => Assert.Equal(gender.GetDisplayName(), v.TrimmedText()));
 
@@ -116,7 +113,6 @@ public class ChangeLogCreateEventTests : TestBase
             LastName = lastName,
             DateOfBirth = dateOfBirth,
             EmailAddress = null,
-            MobileNumber = null,
             NationalInsuranceNumber = null,
             Gender = null
         };

@@ -59,7 +59,6 @@ public class CheckAnswersTests : TestBase
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
-                .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithGender(Gender.Other)
                 .WithCreateReasonChoice(CreateReasonOption.MandatoryQualification)
@@ -77,7 +76,6 @@ public class CheckAnswersTests : TestBase
         doc.AssertRow("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
         doc.AssertRow("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
         doc.AssertRow("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
-        doc.AssertRow("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
         doc.AssertRow("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
         doc.AssertRow("Gender", v => Assert.Equal("Other", v.TrimmedText()));
     }
@@ -105,7 +103,6 @@ public class CheckAnswersTests : TestBase
 
         doc.AssertRow("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
         doc.AssertRow("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRow("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertRow("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
@@ -179,7 +176,6 @@ public class CheckAnswersTests : TestBase
         var lastName = "Great";
         var dateOfBirth = DateOnly.Parse("1 Feb 1980");
         var emailAddress = "test@test.com";
-        var mobileNumber = "447891234567";
         var nationalInsuranceNumber = "AB123456C";
         var gender = Gender.Female;
 
@@ -192,7 +188,6 @@ public class CheckAnswersTests : TestBase
                 .WithName(firstName, middleName, lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithEmail(emailAddress)
-                .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithGender(gender)
                 .WithCreateReasonChoice(CreateReasonOption.AnotherReason, _changeReasonDetails)
@@ -227,12 +222,11 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(lastName, createdPersonRecord.LastName);
             Assert.Equal(dateOfBirth, createdPersonRecord.DateOfBirth);
             Assert.Equal(emailAddress, createdPersonRecord.EmailAddress);
-            Assert.Equal(mobileNumber, createdPersonRecord.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, createdPersonRecord.NationalInsuranceNumber);
             Assert.Equal(gender, createdPersonRecord.Gender);
         });
 
-        var RaisedBy = GetCurrentUserId();
+        var raisedBy = GetCurrentUserId();
 
         EventPublisher.AssertEventsSaved(e =>
         {
@@ -245,7 +239,6 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(lastName, actualEvent.Details.LastName);
             Assert.Equal(dateOfBirth, actualEvent.Details.DateOfBirth);
             Assert.Equal(emailAddress, actualEvent.Details.EmailAddress);
-            Assert.Equal(mobileNumber, actualEvent.Details.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
             Assert.Equal(gender, actualEvent.Details.Gender);
             Assert.Equal("Another reason", actualEvent.CreateReason);

@@ -58,12 +58,5 @@
                 <govuk-summary-list-row-value use-empty-fallback>@Model.Email</govuk-summary-list-row-value>
             </govuk-summary-list-row>
         }
-        @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowMobileNumber))
-        {
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value use-empty-fallback>@Model.MobileNumber</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-        }
     </govuk-summary-list>
 </govuk-summary-card>

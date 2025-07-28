@@ -9,7 +9,6 @@ public record PersonDetails
     public required string LastName { get; set; }
     public required DateOnly? DateOfBirth { get; set; }
     public required string? EmailAddress { get; set; }
-    public required string? MobileNumber { get; set; }
     public required string? NationalInsuranceNumber { get; set; }
     public required Gender? Gender { get; set; }
 
@@ -20,7 +19,6 @@ public record PersonDetails
         LastName = person.LastName,
         DateOfBirth = person.DateOfBirth,
         EmailAddress = person.EmailAddress,
-        MobileNumber = person.MobileNumber,
         NationalInsuranceNumber = person.NationalInsuranceNumber,
         Gender = person.Gender
     };

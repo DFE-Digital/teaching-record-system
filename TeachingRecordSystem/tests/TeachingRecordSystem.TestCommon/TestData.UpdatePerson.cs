@@ -74,7 +74,6 @@ public partial class TestData
                             _updatedName.Value.LastName,
                             person.DateOfBirth,
                             (EmailAddress?)person.EmailAddress,
-                            (MobileNumber?)person.MobileNumber,
                             (NationalInsuranceNumber?)person.NationalInsuranceNumber,
                             person.Gender,
                             nameChangeReason: "Test",

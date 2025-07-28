@@ -71,7 +71,6 @@ public class PersonalDetailsModel(
         LastName = JourneyInstance.State.LastName;
         DateOfBirth = JourneyInstance.State.DateOfBirth;
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed?.ToDisplayString() ?? JourneyInstance.State.EmailAddress.Raw;
-        MobileNumber = JourneyInstance.State.MobileNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.MobileNumber.Raw;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.NationalInsuranceNumber.Raw;
         Gender = JourneyInstance.State.Gender;
 
@@ -89,12 +88,6 @@ public class PersonalDetailsModel(
         if (NationalInsuranceNumber is not null && !Core.NationalInsuranceNumber.TryParse(NationalInsuranceNumber, out nationalInsuranceNumber))
         {
             ModelState.AddModelError(nameof(NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
-        }
-
-        MobileNumber? mobileNumber = null;
-        if (MobileNumber is not null && !Core.MobileNumber.TryParse(MobileNumber, out mobileNumber))
-        {
-            ModelState.AddModelError(nameof(MobileNumber), "Enter a valid UK or international mobile phone number");
         }
 
         EmailAddress? emailAddress = null;
@@ -117,7 +110,6 @@ public class PersonalDetailsModel(
             state.LastName = LastName ?? "";
             state.DateOfBirth = DateOfBirth;
             state.EmailAddress = new(EmailAddress ?? "", emailAddress);
-            state.MobileNumber = new(MobileNumber ?? "", mobileNumber);
             state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", nationalInsuranceNumber);
             state.Gender = Gender;
         });

@@ -40,11 +40,6 @@ public class IndexTests : TestBase
         {
             Assert.Fail($@"Randomly generated email address ""{randomEmail}"" is invalid.");
         }
-        var randomMobile = TestData.GenerateUniqueMobileNumber();
-        if (!MobileNumber.TryParse(randomMobile, out var mobileNumber))
-        {
-            Assert.Fail($@"Randomly generated mobile number ""{randomMobile}"" is invalid.");
-        }
         var updatedFirstName = TestData.GenerateFirstName();
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
@@ -52,7 +47,6 @@ public class IndexTests : TestBase
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithEmail((string?)email)
-            .WithMobileNumber((string?)mobileNumber)
             .WithNationalInsuranceNumber()
             .WithGender());
 
@@ -81,7 +75,6 @@ public class IndexTests : TestBase
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email"));
-        Assert.Equal(createPersonResult.MobileNumber, doc.GetSummaryListValueForKey("Mobile number"));
         Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueForKey("Gender"));
     }
 
@@ -96,11 +89,6 @@ public class IndexTests : TestBase
         {
             Assert.Fail($@"Randomly generated email address ""{randomEmail}"" is invalid.");
         }
-        var randomMobile = TestData.GenerateUniqueMobileNumber();
-        if (!MobileNumber.TryParse(randomMobile, out var mobileNumber))
-        {
-            Assert.Fail($@"Randomly generated mobile number ""{randomMobile}"" is invalid.");
-        }
         var updatedFirstName = TestData.GenerateFirstName();
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
@@ -108,7 +96,6 @@ public class IndexTests : TestBase
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
             .WithTrn()
             .WithEmail((string?)email)
-            .WithMobileNumber((string?)mobileNumber)
             .WithNationalInsuranceNumber()
             .WithGender());
 
@@ -140,7 +127,6 @@ public class IndexTests : TestBase
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email"));
-        Assert.Equal(createPersonResult.MobileNumber, doc.GetSummaryListValueForKey("Mobile number"));
     }
 
     [Fact]
@@ -165,7 +151,6 @@ public class IndexTests : TestBase
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Email"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("National Insurance number"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Mobile number"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Gender"));
     }
 

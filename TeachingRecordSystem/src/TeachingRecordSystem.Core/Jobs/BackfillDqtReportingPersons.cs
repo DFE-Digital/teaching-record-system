@@ -73,7 +73,6 @@ public class BackfillDqtReportingPersons(IConfiguration configuration, TrsDbCont
                     e.DateOfBirth,
                     e.EmailAddress,
                     e.NationalInsuranceNumber,
-                    e.MobileNumber,
                     (int?)e.Gender,
                     e.DqtContactId,
                     e.DqtState,

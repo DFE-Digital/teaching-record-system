@@ -11,7 +11,6 @@ public record PersonDetailViewModel
     public required string? NationalInsuranceNumber { get; init; }
     public required Gender? Gender { get; init; }
     public required string? Email { get; init; }
-    public required string? MobileNumber { get; init; }
 }
 
 [Flags]
@@ -20,6 +19,5 @@ public enum PersonDetailViewModelOptions
     None = 0,
     ShowGender = 1 << 1,
     ShowEmail = 1 << 2,
-    ShowMobileNumber = 1 << 3,
-    ShowAll = ShowGender | ShowEmail | ShowMobileNumber
+    ShowAll = ShowGender | ShowEmail
 }

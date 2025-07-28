@@ -2275,7 +2275,6 @@ public class TrsDataSyncHelper(
             "date_of_birth",
             "email_address",
             "national_insurance_number",
-            "mobile_number",
             "gender",
             "dqt_contact_id",
             "dqt_state",
@@ -2343,7 +2342,6 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DateOfBirth, NpgsqlDbType.Date);
             writer.WriteValueOrNull(person.EmailAddress, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.NationalInsuranceNumber, NpgsqlDbType.Char);
-            writer.WriteValueOrNull(person.MobileNumber, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull((int?)person.Gender, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(person.DqtContactId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.DqtState, NpgsqlDbType.Integer);
@@ -2610,7 +2608,6 @@ public class TrsDataSyncHelper(
             DateOfBirth = c.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             EmailAddress = c.EMailAddress1.NormalizeString(),
             NationalInsuranceNumber = c.dfeta_NINumber.NormalizeString(),
-            MobileNumber = c.MobilePhone.NormalizeMobileNumber(),
             Gender = c.GenderCode.ToGender(),
             DqtContactId = c.Id,
             DqtState = (int)c.StateCode!,
@@ -4377,7 +4374,6 @@ public class TrsDataSyncHelper(
         public required DateOnly? DateOfBirth { get; init; }
         public required string? EmailAddress { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
-        public required string? MobileNumber { get; init; }
         public required Gender? Gender { get; init; }
         public required Guid? DqtContactId { get; init; }
         public required int? DqtState { get; init; }
@@ -4477,7 +4473,4 @@ file static class Extensions
     /// Returns <c>null</c> if <paramref name="value"/> is empty or whitespace.
     /// </summary>
     public static string? NormalizeString(this string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
-
-    public static string? NormalizeMobileNumber(this string? value) =>
-        MobileNumber.TryParse(value, out var mobileNumber) ? mobileNumber.ToString() : null;
 }

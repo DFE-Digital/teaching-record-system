@@ -25,18 +25,15 @@ public class ChangeLogEditDetailsEventTests : TestBase
     [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress, false, false)]
     [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress, true, false)]
     [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress, false, true)]
-    [InlineData(PersonDetailsUpdatedEventChanges.MobileNumber, false, false)]
-    [InlineData(PersonDetailsUpdatedEventChanges.MobileNumber, true, false)]
-    [InlineData(PersonDetailsUpdatedEventChanges.MobileNumber, false, true)]
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, false)]
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, true)]
     [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, true, false)]
     [InlineData(PersonDetailsUpdatedEventChanges.Gender, false, false)]
     [InlineData(PersonDetailsUpdatedEventChanges.Gender, false, true)]
     [InlineData(PersonDetailsUpdatedEventChanges.Gender, true, false)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, false)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, true)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, true, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, true)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, true, false)]
     public async Task Person_WithPersonDetailsUpdatedEvent_RendersExpectedContent(PersonDetailsUpdatedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
@@ -48,7 +45,6 @@ public class ChangeLogEditDetailsEventTests : TestBase
         string oldLastName = "Great";
         DateOnly? oldDateOfBirth = Clock.Today.AddYears(-30);
         string? oldEmailAddress = "old@email-address.com";
-        string? oldMobileNumber = "07654321098";
         string? oldNationalInsuranceNumber = "AB 12 34 56 D";
         Gender? oldGender = Gender.Male;
 
@@ -57,7 +53,6 @@ public class ChangeLogEditDetailsEventTests : TestBase
         string lastName = "Stallion";
         DateOnly? dateOfBirth = Clock.Today.AddYears(-20);
         string emailAddress = "new@email-address.com";
-        string? mobileNumber = "07890123456";
         string? nationalInsuranceNumber = "XY 98 76 54 A";
         Gender? gender = Gender.Female;
 
@@ -97,7 +92,6 @@ public class ChangeLogEditDetailsEventTests : TestBase
             LastName = updatedLastName,
             DateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? dateOfBirth : oldDateOfBirth,
             EmailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) && !newValueIsDefault ? emailAddress : null,
-            MobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) && !newValueIsDefault ? mobileNumber : null,
             NationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) && !newValueIsDefault ? nationalInsuranceNumber : null,
             Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !newValueIsDefault ? gender : null,
         };
@@ -109,7 +103,6 @@ public class ChangeLogEditDetailsEventTests : TestBase
             LastName = oldLastName,
             DateOfBirth = oldDateOfBirth,
             EmailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) && !previousValueIsDefault ? oldEmailAddress : null,
-            MobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) && !previousValueIsDefault ? oldMobileNumber : null,
             NationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) && !previousValueIsDefault ? oldNationalInsuranceNumber : null,
             Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !previousValueIsDefault ? oldGender : null,
         };
@@ -180,17 +173,6 @@ public class ChangeLogEditDetailsEventTests : TestBase
         {
             doc.AssertRowDoesNotExist("details", "Email address");
             doc.AssertRowDoesNotExist("previous-details", "Email address");
-        }
-
-        if (changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber))
-        {
-            doc.AssertRow("details", "Mobile number", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : mobileNumber, v.TrimmedText()));
-            doc.AssertRow("previous-details", "Mobile number", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldMobileNumber, v.TrimmedText()));
-        }
-        else
-        {
-            doc.AssertRowDoesNotExist("details", "Mobile number");
-            doc.AssertRowDoesNotExist("previous-details", "Mobile number");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
