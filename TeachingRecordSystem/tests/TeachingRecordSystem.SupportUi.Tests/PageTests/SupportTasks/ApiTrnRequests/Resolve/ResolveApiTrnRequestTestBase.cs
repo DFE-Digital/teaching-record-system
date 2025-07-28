@@ -17,7 +17,8 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
                 .WithLastName(TestData.GenerateChangedLastName(matchedPerson.LastName))
                 .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
-                .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
+                .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
+                .WithGender(TestData.GenerateGender()));
 
         return (supportTask, matchedPerson);
     }
@@ -33,7 +34,8 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
                 .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
                 .WithTrn()
                 .WithNationalInsuranceNumber()
-                .WithEmail(TestData.GenerateUniqueEmail());
+                .WithEmail(TestData.GenerateUniqueEmail())
+                .WithGender(TestData.GenerateGender());
 
             if (matchedPersonHasFlags)
             {
@@ -68,7 +70,11 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
                 .WithNationalInsuranceNumber(
                     differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber
                         ? matchedPerson.NationalInsuranceNumber
-                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
+                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
+                .WithGender(
+                    differentAttribute != PersonMatchedAttribute.Gender
+                        ? matchedPerson.Gender
+                        : TestData.GenerateChangedGender(matchedPerson.Gender)));
 
         return (supportTask, matchedPerson);
     }

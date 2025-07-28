@@ -25,7 +25,8 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
         string lastName,
         DateOnly? dateOfBirth,
         string? emailAddress,
-        string? nationalInsuranceNumber)
+        string? nationalInsuranceNumber,
+        Gender? gender)
     {
         return Impl().AsReadOnly();
 
@@ -61,6 +62,11 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
             if (nationalInsuranceNumber == requestData.NationalInsuranceNumber)
             {
                 yield return PersonMatchedAttribute.NationalInsuranceNumber;
+            }
+
+            if (gender == requestData.Gender)
+            {
+                yield return PersonMatchedAttribute.Gender;
             }
         }
     }
@@ -107,6 +113,11 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
             {
                 yield return PersonMatchedAttribute.NationalInsuranceNumber;
             }
+
+            if (state.GenderSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.Gender;
+            }
         }
     }
 
@@ -121,7 +132,8 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
                 p.LastName,
                 p.DateOfBirth,
                 p.NationalInsuranceNumber,
-                p.EmailAddress
+                p.EmailAddress,
+                p.Gender
             })
             .SingleAsync();
 
@@ -132,7 +144,8 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
             LastName = personAttributes.LastName,
             DateOfBirth = personAttributes.DateOfBirth,
             EmailAddress = personAttributes.EmailAddress,
-            NationalInsuranceNumber = personAttributes.NationalInsuranceNumber
+            NationalInsuranceNumber = personAttributes.NationalInsuranceNumber,
+            Gender = personAttributes.Gender
         };
     }
 
@@ -147,7 +160,8 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
             LastName = requestData.LastName!,
             DateOfBirth = requestData.DateOfBirth,
             EmailAddress = requestData.EmailAddress,
-            NationalInsuranceNumber = requestData.NationalInsuranceNumber
+            NationalInsuranceNumber = requestData.NationalInsuranceNumber,
+            Gender = requestData.Gender
         };
     }
 
@@ -173,7 +187,8 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
                 LastName = state.LastNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.LastName : trnRequestPersonAttributes.LastName,
                 DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.DateOfBirth : trnRequestPersonAttributes.DateOfBirth,
                 EmailAddress = state.EmailAddressSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.EmailAddress : trnRequestPersonAttributes.EmailAddress,
-                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.NationalInsuranceNumber : trnRequestPersonAttributes.NationalInsuranceNumber
+                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.NationalInsuranceNumber : trnRequestPersonAttributes.NationalInsuranceNumber,
+                Gender = state.GenderSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.Gender : trnRequestPersonAttributes.Gender
             };
         }
     }

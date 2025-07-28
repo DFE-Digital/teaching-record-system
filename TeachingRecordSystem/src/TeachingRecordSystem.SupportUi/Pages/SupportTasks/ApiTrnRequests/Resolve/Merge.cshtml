@@ -143,6 +143,22 @@
                     </govuk-radios>
                 </td>
             </tr>
+
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                    <govuk-radios asp-for="GenderSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
+                        <govuk-radios-fieldset>
+                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
+                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.Gender!.Different)">
+                                @(Model.Gender!.TrnRequestValue?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent)
+                            </govuk-radios-item>
+                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.Gender!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.Gender!.ExistingRecordValue?.GetDisplayName(), Model.Gender.Different); }
+                            </govuk-radios-item>
+                        </govuk-radios-fieldset>
+                    </govuk-radios>
+                </td>
+            </tr>
         </tbody>
     </table>
 

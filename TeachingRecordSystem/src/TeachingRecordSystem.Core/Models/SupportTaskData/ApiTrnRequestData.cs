@@ -14,4 +14,5 @@ public record ApiTrnRequestDataPersonAttributes
     public required DateOnly? DateOfBirth { get; init; }
     public required string? EmailAddress { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
+    public required Gender? Gender { get; init; }
 }

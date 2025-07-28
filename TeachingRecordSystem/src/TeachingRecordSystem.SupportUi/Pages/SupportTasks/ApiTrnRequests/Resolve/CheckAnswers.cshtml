@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = $"Check details before merging with {Model.SourceApplicationUserName} request";
 
-    var backLink = Model.CreatingNewRecord 
+    var backLink = Model.CreatingNewRecord
         ? LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
         : LinkGenerator.ApiTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
 }
@@ -17,7 +17,7 @@
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-            
+
             <govuk-summary-card>
                 <govuk-summary-card-title>Details of the merged record</govuk-summary-card-title>
                 <govuk-summary-card-actions>
@@ -48,6 +48,10 @@
                         <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Gender?.GetDisplayName()</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                     @if (Model.Trn is not null)
                     {
                         <govuk-summary-list-row>
@@ -61,11 +65,11 @@
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
-            
+
             <govuk-warning-text>
                 TODO Some content
             </govuk-warning-text>
-        
+
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm and merge records</govuk-button>
                 <govuk-button type="submit" formaction="@LinkGenerator.ApiTrnRequestCheckAnswersCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>

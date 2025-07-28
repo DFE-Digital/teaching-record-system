@@ -52,7 +52,8 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
                 .WithLastName(match.LastName)
                 .WithDateOfBirth(match.DateOfBirth)
                 .WithEmailAddress(match.Email)
-                .WithNationalInsuranceNumber(match.NationalInsuranceNumber));
+                .WithNationalInsuranceNumber(match.NationalInsuranceNumber)
+                .WithGender(match.Gender));
 
         var requestData = supportTask.TrnRequestMetadata!;
 

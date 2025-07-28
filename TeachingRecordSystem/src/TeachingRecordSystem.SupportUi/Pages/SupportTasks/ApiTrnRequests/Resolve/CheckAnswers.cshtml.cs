@@ -41,6 +41,8 @@ public class CheckAnswers(
 
     public string? NationalInsuranceNumber { get; set; }
 
+    public Gender? Gender { get; set; }
+
     public string? Trn { get; set; }
 
     public string? Comments { get; set; }
@@ -222,6 +224,7 @@ public class CheckAnswers(
             DateOfBirth = requestData.DateOfBirth;
             EmailAddress = requestData.EmailAddress;
             NationalInsuranceNumber = requestData.NationalInsuranceNumber;
+            Gender = requestData.Gender;
             Trn = null;
         }
         else
@@ -243,6 +246,7 @@ public class CheckAnswers(
                     p.DateOfBirth,
                     p.EmailAddress,
                     p.NationalInsuranceNumber,
+                    p.Gender,
                     p.Trn
                 })
                 .SingleAsync();
@@ -254,6 +258,7 @@ public class CheckAnswers(
             DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.ExistingRecord ? selectedPerson.DateOfBirth : requestData.DateOfBirth;
             EmailAddress = state.EmailAddressSource == PersonAttributeSource.ExistingRecord ? selectedPerson.EmailAddress : requestData.EmailAddress;
             NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.ExistingRecord ? selectedPerson.NationalInsuranceNumber : requestData.NationalInsuranceNumber;
+            Gender = state.GenderSource == PersonAttributeSource.ExistingRecord ? selectedPerson.Gender : requestData.Gender;
             Trn = selectedPerson.Trn;
         }
 

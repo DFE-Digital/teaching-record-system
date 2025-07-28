@@ -13,7 +13,7 @@ public record CreateContactQuery : ICrmQuery<Guid>
     public Option<string> StatedMiddleName { get; init; }
     public Option<string> StatedLastName { get; init; }
     public required DateOnly DateOfBirth { get; init; }
-    public required Contact_GenderCode Gender { get; init; }
+    public required Contact_GenderCode? Gender { get; init; }
     public required string? EmailAddress { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
     public required IReadOnlyCollection<CreateContactQueryDuplicateReviewTask> ReviewTasks { get; init; }

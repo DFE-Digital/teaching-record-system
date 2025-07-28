@@ -32,6 +32,7 @@ public partial class TestData
                     .WithDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber)
                     .WithEmailAddress(matchedPerson.EmailAddress)
+                    .WithGender(matchedPerson.Gender)
                     .WithResolvedPersonId(matchedPerson.PersonId);
 
                 configure?.Invoke(t);
@@ -47,6 +48,7 @@ public partial class TestData
         private Option<string> _lastName;
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
+        private Option<Gender?> _gender;
         private Option<TrnRequestMatchedRecord[]> _matchedRecords;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
@@ -89,6 +91,12 @@ public partial class TestData
             return this;
         }
 
+        public CreateApiTrnRequestSupportTaskBuilder WithGender(Gender? gender)
+        {
+            _gender = Option.Some(gender);
+            return this;
+        }
+
         public CreateApiTrnRequestSupportTaskBuilder WithMatchedRecords(params Guid[] personIds)
         {
             _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedRecord() { PersonId = id }).ToArray());
@@ -128,6 +136,7 @@ public partial class TestData
             var lastName = _lastName.ValueOr(testData.GenerateLastName);
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
+            var gender = _gender.ValueOr(testData.GenerateGender());
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
 
             var matchedRecords = _matchedRecords.ValueOrDefault();
@@ -149,6 +158,11 @@ public partial class TestData
                                 .WithLastName(lastName)
                                 .WithDateOfBirth(dateOfBirth)
                                 .WithEmail(emailAddress);
+
+                            if (gender is not null)
+                            {
+                                p.WithGender(gender.Value);
+                            }
 
                             if (nationalInsuranceNumber is not null)
                             {
@@ -182,7 +196,7 @@ public partial class TestData
                 DateOfBirth = dateOfBirth,
                 PotentialDuplicate = potentialDuplicate,
                 NationalInsuranceNumber = nationalInsuranceNumber,
-                Gender = null,
+                Gender = gender,
                 AddressLine1 = null,
                 AddressLine2 = null,
                 AddressLine3 = null,
