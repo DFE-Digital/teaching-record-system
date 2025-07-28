@@ -56,6 +56,7 @@ public class CompareMatchingRecordsModel(
                 EmailAddress = p.EmailAddress,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,
                 Trn = p.Trn!,
+                Gender = p.Gender,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
                 ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen),

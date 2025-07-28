@@ -158,7 +158,7 @@ public class TrnRequestService(
             MiddleName = requestData.MiddleName ?? string.Empty,
             LastName = requestData.LastName!,
             DateOfBirth = requestData.DateOfBirth,
-            Gender = Contact_GenderCode.Notprovided, // TODO when we've sorted gender
+            Gender = requestData.Gender?.ToContact_GenderCode(),
             EmailAddress = requestData.EmailAddress,
             NationalInsuranceNumber = requestData.NationalInsuranceNumber,
             ApplicationUserName = requestData.ApplicationUser!.Name,
@@ -217,6 +217,7 @@ public class TrnRequestService(
                 PersonMatchedAttribute.DateOfBirth => query with { DateOfBirth = Option.Some(requestData.DateOfBirth) },
                 PersonMatchedAttribute.EmailAddress => query with { EmailAddress = Option.Some(requestData.EmailAddress) },
                 PersonMatchedAttribute.NationalInsuranceNumber => query with { NationalInsuranceNumber = Option.Some(requestData.NationalInsuranceNumber) },
+                PersonMatchedAttribute.Gender => query with { Gender = Option.Some(requestData.Gender?.ToContact_GenderCode()) },
                 _ => throw new NotImplementedException()
             };
         }

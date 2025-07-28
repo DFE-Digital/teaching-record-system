@@ -225,6 +225,19 @@ public partial class TestData
         return newNationalInsuranceNumber;
     }
 
+    public Gender GenerateChangedGender(Gender? currentGender)
+    {
+        Gender newGender;
+
+        do
+        {
+            newGender = GenerateGender();
+        }
+        while (newGender == currentGender);
+
+        return newGender;
+    }
+
     public string GenerateUniqueEmail()
     {
         string email;

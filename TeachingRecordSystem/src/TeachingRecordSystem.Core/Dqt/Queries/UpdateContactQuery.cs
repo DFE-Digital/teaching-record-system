@@ -12,7 +12,7 @@ public record UpdateContactQuery : ICrmQuery<bool>
     public Option<string> StatedMiddleName { get; init; }
     public Option<string> StatedLastName { get; init; }
     public required Option<DateOnly> DateOfBirth { get; init; }
-    public required Option<Contact_GenderCode> Gender { get; init; }
+    public required Option<Contact_GenderCode?> Gender { get; init; }
     public required Option<string?> EmailAddress { get; init; }
     public required Option<string?> NationalInsuranceNumber { get; init; }
 }

@@ -54,6 +54,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
                 state.DateOfBirthSource = null;
                 state.EmailAddressSource = null;
                 state.NationalInsuranceNumberSource = null;
+                state.GenderSource = null;
                 state.PersonAttributeSourcesSet = false;
             }
         });
@@ -98,6 +99,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
                     EmailAddress = p.EmailAddress,
                     NationalInsuranceNumber = p.NationalInsuranceNumber,
                     Trn = p.Trn!,
+                    Gender = p.Gender,
                     HasQts = p.QtsDate != null,
                     HasEyts = p.EytsDate != null,
                     ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen),
@@ -116,7 +118,8 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
                     r.LastName,
                     r.DateOfBirth,
                     r.EmailAddress,
-                    r.NationalInsuranceNumber)
+                    r.NationalInsuranceNumber,
+                    r.Gender)
             })
             .ToArray();
 
@@ -134,7 +137,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
         public required string? EmailAddress { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required string Trn { get; init; }
-        // TODO Gender
+        public required Gender? Gender { get; init; }
         public required bool HasQts { get; init; }
         public required bool HasEyts { get; init; }
         public required int ActiveAlertCount { get; init; }
