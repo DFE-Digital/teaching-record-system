@@ -497,7 +497,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             Assert.Equal(command.DateOfBirth, metadata.DateOfBirth);
             Assert.Equal(expectedPotentialDuplicate, metadata.PotentialDuplicate);
             Assert.Equal(command.NationalInsuranceNumber, metadata.NationalInsuranceNumber);
-            Assert.Equal((int?)command.Gender, metadata.Gender);
+            Assert.Equal(command.Gender, metadata.Gender);
             Assert.Null(metadata.AddressLine1);
             Assert.Null(metadata.AddressLine2);
             Assert.Null(metadata.AddressLine3);

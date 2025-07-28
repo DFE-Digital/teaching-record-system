@@ -19,7 +19,7 @@ public record TrnRequestMetadata
     public required DateOnly DateOfBirth { get; init; }
     public required bool? PotentialDuplicate { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
-    public required int? Gender { get; init; }
+    public required Gender? Gender { get; init; }
     public required string? AddressLine1 { get; init; }
     public required string? AddressLine2 { get; init; }
     public required string? AddressLine3 { get; init; }

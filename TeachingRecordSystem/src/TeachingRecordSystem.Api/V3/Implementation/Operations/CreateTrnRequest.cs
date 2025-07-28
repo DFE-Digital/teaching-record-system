@@ -86,7 +86,7 @@ public class CreateTrnRequestHandler(
             DateOfBirth = command.DateOfBirth,
             EmailAddress = emailAddress,
             NationalInsuranceNumber = normalizedNino,
-            Gender = (int?)command.Gender
+            Gender = command.Gender
         };
 
         var matchResult = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
@@ -287,7 +287,7 @@ public class CreateTrnRequestHandler(
                 PotentialDuplicate = potentialDuplicate,
                 EmailAddress = emailAddress,
                 NationalInsuranceNumber = command.NationalInsuranceNumber,
-                Gender = (int?)command.Gender,
+                Gender = command.Gender,
                 AddressLine1 = null,
                 AddressLine2 = null,
                 AddressLine3 = null,
