@@ -107,11 +107,12 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
                 FirstName = requestMetadata.FirstName!,
-                MiddleName = requestMetadata.MiddleName,
+                MiddleName = requestMetadata.MiddleName ?? string.Empty,
                 LastName = requestMetadata.LastName!,
                 DateOfBirth = requestMetadata.DateOfBirth,
                 EmailAddress = requestMetadata.EmailAddress,
-                NationalInsuranceNumber = requestMetadata.NationalInsuranceNumber
+                NationalInsuranceNumber = requestMetadata.NationalInsuranceNumber,
+                Gender = requestMetadata.Gender
             });
         });
 
@@ -122,8 +123,8 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         };
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskCreatedPersonEvent>(e);
-            AssertCreatedPersonEventIsExpected(actualEvent, expectedPersonId: personId);
+            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskUpdatedEvent>(e);
+            AssertSupportTaskEventIsExpected(actualEvent, expectedPersonId: personId);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
@@ -145,14 +146,15 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         return href;
     }
 
-    private void AssertCreatedPersonEventIsExpected(
-    NpqTrnRequestSupportTaskCreatedPersonEvent @event,
-    Guid expectedPersonId)
+    private void AssertSupportTaskEventIsExpected(
+        NpqTrnRequestSupportTaskUpdatedEvent @event,
+        Guid expectedPersonId)
     {
         Assert.Equal(expectedPersonId, @event.PersonId);
         Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
         Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
         Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);
+        Assert.Equal(NpqTrnRequestSupportTaskUpdatedEventChanges.None, @event.Changes);
     }
 
     private void AssertPersonAttributesMatch(

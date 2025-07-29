@@ -15,6 +15,7 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
     public PersonAttributeSource? DateOfBirthSource { get; set; }
     public PersonAttributeSource? EmailAddressSource { get; set; }
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
+    public PersonAttributeSource? GenderSource { get; set; }
     public string? Comments { get; set; }
 
     public enum PersonAttributeSource

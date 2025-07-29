@@ -39,7 +39,7 @@ public class ChangeLogCreateEventTests : TestBase
             Name = "other-evidence.jpg"
         };
 
-        var details = new EventModels.PersonDetails
+        var details = new EventModels.PersonAttributes
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -56,7 +56,7 @@ public class ChangeLogCreateEventTests : TestBase
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
-            Details = details,
+            PersonAttributes = details,
             CreateReason = createReason,
             CreateReasonDetail = createReasonDetail,
             EvidenceFile = evidenceFile
@@ -106,7 +106,7 @@ public class ChangeLogCreateEventTests : TestBase
 
         var createReason = CreateReasonOption.AnotherReason.GetDisplayName();
 
-        var details = new EventModels.PersonDetails
+        var details = new EventModels.PersonAttributes
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -123,7 +123,7 @@ public class ChangeLogCreateEventTests : TestBase
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
-            Details = details,
+            PersonAttributes = details,
             CreateReason = createReason,
             CreateReasonDetail = null,
             EvidenceFile = null

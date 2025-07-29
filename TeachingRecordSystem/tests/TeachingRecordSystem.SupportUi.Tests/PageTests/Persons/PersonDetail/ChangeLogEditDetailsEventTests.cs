@@ -85,7 +85,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             }
             : null;
 
-        var details = new EventModels.PersonDetails
+        var details = new EventModels.PersonAttributes
         {
             FirstName = updatedFirstName,
             MiddleName = updatedMiddleName,
@@ -96,7 +96,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !newValueIsDefault ? gender : null,
         };
 
-        var oldDetails = new EventModels.PersonDetails
+        var oldDetails = new EventModels.PersonAttributes
         {
             FirstName = oldFirstName,
             MiddleName = oldMiddleName,
@@ -113,8 +113,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
-            Details = details,
-            OldDetails = oldDetails,
+            PersonAttributes = details,
+            OldPersonAttributes = oldDetails,
             Changes = changes,
             NameChangeReason = nameChangeReason,
             NameChangeEvidenceFile = nameChangeEvidenceFile,

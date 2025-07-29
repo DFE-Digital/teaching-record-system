@@ -1,12 +1,11 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
-@inject ReferenceDataCache ReferenceDataCache
 @model TimelineItem<TimelineEvent<PersonDetailsUpdatedEvent>>
 @{
     var updatedEvent = Model.ItemModel.Event;
-    var details = updatedEvent.Details;
-    var oldDetails = updatedEvent.OldDetails;
+    var details = updatedEvent.PersonAttributes;
+    var oldDetails = updatedEvent.OldPersonAttributes;
     var name = StringHelper.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
     var oldName = StringHelper.JoinNonEmpty(' ', oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName);
     var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
