@@ -1,10 +1,10 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
+using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 [Collection(nameof(DisableParallelization))]
-public class CommonPageTests : TestBase
+public class CommonPageTests : ManualMergeTestBase
 {
     public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -19,25 +19,22 @@ public class CommonPageTests : TestBase
 
     [Theory]
     [InlineData("enter-trn")]
-    [InlineData("compare-matching-records")]
+    [InlineData("matches")]
+    [InlineData("merge")]
+    [InlineData("check-answers")]
     public async Task Get_FeatureFlagDisabled_ReturnsNotFound(string page)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
 
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
+                .WithPrimaryRecord(personA)
                 .Build());
 
         // Act
@@ -52,22 +49,19 @@ public class CommonPageTests : TestBase
 
     [Theory]
     [InlineData("enter-trn", null)]
-    [InlineData("compare-matching-records", "enter-trn")]
+    [InlineData("matches", "enter-trn")]
+    [InlineData("merge", "matches")]
+    [InlineData("check-answers", "merge")]
     public async Task Get_BacklinkLinksToExpected(string page, string? expectedPage)
     {
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
+                .WithPrimaryRecord(personA)
                 .Build());
 
         // Act
@@ -82,30 +76,27 @@ public class CommonPageTests : TestBase
         var expectedBackLink = $"/persons/{personA.PersonId}";
         if (expectedPage is not null)
         {
-            expectedBackLink += "/merge/" + expectedPage;
+            expectedBackLink += "/manual-merge/" + expectedPage;
         }
         Assert.Contains(expectedBackLink, backlink.Href);
     }
 
     [Theory]
     [InlineData("enter-trn")]
-    [InlineData("compare-matching-records")]
+    [InlineData("matches")]
+    [InlineData("merge")]
+    [InlineData("check-answers")]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage(string page)
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
+                .WithPrimaryRecord(personA)
                 .Build());
 
         // Act
@@ -124,23 +115,20 @@ public class CommonPageTests : TestBase
 
     [Theory]
     [InlineData("enter-trn")]
-    [InlineData("compare-matching-records")]
+    [InlineData("matches")]
+    [InlineData("merge")]
+    [InlineData("check-answers")]
     public async Task Post_Cancel_RedirectsToPersonDetailPage(string page)
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
+                .WithPrimaryRecord(personA)
                 .Build());
 
         // Act
@@ -159,12 +147,12 @@ public class CommonPageTests : TestBase
         AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, string page, JourneyInstance<MergeState>? journeyInstance = null) =>
-        $"/persons/{person.PersonId}/merge/{page}?{journeyInstance?.GetUniqueIdQueryParameter()}";
+    private string GetRequestPath(TestData.CreatePersonResult person, string page, JourneyInstance<ManualMergeState>? journeyInstance = null) =>
+        $"/persons/{person.PersonId}/manual-merge/{page}?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<MergeState>> CreateJourneyInstanceAsync(Guid personId, MergeState? state = null) =>
+    private Task<JourneyInstance<ManualMergeState>> CreateJourneyInstanceAsync(Guid personId, ManualMergeState? state = null) =>
         CreateJourneyInstance(
-            JourneyNames.MergePerson,
-            state ?? new MergeState(),
+            JourneyNames.ManualMergePerson,
+            state ?? new ManualMergeState(),
             new KeyValuePair<string, object>("personId", personId));
 }

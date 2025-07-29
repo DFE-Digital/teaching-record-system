@@ -86,27 +86,25 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
         var matchedPersonIds = RequestData.Matches.MatchedRecords.Select(m => m.PersonId).ToArray();
 
         PotentialDuplicates = (await DbContext.Persons
-                .Where(p => matchedPersonIds.Contains(p.PersonId))
-                .Select(p => new PotentialDuplicate
-                {
-                    Identifier = 'X', // We'll fix this below, can't do it over an IQueryable
-                    MatchedAttributes = Array.Empty<PersonMatchedAttribute>(),  // ditto
-                    PersonId = p.PersonId,
-                    FirstName = p.FirstName,
-                    MiddleName = p.MiddleName,
-                    LastName = p.LastName,
-                    DateOfBirth = p.DateOfBirth,
-                    EmailAddress = p.EmailAddress,
-                    NationalInsuranceNumber = p.NationalInsuranceNumber,
-                    Trn = p.Trn!,
-                    Gender = p.Gender,
-                    HasQts = p.QtsDate != null,
-                    HasEyts = p.EytsDate != null,
-                    ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen),
-                    InductionStatus = p.InductionStatus,
-                    Status = p.Status
-                })
-                .ToArrayAsync())
+            .Where(p => matchedPersonIds.Contains(p.PersonId))
+            .Select(p => new PotentialDuplicate
+            {
+                Identifier = 'X', // We'll fix this below, can't do it over an IQueryable
+                MatchedAttributes = Array.Empty<PersonMatchedAttribute>(),  // ditto
+                PersonId = p.PersonId,
+                FirstName = p.FirstName,
+                MiddleName = p.MiddleName,
+                LastName = p.LastName,
+                DateOfBirth = p.DateOfBirth,
+                EmailAddress = p.EmailAddress,
+                NationalInsuranceNumber = p.NationalInsuranceNumber,
+                Trn = p.Trn!,
+                Gender = p.Gender,
+                HasQts = p.QtsDate != null,
+                HasEyts = p.EytsDate != null,
+                HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen),
+            })
+            .ToArrayAsync())
             // matchedPersonIds is ordered by best match first; ensure we maintain that order
             .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId))
             .Select((r, i) => r with
@@ -140,9 +138,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
         public required Gender? Gender { get; init; }
         public required bool HasQts { get; init; }
         public required bool HasEyts { get; init; }
-        public required int ActiveAlertCount { get; init; }
-        public required InductionStatus InductionStatus { get; init; }
-        public required PersonStatus Status { get; init; }
+        public required bool HasActiveAlerts { get; init; }
         public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
     }
 }

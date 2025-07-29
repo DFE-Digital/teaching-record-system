@@ -1,8 +1,8 @@
-@page "/persons/{personId}/merge/select-details-to-merge"
-@model TeachingRecordSystem.SupportUi.Pages.Persons.Merge.SelectDetailsToMergeModel
+@page "/persons/{personId}/manual-merge/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge.CheckAnswersModel
 @{
     Layout = "_Layout";
-    ViewBag.Title = "Select the details to merge into the primary record";
+    ViewBag.Title = "Check details before updating the primary record";
 }
 
 @section BeforeContent {
@@ -14,7 +14,7 @@
         <span class="govuk-caption-l">Support tasks</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form action="@Model.GetPageLink(MergeJourneyPage.SelectDetailsToMerge)" method="post" data-testid="submit-form">
+        <form action="@Model.GetPageLink(ManualMergeJourneyPage.CheckAnswers)" method="post" data-testid="submit-form">
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
                 <govuk-button formaction="@Model.CancelLink" class="govuk-button--secondary" type="submit" data-testid="cancel-button">Cancel and return to record</govuk-button>

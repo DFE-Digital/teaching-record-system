@@ -92,5 +92,5 @@
 
 @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated) && Model.ShowMergeButton)
 {
-    <govuk-button-link data-testid="merge-button" href="@LinkGenerator.PersonMergeEnterTrn(Model.PersonId)" class="govuk-button--secondary">Merge with another record</govuk-button-link>
+    <govuk-button-link data-testid="merge-button" href="@LinkGenerator.PersonManualMergeEnterTrn(Model.PersonId)" class="govuk-button--secondary">Merge with another record</govuk-button-link>
 }

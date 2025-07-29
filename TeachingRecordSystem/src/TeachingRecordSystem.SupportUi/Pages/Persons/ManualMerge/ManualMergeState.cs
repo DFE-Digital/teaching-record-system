@@ -1,11 +1,11 @@
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
-public class MergeState : IRegisterJourney
+public class ManualMergeState : IRegisterJourney
 {
     public static JourneyDescriptor Journey => new(
-        JourneyNames.MergePerson,
-        typeof(MergeState),
+        JourneyNames.ManualMergePerson,
+        typeof(ManualMergeState),
         requestDataKeys: ["personId"],
         appendUniqueKey: true);
 
@@ -22,13 +22,11 @@ public class MergeState : IRegisterJourney
     public PersonAttributeSource? DateOfBirthSource { get; set; }
     public PersonAttributeSource? EmailAddressSource { get; set; }
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
+    public bool? UploadEvidence { get; set; }
+    public Guid? EvidenceFileId { get; set; }
+    public string? EvidenceFileName { get; set; }
+    public string? EvidenceFileSizeDescription { get; set; }
     public string? Comments { get; set; }
-
-    public enum PersonAttributeSource
-    {
-        PersonA = 0,
-        PersonB = 1
-    }
 
     public async Task EnsureInitializedAsync(Guid personAId, Func<Task<string?>> getPersonATrn)
     {

@@ -1,10 +1,10 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
+using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 [Collection(nameof(DisableParallelization))]
-public class EnterTrnTests : TestBase
+public class EnterTrnTests : ManualMergeTestBase
 {
     public EnterTrnTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -401,7 +401,7 @@ public class EnterTrnTests : TestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/merge/compare-matching-records?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/persons/{personA.PersonId}/manual-merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(personA.PersonId, journeyInstance.State.PersonAId);
@@ -410,13 +410,13 @@ public class EnterTrnTests : TestBase
         Assert.Equal(personB.Trn, journeyInstance.State.PersonBTrn);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergeState>? journeyInstance = null) =>
-        $"/persons/{person.PersonId}/merge/enter-trn?{journeyInstance?.GetUniqueIdQueryParameter()}";
+    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<ManualMergeState>? journeyInstance = null) =>
+        $"/persons/{person.PersonId}/manual-merge/enter-trn?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<MergeState>> CreateJourneyInstanceAsync(Guid personId, MergeState? state = null) =>
+    private Task<JourneyInstance<ManualMergeState>> CreateJourneyInstanceAsync(Guid personId, ManualMergeState? state = null) =>
         CreateJourneyInstance(
-            JourneyNames.MergePerson,
-            state ?? new MergeState(),
+            JourneyNames.ManualMergePerson,
+            state ?? new ManualMergeState(),
             new KeyValuePair<string, object>("personId", personId));
 
 }

@@ -1,12 +1,12 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
+using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 [Collection(nameof(DisableParallelization))]
-public class CompareMatchingRecordsTests : TestBase
+public class MatchesTests : ManualMergeTestBase
 {
-    public CompareMatchingRecordsTests(HostFixture hostFixture) : base(hostFixture)
+    public MatchesTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
     }
@@ -37,38 +37,7 @@ public class CompareMatchingRecordsTests : TestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/merge/enter-trn?{journeyInstance.GetUniqueIdQueryParameter()}");
-    }
-
-    [Fact]
-    public async Task Get_BacklinkLinksToPersonDetails()
-    {
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var backlink = doc.GetElementByTestId("back-link") as IHtmlAnchorElement;
-
-        Assert.NotNull(backlink);
-        Assert.Contains($"/persons/{personA.PersonId}/merge/enter-trn", backlink.Href);
+            $"/persons/{personA.PersonId}/manual-merge/enter-trn?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Fact]
@@ -253,7 +222,7 @@ public class CompareMatchingRecordsTests : TestBase
     }
 
     [Fact]
-    public async Task Post_PersonBIsDeactivated_ShowsWarningAndHidesContinueButton()
+    public async Task Get_PersonBIsDeactivated_ShowsWarningAndHidesContinueButton()
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
@@ -499,7 +468,7 @@ public class CompareMatchingRecordsTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CompareMatchingRecordsModel.PrimaryRecordId), "Select primary record");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryRecordId), "Select primary record");
     }
 
     [Fact]
@@ -763,18 +732,18 @@ public class CompareMatchingRecordsTests : TestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/merge/select-details-to-merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryRecordId);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergeState>? journeyInstance = null) =>
-        $"/persons/{person.PersonId}/merge/compare-matching-records?{journeyInstance?.GetUniqueIdQueryParameter()}";
+    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<ManualMergeState>? journeyInstance = null) =>
+        $"/persons/{person.PersonId}/manual-merge/matches?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<MergeState>> CreateJourneyInstanceAsync(Guid personId, MergeState? state = null) =>
+    private Task<JourneyInstance<ManualMergeState>> CreateJourneyInstanceAsync(Guid personId, ManualMergeState? state = null) =>
         CreateJourneyInstance(
-            JourneyNames.MergePerson,
-            state ?? new MergeState(),
+            JourneyNames.ManualMergePerson,
+            state ?? new ManualMergeState(),
             new KeyValuePair<string, object>("personId", personId));
 }
