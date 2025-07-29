@@ -42,6 +42,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
         DateOnly oldDateOfBirth = Clock.Today.AddYears(-30);
         string oldEmailAddress = "old@email-address.com";
         string oldNationalInsuranceNumber = "AB 12 34 56 D";
+        Gender oldGender = Gender.NotAvailable;
 
         string firstName = "Megan";
         string middleName = "Thee";
@@ -49,12 +50,13 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
         DateOnly dateOfBirth = Clock.Today.AddYears(-20);
         string emailAddress = "new@email-address.com";
         string nationalInsuranceNumber = "XY 98 76 54 A";
+        Gender gender = Gender.Female;
 
         var updatedFirstName = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName) ? firstName : oldFirstName;
         var updatedMiddleName = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName) ? middleName : oldMiddleName;
         var updatedLastName = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName) ? lastName : oldLastName;
 
-        var attributes = new EventModels.TrnRequestPersonAttributes
+        var attributes = new EventModels.PersonAttributes()
         {
             FirstName = updatedFirstName,
             MiddleName = updatedMiddleName,
@@ -62,9 +64,10 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             DateOfBirth = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth) ? dateOfBirth : oldDateOfBirth,
             EmailAddress = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress) && !newValueIsDefault ? emailAddress : null,
             NationalInsuranceNumber = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber) && !newValueIsDefault ? nationalInsuranceNumber : null,
+            Gender = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender) && !newValueIsDefault ? gender : oldGender
         };
 
-        var oldAttributes = new EventModels.TrnRequestPersonAttributes
+        var oldAttributes = new EventModels.PersonAttributes
         {
             FirstName = oldFirstName,
             MiddleName = oldMiddleName,
@@ -72,6 +75,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             DateOfBirth = oldDateOfBirth,
             EmailAddress = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress) && !previousValueIsDefault ? oldEmailAddress : null,
             NationalInsuranceNumber = changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber) && !previousValueIsDefault ? oldNationalInsuranceNumber : null,
+            Gender = oldGender
         };
 
         var supportTask = new EventModels.SupportTask

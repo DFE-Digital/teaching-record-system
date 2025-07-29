@@ -1,7 +1,6 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
-@inject ReferenceDataCache ReferenceDataCache
 @model TimelineItem<TimelineEvent<NpqTrnRequestSupportTaskUpdatedEvent>>
 @{
     var applicationUser = Model.ItemModel.ApplicationUser;
@@ -9,9 +8,7 @@
     var requestData = updatedEvent.RequestData;
     var attributes = updatedEvent.PersonAttributes;
     var oldAttributes = updatedEvent.OldPersonAttributes;
-    var name = StringHelper.JoinNonEmpty(' ', attributes.FirstName, attributes.MiddleName, attributes.LastName);
     var requestDataName = StringHelper.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName);
-    var evidenceFile = requestData.NpqEvidenceFileName;
     var evidenceFileUrl = requestData.NpqEvidenceFileId is not null ? await FileService.GetFileUrlAsync(requestData.NpqEvidenceFileId!.Value, TimeSpan.FromMinutes(15)) : null;
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-details-updated-event">
@@ -25,6 +22,27 @@
     <div class="moj-timeline__description">
         <div data-testid="details">
             <govuk-summary-list>
+                @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@attributes.FirstName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@attributes.MiddleName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonLastName))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@attributes.LastName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
                 @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth))
                 {
                     <govuk-summary-list-row>
@@ -139,6 +157,27 @@
                 <govuk-details-summary>Previous details</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
+                        @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.FirstName</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.MiddleName</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonLastName))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldAttributes.LastName</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
                         @if (updatedEvent.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth))
                         {
                             <govuk-summary-list-row>

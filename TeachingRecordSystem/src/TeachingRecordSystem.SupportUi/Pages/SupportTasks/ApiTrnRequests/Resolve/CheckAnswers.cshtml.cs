@@ -59,7 +59,7 @@ public class CheckAnswers(
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
-        EventModels.TrnRequestPersonAttributes? oldPersonAttributes;
+        EventModels.PersonAttributes? oldPersonAttributes;
 
         async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
         {
@@ -121,14 +121,15 @@ public class CheckAnswers(
                     requestData,
                     attributesToUpdate));
 
-            oldPersonAttributes = new EventModels.TrnRequestPersonAttributes()
+            oldPersonAttributes = new EventModels.PersonAttributes()
             {
                 FirstName = selectedPersonAttributes.FirstName,
                 MiddleName = selectedPersonAttributes.MiddleName,
                 LastName = selectedPersonAttributes.LastName,
                 DateOfBirth = selectedPersonAttributes.DateOfBirth,
                 EmailAddress = selectedPersonAttributes.EmailAddress,
-                NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber
+                NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber,
+                Gender = selectedPersonAttributes.Gender
             };
         }
 
@@ -159,14 +160,15 @@ public class CheckAnswers(
             OldSupportTask = oldSupportTaskEventModel,
             RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
             Changes = changes,
-            PersonAttributes = new EventModels.TrnRequestPersonAttributes()
+            PersonAttributes = new EventModels.PersonAttributes
             {
                 FirstName = resolvedPersonAttributes.FirstName,
                 MiddleName = resolvedPersonAttributes.MiddleName,
                 LastName = resolvedPersonAttributes.LastName,
                 DateOfBirth = resolvedPersonAttributes.DateOfBirth,
                 EmailAddress = resolvedPersonAttributes.EmailAddress,
-                NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber
+                NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber,
+                Gender = resolvedPersonAttributes.Gender
             },
             OldPersonAttributes = oldPersonAttributes,
             Comments = state.Comments,

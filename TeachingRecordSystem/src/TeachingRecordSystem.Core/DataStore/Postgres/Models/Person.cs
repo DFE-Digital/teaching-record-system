@@ -64,7 +64,8 @@ public class Person
     public DateTime? DqtInductionLastSync { get; set; }
     public DateTime? DqtInductionModifiedOn { get; set; }
 
-    public void UpdateDetails(
+    public static CreatePersonResult Create(
+        string trn,
         string firstName,
         string middleName,
         string lastName,
@@ -72,16 +73,37 @@ public class Person
         EmailAddress? emailAddress,
         NationalInsuranceNumber? nationalInsuranceNumber,
         Gender? gender,
-        string? nameChangeReason,
-        EventModels.File? nameChangeEvidenceFile,
-        string? detailsChangeReason,
-        string? detailsChangeReasonDetail,
-        EventModels.File? detailsChangeEvidenceFile,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        out PersonDetailsUpdatedEvent? @event)
+        DateTime now)
     {
-        var oldDetails = EventModels.PersonDetails.FromModel(this);
+        var person = new Person
+        {
+            PersonId = Guid.NewGuid(),
+            Trn = trn,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddress = (string?)emailAddress,
+            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
+            Gender = gender,
+            CreatedOn = now,
+            UpdatedOn = now
+        };
+
+        return new(person, EventModels.PersonAttributes.FromModel(person));
+    }
+
+    public UpdatePersonDetailsResult UpdateDetails(
+        string firstName,
+        string middleName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        EmailAddress? emailAddress,
+        NationalInsuranceNumber? nationalInsuranceNumber,
+        Gender? gender,
+        DateTime now)
+    {
+        var oldAttributes = EventModels.PersonAttributes.FromModel(this);
 
         FirstName = firstName;
         MiddleName = middleName;
@@ -90,52 +112,23 @@ public class Person
         EmailAddress = (string?)emailAddress;
         NationalInsuranceNumber = (string?)nationalInsuranceNumber;
         Gender = gender;
-        UpdatedOn = now;
 
-        var changes = PersonDetailsUpdatedEventChanges.None |
-            (FirstName != oldDetails.FirstName ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
-            (MiddleName != oldDetails.MiddleName ? PersonDetailsUpdatedEventChanges.MiddleName : 0) |
-            (LastName != oldDetails.LastName ? PersonDetailsUpdatedEventChanges.LastName : 0) |
-            (DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
-            (EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
-            (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0) |
-            (Gender != oldDetails.Gender ? PersonDetailsUpdatedEventChanges.Gender : 0);
+        var changes = 0 |
+            (FirstName != oldAttributes.FirstName ? PersonAttributesChanges.FirstName : 0) |
+            (MiddleName != oldAttributes.MiddleName ? PersonAttributesChanges.MiddleName : 0) |
+            (LastName != oldAttributes.LastName ? PersonAttributesChanges.LastName : 0) |
+            (DateOfBirth != oldAttributes.DateOfBirth ? PersonAttributesChanges.DateOfBirth : 0) |
+            (EmailAddress != oldAttributes.EmailAddress ? PersonAttributesChanges.EmailAddress : 0) |
+            (NationalInsuranceNumber != oldAttributes.NationalInsuranceNumber ? PersonAttributesChanges.NationalInsuranceNumber : 0) |
+            (Gender != oldAttributes.Gender ? PersonAttributesChanges.Gender : 0);
 
-        if (changes == PersonDetailsUpdatedEventChanges.None)
+        if (changes != 0)
         {
-            @event = null;
-            return;
+            UpdatedOn = now;
         }
 
-        @event = new PersonDetailsUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Details = EventModels.PersonDetails.FromModel(this),
-            OldDetails = oldDetails,
-            NameChangeReason = nameChangeReason,
-            NameChangeEvidenceFile = nameChangeEvidenceFile,
-            DetailsChangeReason = detailsChangeReason,
-            DetailsChangeReasonDetail = detailsChangeReasonDetail,
-            DetailsChangeEvidenceFile = detailsChangeEvidenceFile,
-            Changes = changes
-        };
+        return new(changes, EventModels.PersonAttributes.FromModel(this), oldAttributes);
     }
-
-    public void UpdateDetailsFromTrnRequest(
-            DateOnly? dateOfBirth,
-            EmailAddress? emailAddress,
-            NationalInsuranceNumber? nationalInsuranceNumber,
-            DateTime now)
-    {
-        DateOfBirth = dateOfBirth;
-        EmailAddress = (string?)emailAddress;
-        NationalInsuranceNumber = (string?)nationalInsuranceNumber;
-        UpdatedOn = now;
-    }
-
 
     public void SetCpdInductionStatus(
         InductionStatus status,
@@ -657,79 +650,6 @@ public class Person
 
     public void UnsafeSetQtlsStatus(QtlsStatus qtlsStatus) => QtlsStatus = qtlsStatus;
 
-    public static Person Create(
-        string trn,
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        EmailAddress? emailAddress,
-        NationalInsuranceNumber? nationalInsuranceNumber,
-        Gender? gender,
-        string? createReason,
-        string? createReasonDetail,
-        EventModels.File? evidenceFile,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        out PersonCreatedEvent @event)
-    {
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            Trn = trn,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            DateOfBirth = dateOfBirth,
-            EmailAddress = (string?)emailAddress,
-            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
-            Gender = gender,
-            CreatedOn = now,
-            UpdatedOn = now,
-        };
-
-        @event = new PersonCreatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = person.PersonId,
-            Details = EventModels.PersonDetails.FromModel(person),
-            CreateReason = createReason,
-            CreateReasonDetail = createReasonDetail,
-            EvidenceFile = evidenceFile,
-        };
-
-        return person;
-    }
-
-    public static Person Create(
-        string trn,
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        EmailAddress? emailAddress,
-        NationalInsuranceNumber? nationalInsuranceNumber,
-        DateTime now)
-    {
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            Trn = trn,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            DateOfBirth = dateOfBirth,
-            EmailAddress = (string?)emailAddress,
-            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
-            CreatedOn = now,
-            UpdatedOn = now
-        };
-
-        return person;
-    }
-
     private static void AssertInductionChangeIsValid(
         InductionStatus status,
         DateOnly? startDate,
@@ -765,3 +685,12 @@ public class Person
         return routeLevelExemptionIds.Concat(InductionExemptionReasonIds).Distinct().AsReadOnly();
     }
 }
+
+public record CreatePersonResult(
+    Person Person,
+    EventModels.PersonAttributes PersonAttributes);
+
+public record UpdatePersonDetailsResult(
+    PersonAttributesChanges Changes,
+    EventModels.PersonAttributes PersonAttributes,
+    EventModels.PersonAttributes OldPersonAttributes);

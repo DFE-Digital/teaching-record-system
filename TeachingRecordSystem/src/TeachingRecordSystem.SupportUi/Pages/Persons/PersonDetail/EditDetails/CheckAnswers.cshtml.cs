@@ -61,7 +61,7 @@ public class CheckAnswersModel(
     {
         var now = clock.UtcNow;
 
-        _person!.UpdateDetails(
+        var updateResult = _person!.UpdateDetails(
             FirstName ?? string.Empty,
             MiddleName ?? string.Empty,
             LastName ?? string.Empty,
@@ -69,39 +69,49 @@ public class CheckAnswersModel(
             EmailAddress,
             NationalInsuranceNumber,
             Gender,
-            NameChangeReason?.GetDisplayName(),
-            NameChangeEvidenceFileId is Guid nameFileId
-                ? new EventModels.File()
-                {
-                    FileId = nameFileId,
-                    Name = NameChangeEvidenceFileName!
-                }
-                : null,
-            OtherDetailsChangeReason?.GetDisplayName(),
-            OtherDetailsChangeReasonDetail,
-            OtherDetailsChangeEvidenceFileId is Guid detailsFileId
-                ? new EventModels.File()
-                {
-                    FileId = detailsFileId,
-                    Name = OtherDetailsChangeEvidenceFileName!
-                }
-                : null,
-            User.GetUserId(),
-            now,
-            out var updatedEvent);
+            now);
 
-        if (updatedEvent != null &&
+        var updatedEvent = updateResult.Changes != 0 ?
+            new PersonDetailsUpdatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = now,
+                RaisedBy = User.GetUserId(),
+                PersonId = PersonId,
+                PersonAttributes = updateResult.PersonAttributes,
+                OldPersonAttributes = updateResult.OldPersonAttributes,
+                NameChangeReason = NameChangeReason?.GetDisplayName(),
+                NameChangeEvidenceFile = NameChangeEvidenceFileId is Guid nameFileId
+                    ? new EventModels.File()
+                    {
+                        FileId = nameFileId,
+                        Name = NameChangeEvidenceFileName!
+                    }
+                    : null,
+                DetailsChangeReason = OtherDetailsChangeReason?.GetDisplayName(),
+                DetailsChangeReasonDetail = OtherDetailsChangeReasonDetail,
+                DetailsChangeEvidenceFile = OtherDetailsChangeEvidenceFileId is Guid detailsFileId
+                    ? new EventModels.File()
+                    {
+                        FileId = detailsFileId,
+                        Name = OtherDetailsChangeEvidenceFileName!
+                    }
+                    : null,
+                Changes = (PersonDetailsUpdatedEventChanges)updateResult.Changes
+            } :
+            null;
+
+        if (updatedEvent is not null &&
             updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) &&
-            (NameChangeReason == EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership ||
-             NameChangeReason == EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess))
+            NameChangeReason is EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership or EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
         {
             DbContext.PreviousNames.Add(new PreviousName
             {
                 PreviousNameId = Guid.NewGuid(),
                 PersonId = PersonId,
-                FirstName = updatedEvent.OldDetails.FirstName ?? string.Empty,
-                MiddleName = updatedEvent.OldDetails.MiddleName ?? string.Empty,
-                LastName = updatedEvent.OldDetails.LastName ?? string.Empty,
+                FirstName = updatedEvent.OldPersonAttributes.FirstName,
+                MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
+                LastName = updatedEvent.OldPersonAttributes.LastName,
                 CreatedOn = now,
                 UpdatedOn = now
             });

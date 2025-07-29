@@ -47,7 +47,8 @@ public class CheckAnswersModel(
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
 
         var trn = await trnGenerator.GenerateTrnAsync();
-        var person = Person.Create(
+
+        var (person, _) = Person.Create(
             trn,
             requestData.FirstName ?? string.Empty,
             requestData.MiddleName ?? string.Empty,
@@ -55,9 +56,12 @@ public class CheckAnswersModel(
             requestData.DateOfBirth,
             requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
             requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
+            requestData.Gender,
             clock.UtcNow);
-        requestData.SetResolvedPerson(person.PersonId);
+
         dbContext.Add(person);
+
+        requestData.SetResolvedPerson(person.PersonId);
 
         var personAttributes = new NpqTrnRequestDataPersonAttributes()
         {
@@ -66,7 +70,8 @@ public class CheckAnswersModel(
             FirstName = requestData.FirstName ?? string.Empty,
             MiddleName = requestData.MiddleName ?? string.Empty,
             LastName = requestData.LastName ?? string.Empty,
-            NationalInsuranceNumber = requestData.NationalInsuranceNumber
+            NationalInsuranceNumber = requestData.NationalInsuranceNumber,
+            Gender = requestData.Gender
         };
 
         supportTask.Status = SupportTaskStatus.Closed;
@@ -77,13 +82,15 @@ public class CheckAnswersModel(
             SelectedPersonAttributes = null
         });
 
-        var @event = new NpqTrnRequestSupportTaskCreatedPersonEvent()
+        var @event = new NpqTrnRequestSupportTaskUpdatedEvent()
         {
             PersonId = requestData.ResolvedPersonId!.Value,
-            PersonDetails = EventModels.PersonDetails.FromModel(person),
+            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+            Changes = 0,
+            PersonAttributes = EventModels.PersonAttributes.FromModel(person),
+            OldPersonAttributes = null,
             SupportTask = EventModels.SupportTask.FromModel(supportTask),
             OldSupportTask = oldSupportTaskEventModel,
-            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
             Comments = null,
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,
@@ -91,7 +98,6 @@ public class CheckAnswersModel(
         };
 
         await dbContext.AddEventAndBroadcastAsync(@event);
-
         await dbContext.SaveChangesAsync();
 
         // This is a little ugly but pushing this into a partial and executing it here is tricky
@@ -100,9 +106,8 @@ public class CheckAnswersModel(
             <a href=""{linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)}"" class=""govuk-link"">View record</a>
             ";
 
-        var message = "Record created for";
         TempData.SetFlashSuccess(
-            $"{message} {FirstName} {MiddleName} {LastName}",
+            $"Record created for {FirstName} {MiddleName} {LastName}",
             messageHtml: flashMessageHtml);
 
         return Redirect(linkGenerator.SupportTasks());

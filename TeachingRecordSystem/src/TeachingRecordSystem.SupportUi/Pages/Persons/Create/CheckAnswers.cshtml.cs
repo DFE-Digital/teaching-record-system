@@ -54,7 +54,7 @@ public class CheckAnswersModel(
 
         var trn = await trnGenerator.GenerateTrnAsync();
 
-        var person = Person.Create(
+        var (person, personAttributes) = Person.Create(
             trn,
             FirstName ?? string.Empty,
             MiddleName ?? string.Empty,
@@ -63,18 +63,25 @@ public class CheckAnswersModel(
             EmailAddress,
             NationalInsuranceNumber,
             Gender,
-            CreateReason?.GetDisplayName(),
-            ReasonDetail,
-            EvidenceFileId is Guid detailsFileId
+            now);
+
+        var createdEvent = new PersonCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = User.GetUserId(),
+            PersonId = person.PersonId,
+            PersonAttributes = personAttributes,
+            CreateReason = CreateReason?.GetDisplayName(),
+            CreateReasonDetail = ReasonDetail,
+            EvidenceFile = EvidenceFileId is Guid detailsFileId
                 ? new EventModels.File()
                 {
                     FileId = detailsFileId,
                     Name = EvidenceFileName!
                 }
-                : null,
-            User.GetUserId(),
-            now,
-            out var createdEvent);
+                : null
+        };
 
         DbContext.Add(person);
         await DbContext.AddEventAndBroadcastAsync(createdEvent);

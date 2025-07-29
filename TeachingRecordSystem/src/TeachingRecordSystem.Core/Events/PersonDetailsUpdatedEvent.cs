@@ -1,10 +1,10 @@
 namespace TeachingRecordSystem.Core.Events;
 
-public record PersonDetailsUpdatedEvent : EventBase, IEventWithPersonId
+public record PersonDetailsUpdatedEvent : EventBase, IEventWithPersonAttributes
 {
     public required Guid PersonId { get; init; }
-    public required EventModels.PersonDetails Details { get; init; }
-    public required EventModels.PersonDetails OldDetails { get; init; }
+    public required EventModels.PersonAttributes PersonAttributes { get; init; }
+    public required EventModels.PersonAttributes OldPersonAttributes { get; init; }
     public required string? NameChangeReason { get; init; }
     public required EventModels.File? NameChangeEvidenceFile { get; init; }
     public required string? DetailsChangeReason { get; init; }
@@ -17,13 +17,13 @@ public record PersonDetailsUpdatedEvent : EventBase, IEventWithPersonId
 public enum PersonDetailsUpdatedEventChanges
 {
     None = 0,
-    FirstName = 1 << 0,
-    MiddleName = 1 << 1,
-    LastName = 1 << 2,
-    DateOfBirth = 1 << 3,
-    EmailAddress = 1 << 4,
-    NationalInsuranceNumber = 1 << 6,
-    Gender = 1 << 7,
+    FirstName = PersonAttributesChanges.FirstName,
+    MiddleName = PersonAttributesChanges.MiddleName,
+    LastName = PersonAttributesChanges.LastName,
+    DateOfBirth = PersonAttributesChanges.DateOfBirth,
+    EmailAddress = PersonAttributesChanges.EmailAddress,
+    NationalInsuranceNumber = PersonAttributesChanges.NationalInsuranceNumber,
+    Gender = PersonAttributesChanges.Gender,
     NameChange = FirstName | MiddleName | LastName,
     OtherThanNameChange = DateOfBirth | EmailAddress | NationalInsuranceNumber | Gender
 }

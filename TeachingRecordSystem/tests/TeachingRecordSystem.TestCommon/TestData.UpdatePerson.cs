@@ -1,6 +1,7 @@
 using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
+using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -68,7 +69,7 @@ public partial class TestData
                         var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId.Value);
                         var now = testData.Clock.UtcNow;
 
-                        person.UpdateDetails(
+                        var updatePersonResult = person.UpdateDetails(
                             _updatedName.Value.FirstName,
                             _updatedName.Value.MiddleName ?? string.Empty,
                             _updatedName.Value.LastName,
@@ -76,25 +77,35 @@ public partial class TestData
                             (EmailAddress?)person.EmailAddress,
                             (NationalInsuranceNumber?)person.NationalInsuranceNumber,
                             person.Gender,
-                            nameChangeReason: "Test",
-                            nameChangeEvidenceFile: null,
-                            detailsChangeReason: "Test",
-                            detailsChangeReasonDetail: "",
-                            detailsChangeEvidenceFile: null,
-                            updatedBy: Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
-                            now,
-                            out var updatedEvent);
+                            now);
 
-                        if (updatedEvent is not null &&
-                            updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+                        var updatedEvent = updatePersonResult.Changes != 0 ?
+                            new PersonDetailsUpdatedEvent
+                            {
+                                EventId = Guid.NewGuid(),
+                                CreatedUtc = now,
+                                RaisedBy = SystemUser.SystemUserId,
+                                PersonId = person.PersonId,
+                                PersonAttributes = updatePersonResult.PersonAttributes,
+                                OldPersonAttributes = updatePersonResult.OldPersonAttributes,
+                                NameChangeReason = null,
+                                NameChangeEvidenceFile = null,
+                                DetailsChangeReason = null,
+                                DetailsChangeReasonDetail = null,
+                                DetailsChangeEvidenceFile = null,
+                                Changes = PersonDetailsUpdatedEventChanges.None
+                            } :
+                            null;
+
+                        if (updatedEvent?.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) == true)
                         {
                             dbContext.PreviousNames.Add(new PreviousName
                             {
                                 PreviousNameId = Guid.NewGuid(),
                                 PersonId = _personId.Value,
-                                FirstName = updatedEvent.OldDetails.FirstName,
-                                MiddleName = updatedEvent.OldDetails.MiddleName,
-                                LastName = updatedEvent.OldDetails.LastName,
+                                FirstName = updatedEvent.OldPersonAttributes.FirstName,
+                                MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
+                                LastName = updatedEvent.OldPersonAttributes.LastName,
                                 CreatedOn = now,
                                 UpdatedOn = now
                             });

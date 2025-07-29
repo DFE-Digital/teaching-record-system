@@ -41,18 +41,20 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
                 p.LastName,
                 p.DateOfBirth,
                 p.NationalInsuranceNumber,
-                p.EmailAddress
+                p.EmailAddress,
+                p.Gender
             })
             .SingleAsync();
 
         return new NpqTrnRequestDataPersonAttributes()
         {
             FirstName = personAttributes.FirstName,
-            MiddleName = personAttributes.MiddleName ?? string.Empty,
+            MiddleName = personAttributes.MiddleName,
             LastName = personAttributes.LastName,
             DateOfBirth = personAttributes.DateOfBirth,
             EmailAddress = personAttributes.EmailAddress,
-            NationalInsuranceNumber = personAttributes.NationalInsuranceNumber
+            NationalInsuranceNumber = personAttributes.NationalInsuranceNumber,
+            Gender = personAttributes.Gender
         };
     }
 
@@ -67,7 +69,8 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
             LastName = requestData.LastName!,
             DateOfBirth = requestData.DateOfBirth,
             EmailAddress = requestData.EmailAddress,
-            NationalInsuranceNumber = requestData.NationalInsuranceNumber
+            NationalInsuranceNumber = requestData.NationalInsuranceNumber,
+            Gender = requestData.Gender
         };
     }
 
@@ -169,7 +172,8 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
                 LastName = selectedPersonAttributes.LastName,
                 DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.DateOfBirth : trnRequestPersonAttributes.DateOfBirth,
                 EmailAddress = state.EmailAddressSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.EmailAddress : trnRequestPersonAttributes.EmailAddress,
-                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.NationalInsuranceNumber : trnRequestPersonAttributes.NationalInsuranceNumber
+                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.NationalInsuranceNumber : trnRequestPersonAttributes.NationalInsuranceNumber,
+                Gender = state.GenderSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.Gender : trnRequestPersonAttributes.Gender
             };
         }
     }

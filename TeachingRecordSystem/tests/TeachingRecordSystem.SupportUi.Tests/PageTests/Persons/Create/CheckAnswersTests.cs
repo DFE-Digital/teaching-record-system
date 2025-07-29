@@ -234,13 +234,13 @@ public class CheckAnswersTests : TestBase
 
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(personId, actualEvent.PersonId);
-            Assert.Equal(firstName, actualEvent.Details.FirstName);
-            Assert.Equal(middleName, actualEvent.Details.MiddleName);
-            Assert.Equal(lastName, actualEvent.Details.LastName);
-            Assert.Equal(dateOfBirth, actualEvent.Details.DateOfBirth);
-            Assert.Equal(emailAddress, actualEvent.Details.EmailAddress);
-            Assert.Equal(nationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
-            Assert.Equal(gender, actualEvent.Details.Gender);
+            Assert.Equal(firstName, actualEvent.PersonAttributes.FirstName);
+            Assert.Equal(middleName, actualEvent.PersonAttributes.MiddleName);
+            Assert.Equal(lastName, actualEvent.PersonAttributes.LastName);
+            Assert.Equal(dateOfBirth, actualEvent.PersonAttributes.DateOfBirth);
+            Assert.Equal(emailAddress, actualEvent.PersonAttributes.EmailAddress);
+            Assert.Equal(nationalInsuranceNumber, actualEvent.PersonAttributes.NationalInsuranceNumber);
+            Assert.Equal(gender, actualEvent.PersonAttributes.Gender);
             Assert.Equal("Another reason", actualEvent.CreateReason);
             Assert.Equal(_changeReasonDetails, actualEvent.CreateReasonDetail);
             Assert.Equal(otherEvidenceFileId, actualEvent.EvidenceFile!.FileId);
