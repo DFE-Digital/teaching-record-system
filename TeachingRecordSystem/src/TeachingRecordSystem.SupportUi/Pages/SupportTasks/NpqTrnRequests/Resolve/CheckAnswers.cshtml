@@ -6,7 +6,7 @@
     var backLink = Model.CreatingNewRecord ?
             LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId) :
             LinkGenerator.NpqTrnRequestMerge(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId);
-    var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update record";
+    var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update existing record";
 }
 
 @section BeforeContent {

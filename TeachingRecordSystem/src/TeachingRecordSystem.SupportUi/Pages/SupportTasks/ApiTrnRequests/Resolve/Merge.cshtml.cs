@@ -57,7 +57,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
     public PersonAttributeSource? GenderSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add comments")]
+    [Display(Name = "Add comments (optional)")]
     public string? Comments { get; set; }
 
     public void OnGet()

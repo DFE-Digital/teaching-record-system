@@ -437,7 +437,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"Records merged successfully for {matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}");
+            $"{requestData.ApplicationUser!.Name} request completed");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
