@@ -125,8 +125,13 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
                 continue;
             }
 
-            static object? FormatValue(object? value) =>
-                value is DateOnly dateOnly ? dateOnly.ToString(UiDefaults.DateOnlyDisplayFormat) : value;
+            static object? FormatValue(object? value) => value switch
+            {
+                null => UiDefaults.EmptyDisplayContent,
+                DateOnly dateOnly => dateOnly.ToString(UiDefaults.DateOnlyDisplayFormat),
+                Gender gender => gender.GetDisplayName(),
+                _ => value
+            };
 
             if (sourcedFromRequestDataAttribute.SummaryListRowKey == kvp.Key)
             {
@@ -389,6 +394,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(requestData.DateOfBirth, crmContact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
         Assert.Equal(requestData.EmailAddress, crmContact.EMailAddress1);
         Assert.Equal(requestData.NationalInsuranceNumber, crmContact.dfeta_NINumber);
+        Assert.Equal(requestData.Gender, crmContact.GenderCode.ToGender());
         Assert.NotNull(crmContact.dfeta_TRN);
 
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
@@ -513,8 +519,12 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var updatedContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
 
-        static object? FormatValue(object? value) =>
-            value is DateOnly dateOnly ? dateOnly.ToDateTimeWithDqtBstFix(isLocalTime: false) : value;
+        static object? FormatValue(object? value) => value switch
+        {
+            DateOnly dateOnly => dateOnly.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            Gender gender => gender.ToContact_GenderCode()!,
+            _ => value
+        };
 
         var allAttributes = PersonAttributeInfos.SelectMany(i => i.CrmAttributes);
         foreach (var attr in allAttributes)
@@ -636,6 +646,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+        state.GenderSource = attribute is PersonMatchedAttribute.Gender ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
     }
 
     private void AssertPersonAttributesMatchContact(
@@ -649,6 +660,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(personAttributes.DateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
         Assert.Equal(personAttributes.EmailAddress, contact.EMailAddress1);
         Assert.Equal(personAttributes.NationalInsuranceNumber, contact.dfeta_NINumber);
+        Assert.Equal(personAttributes.Gender, contact.GenderCode.ToGender());
     }
 
     private void AssertEventIsExpected(
@@ -726,6 +738,15 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             [Contact.Fields.dfeta_NINumber],
             d => d.NationalInsuranceNumber,
             p => p.NationalInsuranceNumber
+        ),
+        new(
+            PersonMatchedAttribute.Gender,
+            "Gender",
+            "Gender",
+            [Contact.Fields.GenderCode],
+            d => d.Gender,
+            p => p.Gender,
+            value => ((Gender?)value)?.GetDisplayName()
         )
     ];
 

@@ -35,6 +35,7 @@ public class UpdateContactHandler : ICrmQueryHandler<UpdateContactQuery, bool>
         SetAttributeIfSpecified(query.DateOfBirth, Contact.Fields.BirthDate, dateOnly => dateOnly.ToDateTimeWithDqtBstFix(isLocalTime: false));
         SetAttributeIfSpecified(query.EmailAddress, Contact.Fields.EMailAddress1);
         SetAttributeIfSpecified(query.NationalInsuranceNumber, Contact.Fields.dfeta_NINumber);
+        SetAttributeIfSpecified(query.Gender, Contact.Fields.GenderCode);
 
         await organizationService.ExecuteAsync(new UpdateRequest()
         {

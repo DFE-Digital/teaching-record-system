@@ -89,6 +89,7 @@ public class TrnRequestService(
                     Contact.Fields.dfeta_StatedLastName,
                     Contact.Fields.EMailAddress1,
                     Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.GenderCode,
                     Contact.Fields.BirthDate,
                     Contact.Fields.Merged,
                     Contact.Fields.MasterId,

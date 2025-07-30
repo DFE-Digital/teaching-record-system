@@ -151,7 +151,8 @@ public class CheckAnswers(
             (state.LastNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName : 0) |
             (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
             (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0);
+            (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0) |
+            (state.GenderSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender : 0);
 
         var @event = new ApiTrnRequestSupportTaskUpdatedEvent()
         {
