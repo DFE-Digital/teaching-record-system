@@ -2,7 +2,7 @@
 @using static ResolveApiTrnRequestState
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.Merge
 @{
-    ViewBag.Title = "Select the details to merge";
+    ViewBag.Title = "Select the details to merge into the existing record";
 }
 
 @section BeforeContent {
@@ -36,7 +36,7 @@
 
     <div style="display: flex">
         <div class="govuk-heading-m govuk-!-width-one-half">
-            @Model.SourceApplicationUserName API request
+            @Model.SourceApplicationUserName request
         </div>
         <div class="govuk-heading-m govuk-!-width-one-half">
             Existing record
@@ -166,10 +166,8 @@
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <govuk-textarea asp-for="Comments" label-class="govuk-label--s" />
 
-            <p class="govuk-body govuk-!-font-size-24 govuk-!-font-weight-bold">Do you want to use these details in the primary record?</p>
-
             <govuk-warning-text>
-                The secondary record will be deactivated once it’s merged with the primary record, but you’ll still be able to view it.
+                The @Model.SourceApplicationUserName request will be marked as complete after the existing record has been updated.
             </govuk-warning-text>
 
             <div class="govuk-button-group">

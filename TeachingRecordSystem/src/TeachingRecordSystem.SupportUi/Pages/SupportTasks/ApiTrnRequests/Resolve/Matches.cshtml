@@ -1,8 +1,7 @@
 @page "/support-tasks/api-trn-requests/{supportTaskReference}/matches/{handler?}"
-@using AngleSharp.Common
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.Matches
 @{
-    ViewBag.Title = "Compare potential duplicates records";
+    ViewBag.Title = $"Compare {Model.SourceApplicationUserName} request with potential matches";
 }
 
 @section BeforeContent {
@@ -186,20 +185,20 @@
             <govuk-radios asp-for="PersonId">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                        Select a record to merge the @Model.SourceApplicationUserName request into
+                        What do you want to do with the @Model.SourceApplicationUserName request?
                     </govuk-radios-fieldset-legend>
 
                     @foreach (var match in Model.PotentialDuplicates!)
                     {
                         <govuk-radios-item value="@match.PersonId">
-                            Record @match.Identifier
+                            Merge it with Record @match.Identifier
                         </govuk-radios-item>
                     }
 
                     <govuk-radios-divider>or</govuk-radios-divider>
 
                     <govuk-radios-item value="@ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel">
-                        I want to create a new record from the @Model.SourceApplicationUserName request
+                        Create a new record from it
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>

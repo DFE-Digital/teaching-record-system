@@ -247,6 +247,7 @@ public partial class TestData
                 // Re-query what we've just added so we return a SupportTask with TrnRequestMetadata populated
                 return await dbContext.SupportTasks
                     .Include(t => t.TrnRequestMetadata)
+                    .ThenInclude(m => m!.ApplicationUser)
                     .SingleAsync(t => t.SupportTaskReference == task.SupportTaskReference);
             });
         }

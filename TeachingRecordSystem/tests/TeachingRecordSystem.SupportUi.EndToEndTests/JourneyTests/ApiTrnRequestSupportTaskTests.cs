@@ -22,11 +22,11 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches");
 
-        await page.CheckAsync($"label{TextIsSelector($"I want to create a new record from the {applicationUser.Name} request")}");
+        await page.CheckAsync($"label{TextIsSelector("Create a new record from it")}");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers");
-        await page.ClickButtonAsync("Confirm and merge records");
+        await page.ClickButtonAsync("Confirm and create record");
 
         await page.WaitForUrlPathAsync("/support-tasks/api-trn-requests");
     }
@@ -66,7 +66,7 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches");
 
-        await page.CheckAsync("label:text-is('Record A')");
+        await page.CheckAsync("label:text-is('Merge it with Record A')");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge");
@@ -74,7 +74,7 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers");
-        await page.ClickButtonAsync("Confirm and merge records");
+        await page.ClickButtonAsync("Confirm and update existing record");
 
         await page.WaitForUrlPathAsync("/support-tasks/api-trn-requests");
     }

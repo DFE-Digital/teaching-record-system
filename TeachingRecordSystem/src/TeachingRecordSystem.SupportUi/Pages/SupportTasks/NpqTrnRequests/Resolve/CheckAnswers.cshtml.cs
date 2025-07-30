@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -184,12 +185,15 @@ public class CheckAnswersModel(
         // This is a little ugly but pushing this into a partial and executing it here is tricky
         var flashMessageHtml =
             $@"
+            {(CreatingNewRecord ? "Record created for" : "Records updated for")}
+            {HtmlEncoder.Default.Encode(FirstName ?? string.Empty)}
+            {HtmlEncoder.Default.Encode(MiddleName ?? string.Empty)}
+            {HtmlEncoder.Default.Encode(LastName ?? string.Empty)}.
             <a href=""{linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)}"" class=""govuk-link"">View record</a>
             ";
 
-        var message = CreatingNewRecord ? "Record created for" : "Records merged successfully for";
         TempData.SetFlashSuccess(
-            $"{message} {FirstName} {MiddleName} {LastName}",
+            $"{SourceApplicationUserName} request completed",
             messageHtml: flashMessageHtml);
 
         await JourneyInstance!.CompleteAsync();
