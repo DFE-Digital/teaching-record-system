@@ -25,7 +25,7 @@ runs:
           exit 1
         fi
 
-        cd $PROJECT_PATH && dotnet test --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
+        cd $PROJECT_PATH && dotnet test --blame-hang-timeout 10m --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
       shell: bash
       env:
         PROJECT_PATH: ${{ inputs.test_project_path }}

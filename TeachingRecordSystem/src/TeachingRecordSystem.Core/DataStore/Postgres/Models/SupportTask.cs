@@ -127,6 +127,7 @@ public class SupportTask
     internal static Type GetDataType(SupportTaskType supportTaskType) => supportTaskType switch
     {
         SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
+        SupportTaskType.ChangeDateOfBirthRequest => typeof(ChangeDateOfBirthRequestData),
         SupportTaskType.ApiTrnRequest => typeof(ApiTrnRequestData),
         SupportTaskType.NpqTrnRequest => typeof(NpqTrnRequestData),
         SupportTaskType.TrnRequestManualChecksNeeded => typeof(TrnRequestManualChecksNeededData),

@@ -1,6 +1,7 @@
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -41,6 +42,8 @@ public abstract class OperationTestBase
     public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
 
     public TrnRequestOptions TrnRequestOptions => _testServices.TrnRequestOptions;
+
+    public IFileService FileService => _testServices.BlobStorageFileService.Object;
 
     public T AssertSuccess<T>(ApiResult<T> result) where T : notnull
     {

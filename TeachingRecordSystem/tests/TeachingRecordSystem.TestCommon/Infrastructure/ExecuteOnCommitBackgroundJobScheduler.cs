@@ -27,7 +27,7 @@ public class ExecuteOnCommitBackgroundJobScheduler(IServiceProvider serviceProvi
             await transactionCompleted.Task;
 
             using var scope = serviceProvider.CreateScope();
-            var service = scope.ServiceProvider.GetRequiredService<T>();
+            var service = ActivatorUtilities.CreateInstance<T>(scope.ServiceProvider);
             var task = expression.Compile()(service);
             await task;
         }

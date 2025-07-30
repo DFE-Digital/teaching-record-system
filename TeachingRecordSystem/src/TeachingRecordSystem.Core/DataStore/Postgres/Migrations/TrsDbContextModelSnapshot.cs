@@ -19988,7 +19988,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_trn_request_metadata_application_users_application_user_id");
 
-                    b.OwnsOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches", "Matches", b1 =>
+                    b.OwnsOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata.Matches#TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches", "Matches", b1 =>
                         {
                             b1.Property<Guid>("TrnRequestMetadataApplicationUserId")
                                 .HasColumnType("uuid");
@@ -19998,7 +19998,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                             b1.HasKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId");
 
-                            b1.ToTable("trn_request_metadata");
+                            b1.ToTable("trn_request_metadata", (string)null);
 
                             b1.ToJson("matches");
 
@@ -20006,7 +20006,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                 .HasForeignKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId")
                                 .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_application_user_");
 
-                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedPerson", "MatchedPersons", b2 =>
+                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata.Matches#TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches.MatchedPersons#TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedPerson", "MatchedPersons", b2 =>
                                 {
                                     b2.Property<Guid>("TrnRequestMatchesTrnRequestMetadataApplicationUserId")
                                         .HasColumnType("uuid");
@@ -20023,7 +20023,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                                     b2.HasKey("TrnRequestMatchesTrnRequestMetadataApplicationUserId", "TrnRequestMatchesTrnRequestMetadataRequestId", "Id");
 
-                                    b2.ToTable("trn_request_metadata");
+                                    b2.ToTable("trn_request_metadata", (string)null);
 
                                     b2.ToJson("matches");
 
