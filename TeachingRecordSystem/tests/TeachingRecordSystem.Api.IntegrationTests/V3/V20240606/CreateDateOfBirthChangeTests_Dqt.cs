@@ -1,17 +1,13 @@
 using System.Text;
 using JustEat.HttpClientInterception;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
 [Collection(nameof(DisableParallelization))]  // Configures EvidenceFilesHttpClient
-public class CreateDateOfBirthChangeTests : TestBase
+public class CreateDateOfBirthChangeTests_Dqt(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public CreateDateOfBirthChangeTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FeatureProvider.Features.Add(FeatureNames.ChangeRequestsInTrs);
-    }
-
     [Theory]
     [InlineData(null, "evidence.jpg", "https://place.com/evidence.jpg")]
     [InlineData("1990-07-01", "evidence.jpg", "https://place.com/evidence.jpg")]
@@ -118,14 +114,12 @@ public class CreateDateOfBirthChangeTests : TestBase
     }
 
     [Fact]
-    public async Task Post_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
+    public async Task Post_ValidRequest_CreatesIncidentAndReturnsTicketNumber()
     {
         // Arrange
-        await TestData.CreateApplicationUserAsync("Get an identity");
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
-        var emailAddress = Faker.Internet.Email();
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
@@ -153,8 +147,7 @@ public class CreateDateOfBirthChangeTests : TestBase
             {
                 dateOfBirth = newDateOfBirth,
                 evidenceFileName,
-                evidenceFileUrl,
-                emailAddress
+                evidenceFileUrl
             })
         };
 
@@ -162,30 +155,16 @@ public class CreateDateOfBirthChangeTests : TestBase
         var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var crmQuery = new QueryByAttribute(Incident.EntityLogicalName);
+        crmQuery.AddAttributeValue(Incident.Fields.CustomerId, new EntityReference(Contact.EntityLogicalName, createPersonResult.ContactId));
+        var crmResults = TestData.OrganizationService.RetrieveMultiple(crmQuery);
+        var incident = Assert.Single(crmResults.Entities).ToEntity<Incident>();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
-            Assert.NotNull(supportTask);
-            Assert.Equal(SupportTaskType.ChangeDateOfBirthRequest, supportTask.SupportTaskType);
-            var requestData = supportTask.Data as ChangeDateOfBirthRequestData;
-            Assert.NotNull(requestData);
-            Assert.Equal(newDateOfBirth, requestData.DateOfBirth);
-            Assert.Equal(evidenceFileName, requestData.EvidenceFileName);
-
-            var email = await dbContext.Emails
-                .Where(e => e.EmailAddress == emailAddress)
-                .SingleOrDefaultAsync();
-            Assert.NotNull(email);
-            Assert.NotNull(email.SentOn);
-
-            await AssertEx.JsonResponseEqualsAsync(
-                response,
-                expected: new
-                {
-                    caseNumber = supportTask.SupportTaskReference
-                });
-        });
+        await AssertEx.JsonResponseEqualsAsync(
+            response,
+            expected: new
+            {
+                caseNumber = incident.TicketNumber
+            });
     }
 }

@@ -9,7 +9,7 @@ public class ExecuteImmediatelyJobScheduler(IServiceProvider serviceProvider) : 
     public async Task<string> EnqueueAsync<T>(Expression<Func<T, Task>> expression) where T : notnull
     {
         using var scope = serviceProvider.CreateScope();
-        var service = scope.ServiceProvider.GetRequiredService<T>();
+        var service = ActivatorUtilities.CreateInstance<T>(scope.ServiceProvider);
         var task = expression.Compile()(service);
         await task;
         return Guid.NewGuid().ToString();
