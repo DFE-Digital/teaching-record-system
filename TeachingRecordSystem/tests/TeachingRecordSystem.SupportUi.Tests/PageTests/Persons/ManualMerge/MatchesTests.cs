@@ -1,7 +1,7 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
 
 [Collection(nameof(DisableParallelization))]
 public class MatchesTests : ManualMergeTestBase
@@ -18,29 +18,6 @@ public class MatchesTests : ManualMergeTestBase
     }
 
     [Fact]
-    public async Task Get_OtherTrnNotSelected_RedirectsToEnterTrnPage()
-    {
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/enter-trn?{journeyInstance.GetUniqueIdQueryParameter()}");
-    }
-
-    [Fact]
     public async Task Get_FieldsPopulatedFromPersonRecord()
     {
         var personA = await TestData.CreatePersonAsync(p => p
@@ -51,7 +28,8 @@ public class MatchesTests : ManualMergeTestBase
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Jan 2001"))
             .WithEmail("an@email.com")
-            .WithNationalInsuranceNumber("AB123456D"));
+            .WithNationalInsuranceNumber("AB123456D")
+            .WithGender(Gender.Female));
 
         var personB = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
@@ -61,7 +39,8 @@ public class MatchesTests : ManualMergeTestBase
             .WithLastName("Pink")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 2002"))
             .WithEmail("another@email.com")
-            .WithNationalInsuranceNumber("AB987654D"));
+            .WithNationalInsuranceNumber("AB987654D")
+            .WithGender(Gender.Other));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -84,6 +63,7 @@ public class MatchesTests : ManualMergeTestBase
         doc.AssertRow("record-a", "Date of birth", v => Assert.Equal("1 January 2001", v.TrimmedText()));
         doc.AssertRow("record-a", "Email", v => Assert.Equal("an@email.com", v.TrimmedText()));
         doc.AssertRow("record-a", "National Insurance number", v => Assert.Equal("AB123456D", v.TrimmedText()));
+        doc.AssertRow("record-a", "Gender", v => Assert.Equal("Female", v.TrimmedText()));
         doc.AssertRow("record-a", "TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
 
         doc.AssertRow("record-b", "First name", v => Assert.Equal("Lily", v.TrimmedText()));
@@ -92,6 +72,7 @@ public class MatchesTests : ManualMergeTestBase
         doc.AssertRow("record-b", "Date of birth", v => Assert.Equal("1 February 2002", v.TrimmedText()));
         doc.AssertRow("record-b", "Email", v => Assert.Equal("another@email.com", v.TrimmedText()));
         doc.AssertRow("record-b", "National Insurance number", v => Assert.Equal("AB987654D", v.TrimmedText()));
+        doc.AssertRow("record-b", "Gender", v => Assert.Equal("Other", v.TrimmedText()));
         doc.AssertRow("record-b", "TRN", v => Assert.Equal(personB.Trn, v.TrimmedText()));
     }
 
@@ -141,55 +122,27 @@ public class MatchesTests : ManualMergeTestBase
         });
     }
 
-    public static TheoryData<PersonMatchedAttribute[]> HighlightedDifferencesData { get; } = new()
+    public static TheoryData<PersonMatchedAttribute[], bool> HighlightedDifferencesData { get; } = new()
     {
         // We could go nuts creating loads of combinations here, but checking every attribute once seems sufficient
-        new[] { PersonMatchedAttribute.FirstName },
-        new[] { PersonMatchedAttribute.MiddleName },
-        new[] { PersonMatchedAttribute.LastName },
-        new[] { PersonMatchedAttribute.DateOfBirth },
-        new[] { PersonMatchedAttribute.EmailAddress },
-        new[] { PersonMatchedAttribute.NationalInsuranceNumber }
+        {  new[] { PersonMatchedAttribute.FirstName }, false },
+        { new[] { PersonMatchedAttribute.MiddleName }, false },
+        { new[] { PersonMatchedAttribute.LastName }, false },
+        { new[] { PersonMatchedAttribute.DateOfBirth }, false },
+        { new[] { PersonMatchedAttribute.EmailAddress }, false },
+        { new[] { PersonMatchedAttribute.EmailAddress }, true },
+        { new[] { PersonMatchedAttribute.NationalInsuranceNumber }, false },
+        { new[] { PersonMatchedAttribute.NationalInsuranceNumber }, true },
+        { new[] { PersonMatchedAttribute.Gender }, false },
+        { new[] { PersonMatchedAttribute.Gender }, true },
     };
 
     [Theory]
     [MemberData(nameof(HighlightedDifferencesData))]
-    public async Task Get_HighlightsDifferencesBetweenPersonAAndPersonB(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
+    public async Task Get_HighlightsDifferencesBetweenPersonAAndPersonB(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes, bool useNullValues)
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
-            .WithEmail()
-            .WithNationalInsuranceNumber());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
-            .WithFirstName(
-                matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
-                    ? personA.FirstName
-                    : TestData.GenerateChangedFirstName(personA.FirstName))
-            .WithMiddleName(
-                matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
-                    ? personA.MiddleName
-                    : TestData.GenerateChangedMiddleName(personA.MiddleName))
-            .WithLastName(
-                matchedAttributes.Contains(PersonMatchedAttribute.LastName)
-                    ? personA.LastName
-                    : TestData.GenerateChangedLastName(personA.LastName))
-            .WithDateOfBirth(
-                matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
-                    ? personA.DateOfBirth
-                    : TestData.GenerateChangedDateOfBirth(personA.DateOfBirth))
-            .WithEmail(
-                matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
-                    ? personA.Email ?? ""
-                    : TestData.GenerateUniqueEmail())
-            .WithNationalInsuranceNumber(
-                matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
-                    ? personA.NationalInsuranceNumber ?? ""
-                    : TestData.GenerateChangedNationalInsuranceNumber(personA.NationalInsuranceNumber!)));
+        var (personA, personB) = await CreatePersonsWithMultipleDifferencesToMatch(matchedAttributes, useNullValues: useNullValues);
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -212,6 +165,7 @@ public class MatchesTests : ManualMergeTestBase
         doc.AssertMatchRowHasExpectedHighlight("record-a", "Date of birth", false);
         doc.AssertMatchRowHasExpectedHighlight("record-a", "Email", false);
         doc.AssertMatchRowHasExpectedHighlight("record-a", "National Insurance number", false);
+        doc.AssertMatchRowHasExpectedHighlight("record-a", "Gender", false);
 
         doc.AssertMatchRowHasExpectedHighlight("record-b", "First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
         doc.AssertMatchRowHasExpectedHighlight("record-b", "Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
@@ -219,6 +173,7 @@ public class MatchesTests : ManualMergeTestBase
         doc.AssertMatchRowHasExpectedHighlight("record-b", "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
         doc.AssertMatchRowHasExpectedHighlight("record-b", "Email", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
         doc.AssertMatchRowHasExpectedHighlight("record-b", "National Insurance number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+        doc.AssertMatchRowHasExpectedHighlight("record-b", "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
     [Fact]
@@ -457,7 +412,7 @@ public class MatchesTests : ManualMergeTestBase
                 .WithPersonB(personB)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePostRequestContentBuilder()
                 .WithPrimaryRecordId(null)
@@ -465,240 +420,10 @@ public class MatchesTests : ManualMergeTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(postRequest);
+        var response = await HttpClient.SendAsync(request);
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryRecordId), "Select primary record");
-    }
-
-    [Fact]
-    public async Task Post_PersonAIsDeactivated_ReturnsBadRequest()
-    {
-        // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Attach(personA.Person);
-            personA.Person.Status = PersonStatus.Deactivated;
-            await dbContext.SaveChangesAsync();
-        });
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personB.PersonId)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest()
-    {
-        // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
-            .WithAlert(a => a.WithEndDate(null)));
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personB.PersonId)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
-    {
-        // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        // Act
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personB.PersonId)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_PersonBIsDeactivated_ReturnsBadRequest()
-    {
-        // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Attach(personB.Person);
-            personB.Person.Status = PersonStatus.Deactivated;
-            await dbContext.SaveChangesAsync();
-        });
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personA.PersonId)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Post_PersonBHasOpenAlert_ReturnsBadRequest()
-    {
-        // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
-            .WithAlert(a => a.WithEndDate(null)));
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personA.PersonId)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task Post_PersonBHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
-    {
-        // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        // Act
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personA.PersonId)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
@@ -736,6 +461,56 @@ public class MatchesTests : ManualMergeTestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryRecordId);
+    }
+
+    [Fact]
+    public async Task Post_PrimaryRecordChanged_SwapsPrimaryAndSecondarySources_ToKeepSelectedDataCorrect()
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithAllDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            new MergeStateBuilder()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
+                .WithPrimaryRecord(personA)
+                .WithAttributeSourcesSet()
+                .WithFirstNameSource(PersonAttributeSource.PrimaryRecord)
+                .WithMiddleNameSource(PersonAttributeSource.SecondaryRecord)
+                // Leaving LastNameSource unselected
+                .WithDateOfBirthSource(PersonAttributeSource.SecondaryRecord)
+                .WithEmailAddressSource(PersonAttributeSource.SecondaryRecord)
+                // Leaving NationalInsuranceNumberSource unselected
+                .WithGenderSource(PersonAttributeSource.PrimaryRecord)
+                .WithUploadEvidenceChoice(false)
+                .WithComments(null)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePostRequestContentBuilder()
+                .WithPrimaryRecordId(personB.PersonId)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        AssertEx.ResponseIsRedirectTo(response,
+            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryRecordId);
+
+        Assert.Equal(PersonAttributeSource.SecondaryRecord, journeyInstance.State.FirstNameSource);
+        Assert.Equal(PersonAttributeSource.PrimaryRecord, journeyInstance.State.MiddleNameSource);
+        Assert.Null(journeyInstance.State.LastNameSource);
+        Assert.Equal(PersonAttributeSource.PrimaryRecord, journeyInstance.State.DateOfBirthSource);
+        Assert.Equal(PersonAttributeSource.PrimaryRecord, journeyInstance.State.EmailAddressSource);
+        Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
+        Assert.Equal(PersonAttributeSource.SecondaryRecord, journeyInstance.State.GenderSource);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<ManualMergeState>? journeyInstance = null) =>

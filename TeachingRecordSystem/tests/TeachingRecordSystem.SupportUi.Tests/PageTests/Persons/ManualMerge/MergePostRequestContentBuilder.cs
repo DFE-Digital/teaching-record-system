@@ -1,6 +1,6 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
 
 public class MergePostRequestContentBuilder : PostRequestContentBuilder
 {
@@ -12,6 +12,7 @@ public class MergePostRequestContentBuilder : PostRequestContentBuilder
     private PersonAttributeSource? DateOfBirthSource { get; set; }
     private PersonAttributeSource? EmailAddressSource { get; set; }
     private PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
+    private PersonAttributeSource? GenderSource { get; set; }
     private bool? UploadEvidence { get; set; }
     private (HttpContent, string)? EvidenceFile { get; set; }
     private Guid? EvidenceFileId { get; set; }
@@ -68,6 +69,12 @@ public class MergePostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
+    public MergePostRequestContentBuilder WithGenderSource(PersonAttributeSource attributeSource)
+    {
+        GenderSource = attributeSource;
+        return this;
+    }
+
     public MergePostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
         UploadEvidence = uploadEvidence;
@@ -88,7 +95,6 @@ public class MergePostRequestContentBuilder : PostRequestContentBuilder
     public MergePostRequestContentBuilder WithComments(string? comments)
     {
         Comments = comments;
-
         return this;
     }
 }

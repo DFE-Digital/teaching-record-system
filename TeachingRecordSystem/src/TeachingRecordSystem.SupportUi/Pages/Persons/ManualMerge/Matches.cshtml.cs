@@ -15,7 +15,7 @@ public class MatchesModel(
     IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    public string BackLink => GetPageLink(ManualMergeJourneyPage.EnterTrn);
+    public string BackLink => GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : ManualMergeJourneyPage.EnterTrn);
 
     public string? CannotMergeReason { get; private set; }
 
@@ -87,9 +87,24 @@ public class MatchesModel(
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
+            // If primary record changes and attribute sources already selected, we assume the selected data for each attribute should be kept the same,
+            // so we need to swap the sources for the selected attributes.
+            if (state.PersonAttributeSourcesSet &&
+                state.PrimaryRecordId is Guid originalPrimaryRecordId &&
+                PrimaryRecordId is Guid newPrimaryRecordId &&
+                originalPrimaryRecordId != newPrimaryRecordId)
+            {
+                state.FirstNameSource = state.FirstNameSource is not PersonAttributeSource firstNameSource ? null : firstNameSource == PersonAttributeSource.PrimaryRecord ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+                state.MiddleNameSource = state.MiddleNameSource is not PersonAttributeSource middleNameSource ? null : middleNameSource == PersonAttributeSource.PrimaryRecord ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+                state.LastNameSource = state.LastNameSource is not PersonAttributeSource lastNameSource ? null : lastNameSource == PersonAttributeSource.PrimaryRecord ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+                state.DateOfBirthSource = state.DateOfBirthSource is not PersonAttributeSource dateOfBirthSource ? null : dateOfBirthSource == PersonAttributeSource.PrimaryRecord ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+                state.EmailAddressSource = state.EmailAddressSource is not PersonAttributeSource emailAddressSource ? null : emailAddressSource == PersonAttributeSource.PrimaryRecord ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+                state.NationalInsuranceNumberSource = state.NationalInsuranceNumberSource is not PersonAttributeSource nationalInsuranceNumberSource ? null : nationalInsuranceNumberSource == PersonAttributeSource.PrimaryRecord ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+                state.GenderSource = state.GenderSource is not PersonAttributeSource genderSource ? null : genderSource == PersonAttributeSource.PrimaryRecord ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+            }
             state.PrimaryRecordId = PrimaryRecordId;
         });
 
-        return Redirect(GetPageLink(ManualMergeJourneyPage.Merge));
+        return Redirect(GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : ManualMergeJourneyPage.Merge));
     }
 }

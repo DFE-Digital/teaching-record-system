@@ -92,6 +92,12 @@
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfDifferent(match.Gender?.GetDisplayName(), !match.MatchedAttributes.Contains(PersonMatchedAttribute.Gender)); }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
                             <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>@match.Trn</govuk-summary-list-row-value>
                         </govuk-summary-list-row>

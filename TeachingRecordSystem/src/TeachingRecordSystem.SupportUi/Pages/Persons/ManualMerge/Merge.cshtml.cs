@@ -17,7 +17,7 @@ public class MergeModel(
     IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    public string BackLink => GetPageLink(ManualMergeJourneyPage.Matches);
+    public string BackLink => GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : ManualMergeJourneyPage.Matches);
 
     public PersonAttribute<string>? Trn { get; set; }
     public PersonAttribute<string>? FirstName { get; set; }
@@ -26,6 +26,7 @@ public class MergeModel(
     public PersonAttribute<DateOnly?>? DateOfBirth { get; set; }
     public PersonAttribute<string?>? EmailAddress { get; set; }
     public PersonAttribute<string?>? NationalInsuranceNumber { get; set; }
+    public PersonAttribute<Gender?>? Gender { get; set; }
 
     [BindProperty]
     [Display(Name = "First name")]
@@ -50,6 +51,10 @@ public class MergeModel(
     [BindProperty]
     [Display(Name = "National Insurance number")]
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Gender")]
+    public PersonAttributeSource? GenderSource { get; set; }
 
     [BindProperty]
     [Display(Name = "Do you want to upload evidence?")]
@@ -99,52 +104,58 @@ public class MergeModel(
 
         var secondaryRecordId = primaryRecordId == personAId ? personBId : personAId;
 
-        var primaryRecordAttributes = _potentialDuplicates.Single(p => p.PersonId == primaryRecordId).Attributes;
-        var secondaryRecordAttributes = _potentialDuplicates.Single(p => p.PersonId == secondaryRecordId).Attributes;
+        var primaryRecord = _potentialDuplicates.Single(p => p.PersonId == primaryRecordId);
+        var secondaryRecord = _potentialDuplicates.Single(p => p.PersonId == secondaryRecordId);
 
         var attributeMatches = GetPersonAttributeMatches(
-            primaryRecordAttributes,
-            secondaryRecordAttributes.FirstName,
-            secondaryRecordAttributes.MiddleName,
-            secondaryRecordAttributes.LastName,
-            secondaryRecordAttributes.DateOfBirth,
-            secondaryRecordAttributes.EmailAddress,
-            secondaryRecordAttributes.NationalInsuranceNumber);
+            primaryRecord.Attributes,
+            secondaryRecord.Attributes.FirstName,
+            secondaryRecord.Attributes.MiddleName,
+            secondaryRecord.Attributes.LastName,
+            secondaryRecord.Attributes.DateOfBirth,
+            secondaryRecord.Attributes.EmailAddress,
+            secondaryRecord.Attributes.NationalInsuranceNumber,
+            secondaryRecord.Attributes.Gender);
 
         Trn = new PersonAttribute<string>(
-            primaryRecordAttributes.Trn,
-            secondaryRecordAttributes.FirstName,
+            primaryRecord.Trn,
+            secondaryRecord.FirstName,
             Different: true);
 
         FirstName = new PersonAttribute<string>(
-            primaryRecordAttributes.FirstName,
-            secondaryRecordAttributes.FirstName,
+            primaryRecord.Attributes.FirstName,
+            secondaryRecord.Attributes.FirstName,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
 
         MiddleName = new PersonAttribute<string>(
-            primaryRecordAttributes.MiddleName,
-            secondaryRecordAttributes.MiddleName,
+            primaryRecord.Attributes.MiddleName,
+            secondaryRecord.Attributes.MiddleName,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.MiddleName));
 
         LastName = new PersonAttribute<string>(
-            primaryRecordAttributes.LastName,
-            secondaryRecordAttributes.LastName,
+            primaryRecord.Attributes.LastName,
+            secondaryRecord.Attributes.LastName,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
-            primaryRecordAttributes.DateOfBirth,
-            secondaryRecordAttributes.DateOfBirth,
+            primaryRecord.Attributes.DateOfBirth,
+            secondaryRecord.Attributes.DateOfBirth,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
 
         EmailAddress = new PersonAttribute<string?>(
-            primaryRecordAttributes.EmailAddress,
-            secondaryRecordAttributes.EmailAddress,
+            primaryRecord.Attributes.EmailAddress,
+            secondaryRecord.Attributes.EmailAddress,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.EmailAddress));
 
         NationalInsuranceNumber = new PersonAttribute<string?>(
-            primaryRecordAttributes.NationalInsuranceNumber,
-            secondaryRecordAttributes.NationalInsuranceNumber,
+            primaryRecord.Attributes.NationalInsuranceNumber,
+            secondaryRecord.Attributes.NationalInsuranceNumber,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+
+        Gender = new PersonAttribute<Gender?>(
+            primaryRecord.Attributes.Gender,
+            secondaryRecord.Attributes.Gender,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
     }
 
     public async Task OnGetAsync()
@@ -155,6 +166,7 @@ public class MergeModel(
         DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
         EmailAddressSource = JourneyInstance!.State.EmailAddressSource;
         NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
+        GenderSource = JourneyInstance!.State.GenderSource;
         Comments = JourneyInstance!.State.Comments;
         UploadEvidence = JourneyInstance!.State.UploadEvidence;
         EvidenceFileId = JourneyInstance.State.EvidenceFileId;
@@ -201,6 +213,11 @@ public class MergeModel(
             ModelState.AddModelError(nameof(NationalInsuranceNumberSource), "Select a National Insurance number");
         }
 
+        if (Gender!.Different && GenderSource is null)
+        {
+            ModelState.AddModelError(nameof(GenderSource), "Select a gender");
+        }
+
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
@@ -243,6 +260,7 @@ public class MergeModel(
             state.DateOfBirthSource = DateOfBirthSource;
             state.EmailAddressSource = EmailAddressSource;
             state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+            state.GenderSource = GenderSource;
             state.PersonAttributeSourcesSet = true;
             state.UploadEvidence = UploadEvidence;
             state.EvidenceFileId = UploadEvidence is true ? EvidenceFileId : null;
