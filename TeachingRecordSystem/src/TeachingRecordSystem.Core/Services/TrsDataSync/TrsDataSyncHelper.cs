@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
+using AngleSharp.Common;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using MoreLinq.Extensions;
 using Npgsql;
 using NpgsqlTypes;
 using Optional;
@@ -46,8 +48,9 @@ public class TrsDataSyncHelper(
             { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
             { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() },
             { ModelTypes.DqtNote, GetModelTypeSyncInfoForNotes() },
-            { ModelTypes.Route, GetModelTypeSyncInfoForRoute() }
-    };
+            { ModelTypes.Route, GetModelTypeSyncInfoForRoute() },
+            { ModelTypes.PreviousName, GetModelTypeSyncInfoForPreviousName() }
+        };
 
     private IReadOnlyDictionary<string, ModelTypeSyncInfo> AllModelTypeSyncInfo => GetModelTypeSyncInfo();
 
@@ -1289,6 +1292,96 @@ public class TrsDataSyncHelper(
                 DqtInductionStatus = dqtInductionStatus
             };
         }
+    }
+
+    public async Task<int> SyncPreviousNamesForContactsAsync(
+        IReadOnlyCollection<Guid> contactIds,
+        bool dryRun,
+        CancellationToken cancellationToken = default)
+    {
+        var modelTypeSyncInfo = GetModelTypeSyncInfo<PreviousName>(ModelTypes.PreviousName);
+
+        var contacts = (await GetEntitiesAsync<Contact>(
+                Contact.EntityLogicalName,
+                Contact.PrimaryIdAttribute,
+                contactIds,
+                [Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName, Contact.Fields.ModifiedOn],
+                activeOnly: false,
+                cancellationToken))
+            .ToDictionary(c => c.ContactId!.Value, c => c);
+
+        var previousNamesByContactId = await GetPreviousNamesByContactIdAsync(contactIds, cancellationToken);
+
+        var mapped = contactIds.SelectMany(id => MapPreviousNames(contacts[id], previousNamesByContactId[id])).ToArray();
+
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+        using (var createTempTableCommand = connection.CreateCommand())
+        {
+            createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
+            createTempTableCommand.Transaction = txn;
+            await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
+
+        foreach (var i in mapped)
+        {
+            writer.StartRow();
+            modelTypeSyncInfo.WriteRecord!(writer, i);
+        }
+
+        await writer.CompleteAsync(cancellationToken);
+        await writer.CloseAsync(cancellationToken);
+
+        using (var mergeCommand = connection.CreateCommand())
+        {
+            mergeCommand.CommandTimeout = 0;
+            mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
+            mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+            mergeCommand.Transaction = txn;
+            await mergeCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        if (!dryRun)
+        {
+            await txn.CommitAsync(cancellationToken);
+        }
+
+        return mapped.Length;
+    }
+
+    private async Task<IReadOnlyDictionary<Guid, dfeta_previousname[]>> GetPreviousNamesByContactIdAsync(
+        IReadOnlyCollection<Guid> contactIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (contactIds.Count == 0)
+        {
+            return new Dictionary<Guid, dfeta_previousname[]>();
+        }
+
+        var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.PreviousName);
+
+        var queryExpression = new QueryExpression
+        {
+            EntityName = modelTypeSyncInfo.EntityLogicalName,
+            ColumnSet = new(modelTypeSyncInfo.AttributeNames),
+            Criteria = new FilterExpression()
+            {
+                Conditions =
+                {
+                    new ConditionExpression(dfeta_previousname.Fields.dfeta_PersonId, ConditionOperator.In, contactIds.ToArray())
+                }
+            }
+        };
+
+        var results = await organizationService.RetrieveMultipleAsync(queryExpression, cancellationToken);
+
+        return results.Entities
+            .Select(e => e.ToEntity<dfeta_previousname>())
+            .GroupBy(r => r.GetAttributeValue<EntityReference>(dfeta_previousname.Fields.dfeta_PersonId).Id)
+            .ToDictionary(g => g.Key, g => g.ToArray());
     }
 
     public async Task<int> SyncEventsAsync(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun, CancellationToken cancellationToken = default)
@@ -2552,6 +2645,91 @@ public class TrsDataSyncHelper(
             GetLastModifiedOnStatement = null,
             EntityLogicalName = string.Empty,
             AttributeNames = [],
+            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) => Task.CompletedTask,
+            WriteRecord = writeRecord
+        };
+    }
+
+    private static ModelTypeSyncInfo GetModelTypeSyncInfoForPreviousName()
+    {
+        var tempTableName = "temp_previous_name_import";
+        var tableName = "previous_names";
+
+        var columnNames = new[]
+        {
+            "previous_name_id",
+            "created_on",
+            "updated_on",
+            "person_id",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "dqt_audit_id",
+            "dqt_previous_name_ids"
+        };
+
+        var columnList = string.Join(", ", columnNames);
+
+        var createTempTableStatement = $"CREATE TEMP TABLE {tempTableName} (LIKE {tableName} INCLUDING DEFAULTS)";
+
+        var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
+
+        var insertStatement =
+            $"""
+            MERGE INTO previous_names AS target
+            USING (SELECT * FROM {tempTableName}) AS source
+            ON target.person_id = source.person_id AND target.dqt_audit_id IS NOT DISTINCT FROM source.dqt_audit_id AND target.dqt_previous_name_ids IS NOT DISTINCT FROM source.dqt_previous_name_ids
+            WHEN NOT MATCHED THEN
+                INSERT (previous_name_id, created_on, updated_on, person_id, first_name, middle_name, last_name, dqt_audit_id, dqt_previous_name_ids)
+                VALUES (source.previous_name_id, source.created_on, source.updated_on, source.person_id, source.first_name, source.middle_name, source.last_name, source.dqt_audit_id, source.dqt_previous_name_ids)
+            WHEN MATCHED THEN
+                UPDATE SET
+                    created_on = source.created_on,
+                    updated_on = source.updated_on,
+                    first_name = source.first_name,
+                    middle_name = source.middle_name,
+                    last_name = source.last_name,
+                    dqt_audit_id = source.dqt_audit_id,
+                    dqt_previous_name_ids = source.dqt_previous_name_ids
+            WHEN NOT MATCHED BY SOURCE AND EXISTS (SELECT person_id FROM {tempTableName} WHERE person_id = target.person_id) THEN
+                DELETE;
+            """;
+
+        Action<NpgsqlBinaryImporter, PreviousName> writeRecord = (writer, previousName) =>
+        {
+            writer.WriteValueOrNull(previousName.PreviousNameId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(previousName.CreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(previousName.UpdatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(previousName.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(previousName.FirstName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(previousName.MiddleName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(previousName.LastName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(previousName.DqtAuditId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(previousName.DqtPreviousNameIds, NpgsqlDbType.Array | NpgsqlDbType.Uuid);
+        };
+
+        var attributeNames = new[]
+        {
+            dfeta_previousname.Fields.dfeta_previousnameId,
+            dfeta_previousname.Fields.dfeta_PersonId,
+            dfeta_previousname.Fields.CreatedOn,
+            "createdby",
+            dfeta_previousname.Fields.StateCode,
+            dfeta_previousname.Fields.dfeta_Type,
+            dfeta_previousname.Fields.dfeta_name,
+            dfeta_previousname.Fields.dfeta_ChangedOn
+        };
+
+        return new ModelTypeSyncInfo<PreviousName>()
+        {
+            CreateTempTableStatement = createTempTableStatement,
+            CopyStatement = copyStatement,
+            UpsertStatement = insertStatement,
+            DeleteStatement = null,
+            IgnoreDeletions = false,
+            GetLastModifiedOnStatement = null,
+            EntityLogicalName = dfeta_previousname.EntityLogicalName,
+            AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) => Task.CompletedTask,
             WriteRecord = writeRecord
         };
@@ -4039,6 +4217,89 @@ public class TrsDataSyncHelper(
         }
     }
 
+    public IReadOnlyCollection<PreviousName> MapPreviousNames(
+        Contact contact,
+        IEnumerable<dfeta_previousname> dqtPreviousNames)
+    {
+        var nextFirstName = contact.FirstName ?? string.Empty;
+        var nextMiddleName = contact.MiddleName ?? string.Empty;
+        var nextLastName = contact.LastName ?? string.Empty;
+        DateTime? nextNameTime = null;
+
+        var toMap = dqtPreviousNames.ToList();
+
+        List<PreviousName> result = new();
+
+        var resolvedPreviousNames = new List<(dfeta_previousname DqtPreviousName, DateTime Created, string FirstName, string MiddleName, string LastName)>();
+
+        foreach (var dqtPreviousName in toMap.OrderByDescending(pn => pn.dfeta_ChangedOn?.ToDateTimeWithDqtBstFix(true) ?? pn.CreatedOn))
+        {
+            if (dqtPreviousName.StateCode is not dfeta_previousnameState.Active)
+            {
+                continue;
+            }
+
+            var firstName = nextFirstName;
+            var middleName = nextMiddleName;
+            var lastName = nextLastName;
+
+            if (dqtPreviousName.dfeta_Type is dfeta_NameType.FirstName)
+            {
+                firstName = dqtPreviousName.dfeta_name ?? string.Empty;
+            }
+            else if (dqtPreviousName.dfeta_Type is dfeta_NameType.MiddleName)
+            {
+                middleName = dqtPreviousName.dfeta_name ?? string.Empty;
+            }
+            else if (dqtPreviousName.dfeta_Type is dfeta_NameType.LastName)
+            {
+                lastName = dqtPreviousName.dfeta_name ?? string.Empty;
+            }
+            else
+            {
+                continue;
+            }
+
+            var changedOn = dqtPreviousName.dfeta_ChangedOn is DateTime dt
+                ? DateTime.SpecifyKind(dt.ToDateTimeWithDqtBstFix(true), DateTimeKind.Utc)
+                : dqtPreviousName.CreatedOn!.Value;
+
+            resolvedPreviousNames.Add((dqtPreviousName, changedOn, firstName, middleName, lastName));
+
+            nextFirstName = firstName;
+            nextMiddleName = middleName;
+            nextLastName = lastName;
+        }
+
+        // Collapse entries where nothing has actually changed
+        var collapsed = resolvedPreviousNames.GroupAdjacent(pn => (pn.FirstName, pn.MiddleName, pn.LastName));
+
+        foreach (var (dqtPreviousName, changedOn, firstName, middleName, lastName) in collapsed.Select(g => g.Last()))
+        {
+            if (changedOn > nextNameTime)
+            {
+                throw new InvalidOperationException(
+                    $"Previous name from DQT '{dqtPreviousName.Id}' is after the last audited previous name for contact: '{contact.Id}'.");
+            }
+
+            var previousName = new PreviousName
+            {
+                PreviousNameId = Guid.NewGuid(),
+                PersonId = contact.Id,
+                CreatedOn = changedOn,
+                UpdatedOn = changedOn,
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DqtPreviousNameIds = [dqtPreviousName.Id]
+            };
+
+            result.Add(previousName);
+        }
+
+        return result;
+    }
+
     public sealed class RouteToProfessionalStatusInfo
     {
         public RouteToProfessionalStatus? ProfessionalStatus { get; init; }
@@ -4430,6 +4691,7 @@ public class TrsDataSyncHelper(
         public const string Induction = "Induction";
         public const string DqtNote = "Annotation";
         public const string Route = "Route";
+        public const string PreviousName = "PreviousName";
     }
 
     private enum RouteMappingPrecedence
@@ -4473,4 +4735,9 @@ file static class Extensions
     /// Returns <c>null</c> if <paramref name="value"/> is empty or whitespace.
     /// </summary>
     public static string? NormalizeString(this string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
+
+    private static readonly TimeZoneInfo _gmt = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+
+    public static DateTime ToDateTimeWithDqtBstFix(this DateTime dateTime, bool isLocalTime) =>
+        isLocalTime ? TimeZoneInfo.ConvertTimeFromUtc(dateTime, _gmt) : dateTime;
 }
