@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
@@ -62,13 +63,13 @@ public class CheckAnswersModel(
         var now = clock.UtcNow;
 
         var updateResult = _person!.UpdateDetails(
-            FirstName ?? string.Empty,
-            MiddleName ?? string.Empty,
-            LastName ?? string.Empty,
-            DateOfBirth,
-            EmailAddress,
-            NationalInsuranceNumber,
-            Gender,
+            Option.Some(FirstName ?? string.Empty),
+            Option.Some(MiddleName ?? string.Empty),
+            Option.Some(LastName ?? string.Empty),
+            Option.Some(DateOfBirth),
+            Option.Some(EmailAddress),
+            Option.Some(NationalInsuranceNumber),
+            Option.Some(Gender),
             now);
 
         var updatedEvent = updateResult.Changes != 0 ?

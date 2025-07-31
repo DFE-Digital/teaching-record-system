@@ -19,6 +19,7 @@ public class CheckAnswers(
     TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
+    IFeatureProvider featureProvider,
     IClock clock) :
     ResolveApiTrnRequestPageModel(dbContext)
 {
@@ -53,6 +54,8 @@ public class CheckAnswers(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        var contactsMigrated = featureProvider.IsEnabled(FeatureNames.ContactsMigrated);
+
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var requestData = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
@@ -60,6 +63,8 @@ public class CheckAnswers(
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
         EventModels.PersonAttributes? oldPersonAttributes;
+
+        var now = clock.UtcNow;
 
         async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
         {
@@ -71,39 +76,55 @@ public class CheckAnswers(
             return await trnRequestService.CreateTrnTokenAsync(trn, requestData.EmailAddress);
         }
 
-        string jobId;
+        string? jobId = null;
         if (CreatingNewRecord)
         {
-            var newContactId = Guid.NewGuid();
-            requestData.SetResolvedPerson(newContactId);
-
             var trn = await trnGenerator.GenerateTrnAsync();
             var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
             requestData.TrnToken = trnToken;
 
-            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
-                trnRequestService => trnRequestService.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
+            if (contactsMigrated)
+            {
+                var (newPerson, _) = trnRequestService.CreatePersonFromTrnRequest(requestData, trn, now);
+                DbContext.Persons.Add(newPerson);
+
+                requestData.SetResolvedPerson(newPerson.PersonId);
+            }
+            else
+            {
+                var newContactId = Guid.NewGuid();
+                requestData.SetResolvedPerson(newContactId);
+
+                jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(trnRequestService =>
+                    trnRequestService.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
+            }
+
             selectedPersonAttributes = null;
             oldPersonAttributes = null;
         }
         else
         {
             Debug.Assert(state.PersonId is not null);
-            var existingContactId = state.PersonId!.Value;
-            var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(existingContactId, requestData.ApplicationUserId);
-            requestData.SetResolvedPerson(existingContactId, furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed);
+            var existingPersonId = state.PersonId!.Value;
+
+            var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(
+                DbContext,
+                existingPersonId,
+                requestData.ApplicationUserId);
+
+            requestData.SetResolvedPerson(existingPersonId, furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed);
 
             if (furtherChecksNeeded)
             {
                 var furtherChecksSupportTask = SupportTask.Create(
                     SupportTaskType.TrnRequestManualChecksNeeded,
                     new TrnRequestManualChecksNeededData(),
-                    existingContactId,
+                    existingPersonId,
                     requestData.OneLoginUserSubject,
                     requestData.ApplicationUserId,
                     requestData.RequestId,
                     User.GetUserId(),
-                    clock.UtcNow,
+                    now,
                     out var furtherChecksSupportTaskCreatedEvent);
 
                 DbContext.SupportTasks.Add(furtherChecksSupportTask);
@@ -113,13 +134,20 @@ public class CheckAnswers(
             Debug.Assert(Trn is not null);
             requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
 
-            selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
+            var selectedPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == existingPersonId);
+            selectedPersonAttributes = GetPersonAttributes(selectedPerson);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
-                trnRequestService => trnRequestService.UpdateContactFromTrnRequestAsync(
+            if (contactsMigrated)
+            {
+                trnRequestService.UpdatePersonFromTrnRequest(selectedPerson, requestData, attributesToUpdate, now);
+            }
+            else
+            {
+                jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(trnRequestService => trnRequestService.UpdateContactFromTrnRequestAsync(
                     requestData,
                     attributesToUpdate));
+            }
 
             oldPersonAttributes = new EventModels.PersonAttributes()
             {
@@ -138,20 +166,27 @@ public class CheckAnswers(
         var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
         supportTask.Status = SupportTaskStatus.Closed;
-        supportTask.UpdatedOn = clock.UtcNow;
+        supportTask.UpdatedOn = now;
         supportTask.UpdateData<ApiTrnRequestData>(data => data with
         {
             ResolvedAttributes = resolvedPersonAttributes,
             SelectedPersonAttributes = selectedPersonAttributes
         });
 
-        var changes = ApiTrnRequestSupportTaskUpdatedEventChanges.Status |
-            (state.FirstNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName : 0) |
-            (state.MiddleNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName : 0) |
-            (state.LastNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName : 0) |
-            (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
-            (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0);
+        var changes = ApiTrnRequestSupportTaskUpdatedEventChanges.Status;
+
+        if (!CreatingNewRecord)
+        {
+            changes |=
+                (state.FirstNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName : 0) |
+                (state.MiddleNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName : 0) |
+                (state.LastNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName : 0) |
+                (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
+                (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
+                (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest
+                    ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber
+                    : 0);
+        }
 
         var @event = new ApiTrnRequestSupportTaskUpdatedEvent()
         {
@@ -173,7 +208,7 @@ public class CheckAnswers(
             OldPersonAttributes = oldPersonAttributes,
             Comments = state.Comments,
             EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = now,
             RaisedBy = User.GetUserId()
         };
         await DbContext.AddEventAndBroadcastAsync(@event);

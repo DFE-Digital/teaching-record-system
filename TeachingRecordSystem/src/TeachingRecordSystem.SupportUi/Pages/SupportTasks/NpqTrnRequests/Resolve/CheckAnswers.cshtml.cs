@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve.ResolveNpqTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
@@ -12,6 +13,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resol
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
     IClock clock) : ResolveNpqTrnRequestPageModel(dbContext)
@@ -54,21 +56,13 @@ public class CheckAnswersModel(
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
         EventModels.PersonAttributes? oldPersonAttributes;
 
+        var now = clock.UtcNow;
+
         if (CreatingNewRecord)
         {
             var trn = await trnGenerator.GenerateTrnAsync();
 
-            var (person, _) = Person.Create(
-                trn,
-                requestData.FirstName ?? string.Empty,
-                requestData.MiddleName ?? string.Empty,
-                requestData.LastName ?? string.Empty,
-                requestData.DateOfBirth,
-                requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
-                requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
-                requestData.Gender,
-                clock.UtcNow);
-
+            var (person, _) = trnRequestService.CreatePersonFromTrnRequest(requestData, trn, now);
             DbContext.Add(person);
 
             requestData.SetResolvedPerson(person.PersonId);
@@ -78,7 +72,7 @@ public class CheckAnswersModel(
             var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
             supportTask.Status = SupportTaskStatus.Closed;
-            supportTask.UpdatedOn = clock.UtcNow;
+            supportTask.UpdatedOn = now;
             supportTask.UpdateData<NpqTrnRequestData>(data => data with
             {
                 ResolvedAttributes = resolvedPersonAttributes,
@@ -96,7 +90,7 @@ public class CheckAnswersModel(
                 OldSupportTask = oldSupportTaskEventModel,
                 Comments = Comments,
                 EventId = Guid.NewGuid(),
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = now,
                 RaisedBy = User.GetUserId()
             };
 
@@ -110,6 +104,7 @@ public class CheckAnswersModel(
             requestData.SetResolvedPerson(existingContactId);
 
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
+            var attributesToUpdate = GetAttributesToUpdate();
 
             oldPersonAttributes = new EventModels.PersonAttributes()
             {
@@ -125,22 +120,12 @@ public class CheckAnswersModel(
             // update the person
             var person = await DbContext.Persons.SingleAsync(p => p.PersonId == requestData.ResolvedPersonId);
 
-            person.UpdateDetails(
-                firstName: selectedPersonAttributes.FirstName,
-                middleName: selectedPersonAttributes.MiddleName,
-                lastName: selectedPersonAttributes.LastName,
-                dateOfBirth: DateOfBirth,
-                emailAddress: EmailAddress is not null ? Core.EmailAddress.Parse(EmailAddress) : null,
-                nationalInsuranceNumber: NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(NationalInsuranceNumber) : null,
-                Gender,
-                clock.UtcNow);
-
-            Debug.Assert(requestData.ResolvedPersonId is not null);
+            trnRequestService.UpdatePersonFromTrnRequest(person, requestData, attributesToUpdate, now);
 
             var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
 
             supportTask.Status = SupportTaskStatus.Closed;
-            supportTask.UpdatedOn = clock.UtcNow;
+            supportTask.UpdatedOn = now;
             supportTask.UpdateData<NpqTrnRequestData>(data => data with
             {
                 ResolvedAttributes = resolvedPersonAttributes,
@@ -173,7 +158,7 @@ public class CheckAnswersModel(
                 OldPersonAttributes = oldPersonAttributes,
                 Comments = Comments,
                 EventId = Guid.NewGuid(),
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = now,
                 RaisedBy = User.GetUserId()
             };
             await DbContext.AddEventAndBroadcastAsync(@event);

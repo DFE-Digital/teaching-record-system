@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Optional;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -94,24 +95,24 @@ public class Person
     }
 
     public UpdatePersonDetailsResult UpdateDetails(
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        EmailAddress? emailAddress,
-        NationalInsuranceNumber? nationalInsuranceNumber,
-        Gender? gender,
+        Option<string> firstName,
+        Option<string> middleName,
+        Option<string> lastName,
+        Option<DateOnly?> dateOfBirth,
+        Option<EmailAddress?> emailAddress,
+        Option<NationalInsuranceNumber?> nationalInsuranceNumber,
+        Option<Gender?> gender,
         DateTime now)
     {
         var oldAttributes = EventModels.PersonAttributes.FromModel(this);
 
-        FirstName = firstName;
-        MiddleName = middleName;
-        LastName = lastName;
-        DateOfBirth = dateOfBirth;
-        EmailAddress = (string?)emailAddress;
-        NationalInsuranceNumber = (string?)nationalInsuranceNumber;
-        Gender = gender;
+        firstName.MatchSome(v => FirstName = v);
+        middleName.MatchSome(v => MiddleName = v);
+        lastName.MatchSome(v => LastName = v);
+        dateOfBirth.MatchSome(v => DateOfBirth = v);
+        emailAddress.MatchSome(v => EmailAddress = (string?)v);
+        nationalInsuranceNumber.MatchSome(v => NationalInsuranceNumber = (string?)v);
+        gender.MatchSome(v => Gender = v);
 
         var changes = 0 |
             (FirstName != oldAttributes.FirstName ? PersonAttributesChanges.FirstName : 0) |
