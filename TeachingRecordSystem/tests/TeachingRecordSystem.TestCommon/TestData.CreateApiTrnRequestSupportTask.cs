@@ -97,7 +97,7 @@ public partial class TestData
             return this;
         }
 
-        public CreateApiTrnRequestSupportTaskBuilder WithMatchedRecords(params Guid[] personIds)
+        public CreateApiTrnRequestSupportTaskBuilder WithMatchedPersons(params Guid[] personIds)
         {
             _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
             return this;
