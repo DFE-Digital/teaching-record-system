@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
 public class MergePostRequestContentBuilder : PostRequestContentBuilder
 {
     private string? OtherTrn { get; set; }
-    private Guid? PrimaryRecordId { get; set; }
+    private Guid? PrimaryPersonId { get; set; }
     private PersonAttributeSource? FirstNameSource { get; set; }
     private PersonAttributeSource? MiddleNameSource { get; set; }
     private PersonAttributeSource? LastNameSource { get; set; }
@@ -27,9 +27,9 @@ public class MergePostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public MergePostRequestContentBuilder WithPrimaryRecordId(Guid? primaryRecordId)
+    public MergePostRequestContentBuilder WithPrimaryPersonId(Guid? primaryPersonId)
     {
-        PrimaryRecordId = primaryRecordId;
+        PrimaryPersonId = primaryPersonId;
         return this;
     }
 

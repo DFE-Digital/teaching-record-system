@@ -17,7 +17,7 @@ public class CheckAnswersModel(
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
     public string BackLink => GetPageLink(ManualMergeJourneyPage.Merge);
-    public string ChangePrimaryRecordLink => GetPageLink(ManualMergeJourneyPage.Matches, fromCheckAnswers: true);
+    public string ChangePrimaryPersonLink => GetPageLink(ManualMergeJourneyPage.Matches, fromCheckAnswers: true);
     public string ChangeDetailsLink => GetPageLink(ManualMergeJourneyPage.Merge, fromCheckAnswers: true);
 
     public string? FirstName { get; set; }
@@ -48,7 +48,7 @@ public class CheckAnswersModel(
             return;
         }
 
-        if (state.PrimaryRecordId is not Guid primaryRecordId)
+        if (state.PrimaryPersonId is not Guid primaryPersonId)
         {
             context.Result = Redirect(GetPageLink(ManualMergeJourneyPage.Matches));
             return;
@@ -62,19 +62,19 @@ public class CheckAnswersModel(
 
         _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
 
-        var secondaryRecordId = primaryRecordId == personAId ? personBId : personAId;
+        var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
 
-        var primaryRecord = _potentialDuplicates.Single(p => p.PersonId == primaryRecordId);
-        var secondaryRecord = _potentialDuplicates.Single(p => p.PersonId == secondaryRecordId);
+        var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
+        var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
 
-        FirstName = state.FirstNameSource == PersonAttributeSource.PrimaryRecord ? primaryRecord.FirstName : secondaryRecord.FirstName;
-        MiddleName = state.MiddleNameSource == PersonAttributeSource.PrimaryRecord ? primaryRecord.MiddleName : secondaryRecord.MiddleName;
-        LastName = state.LastNameSource == PersonAttributeSource.PrimaryRecord ? primaryRecord.LastName : secondaryRecord.LastName;
-        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.PrimaryRecord ? primaryRecord.DateOfBirth : secondaryRecord.DateOfBirth;
-        EmailAddress = state.EmailAddressSource == PersonAttributeSource.PrimaryRecord ? primaryRecord.EmailAddress : secondaryRecord.EmailAddress;
-        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.PrimaryRecord ? primaryRecord.NationalInsuranceNumber : secondaryRecord.NationalInsuranceNumber;
-        Gender = state.GenderSource == PersonAttributeSource.PrimaryRecord ? primaryRecord.Gender : secondaryRecord.Gender;
-        Trn = primaryRecord.Trn;
+        FirstName = state.FirstNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.FirstName : secondaryPerson.FirstName;
+        MiddleName = state.MiddleNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.MiddleName : secondaryPerson.MiddleName;
+        LastName = state.LastNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.LastName : secondaryPerson.LastName;
+        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.DateOfBirth : secondaryPerson.DateOfBirth;
+        EmailAddress = state.EmailAddressSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.EmailAddress : secondaryPerson.EmailAddress;
+        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
+        Gender = state.GenderSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.Gender : secondaryPerson.Gender;
+        Trn = primaryPerson.Trn;
         EvidenceFileId = state.EvidenceFileId;
         EvidenceFileName = state.EvidenceFileName;
         EvidenceFileUrl = state.EvidenceFileId is not null ?
@@ -96,14 +96,12 @@ public class CheckAnswersModel(
         }
 
         var state = JourneyInstance!.State;
-        var primaryRecordId = state.PrimaryRecordId!.Value;
-        var secondaryRecordId = primaryRecordId == state.PersonAId ? state.PersonBId : state.PersonAId;
+        var primaryPersonId = state.PrimaryPersonId!.Value;
+        var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
 
-        var primaryRecord = _potentialDuplicates!.Single(p => p.PersonId == primaryRecordId);
-        var secondaryRecord = _potentialDuplicates!.Single(p => p.PersonId == secondaryRecordId);
+        var primaryPersonAttributes = _potentialDuplicates!.Single(p => p.PersonId == primaryPersonId).Attributes;
 
-        var oldPersonAttributes = primaryRecord.Attributes;
-        var newPersonAttributes = new PersonAttributes()
+        var newPrimaryPersonAttributes = new PersonAttributes()
         {
             FirstName = FirstName ?? string.Empty,
             MiddleName = MiddleName ?? string.Empty,
@@ -115,35 +113,39 @@ public class CheckAnswersModel(
         };
 
         // update the person
-        var person = await DbContext.Persons.SingleAsync(p => p.PersonId == primaryRecordId);
+        var primaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == primaryPersonId);
 
-        person.UpdateDetails(
-            firstName: newPersonAttributes.FirstName,
-            middleName: newPersonAttributes.MiddleName,
-            lastName: newPersonAttributes.LastName,
-            dateOfBirth: newPersonAttributes.DateOfBirth,
-            emailAddress: newPersonAttributes.EmailAddress is not null ? Core.EmailAddress.Parse(newPersonAttributes.EmailAddress) : null,
-            nationalInsuranceNumber: newPersonAttributes.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(newPersonAttributes.NationalInsuranceNumber) : null,
-            gender: newPersonAttributes.Gender,
+        primaryPerson.UpdateDetails(
+            firstName: newPrimaryPersonAttributes.FirstName,
+            middleName: newPrimaryPersonAttributes.MiddleName,
+            lastName: newPrimaryPersonAttributes.LastName,
+            dateOfBirth: newPrimaryPersonAttributes.DateOfBirth,
+            emailAddress: newPrimaryPersonAttributes.EmailAddress is not null ? Core.EmailAddress.Parse(newPrimaryPersonAttributes.EmailAddress) : null,
+            nationalInsuranceNumber: newPrimaryPersonAttributes.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(newPrimaryPersonAttributes.NationalInsuranceNumber) : null,
+            gender: newPrimaryPersonAttributes.Gender,
             clock.UtcNow);
 
         var changes = PersonsMergedEventChanges.None |
-            (state.FirstNameSource is PersonAttributeSource.SecondaryRecord ? PersonsMergedEventChanges.FirstName : 0) |
-            (state.MiddleNameSource is PersonAttributeSource.SecondaryRecord ? PersonsMergedEventChanges.MiddleName : 0) |
-            (state.LastNameSource is PersonAttributeSource.SecondaryRecord ? PersonsMergedEventChanges.LastName : 0) |
-            (state.DateOfBirthSource is PersonAttributeSource.SecondaryRecord ? PersonsMergedEventChanges.DateOfBirth : 0) |
-            (state.EmailAddressSource is PersonAttributeSource.SecondaryRecord ? PersonsMergedEventChanges.EmailAddress : 0) |
-            (state.NationalInsuranceNumberSource is PersonAttributeSource.SecondaryRecord ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
-            (state.GenderSource is PersonAttributeSource.SecondaryRecord ? PersonsMergedEventChanges.Gender : 0);
+            (state.FirstNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.FirstName : 0) |
+            (state.MiddleNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.MiddleName : 0) |
+            (state.LastNameSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.LastName : 0) |
+            (state.DateOfBirthSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.DateOfBirth : 0) |
+            (state.EmailAddressSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.EmailAddress : 0) |
+            (state.NationalInsuranceNumberSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.NationalInsuranceNumber : 0) |
+            (state.GenderSource is PersonAttributeSource.SecondaryPerson ? PersonsMergedEventChanges.Gender : 0);
+
+        var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
+        secondaryPerson.Status = PersonStatus.Deactivated;
 
         var @event = new PersonsMergedEvent()
         {
-            PersonId = primaryRecordId,
-            PrimaryRecordTrn = primaryRecord.Trn,
-            SecondaryRecordTrn = secondaryRecord.Trn,
-            Changes = changes,
-            PersonAttributes = newPersonAttributes,
-            OldPersonAttributes = oldPersonAttributes,
+            PersonId = primaryPersonId,
+            PersonTrn = primaryPerson.Trn!,
+            SecondaryPersonId = secondaryPersonId,
+            SecondaryPersonTrn = secondaryPerson.Trn!,
+            SecondaryPersonStatus = secondaryPerson.Status,
+            PersonAttributes = newPrimaryPersonAttributes,
+            OldPersonAttributes = primaryPersonAttributes,
             EvidenceFile = EvidenceFileId is Guid nameFileId
                 ? new EventModels.File()
                 {
@@ -152,13 +154,11 @@ public class CheckAnswersModel(
                 }
                 : null,
             Comments = Comments,
+            Changes = changes,
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,
             RaisedBy = User.GetUserId()
         };
-
-        var otherPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryRecordId);
-        otherPerson.Status = PersonStatus.Deactivated;
 
         await DbContext.AddEventAndBroadcastAsync(@event);
         await DbContext.SaveChangesAsync();
@@ -166,7 +166,7 @@ public class CheckAnswersModel(
         // This is a little ugly but pushing this into a partial and executing it here is tricky
         var flashMessageHtml =
             $@"
-            <a href=""{LinkGenerator.PersonDetail(primaryRecordId)}"" class=""govuk-link"">View record</a>
+            <a href=""{LinkGenerator.PersonDetail(primaryPersonId)}"" class=""govuk-link"">View record</a>
             ";
 
         TempData.SetFlashSuccess(

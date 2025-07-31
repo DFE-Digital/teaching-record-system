@@ -32,7 +32,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
@@ -67,7 +67,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
@@ -101,7 +101,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
@@ -115,21 +115,21 @@ public class MergeTests : ManualMergeTestBase
 
         Assert.Collection(
             radios,
-            fromRequestRadio =>
+            fromPrimaryPersonRadio =>
             {
-                Assert.False(fromRequestRadio.IsDisabled());
+                Assert.False(fromPrimaryPersonRadio.IsDisabled());
             },
-            fromExistingRecordRadio =>
+            fromSecondaryPersonRadio =>
             {
-                Assert.False(fromExistingRecordRadio.IsDisabled());
+                Assert.False(fromSecondaryPersonRadio.IsDisabled());
                 Assert.NotEmpty(
-                    fromExistingRecordRadio.GetAncestor<IHtmlDivElement>()!.GetElementsByClassName("hods-highlight"));
+                    fromSecondaryPersonRadio.GetAncestor<IHtmlDivElement>()!.GetElementsByClassName("hods-highlight"));
             });
     }
 
     [Theory]
     [MemberData(nameof(AttributesAndFieldsData))]
-    public async Task Get_AttributeSourceSetToPrimaryRecordInState_RendersSelectedSourceRadioButton(
+    public async Task Get_AttributeSourceSetToPrimaryPersonInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName,
         bool useNullValues)
@@ -142,14 +142,14 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
-                .WithFirstNameSource(PersonAttributeSource.PrimaryRecord)
-                .WithMiddleNameSource(PersonAttributeSource.PrimaryRecord)
-                .WithLastNameSource(PersonAttributeSource.PrimaryRecord)
-                .WithDateOfBirthSource(PersonAttributeSource.PrimaryRecord)
-                .WithEmailAddressSource(PersonAttributeSource.PrimaryRecord)
-                .WithNationalInsuranceNumberSource(PersonAttributeSource.PrimaryRecord)
-                .WithGenderSource(PersonAttributeSource.PrimaryRecord)
+                .WithPrimaryPerson(personA)
+                .WithFirstNameSource(PersonAttributeSource.PrimaryPerson)
+                .WithMiddleNameSource(PersonAttributeSource.PrimaryPerson)
+                .WithLastNameSource(PersonAttributeSource.PrimaryPerson)
+                .WithDateOfBirthSource(PersonAttributeSource.PrimaryPerson)
+                .WithEmailAddressSource(PersonAttributeSource.PrimaryPerson)
+                .WithNationalInsuranceNumberSource(PersonAttributeSource.PrimaryPerson)
+                .WithGenderSource(PersonAttributeSource.PrimaryPerson)
                 .WithComments(null)
                 .Build());
 
@@ -166,7 +166,7 @@ public class MergeTests : ManualMergeTestBase
 
     [Theory]
     [MemberData(nameof(AttributesAndFieldsData))]
-    public async Task Get_AttributeSourceSetToSecondaryRecordInState_RendersSelectedSourceRadioButton(
+    public async Task Get_AttributeSourceSetToSecondaryPersonInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName,
         bool useNullValues)
@@ -179,14 +179,14 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
-                .WithFirstNameSource(PersonAttributeSource.SecondaryRecord)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryRecord)
-                .WithLastNameSource(PersonAttributeSource.SecondaryRecord)
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryRecord)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryRecord)
-                .WithNationalInsuranceNumberSource(PersonAttributeSource.SecondaryRecord)
-                .WithGenderSource(PersonAttributeSource.SecondaryRecord)
+                .WithPrimaryPerson(personA)
+                .WithFirstNameSource(PersonAttributeSource.SecondaryPerson)
+                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
+                .WithLastNameSource(PersonAttributeSource.SecondaryPerson)
+                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
+                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
+                .WithNationalInsuranceNumberSource(PersonAttributeSource.SecondaryPerson)
+                .WithGenderSource(PersonAttributeSource.SecondaryPerson)
                 .WithComments(null)
                 .Build());
 
@@ -216,7 +216,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
                 .WithComments(comments)
                 .Build());
@@ -266,7 +266,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -294,7 +294,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -322,7 +322,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -351,7 +351,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -394,7 +394,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -436,7 +436,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -469,7 +469,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -499,7 +499,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -532,7 +532,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -561,7 +561,7 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
@@ -591,14 +591,14 @@ public class MergeTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
-                .WithFirstNameSource(PersonAttributeSource.SecondaryRecord)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryRecord)
-                .WithLastNameSource(PersonAttributeSource.SecondaryRecord)
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryRecord)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryRecord)
-                .WithNationalInsuranceNumberSource(PersonAttributeSource.SecondaryRecord)
-                .WithGenderSource(PersonAttributeSource.SecondaryRecord)
+                .WithPrimaryPerson(personA)
+                .WithFirstNameSource(PersonAttributeSource.SecondaryPerson)
+                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
+                .WithLastNameSource(PersonAttributeSource.SecondaryPerson)
+                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
+                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
+                .WithNationalInsuranceNumberSource(PersonAttributeSource.SecondaryPerson)
+                .WithGenderSource(PersonAttributeSource.SecondaryPerson)
                 .WithComments(null)
                 .Build());
 

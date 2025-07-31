@@ -1,12 +1,16 @@
+using TeachingRecordSystem.Core.Events.Models;
+
 namespace TeachingRecordSystem.Core.Events;
 
 public record PersonsMergedEvent : EventBase, IEventWithPersonAttributes
 {
     public required Guid PersonId { get; init; }
-    public required string? PrimaryRecordTrn { get; init; }
-    public required string? SecondaryRecordTrn { get; init; }
-    public required EventModels.PersonAttributes PersonAttributes { get; init; }
-    public required EventModels.PersonAttributes OldPersonAttributes { get; init; }
+    public required string PersonTrn { get; init; }
+    public required Guid SecondaryPersonId { get; init; }
+    public required string SecondaryPersonTrn { get; init; }
+    public required PersonStatus SecondaryPersonStatus { get; init; }
+    public required PersonAttributes PersonAttributes { get; init; }
+    public required PersonAttributes OldPersonAttributes { get; init; }
     public required EventModels.File? EvidenceFile { get; init; }
     public required string? Comments { get; init; }
     public required PersonsMergedEventChanges Changes { get; init; }

@@ -28,11 +28,12 @@ public abstract class CommonJourneyPage(
 
     public string GetPageLink(ManualMergeJourneyPage? pageName, bool? fromCheckAnswers = null)
     {
+        fromCheckAnswers ??= FromCheckAnswers ? true : null;
         return pageName switch
         {
-            ManualMergeJourneyPage.EnterTrn => LinkGenerator.PersonManualMergeEnterTrn(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers ?? FromCheckAnswers),
-            ManualMergeJourneyPage.Matches => LinkGenerator.PersonManualMergeMatches(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers ?? FromCheckAnswers),
-            ManualMergeJourneyPage.Merge => LinkGenerator.PersonManualMergeMerge(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers ?? FromCheckAnswers),
+            ManualMergeJourneyPage.EnterTrn => LinkGenerator.PersonManualMergeEnterTrn(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            ManualMergeJourneyPage.Matches => LinkGenerator.PersonManualMergeMatches(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            ManualMergeJourneyPage.Merge => LinkGenerator.PersonManualMergeMerge(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
             ManualMergeJourneyPage.CheckAnswers => LinkGenerator.PersonManualMergeCheckAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonDetail(PersonId)
         };

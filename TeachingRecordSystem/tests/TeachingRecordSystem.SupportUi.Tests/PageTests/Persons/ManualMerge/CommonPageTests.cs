@@ -34,7 +34,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .Build());
 
@@ -77,7 +77,7 @@ public class CommonPageTests : ManualMergeTestBase
     [Theory]
     [InlineData("merge")]
     [InlineData("check-answers")]
-    public async Task Get_PrimaryRecordNotSelected_RedirectsToMatches(string page)
+    public async Task Get_PrimaryPersonNotSelected_RedirectsToMatches(string page)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -109,7 +109,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
@@ -136,7 +136,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .Build());
 
@@ -171,7 +171,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .Build());
 
@@ -207,7 +207,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .Build());
 
@@ -240,7 +240,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .Build());
 
@@ -289,7 +289,7 @@ public class CommonPageTests : ManualMergeTestBase
     [Theory]
     [InlineData("merge")]
     [InlineData("check-answers")]
-    public async Task Post_PrimaryRecordNotSelected_RedirectsToMatches(string page)
+    public async Task Post_PrimaryPersonNotSelected_RedirectsToMatches(string page)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -321,7 +321,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, page, journeyInstance));
@@ -356,7 +356,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -365,7 +365,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -393,7 +393,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -402,7 +402,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -441,7 +441,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -451,7 +451,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -484,7 +484,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -493,7 +493,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -520,7 +520,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -529,7 +529,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -565,7 +565,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -575,7 +575,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -602,7 +602,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -611,7 +611,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -644,7 +644,7 @@ public class CommonPageTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -653,7 +653,7 @@ public class CommonPageTests : ManualMergeTestBase
         {
             Content = new MergePostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };

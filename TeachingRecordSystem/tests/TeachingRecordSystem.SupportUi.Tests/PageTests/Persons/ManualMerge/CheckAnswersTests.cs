@@ -32,7 +32,7 @@ public class CheckAnswersTests : ManualMergeTestBase
         var state = new MergeStateBuilder()
             .WithInitializedState(personA)
             .WithPersonB(personB)
-            .WithPrimaryRecord(personA)
+            .WithPrimaryPerson(personA)
             .WithAttributeSourcesSet()
             .WithComments(comments)
             .WithUploadEvidenceChoice(true, evidenceFileId, evidenceFileName)
@@ -61,20 +61,20 @@ public class CheckAnswersTests : ManualMergeTestBase
 
     [Theory]
     [MemberData(nameof(PersonAttributeInfoData))]
-    public async Task Get_AttributeSourceIsSecondaryRecord_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromSecondaryRecordAttribute, bool useNullValues)
+    public async Task Get_AttributeSourceIsSecondaryPerson_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromSecondaryPersonAttribute, bool useNullValues)
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithSingleDifferenceToMatch(
-            sourcedFromSecondaryRecordAttribute.Attribute,
+            sourcedFromSecondaryPersonAttribute.Attribute,
             useNullValues: useNullValues);
 
         var state = new MergeStateBuilder()
             .WithInitializedState(personA)
             .WithPersonB(personB)
-            .WithPrimaryRecord(personA)
+            .WithPrimaryPerson(personA)
             .WithAttributeSourcesSet()
             .Build();
-        SetPersonAttributeSourceToSecondaryRecord(state, sourcedFromSecondaryRecordAttribute.Attribute);
+        SetPersonAttributeSourceToSecondaryPerson(state, sourcedFromSecondaryPersonAttribute.Attribute);
 
         var journeyInstance = await CreateJourneyInstanceAsync(personA.PersonId, state);
 
@@ -107,26 +107,26 @@ public class CheckAnswersTests : ManualMergeTestBase
                 continue;
             }
 
-            if (sourcedFromSecondaryRecordAttribute.SummaryListRowKey == kvp.Key)
+            if (sourcedFromSecondaryPersonAttribute.SummaryListRowKey == kvp.Key)
             {
-                var primaryRecordValue = FormatValue(attributeInfo.GetValueFromPerson(personB));
-                Assert.Equal(primaryRecordValue, kvp.Value);
+                var primaryPersonValue = FormatValue(attributeInfo.GetValueFromPersonResult(personB));
+                Assert.Equal(primaryPersonValue, kvp.Value);
             }
             else
             {
-                var secondaryRecordValue = FormatValue(attributeInfo.GetValueFromPerson(personA));
-                Assert.Equal(secondaryRecordValue, kvp.Value);
+                var secondaryPersonValue = FormatValue(attributeInfo.GetValueFromPersonResult(personA));
+                Assert.Equal(secondaryPersonValue, kvp.Value);
             }
         }
     }
 
     [Theory]
     [MemberData(nameof(PersonAttributeInfoData))]
-    public async Task Post_UpdatesPrimaryRecordPublishesEventDeactivatesSecondaryRecordCompletesJourneyAndRedirects(PersonAttributeInfo sourcedFromSecondaryRecordAttribute, bool useNullValues)
+    public async Task Post_UpdatesPrimaryPersonPublishesEventDeactivatesSecondaryPersonCompletesJourneyAndRedirects(PersonAttributeInfo sourcedFromSecondaryPersonAttribute, bool useNullValues)
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithSingleDifferenceToMatch(
-            sourcedFromSecondaryRecordAttribute.Attribute,
+            sourcedFromSecondaryPersonAttribute.Attribute,
             useNullValues: useNullValues);
 
         Clock.Advance();
@@ -138,12 +138,12 @@ public class CheckAnswersTests : ManualMergeTestBase
         var state = new MergeStateBuilder()
             .WithInitializedState(personA)
             .WithPersonB(personB)
-            .WithPrimaryRecord(personA)
+            .WithPrimaryPerson(personA)
             .WithAttributeSourcesSet()
             .WithComments(comments)
             .WithUploadEvidenceChoice(true, evidenceFileId, evidenceFileName)
             .Build();
-        SetPersonAttributeSourceToSecondaryRecord(state, sourcedFromSecondaryRecordAttribute.Attribute);
+        SetPersonAttributeSourceToSecondaryPerson(state, sourcedFromSecondaryPersonAttribute.Attribute);
 
         var journeyInstance = await CreateJourneyInstanceAsync(personA.PersonId, state);
 
@@ -158,15 +158,15 @@ public class CheckAnswersTests : ManualMergeTestBase
         AssertEx.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}");
 
-        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons
+        var primaryPerson = await WithDbContext(dbContext => dbContext.Persons
             .IgnoreQueryFilters()
             .SingleAsync(p => p.PersonId == personA.PersonId));
-        Assert.Equal(PersonStatus.Active, updatedPerson.Status);
+        Assert.Equal(PersonStatus.Active, primaryPerson.Status);
 
-        var secondaryRecord = await WithDbContext(dbContext => dbContext.Persons
+        var secondaryPerson = await WithDbContext(dbContext => dbContext.Persons
             .IgnoreQueryFilters()
             .SingleAsync(p => p.PersonId == personB.PersonId));
-        Assert.Equal(PersonStatus.Deactivated, secondaryRecord.Status);
+        Assert.Equal(PersonStatus.Deactivated, secondaryPerson.Status);
 
         static object? FormatValue(object? value) =>
             value switch
@@ -179,21 +179,13 @@ public class CheckAnswersTests : ManualMergeTestBase
 
         foreach (var attr in PersonAttributeInfos)
         {
-            if (attr.Attribute == sourcedFromSecondaryRecordAttribute.Attribute)
+            if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
             {
-                var x = attr.GetValueFromPerson(personB);
-                var fx = FormatValue(x);
-                var y = attr.GetValueFromPersonRecord(updatedPerson);
-                var fy = FormatValue(y);
-                Assert.Equal(fx, fy);
+                Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personB)), FormatValue(attr.GetValueFromPerson(primaryPerson)));
             }
             else
             {
-                var x = attr.GetValueFromPerson(personA);
-                var fx = FormatValue(x);
-                var y = attr.GetValueFromPersonRecord(updatedPerson);
-                var fy = FormatValue(y);
-                Assert.Equal(fx, fy);
+                Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personA)), FormatValue(attr.GetValueFromPerson(primaryPerson)));
 
             }
         }
@@ -203,30 +195,22 @@ public class CheckAnswersTests : ManualMergeTestBase
         {
             var actualEvent = Assert.IsType<PersonsMergedEvent>(e);
             Assert.Equal(personA.PersonId, actualEvent.PersonId);
+            Assert.Equal(personA.Trn, actualEvent.PersonTrn);
+            Assert.Equal(personB.PersonId, actualEvent.SecondaryPersonId);
+            Assert.Equal(personB.Trn, actualEvent.SecondaryPersonTrn);
+            Assert.Equal(PersonStatus.Deactivated, actualEvent.SecondaryPersonStatus);
 
             foreach (var attr in PersonAttributeInfos)
             {
-                var x = attr.GetValueFromPerson(personA);
-                var fx = FormatValue(x);
-                var y = attr.GetValueFromPersonAttributes(actualEvent.OldPersonAttributes);
-                var fy = FormatValue(y);
-                Assert.Equal(fx, fy);
+                Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.OldPersonAttributes)));
 
-                if (attr.Attribute == sourcedFromSecondaryRecordAttribute.Attribute)
+                if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
                 {
-                    var a = attr.GetValueFromPerson(personB);
-                    var fa = FormatValue(a);
-                    var b = attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes);
-                    var fb = FormatValue(b);
-                    Assert.Equal(fa, fb);
+                    Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personB)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
                 }
                 else
                 {
-                    var a = attr.GetValueFromPerson(personA);
-                    var fa = FormatValue(a);
-                    var b = attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes);
-                    var fb = FormatValue(b);
-                    Assert.Equal(fa, fb);
+                    Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
                 }
             }
 
@@ -234,27 +218,40 @@ public class CheckAnswersTests : ManualMergeTestBase
             Assert.Equal(evidenceFileName, actualEvent.EvidenceFile?.Name);
             Assert.Equal(comments, actualEvent.Comments);
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
+
+            var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
+            {
+                PersonMatchedAttribute.FirstName => PersonsMergedEventChanges.FirstName,
+                PersonMatchedAttribute.MiddleName => PersonsMergedEventChanges.MiddleName,
+                PersonMatchedAttribute.LastName => PersonsMergedEventChanges.LastName,
+                PersonMatchedAttribute.DateOfBirth => PersonsMergedEventChanges.DateOfBirth,
+                PersonMatchedAttribute.EmailAddress => PersonsMergedEventChanges.EmailAddress,
+                PersonMatchedAttribute.NationalInsuranceNumber => PersonsMergedEventChanges.NationalInsuranceNumber,
+                PersonMatchedAttribute.Gender => PersonsMergedEventChanges.Gender,
+                _ => PersonsMergedEventChanges.None,
+            };
+            Assert.Equal(expectedChange, actualEvent.Changes);
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"Records merged successfully for {updatedPerson.FirstName} {updatedPerson.MiddleName} {updatedPerson.LastName}");
+            $"Records merged successfully for {primaryPerson.FirstName} {primaryPerson.MiddleName} {primaryPerson.LastName}");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
     }
 
-    private static void SetPersonAttributeSourceToSecondaryRecord(ManualMergeState state, PersonMatchedAttribute attribute)
+    private static void SetPersonAttributeSourceToSecondaryPerson(ManualMergeState state, PersonMatchedAttribute attribute)
     {
-        state.FirstNameSource = attribute is PersonMatchedAttribute.FirstName ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
-        state.MiddleNameSource = attribute is PersonMatchedAttribute.MiddleName ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
-        state.LastNameSource = attribute is PersonMatchedAttribute.LastName ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
-        state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
-        state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
-        state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
-        state.GenderSource = attribute is PersonMatchedAttribute.Gender ? PersonAttributeSource.SecondaryRecord : PersonAttributeSource.PrimaryRecord;
+        state.FirstNameSource = attribute is PersonMatchedAttribute.FirstName ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+        state.MiddleNameSource = attribute is PersonMatchedAttribute.MiddleName ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+        state.LastNameSource = attribute is PersonMatchedAttribute.LastName ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+        state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+        state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+        state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
+        state.GenderSource = attribute is PersonMatchedAttribute.Gender ? PersonAttributeSource.SecondaryPerson : PersonAttributeSource.PrimaryPerson;
     }
 
     public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
@@ -324,8 +321,8 @@ public class CheckAnswersTests : ManualMergeTestBase
         PersonMatchedAttribute Attribute,
         string FieldName,
         string SummaryListRowKey,
-        Func<TestData.CreatePersonResult, object?> GetValueFromPerson,
-        Func<Person, object?> GetValueFromPersonRecord,
+        Func<TestData.CreatePersonResult, object?> GetValueFromPersonResult,
+        Func<Person, object?> GetValueFromPerson,
         Func<PersonAttributes, object?> GetValueFromPersonAttributes,
         Func<object?, object?>? MapValueToSummaryListRowValue = null);
 

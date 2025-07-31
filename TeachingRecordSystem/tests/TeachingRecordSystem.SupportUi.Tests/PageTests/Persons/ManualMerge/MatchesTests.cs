@@ -18,7 +18,7 @@ public class MatchesTests : ManualMergeTestBase
     }
 
     [Fact]
-    public async Task Get_FieldsPopulatedFromPersonRecord()
+    public async Task Get_FieldsPopulatedFromPerson()
     {
         var personA = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
@@ -57,23 +57,23 @@ public class MatchesTests : ManualMergeTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("record-a", "First name", v => Assert.Equal("Alfred", v.TrimmedText()));
-        doc.AssertRow("record-a", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
-        doc.AssertRow("record-a", "Last name", v => Assert.Equal("Great", v.TrimmedText()));
-        doc.AssertRow("record-a", "Date of birth", v => Assert.Equal("1 January 2001", v.TrimmedText()));
-        doc.AssertRow("record-a", "Email", v => Assert.Equal("an@email.com", v.TrimmedText()));
-        doc.AssertRow("record-a", "National Insurance number", v => Assert.Equal("AB123456D", v.TrimmedText()));
-        doc.AssertRow("record-a", "Gender", v => Assert.Equal("Female", v.TrimmedText()));
-        doc.AssertRow("record-a", "TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
+        doc.AssertRow("person-a", "First name", v => Assert.Equal("Alfred", v.TrimmedText()));
+        doc.AssertRow("person-a", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
+        doc.AssertRow("person-a", "Last name", v => Assert.Equal("Great", v.TrimmedText()));
+        doc.AssertRow("person-a", "Date of birth", v => Assert.Equal("1 January 2001", v.TrimmedText()));
+        doc.AssertRow("person-a", "Email", v => Assert.Equal("an@email.com", v.TrimmedText()));
+        doc.AssertRow("person-a", "National Insurance number", v => Assert.Equal("AB123456D", v.TrimmedText()));
+        doc.AssertRow("person-a", "Gender", v => Assert.Equal("Female", v.TrimmedText()));
+        doc.AssertRow("person-a", "TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
 
-        doc.AssertRow("record-b", "First name", v => Assert.Equal("Lily", v.TrimmedText()));
-        doc.AssertRow("record-b", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
-        doc.AssertRow("record-b", "Last name", v => Assert.Equal("Pink", v.TrimmedText()));
-        doc.AssertRow("record-b", "Date of birth", v => Assert.Equal("1 February 2002", v.TrimmedText()));
-        doc.AssertRow("record-b", "Email", v => Assert.Equal("another@email.com", v.TrimmedText()));
-        doc.AssertRow("record-b", "National Insurance number", v => Assert.Equal("AB987654D", v.TrimmedText()));
-        doc.AssertRow("record-b", "Gender", v => Assert.Equal("Other", v.TrimmedText()));
-        doc.AssertRow("record-b", "TRN", v => Assert.Equal(personB.Trn, v.TrimmedText()));
+        doc.AssertRow("person-b", "First name", v => Assert.Equal("Lily", v.TrimmedText()));
+        doc.AssertRow("person-b", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
+        doc.AssertRow("person-b", "Last name", v => Assert.Equal("Pink", v.TrimmedText()));
+        doc.AssertRow("person-b", "Date of birth", v => Assert.Equal("1 February 2002", v.TrimmedText()));
+        doc.AssertRow("person-b", "Email", v => Assert.Equal("another@email.com", v.TrimmedText()));
+        doc.AssertRow("person-b", "National Insurance number", v => Assert.Equal("AB987654D", v.TrimmedText()));
+        doc.AssertRow("person-b", "Gender", v => Assert.Equal("Other", v.TrimmedText()));
+        doc.AssertRow("person-b", "TRN", v => Assert.Equal(personB.Trn, v.TrimmedText()));
     }
 
     [Fact]
@@ -106,14 +106,14 @@ public class MatchesTests : ManualMergeTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("record-a", "Alerts", v =>
+        doc.AssertRow("person-a", "Alerts", v =>
         {
             var a = v.QuerySelector("a") as IHtmlAnchorElement;
             Assert.NotNull(a);
             Assert.Equal("(1) open alert (opens in a new tab)", a.TrimmedText());
             Assert.Contains($"/persons/{personA.PersonId}/alerts", a.Href);
         });
-        doc.AssertRow("record-b", "Alerts", v =>
+        doc.AssertRow("person-b", "Alerts", v =>
         {
             var a = v.QuerySelector("a") as IHtmlAnchorElement;
             Assert.NotNull(a);
@@ -159,21 +159,21 @@ public class MatchesTests : ManualMergeTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertMatchRowHasExpectedHighlight("record-a", "First name", false);
-        doc.AssertMatchRowHasExpectedHighlight("record-a", "Middle name", false);
-        doc.AssertMatchRowHasExpectedHighlight("record-a", "Last name", false);
-        doc.AssertMatchRowHasExpectedHighlight("record-a", "Date of birth", false);
-        doc.AssertMatchRowHasExpectedHighlight("record-a", "Email", false);
-        doc.AssertMatchRowHasExpectedHighlight("record-a", "National Insurance number", false);
-        doc.AssertMatchRowHasExpectedHighlight("record-a", "Gender", false);
+        doc.AssertMatchRowHasExpectedHighlight("person-a", "First name", false);
+        doc.AssertMatchRowHasExpectedHighlight("person-a", "Middle name", false);
+        doc.AssertMatchRowHasExpectedHighlight("person-a", "Last name", false);
+        doc.AssertMatchRowHasExpectedHighlight("person-a", "Date of birth", false);
+        doc.AssertMatchRowHasExpectedHighlight("person-a", "Email", false);
+        doc.AssertMatchRowHasExpectedHighlight("person-a", "National Insurance number", false);
+        doc.AssertMatchRowHasExpectedHighlight("person-a", "Gender", false);
 
-        doc.AssertMatchRowHasExpectedHighlight("record-b", "First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
-        doc.AssertMatchRowHasExpectedHighlight("record-b", "Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
-        doc.AssertMatchRowHasExpectedHighlight("record-b", "Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
-        doc.AssertMatchRowHasExpectedHighlight("record-b", "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
-        doc.AssertMatchRowHasExpectedHighlight("record-b", "Email", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
-        doc.AssertMatchRowHasExpectedHighlight("record-b", "National Insurance number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
-        doc.AssertMatchRowHasExpectedHighlight("record-b", "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
+        doc.AssertMatchRowHasExpectedHighlight("person-b", "First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
+        doc.AssertMatchRowHasExpectedHighlight("person-b", "Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
+        doc.AssertMatchRowHasExpectedHighlight("person-b", "Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
+        doc.AssertMatchRowHasExpectedHighlight("person-b", "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
+        doc.AssertMatchRowHasExpectedHighlight("person-b", "Email", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
+        doc.AssertMatchRowHasExpectedHighlight("person-b", "National Insurance number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+        doc.AssertMatchRowHasExpectedHighlight("person-b", "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
     [Fact]
@@ -212,12 +212,12 @@ public class MatchesTests : ManualMergeTestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
-        var primaryRecordOptions = doc.GetElementByTestId("primary-record-options");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
         var continueButton = doc.GetElementByTestId("continue-button");
 
         Assert.NotNull(warningText);
         Assert.Contains("One of these records has been deactivated. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
-        Assert.Null(primaryRecordOptions);
+        Assert.Null(primaryPersonOptions);
         Assert.Null(continueButton);
     }
 
@@ -250,12 +250,12 @@ public class MatchesTests : ManualMergeTestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
-        var primaryRecordOptions = doc.GetElementByTestId("primary-record-options");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
         var continueButton = doc.GetElementByTestId("continue-button");
 
         Assert.NotNull(warningText);
         Assert.Contains("One of these records has an alert. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
-        Assert.Null(primaryRecordOptions);
+        Assert.Null(primaryPersonOptions);
         Assert.Null(continueButton);
     }
 
@@ -298,20 +298,20 @@ public class MatchesTests : ManualMergeTestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
-        var primaryRecordOptions = doc.GetElementByTestId("primary-record-options");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
         var continueButton = doc.GetElementByTestId("continue-button");
 
         if (expectMergeToBeAllowed)
         {
             Assert.Null(warningText);
-            Assert.NotNull(primaryRecordOptions);
+            Assert.NotNull(primaryPersonOptions);
             Assert.NotNull(continueButton);
         }
         else
         {
             Assert.NotNull(warningText);
             Assert.Contains($"The induction status of one of these records is {status.GetDisplayName()}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
-            Assert.Null(primaryRecordOptions);
+            Assert.Null(primaryPersonOptions);
             Assert.Null(continueButton);
         }
     }
@@ -352,17 +352,17 @@ public class MatchesTests : ManualMergeTestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
-        var primaryRecordOptions = doc.GetElementByTestId("primary-record-options");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
         var continueButton = doc.GetElementByTestId("continue-button");
 
         Assert.NotNull(warningText);
         Assert.Contains($"One of these records has an alert and an induction status of {status.GetDisplayName()}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
-        Assert.Null(primaryRecordOptions);
+        Assert.Null(primaryPersonOptions);
         Assert.Null(continueButton);
     }
 
     [Fact]
-    public async Task Get_PrimaryRecordAlreadySelected_SelectsChosenRecord()
+    public async Task Get_PrimaryPersonAlreadySelected_SelectsChosenPerson()
     {
         var personA = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
@@ -377,7 +377,7 @@ public class MatchesTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personB)
+                .WithPrimaryPerson(personB)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
@@ -388,13 +388,13 @@ public class MatchesTests : ManualMergeTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var primaryRecordChoice = doc.GetChildElementsOfTestId<IHtmlInputElement>("primary-record-options", "input[type='radio']")
+        var primaryPersonChoice = doc.GetChildElementsOfTestId<IHtmlInputElement>("primary-person-options", "input[type='radio']")
             .Single(i => i.IsChecked == true).Value;
-        Assert.Equal(personB.PersonId.ToString(), primaryRecordChoice);
+        Assert.Equal(personB.PersonId.ToString(), primaryPersonChoice);
     }
 
     [Fact]
-    public async Task Post_PrimaryRecordNotSelected_ShowsPageError()
+    public async Task Post_PrimaryPersonNotSelected_ShowsPageError()
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
@@ -415,7 +415,7 @@ public class MatchesTests : ManualMergeTestBase
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(null)
+                .WithPrimaryPersonId(null)
                 .BuildFormUrlEncoded()
         };
 
@@ -423,7 +423,7 @@ public class MatchesTests : ManualMergeTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryRecordId), "Select primary record");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "Select primary record");
     }
 
     [Fact]
@@ -448,7 +448,7 @@ public class MatchesTests : ManualMergeTestBase
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .BuildFormUrlEncoded()
         };
 
@@ -460,11 +460,11 @@ public class MatchesTests : ManualMergeTestBase
             $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryRecordId);
+        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
     }
 
     [Fact]
-    public async Task Post_PrimaryRecordChanged_SwapsPrimaryAndSecondarySources_ToKeepSelectedDataCorrect()
+    public async Task Post_PrimaryPersonChanged_SwapsPrimaryAndSecondarySources_ToKeepSelectedDataCorrect()
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithAllDifferences();
@@ -474,15 +474,15 @@ public class MatchesTests : ManualMergeTestBase
             new MergeStateBuilder()
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
-                .WithPrimaryRecord(personA)
+                .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
-                .WithFirstNameSource(PersonAttributeSource.PrimaryRecord)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryRecord)
+                .WithFirstNameSource(PersonAttributeSource.PrimaryPerson)
+                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
                 // Leaving LastNameSource unselected
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryRecord)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryRecord)
+                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
+                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
                 // Leaving NationalInsuranceNumberSource unselected
-                .WithGenderSource(PersonAttributeSource.PrimaryRecord)
+                .WithGenderSource(PersonAttributeSource.PrimaryPerson)
                 .WithUploadEvidenceChoice(false)
                 .WithComments(null)
                 .Build());
@@ -490,7 +490,7 @@ public class MatchesTests : ManualMergeTestBase
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePostRequestContentBuilder()
-                .WithPrimaryRecordId(personB.PersonId)
+                .WithPrimaryPersonId(personB.PersonId)
                 .BuildFormUrlEncoded()
         };
 
@@ -502,15 +502,15 @@ public class MatchesTests : ManualMergeTestBase
             $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryRecordId);
+        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
 
-        Assert.Equal(PersonAttributeSource.SecondaryRecord, journeyInstance.State.FirstNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryRecord, journeyInstance.State.MiddleNameSource);
+        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.FirstNameSource);
+        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.MiddleNameSource);
         Assert.Null(journeyInstance.State.LastNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryRecord, journeyInstance.State.DateOfBirthSource);
-        Assert.Equal(PersonAttributeSource.PrimaryRecord, journeyInstance.State.EmailAddressSource);
+        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.DateOfBirthSource);
+        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.EmailAddressSource);
         Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
-        Assert.Equal(PersonAttributeSource.SecondaryRecord, journeyInstance.State.GenderSource);
+        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.GenderSource);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<ManualMergeState>? journeyInstance = null) =>

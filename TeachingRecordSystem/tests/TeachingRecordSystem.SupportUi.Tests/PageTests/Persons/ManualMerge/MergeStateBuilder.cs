@@ -9,7 +9,7 @@ public class MergeStateBuilder
     private string? PersonBTrn { get; set; }
     private Guid? PersonAId { get; set; }
     private Guid? PersonBId { get; set; }
-    private Guid? PrimaryRecordId { get; set; }
+    private Guid? PrimaryPersonId { get; set; }
     private PersonAttributeSource? FirstNameSource { get; set; }
     private PersonAttributeSource? MiddleNameSource { get; set; }
     private PersonAttributeSource? LastNameSource { get; set; }
@@ -39,9 +39,9 @@ public class MergeStateBuilder
         return this;
     }
 
-    public MergeStateBuilder WithPrimaryRecord(TestData.CreatePersonResult person)
+    public MergeStateBuilder WithPrimaryPerson(TestData.CreatePersonResult person)
     {
-        PrimaryRecordId = person.PersonId;
+        PrimaryPersonId = person.PersonId;
         return this;
     }
 
@@ -120,7 +120,7 @@ public class MergeStateBuilder
             PersonATrn = PersonATrn,
             PersonBId = PersonBId,
             PersonBTrn = PersonBTrn,
-            PrimaryRecordId = PrimaryRecordId,
+            PrimaryPersonId = PrimaryPersonId,
 
             PersonAttributeSourcesSet = PersonAttributeSourcesSet,
             FirstNameSource = FirstNameSource,

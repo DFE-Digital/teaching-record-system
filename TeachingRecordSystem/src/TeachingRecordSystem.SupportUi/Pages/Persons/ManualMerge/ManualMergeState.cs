@@ -14,7 +14,7 @@ public class ManualMergeState : IRegisterJourney
     public string? PersonBTrn { get; set; }
     public Guid? PersonAId { get; set; }
     public Guid? PersonBId { get; set; }
-    public Guid? PrimaryRecordId { get; set; }
+    public Guid? PrimaryPersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }
     public PersonAttributeSource? MiddleNameSource { get; set; }

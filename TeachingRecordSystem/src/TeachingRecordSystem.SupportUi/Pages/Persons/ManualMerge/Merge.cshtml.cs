@@ -94,7 +94,7 @@ public class MergeModel(
             return;
         }
 
-        if (JourneyInstance!.State.PrimaryRecordId is not Guid primaryRecordId)
+        if (JourneyInstance!.State.PrimaryPersonId is not Guid primaryPersonId)
         {
             context.Result = Redirect(GetPageLink(ManualMergeJourneyPage.Matches));
             return;
@@ -102,59 +102,59 @@ public class MergeModel(
 
         _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
 
-        var secondaryRecordId = primaryRecordId == personAId ? personBId : personAId;
+        var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
 
-        var primaryRecord = _potentialDuplicates.Single(p => p.PersonId == primaryRecordId);
-        var secondaryRecord = _potentialDuplicates.Single(p => p.PersonId == secondaryRecordId);
+        var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
+        var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
 
         var attributeMatches = GetPersonAttributeMatches(
-            primaryRecord.Attributes,
-            secondaryRecord.Attributes.FirstName,
-            secondaryRecord.Attributes.MiddleName,
-            secondaryRecord.Attributes.LastName,
-            secondaryRecord.Attributes.DateOfBirth,
-            secondaryRecord.Attributes.EmailAddress,
-            secondaryRecord.Attributes.NationalInsuranceNumber,
-            secondaryRecord.Attributes.Gender);
+            primaryPerson.Attributes,
+            secondaryPerson.Attributes.FirstName,
+            secondaryPerson.Attributes.MiddleName,
+            secondaryPerson.Attributes.LastName,
+            secondaryPerson.Attributes.DateOfBirth,
+            secondaryPerson.Attributes.EmailAddress,
+            secondaryPerson.Attributes.NationalInsuranceNumber,
+            secondaryPerson.Attributes.Gender);
 
         Trn = new PersonAttribute<string>(
-            primaryRecord.Trn,
-            secondaryRecord.FirstName,
+            primaryPerson.Trn,
+            secondaryPerson.FirstName,
             Different: true);
 
         FirstName = new PersonAttribute<string>(
-            primaryRecord.Attributes.FirstName,
-            secondaryRecord.Attributes.FirstName,
+            primaryPerson.Attributes.FirstName,
+            secondaryPerson.Attributes.FirstName,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
 
         MiddleName = new PersonAttribute<string>(
-            primaryRecord.Attributes.MiddleName,
-            secondaryRecord.Attributes.MiddleName,
+            primaryPerson.Attributes.MiddleName,
+            secondaryPerson.Attributes.MiddleName,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.MiddleName));
 
         LastName = new PersonAttribute<string>(
-            primaryRecord.Attributes.LastName,
-            secondaryRecord.Attributes.LastName,
+            primaryPerson.Attributes.LastName,
+            secondaryPerson.Attributes.LastName,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
-            primaryRecord.Attributes.DateOfBirth,
-            secondaryRecord.Attributes.DateOfBirth,
+            primaryPerson.Attributes.DateOfBirth,
+            secondaryPerson.Attributes.DateOfBirth,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
 
         EmailAddress = new PersonAttribute<string?>(
-            primaryRecord.Attributes.EmailAddress,
-            secondaryRecord.Attributes.EmailAddress,
+            primaryPerson.Attributes.EmailAddress,
+            secondaryPerson.Attributes.EmailAddress,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.EmailAddress));
 
         NationalInsuranceNumber = new PersonAttribute<string?>(
-            primaryRecord.Attributes.NationalInsuranceNumber,
-            secondaryRecord.Attributes.NationalInsuranceNumber,
+            primaryPerson.Attributes.NationalInsuranceNumber,
+            secondaryPerson.Attributes.NationalInsuranceNumber,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
 
         Gender = new PersonAttribute<Gender?>(
-            primaryRecord.Attributes.Gender,
-            secondaryRecord.Attributes.Gender,
+            primaryPerson.Attributes.Gender,
+            secondaryPerson.Attributes.Gender,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
     }
 

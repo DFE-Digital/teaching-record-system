@@ -37,10 +37,10 @@
 
     <div style="display: flex">
         <div class="govuk-heading-m govuk-!-width-one-half">
-            Primary record (TRN @Model.Trn!.PrimaryRecordValue)
+            Primary record (TRN @Model.Trn!.PrimaryPersonValue)
         </div>
         <div class="govuk-heading-m govuk-!-width-one-half">
-            Secondary record (TRN @Model.Trn!.SecondaryRecordValue)
+            Secondary record (TRN @Model.Trn!.SecondaryPersonValue)
         </div>
     </div>
 
@@ -54,11 +54,11 @@
                     <govuk-radios asp-for="FirstNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.PrimaryRecord" disabled="@(!Model.FirstName!.Different)">
-                                @(Model.FirstName!.PrimaryRecordValue ?? UiDefaults.EmptyDisplayContent)
+                            <govuk-radios-item value="@PersonAttributeSource.PrimaryPerson" disabled="@(!Model.FirstName!.Different)">
+                                @(Model.FirstName!.PrimaryPersonValue ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.SecondaryRecord" disabled="@(!Model.FirstName!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.FirstName!.SecondaryRecordValue, Model.FirstName.Different); }
+                            <govuk-radios-item value="@PersonAttributeSource.SecondaryPerson" disabled="@(!Model.FirstName!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.FirstName!.SecondaryPersonValue, Model.FirstName.Different); }
                             </govuk-radios-item>
                         </govuk-radios-fieldset>
                     </govuk-radios>
@@ -70,11 +70,11 @@
                     <govuk-radios asp-for="MiddleNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.PrimaryRecord" disabled="@(!Model.MiddleName!.Different)">
-                                @(Model.MiddleName!.PrimaryRecordValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
+                            <govuk-radios-item value="@PersonAttributeSource.PrimaryPerson" disabled="@(!Model.MiddleName!.Different)">
+                                @(Model.MiddleName!.PrimaryPersonValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.SecondaryRecord" disabled="@(!Model.MiddleName!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.MiddleName!.SecondaryRecordValue, Model.MiddleName.Different); }
+                            <govuk-radios-item value="@PersonAttributeSource.SecondaryPerson" disabled="@(!Model.MiddleName!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.MiddleName!.SecondaryPersonValue, Model.MiddleName.Different); }
                             </govuk-radios-item>
                         </govuk-radios-fieldset>
                     </govuk-radios>
@@ -86,11 +86,11 @@
                     <govuk-radios asp-for="LastNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.PrimaryRecord" disabled="@(!Model.LastName!.Different)">
-                                @(Model.LastName!.PrimaryRecordValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
+                            <govuk-radios-item value="@PersonAttributeSource.PrimaryPerson" disabled="@(!Model.LastName!.Different)">
+                                @(Model.LastName!.PrimaryPersonValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.SecondaryRecord" disabled="@(!Model.LastName!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.LastName!.SecondaryRecordValue, Model.LastName.Different); }
+                            <govuk-radios-item value="@PersonAttributeSource.SecondaryPerson" disabled="@(!Model.LastName!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.LastName!.SecondaryPersonValue, Model.LastName.Different); }
                             </govuk-radios-item>
                         </govuk-radios-fieldset>
                     </govuk-radios>
@@ -102,11 +102,11 @@
                     <govuk-radios asp-for="DateOfBirthSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.PrimaryRecord" disabled="@(!Model.DateOfBirth!.Different)">
-                                @(Model.DateOfBirth!.PrimaryRecordValue?.ToString(UiDefaults.DateOnlyDisplayFormat) ?? UiDefaults.EmptyDisplayContent)
+                            <govuk-radios-item value="@PersonAttributeSource.PrimaryPerson" disabled="@(!Model.DateOfBirth!.Different)">
+                                @(Model.DateOfBirth!.PrimaryPersonValue?.ToString(UiDefaults.DateOnlyDisplayFormat) ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.SecondaryRecord" disabled="@(!Model.DateOfBirth!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.DateOfBirth!.SecondaryRecordValue?.ToString(UiDefaults.DateOnlyDisplayFormat), Model.DateOfBirth.Different); }
+                            <govuk-radios-item value="@PersonAttributeSource.SecondaryPerson" disabled="@(!Model.DateOfBirth!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.DateOfBirth!.SecondaryPersonValue?.ToString(UiDefaults.DateOnlyDisplayFormat), Model.DateOfBirth.Different); }
                             </govuk-radios-item>
                         </govuk-radios-fieldset>
                     </govuk-radios>
@@ -118,11 +118,11 @@
                     <govuk-radios asp-for="EmailAddressSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.PrimaryRecord" disabled="@(!Model.EmailAddress!.Different)">
-                                @(Model.EmailAddress!.PrimaryRecordValue?.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
+                            <govuk-radios-item value="@PersonAttributeSource.PrimaryPerson" disabled="@(!Model.EmailAddress!.Different)">
+                                @(Model.EmailAddress!.PrimaryPersonValue?.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.SecondaryRecord" disabled="@(!Model.EmailAddress!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.EmailAddress!.SecondaryRecordValue, Model.EmailAddress.Different); }
+                            <govuk-radios-item value="@PersonAttributeSource.SecondaryPerson" disabled="@(!Model.EmailAddress!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.EmailAddress!.SecondaryPersonValue, Model.EmailAddress.Different); }
                             </govuk-radios-item>
                         </govuk-radios-fieldset>
                     </govuk-radios>
@@ -134,11 +134,11 @@
                     <govuk-radios asp-for="NationalInsuranceNumberSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.PrimaryRecord" disabled="@(!Model.NationalInsuranceNumber!.Different)">
-                                @(Model.NationalInsuranceNumber!.PrimaryRecordValue?.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
+                            <govuk-radios-item value="@PersonAttributeSource.PrimaryPerson" disabled="@(!Model.NationalInsuranceNumber!.Different)">
+                                @(Model.NationalInsuranceNumber!.PrimaryPersonValue?.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.SecondaryRecord" disabled="@(!Model.NationalInsuranceNumber!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.NationalInsuranceNumber!.SecondaryRecordValue, Model.NationalInsuranceNumber.Different); }
+                            <govuk-radios-item value="@PersonAttributeSource.SecondaryPerson" disabled="@(!Model.NationalInsuranceNumber!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.NationalInsuranceNumber!.SecondaryPersonValue, Model.NationalInsuranceNumber.Different); }
                             </govuk-radios-item>
                         </govuk-radios-fieldset>
                     </govuk-radios>
@@ -150,11 +150,11 @@
                     <govuk-radios asp-for="GenderSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
                         <govuk-radios-fieldset>
                             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.PrimaryRecord" disabled="@(!Model.Gender!.Different)">
-                                @(Model.Gender!.PrimaryRecordValue?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent)
+                            <govuk-radios-item value="@PersonAttributeSource.PrimaryPerson" disabled="@(!Model.Gender!.Different)">
+                                @(Model.Gender!.PrimaryPersonValue?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent)
                             </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.SecondaryRecord" disabled="@(!Model.Gender!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.Gender!.SecondaryRecordValue?.GetDisplayName(), Model.Gender.Different); }
+                            <govuk-radios-item value="@PersonAttributeSource.SecondaryPerson" disabled="@(!Model.Gender!.Different)">
+                                @{ await RenderWithHighlightIfDifferent(Model.Gender!.SecondaryPersonValue?.GetDisplayName(), Model.Gender.Different); }
                             </govuk-radios-item>
                         </govuk-radios-fieldset>
                     </govuk-radios>
