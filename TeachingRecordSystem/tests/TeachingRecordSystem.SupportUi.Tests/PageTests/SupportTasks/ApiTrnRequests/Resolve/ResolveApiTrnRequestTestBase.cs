@@ -11,7 +11,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
-                .WithMatchedRecords(matchedPerson.PersonId)
+                .WithMatchedPersons(matchedPerson.PersonId)
                 .WithFirstName(TestData.GenerateChangedFirstName(matchedPerson.FirstName))
                 .WithMiddleName(TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
                 .WithLastName(TestData.GenerateChangedLastName(matchedPerson.LastName))
@@ -46,7 +46,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUserId,
             t => t
-                .WithMatchedRecords(matchedPerson.PersonId)
+                .WithMatchedPersons(matchedPerson.PersonId)
                 .WithFirstName(
                     differentAttribute != PersonMatchedAttribute.FirstName
                         ? matchedPerson.FirstName

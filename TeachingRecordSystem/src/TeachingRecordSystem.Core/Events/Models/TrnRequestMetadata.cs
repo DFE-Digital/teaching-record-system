@@ -63,11 +63,11 @@ public record TrnRequestMetadata
             Country = model.Country,
             TrnToken = model.TrnToken,
             ResolvedPersonId = model.ResolvedPersonId,
-            Matches = model.Matches is not null && model.Matches.MatchedRecords is not null ?
+            Matches = model.Matches is not null && model.Matches.MatchedPersons is not null ?
                 new TrnRequestMatches()
                 {
-                    MatchedRecords = model.Matches.MatchedRecords
-                        .Select(m => new TrnRequestMatchedRecord()
+                    MatchedPersons = model.Matches.MatchedPersons
+                        .Select(m => new TrnRequestMatchedPerson()
                         {
                             PersonId = m.PersonId
                         })
@@ -85,10 +85,10 @@ public record TrnRequestMetadata
 
 public record TrnRequestMatches
 {
-    public required IReadOnlyList<TrnRequestMatchedRecord> MatchedRecords { get; init; }
+    public required IReadOnlyList<TrnRequestMatchedPerson> MatchedPersons { get; init; }
 }
 
-public record TrnRequestMatchedRecord
+public record TrnRequestMatchedPerson
 {
     public required Guid PersonId { get; init; }
 }

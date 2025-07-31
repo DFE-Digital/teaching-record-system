@@ -45,7 +45,7 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
-                .WithMatchedRecords(match.PersonId)
+                .WithMatchedPersons(match.PersonId)
                 .WithStatus(SupportTaskStatus.Open)
                 .WithFirstName(match.FirstName)
                 .WithMiddleName(TestData.GenerateChangedMiddleName(match.MiddleName))

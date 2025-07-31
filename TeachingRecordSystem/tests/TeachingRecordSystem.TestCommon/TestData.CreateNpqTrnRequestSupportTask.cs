@@ -25,7 +25,7 @@ public partial class TestData
         private Option<string> _lastName;
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
-        private Option<TrnRequestMatchedRecord[]> _matchedRecords;
+        private Option<TrnRequestMatchedPerson[]> _matchedPersons;
         private Option<string> _npqApplicationId;
         private Option<bool> _npqIsInEducationalSetting;
         private Option<string> _npqName;
@@ -114,13 +114,13 @@ public partial class TestData
             return this;
         }
 
-        public CreateNpqTrnRequestSupportTaskBuilder WithMatchedRecords(params Guid[] personIds)
+        public CreateNpqTrnRequestSupportTaskBuilder WithMatchedPersons(params Guid[] personIds)
         {
             if (_withMatches is false)
             {
-                throw new InvalidOperationException("WithMatchedRecords cannot be called when WithMatches is false.");
+                throw new InvalidOperationException("WithMatchedPersons cannot be called when WithMatches is false.");
             }
-            _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedRecord() { PersonId = id }).ToArray());
+            _matchedPersons = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
 
             return this;
         }
@@ -154,13 +154,13 @@ public partial class TestData
             var npqEvidenceFileId = _npqEvidenceFileId.ValueOr(Guid.NewGuid);
             var npqEvidenceFileName = _npqEvidenceFileName.ValueOr("Filename1.txt");
 
-            var matchedRecords = _matchedRecords.ValueOrDefault();
+            var matchedPersons = _matchedPersons.ValueOrDefault();
 
-            if (_withMatches && matchedRecords is null)
+            if (_withMatches && matchedPersons is null)
             {
                 // Matches wasn't explicitly specified; create two person records that match details in this request
 
-                matchedRecords = await Enumerable.Range(1, 2)
+                matchedPersons = await Enumerable.Range(1, 2)
                     .ToAsyncEnumerable()
                     .SelectAwait(async _ =>
                     {
@@ -180,14 +180,14 @@ public partial class TestData
                             }
                         });
 
-                        return new TrnRequestMatchedRecord() { PersonId = person.PersonId };
+                        return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
                     })
                     .ToArrayAsync();
             }
 
-            var matches = new TrnRequestMatches() { MatchedRecords = matchedRecords };
+            var matches = new TrnRequestMatches() { MatchedPersons = matchedPersons };
 
-            var potentialDuplicate = matchedRecords?.Length > 0;
+            var potentialDuplicate = matchedPersons?.Length > 0;
 
             var metadata = new TrnRequestMetadata
             {

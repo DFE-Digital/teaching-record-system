@@ -72,7 +72,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId);
+            supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -147,7 +147,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 DateOfBirthSource = PersonAttributeSource.TrnRequest,
                 EmailAddressSource = PersonAttributeSource.TrnRequest,
                 NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
@@ -216,7 +216,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 Comments = comments
             });
 
@@ -332,7 +332,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId);
+            supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,

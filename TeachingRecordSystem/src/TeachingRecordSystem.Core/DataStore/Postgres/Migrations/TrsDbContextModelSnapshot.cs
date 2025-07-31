@@ -20012,7 +20012,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                 .HasForeignKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId")
                                 .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_application_user_");
 
-                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedRecord", "MatchedRecords", b2 =>
+                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedPerson", "MatchedPersons", b2 =>
                                 {
                                     b2.Property<Guid>("TrnRequestMatchesTrnRequestMetadataApplicationUserId")
                                         .HasColumnType("uuid");
@@ -20038,7 +20038,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                         .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_trn_request_matches");
                                 });
 
-                            b1.Navigation("MatchedRecords");
+                            b1.Navigation("MatchedPersons");
                         });
 
                     b.Navigation("ApplicationUser");
