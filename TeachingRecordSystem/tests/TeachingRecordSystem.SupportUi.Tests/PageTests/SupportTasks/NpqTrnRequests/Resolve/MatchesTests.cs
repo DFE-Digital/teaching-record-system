@@ -78,7 +78,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
 
         var firstMatch = await WithDbContext(
             dbContext => dbContext.Persons.SingleAsync(
-                p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId));
+                p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -190,7 +190,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var firstMatchId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId;
+        var firstMatchId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
@@ -331,7 +331,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
             applicationUser.UserId,
             t => t.WithStatus(SupportTaskStatus.Closed));
 
-        var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId;
+        var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -405,7 +405,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId;
+        var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -473,7 +473,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,

@@ -61,7 +61,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = false
             });
 
@@ -184,7 +184,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true
             });
 
@@ -214,7 +214,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true,
                 Comments = comments
             });
@@ -243,7 +243,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true
             });
 
@@ -333,7 +333,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = false
             });
 

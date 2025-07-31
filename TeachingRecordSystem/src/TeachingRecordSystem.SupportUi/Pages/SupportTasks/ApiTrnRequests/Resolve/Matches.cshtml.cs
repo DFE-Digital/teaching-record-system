@@ -77,13 +77,13 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
         RequestData = GetRequestData();
 
         if (RequestData.PotentialDuplicate != true ||
-            RequestData.Matches is not { MatchedRecords.Count: >= 1 })
+            RequestData.Matches is not { MatchedPersons.Count: >= 1 })
         {
             context.Result = BadRequest();
             return;
         }
 
-        var matchedPersonIds = RequestData.Matches.MatchedRecords.Select(m => m.PersonId).ToArray();
+        var matchedPersonIds = RequestData.Matches.MatchedPersons.Select(m => m.PersonId).ToArray();
 
         PotentialDuplicates = (await DbContext.Persons
             .Where(p => matchedPersonIds.Contains(p.PersonId))

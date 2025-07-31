@@ -49,7 +49,7 @@ public partial class TestData
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
         private Option<Gender?> _gender;
-        private Option<TrnRequestMatchedRecord[]> _matchedRecords;
+        private Option<TrnRequestMatchedPerson[]> _matchedRecords;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
         private Option<TrnRequestStatus> _trnRequestStatus;
@@ -99,7 +99,7 @@ public partial class TestData
 
         public CreateApiTrnRequestSupportTaskBuilder WithMatchedRecords(params Guid[] personIds)
         {
-            _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedRecord() { PersonId = id }).ToArray());
+            _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
             return this;
         }
 
@@ -170,12 +170,12 @@ public partial class TestData
                             }
                         });
 
-                        return new TrnRequestMatchedRecord() { PersonId = person.PersonId };
+                        return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
                     })
                     .ToArrayAsync();
             }
 
-            var matches = new TrnRequestMatches() { MatchedRecords = matchedRecords };
+            var matches = new TrnRequestMatches() { MatchedPersons = matchedRecords };
 
             var potentialDuplicate = matchedRecords.Length > 0;
 

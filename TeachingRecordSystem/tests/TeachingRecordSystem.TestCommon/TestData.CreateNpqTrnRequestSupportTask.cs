@@ -25,7 +25,7 @@ public partial class TestData
         private Option<string> _lastName;
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
-        private Option<TrnRequestMatchedRecord[]> _matchedRecords;
+        private Option<TrnRequestMatchedPerson[]> _matchedRecords;
         private Option<string> _npqApplicationId;
         private Option<bool> _npqIsInEducationalSetting;
         private Option<string> _npqName;
@@ -120,7 +120,7 @@ public partial class TestData
             {
                 throw new InvalidOperationException("WithMatchedRecords cannot be called when WithMatches is false.");
             }
-            _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedRecord() { PersonId = id }).ToArray());
+            _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
 
             return this;
         }
@@ -180,12 +180,12 @@ public partial class TestData
                             }
                         });
 
-                        return new TrnRequestMatchedRecord() { PersonId = person.PersonId };
+                        return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
                     })
                     .ToArrayAsync();
             }
 
-            var matches = new TrnRequestMatches() { MatchedRecords = matchedRecords };
+            var matches = new TrnRequestMatches() { MatchedPersons = matchedRecords };
 
             var potentialDuplicate = matchedRecords?.Length > 0;
 

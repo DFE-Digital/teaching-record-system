@@ -87,10 +87,10 @@ public class TrnRequestMetadata
 
 public record TrnRequestMatches
 {
-    public required IReadOnlyList<TrnRequestMatchedRecord> MatchedRecords { get; init; }
+    public required IReadOnlyList<TrnRequestMatchedPerson> MatchedPersons { get; init; }
 }
 
-public record TrnRequestMatchedRecord
+public record TrnRequestMatchedPerson
 {
     public required Guid PersonId { get; init; }
 }

@@ -157,13 +157,13 @@ public class CreateTrnRequestHandler(
 
         trnRequestMetadata.Matches = new PostgresModels.TrnRequestMatches()
         {
-            MatchedRecords = matchResult.Outcome switch
+            MatchedPersons = matchResult.Outcome switch
             {
                 TrnRequestMatchResultOutcome.PotentialMatches =>
                     matchResult.PotentialMatchesPersonIds
-                        .Select(id => new PostgresModels.TrnRequestMatchedRecord() { PersonId = id })
+                        .Select(id => new PostgresModels.TrnRequestMatchedPerson() { PersonId = id })
                         .ToList(),
-                TrnRequestMatchResultOutcome.DefiniteMatch => [new PostgresModels.TrnRequestMatchedRecord() { PersonId = matchResult.PersonId }],
+                TrnRequestMatchResultOutcome.DefiniteMatch => [new PostgresModels.TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
                 _ => []
             }
         };
