@@ -1,4 +1,5 @@
 using Microsoft.Xrm.Sdk.Messages;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
@@ -71,13 +72,13 @@ public partial class TestData
                         var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId.Value);
 
                         var updatePersonResult = person.UpdateDetails(
-                            _updatedName.Value.FirstName,
-                            _updatedName.Value.MiddleName ?? string.Empty,
-                            _updatedName.Value.LastName,
-                            person.DateOfBirth,
-                            (EmailAddress?)person.EmailAddress,
-                            (NationalInsuranceNumber?)person.NationalInsuranceNumber,
-                            person.Gender,
+                            Option.Some(_updatedName.Value.FirstName),
+                            Option.Some(_updatedName.Value.MiddleName ?? string.Empty),
+                            Option.Some(_updatedName.Value.LastName),
+                            Option.Some(person.DateOfBirth),
+                            Option.Some((EmailAddress?)person.EmailAddress),
+                            Option.Some((NationalInsuranceNumber?)person.NationalInsuranceNumber),
+                            Option.Some(person.Gender),
                             now);
 
                         var updatedEvent = updatePersonResult.Changes != 0 ?

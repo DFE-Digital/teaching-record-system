@@ -356,7 +356,7 @@ public class SignInJourneyHelper(
             return null;
         }
 
-        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
+        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(dbContext, trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
         if (trnRequest is null)
         {
             Debug.Fail("TRN request does not exist.");

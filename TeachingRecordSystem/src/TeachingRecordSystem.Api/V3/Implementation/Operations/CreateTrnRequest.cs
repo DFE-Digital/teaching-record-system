@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Text;
-using System.Transactions;
 using Microsoft.Extensions.Options;
 using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;
@@ -9,7 +8,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.PersonMatching;
@@ -34,46 +32,41 @@ public record CreateTrnRequestCommand
 }
 
 public class CreateTrnRequestHandler(
-    IDbContextFactory<TrsDbContext> dbContextFactory,
+    TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     IPersonMatchingService personMatchingService,
     TrnRequestService trnRequestService,
     ICurrentUserProvider currentUserProvider,
     ITrnGenerator trnGenerationApiClient,
-    IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor,
     IFeatureProvider featureProvider)
 {
-    private static readonly TimeSpan _waitForBackgroundJobCompletion = TimeSpan.FromSeconds(10);
-
     public async Task<ApiResult<TrnRequestInfo>> HandleAsync(CreateTrnRequestCommand command)
     {
-        if (!featureProvider.IsEnabled(FeatureNames.ApiTrnRequestsInTrs))
+        if (!featureProvider.IsEnabled(FeatureNames.ContactsMigrated))
         {
             return await HandleOverDqtAsync(command);
         }
 
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
+        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(dbContext, currentApplicationUserId, command.RequestId);
         if (trnRequest is not null)
         {
             return ApiError.TrnRequestAlreadyCreated(command.RequestId);
         }
 
-        // Create a TransactionScope so that enqueued Hangfire jobs are in the same transaction as our DB additions
-        using var txn = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
         var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
         var emailAddress = command.EmailAddresses.FirstOrDefault();
+
+        var now = clock.UtcNow;
 
         var trnRequestMetadata = new PostgresModels.TrnRequestMetadata()
         {
             ApplicationUserId = currentApplicationUserId,
             RequestId = command.RequestId,
-            CreatedOn = clock.UtcNow,
+            CreatedOn = now,
             IdentityVerified = command.IdentityVerified,
             OneLoginUserSubject = command.OneLoginUserSubject,
             Name = GetNonEmptyValues(
@@ -93,16 +86,20 @@ public class CreateTrnRequestHandler(
 
         string? trn = null;
 
-        string? jobId = null;
-
         if (matchResult.Outcome is TrnRequestMatchResultOutcome.DefiniteMatch)
         {
             trn = matchResult.Trn;
 
-            var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(matchResult.PersonId, currentApplicationUserId);
+            var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(
+                dbContext,
+                matchResult.PersonId,
+                currentApplicationUserId);
+
+            trnRequestMetadata.SetResolvedPerson(matchResult.PersonId, furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed);
+
             if (furtherChecksNeeded)
             {
-                var supportTask = PostgresModels.SupportTask.Create(
+                var furtherChecksSupportTask = PostgresModels.SupportTask.Create(
                     SupportTaskType.TrnRequestManualChecksNeeded,
                     new TrnRequestManualChecksNeededData(),
                     matchResult.PersonId,
@@ -110,14 +107,12 @@ public class CreateTrnRequestHandler(
                     currentApplicationUserId,
                     command.RequestId,
                     createdBy: currentApplicationUserId,
-                    clock.UtcNow,
-                    out var createdEvent);
+                    now,
+                    out var furtherChecksSupportTaskCreatedEvent);
 
-                dbContext.SupportTasks.Add(supportTask);
-                await dbContext.AddEventAndBroadcastAsync(createdEvent);
+                dbContext.SupportTasks.Add(furtherChecksSupportTask);
+                await dbContext.AddEventAndBroadcastAsync(furtherChecksSupportTaskCreatedEvent);
             }
-
-            trnRequestMetadata.SetResolvedPerson(matchResult.PersonId, furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed);
         }
         else if (matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches)
         {
@@ -129,7 +124,7 @@ public class CreateTrnRequestHandler(
                 currentApplicationUserId,
                 command.RequestId,
                 createdBy: currentApplicationUserId,
-                clock.UtcNow,
+                now,
                 out var createdEvent);
 
             dbContext.SupportTasks.Add(supportTask);
@@ -140,13 +135,25 @@ public class CreateTrnRequestHandler(
             Debug.Assert(matchResult.Outcome is TrnRequestMatchResultOutcome.NoMatches);
 
             trn = await trnGenerationApiClient.GenerateTrnAsync();
-            var newContactId = Guid.NewGuid();
-            trnRequestMetadata.SetResolvedPerson(newContactId);
 
-            Debug.Assert(trn is not null);
+            var createPersonResult = trnRequestService.CreatePersonFromTrnRequest(trnRequestMetadata, trn, now);
+            dbContext.Persons.Add(createPersonResult.Person);
 
-            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
-                h => h.CreateContactFromTrnRequestAsync(currentApplicationUserId, command.RequestId, newContactId, trn));
+            var personCreatedEvent = new PersonCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = now,
+                RaisedBy = currentApplicationUserId,
+                PersonId = createPersonResult.Person.PersonId,
+                PersonAttributes = createPersonResult.PersonAttributes,
+                CreateReason = null,
+                CreateReasonDetail = null,
+                EvidenceFile = null,
+                TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata)
+            };
+            await dbContext.AddEventAndBroadcastAsync(personCreatedEvent);
+
+            trnRequestMetadata.SetResolvedPerson(createPersonResult.Person.PersonId);
         }
 
         var trnToken = emailAddress is not null && trn is not null ? await trnRequestService.CreateTrnTokenAsync(trn, emailAddress) : null;
@@ -171,19 +178,6 @@ public class CreateTrnRequestHandler(
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
         await dbContext.SaveChangesAsync();
-        txn.Complete();
-
-        // This explicit Dispose() is to trigger the TransactionCompletedEvent *before* we call backgroundJobScheduler.WaitForJobToCompleteAsync()
-        txn.Dispose();
-
-        if (jobId is not null)
-        {
-            using var backgroundJobCompletionCts = new CancellationTokenSource();
-            backgroundJobCompletionCts.CancelAfter(_waitForBackgroundJobCompletion);
-
-            await backgroundJobScheduler.WaitForJobToCompleteAsync(jobId, backgroundJobCompletionCts.Token)
-                .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing | ConfigureAwaitOptions.ContinueOnCapturedContext);
-        }
 
         var status = trnRequestMetadata.Status!.Value;
 
@@ -227,13 +221,11 @@ public class CreateTrnRequestHandler(
     {
         var (currentApplicationUserId, currentApplicationUserName) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
+        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(dbContext, currentApplicationUserId, command.RequestId);
         if (trnRequest is not null)
         {
             return ApiError.TrnRequestAlreadyCreated(command.RequestId);
         }
-
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
         // Normalize names; DQT matching process requires a single-word first name :-|
         var firstAndMiddleNames = $"{command.FirstName} {command.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

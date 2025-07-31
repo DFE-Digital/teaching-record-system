@@ -80,7 +80,8 @@ public class CheckAnswersModel(
                     FileId = detailsFileId,
                     Name = EvidenceFileName!
                 }
-                : null
+                : null,
+            TrnRequestMetadata = null
         };
 
         DbContext.Add(person);

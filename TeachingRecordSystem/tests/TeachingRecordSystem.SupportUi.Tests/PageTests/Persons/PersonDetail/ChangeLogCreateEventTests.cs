@@ -59,7 +59,8 @@ public class ChangeLogCreateEventTests : TestBase
             PersonAttributes = details,
             CreateReason = createReason,
             CreateReasonDetail = createReasonDetail,
-            EvidenceFile = evidenceFile
+            EvidenceFile = evidenceFile,
+            TrnRequestMetadata = null
         };
 
         await WithDbContext(async dbContext =>
@@ -126,7 +127,8 @@ public class ChangeLogCreateEventTests : TestBase
             PersonAttributes = details,
             CreateReason = createReason,
             CreateReasonDetail = null,
-            EvidenceFile = null
+            EvidenceFile = null,
+            TrnRequestMetadata = null
         };
 
         await WithDbContext(async dbContext =>
