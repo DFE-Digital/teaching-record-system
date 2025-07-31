@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
@@ -182,19 +182,16 @@ public class CheckAnswersModel(
 
         await DbContext.SaveChangesAsync();
 
-        // This is a little ugly but pushing this into a partial and executing it here is tricky
-        var flashMessageHtml =
-            $@"
-            {(CreatingNewRecord ? "Record created for" : "Records updated for")}
-            {HtmlEncoder.Default.Encode(FirstName ?? string.Empty)}
-            {HtmlEncoder.Default.Encode(MiddleName ?? string.Empty)}
-            {HtmlEncoder.Default.Encode(LastName ?? string.Empty)}.
-            <a href=""{linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)}"" class=""govuk-link"">View record</a>
-            ";
-
         TempData.SetFlashSuccess(
             $"{SourceApplicationUserName} request completed",
-            messageHtml: flashMessageHtml);
+            buildMessageHtml: b =>
+            {
+                var link = new TagBuilder("a");
+                link.AddCssClass("govuk-link");
+                link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
+                link.InnerHtml.Append($"Record {(CreatingNewRecord ? "created" : "updated")} for {FirstName} {MiddleName} {LastName}");
+                b.AppendHtml(link);
+            });
 
         await JourneyInstance!.CompleteAsync();
         return Redirect(linkGenerator.SupportTasks());
