@@ -49,7 +49,7 @@ public partial class TestData
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
         private Option<Gender?> _gender;
-        private Option<TrnRequestMatchedPerson[]> _matchedRecords;
+        private Option<TrnRequestMatchedPerson[]> _matchedPersons;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
         private Option<TrnRequestStatus> _trnRequestStatus;
@@ -99,7 +99,7 @@ public partial class TestData
 
         public CreateApiTrnRequestSupportTaskBuilder WithMatchedPersons(params Guid[] personIds)
         {
-            _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
+            _matchedPersons = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
             return this;
         }
 
@@ -139,13 +139,13 @@ public partial class TestData
             var gender = _gender.ValueOr(testData.GenerateGender());
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
 
-            var matchedRecords = _matchedRecords.ValueOrDefault();
+            var matchedPersons = _matchedPersons.ValueOrDefault();
 
-            if (matchedRecords is null)
+            if (matchedPersons is null)
             {
                 // Matches wasn't explicitly specified; create two person records that match details in this request
 
-                matchedRecords = await Enumerable.Range(1, 2)
+                matchedPersons = await Enumerable.Range(1, 2)
                     .ToAsyncEnumerable()
                     .SelectAwait(async _ =>
                     {
@@ -175,9 +175,9 @@ public partial class TestData
                     .ToArrayAsync();
             }
 
-            var matches = new TrnRequestMatches() { MatchedPersons = matchedRecords };
+            var matches = new TrnRequestMatches() { MatchedPersons = matchedPersons };
 
-            var potentialDuplicate = matchedRecords.Length > 0;
+            var potentialDuplicate = matchedPersons.Length > 0;
 
             var metadata = new TrnRequestMetadata
             {

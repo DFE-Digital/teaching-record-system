@@ -110,7 +110,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithAlert());
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            t => t.WithMatchedRecords(matchedPerson.PersonId));
+            t => t.WithMatchedPersons(matchedPerson.PersonId));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -137,7 +137,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithQts());
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            t => t.WithMatchedRecords(matchedPerson.PersonId));
+            t => t.WithMatchedPersons(matchedPerson.PersonId));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -164,7 +164,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts(Clock.Today.AddDays(-1)));
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            t => t.WithMatchedRecords(matchedPerson.PersonId));
+            t => t.WithMatchedPersons(matchedPerson.PersonId));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -259,7 +259,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t
-                .WithMatchedRecords(matchedPerson.PersonId)
+                .WithMatchedPersons(matchedPerson.PersonId)
                 .WithFirstName(
                     matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
                         ? matchedPerson.FirstName
