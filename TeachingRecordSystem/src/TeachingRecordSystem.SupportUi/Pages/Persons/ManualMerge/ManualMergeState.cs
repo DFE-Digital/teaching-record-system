@@ -14,7 +14,7 @@ public class ManualMergeState : IRegisterJourney
     public string? PersonBTrn { get; set; }
     public Guid? PersonAId { get; set; }
     public Guid? PersonBId { get; set; }
-    public Guid? PrimaryRecordId { get; set; }
+    public Guid? PrimaryPersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }
     public PersonAttributeSource? MiddleNameSource { get; set; }
@@ -22,6 +22,7 @@ public class ManualMergeState : IRegisterJourney
     public PersonAttributeSource? DateOfBirthSource { get; set; }
     public PersonAttributeSource? EmailAddressSource { get; set; }
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
+    public PersonAttributeSource? GenderSource { get; set; }
     public bool? UploadEvidence { get; set; }
     public Guid? EvidenceFileId { get; set; }
     public string? EvidenceFileName { get; set; }

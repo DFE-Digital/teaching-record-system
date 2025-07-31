@@ -9,16 +9,101 @@
     <govuk-back-link data-testid="back-link" href="@Model.BackLink" />
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
-        <span class="govuk-caption-l">Support tasks</span>
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<form action="@Model.GetPageLink(ManualMergeJourneyPage.CheckAnswers)" method="post" data-testid="submit-form">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Support tasks</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form action="@Model.GetPageLink(ManualMergeJourneyPage.CheckAnswers)" method="post" data-testid="submit-form">
+            <govuk-summary-card>
+                <govuk-summary-card-title>Primary record (TRN @Model.Trn)</govuk-summary-card-title>
+                <govuk-summary-card-actions>
+                    <govuk-summary-card-action href="@Model.ChangePrimaryPersonLink" data-testid="change-primary-person-link">Change</govuk-summary-card-action>
+                </govuk-summary-card-actions>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.FirstName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="first name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.MiddleName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="middle name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="last name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="email address">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="national insurance number">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Gender?.GetDisplayName()</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="gender">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (Model.EvidenceFileUrl is not null)
+                            {
+                                <a href="@Model.EvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Comments</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="comments">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+
             <div class="govuk-button-group">
-                <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
-                <govuk-button formaction="@Model.CancelLink" class="govuk-button--secondary" type="submit" data-testid="cancel-button">Cancel and return to record</govuk-button>
+                <govuk-button type="submit" data-testid="continue-button">Confirm and update primary record</govuk-button>
+                <govuk-button type="submit" formaction="@Model.CancelLink" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>

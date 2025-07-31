@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
@@ -25,13 +26,14 @@ public abstract class CommonJourneyPage(
 
     public string CancelLink => LinkGenerator.PersonManualMergeCancel(PersonId, JourneyInstance!.InstanceId);
 
-    public string GetPageLink(ManualMergeJourneyPage? pageName)
+    public string GetPageLink(ManualMergeJourneyPage? pageName, bool? fromCheckAnswers = null)
     {
+        fromCheckAnswers ??= FromCheckAnswers ? true : null;
         return pageName switch
         {
-            ManualMergeJourneyPage.EnterTrn => LinkGenerator.PersonManualMergeEnterTrn(PersonId, JourneyInstance!.InstanceId),
-            ManualMergeJourneyPage.Matches => LinkGenerator.PersonManualMergeMatches(PersonId, JourneyInstance!.InstanceId),
-            ManualMergeJourneyPage.Merge => LinkGenerator.PersonManualMergeMerge(PersonId, JourneyInstance!.InstanceId),
+            ManualMergeJourneyPage.EnterTrn => LinkGenerator.PersonManualMergeEnterTrn(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            ManualMergeJourneyPage.Matches => LinkGenerator.PersonManualMergeMatches(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            ManualMergeJourneyPage.Merge => LinkGenerator.PersonManualMergeMerge(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
             ManualMergeJourneyPage.CheckAnswers => LinkGenerator.PersonManualMergeCheckAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonDetail(PersonId)
         };
@@ -73,7 +75,8 @@ public abstract class CommonJourneyPage(
         string lastName,
         DateOnly? dateOfBirth,
         string? emailAddress,
-        string? nationalInsuranceNumber)
+        string? nationalInsuranceNumber,
+        Gender? gender)
     {
         return Impl().AsReadOnly();
 
@@ -108,6 +111,11 @@ public abstract class CommonJourneyPage(
             {
                 yield return PersonMatchedAttribute.NationalInsuranceNumber;
             }
+
+            if (gender == recordToMatchAgainst.Gender)
+            {
+                yield return PersonMatchedAttribute.Gender;
+            }
         }
     }
 
@@ -128,18 +136,19 @@ public abstract class CommonJourneyPage(
                 DateOfBirth = p.DateOfBirth,
                 EmailAddress = p.EmailAddress,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,
+                Gender = p.Gender,
                 Status = p.Status,
                 InductionStatus = p.InductionStatus,
                 ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen && a.DeletedOn == null),
                 Attributes = new PersonAttributes
                 {
-                    Trn = p.Trn ?? string.Empty,
                     FirstName = p.FirstName,
                     MiddleName = p.MiddleName,
                     LastName = p.LastName,
                     DateOfBirth = p.DateOfBirth,
                     EmailAddress = p.EmailAddress,
-                    NationalInsuranceNumber = p.NationalInsuranceNumber
+                    NationalInsuranceNumber = p.NationalInsuranceNumber,
+                    Gender = p.Gender
                 }
             })
             .ToArrayAsync())
@@ -157,7 +166,8 @@ public abstract class CommonJourneyPage(
                         PersonMatchedAttribute.LastName,
                         PersonMatchedAttribute.DateOfBirth,
                         PersonMatchedAttribute.EmailAddress,
-                        PersonMatchedAttribute.NationalInsuranceNumber
+                        PersonMatchedAttribute.NationalInsuranceNumber,
+                        PersonMatchedAttribute.Gender
                     ]
                     : GetPersonAttributeMatches(
                         potentialDuplicates[0].Attributes,
@@ -166,7 +176,8 @@ public abstract class CommonJourneyPage(
                         r.LastName,
                         r.DateOfBirth,
                         r.EmailAddress,
-                        r.NationalInsuranceNumber)
+                        r.NationalInsuranceNumber,
+                        r.Gender)
             })
             .ToArray();
     }

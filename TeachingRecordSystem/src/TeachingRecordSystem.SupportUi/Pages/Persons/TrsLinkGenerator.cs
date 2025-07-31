@@ -92,14 +92,14 @@ public partial class TrsLinkGenerator
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
 
-    public string PersonManualMergeEnterTrn(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/Persons/ManualMerge/EnterTrn", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string PersonManualMergeEnterTrn(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/EnterTrn", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string PersonManualMergeMatches(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/Persons/ManualMerge/Matches", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string PersonManualMergeMatches(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/Matches", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string PersonManualMergeMerge(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/Persons/ManualMerge/Merge", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string PersonManualMergeMerge(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/ManualMerge/Merge", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string PersonManualMergeCheckAnswers(Guid personId, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/Persons/ManualMerge/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);

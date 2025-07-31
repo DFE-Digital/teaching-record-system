@@ -1,7 +1,7 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
 
 [Collection(nameof(DisableParallelization))]
 public class EnterTrnTests : ManualMergeTestBase

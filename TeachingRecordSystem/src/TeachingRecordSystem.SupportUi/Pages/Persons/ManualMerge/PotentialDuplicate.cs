@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Models;
+
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
 
 public record PotentialDuplicate
@@ -13,6 +15,7 @@ public record PotentialDuplicate
     public required DateOnly? DateOfBirth { get; init; }
     public required string? EmailAddress { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
+    public required Gender? Gender { get; init; }
     public required PersonStatus Status { get; init; }
     public required InductionStatus InductionStatus { get; init; }
     public required int ActiveAlertCount { get; init; }

@@ -26,7 +26,7 @@ public class EnterTrnModel(
     [BindProperty]
     public string? OtherTrn { get; set; }
 
-    public string BackLink => GetPageLink(null);
+    public string BackLink => GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : null);
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -83,7 +83,7 @@ public class EnterTrnModel(
                 state.PersonBTrn = otherPerson.Trn;
             });
 
-            return Redirect(GetPageLink(ManualMergeJourneyPage.Matches));
+            return Redirect(GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : ManualMergeJourneyPage.Matches));
         }
     }
 }
