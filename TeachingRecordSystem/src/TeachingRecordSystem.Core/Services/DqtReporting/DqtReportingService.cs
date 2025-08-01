@@ -109,7 +109,7 @@ public partial class DqtReportingService : BackgroundService
         {
             try
             {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChangesAsync(observer: null, ct), stoppingToken);
+                await ProcessTrsChangesAsync(observer: null, stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -117,7 +117,6 @@ public partial class DqtReportingService : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed processing TRS changes.");
-                return;
             }
         }
     }
@@ -491,12 +490,23 @@ public partial class DqtReportingService : BackgroundService
                     _ => throw new NotSupportedException($"{message.GetType().Name} messages are not supported.")
                 };
 
+                var columns = relation.Columns.ToList();
+
                 var targetTableName = GetTargetTableName(relation);
-                var values = await GetTupleValuesAsync(tuple);
-                var columns = relation.Columns.ToArray();
+                object?[] values;
+                try
+                {
+                    values = await GetTupleValuesAsync(tuple);
+                }
+                catch (Exception e) when (e.Message.Contains("the returned array contains nulls"))
+                {
+                    replicationConn.SetReplicationStatus(message.WalEnd);
+                    continue;
+                }
+
                 var idColumn = columns.Single(c => c.Flags == RelationMessage.Column.ColumnFlags.PartOfKey);
                 var columnValues = columns.Zip(values, (c, v) => (Column: c, Value: v)).ToDictionary(t => t.Column.ColumnName, t => t.Value);
-                var id = values[Array.IndexOf(columns, idColumn)]!;
+                var id = values[columns.IndexOf(idColumn)]!;
 
                 if (message is InsertMessage or UpdateMessage)
                 {
@@ -510,25 +520,33 @@ public partial class DqtReportingService : BackgroundService
 
                 replicationConn.SetReplicationStatus(message.WalEnd);
                 PublishMessageConsumed();
+
+                ValueTask<object?[]> GetTupleValuesAsync(ReplicationTuple tuple)
+                {
+                    return CoreAsync().ToArrayAsync();
+
+                    async IAsyncEnumerable<object?> CoreAsync()
+                    {
+                        int i = 0;
+                        await foreach (var value in tuple)
+                        {
+                            if (value.IsUnchangedToastedValue)
+                            {
+                                columns.RemoveAt(i);
+                                continue;
+                            }
+
+                            yield return value.IsDBNull ? null : await value.Get();
+                            i++;
+                        }
+                    }
+                }
             }
 
             void PublishMessageConsumed() => observer?.OnNext(TrsReplicationStatus.MessageConsumed);
         }
 
         static string GetTargetTableName(RelationMessage relation) => $"trs_{relation.RelationName}";
-
-        static ValueTask<object?[]> GetTupleValuesAsync(ReplicationTuple tuple)
-        {
-            return CoreAsync().ToArrayAsync();
-
-            async IAsyncEnumerable<object?> CoreAsync()
-            {
-                await foreach (var value in tuple)
-                {
-                    yield return value.IsDBNull ? null : await value.Get();
-                }
-            }
-        }
     }
 
     private async Task<PgOutputReplicationSlot> GetReplicationSlotAsync(
