@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace TeachingRecordSystem.SupportUi;
@@ -15,11 +17,19 @@ public static class TempDataExtensions
         this ITempDataDictionary tempData,
         string? heading = null,
         string? messageText = null,
-        string? messageHtml = null)
+        Action<IHtmlContentBuilder>? buildMessageHtml = null)
     {
-        if (messageText is not null && messageHtml is not null)
+        if (messageText is not null && buildMessageHtml is not null)
         {
-            throw new ArgumentException($"Cannot set both {nameof(messageText)} and {nameof(messageHtml)}.");
+            throw new ArgumentException($"Cannot set both {nameof(messageText)} and {nameof(buildMessageHtml)}.");
+        }
+
+        string? messageHtml = null;
+        if (buildMessageHtml is not null)
+        {
+            var builder = new HtmlContentBuilder();
+            buildMessageHtml(builder);
+            messageHtml = builder.ToHtmlString(HtmlEncoder.Default);
         }
 
         tempData.Add(

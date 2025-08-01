@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
@@ -100,15 +101,16 @@ public class CheckAnswersModel(
         await dbContext.AddEventAndBroadcastAsync(@event);
         await dbContext.SaveChangesAsync();
 
-        // This is a little ugly but pushing this into a partial and executing it here is tricky
-        var flashMessageHtml =
-            $@"
-            <a href=""{linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)}"" class=""govuk-link"">View record</a>
-            ";
-
         TempData.SetFlashSuccess(
             $"Record created for {FirstName} {MiddleName} {LastName}",
-            messageHtml: flashMessageHtml);
+            buildMessageHtml: b =>
+            {
+                var link = new TagBuilder("a");
+                link.AddCssClass("govuk-link");
+                link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
+                link.InnerHtml.Append("View record");
+                b.AppendHtml(link);
+            });
 
         return Redirect(linkGenerator.SupportTasks());
     }

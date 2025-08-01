@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Services.Files;
@@ -163,15 +164,16 @@ public class CheckAnswersModel(
         await DbContext.AddEventAndBroadcastAsync(@event);
         await DbContext.SaveChangesAsync();
 
-        // This is a little ugly but pushing this into a partial and executing it here is tricky
-        var flashMessageHtml =
-            $@"
-            <a href=""{LinkGenerator.PersonDetail(primaryPersonId)}"" class=""govuk-link"">View record</a>
-            ";
-
         TempData.SetFlashSuccess(
             $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
-            messageHtml: flashMessageHtml);
+            buildMessageHtml: b =>
+            {
+                var link = new TagBuilder("a");
+                link.AddCssClass("govuk-link");
+                link.MergeAttribute("href", LinkGenerator.PersonDetail(primaryPersonId));
+                link.InnerHtml.Append("View record");
+                b.AppendHtml(link);
+            });
 
         await JourneyInstance!.CompleteAsync();
 
