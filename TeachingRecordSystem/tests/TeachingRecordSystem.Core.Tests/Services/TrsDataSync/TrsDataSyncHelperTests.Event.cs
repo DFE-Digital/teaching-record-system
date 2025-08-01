@@ -38,7 +38,6 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(@event.CreatedUtc, dbEvent.Created);
             Assert.Equal(Clock.UtcNow, dbEvent.Inserted);
             AssertEx.JsonObjectEquals(@event, EventBase.Deserialize(dbEvent.Payload, dbEvent.EventName));
-            Assert.Null(dbEvent.Key);
             Assert.False(dbEvent.Published);
             Assert.Null(dbEvent.PersonId);
         });

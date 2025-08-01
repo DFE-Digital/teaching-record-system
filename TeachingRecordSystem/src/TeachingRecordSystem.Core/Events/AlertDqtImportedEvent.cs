@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record AlertDqtImportedEvent : EventBase, IEventWithPersonId, IEventWithAlert, IEventWithKey
+public record AlertDqtImportedEvent : EventBase, IEventWithPersonId, IEventWithAlert
 {
     public string? Key { get; init; }
     public required Guid PersonId { get; init; }

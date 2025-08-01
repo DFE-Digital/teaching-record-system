@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record MandatoryQualificationCreatedEvent : EventBase, IEventWithPersonId, IEventWithMandatoryQualification, IEventWithKey
+public record MandatoryQualificationCreatedEvent : EventBase, IEventWithPersonId, IEventWithMandatoryQualification
 {
     public string? Key { get; init; }
     public required Guid PersonId { get; init; }
