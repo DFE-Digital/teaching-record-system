@@ -1386,8 +1386,6 @@ public class TrsDataSyncHelper(
 
     public async Task<int> SyncEventsAsync(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun, CancellationToken cancellationToken = default)
     {
-        var modelTypeSyncInfo = GetModelTypeSyncInfo<EventInfo>(ModelTypes.Event);
-
         var mapped = events.Select(e => EventInfo.Deserialize(e.dfeta_Payload).Event).ToArray();
 
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
