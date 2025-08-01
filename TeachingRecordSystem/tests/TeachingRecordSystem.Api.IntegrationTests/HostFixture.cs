@@ -38,6 +38,8 @@ public class HostFixture : WebApplicationFactory<Program>
 
     public static Guid DefaultApplicationUserId { get; } = new("c0c8c511-e8e4-4b8e-96e3-55085dafc05d");
 
+    public static Guid GetAnIdentityApplicationUserId { get; } = new("873f0cb0-7174-4256-921a-e8a8aaa06361");
+
     public HttpClientInterceptorOptions EvidenceFilesHttpClientInterceptorOptions { get; } = new();
 
     public SigningCredentials JwtSigningCredentials { get; }
@@ -136,6 +138,13 @@ public class HostFixture : WebApplicationFactory<Program>
                     UserId = DefaultApplicationUserId,
                     Name = "Tests",
                     ApiRoles = ApiRoles.All.ToArray()
+                });
+
+                dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+                {
+                    UserId = GetAnIdentityApplicationUserId,
+                    Name = "Get an identity",
+                    ApiRoles = [ApiRoles.UpdatePerson]
                 });
 
                 await dbContext.SaveChangesAsync();

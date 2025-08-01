@@ -101,6 +101,7 @@ public abstract class TestBase
         });
 
         var jwtHandler = new JwtSecurityTokenHandler();
+        jwtHandler.MapInboundClaims = false;
 
         var signingCredentials = HostFixture.JwtSigningCredentials;
 
