@@ -14,7 +14,9 @@ public class EventMapping : IEntityTypeConfiguration<Event>
         builder.Property(e => e.Payload).IsRequired().HasColumnType("jsonb");
         builder.Property(e => e.Published);
         builder.HasKey(e => e.EventId);
+        builder.Property(e => e.PersonIds);
         builder.HasIndex(e => new { e.PersonId, e.EventName }).HasFilter("person_id is not null");
+        builder.HasIndex(e => new { e.PersonIds, e.EventName }).HasDatabaseName("ix_events_person_ids").HasMethod("gin").IsCreatedConcurrently();
         builder.HasIndex(e => new { e.EventName, e.Created }).IsCreatedConcurrently();
     }
 }

@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record PersonsMergedEvent : EventBase, IEventWithPersonAttributes
+public record PersonsMergedEvent : EventBase, IEventWithPersonAttributes, IEventWithSecondaryPersonId
 {
     public required Guid PersonId { get; init; }
     public required string PersonTrn { get; init; }
