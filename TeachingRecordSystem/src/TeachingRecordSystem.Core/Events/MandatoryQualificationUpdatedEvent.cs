@@ -3,7 +3,7 @@ using File = TeachingRecordSystem.Core.Events.Models.File;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record MandatoryQualificationUpdatedEvent : EventBase, IEventWithPersonId, IEventWithMandatoryQualification, IEventWithKey
+public record MandatoryQualificationUpdatedEvent : EventBase, IEventWithPersonId, IEventWithMandatoryQualification
 {
     public string? Key { get; init; }
     public required Guid PersonId { get; init; }

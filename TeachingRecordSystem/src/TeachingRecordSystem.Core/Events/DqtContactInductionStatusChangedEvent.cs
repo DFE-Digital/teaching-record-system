@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Events;
 
-public record DqtContactInductionStatusChangedEvent : EventBase, IEventWithPersonId, IEventWithKey
+public record DqtContactInductionStatusChangedEvent : EventBase, IEventWithPersonId
 {
     public string? Key { get; init; }
     public required Guid PersonId { get; init; }

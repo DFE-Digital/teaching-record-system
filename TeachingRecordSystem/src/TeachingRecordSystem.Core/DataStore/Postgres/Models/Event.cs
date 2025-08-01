@@ -9,7 +9,6 @@ public class Event
     public required DateTime Created { get; init; }
     public required DateTime Inserted { get; init; }
     public required string Payload { get; init; }
-    public string? Key { get; init; }
     public bool Published { get; set; }
     public Guid? PersonId { get; init; }
     public Guid? QualificationId { get; init; }
@@ -27,7 +26,6 @@ public class Event
             Created = @event.CreatedUtc,
             Inserted = inserted ?? @event.CreatedUtc,
             Payload = payload,
-            Key = (@event as IEventWithKey)?.Key,
             PersonId = @event.TryGetPersonId(out var personId) ? personId : null,
             QualificationId =
                 (@event as IEventWithMandatoryQualification)?.MandatoryQualification.QualificationId ??

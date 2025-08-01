@@ -55,7 +55,6 @@ public static class NpgsqlExtensions
             "created",
             "inserted",
             "payload",
-            "key",
             "person_id",
             "qualification_id",
             "alert_id"
@@ -70,7 +69,6 @@ public static class NpgsqlExtensions
                 created TIMESTAMP WITH TIME ZONE NOT NULL,
                 inserted TIMESTAMP WITH TIME ZONE NOT NULL,
                 payload JSONB NOT NULL,
-                key VARCHAR(200),
                 person_id UUID,
                 qualification_id UUID,
                 alert_id UUID
@@ -104,7 +102,6 @@ public static class NpgsqlExtensions
             writer.WriteValueOrNull(e.Created, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(e.Inserted, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(e.Payload, NpgsqlDbType.Jsonb);
-            writer.WriteValueOrNull(e.Key, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(e.PersonId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(e.QualificationId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(e.AlertId, NpgsqlDbType.Uuid);
