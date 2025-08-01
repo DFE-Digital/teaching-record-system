@@ -236,6 +236,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<BackfillPersonCreatedByTpsJob>(
+                    nameof(BackfillPersonCreatedByTpsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
