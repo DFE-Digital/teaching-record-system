@@ -67,7 +67,6 @@ public class PersonalDetailsTests : TestBase
         var lastName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-last-name", "input");
         var dateOfBirth = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-date-of-birth", "input");
         var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
-        var mobileNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-mobile-number", "input");
         var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
         var genderSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']")
             .Single(i => i.IsChecked == true);
