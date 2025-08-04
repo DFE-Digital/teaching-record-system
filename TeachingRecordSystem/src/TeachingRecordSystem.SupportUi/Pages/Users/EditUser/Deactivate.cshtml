@@ -13,7 +13,7 @@
     <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form method="post" enctype="multipart/form-data">
+        <form method="post">
             <govuk-radios asp-for="HasAdditionalReason">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-visually-hidden" />
@@ -24,18 +24,18 @@
                         Another reason
 
                         <govuk-radios-item-conditional>
-                            <govuk-character-count asp-for="AdditionalReasonDetail" 
-                                                   textarea-class="govuk-!-width-one-half" 
-                                                   label-class="govuk-label--s" 
-                                                   max-length="FileUploadDefaults.DetailMaxCharacterCount" 
+                            <govuk-character-count asp-for="AdditionalReasonDetail"
+                                                   textarea-class="govuk-!-width-one-half"
+                                                   label-class="govuk-label--s"
+                                                   max-length="FileUploadDefaults.DetailMaxCharacterCount"
                                                    rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
-            
+
             <h2 class="govuk-heading-m">Do you want to provide more details?</h2>
-            
+
             <govuk-radios asp-for="HasMoreInformation">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-visually-hidden" />
@@ -43,10 +43,10 @@
                         Yes
 
                         <govuk-radios-item-conditional>
-                            <govuk-character-count asp-for="MoreInformationDetail" 
-                                                   textarea-class="govuk-!-width-one-half" 
-                                                   label-class="govuk-label--s" 
-                                                   max-length="FileUploadDefaults.DetailMaxCharacterCount" 
+                            <govuk-character-count asp-for="MoreInformationDetail"
+                                                   textarea-class="govuk-!-width-one-half"
+                                                   label-class="govuk-label--s"
+                                                   max-length="FileUploadDefaults.DetailMaxCharacterCount"
                                                    rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
@@ -55,7 +55,7 @@
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
-            
+
             <h2 class="govuk-heading-m">Do you want to upload evidence?</h2>
 
             <govuk-radios asp-for="UploadEvidence">
@@ -76,7 +76,7 @@
                                 <input type="hidden" asp-for="EvidenceFileSizeDescription" />
                                 <input type="hidden" asp-for="UploadedEvidenceFileUrl" />
                             }
-                            <govuk-file-upload asp-for="EvidenceFile" 
+                            <govuk-file-upload asp-for="EvidenceFile"
                                                label-class="govuk-label--m"
                                                input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                                 <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
