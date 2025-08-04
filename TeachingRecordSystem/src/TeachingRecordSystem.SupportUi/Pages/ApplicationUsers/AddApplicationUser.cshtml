@@ -13,9 +13,9 @@
         <form action="@LinkGenerator.AddApplicationUser()" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="Name" label-class="govuk-label--m" autocomplete="off" />
-            
-            <govuk-input asp-for="ShortName" input-class="govuk-input--width-10" label-class="govuk-label--m" autocomplete="off" />
+            <govuk-input asp-for="Name" label-class="govuk-label--m" />
+
+            <govuk-input asp-for="ShortName" input-class="govuk-input--width-10" label-class="govuk-label--m" />
 
             <govuk-button type="submit">Save</govuk-button>
         </form>

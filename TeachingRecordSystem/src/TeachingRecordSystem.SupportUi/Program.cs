@@ -1,3 +1,4 @@
+using GovUk.Frontend.AspNetCore.TagHelpers;
 using Hangfire;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -178,7 +179,8 @@ builder.Services
     .AddTransient<RequireOpenAlertFilter>()
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()
-    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
+    .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>();
 
 var app = builder.Build();
 
