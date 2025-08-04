@@ -71,7 +71,7 @@ public class BatchSendProfessionalStatusEmailsJob(
             var qtsAwardees = await dbContext.Database.SqlQuery<QtsAwardeeQueryResult>(
                     $"""
                      select
-                         person_id,
+                         person_ids[1] as person_id,
                          (payload->'RouteToProfessionalStatus'->>'RouteToProfessionalStatusTypeId')::uuid route_to_professional_status_type_id
                      from events
                      where event_name = any({eventNames})
@@ -133,7 +133,7 @@ public class BatchSendProfessionalStatusEmailsJob(
         {
             var eytsAwardees = await dbContext.Database.SqlQuery<EytsAwardeeQueryResult>(
                     $"""
-                     select person_id from events
+                     select person_ids[1] as person_id from events
                      where event_name = any({eventNames})
                      and created >= {start}
                      and created < {end}
@@ -188,7 +188,7 @@ public class BatchSendProfessionalStatusEmailsJob(
         {
             var qtlsLosers = await dbContext.Database.SqlQuery<QtlsLoserQueryResult>(
                     $"""
-                     select person_id from events
+                     select person_ids[1] as person_id from events
                      where event_name = any({eventNames})
                      and created >= {start}
                      and created < {end}
