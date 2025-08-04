@@ -128,7 +128,7 @@ public class ChangeHistoryModel(
                     LEFT JOIN
                         users as a ON ((e.payload #>> Array['RequestData','ApplicationUserId']) :: uuid) = a.user_id
                 WHERE
-                    e.person_id = {PersonId}
+                    e.person_ids @> ARRAY[{PersonId}]
                     AND e.event_name = any ({eventTypes})
 
                     -- Only return alerts that have an alert type (or DQT sanction code) that the user is authorized to Read
