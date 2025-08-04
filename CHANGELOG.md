@@ -7,6 +7,9 @@ An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record wit
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 
+## 20250804
+- Webhook messages have been added to notify when an alert is created, updated, or deleted.
+
 ## 20250627
 
 ### `PUT /v3/persons/<trn>/professional-statuses/<reference>`
