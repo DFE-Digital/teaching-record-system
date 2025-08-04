@@ -1,7 +1,7 @@
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.WebhookData;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-namespace TeachingRecordSystem.Core.Tests.ApiSchema.VNext.WebhookData;
+namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 
 public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : EventMapperTestBase(fixture)
 {

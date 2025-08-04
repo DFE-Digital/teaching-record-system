@@ -1,19 +1,19 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.WebhookData;
+namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 
-public record AlertCreatedNotification : IWebhookMessageData
+public record AlertDeletedNotification : IWebhookMessageData
 {
-    public static string CloudEventType { get; } = "alert.created";
+    public static string CloudEventType { get; } = "alert.deleted";
 
     public required string Trn { get; init; }
     public required Alert Alert { get; init; }
 }
 
-public class AlertCreatedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
-    IEventMapper<AlertCreatedEvent, AlertCreatedNotification>
+public class AlertDeletedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
+    IEventMapper<AlertDeletedEvent, AlertDeletedNotification>
 {
-    public async Task<AlertCreatedNotification?> MapEventAsync(AlertCreatedEvent @event)
+    public async Task<AlertDeletedNotification?> MapEventAsync(AlertDeletedEvent @event)
     {
         if (@event.Alert.AlertTypeId is not Guid alertTypeId)
         {

@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.WebhookData;
+namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 
 public record PingNotification
 {

@@ -1,13 +1,12 @@
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.WebhookData;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 
-namespace TeachingRecordSystem.Core.Tests.ApiSchema.VNext.WebhookData;
+namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 
-public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : EventMapperTestBase(fixture)
+public class AlertCreatedNotificationMapperTests(EventMapperFixture fixture) : EventMapperTestBase(fixture)
 {
     [Fact]
     public Task MapEventAsync_AlertIsNotInternalOnly_ReturnsNotification() =>
-        WithEventMapper<AlertDeletedNotificationMapper>(async mapper =>
+        WithEventMapper<AlertCreatedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
@@ -18,22 +17,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
-
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
-            {
-                dbContext.Alerts.Attach(alert);
-
-                alert.Delete(
-                    deletionReasonDetail: null,
-                    evidenceFile: null,
-                    deletedBy: SystemUser.SystemUserId,
-                    Clock.UtcNow,
-                    out var deletedEvent);
-
-                await dbContext.SaveChangesAsync();
-
-                return deletedEvent;
-            });
+            var @event = person.Events.OfType<AlertCreatedEvent>().Single();
 
             // Act
             var notification = await mapper.MapEventAsync(@event);
@@ -53,7 +37,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
 
     [Fact]
     public Task MapEventAsync_AlertIsInternalOnly_ReturnsNull() =>
-        WithEventMapper<AlertDeletedNotificationMapper>(async mapper =>
+        WithEventMapper<AlertCreatedNotificationMapper>(async mapper =>
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
@@ -64,22 +48,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
-
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
-            {
-                dbContext.Alerts.Attach(alert);
-
-                alert.Delete(
-                    deletionReasonDetail: null,
-                    evidenceFile: null,
-                    deletedBy: SystemUser.SystemUserId,
-                    Clock.UtcNow,
-                    out var deletedEvent);
-
-                await dbContext.SaveChangesAsync();
-
-                return deletedEvent;
-            });
+            var @event = person.Events.OfType<AlertCreatedEvent>().Single();
 
             // Act
             var notification = await mapper.MapEventAsync(@event);
