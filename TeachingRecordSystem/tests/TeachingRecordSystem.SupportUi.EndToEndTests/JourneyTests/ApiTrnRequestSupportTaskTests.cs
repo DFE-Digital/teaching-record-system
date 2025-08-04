@@ -70,7 +70,7 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge");
-        await page.CheckAsync($"label{TextIsSelector(requestData.MiddleName)}");
+        await page.CheckAsync($"label{HasTextSelector(requestData.MiddleName)}");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers");

@@ -1,0 +1,33 @@
+@model ChoosePersonAttributeViewModel
+
+<tr class="govuk-table__row">
+    <td class="govuk-table__cell">
+        <govuk-radios name="@Model.Name" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
+            <govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
+                    @Model.Label
+                </govuk-radios-fieldset-legend>
+                @if (ViewData.ModelState[Model.Name]?.Errors.Count > 0)
+                {
+                    <govuk-radios-error-message>
+                        @ViewData.ModelState[Model.Name]!.Errors.First().ErrorMessage
+                    </govuk-radios-error-message>
+                }
+                <govuk-radios-item value="@Model.LeftValue"
+                                   checked="@(Model.SelectedValue?.Equals(Model.LeftValue))"
+                                   disabled="@(!Model.Different)"
+                                   highlight="@(Model.Different)"
+                                   use-empty-fallback>
+                    @Model.LeftLabel
+                </govuk-radios-item>
+                <govuk-radios-item value="@Model.RightValue"
+                                   checked="@(Model.SelectedValue?.Equals(Model.RightValue))"
+                                   disabled="@(!Model.Different)"
+                                   highlight="@(Model.Different)"
+                                   use-empty-fallback>
+                    @Model.RightLabel
+                </govuk-radios-item>
+            </govuk-radios-fieldset>
+        </govuk-radios>
+    </td>
+</tr>

@@ -1,25 +1,36 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace TeachingRecordSystem.SupportUi.TagHelpers;
 
 [HtmlTargetElement("highlight")]
+[HtmlTargetElement("*", Attributes = "highlight")]
 public class HighlightTagHelper : TagHelper
 {
+    [HtmlAttributeName("highlight")]
+    public bool Highlight { get; set; } = true;
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        var content = await output.GetChildContentAsync();
+        if (Highlight)
+        {
+            var content = await output.GetChildContentAsync();
 
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.TagName = "mark";
-        output.AddClass("hods-highlight", HtmlEncoder.Default);
+            if (output.IsContentModified)
+            {
+                content = output.Content;
+            }
 
-        var wrapper = new TagBuilder("strong");
-        wrapper.InnerHtml.AppendHtml(content);
+            var mark = new TagBuilder("mark");
+            mark.AddCssClass("hods-highlight");
 
-        output.Content.SetHtmlContent(wrapper);
+            var strong = new TagBuilder("strong");
+            strong.InnerHtml.Append(content.ToHtmlString(HtmlEncoder.Default));
+            mark.InnerHtml.AppendHtml(strong);
+
+            output.Content.SetHtmlContent(mark);
+        }
     }
 }
 

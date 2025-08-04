@@ -8,27 +8,6 @@
     <govuk-back-link href="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" />
 }
 
-@functions {
-#pragma warning disable CS1998
-    private async Task RenderWithHighlightIfDifferent(string? value, bool different)
-    {
-        if (string.IsNullOrEmpty(value))
-        {
-            value = UiDefaults.EmptyDisplayContent;
-        }
-
-        if (different)
-        {
-            <highlight>@value</highlight>
-        }
-        else
-        {
-            @value
-        }
-    }
-#pragma warning restore CS1998
-}
-
 <form action="@LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
@@ -40,7 +19,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half-from-desktop">
             <govuk-inset-text class="govuk-!-margin-top-0">
-                Differences are <highlight>highlighted</highlight> in the existing record
+                Differences are <highlight>highlighted</highlight> on the existing records
             </govuk-inset-text>
 
             <govuk-summary-card data-testid="request">
@@ -130,50 +109,38 @@
 
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
-                                @{
-                                    await RenderWithHighlightIfDifferent(match.FirstName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName));
-                                }
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName))">
+                                @match.FirstName
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
-                                @{
-                                    await RenderWithHighlightIfDifferent(match.MiddleName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
-                                }
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName))">
+                                @match.MiddleName
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
-                                @{
-                                    await RenderWithHighlightIfDifferent(match.LastName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName));
-                                }
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName))">
+                                @match.LastName
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
-                                @{
-                                    await RenderWithHighlightIfDifferent(match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), !match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
-                                }
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth))">
+                                @match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
-                                @{
-                                    await RenderWithHighlightIfDifferent(match.EmailAddress, !match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
-                                }
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress))">
+                                @match.EmailAddress
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
-                                @{
-                                    await RenderWithHighlightIfDifferent(match.NationalInsuranceNumber, !match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
-                                }
+                            <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber))">
+                                @match.NationalInsuranceNumber
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
