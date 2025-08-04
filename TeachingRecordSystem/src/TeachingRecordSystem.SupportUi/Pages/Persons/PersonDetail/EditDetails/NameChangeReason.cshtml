@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.PersonEditDetailsNameChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" enctype="multipart/form-data" data-testid="submit-form">
+        <form action=@LinkGenerator.PersonEditDetailsNameChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="edit-details-caption">Change name - @Model.PersonName</span>
 
             <govuk-radios asp-for="NameChangeReason" data-testid="change-reason-options">
@@ -46,7 +46,7 @@
                                 <input type="hidden" asp-for="NameChangeEvidenceFileSizeDescription" />
                                 <input type="hidden" asp-for="NameChangeUploadedEvidenceFileUrl" />
                             }
-                            <govuk-file-upload asp-for="NameChangeEvidenceFile" 
+                            <govuk-file-upload asp-for="NameChangeEvidenceFile"
                                                label-class="govuk-label--m"
                                                input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                                 <govuk-file-upload-label>Upload a file</govuk-file-upload-label>

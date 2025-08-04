@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqDelete(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post" enctype="multipart/form-data">
+        <form action="@LinkGenerator.MqDelete(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">Mandatory qualification@(Model.Specialism is MandatoryQualificationSpecialism specialism ? $" for {specialism.GetName()}" : "")</h1>
 
@@ -29,7 +29,7 @@
                     <govuk-radios-item value="@MqDeletionReasonOption.AnotherReason">
                         @MqDeletionReasonOption.AnotherReason.GetDisplayName()
                     </govuk-radios-item>
-                </govuk-radios-fieldset>                
+                </govuk-radios-fieldset>
             </govuk-radios>
 
             <govuk-character-count asp-for="DeletionReasonDetail" label-class="govuk-label--m" max-length="300" />
@@ -45,8 +45,8 @@
                                 <span class="govuk-caption-m">Currently uploaded file</span>
                                 <p class="govuk-body">
                                     <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
-                                </p>                                
-                            }                            
+                                </p>
+                            }
                             <govuk-file-upload asp-for="EvidenceFile" input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                                 <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
                             </govuk-file-upload>

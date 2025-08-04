@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.PersonCreateCreateReason(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" enctype="multipart/form-data" data-testid="submit-form">
+        <form action=@LinkGenerator.PersonCreateCreateReason(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="create-reason-caption">Create a record</span>
             <govuk-radios asp-for="CreateReason" data-testid="create-reason-options">
                 <govuk-radios-fieldset>
@@ -52,7 +52,7 @@
                                 <input type="hidden" asp-for="EvidenceFileSizeDescription" />
                                 <input type="hidden" asp-for="EvidenceFileUrl" />
                             }
-                            <govuk-file-upload asp-for="EvidenceFile" 
+                            <govuk-file-upload asp-for="EvidenceFile"
                                                label-class="govuk-label--m"
                                                input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                                 <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
