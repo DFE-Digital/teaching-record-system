@@ -1,4 +1,5 @@
 @page "/support-tasks/api-trn-requests/{supportTaskReference}/merge/{handler?}"
+@using TeachingRecordSystem.SupportUi.Pages.Shared
 @using static ResolveApiTrnRequestState
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.Merge
 @{
@@ -11,21 +12,26 @@
 
 @functions {
 #pragma warning disable CS1998
-    private async Task RenderWithHighlightIfDifferent(string? value, bool different)
+    private async Task RenderChoosePersonAttribute(
+        string label,
+        bool different,
+        string name,
+        string? leftLabel,
+        string? rightLabel,
+        PersonAttributeSource? selectedValue)
     {
-        if (string.IsNullOrEmpty(value))
+        var chooseAttributeModel = new ChoosePersonAttributeViewModel()
         {
-            value = UiDefaults.EmptyDisplayContent;
-        }
-
-        if (different)
-        {
-            <highlight>@value</highlight>
-        }
-        else
-        {
-            @value
-        }
+            Label = label,
+            Different = different,
+            Name = name,
+            LeftValue = PersonAttributeSource.TrnRequest,
+            LeftLabel = leftLabel,
+            RightValue = PersonAttributeSource.ExistingRecord,
+            RightLabel = rightLabel,
+            SelectedValue = selectedValue
+        };
+        <partial name="Shared/_ChoosePersonAttribute" model="@chooseAttributeModel" />
     }
 #pragma warning restore CS1998
 }
@@ -45,120 +51,63 @@
 
     <table class="govuk-table">
         <tbody class="govuk-table__body">
-            @* Annoyingly we can't wrap this markup into a function because there's no way to pass a ModelExpression to bind to
-              https://github.com/dotnet/aspnetcore/issues/45845
-             *@
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                    <govuk-radios asp-for="FirstNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
-                        <govuk-radios-fieldset>
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.FirstName!.Different)">
-                                @(Model.FirstName!.TrnRequestValue ?? UiDefaults.EmptyDisplayContent)
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.FirstName!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.FirstName!.ExistingRecordValue, Model.FirstName.Different); }
-                            </govuk-radios-item>
-                        </govuk-radios-fieldset>
-                    </govuk-radios>
-                </td>
-            </tr>
+            @{
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.FirstNameSource),
+                    Model.FirstName!.Different,
+                    Html.NameFor(m => m.FirstNameSource),
+                    Model.FirstName!.TrnRequestValue,
+                    Model.FirstName!.ExistingRecordValue,
+                    Model.FirstNameSource);
 
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                    <govuk-radios asp-for="MiddleNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
-                        <govuk-radios-fieldset>
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.MiddleName!.Different)">
-                                @(Model.MiddleName!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.MiddleName!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.MiddleName!.ExistingRecordValue, Model.MiddleName.Different); }
-                            </govuk-radios-item>
-                        </govuk-radios-fieldset>
-                    </govuk-radios>
-                </td>
-            </tr>
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.MiddleNameSource),
+                    Model.MiddleName!.Different,
+                    Html.NameFor(m => m.MiddleNameSource),
+                    Model.MiddleName!.TrnRequestValue,
+                    Model.MiddleName!.ExistingRecordValue,
+                    Model.MiddleNameSource);
 
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                    <govuk-radios asp-for="LastNameSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
-                        <govuk-radios-fieldset>
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.LastName!.Different)">
-                                @(Model.LastName!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.LastName!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.LastName!.ExistingRecordValue, Model.LastName.Different); }
-                            </govuk-radios-item>
-                        </govuk-radios-fieldset>
-                    </govuk-radios>
-                </td>
-            </tr>
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.LastNameSource),
+                    Model.LastName!.Different,
+                    Html.NameFor(m => m.LastNameSource),
+                    Model.LastName!.TrnRequestValue,
+                    Model.LastName!.ExistingRecordValue,
+                    Model.LastNameSource);
 
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                    <govuk-radios asp-for="DateOfBirthSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
-                        <govuk-radios-fieldset>
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.DateOfBirth!.Different)">
-                                @(Model.DateOfBirth!.TrnRequestValue?.ToString(UiDefaults.DateOnlyDisplayFormat) ?? UiDefaults.EmptyDisplayContent)
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.DateOfBirth!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.DateOfBirth!.ExistingRecordValue?.ToString(UiDefaults.DateOnlyDisplayFormat), Model.DateOfBirth.Different); }
-                            </govuk-radios-item>
-                        </govuk-radios-fieldset>
-                    </govuk-radios>
-                </td>
-            </tr>
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.DateOfBirthSource),
+                    Model.DateOfBirth!.Different,
+                    Html.NameFor(m => m.DateOfBirthSource),
+                    Model.DateOfBirth!.TrnRequestValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
+                    Model.DateOfBirth!.ExistingRecordValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
+                    Model.DateOfBirthSource);
 
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                    <govuk-radios asp-for="EmailAddressSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
-                        <govuk-radios-fieldset>
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.EmailAddress!.Different)">
-                                @(Model.EmailAddress!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.EmailAddress!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.EmailAddress!.ExistingRecordValue, Model.EmailAddress.Different); }
-                            </govuk-radios-item>
-                        </govuk-radios-fieldset>
-                    </govuk-radios>
-                </td>
-            </tr>
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.EmailAddressSource),
+                    Model.EmailAddress!.Different,
+                    Html.NameFor(m => m.EmailAddressSource),
+                    Model.EmailAddress!.TrnRequestValue,
+                    Model.EmailAddress!.ExistingRecordValue,
+                    Model.EmailAddressSource);
 
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                    <govuk-radios asp-for="NationalInsuranceNumberSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
-                        <govuk-radios-fieldset>
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.NationalInsuranceNumber!.Different)">
-                                @(Model.NationalInsuranceNumber!.TrnRequestValue.ToNullIfEmpty() ?? UiDefaults.EmptyDisplayContent)
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.NationalInsuranceNumber!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.NationalInsuranceNumber!.ExistingRecordValue, Model.NationalInsuranceNumber.Different); }
-                            </govuk-radios-item>
-                        </govuk-radios-fieldset>
-                    </govuk-radios>
-                </td>
-            </tr>
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.NationalInsuranceNumberSource),
+                    Model.NationalInsuranceNumber!.Different,
+                    Html.NameFor(m => m.NationalInsuranceNumberSource),
+                    Model.NationalInsuranceNumber!.TrnRequestValue,
+                    Model.NationalInsuranceNumber!.ExistingRecordValue,
+                    Model.NationalInsuranceNumberSource);
 
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                    <govuk-radios asp-for="GenderSource" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
-                        <govuk-radios-fieldset>
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s"/>
-                            <govuk-radios-item value="@PersonAttributeSource.TrnRequest" disabled="@(!Model.Gender!.Different)">
-                                @(Model.Gender!.TrnRequestValue?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent)
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@PersonAttributeSource.ExistingRecord" disabled="@(!Model.Gender!.Different)">
-                                @{ await RenderWithHighlightIfDifferent(Model.Gender!.ExistingRecordValue?.GetDisplayName(), Model.Gender.Different); }
-                            </govuk-radios-item>
-                        </govuk-radios-fieldset>
-                    </govuk-radios>
-                </td>
-            </tr>
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.GenderSource),
+                    Model.Gender!.Different,
+                    Html.NameFor(m => m.GenderSource),
+                    Model.Gender!.TrnRequestValue?.GetDisplayName(),
+                    Model.Gender!.ExistingRecordValue?.GetDisplayName(),
+                    Model.GenderSource);
+            }
         </tbody>
     </table>
 
@@ -171,8 +120,8 @@
             </govuk-warning-text>
 
             <div class="govuk-button-group">
-                <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.ApiTrnRequestMergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+               <govuk-button type="submit">Continue</govuk-button>
+               <govuk-button type="submit" formaction="@LinkGenerator.ApiTrnRequestMergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>
