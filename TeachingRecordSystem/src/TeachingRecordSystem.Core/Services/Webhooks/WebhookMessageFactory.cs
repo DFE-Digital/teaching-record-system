@@ -69,8 +69,7 @@ public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClo
 
             if (mapperType is null)
             {
-                throw new InvalidOperationException(
-                    $"Could not find mapper for event type '{@event.GetType().Name}', cloud event type '{cloudEventType}' and API version '{version}'.");
+                continue;
             }
 
             var payload = await MapEventAsync(mapperType, dataType!);
