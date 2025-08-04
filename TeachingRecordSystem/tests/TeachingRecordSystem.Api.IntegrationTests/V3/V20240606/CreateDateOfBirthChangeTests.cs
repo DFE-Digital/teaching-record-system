@@ -121,7 +121,6 @@ public class CreateDateOfBirthChangeTests : TestBase
     public async Task Post_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
     {
         // Arrange
-        await TestData.CreateApplicationUserAsync("Get an identity");
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 

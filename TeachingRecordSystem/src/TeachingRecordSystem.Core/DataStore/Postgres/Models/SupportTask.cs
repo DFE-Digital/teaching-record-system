@@ -128,6 +128,7 @@ public class SupportTask
     {
         SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
         SupportTaskType.ChangeDateOfBirthRequest => typeof(ChangeDateOfBirthRequestData),
+        SupportTaskType.ChangeNameRequest => typeof(ChangeNameRequestData),
         SupportTaskType.ApiTrnRequest => typeof(ApiTrnRequestData),
         SupportTaskType.NpqTrnRequest => typeof(NpqTrnRequestData),
         SupportTaskType.TrnRequestManualChecksNeeded => typeof(TrnRequestManualChecksNeededData),

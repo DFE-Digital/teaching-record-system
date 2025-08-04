@@ -1,17 +1,13 @@
 using System.Text;
 using JustEat.HttpClientInterception;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
 [Collection(nameof(DisableParallelization))]  // Configures EvidenceFilesHttpClient
-public class CreateNameChangeTests : TestBase
+public class CreateNameChangeTests_Dqt(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public CreateNameChangeTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FeatureProvider.Features.Add(FeatureNames.ChangeRequestsInTrs);
-    }
-
     [Theory]
     [InlineData(null, "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
     [InlineData("First", "Middle", null, "evidence.jpg", "https://place.com/evidence.jpg")]
@@ -78,7 +74,7 @@ public class CreateNameChangeTests : TestBase
     }
 
     [Fact]
-    public async Task Post_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
+    public async Task Post_ValidRequest_CreatesIncidentAndReturnsTicketNumber()
     {
         // Arrange
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
@@ -86,7 +82,6 @@ public class CreateNameChangeTests : TestBase
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
 
-        var emailAddress = Faker.Internet.Email();
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
@@ -116,8 +111,7 @@ public class CreateNameChangeTests : TestBase
                 middleName = newMiddleName,
                 lastName = newLastName,
                 evidenceFileName,
-                evidenceFileUrl,
-                emailAddress
+                evidenceFileUrl
             })
         };
 
@@ -125,32 +119,17 @@ public class CreateNameChangeTests : TestBase
         var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var crmQuery = new QueryByAttribute(Incident.EntityLogicalName);
+        crmQuery.AddAttributeValue(Incident.Fields.CustomerId, new EntityReference(Contact.EntityLogicalName, createPersonResult.ContactId));
+        var crmResults = TestData.OrganizationService.RetrieveMultiple(crmQuery);
+        var incident = Assert.Single(crmResults.Entities).ToEntity<Incident>();
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
-            Assert.NotNull(supportTask);
-            Assert.Equal(SupportTaskType.ChangeNameRequest, supportTask.SupportTaskType);
-            var requestData = supportTask.Data as ChangeNameRequestData;
-            Assert.NotNull(requestData);
-            Assert.Equal(newFirstName, requestData.FirstName);
-            Assert.Equal(newMiddleName, requestData.MiddleName);
-            Assert.Equal(newLastName, requestData.LastName);
-            Assert.Equal(evidenceFileName, requestData.EvidenceFileName);
-
-            var email = await dbContext.Emails
-                .Where(e => e.EmailAddress == emailAddress)
-                .SingleOrDefaultAsync();
-            Assert.NotNull(email);
-            Assert.NotNull(email.SentOn);
-
-            await AssertEx.JsonResponseEqualsAsync(
-                response,
-                expected: new
-                {
-                    caseNumber = supportTask.SupportTaskReference
-                });
-        });
+        await AssertEx.JsonResponseEqualsAsync(
+            response,
+            expected: new
+            {
+                caseNumber = incident.TicketNumber
+            });
     }
 }
+

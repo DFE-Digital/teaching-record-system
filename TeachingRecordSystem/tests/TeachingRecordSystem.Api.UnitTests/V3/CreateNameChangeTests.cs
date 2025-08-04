@@ -4,16 +4,16 @@ using TeachingRecordSystem.Core.Models.SupportTaskData;
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
 [Collection(nameof(DisableParallelization))]
-public class CreateDateOfBirthChangeTests : OperationTestBase
+public class CreateNameChangeTests : OperationTestBase
 {
-    public CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
+    public CreateNameChangeTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
     {
         FeatureProvider.Features.Add(FeatureNames.ChangeRequestsInTrs);
     }
 
     [Fact]
     public Task HandleAsync_PersonDoesNotExist_ReturnsError() =>
-        WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
+        WithHandler<CreateNameChangeRequestHandler>(async handler =>
         {
             // Arrange
             var command = await CreateCommand();
@@ -27,7 +27,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
 
     [Fact]
     public Task HandleAsync_EvidenceFileDoesNotExist_ReturnsError() =>
-        WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
+        WithHandler<CreateNameChangeRequestHandler>(async handler =>
         {
             // Arrange
             var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
@@ -46,7 +46,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
 
     [Fact]
     public Task HandleAsync_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber() =>
-        WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
+        WithHandler<CreateNameChangeRequestHandler>(async handler =>
         {
             // Arrange
             var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
@@ -54,7 +54,6 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             {
                 Trn = createPersonResult!.Trn!
             };
-
             // Act
             var result = await handler.HandleAsync(command);
 
@@ -66,10 +65,12 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             {
                 var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
                 Assert.NotNull(supportTask);
-                Assert.Equal(SupportTaskType.ChangeDateOfBirthRequest, supportTask.SupportTaskType);
-                var requestData = supportTask.Data as ChangeDateOfBirthRequestData;
+                Assert.Equal(SupportTaskType.ChangeNameRequest, supportTask.SupportTaskType);
+                var requestData = supportTask.Data as ChangeNameRequestData;
                 Assert.NotNull(requestData);
-                Assert.Equal(command.DateOfBirth, requestData.DateOfBirth);
+                Assert.Equal(command.FirstName, requestData.FirstName);
+                Assert.Equal(command.MiddleName, requestData.MiddleName);
+                Assert.Equal(command.LastName, requestData.LastName);
                 Assert.Equal(command.EvidenceFileName, requestData.EvidenceFileName);
 
                 var email = await dbContext.Emails
@@ -80,13 +81,15 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             });
         });
 
-    private async Task<CreateDateOfBirthChangeRequestCommand> CreateCommand() =>
-        new CreateDateOfBirthChangeRequestCommand()
+    private async Task<CreateNameChangeRequestCommand> CreateCommand() =>
+        new CreateNameChangeRequestCommand
         {
             Trn = await TestData.GenerateTrnAsync(),
-            DateOfBirth = TestData.GenerateDateOfBirth(),
+            FirstName = TestData.GenerateFirstName(),
+            MiddleName = TestData.GenerateMiddleName(),
+            LastName = TestData.GenerateLastName(),
             EmailAddress = TestData.GenerateUniqueEmail(),
-            EvidenceFileName = "evidence.txt",
+            EvidenceFileName = "evidence.jpg",
             EvidenceFileUrl = Startup.EvidenceFileUrl
         };
 }
