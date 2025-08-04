@@ -2,6 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using MoreLinq;
+using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -52,10 +54,23 @@ public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClo
 
         foreach (var (version, cloudEventType) in endpointCloudEventTypeVersions.Keys)
         {
-            var mapperType = eventMapperRegistry.GetMapperType(@event.GetType(), cloudEventType, version, out var dataType);
+            Type? mapperType = null;
+            Type? dataType = null;
+
+            foreach (var v in VersionRegistry.AllV3MinorVersions.TakeUntil(e => e == version).Reverse())
+            {
+                mapperType = eventMapperRegistry.GetMapperType(@event.GetType(), cloudEventType, v, out dataType);
+
+                if (mapperType is not null)
+                {
+                    break;
+                }
+            }
+
             if (mapperType is null)
             {
-                continue;
+                throw new InvalidOperationException(
+                    $"Could not find mapper for event type '{@event.GetType().Name}', cloud event type '{cloudEventType}' and API version '{version}'.");
             }
 
             var payload = await MapEventAsync(mapperType, dataType!);
