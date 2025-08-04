@@ -30,6 +30,7 @@ using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
+using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -196,7 +197,8 @@ public class Program
             .AddDqtOutboxMessageSerializer()
             .AddWebhookOptions()
             .AddTrsSyncHelper()
-            .AddTrnRequestService();
+            .AddTrnRequestService()
+            .AddEmail();
 
         services
             .AddTrsBaseServices()

@@ -8,4 +8,5 @@ public class Email
     public required IDictionary<string, string> Personalization { get; init; }
     public IDictionary<string, object> Metadata { get; init; } = new Dictionary<string, object>();
     public DateTime? SentOn { get; set; }
+    public string? EmailReplyToId { get; init; }
 }

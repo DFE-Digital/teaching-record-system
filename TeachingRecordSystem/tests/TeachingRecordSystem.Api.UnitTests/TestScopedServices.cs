@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -18,6 +19,7 @@ public class TestScopedServices
         EventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         TrnRequestOptions = new();
+        BlobStorageFileService = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -56,4 +58,6 @@ public class TestScopedServices
     public TestableFeatureProvider FeatureProvider { get; }
 
     public TrnRequestOptions TrnRequestOptions { get; }
+
+    public Mock<IFileService> BlobStorageFileService { get; }
 }

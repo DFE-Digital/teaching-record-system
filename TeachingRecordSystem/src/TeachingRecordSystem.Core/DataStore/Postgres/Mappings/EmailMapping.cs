@@ -12,5 +12,6 @@ public class EmailMapping : IEntityTypeConfiguration<Email>
         builder.Property(e => e.EmailAddress).HasMaxLength(200);
         builder.Property(e => e.Personalization).HasJsonConversion().IsRequired().HasColumnType("jsonb");
         builder.Property(e => e.Metadata).HasJsonConversion().IsRequired().HasColumnType("jsonb");
+        builder.Property(e => e.EmailReplyToId).HasMaxLength(Guid.Empty.ToString().Length);
     }
 }
