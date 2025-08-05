@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <NoWarn>GFA0001</NoWarn>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
 
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
     <IsPublishable Condition="'$(IsTestProject)' == 'true'">false</IsPublishable>
