@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "Check details before creating record";
 
-    var backLink = LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference!);
+    var backLink = LinkGenerator.NpqTrnRequestDetailsPage(Model.SupportTaskReference!);
     var confirmButtonLabel = "Confirm and create record";
 }
 
@@ -20,7 +20,7 @@
     </div>
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-half-from-desktop">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
             <govuk-summary-card data-testid="request">
                 <govuk-summary-card-title>
                     Details of the record

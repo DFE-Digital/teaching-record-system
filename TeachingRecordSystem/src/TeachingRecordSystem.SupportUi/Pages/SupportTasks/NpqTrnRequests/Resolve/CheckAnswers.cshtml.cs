@@ -194,7 +194,7 @@ public class CheckAnswersModel(
             });
 
         await JourneyInstance!.CompleteAsync();
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public async Task<IActionResult> OnPostCancelAsync()

@@ -1,0 +1,79 @@
+@page "/support-tasks/npq-trn-requests/{supportTaskReference}/details"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.DetailsModel
+@{
+    ViewBag.Title = $"TRN request for {Model.PersonName}";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.SupportTasks()" />
+}
+
+<form action="@LinkGenerator.NpqTrnRequestDetailsPage(Model.SupportTaskReference)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Support tasks</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <govuk-summary-card>
+                <govuk-summary-card-title>
+                    Requested on @Model.SupportTask!.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)
+                </govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Source</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.SourceApplicationUserName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.PersonName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.SupportTask!.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Working in school or educational setting</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@(Model.NpqWorkingInEducationalSetting.HasValue ? Model.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NPQ application ID</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqApplicationId</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NPQ name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NPQ training provider</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NpqTrainingProvider</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="evidence">
+                            @if (Model.NpqEvidenceFileId is not null)
+                            {
+                                <a href="@Model.NpqEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="evidence-link">@($"{Model.NpqEvidenceFileName} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+            <govuk-radios asp-for="CreateRecord">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend is-page-heading="false" class="govuk-fieldset__legend--m">
+                        Create a record from this request?
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value=true>Yes</govuk-radios-item>
+                    <govuk-radios-item value=false>No, reject this request</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.NpqTrnRequestDetailsPageCancel(Model.SupportTaskReference)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+            </div>
+        </div>
+    </div>
+</form>

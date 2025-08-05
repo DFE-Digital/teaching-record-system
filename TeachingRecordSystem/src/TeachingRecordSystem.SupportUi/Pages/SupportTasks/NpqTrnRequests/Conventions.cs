@@ -11,7 +11,16 @@ public class Conventions : IConfigureFolderConventions
             this.GetFolderPathFromNamespace(),
             model =>
             {
+                var relativePath = model.RelativePath;
+
+                // Exclude this specific file
+                if (relativePath.EndsWith("Index.cshtml", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
                 model.Filters.Add(new CheckSupportTaskExistsFilterFactory(openOnly: true, supportTaskType: SupportTaskType.NpqTrnRequest));
+
             });
     }
 }

@@ -112,7 +112,7 @@ public class CheckAnswersModel(
                 b.AppendHtml(link);
             });
 
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public IActionResult OnPostCancel()

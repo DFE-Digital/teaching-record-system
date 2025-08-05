@@ -37,7 +37,7 @@
         <div class="trs-tile-section">
             <h2 class="govuk-heading-m">TRN requests</h2>
             <div class="trs-tile-row">
-                <a href="@LinkGenerator.SupportTasks(new SupportTaskCategory[]{SupportTaskCategory.TrnRequests})" class="trs-tile">
+                <a href="@LinkGenerator.NpqTrnRequests()" class="trs-tile">
                     <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.NpqTrnRequest)</span>
                     <span class="trs-tile__title">NPQ TRN requests</span>
                 </a>

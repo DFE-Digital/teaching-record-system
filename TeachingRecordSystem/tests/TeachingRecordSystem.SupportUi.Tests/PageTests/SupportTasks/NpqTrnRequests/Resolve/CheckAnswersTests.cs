@@ -388,7 +388,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         // redirect
-        Assert.Equal("/support-tasks", response.Headers.Location?.OriginalString);
+        Assert.Equal("/support-tasks/npq-trn-requests", response.Headers.Location?.OriginalString);
 
         // person record is updated
         await WithDbContext(async dbContext =>
@@ -575,7 +575,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         // Assert
 
         // redirect
-        Assert.Equal("/support-tasks", response.Headers.Location?.OriginalString);
+        Assert.Equal("/support-tasks/npq-trn-requests", response.Headers.Location?.OriginalString);
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
