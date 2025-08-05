@@ -195,7 +195,7 @@ public class CheckAnswersTests : LinkTestBase
 
             var expectedAlertUpdatedEvent = new AlertUpdatedEvent()
             {
-                EventId = Guid.Empty,
+                EventId = actualAlertUpdatedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,
                 RaisedBy = GetCurrentUserId(),
                 PersonId = person.PersonId,

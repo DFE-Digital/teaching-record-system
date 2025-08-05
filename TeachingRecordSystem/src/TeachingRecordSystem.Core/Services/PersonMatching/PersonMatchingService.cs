@@ -56,7 +56,9 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
         return results switch
         {
+#pragma warning disable format
             [OneLoginUserMatchQueryResult r] => new OneLoginUserMatchResult(r.person_id, r.trn, MapMatchedAttrs(r.matched_attrs)),
+#pragma warning restore format
             _ => null
         };
     }
@@ -192,12 +194,14 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
         return results switch
         {
+#pragma warning disable format
             [var singleMatch]
                 when singleMatch.matched_attr_keys
                     .Select(Enum.Parse<PersonMatchedAttribute>)
                     .ToHashSet()
                     .IsSupersetOf([PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber]) =>
                 TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
+#pragma warning restore format
             [] => TrnRequestMatchResult.NoMatches(),
             _ => TrnRequestMatchResult.PotentialMatches(results.Select(r => r.person_id))
         };

@@ -155,7 +155,7 @@ public class CheckAnswersTests : AddAlertTestBase
                 PersonId = person.PersonId,
                 Alert = new()
                 {
-                    AlertId = Guid.Empty,
+                    AlertId = actualAlertCreatedEvent.Alert.AlertId,
                     AlertTypeId = journeyInstance.State.AlertTypeId,
                     Details = journeyInstance.State.Details,
                     ExternalLink = journeyInstance.State.Link,

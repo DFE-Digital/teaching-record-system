@@ -5,6 +5,22 @@ updates:
     directory: /TeachingRecordSystem/
     schedule:
       interval: 'daily'
+    groups:
+      dotnet:
+        patterns:
+          - 'Microsoft.AspNetCore.*'
+          - 'Microsoft.EntityFrameworkCore.*'
+          - 'Microsoft.Extensions.*'
+          - 'System.Net.Http.Json'
+      serilog:
+        patterns:
+          - 'Serilog.*'
+      openiddict:
+        patterns:
+          - 'OpenIddict.*'
+      hangfire:
+        patterns:
+          - 'Hangfire.*'
 
   - package-ecosystem: github-actions
     directory: /

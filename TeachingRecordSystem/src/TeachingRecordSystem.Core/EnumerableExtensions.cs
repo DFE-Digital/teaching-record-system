@@ -60,8 +60,10 @@ public static class EnumerableExtensions
 
         return valuesArray switch
         {
+#pragma warning disable format
             [] => string.Empty,
             [var only] => only,
+#pragma warning restore format
             _ => string.Join(", ", valuesArray[0..^2].Append(string.Join($" {finalValuesConjunction} ", valuesArray[^2..])))
         };
     }
