@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using OpenIddict.EntityFrameworkCore.Models;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
@@ -89,15 +90,15 @@ builder.Services.AddOpenIddict()
                 .UseDbContext<TrsDbContext>()
                 .ReplaceDefaultEntities<Guid>();
 
-        options.ReplaceApplicationManager<ApplicationManager>();
+        options.ReplaceApplicationManager<OpenIddictEntityFrameworkCoreApplication<Guid>, ApplicationManager>();
     })
     .AddServer(options =>
     {
         options
             .SetAuthorizationEndpointUris("oauth2/authorize")
-            .SetLogoutEndpointUris("oauth2/logout")
+            .SetEndSessionEndpointUris("oauth2/logout")
             .SetTokenEndpointUris("oauth2/token")
-            .SetUserinfoEndpointUris("oauth2/userinfo");
+            .SetUserInfoEndpointUris("oauth2/userinfo");
 
         options.SetIssuer(builder.Configuration.GetRequiredValue("AuthorizeAccessIssuer"));
 
@@ -139,9 +140,9 @@ builder.Services.AddOpenIddict()
 
         options.UseAspNetCore()
             .EnableAuthorizationEndpointPassthrough()
-            .EnableLogoutEndpointPassthrough()
+            .EnableEndSessionEndpointPassthrough()
             .EnableTokenEndpointPassthrough()
-            .EnableUserinfoEndpointPassthrough()
+            .EnableUserInfoEndpointPassthrough()
             .EnableStatusCodePagesIntegration();
     });
 

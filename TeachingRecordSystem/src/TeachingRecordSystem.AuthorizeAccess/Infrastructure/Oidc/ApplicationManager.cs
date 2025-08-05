@@ -11,7 +11,7 @@ public class ApplicationManager : OpenIddictApplicationManager<OpenIddictEntityF
         IOpenIddictApplicationCache<OpenIddictEntityFrameworkCoreApplication<Guid>> cache,
         ILogger<OpenIddictApplicationManager<OpenIddictEntityFrameworkCoreApplication<Guid>>> logger,
         IOptionsMonitor<OpenIddictCoreOptions> options,
-        IOpenIddictApplicationStoreResolver resolver) : base(cache, logger, options, resolver)
+        IOpenIddictApplicationStore<OpenIddictEntityFrameworkCoreApplication<Guid>> store) : base(cache, logger, options, store)
     {
     }
 

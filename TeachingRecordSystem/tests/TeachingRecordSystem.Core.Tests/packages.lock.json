@@ -322,24 +322,24 @@
       },
       "Microsoft.EntityFrameworkCore": {
         "type": "Transitive",
-        "resolved": "8.0.10",
-        "contentHash": "PPkQdIqfR1nU3n6YgGGDk8G+eaYbaAKM1AzIQtlPNTKf10Osg3N9T+iK9AlnSA/ujsK00flPpFHVfJrbuBFS1A==",
+        "resolved": "8.0.17",
+        "contentHash": "WqZly7Guj0I9EKXrPMCQFDaJMEIRHxfIs7/0ZUB3H1k4a15R1QgzN5ZGCCYoQWMLe0XL0f9AZIB4XwumeO9Gvw==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Abstractions": "8.0.10",
-          "Microsoft.EntityFrameworkCore.Analyzers": "8.0.10",
+          "Microsoft.EntityFrameworkCore.Abstractions": "8.0.17",
+          "Microsoft.EntityFrameworkCore.Analyzers": "8.0.17",
           "Microsoft.Extensions.Caching.Memory": "8.0.1",
           "Microsoft.Extensions.Logging": "8.0.1"
         }
       },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",
-        "resolved": "8.0.10",
-        "contentHash": "FV0QlcX9INY4kAD2o72uPtyOh0nZut2jB11Jf9mNYBtHay8gDLe+x4AbXFwuQg+eSvofjT7naV82e827zGfyMg=="
+        "resolved": "8.0.17",
+        "contentHash": "qj8GWkooslMPawGU/uKljHx9q9zI80qZ2O1nMpHsSA7Ud78B0G1rth3u4tYAMp8/SAuOeaXXa4FzwiyMOtIEOA=="
       },
       "Microsoft.EntityFrameworkCore.Analyzers": {
         "type": "Transitive",
-        "resolved": "8.0.10",
-        "contentHash": "51KkPIc0EMv/gVXhPIUi6cwJE9Mvh+PLr4Lap4naLcsoGZ0lF2SvOPgUUprwRV3MnN7nyD1XPhT5RJ/p+xFAXw=="
+        "resolved": "8.0.17",
+        "contentHash": "ndRuqcOP6GV3tMCyPipuMNbQq2dUNdRlcvfbXkfwbm8b8fc6psLIABgkL5qaekgyTKxEa1ftnidU7S0til/Jwg=="
       },
       "Microsoft.Extensions.Caching.Abstractions": {
         "type": "Transitive",
@@ -593,8 +593,8 @@
       },
       "Microsoft.IdentityModel.Abstractions": {
         "type": "Transitive",
-        "resolved": "7.2.0",
-        "contentHash": "7YgmrhCORuOP8miZJLdQhSEzyHdD5PfRjaqINbqSzS9LKEfOoHq8S9o4FVmK9Mu7Gts8MfL46sshwCk4AgjNyw=="
+        "resolved": "8.12.0",
+        "contentHash": "V7fHMFpfzvx7twWMV3jrf3OFVmYn3QhUYtvfMRD9yUPs9gxnQSaRMZh5NzCsnW3ZZ80J09EE7yyjM71y9JC6hQ=="
       },
       "Microsoft.IdentityModel.Clients.ActiveDirectory": {
         "type": "Transitive",
@@ -629,10 +629,10 @@
       },
       "Microsoft.IdentityModel.Logging": {
         "type": "Transitive",
-        "resolved": "7.2.0",
-        "contentHash": "U15cZGq0JfkFXKDaDalq75WKGJniZnV0D6tCbaqc/NgLpIIO/Sq56PGr1v9fhPmXW2xb6ParGFfZkfryewmpWQ==",
+        "resolved": "8.12.0",
+        "contentHash": "IakwNWUTy5RlcDcKwtL5TyfDLZmA8FFnSDhfr+wfGGPMON9GkpkUY8NakIJjdy6mv6C1lM/Jkn3IuaeS9MXesA==",
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "7.2.0"
+          "Microsoft.IdentityModel.Abstractions": "8.12.0"
         }
       },
       "Microsoft.IdentityModel.Protocols": {
@@ -644,21 +644,13 @@
           "Microsoft.IdentityModel.Tokens": "6.35.0"
         }
       },
-      "Microsoft.IdentityModel.Protocols.OpenIdConnect": {
-        "type": "Transitive",
-        "resolved": "6.35.0",
-        "contentHash": "LMtVqnECCCdSmyFoCOxIE5tXQqkOLrvGrL7OxHg41DIm1bpWtaCdGyVcTAfOQpJXvzND9zUKIN/lhngPkYR8vg==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Protocols": "6.35.0",
-          "System.IdentityModel.Tokens.Jwt": "6.35.0"
-        }
-      },
       "Microsoft.IdentityModel.Tokens": {
         "type": "Transitive",
-        "resolved": "7.2.0",
-        "contentHash": "ycDxTRKNG2ad+y8166YuE0vqbzONEcgoZhMeOfqOoC4GDNOGEYlMoSS+Qm6n/GBHgW6FNmNxpXOUJLRMbJxcWQ==",
+        "resolved": "8.12.0",
+        "contentHash": "WCU3wv5sioX5hhp3oHw8sCdygnfZJtRKJGCg+AckP6nbp0QGKK3VohTrxIF0dpuziLAPg57CPfS9X8UERroKxA==",
         "dependencies": {
-          "Microsoft.IdentityModel.Logging": "7.2.0"
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Microsoft.IdentityModel.Logging": "8.12.0"
         }
       },
       "Microsoft.IO.RecyclableMemoryStream": {
@@ -785,29 +777,29 @@
       },
       "OpenIddict.Abstractions": {
         "type": "Transitive",
-        "resolved": "5.2.0",
-        "contentHash": "7v96FahB57w9VXH29iqHzp/s9MVZGGV9ePtkwIWgjcBCMN1wawl+0Xvn/S1ikHJ5+aqkWoJCEpn5ztMlAg4KxQ==",
+        "resolved": "7.0.0",
+        "contentHash": "8GIdJ0WJVjnsXG0A72F2QPcyTQjn4B5lLWTw+FZ701rhRn/EvxHF8yH8dwJ6Jnq5j2FcIqIIIbANJrCgXmX8lw==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
           "Microsoft.Extensions.Primitives": "8.0.0",
-          "Microsoft.IdentityModel.Tokens": "7.2.0"
+          "Microsoft.IdentityModel.Tokens": "8.12.0"
         }
       },
       "OpenIddict.Core": {
         "type": "Transitive",
-        "resolved": "5.2.0",
-        "contentHash": "V9jNa1exoZsUlY0UJLI/1jTqwe7CKSCi+CXwJxEk8XLlHPAg6QwIMy2rr6tcpnNxPq24A13pzhKyFza4KEmDrA==",
+        "resolved": "7.0.0",
+        "contentHash": "rtYHSuXM7BlZ6B48TTHDQ6TgCpwNHFdrJPsvYT9aiOzV3CU8GFZl4YXJT9wrwj7nTSMOFOEnEAwynbVZxsiV4Q==",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "8.0.0",
-          "Microsoft.Extensions.Logging": "8.0.0",
-          "Microsoft.Extensions.Options": "8.0.1",
-          "OpenIddict.Abstractions": "5.2.0"
+          "Microsoft.Extensions.Caching.Memory": "8.0.1",
+          "Microsoft.Extensions.Logging": "8.0.1",
+          "Microsoft.Extensions.Options": "8.0.2",
+          "OpenIddict.Abstractions": "7.0.0"
         }
       },
       "OpenIddict.EntityFrameworkCore.Models": {
         "type": "Transitive",
-        "resolved": "5.2.0",
-        "contentHash": "CMzogVlVEaeZK/xlYPAeqDsZM01512x4dMQsgFKH2RzE+o5tI8LzpwX+0pQ2WKaNq6cl82zDEHS2rnOPIOUCUg=="
+        "resolved": "7.0.0",
+        "contentHash": "HGAux2nT6jzgC8l7RxXiHDj3+9WqDm7K9vnWMWe8DFNB4VuuoBJFqwR3+MZbm9r1svDl6QS74+ux3R41IA8pHQ=="
       },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl": {
         "type": "Transitive",
@@ -1199,15 +1191,6 @@
           "System.Runtime": "4.3.0",
           "System.Runtime.Extensions": "4.3.0",
           "System.Runtime.InteropServices": "4.3.0"
-        }
-      },
-      "System.IdentityModel.Tokens.Jwt": {
-        "type": "Transitive",
-        "resolved": "6.35.0",
-        "contentHash": "yxGIQd3BFK7F6S62/7RdZk3C/mfwyVxvh6ngd1VYMBmbJ1YZZA9+Ku6suylVtso0FjI0wbElpJ0d27CdsyLpBQ==",
-        "dependencies": {
-          "Microsoft.IdentityModel.JsonWebTokens": "6.35.0",
-          "Microsoft.IdentityModel.Tokens": "6.35.0"
         }
       },
       "System.IO": {
@@ -2087,7 +2070,7 @@
           "Hangfire.PostgreSql": "[1.20.10, )",
           "IdentityModel": "[6.2.0, )",
           "Microsoft.Data.SqlClient": "[5.2.2, )",
-          "Microsoft.EntityFrameworkCore.Relational": "[8.0.10, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[8.0.17, )",
           "Microsoft.Extensions.Azure": "[1.7.5, )",
           "Microsoft.Extensions.Configuration.Abstractions": "[8.0.0, )",
           "Microsoft.Extensions.Configuration.Binder": "[8.0.2, )",
@@ -2104,7 +2087,7 @@
           "Npgsql.DependencyInjection": "[8.0.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[8.0.10, )",
           "OneOf": "[3.0.271, )",
-          "OpenIddict.EntityFrameworkCore": "[5.2.0, )",
+          "OpenIddict.EntityFrameworkCore": "[7.0.0, )",
           "Optional": "[4.0.0, )",
           "Parquet.Net": "[4.24.0, )",
           "Polly.Core": "[8.2.1, )",
@@ -2341,11 +2324,11 @@
       },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "CentralTransitive",
-        "requested": "[8.0.10, )",
-        "resolved": "8.0.10",
-        "contentHash": "OefBEE47kGKPRPV3OT+FAW6o5BFgLk2D9EoeWVy7NbOepzUneayLQxbVE098FfedTyMwxvZQoDD9LrvZc3MadA==",
+        "requested": "[8.0.17, )",
+        "resolved": "8.0.17",
+        "contentHash": "qgCpPznBOuCU7vebzjIz9uIJaHUQ6X4olzk2eoAY/o0hY/4yKyeOf7zmVSHz9xFPrcPMK4K0Kfl7/ZMHdagtsg==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "8.0.10",
+          "Microsoft.EntityFrameworkCore": "8.0.17",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
         }
       },
@@ -2474,6 +2457,16 @@
           "Microsoft.Extensions.Options": "8.0.0"
         }
       },
+      "Microsoft.IdentityModel.Protocols.OpenIdConnect": {
+        "type": "CentralTransitive",
+        "requested": "[8.13.0, )",
+        "resolved": "6.35.0",
+        "contentHash": "LMtVqnECCCdSmyFoCOxIE5tXQqkOLrvGrL7OxHg41DIm1bpWtaCdGyVcTAfOQpJXvzND9zUKIN/lhngPkYR8vg==",
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols": "6.35.0",
+          "System.IdentityModel.Tokens.Jwt": "6.35.0"
+        }
+      },
       "Microsoft.PowerPlatform.Dataverse.Client": {
         "type": "CentralTransitive",
         "requested": "[1.1.27, )",
@@ -2576,13 +2569,13 @@
       },
       "OpenIddict.EntityFrameworkCore": {
         "type": "CentralTransitive",
-        "requested": "[5.2.0, )",
-        "resolved": "5.2.0",
-        "contentHash": "z2qjB+jQ3Z0vd+VRbcx/VSmtcdBgHTIXo2MQNyJTUNaEAnTgDCnewtu8aeuTOas6bqasXbXpf4u26rOL4brsCw==",
+        "requested": "[7.0.0, )",
+        "resolved": "7.0.0",
+        "contentHash": "mut7whbVHMHqeeW0Fb+AyWQ4rclnSR2B4lwpwXCcpA2PIALSVKtU5BtCbWgv+P8sbaTmMEvONwmPAjNbPU1Xlg==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "8.0.1",
-          "OpenIddict.Core": "5.2.0",
-          "OpenIddict.EntityFrameworkCore.Models": "5.2.0"
+          "Microsoft.EntityFrameworkCore.Relational": "8.0.17",
+          "OpenIddict.Core": "7.0.0",
+          "OpenIddict.EntityFrameworkCore.Models": "7.0.0"
         }
       },
       "Optional": {
@@ -2698,6 +2691,16 @@
         "contentHash": "hCMeW6+4jzbIDwRJulxVsBlAPEtQjZcbVyw8C5yYpI/shQZlYXeSivrjEexeo3nPO/H14wOPoAjE9NDXAWiPxg==",
         "dependencies": {
           "Serilog": "2.10.0"
+        }
+      },
+      "System.IdentityModel.Tokens.Jwt": {
+        "type": "CentralTransitive",
+        "requested": "[8.13.0, )",
+        "resolved": "6.35.0",
+        "contentHash": "yxGIQd3BFK7F6S62/7RdZk3C/mfwyVxvh6ngd1VYMBmbJ1YZZA9+Ku6suylVtso0FjI0wbElpJ0d27CdsyLpBQ==",
+        "dependencies": {
+          "Microsoft.IdentityModel.JsonWebTokens": "6.35.0",
+          "Microsoft.IdentityModel.Tokens": "6.35.0"
         }
       },
       "System.Linq.Async": {
