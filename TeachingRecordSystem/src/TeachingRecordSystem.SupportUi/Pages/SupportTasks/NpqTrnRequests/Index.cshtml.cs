@@ -46,7 +46,7 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
         {
             var minDate = date.ToDateTime(new TimeOnly(0, 0, 0), DateTimeKind.Utc);
             var maxDate = minDate.AddDays(1);
-            tasks = tasks.Where(t => t.TrnRequestMetadata!.CreatedOn >= minDate && t.TrnRequestMetadata.CreatedOn < maxDate);
+            tasks = tasks.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
         }
         else if (SearchTextIsEmail())
         {

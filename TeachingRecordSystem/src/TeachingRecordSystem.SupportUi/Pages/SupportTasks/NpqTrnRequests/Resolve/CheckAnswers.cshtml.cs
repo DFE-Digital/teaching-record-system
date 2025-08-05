@@ -201,7 +201,7 @@ public class CheckAnswersModel(
     {
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

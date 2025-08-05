@@ -117,7 +117,7 @@ public class CheckAnswersModel(
 
     public IActionResult OnPostCancel()
     {
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

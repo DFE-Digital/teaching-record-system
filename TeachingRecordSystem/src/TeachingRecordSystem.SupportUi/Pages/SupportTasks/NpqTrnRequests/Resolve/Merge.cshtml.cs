@@ -81,7 +81,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

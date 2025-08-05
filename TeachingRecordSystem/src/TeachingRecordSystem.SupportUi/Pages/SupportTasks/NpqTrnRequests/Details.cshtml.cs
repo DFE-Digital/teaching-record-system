@@ -55,7 +55,7 @@ public class DetailsModel(TrsLinkGenerator linkGenerator, IFileService fileServi
 
     public IActionResult OnPostCancel()
     {
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
