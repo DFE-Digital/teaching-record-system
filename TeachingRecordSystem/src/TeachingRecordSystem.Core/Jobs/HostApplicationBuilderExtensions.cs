@@ -32,6 +32,11 @@ public static class HostApplicationBuilderExtensions
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                builder.Services.AddOptions<CapitaTpsUserOption>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs:CapitaTpsImport"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
                 builder.Services.AddStartupTask(sp =>
                 {
                     var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
@@ -250,6 +255,11 @@ public static class HostApplicationBuilderExtensions
                     nameof(CapitaExportNewJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportNewJob.JobSchedule);
+
+                recurringJobManager.AddOrUpdate<CapitaExportAmendJob>(
+                    nameof(CapitaExportAmendJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    CapitaExportAmendJob.JobSchedule);
 
                 return Task.CompletedTask;
             });
