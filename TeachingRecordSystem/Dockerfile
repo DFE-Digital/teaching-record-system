@@ -1,14 +1,14 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.18
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine3.21
 ARG GIT_SHA
-ENV SENTRY_RELEASE ${GIT_SHA}
-ENV GIT_SHA ${GIT_SHA}
-ENV ASPNETCORE_HTTP_PORTS 3000
-COPY src/TeachingRecordSystem.Api/bin/Release/net8.0/publish/ Apps/Api/
-COPY src/TeachingRecordSystem.Cli/bin/Release/net8.0/publish/ Apps/TrsCli/
-COPY src/TeachingRecordSystem.SupportUi/bin/Release/net8.0/publish/ Apps/SupportUi/
-COPY src/TeachingRecordSystem.Worker/bin/Release/net8.0/publish/ Apps/Worker/
-COPY src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net8.0/publish/ Apps/AuthorizeAccess/
+ENV SENTRY_RELEASE=${GIT_SHA}
+ENV GIT_SHA=${GIT_SHA}
+ENV ASPNETCORE_HTTP_PORTS=3000
+COPY src/TeachingRecordSystem.Api/bin/Release/net9.0/publish/ Apps/Api/
+COPY src/TeachingRecordSystem.Cli/bin/Release/net9.0/publish/ Apps/TrsCli/
+COPY src/TeachingRecordSystem.SupportUi/bin/Release/net9.0/publish/ Apps/SupportUi/
+COPY src/TeachingRecordSystem.Worker/bin/Release/net9.0/publish/ Apps/Worker/
+COPY src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net9.0/publish/ Apps/AuthorizeAccess/
 COPY db.sh Apps/db.sh
 WORKDIR /Apps
 
@@ -24,7 +24,7 @@ RUN apk add --no-cache \
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Install Postgres client
-RUN apk --no-cache add postgresql14-client
+RUN apk --no-cache add postgresql17-client
 
 # Fix for invoking trscli
 RUN apk --no-cache add libc6-compat

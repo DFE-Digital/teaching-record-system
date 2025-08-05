@@ -29,11 +29,11 @@ restore:
 # Install Playwright
 [working-directory: 'tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests']
 install-playwright:
-  @pwsh bin/Debug/net8.0/playwright.ps1 install chromium
+  @pwsh bin/Debug/net9.0/playwright.ps1 install chromium
 
 # Run the trscli
 cli *ARGS:
-  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net8.0" / "trscli.dll"}} {{ARGS}}
+  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net9.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
 build:
@@ -123,7 +123,7 @@ set-tests-secret key value:
 
 [working-directory: 'src/TeachingRecordSystem.Cli']
 create-admin email name:
-  @dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
+  @dotnet {{"bin" / "Debug" / "net9.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
 
 [working-directory: '..']
 make *ARGS:

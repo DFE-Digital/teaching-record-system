@@ -91,35 +91,33 @@ public class ApplicationUser : UserBase
         }
     }
 
-    public OpenIddictEntityFrameworkCoreApplication<Guid>? ToOpenIddictApplication()
+    public void PopulateOpenIddictApplication(OpenIddictEntityFrameworkCoreApplication<Guid> app)
     {
         if (!IsOidcClient)
         {
-            return null;
+            app.Permissions = "[]";
+            return;
         }
 
-        return new OpenIddictEntityFrameworkCoreApplication<Guid>()
-        {
-            ApplicationType = ApplicationTypes.Web,
-            ClientId = ClientId,
-            ClientSecret = ClientSecret,
-            ClientType = ClientTypes.Confidential,
-            ConsentType = ConsentTypes.Implicit,
-            DisplayName = Name,
-            Id = UserId,
-            Permissions = CreateJsonArray(
-                Permissions.Endpoints.Authorization,
-                Permissions.Endpoints.Token,
-                Permissions.Endpoints.EndSession,
-                Permissions.GrantTypes.AuthorizationCode,
-                Permissions.ResponseTypes.Code,
-                Permissions.Scopes.Email,
-                Permissions.Scopes.Profile,
-                $"{Permissions.Prefixes.Scope}teaching_record"),
-            RedirectUris = CreateJsonArray(RedirectUris!.ToArray()),
-            PostLogoutRedirectUris = CreateJsonArray(PostLogoutRedirectUris!.ToArray()),
-            Requirements = CreateJsonArray(Requirements.Features.ProofKeyForCodeExchange)
-        };
+        app.ApplicationType = ApplicationTypes.Web;
+        app.ClientId = ClientId;
+        app.ClientSecret = ClientSecret;
+        app.ClientType = ClientTypes.Confidential;
+        app.ConsentType = ConsentTypes.Implicit;
+        app.DisplayName = Name;
+        app.Id = UserId;
+        app.Permissions = CreateJsonArray(
+            Permissions.Endpoints.Authorization,
+            Permissions.Endpoints.Token,
+            Permissions.Endpoints.EndSession,
+            Permissions.GrantTypes.AuthorizationCode,
+            Permissions.ResponseTypes.Code,
+            Permissions.Scopes.Email,
+            Permissions.Scopes.Profile,
+            $"{Permissions.Prefixes.Scope}teaching_record");
+        app.RedirectUris = CreateJsonArray(RedirectUris!.ToArray());
+        app.PostLogoutRedirectUris = CreateJsonArray(PostLogoutRedirectUris!.ToArray());
+        app.Requirements = CreateJsonArray(Requirements.Features.ProofKeyForCodeExchange);
 
         static string CreateJsonArray(params string[] values) => JsonSerializer.Serialize(values);
     }

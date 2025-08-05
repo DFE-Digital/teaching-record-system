@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <IsPublishable>false</IsPublishable>
   </PropertyGroup>
 
@@ -218,7 +217,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0068_TrsQualificationsTrainingCountryId.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0069_TrsQualificationsDegreeTypeId.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0070_TrsQualificationsExemptFromInductionDueToQtsDate.sql" />
-    <EmbeddedResource Include="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />  
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0072_TrsQualificationsDqtAgeRange.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0073_TrsPersonsGender.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0074_TrsRouteMigrationReportItem.sql" />
