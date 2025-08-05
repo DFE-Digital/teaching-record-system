@@ -68,6 +68,7 @@ public class Program
                 options.Authority = configuration["GetAnIdentity:BaseAddress"];
                 options.MapInboundClaims = false;
                 options.TokenValidationParameters.ValidateAudience = false;
+                options.TokenValidationParameters.RequireExpirationTime = false;
             })
             .AddJwtBearer(AuthenticationSchemeNames.AuthorizeAccessAccessToken, options =>
             {
