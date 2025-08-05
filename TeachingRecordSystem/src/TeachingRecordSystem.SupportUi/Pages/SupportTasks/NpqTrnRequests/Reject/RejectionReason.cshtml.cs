@@ -29,7 +29,7 @@ public class RejectionReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkG
     public IActionResult OnPostCancel()
     {
         // stub page
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

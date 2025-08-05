@@ -32,7 +32,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
-        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}";
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -72,7 +72,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         // Assert
 
         // redirect
-        Assert.Equal("/support-tasks", response.Headers.Location?.OriginalString);
+        Assert.Equal("/support-tasks/npq-trn-requests", response.Headers.Location?.OriginalString);
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();

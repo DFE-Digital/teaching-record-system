@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NpqTrnRequestStartPage(Model.SupportTaskReference)" />
+    <govuk-back-link href="@LinkGenerator.NpqTrnRequestDetailsPage(Model.SupportTaskReference)" />
 }
 
 <form action="@LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">

@@ -1,79 +1,128 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
-public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
 {
-    public string PersonName => string.Join(" ", SupportTask!.TrnRequestMetadata!.Name);
+    private const int TasksPerPage = 20;
 
-    public SupportTask? SupportTask { get; set; }
+    [Display(Name = "Search", Description = "By name, email or request date, for example 4/3/1975")]
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public string? Search { get; set; }
 
-    public string SourceApplicationUserName => SupportTask!.TrnRequestMetadata!.ApplicationUser!.Name;
-    public bool? NpqWorkingInEducationalSetting { get; set; }
-    public string? NpqApplicationId { get; set; }
-    public string? NpqName { get; set; }
-    public string? NpqTrainingProvider { get; set; }
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortDirection? SortDirection { get; set; }
 
-    public Guid? NpqEvidenceFileId { get; set; }
-    public string? NpqEvidenceFileName { get; set; }
-    public string? NpqEvidenceFileUrl { get; set; }
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortByOption? SortBy { get; set; }
 
-    [FromRoute]
-    public required string SupportTaskReference { get; init; }
+    [BindProperty(SupportsGet = true)]
+    public int? PageNumber { get; set; }
 
-    [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to create a record from this request")]
-    public bool CreateRecord { get; set; }
+    public ResultPage<Result>? Results { get; set; }
 
-    public void OnGet()
+    public PaginationViewModel? Pagination { get; set; }
+
+    public async Task<IActionResult> OnGetAsync()
     {
-    }
+        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
+        var sortBy = SortBy ??= SortByOption.RequestedOn;
 
-    public IActionResult OnPost()
-    {
-        if (ModelState.IsValid == false)
+        var tasks = dbContext.SupportTasks
+            .Include(t => t.TrnRequestMetadata)
+            .ThenInclude(m => m!.ApplicationUser)
+            .Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest && t.Status == SupportTaskStatus.Open);
+
+        Search = Search?.Trim() ?? string.Empty;
+
+        if (SearchTextIsDate(out var date))
         {
-            return this.PageWithErrors();
+            var minDate = date.ToDateTime(new TimeOnly(0, 0, 0), DateTimeKind.Utc);
+            var maxDate = minDate.AddDays(1);
+            tasks = tasks.Where(t => t.CreatedOn >= minDate && t.CreatedOn < maxDate);
         }
-
-        if (CreateRecord)
+        else if (SearchTextIsEmail())
         {
-            return (SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?? false) ?
-               Redirect(linkGenerator.NpqTrnRequestMatches(SupportTaskReference)) :
-               Redirect(linkGenerator.NpqTrnRequestNoMatchesCheckAnswers(SupportTaskReference));
+            tasks = tasks
+                .Where(t => t.TrnRequestMetadata!.EmailAddress != null && t.TrnRequestMetadata.EmailAddress.ToLower() == Search.ToLower());
         }
         else
         {
-            return Redirect(linkGenerator.NpqTrnRequestRejectionReason(SupportTaskReference));
+            var nameParts = Search
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(n => n.ToLower())
+                .ToArray();
+
+            if (nameParts.Length > 0)
+            {
+                tasks = tasks.Where(t => nameParts.All(n => t.TrnRequestMetadata!.Name.Select(m => m.ToLower()).Contains(n)));
+            }
         }
+
+        if (sortBy == SortByOption.Name)
+        {
+            tasks = tasks
+                .OrderBy(sortDirection, t => t.TrnRequestMetadata!.FirstName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.MiddleName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.LastName);
+        }
+        else if (sortBy == SortByOption.Email)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.EmailAddress);
+        }
+        else if (sortBy == SortByOption.RequestedOn)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.CreatedOn);
+        }
+        else if (sortBy == SortByOption.PotentialDuplicate)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.PotentialDuplicate);
+        }
+
+        Results = await tasks
+            .Select(t => new Result(
+                t.SupportTaskReference,
+                t.TrnRequestMetadata!.FirstName!,
+                t.TrnRequestMetadata!.MiddleName ?? "",
+                t.TrnRequestMetadata!.LastName!,
+                t.TrnRequestMetadata!.EmailAddress,
+                t.CreatedOn,
+                t.TrnRequestMetadata.ApplicationUser!.Name,
+                t.TrnRequestMetadata.ApplicationUser.ShortName,
+                t.TrnRequestMetadata.PotentialDuplicate))
+            .GetPageAsync(PageNumber, TasksPerPage);
+
+        Pagination = PaginationViewModel.Create(
+            Results,
+            pageNumber => linkGenerator.NpqTrnRequests(Search, SortBy, SortDirection, pageNumber));
+
+        return Page();
+
+        bool SearchTextIsDate(out DateOnly date) =>
+            DateOnly.TryParseExact(Search, UiDefaults.DateOnlyDisplayFormat, out date) ||
+            DateOnly.TryParseExact(Search, "d/M/yyyy", out date);
+
+        bool SearchTextIsEmail() => Search.Contains('@');
     }
 
-    public IActionResult OnPostCancel()
+    public record Result(
+        string SupportTaskReference,
+        string FirstName,
+        string MiddleName,
+        string LastName,
+        string? EmailAddress,
+        DateTime CreatedOn,
+        string SourceApplicationName,
+        string? SourceApplicationShortName,
+        bool? PotentialDuplicate)
     {
-        return Redirect(linkGenerator.SupportTasks());
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var supportTaskFeature = context.HttpContext.GetCurrentSupportTaskFeature();
-        SupportTask = supportTaskFeature.SupportTask;
-
-        NpqWorkingInEducationalSetting = SupportTask!.TrnRequestMetadata?.NpqWorkingInEducationalSetting;
-        NpqApplicationId = SupportTask.TrnRequestMetadata?.NpqApplicationId;
-        NpqName = SupportTask.TrnRequestMetadata?.NpqName;
-        NpqTrainingProvider = SupportTask.TrnRequestMetadata?.NpqTrainingProvider;
-        NpqEvidenceFileId = SupportTask.TrnRequestMetadata?.NpqEvidenceFileId;
-        NpqEvidenceFileName = SupportTask.TrnRequestMetadata?.NpqEvidenceFileName;
-
-        NpqEvidenceFileUrl = NpqEvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
-            null;
-
-        await base.OnPageHandlerExecutionAsync(context, next);
+        public string Source => !string.IsNullOrEmpty(SourceApplicationShortName) ? SourceApplicationShortName : SourceApplicationName;
     }
 }
