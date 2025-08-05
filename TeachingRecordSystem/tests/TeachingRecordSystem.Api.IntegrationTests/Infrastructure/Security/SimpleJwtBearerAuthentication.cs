@@ -37,6 +37,7 @@ public class SimpleJwtBearerAuthentication(
                     {
                         ValidateAudience = false,
                         ValidateIssuer = false,
+                        RequireExpirationTime = false,
                         IssuerSigningKey = Options.IssuerSigningKey
                     },
                     out _);

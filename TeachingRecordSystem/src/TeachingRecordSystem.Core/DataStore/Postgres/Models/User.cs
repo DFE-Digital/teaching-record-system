@@ -110,7 +110,7 @@ public class ApplicationUser : UserBase
             Permissions = CreateJsonArray(
                 Permissions.Endpoints.Authorization,
                 Permissions.Endpoints.Token,
-                Permissions.Endpoints.Logout,
+                Permissions.Endpoints.EndSession,
                 Permissions.GrantTypes.AuthorizationCode,
                 Permissions.ResponseTypes.Code,
                 Permissions.Scopes.Email,
