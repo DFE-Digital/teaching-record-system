@@ -25,4 +25,5 @@ public static class JourneyNames
     public const string CreatePerson = nameof(CreatePerson);
     public const string ManualMergePerson = nameof(ManualMergePerson);
     public const string ResolveNpqTrnRequest = nameof(ResolveNpqTrnRequest);
+    public const string RejectNpqTrnRequest = nameof(RejectNpqTrnRequest);
 }

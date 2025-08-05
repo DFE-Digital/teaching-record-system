@@ -1,4 +1,4 @@
-@page "/support-tasks/npq-trn-requests/{supportTaskReference}/rejection-reason/{handler?}"
+@page "/support-tasks/npq-trn-requests/{supportTaskReference}/reject/reason/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject.RejectionReasonModel
 @{
     ViewBag.Title = "Compare potential duplicate records";
@@ -12,7 +12,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">TRN request - @Model.PersonName</span>
-            <govuk-radios asp-for="RejectionReason" data-testid="reason-options">
+            <govuk-radios asp-for=@Model.RejectionReason data-testid="reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
                     <govuk-radios-item value="@RejectionReasonOption.EvidenceDoesNotMatch">

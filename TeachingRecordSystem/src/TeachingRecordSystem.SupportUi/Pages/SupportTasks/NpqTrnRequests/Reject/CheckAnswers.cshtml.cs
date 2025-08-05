@@ -1,45 +1,46 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
-[Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class RejectionReasonModel(TrsLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance]
+public class CheckAnswersModel(
+    TrsDbContext dbContext,
+    TrsLinkGenerator linkGenerator,
+    IClock clock) : PageModel
 {
+    public string? SourceApplicationUserName { get; set; }
+
     public string PersonName => StringHelper.JoinNonEmpty(' ', RequestData!.Name);
 
-    public TrnRequestMetadata? RequestData { get; set; } // CML TODO - needed? or just name needed?
+    public TrnRequestMetadata? RequestData { get; set; }
 
     public JourneyInstance<RejectNpqTrnRequestState>? JourneyInstance { get; set; }
+
+    public RejectionReasonOption? RejectionReason { get; set; }
 
     [FromRoute]
     public string SupportTaskReference { get; set; } = null!;
 
-    [BindProperty]
-    [Required(ErrorMessage = "Select a reason for rejecting this request")]
-    public RejectionReasonOption? RejectionReason { get; set; }
-
     public void OnGet()
     {
-        RejectionReason = JourneyInstance!.State.RejectionReason;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        supportTask.Status = SupportTaskStatus.Closed;
+        supportTask.UpdatedOn = clock.UtcNow;
+        await dbContext.SaveChangesAsync();
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.RejectionReason = RejectionReason;
-        });
+        TempData.SetFlashSuccess(
+            $"{SourceApplicationUserName} request for {PersonName} rejected");
 
-        return Redirect(linkGenerator.NpqTrnRequestRejectionCheckAnswers(SupportTaskReference, JourneyInstance!.InstanceId));
+        await JourneyInstance!.CompleteAsync();
+        return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -52,6 +53,9 @@ public class RejectionReasonModel(TrsLinkGenerator linkGenerator) : PageModel
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         RequestData = supportTask.TrnRequestMetadata!;
+        SourceApplicationUserName = RequestData.ApplicationUser!.Name;
+
+        RejectionReason = JourneyInstance!.State.RejectionReason;
 
         return base.OnPageHandlerExecutionAsync(context, next);
     }
