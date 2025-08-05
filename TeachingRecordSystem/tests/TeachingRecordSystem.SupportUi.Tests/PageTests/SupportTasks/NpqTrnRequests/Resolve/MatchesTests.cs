@@ -574,7 +574,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/support-tasks", location);
+        Assert.Equal($"/support-tasks/npq-trn-requests", location);
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
