@@ -417,7 +417,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"Records merged successfully for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
+            $"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
     }
 
     [Fact]
