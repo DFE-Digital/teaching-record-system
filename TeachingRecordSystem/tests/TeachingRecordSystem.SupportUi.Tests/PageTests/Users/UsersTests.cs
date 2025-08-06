@@ -14,7 +14,12 @@ public class UsersTests : TestBase, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await WithDbContext(dbContext => dbContext.Users.ExecuteDeleteAsync());
+        await WithDbContext(async dbContext =>
+        {
+            await dbContext.Notes.ExecuteDeleteAsync();
+            await dbContext.Users.ExecuteDeleteAsync();
+        });
+
         TestUsers.ClearCache();
     }
 

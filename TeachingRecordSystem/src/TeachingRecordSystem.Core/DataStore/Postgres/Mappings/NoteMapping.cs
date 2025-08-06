@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Mappings;
 
-public class DqtNoteMapping : IEntityTypeConfiguration<Note>
+public class NoteMapping : IEntityTypeConfiguration<Note>
 {
     public void Configure(EntityTypeBuilder<Note> builder)
     {
@@ -14,6 +14,7 @@ public class DqtNoteMapping : IEntityTypeConfiguration<Note>
         builder.Property(x => x.CreatedByDqtUserId).IsRequired(false);
         builder.Property(x => x.CreatedByDqtUserName).IsRequired(false);
         builder.Property(x => x.CreatedOn).IsRequired();
+        builder.HasOne(x => x.CreatedBy).WithMany().HasForeignKey(x => x.CreatedByUserId);
         builder.HasOne<Person>().WithMany().HasForeignKey(q => q.PersonId);
     }
 }

@@ -1,0 +1,24 @@
+@page "/persons/{personId}/notes/add"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.AddNote
+@{
+    ViewBag.Title = $"Add a note for {Model.PersonName}";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.AddNote(Model.PersonId)" method="post">
+            <govuk-textarea for="Text" data-testid="text">
+                <govuk-textarea-label class="govuk-label--l" is-page-heading="true">@ViewBag.Title</govuk-textarea-label>
+            </govuk-textarea>
+
+            <govuk-file-upload for="File" input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
+                <govuk-file-upload-label>Upload a file (optional)</govuk-file-upload-label>
+            </govuk-file-upload>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button-link href="@LinkGenerator.PersonNotes(Model.PersonId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>

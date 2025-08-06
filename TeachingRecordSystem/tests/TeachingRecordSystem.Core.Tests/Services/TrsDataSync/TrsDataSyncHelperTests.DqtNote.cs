@@ -43,7 +43,7 @@ public partial class TrsDataSyncHelperTests
         {
             var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
-            Assert.Null(dqtNote.FileName);
+            Assert.Null(dqtNote.FileId);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
             Assert.Equal(noteText, dqtNote.ContentHtml);
             Assert.Equal(createdOn, dqtNote.CreatedOn);
@@ -102,7 +102,7 @@ public partial class TrsDataSyncHelperTests
         {
             var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
-            Assert.Null(dqtNote.FileName);
+            Assert.Null(dqtNote.FileId);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
             Assert.Equal(updatedNoteText, dqtNote.ContentHtml);
             Assert.Equal(updatedDate, dqtNote.UpdatedOn);
@@ -154,7 +154,7 @@ public partial class TrsDataSyncHelperTests
         {
             var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
-            Assert.Null(dqtNote.FileName);
+            Assert.Null(dqtNote.FileId);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
             Assert.Equal(createdOn, dqtNote.CreatedOn);
             Assert.Equal(noteText, dqtNote.ContentHtml);
@@ -245,7 +245,7 @@ public partial class TrsDataSyncHelperTests
         {
             var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
-            Assert.NotNull(dqtNote.FileName);
+            Assert.NotNull(dqtNote.FileId);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
             Assert.Equal(noteText, dqtNote.ContentHtml);
             //updatedon defaults to createdon
@@ -313,7 +313,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(note.CreatedBy.Id, dqtNote.CreatedByDqtUserId);
             Assert.Equal(note.ModifiedBy!.Id, dqtNote.UpdatedByDqtUserId);
             Assert.Null(dqtNote.OriginalFileName);
-            Assert.Null(dqtNote.FileName);
+            Assert.Null(dqtNote.FileId);
             Assert.Equal(createdByDqtUserName, dqtNote.CreatedByDqtUserName);
             Assert.Equal(updatedByDqtUserName, dqtNote.UpdatedByDqtUserName);
             BlobStorageFileService.Verify(x => x.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), note.Id), Times.Once());
