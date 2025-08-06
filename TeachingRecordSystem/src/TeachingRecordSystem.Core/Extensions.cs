@@ -50,6 +50,19 @@ public static class Extensions
 
     public static IHostApplicationBuilder AddHangfire(this IHostApplicationBuilder builder)
     {
+        var prepareSchemaIfNecessary = true;
+
+        var schemaPreparedMarkerFile = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "TeachingRecordSystem",
+            "hangfire-schema-prepared");
+
+        // Try to skip schema preparation in development to speed up startup
+        if (builder.Environment.IsDevelopment() && File.Exists(schemaPreparedMarkerFile))
+        {
+            prepareSchemaIfNecessary = false;
+        }
+
         if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddHangfire((sp, configuration) => configuration
@@ -60,8 +73,15 @@ public static class Extensions
                     new DbDataSourceConnectionFactory(sp.GetRequiredService<NpgsqlDataSource>())),
                     new PostgreSqlStorageOptions()
                     {
+                        PrepareSchemaIfNecessary = prepareSchemaIfNecessary,
                         UseSlidingInvisibilityTimeout = true
                     }));
+        }
+
+        if (builder.Environment.IsDevelopment() && !File.Exists(schemaPreparedMarkerFile))
+        {
+            Directory.CreateDirectory(Directory.GetParent(schemaPreparedMarkerFile)!.FullName);
+            File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
         }
 
         return builder;
