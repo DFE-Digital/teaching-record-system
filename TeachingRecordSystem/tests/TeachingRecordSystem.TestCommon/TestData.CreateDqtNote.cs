@@ -4,21 +4,35 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<Note> CreateNoteAsync(Guid personId, string noteText, Guid createdByUserId, string? createdByUserName, string? originalFileName, Guid? fileName, DateTime? createDate = null) => WithDbContextAsync(async dbContext =>
+    public Task<Note> CreateNoteFromDqtAsync(
+            Guid personId,
+            string contentHtml,
+            Guid createdByUserId,
+            string? createdByUserName,
+            string? originalFileName,
+            Guid? fileName,
+            DateTime? createdDate = null) =>
+        WithDbContextAsync(async dbContext =>
     {
-        var note = new Note()
+        var noteId = Guid.NewGuid();
+
+        var note = new Note
         {
-            NoteId = Guid.NewGuid(),
+            NoteId = noteId,
             PersonId = personId,
-            ContentHtml = noteText,
+            ContentHtml = contentHtml,
             CreatedByDqtUserName = createdByUserName ?? GenerateName(),
             CreatedByDqtUserId = createdByUserId,
-            CreatedOn = createDate ?? Clock.UtcNow,
+            CreatedOn = createdDate ?? Clock.UtcNow,
             UpdatedByDqtUserId = null,
             UpdatedOn = null,
             UpdatedByDqtUserName = null,
             OriginalFileName = originalFileName,
-            FileName = fileName?.ToString()
+            FileId = originalFileName is not null
+                ? noteId
+                : null,
+            Content = null,
+            CreatedByUserId = null
         };
 
         dbContext.Notes.Add(note);

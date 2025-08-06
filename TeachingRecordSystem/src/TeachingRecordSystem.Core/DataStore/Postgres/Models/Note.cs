@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using AngleSharp;
 using AngleSharp.Dom;
@@ -7,26 +8,32 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Note
 {
-    public required Guid NoteId { get; set; }
-    public required Guid PersonId { get; set; }
-    public required string? ContentHtml { get; set; }
+    public required Guid NoteId { get; init; }
+    public required Guid PersonId { get; init; }
+    // Notes created in TRS have Content (plain text)
+    public required string? Content { get; init; }
+    // Notes migrated from DQT have ContentHtml
+    public string? ContentHtml { get; set; }
     public required DateTime? UpdatedOn { get; set; }
-    public required DateTime CreatedOn { get; set; }
-    public required Guid? CreatedByDqtUserId { get; set; }
-    public required string? CreatedByDqtUserName { get; set; }
-    public required Guid? UpdatedByDqtUserId { get; set; }
-    public required string? UpdatedByDqtUserName { get; set; }
-    public required string? FileName { get; set; }
-    public required string? OriginalFileName { get; set; }
+    public required DateTime CreatedOn { get; init; }
+    public required Guid? CreatedByUserId { get; init; }
+    public User? CreatedBy { get; }
+    public Guid? CreatedByDqtUserId { get; init; }
+    public string? CreatedByDqtUserName { get; init; }
+    public Guid? UpdatedByDqtUserId { get; set; }
+    public string? UpdatedByDqtUserName { get; set; }
+    public required Guid? FileId { get; init; }
+    public required string? OriginalFileName { get; init; }
 
-    public async Task<string> GetNoteTextWithoutHtmlAsync()
+    public async Task<string> GetNoteContentAsync()
     {
-        var text = ContentHtml;
-
-        if (string.IsNullOrEmpty(text))
+        if (Content is not null)
         {
-            return string.Empty;
+            return Content;
         }
+
+        var text = ContentHtml;
+        Debug.Assert(text is not null);
 
         using var context = BrowsingContext.New(Configuration.Default);
         using var doc = (IHtmlDocument)await context.OpenAsync(req => req.Content(text));
@@ -47,7 +54,11 @@ public class Note
                     return;
                 }
 
-                blocks.Append(node.Text());
+                var nodeText = node.Text();
+                if (!string.IsNullOrWhiteSpace(nodeText))
+                {
+                    blocks.AppendLine(nodeText);
+                }
             });
 
         return blocks.ToString();

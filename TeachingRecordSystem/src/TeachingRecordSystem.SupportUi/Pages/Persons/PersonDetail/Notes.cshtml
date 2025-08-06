@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core.Dqt.Models
 @using TeachingRecordSystem.SupportUi.Pages.Common;
 @using TeachingRecordSystem.Core.Services.Files;
-@inject IFileService fileService;
+@inject IFileService FileService;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.NotesModel
 @{
     Layout = "Layout";
@@ -14,12 +14,9 @@
     <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)">Back to record</govuk-back-link>
 }
 
-<div>
-    <h2 class="govuk-heading-m">Notes</h2>
+<h2 class="govuk-heading-m">Notes</h2>
 
-</div>
-
-@if (Model.NotesNotVisibleFlag)
+@if (!Model.CanViewNotes)
 {
     <govuk-notification-banner data-testid="no-notes-permission">
         <p class="govuk-notification-banner__heading">
@@ -30,27 +27,33 @@
 }
 else
 {
-    @if (Model.Notes.Count() == 0)
+    <govuk-button-link href="@LinkGenerator.AddNote(person.PersonId)" data-testid="add-note-button">Add a note</govuk-button-link>
+
+    @if (Model.Notes!.Count == 0)
     {
-        <p class="govuk-body" data-testid="no-dqt-notes">There are no notes associated with this record</p>
+        <p class="govuk-body" data-testid="no-notes">There are no notes associated with this record</p>
     }
     else
     {
         foreach (var note in Model.Notes)
         {
-            var downloadUrl = await fileService.GetFileUrlAsync(note.NoteId, TimeSpan.FromMinutes(15));
-
-            <div data-testid="dqtnote">
-                <h3 class="govuk-heading-s">Added by <span data-testid="@note.NoteId-dqt-note-created-by">@note.CreatedByDqtUserName</span> on <span data-testid="@note.NoteId-dqt-note-created-on">@note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm")</span></h3>
-                <div class="govuk-details" data-testid="@note.NoteId-dqt-note">
+            <div data-testid="note" class="govuk-!-margin-bottom-3">
+                <div class="govuk-heading-s">
+                    Added by <span data-testid="@note.NoteId-note-created-by">@note.CreatedBy</span>
+                    on <span data-testid="@note.NoteId-note-created-on">@note.CreatedOn.ToString($"{UiDefaults.DateOnlyDisplayFormat} 'at' HH:mm")</span>
+                </div>
+                <div class="govuk-details">
                     <div class="govuk-details__text">
-                        <p>
-                            <span data-testid="@note.NoteId-dqt-note-text">@note.Description</span>
+                        <p data-testid="@note.NoteId-note-text">
+                            @(Html.ConvertNewlinesToLineBreaks(note.Content))
                         </p>
-                        @if (note.OriginalFileName is not null)
+                        @if (note.FileId is Guid fileId)
                         {
-                            <h2 class="govuk-heading-s">Attached file</h2>
-                            <a href=@downloadUrl target="_blank" class="govuk-link"><span data-testid="@note.NoteId-dqt-note-file-name">@note.OriginalFileName</span> (opens in a new tab)</a>
+                            var downloadUrl = await FileService.GetFileUrlAsync(fileId, TimeSpan.FromMinutes(15));
+                            <div class="govuk-heading-s govuk-!-margin-bottom-0">Attached file</div>
+                            <a href=@downloadUrl target="_blank" class="govuk-link">
+                                <span data-testid="@note.NoteId-note-file-name">@note.OriginalFileName</span> (opens in a new tab)
+                            </a>
                         }
                     </div>
                 </div>

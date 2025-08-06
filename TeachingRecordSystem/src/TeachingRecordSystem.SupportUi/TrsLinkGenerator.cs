@@ -414,6 +414,9 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string ResolveTrnRequestManualChecksNeededConfirm(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Resolve/Confirm", routeValues: new { supportTaskReference });
 
+    public string AddNote(Guid personId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/AddNote", routeValues: new { personId });
+
     private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
         var url = linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");

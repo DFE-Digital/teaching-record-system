@@ -12,35 +12,32 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
     [FromRoute]
     public Guid PersonId { get; set; }
 
-    public List<Note> Notes { get; set; } = new List<Note>();
+    public IReadOnlyCollection<NoteViewModel>? Notes { get; set; }
 
-    public bool NotesNotVisibleFlag { get; set; }
+    public bool CanViewNotes { get; set; }
 
     public async Task OnGetAsync()
     {
-        NotesNotVisibleFlag = (await authorizationService.AuthorizeAsync(User, PersonId, AuthorizationPolicies.NotesView)) is not { Succeeded: true };
+        CanViewNotes = (await authorizationService.AuthorizeAsync(User, PersonId, AuthorizationPolicies.NotesView)) is { Succeeded: true };
 
         var notesResult = await dbContext.Notes
-            .Where(x => x.PersonId == PersonId)
+            .Include(n => n.CreatedBy)
+            .Where(n => n.PersonId == PersonId)
             .ToArrayAsync();
 
-        var noteTasks = notesResult.Select(async x =>
-            new Note(
-                x.NoteId,
-                string.Empty,
-                await x.GetNoteTextWithoutHtmlAsync(),
-                x.CreatedOn.ToGmt(),
-                x.FileName,
-                x.OriginalFileName,
-                x.CreatedByDqtUserName
-            )
-        );
-        var notesArray = await Task.WhenAll(noteTasks);
-
-        Notes = notesArray
+        Notes = await notesResult
+            .ToAsyncEnumerable()
+            .SelectAwait(async n => new NoteViewModel(
+                n.NoteId,
+                await n.GetNoteContentAsync(),
+                n.CreatedOn.ToGmt(),
+                n.FileId,
+                n.OriginalFileName,
+                n.CreatedByDqtUserName ?? n.CreatedBy?.Name
+            ))
             .OrderByDescending(x => x.CreatedOn)
-            .ToList();
+            .ToArrayAsync();
     }
 }
 
-public record Note(Guid NoteId, string Title, string Description, DateTime CreatedOn, string? FileName, string? OriginalFileName, string? CreatedByDqtUserName);
+public record NoteViewModel(Guid NoteId, string Content, DateTime CreatedOn, Guid? FileId, string? OriginalFileName, string? CreatedBy);

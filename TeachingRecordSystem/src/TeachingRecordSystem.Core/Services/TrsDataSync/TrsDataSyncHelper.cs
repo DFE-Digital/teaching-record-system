@@ -647,7 +647,7 @@ public class TrsDataSyncHelper(
             CreatedOn = annotation.CreatedOn!.Value,
             UpdatedByDqtUserId = annotation.ModifiedBy?.Id,
             UpdatedByDqtUserName = annotation.ModifiedBy?.Name,
-            FileName = null,
+            FileId = null,
             AttachmentBytes = string.IsNullOrEmpty(annotation.FileName) ? null : Convert.FromBase64String(annotation.DocumentBody),
             OriginalFileName = annotation.FileName,
             MimeType = annotation.MimeType,
@@ -1011,7 +1011,7 @@ public class TrsDataSyncHelper(
             {
                 //not interested if file exists or not
                 await fileService.DeleteFileAsync(fileId!.Value);
-                noteAttachment.FileName = null;
+                noteAttachment.FileId = null;
                 noteAttachment.OriginalFileName = null;
             }
 
@@ -1024,7 +1024,7 @@ public class TrsDataSyncHelper(
                 {
                     await fileService.UploadFileAsync(stream, noteAttachment.MimeType, noteAttachment.Id);
                     noteAttachment.OriginalFileName = noteAttachment.OriginalFileName;
-                    noteAttachment.FileName = fileId.ToString();
+                    noteAttachment.FileId = fileId;
                 }
             }
         }
@@ -2251,7 +2251,7 @@ public class TrsDataSyncHelper(
             "content_html",
             "created_on",
             "created_by_dqt_user_id",
-            "file_name",
+            "file_id",
             "original_file_name",
             "created_by_dqt_user_name",
             "updated_by_dqt_user_id",
@@ -2261,7 +2261,7 @@ public class TrsDataSyncHelper(
 
         var columnsToUpdate = new[] {
             "content_html",
-            "file_name",
+            "file_id",
             "original_file_name",
             "updated_on",
             "updated_by_dqt_user_id",
@@ -2279,7 +2279,7 @@ public class TrsDataSyncHelper(
                 content_html TEXT NULL,
                 created_on timestamp with time zone,
                 created_by_dqt_user_id uuid NOT NULL,
-                file_name TEXT NULL,
+                file_id UUID NULL,
                 original_file_name TEXT NULL,
                 created_by_dqt_user_name TEXT,
                 updated_by_dqt_user_name text NULL,
@@ -2325,7 +2325,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(note.ContentHtml, NpgsqlDbType.Text);
             writer.WriteValueOrNull(note.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(note.CreatedByDqtUserId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(note.FileName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(note.FileId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(note.OriginalFileName, NpgsqlDbType.Text);
             writer.WriteValueOrNull(note.CreatedByDqtUserName, NpgsqlDbType.Text);
             writer.WriteValueOrNull(note.UpdatedByDqtUserId, NpgsqlDbType.Uuid);
@@ -4673,7 +4673,7 @@ public class TrsDataSyncHelper(
         public required DateTime? UpdatedOn { get; set; }
         public required Guid? UpdatedByDqtUserId { get; set; }
         public required string? UpdatedByDqtUserName { get; set; }
-        public required string? FileName { get; set; }
+        public required Guid? FileId { get; set; }
         public required byte[]? AttachmentBytes { get; set; }
         public required string? OriginalFileName { get; set; }
         public required string? MimeType { get; set; }
