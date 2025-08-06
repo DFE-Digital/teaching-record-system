@@ -1,7 +1,7 @@
 @page "/support-tasks/api-trn-requests/{supportTaskReference}/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.CheckAnswers
 @{
-    ViewBag.Title = "Check details before updating the existing record";
+    ViewBag.Title = Model.CreatingNewRecord ? "Check details before creating a new record" : "Check details before updating the existing record";
 
     var backLink = Model.CreatingNewRecord
         ? LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
@@ -21,7 +21,7 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-card>
-                <govuk-summary-card-title>Details of the merged record</govuk-summary-card-title>
+                <govuk-summary-card-title>Details of the @(Model.CreatingNewRecord ? "new" : "merged") record</govuk-summary-card-title>
                 <govuk-summary-card-actions>
                     <govuk-summary-card-action href="@backLink" data-testid="change-link">Change</govuk-summary-card-action>
                 </govuk-summary-card-actions>
