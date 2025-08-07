@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
-public class MatchesTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(hostFixture)
+public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_TaskDoesNotExist_ReturnsNotFound()

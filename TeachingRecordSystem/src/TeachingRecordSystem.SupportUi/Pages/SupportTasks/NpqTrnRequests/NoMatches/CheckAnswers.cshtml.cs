@@ -84,7 +84,7 @@ public class CheckAnswersModel(
             SelectedPersonAttributes = null
         });
 
-        var @event = new NpqTrnRequestSupportTaskUpdatedEvent()
+        var @event = new NpqTrnRequestSupportTaskResolvedEvent()
         {
             PersonId = requestData.ResolvedPersonId!.Value,
             RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),

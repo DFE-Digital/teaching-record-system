@@ -5,7 +5,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
-public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(hostFixture)
+public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()

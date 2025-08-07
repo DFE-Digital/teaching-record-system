@@ -8,7 +8,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
-public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
+public class CheckAnswersTests : NpqTrnRequestTestBase
 {
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -430,7 +430,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         };
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskUpdatedEvent>(e);
+            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskUpdatedEventIsExpected(actualEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
@@ -630,7 +630,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         };
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskUpdatedEvent>(e);
+            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskUpdatedEventIsExpected(actualEvent, expectedPersonId: personId, expectOldPersonAttributes: false, comments: comments);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
@@ -684,14 +684,14 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
     }
 
     private void AssertSupportTaskUpdatedEventIsExpected(
-        NpqTrnRequestSupportTaskUpdatedEvent @event,
+        NpqTrnRequestSupportTaskResolvedEvent @event,
         bool expectOldPersonAttributes,
         Guid expectedPersonId,
         string? comments)
     {
         Assert.Equal(expectedPersonId, @event.PersonId);
         Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
-        Assert.True(@event.Changes.HasFlag(NpqTrnRequestSupportTaskUpdatedEventChanges.Status));
+        Assert.True(@event.Changes.HasFlag(NpqTrnRequestSupportTaskResolvedEventChanges.Status));
 
         Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
         Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);

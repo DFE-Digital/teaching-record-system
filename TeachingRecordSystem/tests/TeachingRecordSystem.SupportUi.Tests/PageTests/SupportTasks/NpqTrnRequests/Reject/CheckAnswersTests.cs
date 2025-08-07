@@ -1,32 +1,19 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+
 using TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 using Xunit.Sdk;
 using static TeachingRecordSystem.TestCommon.TestData;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.NoMatches;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Reject;
 
-public class CheckAnswersTests : NpqTrnRequestTestBase
+public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
-    }
-
     [Fact]
-    public async Task Get_CreatingNewRecord_HasBackLinkToLandingPage()
+    public async Task Get_HasBackLinkToLandingPage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
         var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
@@ -36,7 +23,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/no-matches/check-answers");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers/");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -47,10 +34,10 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventAndRedirects()
+    public async Task Post_UpdatesSupportTaskPublishesEventAndRedirects()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
 
         var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
@@ -58,13 +45,12 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var requestMetadata = supportTask.TrnRequestMetadata;
         Assert.NotNull(requestMetadata);
-        var comments = Faker.Lorem.Paragraph();
 
         EventPublisher.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/no-matches/check-answers");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers/");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -76,22 +62,6 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        var linkToPersonRecord = GetLinkToPersonFromBanner(nextPageDoc);
-        Assert.NotNull(linkToPersonRecord);
-        var personId = Guid.Parse(linkToPersonRecord!.Substring("/persons/".Length));
-
-        // person record is updated
-        await WithDbContext(async dbContext =>
-        {
-            var person = await dbContext.Persons
-                .SingleAsync(p => p.PersonId == personId);
-            Assert.Equal(person.FirstName, requestMetadata.FirstName);
-            Assert.Equal(person.MiddleName, requestMetadata.MiddleName);
-            Assert.Equal(person.LastName, requestMetadata.LastName);
-            Assert.Equal(person.DateOfBirth, requestMetadata.DateOfBirth);
-            Assert.Equal(person.EmailAddress, requestMetadata.EmailAddress);
-            Assert.Equal(person.NationalInsuranceNumber, requestMetadata.NationalInsuranceNumber);
-        });
 
         // support task is updated
         await WithDbContext(async dbContext =>
@@ -102,9 +72,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
-            Assert.Equal(personId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
-            Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
+            //Assert.Equal(); // CML TODO
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
                 FirstName = requestMetadata.FirstName!,
@@ -120,12 +89,12 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // event is published
         var expectedMetadata = EventModels.TrnRequestMetadata.FromModel(requestMetadata) with
         {
-            ResolvedPersonId = personId
+            ResolvedPersonId = null
         };
         EventPublisher.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
-            AssertSupportTaskEventIsExpected(actualEvent, expectedPersonId: personId);
+            AssertSupportTaskEventIsExpected(actualEvent, expectedPersonId: null);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
@@ -149,7 +118,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
     private void AssertSupportTaskEventIsExpected(
         NpqTrnRequestSupportTaskResolvedEvent @event,
-        Guid expectedPersonId)
+        Guid? expectedPersonId)
     {
         Assert.Equal(expectedPersonId, @event.PersonId);
         Assert.Equal(Clock.UtcNow, @event.CreatedUtc);

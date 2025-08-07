@@ -3,7 +3,7 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests;
 
-public class DetailsTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(hostFixture)
+public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_ShowsExpected()

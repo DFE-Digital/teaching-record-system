@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
-public abstract class ResolveNpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(hostFixture)
+public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
     protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
     {
