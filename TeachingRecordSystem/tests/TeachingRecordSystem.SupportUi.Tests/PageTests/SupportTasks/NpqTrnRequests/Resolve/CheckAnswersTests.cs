@@ -409,6 +409,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             Assert.Equal(matchedPerson.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
+            Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
@@ -530,6 +531,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
+            Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
@@ -608,6 +610,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             Assert.Equal(personId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
+            Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
                 FirstName = requestMetadata.FirstName!,

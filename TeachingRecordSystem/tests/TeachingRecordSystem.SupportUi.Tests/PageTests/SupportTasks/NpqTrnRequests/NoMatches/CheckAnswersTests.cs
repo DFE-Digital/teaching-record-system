@@ -104,6 +104,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             Assert.Equal(personId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
+            Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
                 FirstName = requestMetadata.FirstName!,
