@@ -52,6 +52,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var note1 = await TestData.CreateNoteFromDqtAsync(person.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
+        Clock.Advance();
         var note2 = await TestData.CreateNoteFromDqtAsync(person.ContactId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
@@ -63,9 +64,8 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var notes = doc.GetAllElementsByTestId("note");
         Assert.Collection(notes,
-            n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note1.NoteId}-note-text")?.TrimmedText()),
-            n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note2.NoteId}-note-text")?.TrimmedText()));
-        var note2Text = doc.GetElementByTestId($"{note2.NoteId}-note-text");
+            n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note2.NoteId}-note-text")?.TrimmedText()),
+            n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note1.NoteId}-note-text")?.TrimmedText()));
     }
 
     [Fact]
