@@ -32,8 +32,6 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
             .WithQts()
             .WithEmail(TestData.GenerateUniqueEmail()));
 
-        await using var dbContext = await Fixture.DbFixture.GetDbContextFactory().CreateDbContextAsync();
-
         await Fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(inductionCompletee1.Person);
@@ -60,7 +58,7 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
 
         var job = new BatchSendInductionCompletedEmailsJob(
             jobOptions,
-            dbContext,
+            Fixture.DbFixture.GetDbContextFactory(),
             backgroundJobScheduler.Object,
             Clock);
 
@@ -68,8 +66,8 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        var jobItem = await dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(
-            i => i.PersonId == inductionCompletee1.PersonId);
+        var jobItem = await DbFixture.WithDbContextAsync(dbContext => dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(
+            i => i.PersonId == inductionCompletee1.PersonId));
         Assert.NotNull(jobItem);
         Assert.Equal(inductionCompletee1.Trn, jobItem.Trn);
         Assert.Equal(inductionCompletee1.Email, jobItem.EmailAddress);

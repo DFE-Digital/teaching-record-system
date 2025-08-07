@@ -8,12 +8,16 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public class BatchSendInductionCompletedEmailsJob(
     IOptions<BatchSendInductionCompletedEmailsJobOptions> jobOptionsAccessor,
-    TrsDbContext dbContext,
+    IDbContextFactory<TrsDbContext> dbContextFactory,
     IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+
         var lastPassedEndUtc = await dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.PassedEndUtc) ??
             jobOptionsAccessor.Value.InitialLastPassedEndUtc;
 
@@ -47,9 +51,6 @@ public class BatchSendInductionCompletedEmailsJob(
             .Where(p => !dbContext.InductionCompletedEmailsJobItems.Any(i => i.Trn == p.Trn))  // Ensure we haven't already processed this TRN
             .Select(p => new { p.PersonId, Trn = p.Trn!, EmailAddress = p.EmailAddress!, p.FirstName, p.LastName })
             .ToArrayAsync(cancellationToken: cancellationToken);
-
-        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         dbContext.InductionCompletedEmailsJobs.Add(job);
 

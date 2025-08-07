@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using Azure.Storage.Blobs;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -111,7 +110,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
                 //update last run date
                 if (jobMetaData != null)
                 {
-                    jobMetaData.Metadata = new Dictionary<string, object>
+                    jobMetaData.Metadata = new Dictionary<string, string>
                     {
                         {
                             LastRunDateKey, clock.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
@@ -124,7 +123,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
                     var job = new JobMetadata()
                     {
                         JobName = nameof(CapitaExportAmendJob),
-                        Metadata = new Dictionary<string, object>
+                        Metadata = new Dictionary<string, string>
                         {
                             {
                                 LastRunDateKey, clock.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
@@ -167,8 +166,8 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
 
         /*
          * Column 1:
-         * Contains a concatination of the the TRN, gender and the first six letters of the surname. 
-         * Gender should be suffixed onto the end of the TRN using the values 1 and 2 (1 = male, 2 = female). 
+         * Contains a concatination of the the TRN, gender and the first six letters of the surname.
+         * Gender should be suffixed onto the end of the TRN using the values 1 and 2 (1 = male, 2 = female).
          * The gender and surname are separated by the values: //
          */
         var trn = person!.Trn;
@@ -218,7 +217,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
 
         /*
          * Column 4: fixed length of 8 characters
-         * Contains update code. 
+         * Contains update code.
          * For NI number changes the code is: 321ZE2*
          * For DOB chnages the code is: 1211ZE1*
          */
@@ -242,24 +241,9 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
 
         DateTime? lastRunDate = null;
 
-        if (item?.Metadata != null && item.Metadata.TryGetValue("LastRunDate", out var obj))
+        if (item?.Metadata != null && item.Metadata.TryGetValue("LastRunDate", out var dateStr) && DateTime.TryParse(dateStr, out var parsed))
         {
-            string? dateStr = obj switch
-            {
-                JsonElement json => json.ValueKind switch
-                {
-                    JsonValueKind.String => json.GetString(),
-                    JsonValueKind.Number when json.TryGetDateTime(out var dt) => dt.ToString("o"),
-                    _ => null
-                },
-                string str => str,
-                _ => null
-            };
-
-            if (dateStr != null && DateTime.TryParse(dateStr, out var parsed))
-            {
-                lastRunDate = DateTime.SpecifyKind(parsed, DateTimeKind.Utc);
-            }
+            lastRunDate = DateTime.SpecifyKind(parsed, DateTimeKind.Utc);
         }
 
         return (lastRunDate, item);
@@ -277,7 +261,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
         var filteredGenders = new[] { Gender.Male, Gender.Female };
         var changeEvents = await dbContext.Database.SqlQuery<CapitaExportAmendJobResult>(
         $"""
-            select 
+            select
                 e.person_ids[1] as person_id,
                 e.payload->'PersonAttributes'->>'NationalInsuranceNumber' as "national_insurance_number",
                 (e.payload->'PersonAttributes'->>'DateOfBirth')::date as "date_of_birth",

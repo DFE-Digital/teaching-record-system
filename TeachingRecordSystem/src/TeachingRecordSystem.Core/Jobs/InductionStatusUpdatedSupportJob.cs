@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -20,11 +20,9 @@ public class InductionStatusUpdatedSupportJob(TrsDbContext dbContext, ICrmQueryD
         //if the job has ran before - the lastrundate from metadata is used.
         if (item != null)
         {
-            if (item.Metadata.TryGetValue(LastRunDateKey, out var obj) &&
-                obj is JsonElement jsonElement &&
-                jsonElement.ValueKind == JsonValueKind.String)
+            if (item.Metadata.TryGetValue(LastRunDateKey, out var str))
             {
-                lastRunDate = jsonElement.GetDateTime(); ;
+                lastRunDate = DateTime.Parse(str);
             }
         }
 
@@ -55,9 +53,9 @@ public class InductionStatusUpdatedSupportJob(TrsDbContext dbContext, ICrmQueryD
         //update last run
         if (item != null)
         {
-            item.Metadata = new Dictionary<string, object>
+            item.Metadata = new Dictionary<string, string>
             {
-                { LastRunDateKey, clock.UtcNow }
+                { LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture) }
             };
         }
         else
@@ -65,9 +63,9 @@ public class InductionStatusUpdatedSupportJob(TrsDbContext dbContext, ICrmQueryD
             item = new JobMetadata()
             {
                 JobName = nameof(InductionStatusUpdatedSupportJob),
-                Metadata = new Dictionary<string, object>
+                Metadata = new Dictionary<string, string>
                 {
-                    { LastRunDateKey, clock.UtcNow}
+                    { LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture) }
                 }
             };
             dbContext.JobMetadata.Add(item);

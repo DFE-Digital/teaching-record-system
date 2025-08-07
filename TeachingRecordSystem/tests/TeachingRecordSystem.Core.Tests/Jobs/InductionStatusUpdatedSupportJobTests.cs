@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -52,9 +53,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         context.JobMetadata.Add(new JobMetadata()
         {
             JobName = nameof(InductionStatusUpdatedSupportJob),
-            Metadata = new Dictionary<string, object>
+            Metadata = new Dictionary<string, string>
             {
-                { "LastRunDate", Clock.UtcNow.AddDays(-1) }
+                { "LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", CultureInfo.InvariantCulture) }
             }
         });
         context.SaveChanges();
@@ -75,9 +76,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         await using var context = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         using var ctx = new DqtCrmServiceContext(OrganizationService);
         var jobMetaData = await context.JobMetadata.SingleAsync(i => i.JobName == nameof(InductionStatusUpdatedSupportJob));
-        jobMetaData.Metadata = new Dictionary<string, object>
+        jobMetaData.Metadata = new Dictionary<string, string>
         {
-            {"LastRunDate", Clock.UtcNow.AddDays(-1) }
+            {"LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", CultureInfo.InvariantCulture) }
         };
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trsPerson = context.Persons.Single(x => x.Trn == person.Trn);
@@ -127,9 +128,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         await using var context = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         using var ctx = new DqtCrmServiceContext(OrganizationService);
         var jobMetaData = await context.JobMetadata.SingleAsync(i => i.JobName == nameof(InductionStatusUpdatedSupportJob));
-        jobMetaData.Metadata = new Dictionary<string, object>
+        jobMetaData.Metadata = new Dictionary<string, string>
         {
-            { "LastRunDate", Clock.UtcNow.AddDays(-1) }
+            { "LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", CultureInfo.InvariantCulture) }
         };
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trsPerson = context.Persons.Single(x => x.Trn == person.Trn);
@@ -180,9 +181,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         await using var context = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         using var ctx = new DqtCrmServiceContext(OrganizationService);
         var jobMetaData = await context.JobMetadata.SingleAsync(i => i.JobName == nameof(InductionStatusUpdatedSupportJob));
-        jobMetaData.Metadata = new Dictionary<string, object>
+        jobMetaData.Metadata = new Dictionary<string, string>
         {
-            { "LastRunDate", Clock.UtcNow.AddDays(-1) }
+            { "LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", CultureInfo.InvariantCulture) }
         };
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trsPerson = context.Persons.Single(x => x.Trn == person.Trn);

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Transactions;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -8,7 +9,7 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public class BatchSendProfessionalStatusEmailsJob(
     IOptions<BatchSendProfessionalStatusEmailsOptions> jobOptionsAccessor,
-    TrsDbContext dbContext,
+    IDbContextFactory<TrsDbContext> dbContextFactory,
     IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock)
 {
@@ -29,6 +30,10 @@ public class BatchSendProfessionalStatusEmailsJob(
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+
         var jobName = nameof(BatchSendProfessionalStatusEmailsJob);
 
         var jobMetadata = await dbContext.JobMetadata
@@ -37,31 +42,25 @@ public class BatchSendProfessionalStatusEmailsJob(
 
         if (jobMetadata is null)
         {
-            jobMetadata = new JobMetadata { JobName = jobName, Metadata = new Dictionary<string, object>() };
+            jobMetadata = new JobMetadata { JobName = jobName, Metadata = new Dictionary<string, string>() };
             dbContext.JobMetadata.Add(jobMetadata);
         }
 
-        if (!jobMetadata.Metadata.TryGetValue(MetadataKeys.LastHoldsFromEnd, out var lastHoldsFromEndObj) ||
-            lastHoldsFromEndObj is not DateTime lastHoldsFromEnd)
-        {
-            lastHoldsFromEnd = DateTime.SpecifyKind(_batchSendQtsAwardedEmailsJobOptions.InitialLastHoldsFromEndUtc, DateTimeKind.Utc);
-        }
+        var start = jobMetadata.Metadata.TryGetValue(MetadataKeys.LastHoldsFromEnd, out var lastHoldsFromEndStr) ?
+            DateTime.Parse(lastHoldsFromEndStr) :
+            DateTime.SpecifyKind(_batchSendQtsAwardedEmailsJobOptions.InitialLastHoldsFromEndUtc, DateTimeKind.Utc);
 
-        var start = lastHoldsFromEnd;
         var end = clock.Today.AddDays(-_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
 
         var eventNames = EventBase.GetEventNamesForBaseType(typeof(IEventWithRouteToProfessionalStatus))
             .Except([nameof(RouteToProfessionalStatusMigratedEvent)])
             .ToArray();
 
-        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
         await ProcessQtsAwardeesAsync();
         await ProcessEytsAwardeesAsync();
         await ProcessQtlsLosersAsync();
 
-        jobMetadata.Metadata[MetadataKeys.LastHoldsFromEnd] = end;
+        jobMetadata.Metadata[MetadataKeys.LastHoldsFromEnd] = end.ToString("s", CultureInfo.InvariantCulture);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         transaction.Complete();
