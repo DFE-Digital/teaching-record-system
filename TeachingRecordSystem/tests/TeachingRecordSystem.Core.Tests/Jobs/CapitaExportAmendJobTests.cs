@@ -126,7 +126,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportAmendJob),
-            Metadata = new Dictionary<string, object>
+            Metadata = new Dictionary<string, string>
                 {
                     {
                         "LastRunDate", Clock.UtcNow.AddDays(-3).AddHours(-2).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
@@ -240,7 +240,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportAmendJob),
-            Metadata = new Dictionary<string, object>
+            Metadata = new Dictionary<string, string>
                 {
                     {
                         "LastRunDate", Clock.UtcNow.AddDays(-3).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
@@ -353,7 +353,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportAmendJob),
-            Metadata = new Dictionary<string, object>
+            Metadata = new Dictionary<string, string>
                 {
                     {
                         "LastRunDate", Clock.UtcNow.AddDays(-3).AddHours(-5).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
