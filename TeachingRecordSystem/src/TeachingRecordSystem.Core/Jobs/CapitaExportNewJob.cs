@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using Azure.Storage.Blobs;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -134,7 +133,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
                 //update last run date
                 if (jobMetaData != null)
                 {
-                    jobMetaData.Metadata = new Dictionary<string, object>
+                    jobMetaData.Metadata = new Dictionary<string, string>
                     {
                         {
                             LastRunDateKey, clock.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
@@ -147,7 +146,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
                     var job = new JobMetadata()
                     {
                         JobName = nameof(CapitaExportNewJob),
-                        Metadata = new Dictionary<string, object>
+                        Metadata = new Dictionary<string, string>
                         {
                             {
                                 LastRunDateKey, clock.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
@@ -199,7 +198,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
         var previousNameResult = await dbContext.Database.SqlQuery<CapitaExportNewJobResult>(
         $"""
-        select 
+        select
             person_ids[1] as person_id,
             payload->'OldPersonAttributes'->>'LastName' as "previous_last_name",
             created as "Created"
@@ -232,7 +231,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
         /*
          * Row 2, Column 1:
-         * Contains a concatination of the the TRN and gender. 
+         * Contains a concatination of the the TRN and gender.
          * Gender should be suffixed onto the end of the TRN using the values 1 and 2 (1 = male, 2 = female)
          */
         builder.Append(person.Trn);
@@ -279,7 +278,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
         /**
          * Column 1:
-         * Contains a concatination of the the TRN and gender. 
+         * Contains a concatination of the the TRN and gender.
          * Gender should be suffixed onto the end of the TRN using the values 1 and 2 (1 = male, 2 = female)
          */
         builder.Append(person.Trn);
@@ -317,8 +316,8 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
         /*
          * Column 4:
-         * Contains firstname and any middle names. 
-         * If the record contains s previous surname the value '1' should appear before the First name. 
+         * Contains firstname and any middle names.
+         * If the record contains s previous surname the value '1' should appear before the First name.
          * The surname should appear in Row 2.
          */
         string firstName = person.FirstName;
@@ -349,21 +348,9 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
         DateTime? lastRunDate = null;
 
-        if (item?.Metadata != null && item.Metadata.TryGetValue("LastRunDate", out var obj))
+        if (item?.Metadata != null && item.Metadata.TryGetValue("LastRunDate", out var dateStr))
         {
-            string? dateStr = obj switch
-            {
-                JsonElement json => json.ValueKind switch
-                {
-                    JsonValueKind.String => json.GetString(),
-                    JsonValueKind.Number when json.TryGetDateTime(out var dt) => dt.ToString("o"),
-                    _ => null
-                },
-                string str => str,
-                _ => null
-            };
-
-            if (dateStr != null && DateTime.TryParse(dateStr, out var parsed))
+            if (DateTime.TryParse(dateStr, out var parsed))
             {
                 lastRunDate = DateTime.SpecifyKind(parsed, DateTimeKind.Utc);
             }
