@@ -13,6 +13,9 @@ public class WebhookDeliveryService(
 {
     public const int BatchSize = 20;
 
+    // The number of delivery errors before we log an error instead of a warning.
+    private const int MessageAttemptsErrorLogThreshold = 5;
+
     private static readonly TimeSpan _pollInterval = TimeSpan.FromMinutes(1);
 
     private static readonly ResiliencePipeline _resiliencePipeline = new ResiliencePipelineBuilder()
@@ -83,7 +86,7 @@ public class WebhookDeliveryService(
             """)
             .Where(m => m.WebhookEndpoint!.Enabled)
             .Include(m => m.WebhookEndpoint)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var moreRecords = messages.Length > BatchSize;
 
@@ -99,14 +102,17 @@ public class WebhookDeliveryService(
 
                 try
                 {
-                    await webhookSender.SendMessageAsync(message);
+                    await webhookSender.SendMessageAsync(message, ct);
 
                     message.Delivered = now;
                     message.NextDeliveryAttempt = null;
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(ex, "Failed delivering webhook message.");
+                    var logLevel = message.DeliveryAttempts.Count >= MessageAttemptsErrorLogThreshold
+                        ? LogLevel.Error
+                        : LogLevel.Warning;
+                    logger.Log(logLevel, ex, "Failed delivering webhook message.");
 
                     message.DeliveryErrors.Add(ex.Message);
 
