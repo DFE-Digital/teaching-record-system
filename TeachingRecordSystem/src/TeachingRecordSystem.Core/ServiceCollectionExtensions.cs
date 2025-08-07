@@ -12,7 +12,6 @@ public static partial class ServiceCollectionExtensions
         return services
             .AddSingleton<IClock, Clock>()
             .AddCrmQueries()
-            .AddSingleton<PreviousNameHelper>()
             .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>();
     }
 

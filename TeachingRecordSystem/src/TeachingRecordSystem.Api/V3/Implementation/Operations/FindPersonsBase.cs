@@ -1,9 +1,7 @@
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -28,13 +26,9 @@ public record FindPersonsResultItem
 
 public abstract class FindPersonsHandlerBase(
     TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    PreviousNameHelper previousNameHelper,
     ReferenceDataCache referenceDataCache)
 {
     protected TrsDbContext DbContext => dbContext;
-
-    protected ICrmQueryDispatcher CrmQueryDispatcher => crmQueryDispatcher;
 
     protected static ColumnSet ContactColumnSet { get; } = new(
         Contact.Fields.dfeta_TRN,
@@ -51,18 +45,12 @@ public abstract class FindPersonsHandlerBase(
 
     protected async Task<FindPersonsResult> CreateResultAsync(IReadOnlyCollection<Guid> matchedPersonIds)
     {
-        var getPersonsTask = dbContext.Persons
+        var persons = await dbContext.Persons
             .Include(p => p.Alerts!).AsSplitQuery()
             .Include(p => p.Qualifications!).AsSplitQuery()
+            .Include(p => p.PreviousNames).AsSplitQuery()
             .Where(p => matchedPersonIds.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, p => p);
-
-        var getPreviousNamesTask = crmQueryDispatcher.ExecuteQueryAsync(new GetPreviousNamesByContactIdsQuery(matchedPersonIds));
-
-        await Task.WhenAll(getPersonsTask, getPreviousNamesTask);
-
-        var persons = getPersonsTask.Result;
-        var previousNames = getPreviousNamesTask.Result;
 
         var items = await matchedPersonIds
             .ToAsyncEnumerable()
@@ -103,7 +91,8 @@ public abstract class FindPersonsHandlerBase(
                         EndDate = a.EndDate
                     })
                     .AsReadOnly(),
-                PreviousNames = previousNameHelper.GetFullPreviousNames(previousNames[person.PersonId], person)
+                PreviousNames = person.PreviousNames!
+                    .OrderByDescending(pn => pn.CreatedOn)
                     .Select(name => new NameInfo()
                     {
                         FirstName = name.FirstName,

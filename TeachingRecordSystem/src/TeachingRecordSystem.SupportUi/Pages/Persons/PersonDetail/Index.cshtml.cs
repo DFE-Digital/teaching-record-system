@@ -10,7 +10,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 public class IndexModel(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
-    PreviousNameHelper previousNameHelper,
     IFeatureProvider featureProvider) : PageModel
 {
     private static readonly InductionStatus[] _invalidInductionStatusesForMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
@@ -75,28 +74,26 @@ public class IndexModel(
 
     private async Task<PersonInfo> BuildPersonInfoAsync()
     {
+        var person = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .Include(p => p.PreviousNames).AsSplitQuery()
+            .SingleAsync(p => p.PersonId == PersonId);
+
         var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == PersonId && a.IsOpen).AnyAsync();
+
         if (featureProvider.IsEnabled(FeatureNames.ContactsMigrated))
         {
-            var person = await dbContext.Persons
-                .IgnoreQueryFilters()
-                .SingleOrDefaultAsync(p => p.PersonId == PersonId);
-
-            var previousNames = await dbContext.PreviousNames
-                .Where(n => n.PersonId == PersonId)
-                .OrderByDescending(n => n.CreatedOn)
-                .ToArrayAsync();
-
             return new PersonInfo
             {
-                Name = StringHelper.JoinNonEmpty(' ', person!.FirstName, person.MiddleName, person.LastName),
+                Name = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
                 DateOfBirth = person.DateOfBirth,
                 Trn = person.Trn,
                 NationalInsuranceNumber = person.NationalInsuranceNumber,
                 Email = person.EmailAddress,
                 Gender = person.Gender,
                 HasActiveAlert = hasActiveAlert,
-                PreviousNames = previousNames
+                PreviousNames = person.PreviousNames!
+                    .OrderByDescending(n => n.CreatedOn)
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
                     .ToArray(),
                 IsActive = person.Status == PersonStatus.Active
@@ -133,7 +130,8 @@ public class IndexModel(
                 Email = contact.EMailAddress1,
                 Gender = contact.GenderCode.ToGender(),
                 HasActiveAlert = hasActiveAlert,
-                PreviousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
+                PreviousNames = person.PreviousNames!
+                    .OrderByDescending(n => n.CreatedOn)
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
                     .ToArray(),
                 IsActive = contact.StatusCode == Contact_StatusCode.Alive
