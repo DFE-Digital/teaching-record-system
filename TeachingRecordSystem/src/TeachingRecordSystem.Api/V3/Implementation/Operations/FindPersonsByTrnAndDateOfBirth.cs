@@ -1,6 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -8,10 +6,8 @@ public record FindPersonsByTrnAndDateOfBirthCommand(IEnumerable<(string Trn, Dat
 
 public class FindPersonsByTrnAndDateOfBirthHandler(
     TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    PreviousNameHelper previousNameHelper,
     ReferenceDataCache referenceDataCache) :
-    FindPersonsHandlerBase(dbContext, crmQueryDispatcher, previousNameHelper, referenceDataCache)
+    FindPersonsHandlerBase(dbContext, referenceDataCache)
 {
     public async Task<ApiResult<FindPersonsResult>> HandleAsync(FindPersonsByTrnAndDateOfBirthCommand command)
     {

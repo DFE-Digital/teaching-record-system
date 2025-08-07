@@ -46,7 +46,6 @@ public static class ServiceCollectionExtensions
         fakedXrmContext.InitializeMetadata(typeof(Contact).Assembly);
 
         AssignTicketNumberToIncidentPlugin.Register(fakedXrmContext);
-        PersonNameChangedPlugin.Register(fakedXrmContext);
 
         // SeedCrmReferenceData must be registered before AddDefaultServiceClient is called
         // to ensure this task runs before the cache pre-warming task

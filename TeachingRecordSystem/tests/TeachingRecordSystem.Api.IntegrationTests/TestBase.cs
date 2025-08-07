@@ -16,7 +16,7 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
-public abstract class TestBase
+public abstract class TestBase : IAsyncLifetime
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
     {
@@ -43,6 +43,8 @@ public abstract class TestBase
     }
 
     public HostFixture HostFixture { get; }
+
+    public DbHelper DbHelper => HostFixture.Services.GetRequiredService<DbHelper>();
 
     public Guid DefaultApplicationUserId => HostFixture.DefaultApplicationUserId;
 
@@ -171,4 +173,8 @@ public abstract class TestBase
 
         return processed;
     }
+
+    public virtual Task InitializeAsync() => Task.CompletedTask;
+
+    public virtual Task DisposeAsync() => Task.CompletedTask;
 }

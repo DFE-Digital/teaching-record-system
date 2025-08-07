@@ -541,7 +541,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
     public async Task InitializeAsync()
     {
         // Any existing Contacts will affect our duplicate matching; clear them all out before every test
-        await OperationTestFixture.DbFixture.DeleteAllPersonsAsync();
+        await OperationTestFixture.DbFixture.DbHelper.DeleteAllPersonsAsync();
 
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
