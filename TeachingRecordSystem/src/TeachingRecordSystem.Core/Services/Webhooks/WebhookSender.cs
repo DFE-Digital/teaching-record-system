@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using CloudNative.CloudEvents;
 using CloudNative.CloudEvents.Http;
 using CloudNative.CloudEvents.SystemTextJson;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSign;
 using NSign.Client;
@@ -80,7 +82,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
                 .SetParameters = signingOptions => signingOptions
                     .WithTag(TagName)
                     .WithCreatedNow()
-                    .WithExpires(DateTimeOffset.UtcNow.AddMinutes(5))
+                    .WithExpires(DateTimeOffset.UtcNow.AddDays(5))
                     .WithAlgorithm(SignatureAlgorithm.EcdsaP384Sha384)
                     .WithKeyId(keyId)
                     .WithNonce(Guid.NewGuid().ToString("N"));
@@ -117,6 +119,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
                 client.DefaultRequestHeaders.ExpectContinue = false;
                 client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
             })
+            .AddHttpMessageHandler(_ => new LogRequestHandler())
             .AddHttpMessageHandler(sp =>
                 ActivatorUtilities.CreateInstance<AddContentDigestHandler>(
                     sp,
@@ -131,6 +134,36 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
         if (getPrimaryHandler is not null)
         {
             httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() => getPrimaryHandler());
+        }
+    }
+
+    private class LogRequestHandler : DelegatingHandler
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var response = await base.SendAsync(request, cancellationToken);
+
+            var logFile = "/httpClient.log";
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"{request.Method} {request.RequestUri}");
+            sb.AppendLine();
+
+            foreach (var header in request.Headers.Concat(request.Content!.Headers))
+            {
+                sb.AppendLine($"{header.Key}: {string.Join(" ", header.Value)}");
+            }
+
+            sb.AppendLine();
+
+            sb.AppendLine(await request.Content!.ReadAsStringAsync());
+
+            sb.AppendLine();
+            sb.AppendLine();
+
+            await File.AppendAllTextAsync(logFile, sb.ToString());
+
+            return response;
         }
     }
 }
