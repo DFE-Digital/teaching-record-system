@@ -6,5 +6,5 @@ public record ChangeDateOfBirthRequestData
     public required Guid EvidenceFileId { get; init; }
     public required string EvidenceFileName { get; init; }
     public required string? EmailAddress { get; init; }
-    public required ChangeRequestOutcome? ChangeRequestOutcome { get; init; }
+    public required SupportRequestOutcome? ChangeRequestOutcome { get; init; }
 }

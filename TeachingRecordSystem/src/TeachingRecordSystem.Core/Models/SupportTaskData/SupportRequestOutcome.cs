@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
-public enum ChangeRequestOutcome
+public enum SupportRequestOutcome
 {
     Approved = 1,
     Rejected = 2

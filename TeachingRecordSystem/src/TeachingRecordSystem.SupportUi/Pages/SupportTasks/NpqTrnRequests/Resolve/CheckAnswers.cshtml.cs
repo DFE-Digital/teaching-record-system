@@ -82,6 +82,7 @@ public class CheckAnswersModel(
             supportTask.UpdatedOn = clock.UtcNow;
             supportTask.UpdateData<NpqTrnRequestData>(data => data with
             {
+                SupportRequestOutcome = SupportRequestOutcome.Approved,
                 ResolvedAttributes = resolvedPersonAttributes,
                 SelectedPersonAttributes = selectedPersonAttributes
             });
@@ -144,6 +145,7 @@ public class CheckAnswersModel(
             supportTask.UpdatedOn = clock.UtcNow;
             supportTask.UpdateData<NpqTrnRequestData>(data => data with
             {
+                SupportRequestOutcome = SupportRequestOutcome.Approved,
                 ResolvedAttributes = resolvedPersonAttributes,
                 SelectedPersonAttributes = selectedPersonAttributes
             });
