@@ -291,7 +291,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            t => t.WithFirstName("aaron@example.com"));
+            t => t.WithEmailAddress("aaron@example.com"));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -320,7 +320,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            t => t.WithFirstName("aaron@example.com"));
+            t => t.WithEmailAddress("aaron@example.com"));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
