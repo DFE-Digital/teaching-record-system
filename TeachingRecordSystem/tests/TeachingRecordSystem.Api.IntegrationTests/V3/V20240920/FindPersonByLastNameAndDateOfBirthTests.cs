@@ -5,9 +5,10 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 {
     public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
     {
-        XrmFakedContext.DeleteAllEntities<Contact>();
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
+
+    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
 
     [Fact]
     public async Task Get_ValidRequestWithMatchOnPersonWithAlerts_ReturnsExpectedAlertsContent()

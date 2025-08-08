@@ -53,7 +53,7 @@ public class IndexTests : TestBase
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.ContactId)
             .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
-        await Task.Delay(2000);
+        Clock.Advance();
         await TestData.UpdatePersonAsync(b => b
             .WithPersonId(createPersonResult.ContactId)
             .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));

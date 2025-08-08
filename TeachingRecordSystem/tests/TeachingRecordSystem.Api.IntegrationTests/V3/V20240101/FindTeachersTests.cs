@@ -12,6 +12,8 @@ public class FindTeachersTests : TestBase
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 
+    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
+
     [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {

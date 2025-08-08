@@ -6,9 +6,10 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
     public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        XrmFakedContext.DeleteAllEntities<Contact>();
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
+
+    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
 
     [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)

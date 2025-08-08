@@ -62,12 +62,13 @@ public partial class TestData
 
             if (_updatedName is not null)
             {
+                var now = testData.Clock.UtcNow;
+
                 if (_contactsMigrated is true)
                 {
                     await testData.WithDbContextAsync(async dbContext =>
                     {
                         var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId.Value);
-                        var now = testData.Clock.UtcNow;
 
                         var updatePersonResult = person.UpdateDetails(
                             _updatedName.Value.FirstName,
@@ -130,9 +131,22 @@ public partial class TestData
                     await testData.WithDbContextAsync(async dbContext =>
                     {
                         var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId);
+
+                        dbContext.PreviousNames.Add(new PreviousName
+                        {
+                            PreviousNameId = Guid.NewGuid(),
+                            PersonId = _personId.Value,
+                            FirstName = person.FirstName,
+                            MiddleName = person.MiddleName,
+                            LastName = person.LastName,
+                            CreatedOn = now,
+                            UpdatedOn = now
+                        });
+
                         person.FirstName = _updatedName.Value.FirstName;
                         person.MiddleName = _updatedName.Value.MiddleName ?? "";
                         person.LastName = _updatedName.Value.LastName;
+
                         await dbContext.SaveChangesAsync();
                     });
                 }
