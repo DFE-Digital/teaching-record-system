@@ -1,6 +1,6 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
-
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 using Xunit.Sdk;
 using static TeachingRecordSystem.TestCommon.TestData;
@@ -19,11 +19,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             .WithMatches(false)
             .ExecuteAsync(TestData);
 
+        var state = new RejectNpqTrnRequestState
+        {
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+        };
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers/");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -31,6 +37,37 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_ShowsSelectedReason()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+
+        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+            .WithMatches(false)
+            .ExecuteAsync(TestData);
+
+        var state = new RejectNpqTrnRequestState
+        {
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+        };
+        var journeyInstance = await CreateJourneyInstance(
+                JourneyNames.RejectNpqTrnRequest,
+                state,
+                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(state.RejectionReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason"));
     }
 
     [Fact]
@@ -73,17 +110,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
-            //Assert.Equal(); // CML TODO
-            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
-            {
-                FirstName = requestMetadata.FirstName!,
-                MiddleName = requestMetadata.MiddleName ?? string.Empty,
-                LastName = requestMetadata.LastName!,
-                DateOfBirth = requestMetadata.DateOfBirth,
-                EmailAddress = requestMetadata.EmailAddress,
-                NationalInsuranceNumber = requestMetadata.NationalInsuranceNumber,
-                Gender = requestMetadata.Gender
-            });
+            Assert.Equal(SupportRequestOutcome.Rejected, supportTaskData.SupportRequestOutcome);
+            Assert.Null(supportTaskData.ResolvedAttributes);
+            Assert.Null(supportTaskData.SelectedPersonAttributes);
         });
 
         // event is published
@@ -93,8 +122,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         };
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
-            AssertSupportTaskEventIsExpected(actualEvent, expectedPersonId: null);
+            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskRejectedEvent>(e);
+            AssertSupportTaskEventIsExpected(actualEvent);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
@@ -116,25 +145,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         return href;
     }
 
-    private void AssertSupportTaskEventIsExpected(
-        NpqTrnRequestSupportTaskResolvedEvent @event,
-        Guid? expectedPersonId)
+    private void AssertSupportTaskEventIsExpected(NpqTrnRequestSupportTaskRejectedEvent @event)
     {
-        Assert.Equal(expectedPersonId, @event.PersonId);
         Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
         Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
         Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);
-        Assert.Equal(NpqTrnRequestSupportTaskResolvedEventChanges.None, @event.Changes);
-    }
-
-    private void AssertPersonAttributesMatch(
-        NpqTrnRequestDataPersonAttributes? personAttributes,
-        NpqTrnRequestDataPersonAttributes expectedPersonAttributes)
-    {
-        Assert.NotNull(personAttributes);
-        Assert.Equal(personAttributes.DateOfBirth, expectedPersonAttributes.DateOfBirth);
-        Assert.Equal(personAttributes.EmailAddress, expectedPersonAttributes.EmailAddress);
-        Assert.Equal(personAttributes.NationalInsuranceNumber, expectedPersonAttributes.NationalInsuranceNumber);
     }
 
     private void AssertTrnRequestMetadataMatches(EventModels.TrnRequestMetadata expected, EventModels.TrnRequestMetadata actual)
