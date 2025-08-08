@@ -42,6 +42,39 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
     }
 
     [Fact]
+    public async Task Get__FromCYA_HasBackLinkToCYA()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+
+        var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
+            .WithMatches(false)
+            .ExecuteAsync(TestData);
+
+        var state = new RejectNpqTrnRequestState
+        {
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+        };
+        var journeyInstance = await CreateJourneyInstance(
+                JourneyNames.RejectNpqTrnRequest,
+                state,
+                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/reason?FromCheckAnswers=true&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+    }
+
+    [Fact]
     public async Task Get_ShowsSelectedReasonFromJourneyState()
     {
         // Arrange

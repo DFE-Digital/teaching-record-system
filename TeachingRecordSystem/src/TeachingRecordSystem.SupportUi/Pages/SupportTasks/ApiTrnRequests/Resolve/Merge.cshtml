@@ -7,7 +7,9 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)"/>
+    <govuk-back-link href="@(Model.FromCheckAnswers ?
+        LinkGenerator.ApiTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId))"/>
 }
 
 @functions {

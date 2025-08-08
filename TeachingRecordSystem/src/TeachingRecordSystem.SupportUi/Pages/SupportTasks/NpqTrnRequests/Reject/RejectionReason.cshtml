@@ -5,7 +5,9 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NpqTrnRequestDetailsPage(Model.SupportTaskReference)" />
+    <govuk-back-link href="@(Model.FromCheckAnswers ?
+        LinkGenerator.NpqTrnRequestRejectionCheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator.NpqTrnRequestDetailsPage(Model.SupportTaskReference))" />
 }
 
 <div class="govuk-grid-row">

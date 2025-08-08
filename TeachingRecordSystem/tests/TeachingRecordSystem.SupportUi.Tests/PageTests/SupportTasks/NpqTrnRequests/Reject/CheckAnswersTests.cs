@@ -105,12 +105,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
 
         // Assert
 
-        // redirect
-        Assert.Equal("/support-tasks/npq-trn-requests", response.Headers.Location?.OriginalString);
-
-        var nextPage = await response.FollowRedirectAsync(HttpClient);
-        var nextPageDoc = await nextPage.GetDocumentAsync();
-
         // support task is updated
         await WithDbContext(async dbContext =>
         {
@@ -141,6 +135,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
             Assert.Equal(requestMetadata.NpqEvidenceFileName, actualEvent.RequestData?.NpqEvidenceFileName);
         });
+
+        // redirect
+        Assert.Equal("/support-tasks/npq-trn-requests", response.Headers.Location?.OriginalString);
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+
+        AssertEx.HtmlDocumentHasFlashSuccess(
+            nextPageDoc,
+            $"NPQ request for {StringHelper.JoinNonEmpty(' ', new string?[] { requestMetadata.FirstName, requestMetadata.MiddleName, requestMetadata.LastName })} rejected");
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
     }
 
     public string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)

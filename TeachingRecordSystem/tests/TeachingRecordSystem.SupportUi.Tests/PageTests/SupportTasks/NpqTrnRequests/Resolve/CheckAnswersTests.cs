@@ -232,7 +232,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Get_UpdatingExistingRecord_HasBackLinkToMergePageAndChangeLinkToMatchPage()
+    public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -248,7 +248,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             });
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
-        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/merge?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -280,7 +280,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             });
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
-        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

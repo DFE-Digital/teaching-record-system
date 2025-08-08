@@ -18,6 +18,9 @@ public class RejectionReasonModel(TrsLinkGenerator linkGenerator) : PageModel
     [FromRoute]
     public string SupportTaskReference { get; set; } = null!;
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Required(ErrorMessage = "Select a reason for rejecting this request")]
     public RejectionReasonOption? RejectionReason { get; set; }

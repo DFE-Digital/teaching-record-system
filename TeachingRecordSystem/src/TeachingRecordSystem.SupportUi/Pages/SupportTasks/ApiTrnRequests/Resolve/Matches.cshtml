@@ -5,7 +5,9 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.ApiTrnRequests()"/>
+    <govuk-back-link href="@(Model.FromCheckAnswers ?
+        LinkGenerator.ApiTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator.ApiTrnRequests())"/>
 }
 
 <form action="@LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">

@@ -75,7 +75,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             state.Comments = Comments;
         });
 
-        return Redirect(linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.NpqTrnRequestMergeCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -97,7 +97,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         if (state.PersonId == CreateNewRecordPersonIdSentinel)
         {
-            context.Result = Redirect(linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.NpqTrnRequestMergeCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
         var personAttributes = await GetPersonAttributesAsync(personId);

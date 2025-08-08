@@ -19,7 +19,7 @@
                     <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.RejectionReason?.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" data-testid="change-link">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" data-testid="change-link">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>
