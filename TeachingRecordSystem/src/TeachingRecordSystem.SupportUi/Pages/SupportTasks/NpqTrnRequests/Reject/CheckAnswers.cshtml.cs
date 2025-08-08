@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
@@ -32,8 +33,28 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
+
         supportTask.Status = SupportTaskStatus.Closed;
         supportTask.UpdatedOn = clock.UtcNow;
+        supportTask.UpdateData<NpqTrnRequestData>(data => data with
+        {
+            SupportRequestOutcome = SupportRequestOutcome.Rejected
+        });
+
+        var @event = new NpqTrnRequestSupportTaskRejectedEvent()
+        {
+            RequestData = EventModels.TrnRequestMetadata.FromModel(supportTask.TrnRequestMetadata!),
+            SupportTask = EventModels.SupportTask.FromModel(supportTask),
+            OldSupportTask = oldSupportTaskEventModel,
+            RejectionReason = JourneyInstance!.State.RejectionReason!.GetDisplayName(),
+            EventId = Guid.NewGuid(),
+            CreatedUtc = clock.UtcNow,
+            RaisedBy = User.GetUserId()
+        };
+
+        await dbContext.AddEventAndBroadcastAsync(@event);
+
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
@@ -56,6 +77,10 @@ public class CheckAnswersModel(
         SourceApplicationUserName = RequestData.ApplicationUser!.Name;
 
         RejectionReason = JourneyInstance!.State.RejectionReason;
+        if (!RejectionReason.HasValue)
+        {
+            Redirect(linkGenerator.NpqTrnRequestRejectionReason(supportTask.SupportTaskReference, JourneyInstance!.InstanceId));
+        }
 
         return base.OnPageHandlerExecutionAsync(context, next);
     }

@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequ
 public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_HasBackLinkToLandingPage()
+    public async Task Get_HasBackLinkExpected()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
@@ -23,9 +23,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         {
             RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
         };
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+        var journeyInstance = await CreateJourneyInstance(
+                JourneyNames.RejectNpqTrnRequest,
+                state,
+                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
-        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details";
+        var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -79,6 +82,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
             .ExecuteAsync(TestData);
+        var state = new RejectNpqTrnRequestState
+        {
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+        };
+        var journeyInstance = await CreateJourneyInstance(
+                JourneyNames.RejectNpqTrnRequest,
+                state,
+                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var requestMetadata = supportTask.TrnRequestMetadata;
         Assert.NotNull(requestMetadata);
@@ -87,7 +98,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers/");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -123,6 +134,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         EventPublisher.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskRejectedEvent>(e);
+            Assert.Equal(state.RejectionReason.GetDisplayName(), actualEvent.RejectionReason);
             AssertSupportTaskEventIsExpected(actualEvent);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);

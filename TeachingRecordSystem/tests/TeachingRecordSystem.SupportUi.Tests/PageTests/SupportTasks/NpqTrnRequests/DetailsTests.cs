@@ -109,7 +109,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/rejection-reason",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/reason",
             response.Headers.Location?.OriginalString);
     }
 }
