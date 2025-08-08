@@ -47,7 +47,7 @@ public class BatchSendProfessionalStatusEmailsJob(
         }
 
         var start = jobMetadata.Metadata.TryGetValue(MetadataKeys.LastHoldsFromEnd, out var lastHoldsFromEndStr) ?
-            DateTime.Parse(lastHoldsFromEndStr) :
+            DateTime.Parse(lastHoldsFromEndStr).ToUniversalTime() :
             DateTime.SpecifyKind(_batchSendQtsAwardedEmailsJobOptions.InitialLastHoldsFromEndUtc, DateTimeKind.Utc);
 
         var end = clock.Today.AddDays(-_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
