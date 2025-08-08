@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Prometheus;
-using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.WebCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
@@ -34,9 +33,7 @@ public static class Extensions
 
         if (builder.Environment.IsProduction())
         {
-            builder.Configuration
-                .AddJsonEnvironmentVariable("AppConfig")
-                .AddJsonEnvironmentVariable("SharedConfig");
+            builder.Configuration.AddAksConfiguration();
 
             builder.Services.Configure<ForwardedHeadersOptions>(options =>
             {

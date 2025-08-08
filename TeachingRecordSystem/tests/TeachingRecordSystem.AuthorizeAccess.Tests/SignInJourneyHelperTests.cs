@@ -161,7 +161,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Null(state.AuthenticationTicket);
 
             var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
-            Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, challengeResult.Properties?.GetVectorOfTrust());
+            Assert.Collection(
+                challengeResult.Properties!.GetVectorsOfTrust(),
+                vtr => Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, vtr));
         });
 
     [Fact]
@@ -240,7 +242,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Null(state.AuthenticationTicket);
 
             var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
-            Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, challengeResult.Properties?.GetVectorOfTrust());
+            Assert.Collection(
+                challengeResult.Properties!.GetVectorsOfTrust(),
+                vtr => Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, vtr));
         });
 
     [Fact]
@@ -275,7 +279,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Null(state.AuthenticationTicket);
 
             var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
-            Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, challengeResult.Properties?.GetVectorOfTrust());
+            Assert.Collection(
+                challengeResult.Properties!.GetVectorsOfTrust(),
+                vtr => Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, vtr));
         });
 
     [Fact]
@@ -312,7 +318,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Null(state.AuthenticationTicket);
 
             var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
-            Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, challengeResult.Properties?.GetVectorOfTrust());
+            Assert.Collection(
+                challengeResult.Properties!.GetVectorsOfTrust(),
+                vtr => Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, vtr));
         });
 
     [Fact]
@@ -349,7 +357,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.NotEqual(Clock.UtcNow, user.LastSignIn);
 
             var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
-            Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, challengeResult.Properties?.GetVectorOfTrust());
+            Assert.Collection(
+                challengeResult.Properties!.GetVectorsOfTrust(),
+                vtr => Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, vtr));
         });
 
     [Fact]
@@ -385,7 +395,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.NotEqual(Clock.UtcNow, user.LastSignIn);
 
             var challengeResult = Assert.IsType<ChallengeHttpResult>(result);
-            Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, challengeResult.Properties?.GetVectorOfTrust());
+            Assert.Collection(
+                challengeResult.Properties!.GetVectorsOfTrust(),
+                vtr => Assert.Equal(SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, vtr));
         });
 
     [Fact]

@@ -206,7 +206,7 @@ public class Program
             .AddTransient<GetPersonHelper>()
             .AddPersonMatching();
 
-        if (!env.IsUnitTests())
+        if (!env.IsTests())
         {
             var crmServiceClient = GetCrmServiceClient();
             services.AddTrnGeneration(configuration);

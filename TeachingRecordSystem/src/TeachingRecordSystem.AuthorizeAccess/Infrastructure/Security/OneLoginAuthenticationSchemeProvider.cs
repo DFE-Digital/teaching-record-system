@@ -16,7 +16,6 @@ namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 public sealed class OneLoginAuthenticationSchemeProvider(
         IAuthenticationSchemeProvider innerProvider,
-        IConfiguration configuration,
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOptionsMonitorCache<OneLoginOptions> oneLoginOptionsMonitorCache,
         ILogger<OneLoginAuthenticationSchemeProvider> logger) :
@@ -32,8 +31,6 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
     private Task? _reloadSchemesTask;
     private CancellationTokenSource? _stoppingCts;
-
-    private readonly ECDsaSecurityKey _coreIdentityIssuerSigningKey = GetCoreIdentityIssuerSigningKey(configuration);
 
     public void AddScheme(AuthenticationScheme scheme) =>
         innerProvider.AddScheme(scheme);
@@ -80,16 +77,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
     public void Dispose()
     {
-        _coreIdentityIssuerSigningKey.ECDsa.Dispose();
         _stoppingCts?.Dispose();
-    }
-
-    private static ECDsaSecurityKey GetCoreIdentityIssuerSigningKey(IConfiguration configuration)
-    {
-        var coreIdentityIssuer = ECDsa.Create();
-        var coreIdentityIssuerPem = configuration.GetRequiredValue("OneLogin:CoreIdentityIssuerPem");
-        coreIdentityIssuer.ImportSubjectPublicKeyInfo(Convert.FromBase64String(coreIdentityIssuerPem), out _);
-        return new ECDsaSecurityKey(coreIdentityIssuer);
     }
 
     private async Task EnsureLoadedAsync()
@@ -179,7 +167,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         {
             // This handles the scenario where we've requested ID verification but One Login couldn't do it.
 
-            if (context.Properties!.TryGetVectorOfTrust(out var vtr) && vtr == SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr &&
+            if (context.Properties!.TryGetVectorsOfTrust(out var vtr) && vtr.SequenceEqual([SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr]) &&
                 TryGetJourneyInstanceId(context.Properties, out var journeyInstanceId))
             {
                 context.HandleResponse();
@@ -192,15 +180,11 @@ public sealed class OneLoginAuthenticationSchemeProvider(
             }
         };
 
-        options.CoreIdentityClaimIssuerSigningKey = _coreIdentityIssuerSigningKey;
-        options.CoreIdentityClaimIssuer = "https://identity.integration.account.gov.uk/";
-
-        options.VectorOfTrust = @"[""Cl.Cm.P2""]";
+        options.VectorsOfTrust = ["Cl.Cm.P2"];
 
         options.Claims.Add(OneLoginClaimTypes.CoreIdentity);
 
-        options.MetadataAddress = "https://oidc.integration.account.gov.uk/.well-known/openid-configuration";
-        options.ClientAssertionJwtAudience = "https://oidc.integration.account.gov.uk/token";
+        options.Environment = OneLoginEnvironments.Integration;
 
         using (var rsa = RSA.Create())
         {

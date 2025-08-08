@@ -6,7 +6,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IHostEnvironment environment)
     {
-        if (!environment.IsUnitTests())
+        if (!environment.IsTests())
         {
             services.AddTransient<IAadUserService, AadUserService>();
         }

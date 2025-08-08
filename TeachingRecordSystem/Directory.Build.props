@@ -17,6 +17,10 @@
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(RequiresSharedAppsettings)' == 'true'">
+    <Content Include="$(MSBuildThisFileDirectory)appsettings.aks_*_shared.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="TeachingRecordSystem.Core" />

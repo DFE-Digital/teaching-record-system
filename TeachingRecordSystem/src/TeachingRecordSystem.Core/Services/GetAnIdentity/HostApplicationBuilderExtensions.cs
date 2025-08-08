@@ -10,7 +10,7 @@ public static class HostApplicationBuilderExtensions
 {
     public static IHostApplicationBuilder AddIdentityApi(this IHostApplicationBuilder builder)
     {
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddOptions<GetAnIdentityOptions>()
                 .Bind(builder.Configuration.GetSection("GetAnIdentity"))

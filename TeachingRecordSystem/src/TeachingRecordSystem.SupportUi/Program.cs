@@ -58,7 +58,7 @@ builder.Services.AddGovUkFrontend(options =>
 
 builder.Services.AddCsp(nonceByteAmount: 32);
 
-if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
     var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
 
@@ -126,7 +126,7 @@ builder.Services.Scan(s => s.FromAssemblyOf<Program>()
 
 builder.Services.AddRedis(builder.Environment, builder.Configuration);
 
-if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
     builder.Services.AddTrnGeneration(builder.Configuration);
 
@@ -190,7 +190,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
 }
-else if (!app.Environment.IsUnitTests())
+else if (!app.Environment.IsTests())
 {
     app.UseExceptionHandler("/error");
     app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
@@ -234,7 +234,7 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 
-if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
     app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.AdminOnly, "/_hangfire");
 }

@@ -49,7 +49,7 @@ public class HostFixture : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment("Tests");
 
         // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
         // i.e. Program.cs and that has a dependency on IConfiguration
@@ -101,7 +101,6 @@ public class HostFixture : WebApplicationFactory<Program>
                 options.ClientId = "dummy";
                 options.ClientSecret = "dummy";
                 options.BaseAddress = "dummy";
-                options.WebHookClientSecret = "dummy";
             });
 
             services.Configure<WebhookOptions>(options =>
