@@ -12,6 +12,9 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public TrnRequestMetadata? RequestData { get; set; }
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;

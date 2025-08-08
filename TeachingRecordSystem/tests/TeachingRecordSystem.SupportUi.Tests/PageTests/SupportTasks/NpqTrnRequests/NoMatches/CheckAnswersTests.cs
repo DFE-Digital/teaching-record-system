@@ -7,7 +7,7 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.NoMatches;
 
-public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
+public class CheckAnswersTests : NpqTrnRequestTestBase
 {
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -124,7 +124,7 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
         };
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskUpdatedEvent>(e);
+            var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskEventIsExpected(actualEvent, expectedPersonId: personId);
 
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
@@ -148,14 +148,14 @@ public class CheckAnswersTests : ResolveNpqTrnRequestTestBase
     }
 
     private void AssertSupportTaskEventIsExpected(
-        NpqTrnRequestSupportTaskUpdatedEvent @event,
+        NpqTrnRequestSupportTaskResolvedEvent @event,
         Guid expectedPersonId)
     {
         Assert.Equal(expectedPersonId, @event.PersonId);
         Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
         Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
         Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);
-        Assert.Equal(NpqTrnRequestSupportTaskUpdatedEventChanges.None, @event.Changes);
+        Assert.Equal(NpqTrnRequestSupportTaskResolvedEventChanges.None, @event.Changes);
     }
 
     private void AssertPersonAttributesMatch(

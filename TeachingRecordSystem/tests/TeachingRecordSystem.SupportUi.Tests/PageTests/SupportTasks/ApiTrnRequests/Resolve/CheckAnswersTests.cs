@@ -249,6 +249,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             });
 
         var expectedBackLink = $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -260,7 +261,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedBackLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
     [Fact]
@@ -280,6 +281,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             });
 
         var expectedBackLink = $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
+        var expectedChangeLink = $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}";
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -291,7 +293,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
-        Assert.Equal(expectedBackLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+        Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
     [Fact]

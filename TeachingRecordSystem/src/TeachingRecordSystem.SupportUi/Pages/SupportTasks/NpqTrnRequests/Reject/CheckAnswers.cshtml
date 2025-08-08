@@ -1,0 +1,33 @@
+@page "/support-tasks/npq-trn-requests/{supportTaskReference}/reject/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject.CheckAnswersModel
+@{
+    ViewBag.Title = "Check details before rejecting request";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" />
+}
+
+<form action="@LinkGenerator.NpqTrnRequestRejectionCheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">TRN request - @Model.PersonName</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <h2 class="govuk-heading-s">Why are you rejecting this request?</h2>
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.RejectionReason?.GetDisplayName()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" data-testid="change-link">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="submit">Confirm and reject request</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestRejectionCheckAnswersCancel(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+            </div>
+        </div>
+    </div>
+</form>
+

@@ -6,6 +6,9 @@
     var backLink = Model.CreatingNewRecord
         ? LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
         : LinkGenerator.ApiTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
+    var changeLink = Model.CreatingNewRecord
+        ? LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)
+        : LinkGenerator.ApiTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true);
 
     var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update existing record";
 }
@@ -23,7 +26,7 @@
             <govuk-summary-card>
                 <govuk-summary-card-title>Details of the @(Model.CreatingNewRecord ? "new" : "merged") record</govuk-summary-card-title>
                 <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@backLink" data-testid="change-link">Change</govuk-summary-card-action>
+                    <govuk-summary-card-action href="@changeLink" data-testid="change-link">Change</govuk-summary-card-action>
                 </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>

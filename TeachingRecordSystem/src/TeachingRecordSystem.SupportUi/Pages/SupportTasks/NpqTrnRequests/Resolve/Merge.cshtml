@@ -7,7 +7,9 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@(Model.FromCheckAnswers ?
+        LinkGenerator.NpqTrnRequestMergeCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator.NpqTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId))" />
 }
 
 @functions {

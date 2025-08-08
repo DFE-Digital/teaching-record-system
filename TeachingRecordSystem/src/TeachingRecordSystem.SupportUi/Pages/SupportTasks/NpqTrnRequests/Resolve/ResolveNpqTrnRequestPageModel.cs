@@ -17,6 +17,9 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
     [FromRoute]
     public required string SupportTaskReference { get; init; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     protected TrnRequestMetadata GetRequestData()
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;

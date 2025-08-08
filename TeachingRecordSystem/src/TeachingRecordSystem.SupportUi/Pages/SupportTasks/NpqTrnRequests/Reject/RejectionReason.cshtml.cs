@@ -1,40 +1,61 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
-[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class RejectionReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
+[Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
+public class RejectionReasonModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    public string PersonName => string.Join(" ", RequestData!.Name);
+    public string PersonName => StringHelper.JoinNonEmpty(' ', RequestData!.Name);
 
-    public TrnRequestMetadata? RequestData { get; set; }
+    public TrnRequestMetadata? RequestData { get; set; } // CML TODO - needed? or just name needed?
+
+    public JourneyInstance<RejectNpqTrnRequestState>? JourneyInstance { get; set; }
+
+    [FromRoute]
+    public string SupportTaskReference { get; set; } = null!;
+
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
 
     [BindProperty]
-    public RejectionReasonOption RejectionReason { get; set; }
+    [Required(ErrorMessage = "Select a reason for rejecting this request")]
+    public RejectionReasonOption? RejectionReason { get; set; }
 
     public void OnGet()
     {
-        // stub page
+        RejectionReason = JourneyInstance!.State.RejectionReason;
     }
 
-    public void OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        // stub page
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.RejectionReason = RejectionReason;
+        });
+
+        return Redirect(linkGenerator.NpqTrnRequestRejectionCheckAnswers(SupportTaskReference, JourneyInstance!.InstanceId));
     }
 
-    public IActionResult OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
-        // stub page
+        await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.NpqTrnRequests());
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        RequestData = GetRequestData();
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        RequestData = supportTask.TrnRequestMetadata!;
+
         return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

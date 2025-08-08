@@ -87,11 +87,11 @@ public class CheckAnswersModel(
                 SelectedPersonAttributes = selectedPersonAttributes
             });
 
-            var @event = new NpqTrnRequestSupportTaskUpdatedEvent()
+            var @event = new NpqTrnRequestSupportTaskResolvedEvent()
             {
                 PersonId = requestData.ResolvedPersonId!.Value,
                 RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
-                Changes = NpqTrnRequestSupportTaskUpdatedEventChanges.Status,
+                Changes = NpqTrnRequestSupportTaskResolvedEventChanges.Status,
                 PersonAttributes = EventModels.PersonAttributes.FromModel(person),
                 OldPersonAttributes = oldPersonAttributes,
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),
@@ -150,13 +150,13 @@ public class CheckAnswersModel(
                 SelectedPersonAttributes = selectedPersonAttributes
             });
 
-            var changes = NpqTrnRequestSupportTaskUpdatedEventChanges.Status |
-                (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
-                (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
-                (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0) |
-                (state.GenderSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskUpdatedEventChanges.PersonGender : 0);
+            var changes = NpqTrnRequestSupportTaskResolvedEventChanges.Status |
+                (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth : 0) |
+                (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress : 0) |
+                (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber : 0) |
+                (state.GenderSource is PersonAttributeSource.TrnRequest ? NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender : 0);
 
-            var @event = new NpqTrnRequestSupportTaskUpdatedEvent()
+            var @event = new NpqTrnRequestSupportTaskResolvedEvent()
             {
                 PersonId = requestData.ResolvedPersonId!.Value,
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),

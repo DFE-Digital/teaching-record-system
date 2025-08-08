@@ -12,6 +12,9 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public string? SourceApplicationUserName { get; set; }
 
     public PersonAttribute<string?>? FirstName { get; set; }

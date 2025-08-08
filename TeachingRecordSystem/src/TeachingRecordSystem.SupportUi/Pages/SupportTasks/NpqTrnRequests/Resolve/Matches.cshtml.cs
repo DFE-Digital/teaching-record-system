@@ -57,7 +57,7 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
 
         return Redirect(
             PersonId == ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel ?
-                linkGenerator.NpqTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
+                linkGenerator.NpqTrnRequestMergeCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
                 linkGenerator.NpqTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 

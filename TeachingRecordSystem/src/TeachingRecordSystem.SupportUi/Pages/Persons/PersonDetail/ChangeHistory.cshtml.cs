@@ -82,7 +82,7 @@ public class ChangeHistoryModel(
             nameof(RouteToProfessionalStatusDeletedEvent),
             nameof(RouteToProfessionalStatusMigratedEvent),
             nameof(ApiTrnRequestSupportTaskUpdatedEvent),
-            nameof(NpqTrnRequestSupportTaskUpdatedEvent),
+            nameof(NpqTrnRequestSupportTaskResolvedEvent),
             nameof(DqtInitialTeacherTrainingCreatedEvent),
             nameof(DqtInitialTeacherTrainingUpdatedEvent),
             nameof(DqtQtsRegistrationCreatedEvent),

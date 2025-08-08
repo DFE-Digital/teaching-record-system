@@ -1,17 +1,17 @@
 namespace TeachingRecordSystem.Core.Events;
 
-public record NpqTrnRequestSupportTaskUpdatedEvent : SupportTaskUpdatedEvent, IEventWithPersonAttributes
+public record NpqTrnRequestSupportTaskResolvedEvent : SupportTaskUpdatedEvent, IEventWithPersonAttributes
 {
     public required Guid PersonId { get; init; }
     public required EventModels.TrnRequestMetadata RequestData { get; init; }
-    public required NpqTrnRequestSupportTaskUpdatedEventChanges Changes { get; init; }
+    public required NpqTrnRequestSupportTaskResolvedEventChanges Changes { get; init; }
     public required EventModels.PersonAttributes PersonAttributes { get; init; }
     public required EventModels.PersonAttributes? OldPersonAttributes { get; init; }
     public required string? Comments { get; init; }
 }
 
 [Flags]
-public enum NpqTrnRequestSupportTaskUpdatedEventChanges
+public enum NpqTrnRequestSupportTaskResolvedEventChanges
 {
     None = 0,
     Status = 1 << 0,

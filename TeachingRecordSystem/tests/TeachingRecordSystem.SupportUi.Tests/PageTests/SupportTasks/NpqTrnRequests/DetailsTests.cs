@@ -3,7 +3,7 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests;
 
-public class DetailsTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(hostFixture)
+public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_ShowsExpected()
@@ -109,7 +109,7 @@ public class DetailsTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBas
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/rejection-reason",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/reason",
             response.Headers.Location?.OriginalString);
     }
 }

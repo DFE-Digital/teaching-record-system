@@ -5,8 +5,38 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
-public class MergeTests(HostFixture hostFixture) : ResolveNpqTrnRequestTestBase(hostFixture)
+public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
+    [Theory]
+    [InlineData(false, "matches")]
+    [InlineData(true, "check-answers")]
+    public async Task Get_HasExpectedBackLink(bool fromCheckAnswers, string expectedBackLink)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveNpqTrnRequestState()
+            {
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
+                PersonAttributeSourcesSet = true
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}" + (fromCheckAnswers ? "&fromCheckAnswers=true" : ""));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal($"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/{expectedBackLink}?{journeyInstance.GetUniqueIdQueryParameter()}", doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+    }
+
     [Fact]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
