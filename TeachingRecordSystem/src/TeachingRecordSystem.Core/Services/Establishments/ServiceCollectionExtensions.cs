@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
 {
     public static IHostApplicationBuilder AddGias(this IHostApplicationBuilder builder)
     {
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddOptions<GiasOptions>()
                 .Bind(builder.Configuration.GetSection("Gias"))

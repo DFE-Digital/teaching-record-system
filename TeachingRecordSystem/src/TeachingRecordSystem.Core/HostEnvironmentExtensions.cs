@@ -5,8 +5,8 @@ namespace TeachingRecordSystem.Core;
 public static class HostEnvironmentExtensions
 {
     public static bool IsEndToEndTests(this IHostEnvironment environment) =>
-        environment.EnvironmentName.Equals("EndToEndTests");
+        environment.IsEnvironment("EndToEndTests");
 
-    public static bool IsUnitTests(this IHostEnvironment environment) =>
-        environment.EnvironmentName.Equals("Testing");
+    public static bool IsTests(this IHostEnvironment environment) =>
+        environment.IsEnvironment("Tests");
 }
