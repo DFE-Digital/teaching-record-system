@@ -4,8 +4,6 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public interface IDataverseAdapter
 {
-    Task<Account[]> GetIttProvidersAsync(bool activeOnly);
-
     Task<Contact[]> FindTeachersAsync(FindTeachersByTrnBirthDateAndNinoQuery query);
 
     Task<dfeta_qualification[]> GetQualificationsForTeacherAsync(

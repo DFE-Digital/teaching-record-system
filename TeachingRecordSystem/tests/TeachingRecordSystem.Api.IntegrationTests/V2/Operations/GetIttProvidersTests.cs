@@ -1,32 +1,16 @@
-#nullable disable
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V2.Operations;
 
-public class GetIttProvidersTests : TestBase
+[Collection(nameof(DisableParallelization))]  // To keep the set of training providers consistent
+public class GetIttProvidersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public GetIttProvidersTests(HostFixture hostFixture) : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Given_request_returns_list_of_itt_providers()
     {
         // Arrange
-        var provider1 = new Account()
-        {
-            Name = "Provider 1",
-            dfeta_UKPRN = "1234567"
-        };
-
-        var provider2 = new Account()
-        {
-            Name = "Provider 2",
-            dfeta_UKPRN = "2345678"
-        };
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetIttProvidersAsync(false))
-            .ReturnsAsync(new[] { provider1, provider2 });
+        await DbHelper.ClearDataAsync();
+        await WithDbContextAsync(SeedLookupData.ResetTrainingProvidersAsync);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/v2/itt-providers");
 
@@ -42,13 +26,13 @@ public class GetIttProvidersTests : TestBase
                 {
                     new
                     {
-                        providerName = provider1.Name,
-                        ukprn = provider1.dfeta_UKPRN
+                        providerName = "TestProviderName",
+                        ukprn = "11111111"
                     },
                     new
                     {
-                        providerName = provider2.Name,
-                        ukprn = provider2.dfeta_UKPRN
+                        providerName = "TestProviderNameInactive",
+                        ukprn = "23456789"
                     }
                 }
             },

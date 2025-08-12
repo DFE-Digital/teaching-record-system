@@ -10,14 +10,9 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         return AddTrainingProvidersAsync();
     }
 
-    private async Task AddTrainingProvidersAsync()
+    public static async Task ResetTrainingProvidersAsync(TrsDbContext dbContext)
     {
-        using var dbContext = dbContextFactory.CreateDbContext();
-
-        if (await dbContext.TrainingProviders.AnyAsync())
-        {
-            return;
-        }
+        await dbContext.TrainingProviders.ExecuteDeleteAsync();
 
         dbContext.TrainingProviders.Add(new TrainingProvider()
         {
@@ -52,5 +47,17 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         });
 
         await dbContext.SaveChangesAsync();
+    }
+
+    private async Task AddTrainingProvidersAsync()
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        if (await dbContext.TrainingProviders.AnyAsync())
+        {
+            return;
+        }
+
+        await ResetTrainingProvidersAsync(dbContext);
     }
 }
