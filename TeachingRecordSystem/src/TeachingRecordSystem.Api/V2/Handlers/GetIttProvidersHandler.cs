@@ -1,31 +1,24 @@
-#nullable disable
 using MediatR;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
-using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
-public class GetIttProvidersHandler : IRequestHandler<GetIttProvidersRequest, GetIttProvidersResponse>
+public class GetIttProvidersHandler(TrsDbContext dbContext) : IRequestHandler<GetIttProvidersRequest, GetIttProvidersResponse>
 {
-    private readonly IDataverseAdapter _dataverseAdapter;
-
-    public GetIttProvidersHandler(IDataverseAdapter dataverseAdapter)
-    {
-        _dataverseAdapter = dataverseAdapter;
-    }
-
     public async Task<GetIttProvidersResponse> Handle(GetIttProvidersRequest request, CancellationToken cancellationToken)
     {
-        var ittProviders = await _dataverseAdapter.GetIttProvidersAsync(false);
+        var ittProviders = await dbContext.TrainingProviders
+            .Where(p => p.Ukprn != null)
+            .OrderBy(p => p.Name)
+            .ThenBy(p => p.Ukprn)
+            .Select(p => new IttProviderInfo() { ProviderName = p.Name, Ukprn = p.Ukprn! })
+            .ToArrayAsync();
 
         return new GetIttProvidersResponse()
         {
-            IttProviders = ittProviders.Select(a => new IttProviderInfo()
-            {
-                ProviderName = a.Name,
-                Ukprn = a.dfeta_UKPRN
-            })
+            IttProviders = ittProviders
         };
     }
 }
