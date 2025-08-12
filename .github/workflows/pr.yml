@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: hashicorp/setup-terraform@v3
         with:
@@ -94,7 +94,7 @@ jobs:
       project_short_names: ${{ steps.get_test_projects.outputs.project_short_names }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -148,7 +148,7 @@ jobs:
 
           docker restart --time 0 postgres
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: extractions/setup-just@v3
 
