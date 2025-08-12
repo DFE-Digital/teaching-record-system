@@ -1,7 +1,7 @@
 @page "/support-tasks/npq-trn-requests/{supportTaskReference}/reject/reason/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject.RejectionReasonModel
 @{
-    ViewBag.Title = "Why are you rejecting this request?";
+    ViewBag.Title = Html.DisplayNameFor(m => m.RejectionReason);
 }
 
 @section BeforeContent {
