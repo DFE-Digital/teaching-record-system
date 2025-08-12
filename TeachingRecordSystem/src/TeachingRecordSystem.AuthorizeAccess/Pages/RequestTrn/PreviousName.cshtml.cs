@@ -57,7 +57,7 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
         {
             context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
         }
-        else if (state.Name is null)
+        else if (state.FirstName is null || state.LastName is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
             return;

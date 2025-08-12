@@ -37,6 +37,7 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrm
 
         await JourneyInstance!.UpdateStateAsync(state => state.PersonalEmail = PersonalEmail);
 
+        // CML TODO - rewire over Trs SuportTask
         var openTasks = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetOpenTasksForEmailAddressQuery(EmailAddress: JourneyInstance!.State.PersonalEmail!));
 

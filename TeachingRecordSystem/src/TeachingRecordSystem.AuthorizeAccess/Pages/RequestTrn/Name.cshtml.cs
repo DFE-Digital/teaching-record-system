@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -15,14 +16,27 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "What is your name?", Description = "Full name")]
-    [Required(ErrorMessage = "Enter your name")]
-    [MaxLength(200, ErrorMessage = "Name must be 200 characters or less")]
-    public string? Name { get; set; }
+    [Display(Name = "First name")]
+    [Required(ErrorMessage = "Enter your first name")]
+    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"First name must be 100 characters or less")]
+    public string? FirstName { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Middle name (optional)")]
+    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Middle name must be 100 characters or less")]
+    public string? MiddleName { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Last name")]
+    [Required(ErrorMessage = "Enter your last name")]
+    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Last name must be 100 characters or less")]
+
+    public string? LastName { get; set; }
     public void OnGet()
     {
-        Name = JourneyInstance!.State.Name;
+        FirstName = JourneyInstance!.State.FirstName;
+        MiddleName = JourneyInstance!.State.MiddleName;
+        LastName = JourneyInstance!.State.LastName;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -34,7 +48,9 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.Name = Name;
+            state.FirstName = FirstName;
+            state.MiddleName = MiddleName;
+            state.LastName = LastName;
         });
 
         return FromCheckAnswers == true ?

@@ -65,7 +65,28 @@ public abstract class TestBase : IDisposable
         return (JourneyInstance<RequestTrnJourneyState>)reloadedInstance!;
     }
 
-    public RequestTrnJourneyState CreateNewState(string? email = null) => new RequestTrnJourneyState() { PersonalEmail = email };
+    public RequestTrnJourneyState CreateNewState() => new RequestTrnJourneyState()
+    {
+        IsTakingNpq = true,
+        HaveRegisteredForAnNpq = true,
+        NpqApplicationId = "SOMEID",
+        WorkingInSchoolOrEducationalSetting = true,
+        WorkEmail = Faker.Internet.Email(),
+        PersonalEmail = Faker.Internet.Email(),
+        FirstName = TestData.GenerateFirstName(),
+        MiddleName = TestData.GenerateMiddleName(),
+        LastName = TestData.GenerateLastName(),
+        HasPreviousName = false,
+        PreviousName = null,
+        DateOfBirth = new DateOnly(1999, 01, 01),
+        EvidenceFileId = Guid.NewGuid(),
+        EvidenceFileName = "evidence-file-name.jpg",
+        EvidenceFileSizeDescription = "1.2 MB",
+        HasNationalInsuranceNumber = true,
+        NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber()
+    };
+
+    public RequestTrnJourneyState CreatePopulatedState(string? email = null) => new RequestTrnJourneyState() { PersonalEmail = email };
 
     public virtual void Dispose()
     {

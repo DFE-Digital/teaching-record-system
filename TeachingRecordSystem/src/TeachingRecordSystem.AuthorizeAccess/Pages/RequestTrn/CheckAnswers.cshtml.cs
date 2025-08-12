@@ -2,15 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.StaticFiles;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher, IFileService fileService) : PageModel
+public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDbContext dbContext, IPersonMatchingService matchingService, IFileService fileService) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -20,8 +22,13 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
 
     public string? WorkEmail { get; set; }
 
-    public string? Name { get; set; }
+    public string? FirstName { get; set; }
 
+    public string? MiddleName { get; set; }
+
+    public string? LastName { get; set; }
+
+    public string? Name => StringHelper.JoinNonEmpty(' ', new string?[] { FirstName, MiddleName, LastName });
     public string? PreviousName { get; set; }
 
     public DateOnly? DateOfBirth { get; set; }
@@ -57,7 +64,9 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
     public async Task OnGetAsync()
     {
         WorkEmail = JourneyInstance!.State.WorkEmail;
-        Name = JourneyInstance!.State.Name;
+        FirstName = JourneyInstance!.State.FirstName;
+        MiddleName = JourneyInstance!.State.MiddleName;
+        LastName = JourneyInstance!.State.LastName;
         PreviousName = JourneyInstance!.State.PreviousName;
         DateOfBirth = JourneyInstance!.State.DateOfBirth;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
@@ -81,31 +90,63 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
     public async Task<IActionResult> OnPostAsync()
     {
         var state = JourneyInstance!.State;
+        var requestId = Guid.NewGuid().ToString(); // CML TODO - does this have to be constructed such that duplicate requests are recognised?
 
-        var description = $"""
-            Working In School or Educational Setting: {(state.WorkingInSchoolOrEducationalSetting == true ? "Yes" : "No")}
-            Personal Email: {state.PersonalEmail}
-            Work Email: {state.WorkEmail}
-            Name: {state.Name}
-            Previous name: {state.PreviousName}
-            Date of birth: {state.DateOfBirth:dd/MM/yyyy}
-            National Insurance number: {Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber)}
-            Registered For NPQ: {(state.HaveRegisteredForAnNpq == true ? "Yes" : "No")}
-            NPQ application ID: {state.NpqApplicationId}
-            NPQ name: {state.NpqName}
-            NPQ training provider: {state.NpqTrainingProvider}
-            """;
-        if (state.HasNationalInsuranceNumber == false)
+        var trnRequestMetadata = new TrnRequestMetadata
         {
-            description += $"""
+            OneLoginUserSubject = null,
+            CreatedOn = DateTime.UtcNow,
+            RequestId = requestId, // CML TODO - how to set this?
+            IdentityVerified = false,
+            ApplicationUserId = ApplicationUser.NPQApplicationUserGuid,
+            FirstName = state.FirstName,
+            MiddleName = state.MiddleName,
+            LastName = state.LastName,
+            Name = new[] { state.FirstName!, state.MiddleName ?? string.Empty, state.LastName! }, // CML TODO - use individual name vars or this array?
+            EmailAddress = state.PersonalEmail,
+            //PreviousName = state.PreviousName,
+            DateOfBirth = state.DateOfBirth!.Value,
+            NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber),
+            NpqApplicationId = state.NpqApplicationId,
+            NpqName = state.NpqName,
+            NpqTrainingProvider = state.NpqTrainingProvider
+        };
 
-                Address line 1: {state.AddressLine1}
-                Address line 2: {state.AddressLine2}
-                Town or city: {state.TownOrCity}
-                Postal code: {state.PostalCode}
-                Country: {state.Country}
-                """;
-        }
+        // look for potential matches
+        var matchResult = await matchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
+        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is not TrnRequestMatchResultOutcome.NoMatches;
+
+        trnRequestMetadata.Matches = new TrnRequestMatches()
+        {
+            MatchedPersons = matchResult.Outcome switch
+            {
+                TrnRequestMatchResultOutcome.PotentialMatches =>
+                    matchResult.PotentialMatchesPersonIds
+                        .Select(id => new TrnRequestMatchedPerson() { PersonId = id })
+                        .ToList(),
+                TrnRequestMatchResultOutcome.DefiniteMatch => [new TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
+                _ => []
+            }
+        };
+
+        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+
+        dbContext.SupportTasks.Add(new SupportTask
+        {
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
+            TrnRequestId = requestId,
+            Status = SupportTaskStatus.Open,
+            SupportTaskType = SupportTaskType.NpqTrnRequest,
+            Data = new NpqTrnRequestData(), // CML TODO - is this correct?
+            OneLoginUserSubject = null,
+            PersonId = null,
+            SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
+            TrnRequestApplicationUserId = ApplicationUser.NPQApplicationUserGuid
+        });
+        dbContext.SaveChanges(); // CML TODO - what if it fails?
+        // CML TODO - ensure the file upload happens successfully along with the DB update?
+        // CML TODO - clarify what's to happen with the fields that are submitted but not used by the console app
 
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (!fileExtensionContentTypeProvider.TryGetContentType(JourneyInstance!.State.EvidenceFileName!, out var evidenceFileMimeType))
@@ -115,17 +156,9 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
 
         using var stream = await fileService.OpenReadStreamAsync(JourneyInstance!.State.EvidenceFileId!.Value);
 
-        await crmQueryDispatcher.ExecuteQueryAsync(
-            new CreateTrnRequestTaskQuery()
-            {
-                Description = description,
-                EvidenceFileName = JourneyInstance!.State.EvidenceFileName!,
-                EvidenceFileContent = stream,
-                EvidenceFileMimeType = evidenceFileMimeType,
-                EmailAddress = JourneyInstance!.State.PersonalEmail!
-            });
 
-        await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
+        await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true); // CML TODO understand this - To stop duplicates?, but how is their reference preserved?
+
 
         return Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
     }
@@ -150,7 +183,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
             // personal email is required for either WorkingInSchoolOrEducationalSetting being true or false
             context.Result = Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance.InstanceId));
         }
-        else if (state.Name is null)
+        else if (state.FirstName is null || state.LastName is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
         }
