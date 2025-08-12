@@ -11,7 +11,11 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
 {
     public async Task<ApiResult<FindPersonsResult>> HandleAsync(FindPersonsByTrnAndDateOfBirthCommand command)
     {
-        var trns = command.Persons.Select(t => t.Trn).ToArray();
+        var trns = command.Persons
+            .Where(t => !string.IsNullOrEmpty(t.Trn))
+            .Select(t => t.Trn)
+            .ToArray();
+
         var persons = await DbContext.Persons
             .Where(p => trns.Contains(p.Trn))
             .Select(p => new { p.PersonId, p.DateOfBirth, p.Trn })
