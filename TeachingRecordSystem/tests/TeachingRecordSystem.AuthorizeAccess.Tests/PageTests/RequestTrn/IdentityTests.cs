@@ -25,6 +25,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.DateOfBirth = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/identity?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -42,13 +43,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.DateOfBirth = new DateOnly(1980, 3, 1);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/identity?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -86,6 +81,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.DateOfBirth = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var multipartContent = CreateFormFileUpload(".png");
@@ -107,10 +103,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.DateOfBirth = new DateOnly(1980, 3, 1);
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/identity?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -127,10 +120,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.DateOfBirth = new DateOnly(1980, 3, 1);
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var multipartContent = CreateFormFileUpload(".cs");
@@ -152,10 +142,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.DateOfBirth = new DateOnly(1980, 3, 1);
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var multipartContent = CreateFormFileUpload(".png");

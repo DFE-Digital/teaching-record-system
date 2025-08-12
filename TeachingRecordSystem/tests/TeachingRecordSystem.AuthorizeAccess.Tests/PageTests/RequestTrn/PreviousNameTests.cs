@@ -25,6 +25,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.LastName = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -42,8 +43,6 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
         state.PreviousName = TestData.GenerateName();
         state.HasPreviousName = true;
         var journeyInstance = await CreateJourneyInstance(state);
@@ -84,6 +83,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.LastName = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -101,8 +101,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -125,8 +124,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -148,8 +146,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToNextPage()
     {
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var previousName = TestData.GenerateName();

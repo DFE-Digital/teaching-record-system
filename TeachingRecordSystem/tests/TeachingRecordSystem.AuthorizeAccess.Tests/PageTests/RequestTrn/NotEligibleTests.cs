@@ -25,6 +25,7 @@ public class NotEligibleTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.IsTakingNpq = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/not-eligible?{journeyInstance.GetUniqueIdQueryParameter()}");

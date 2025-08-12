@@ -294,11 +294,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_GetValidRequestWorkingInSchoolOrEducationalSettingFalse_HidesWorkEmail()
+    public async Task Get_GetValidRequestWorkEmailIsNull_HidesWorkEmail()
     {
         // Arrange
         var state = CreateNewState();
         state.WorkingInSchoolOrEducationalSetting = false;
+        state.WorkEmail = null;
 
         var journeyInstance = await CreateJourneyInstance(state);
 

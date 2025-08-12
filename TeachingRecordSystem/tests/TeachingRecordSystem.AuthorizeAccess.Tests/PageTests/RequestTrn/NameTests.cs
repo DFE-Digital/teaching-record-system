@@ -45,10 +45,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.PersonalEmail = Faker.Internet.Email();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -58,7 +55,9 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(state.Name, doc.GetElementById("Name")?.GetAttribute("value"));
+        Assert.Equal(state.FirstName, doc.GetElementById("FirstName")?.GetAttribute("value"));
+        Assert.Equal(state.MiddleName, doc.GetElementById("MiddleName")?.GetAttribute("value"));
+        Assert.Equal(state.LastName, doc.GetElementById("LastName")?.GetAttribute("value"));
     }
 
     [Fact]
@@ -84,9 +83,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.PersonalEmail = Faker.Internet.Email();
-        state.WorkEmail = Faker.Internet.Email();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -95,7 +92,8 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter your name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "FirstName", "Enter your first name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "LastName", "Enter your last name");
     }
 
     [Fact]
@@ -111,7 +109,9 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["Name"] = TestData.GenerateName()
+                ["FirstName"] = TestData.GenerateFirstName(),
+                ["MiddleName"] = TestData.GenerateMiddleName(),
+                ["LastName"] = TestData.GenerateLastName()
             }),
         };
 
@@ -129,7 +129,6 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.WorkingInSchoolOrEducationalSetting = true;
-        state.PersonalEmail = Faker.Internet.Email();
         state.WorkEmail = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -137,7 +136,9 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["Name"] = TestData.GenerateName()
+                ["FirstName"] = TestData.GenerateFirstName(),
+                ["MiddleName"] = TestData.GenerateMiddleName(),
+                ["LastName"] = TestData.GenerateLastName()
             }),
         };
 
@@ -154,17 +155,19 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.PersonalEmail = Faker.Internet.Email();
-        state.WorkEmail = Faker.Internet.Email();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var name = TestData.GenerateName();
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["Name"] = name
+                ["FirstName"] = firstName,
+                ["MiddleName"] = middleName,
+                ["LastName"] = lastName
             }),
         };
 
@@ -176,6 +179,8 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         var reloadedJourneyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(name, reloadedJourneyInstance.State.Name);
+        Assert.Equal(firstName, reloadedJourneyInstance.State.FirstName);
+        Assert.Equal(middleName, reloadedJourneyInstance.State.MiddleName);
+        Assert.Equal(lastName, reloadedJourneyInstance.State.LastName);
     }
 }

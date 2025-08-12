@@ -25,6 +25,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.HasPreviousName = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -42,12 +43,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
-        var dateOfBirth = new DateOnly(1980, 1, 1);
-        state.DateOfBirth = dateOfBirth;
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -57,9 +53,9 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal($"{dateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")?.GetAttribute("value"));
-        Assert.Equal($"{dateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")?.GetAttribute("value"));
-        Assert.Equal($"{dateOfBirth:yyyy}", doc.GetElementById("DateOfBirth.Year")?.GetAttribute("value"));
+        Assert.Equal($"{state.DateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")?.GetAttribute("value"));
+        Assert.Equal($"{state.DateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")?.GetAttribute("value"));
+        Assert.Equal($"{state.DateOfBirth:yyyy}", doc.GetElementById("DateOfBirth.Year")?.GetAttribute("value"));
     }
 
     [Fact]
@@ -84,10 +80,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoDateOfBirthIsEntered_ReturnsError()
     {
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -106,10 +99,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenDateOfBirthIsInTheFuture_ReturnsError()
     {
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -136,6 +126,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var dateOfBirth = new DateOnly(1980, 3, 1);
         state.DateOfBirth = dateOfBirth;
+        state.HasPreviousName = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -161,21 +152,16 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
-        var dateOfBirth = new DateOnly(1980, 3, 1);
-        state.DateOfBirth = dateOfBirth;
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                { "DateOfBirth.Day", $"{dateOfBirth:%d}" },
-                { "DateOfBirth.Month", $"{dateOfBirth:%M}" },
-                { "DateOfBirth.Year", $"{dateOfBirth:yyyy}" }
+                { "DateOfBirth.Day", $"{state.DateOfBirth:%d}" },
+                { "DateOfBirth.Month", $"{state.DateOfBirth:%M}" },
+                { "DateOfBirth.Year", $"{state.DateOfBirth:yyyy}" }
             })
         };
 

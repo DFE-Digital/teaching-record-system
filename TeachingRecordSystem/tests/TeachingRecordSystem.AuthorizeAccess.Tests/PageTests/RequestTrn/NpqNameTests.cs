@@ -36,7 +36,7 @@ public class NpqNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "NpqName", "Enter the NPQ you plan on taking");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "NpqName", "Enter the NPQ you plan to take");
     }
 
     [Fact]
