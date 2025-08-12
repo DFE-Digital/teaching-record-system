@@ -28,7 +28,5 @@ public interface IDataverseAdapter
 
     Task<dfeta_teacherstatus> GetTeacherStatusAsync(string value, RequestBuilder requestBuilder);
 
-    Task<bool> UnlockTeacherRecordAsync(Guid teacherId);
-
     Task<Incident[]> GetIncidentsByContactIdAsync(Guid contactId, IncidentState? state, string[] columnNames);
 }
