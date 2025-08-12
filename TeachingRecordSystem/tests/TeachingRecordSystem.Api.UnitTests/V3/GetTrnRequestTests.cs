@@ -185,7 +185,7 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
     public async Task InitializeAsync()
     {
         // Any existing Contacts will affect our duplicate matching; clear them all out before every test
-        await OperationTestFixture.DbFixture.DeleteAllPersonsAsync();
+        await OperationTestFixture.DbFixture.DbHelper.DeleteAllPersonsAsync();
         XrmFakedContext.DeleteAllEntities<Contact>();
 
         GetAnIdentityApiClientMock

@@ -181,8 +181,7 @@ public class GetPersonHandler(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
-    IDataverseAdapter dataverseAdapter,
-    PreviousNameHelper previousNameHelper)
+    IDataverseAdapter dataverseAdapter)
 {
     public async Task<ApiResult<GetPersonResult>> HandleAsync(GetPersonCommand command)
     {
@@ -261,7 +260,8 @@ public class GetPersonHandler(
 
         var personQuery = dbContext.Persons
             .Where(p => p.PersonId == personId)
-            .Include(p => p.Qualifications).AsSplitQuery();
+            .Include(p => p.Qualifications).AsSplitQuery()
+            .Include(p => p.PreviousNames).AsSplitQuery();
 
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
@@ -287,15 +287,6 @@ public class GetPersonHandler(
         {
             personQuery = personQuery.Include(p => p.Alerts).AsSplitQuery();
         }
-
-        IEnumerable<NameInfo> previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
-            .Select(name => new NameInfo()
-            {
-                FirstName = name.FirstName,
-                MiddleName = name.MiddleName,
-                LastName = name.LastName
-            })
-            .AsReadOnly();
 
         var person = await personQuery.SingleAsync();
 
@@ -401,7 +392,15 @@ public class GetPersonHandler(
                     .AsReadOnly()) :
                 default,
             PreviousNames = command.Include.HasFlag(GetPersonCommandIncludes.PreviousNames) ?
-                Option.Some(previousNames.Select(n => n).AsReadOnly()) :
+                Option.Some(
+                    person.PreviousNames!
+                        .Select(n => new NameInfo
+                        {
+                            FirstName = n.FirstName,
+                            MiddleName = n.MiddleName,
+                            LastName = n.LastName
+                        })
+                        .AsReadOnly()) :
                 default,
             AllowIdSignInWithProhibitions = allowIdSignInWithProhibitions
         };
