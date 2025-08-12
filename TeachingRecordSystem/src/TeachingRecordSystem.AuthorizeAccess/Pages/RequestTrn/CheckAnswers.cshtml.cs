@@ -23,13 +23,15 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
     public string? WorkEmail { get; set; }
 
     public string? FirstName { get; set; }
-
     public string? MiddleName { get; set; }
-
     public string? LastName { get; set; }
 
+    public string? PreviousFirstName { get; set; }
+    public string? PreviousMiddleName { get; set; }
+    public string? PreviousLastName { get; set; }
+
     public string? Name => StringHelper.JoinNonEmpty(' ', new string?[] { FirstName, MiddleName, LastName });
-    public string? PreviousName { get; set; }
+    public string? PreviousName => StringHelper.JoinNonEmpty(' ', new string?[] { PreviousFirstName, PreviousMiddleName, PreviousLastName });
 
     public DateOnly? DateOfBirth { get; set; }
 
@@ -67,7 +69,9 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
         FirstName = JourneyInstance!.State.FirstName;
         MiddleName = JourneyInstance!.State.MiddleName;
         LastName = JourneyInstance!.State.LastName;
-        PreviousName = JourneyInstance!.State.PreviousName;
+        PreviousFirstName = JourneyInstance!.State.PreviousFirstName;
+        PreviousMiddleName = JourneyInstance!.State.PreviousMiddleName;
+        PreviousLastName = JourneyInstance!.State.PreviousLastName;
         DateOfBirth = JourneyInstance!.State.DateOfBirth;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
@@ -102,14 +106,25 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
             FirstName = state.FirstName,
             MiddleName = state.MiddleName,
             LastName = state.LastName,
+            PreviousFirstName = state.PreviousFirstName,
+            PreviousMiddleName = state.PreviousMiddleName,
+            PreviousLastName = state.PreviousLastName,
+            WorkEmailAddress = state.WorkEmail,
             Name = new[] { state.FirstName!, state.MiddleName ?? string.Empty, state.LastName! }, // CML TODO - use individual name vars or this array?
             EmailAddress = state.PersonalEmail,
-            //PreviousName = state.PreviousName,
             DateOfBirth = state.DateOfBirth!.Value,
             NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber),
             NpqApplicationId = state.NpqApplicationId,
             NpqName = state.NpqName,
-            NpqTrainingProvider = state.NpqTrainingProvider
+            NpqTrainingProvider = state.NpqTrainingProvider,
+            AddressLine1 = state.AddressLine1,
+            AddressLine2 = state.AddressLine2,
+            Postcode = state.PostalCode,
+            City = state.TownOrCity,
+            Country = state.Country,
+            NpqEvidenceFileId = state.EvidenceFileId,
+            NpqEvidenceFileName = state.EvidenceFileName,
+            NpqWorkingInEducationalSetting = state.WorkingInSchoolOrEducationalSetting
         };
 
         // look for potential matches
@@ -187,7 +202,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
         {
             context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
         }
-        else if (state.HasPreviousName is null || (state.HasPreviousName == true && state.PreviousName is null))
+        else if (state.HasPreviousName is null || (state.HasPreviousName == true && (state.PreviousFirstName is null || state.PreviousLastName is null)))
         {
             context.Result = Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance.InstanceId));
         }

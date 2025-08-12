@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.WebCommon.DataAnnotations;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -21,15 +21,28 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
     public bool? HasPreviousName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Previous full name")]
-    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Enter your previous full name")]
-    [MaxLength(200, ErrorMessage = "Previous name must be 200 characters or less")]
-    public string? PreviousName { get; set; }
+    [Display(Name = "Previous first name")]
+    [Required(ErrorMessage = "Enter your previous first name")]
+    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous first name must be 100 characters or less")]
+    public string? FirstName { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Previous middle name (optional)")]
+    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous middle name must be 100 characters or less")]
+    public string? MiddleName { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Previous last name")]
+    [Required(ErrorMessage = "Enter your previous last name")]
+    [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous last name must be 100 characters or less")]
+    public string? LastName { get; set; }
 
     public void OnGet()
     {
         HasPreviousName = JourneyInstance!.State.HasPreviousName;
-        PreviousName = JourneyInstance!.State.PreviousName;
+        FirstName = JourneyInstance!.State.PreviousFirstName;
+        MiddleName = JourneyInstance!.State.PreviousMiddleName;
+        LastName = JourneyInstance!.State.PreviousLastName;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -42,7 +55,9 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.HasPreviousName = HasPreviousName;
-            state.PreviousName = HasPreviousName!.Value ? PreviousName : null;
+            state.PreviousFirstName = FirstName;
+            state.PreviousMiddleName = MiddleName;
+            state.PreviousLastName = LastName;
         });
 
         return FromCheckAnswers == true ?

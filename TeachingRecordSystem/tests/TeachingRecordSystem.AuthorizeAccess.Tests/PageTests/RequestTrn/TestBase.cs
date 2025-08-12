@@ -77,7 +77,9 @@ public abstract class TestBase : IDisposable
         MiddleName = TestData.GenerateMiddleName(),
         LastName = TestData.GenerateLastName(),
         HasPreviousName = false,
-        PreviousName = null,
+        PreviousFirstName = null,
+        PreviousMiddleName = null,
+        PreviousLastName = null,
         DateOfBirth = new DateOnly(1999, 01, 01),
         EvidenceFileId = Guid.NewGuid(),
         EvidenceFileName = "evidence-file-name.jpg",
@@ -85,8 +87,6 @@ public abstract class TestBase : IDisposable
         HasNationalInsuranceNumber = true,
         NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber()
     };
-
-    public RequestTrnJourneyState CreatePopulatedState(string? email = null) => new RequestTrnJourneyState() { PersonalEmail = email };
 
     public virtual void Dispose()
     {

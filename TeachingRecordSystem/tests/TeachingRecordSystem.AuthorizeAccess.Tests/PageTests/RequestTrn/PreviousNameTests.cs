@@ -43,7 +43,9 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.PreviousName = TestData.GenerateName();
+        state.PreviousFirstName = TestData.GenerateFirstName();
+        state.PreviousMiddleName = TestData.GenerateMiddleName();
+        state.PreviousLastName = TestData.GenerateLastName();
         state.HasPreviousName = true;
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -57,7 +59,9 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var radioButtons = doc.GetElementsByName("HasPreviousName");
         var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
         Assert.Equal("True", selectedRadioButton.GetAttribute("value"));
-        Assert.Equal(state.PreviousName, doc.GetElementById("PreviousName")?.GetAttribute("value"));
+        Assert.Equal(state.PreviousFirstName, doc.GetElementById("FirstName")?.GetAttribute("value"));
+        Assert.Equal(state.PreviousMiddleName, doc.GetElementById("MiddleName")?.GetAttribute("value"));
+        Assert.Equal(state.PreviousLastName, doc.GetElementById("LastName")?.GetAttribute("value"));
     }
 
     [Fact]
@@ -139,7 +143,8 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "PreviousName", "Enter your previous full name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "FirstName", "Enter your previous first name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "LastName", "Enter your previous last name");
     }
 
     [Fact]
@@ -149,13 +154,17 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var previousName = TestData.GenerateName();
+        var previousFirstName = TestData.GenerateFirstName();
+        var previousMiddleName = TestData.GenerateMiddleName();
+        var previousLastName = TestData.GenerateLastName();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["HasPreviousName"] = "True",
-                ["PreviousName"] = previousName
+                ["FirstName"] = previousFirstName,
+                ["MiddleName"] = previousMiddleName,
+                ["LastName"] = previousLastName
             }),
         };
 
@@ -167,7 +176,9 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         var reloadedJourneyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(previousName, reloadedJourneyInstance.State.PreviousName);
+        Assert.Equal(previousFirstName, reloadedJourneyInstance.State.PreviousFirstName);
+        Assert.Equal(previousMiddleName, reloadedJourneyInstance.State.PreviousMiddleName);
+        Assert.Equal(previousLastName, reloadedJourneyInstance.State.PreviousLastName);
         Assert.True(reloadedJourneyInstance.State.HasPreviousName);
     }
 }

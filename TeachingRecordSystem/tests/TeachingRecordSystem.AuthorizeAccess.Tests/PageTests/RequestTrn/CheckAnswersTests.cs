@@ -82,7 +82,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.HasPreviousName = null;
-        state.PreviousName = null;
 
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -200,6 +199,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.HasPreviousName = true;
+        state.PreviousFirstName = TestData.GenerateFirstName();
+        state.PreviousMiddleName = TestData.GenerateMiddleName();
+        state.PreviousLastName = TestData.GenerateLastName();
 
         state.HasNationalInsuranceNumber = hasNationalInsuranceNumber;
         state.NationalInsuranceNumber = hasNationalInsuranceNumber ? Faker.Identification.UkNationalInsuranceNumber() : null;
@@ -225,7 +228,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(state.WorkEmail, doc.GetSummaryListValueForKey("Work email"));
         Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueForKey("Personal email"));
         Assert.Equal(StringHelper.JoinNonEmpty(' ', new string?[] { state.FirstName, state.MiddleName, state.LastName }), doc.GetSummaryListValueForKey("Name"));
-        Assert.Equal(state.PreviousName, doc.GetSummaryListValueForKey("Previous name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', new string?[] { state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName }), doc.GetSummaryListValueForKey("Previous name"));
         Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
         Assert.Equal(state.EvidenceFileName, doc.GetSummaryListValueForKey("Proof of identity"));
         if (hasNationalInsuranceNumber)
@@ -397,7 +400,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var state = CreateNewState();
         state.HasPreviousName = true;
-        state.PreviousName = null;
+        state.PreviousFirstName = TestData.GenerateFirstName();
+        state.PreviousMiddleName = null;
+        state.PreviousLastName = null;
 
         var journeyInstance = await CreateJourneyInstance(state);
 
