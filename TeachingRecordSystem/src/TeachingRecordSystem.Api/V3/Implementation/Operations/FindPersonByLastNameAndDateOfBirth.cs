@@ -16,8 +16,9 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                 """
                 SELECT DISTINCT p.person_id FROM persons p
                 LEFT JOIN previous_names pn ON p.person_id = pn.person_id
-                WHERE p.date_of_birth = :date_of_birth AND
-                (p.last_name = :last_name OR pn.last_name = :last_name)
+                WHERE p.date_of_birth = :date_of_birth
+                AND (p.last_name = :last_name OR pn.last_name = :last_name)
+                AND p.status = 0
                 """,
                 parameters: [
                     new NpgsqlParameter("last_name", command.LastName),
