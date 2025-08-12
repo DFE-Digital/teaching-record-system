@@ -226,6 +226,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0078_TrsPersonsCreatedByTps.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0079_TrsEventsPersonIds.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0079_TrsPreviousNamesDqtFields.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0080_TrsNotes.sql" />
   </ItemGroup>
 
   <ItemGroup>
