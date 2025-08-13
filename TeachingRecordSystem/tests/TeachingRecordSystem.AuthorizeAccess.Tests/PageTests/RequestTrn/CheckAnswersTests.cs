@@ -546,4 +546,39 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var reloadedJourneyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(reloadedJourneyInstance.State.HasPendingTrnRequest);
     }
+
+    [Fact]
+    public async Task Post_SavesSupportTask()
+    {
+        throw new NotImplementedException("This test needs to be implemented.");
+    }
+
+    [Fact]
+    public async Task Post_CreateEvent()
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task AssertSupportTaskCreatedAsync(Guid applicationUserId, string requestId) =>
+        base.WithDbContext(async dbContext =>
+    {
+        var supportTask = await dbContext.SupportTasks
+            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
+                t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
+                t.TrnRequestMetadata!.RequestId == requestId);
+
+        Assert.NotNull(supportTask);
+        Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+    });
+
+    private Task AssertNoSupportTaskCreatedAsync(Guid applicationUserId, string requestId) =>
+        base.WithDbContext(async dbContext =>
+        {
+            var supportTask = await dbContext.SupportTasks
+                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
+                    t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
+                    t.TrnRequestMetadata!.RequestId == requestId);
+
+            Assert.Null(supportTask);
+        });
 }

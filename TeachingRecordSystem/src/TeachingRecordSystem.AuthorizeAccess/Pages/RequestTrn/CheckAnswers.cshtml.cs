@@ -100,7 +100,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
         {
             OneLoginUserSubject = null,
             CreatedOn = DateTime.UtcNow,
-            RequestId = requestId, // CML TODO - how to set this?
+            RequestId = requestId,
             IdentityVerified = false,
             ApplicationUserId = ApplicationUser.NPQApplicationUserGuid,
             FirstName = state.FirstName,
@@ -146,22 +146,21 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
 
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
-        dbContext.SupportTasks.Add(new SupportTask
-        {
-            CreatedOn = DateTime.UtcNow,
-            UpdatedOn = DateTime.UtcNow,
-            TrnRequestId = requestId,
-            Status = SupportTaskStatus.Open,
-            SupportTaskType = SupportTaskType.NpqTrnRequest,
-            Data = new NpqTrnRequestData(), // CML TODO - is this correct?
-            OneLoginUserSubject = null,
-            PersonId = null,
-            SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
-            TrnRequestApplicationUserId = ApplicationUser.NPQApplicationUserGuid
-        });
+        var supportTask = SupportTask.Create(
+            supportTaskType: SupportTaskType.NpqTrnRequest,
+            data: new NpqTrnRequestData(),
+            personId: null,
+            oneLoginUserSubject: null,
+            trnRequestApplicationUserId: ApplicationUser.NPQApplicationUserGuid,
+            trnRequestId: requestId,
+            createdBy: ApplicationUser.NPQApplicationUserGuid,
+            now: DateTime.UtcNow,
+            out var createdEvent
+            );
+        dbContext.SupportTasks.Add(supportTask);
+        await dbContext.AddEventAndBroadcastAsync(createdEvent);
         dbContext.SaveChanges(); // CML TODO - what if it fails?
         // CML TODO - ensure the file upload happens successfully along with the DB update?
-        // CML TODO - clarify what's to happen with the fields that are submitted but not used by the console app
 
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (!fileExtensionContentTypeProvider.TryGetContentType(JourneyInstance!.State.EvidenceFileName!, out var evidenceFileMimeType))
@@ -173,7 +172,6 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
 
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true); // CML TODO understand this - To stop duplicates?, but how is their reference preserved?
-
 
         return Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
     }
