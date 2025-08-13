@@ -79,7 +79,7 @@ public class InductionModel(
             .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
             .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatusType != null && r.ExemptFromInduction == true);
 
-        CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit))
-            .Succeeded;
+        CanWrite = person.Status == PersonStatus.Active &&
+            (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit)).Succeeded;
     }
 }

@@ -9,14 +9,14 @@
     var selectedTab = (PersonDetailSubNavigationTab)ViewBag.SelectedTab;
     var person = Context.Features.GetRequiredFeature<CurrentPersonFeature>();
     var personId = person.PersonId;
-    ViewBag.Title = person.Name;
+    ViewBag.Title = person.Name + (person.Status == PersonStatus.Deactivated ? " (deactivated)" : "");
 }
 
 @section BeforeContent {
     @RenderSection("BeforeContent", required: false)
 }
 
-<h1 class="govuk-heading-l" data-testid="page-title">@person.Name</h1>
+<h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">

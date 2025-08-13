@@ -492,4 +492,55 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
     }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_PersonStatus_EditLinksShownAsExpected(PersonStatus personStatus, bool canSeeEditLinks)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null))
+            .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
+
+        if (personStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var openAlert = doc.GetElementByTestId("open-alert");
+        Assert.NotNull(openAlert);
+        var openAlertCardActions = openAlert.QuerySelectorAll(".govuk-summary-card__actions>*");
+        var openAlertChangeActions = openAlert.QuerySelectorAll(".govuk-summary-list__actions>*");
+
+        var closedAlerts = doc.GetElementByTestId("closed-alerts");
+        Assert.NotNull(closedAlerts);
+        var closedAlertActions = closedAlerts.QuerySelectorAll("tbody>tr>td:last-child>a");
+
+        if (canSeeEditLinks)
+        {
+            Assert.NotEmpty(openAlertCardActions);
+            Assert.NotEmpty(openAlertChangeActions);
+            Assert.NotEmpty(closedAlertActions);
+        }
+        else
+        {
+            Assert.Empty(openAlertCardActions);
+            Assert.Empty(openAlertChangeActions);
+            Assert.Empty(closedAlertActions);
+        }
+    }
 }

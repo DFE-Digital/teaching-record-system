@@ -106,4 +106,13 @@ public partial class TrsLinkGenerator
 
     public string PersonManualMergeCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Persons/ManualMerge/EnterTrn", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string PersonSetStatus(Guid personId, PersonStatus targetStatus, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/ChangeReason", routeValues: new { personId, targetStatus, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string PersonSetStatusCheckAnswers(Guid personId, PersonStatus targetStatus, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/CheckAnswers", routeValues: new { personId, targetStatus, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string PersonSetStatusCancel(Guid personId, PersonStatus targetStatus, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/ChangeReason", "cancel", routeValues: new { personId, targetStatus }, journeyInstanceId: journeyInstanceId);
 }

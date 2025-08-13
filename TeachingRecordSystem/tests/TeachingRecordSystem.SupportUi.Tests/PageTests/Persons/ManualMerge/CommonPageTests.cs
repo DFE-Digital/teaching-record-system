@@ -18,11 +18,10 @@ public class CommonPageTests : ManualMergeTestBase
     }
 
     [Theory]
-    [InlineData("enter-trn")]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
-    public async Task Get_FeatureFlagDisabled_ReturnsNotFound(string page)
+    [MemberData(nameof(AllCombinationsOf),
+        new[] { "enter-trn", "matches", "merge", "check-answers" },
+        TestHttpMethods.GetAndPost)]
+    public async Task FeatureFlagDisabled_ReturnsNotFound(string page, HttpMethod httpMethod)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
 
@@ -39,7 +38,7 @@ public class CommonPageTests : ManualMergeTestBase
                 .Build());
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
+        var request = new HttpRequestMessage(httpMethod, GetRequestPath(personA, page, journeyInstance));
         var response = await HttpClient.SendAsync(request);
 
         // Assert
@@ -49,10 +48,10 @@ public class CommonPageTests : ManualMergeTestBase
     }
 
     [Theory]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
-    public async Task Get_OtherTrnNotSelected_RedirectsToEnterTrnPage(string page)
+    [MemberData(nameof(AllCombinationsOf),
+        new[] { "matches", "merge", "check-answers" },
+        TestHttpMethods.GetAndPost)]
+    public async Task OtherTrnNotSelected_RedirectsToEnterTrnPage(string page, HttpMethod httpMethod)
     {
         var personA = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
@@ -64,7 +63,7 @@ public class CommonPageTests : ManualMergeTestBase
                 .WithInitializedState(personA)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
+        var request = new HttpRequestMessage(httpMethod, GetRequestPath(personA, page, journeyInstance));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -75,9 +74,10 @@ public class CommonPageTests : ManualMergeTestBase
     }
 
     [Theory]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
-    public async Task Get_PrimaryPersonNotSelected_RedirectsToMatches(string page)
+    [MemberData(nameof(AllCombinationsOf),
+        new[] { "merge", "check-answers" },
+        TestHttpMethods.GetAndPost)]
+    public async Task PrimaryPersonNotSelected_RedirectsToMatches(string page, HttpMethod httpMethod)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -88,7 +88,7 @@ public class CommonPageTests : ManualMergeTestBase
                 .WithPersonB(personB)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
+        var request = new HttpRequestMessage(httpMethod, GetRequestPath(personA, page, journeyInstance));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -99,8 +99,10 @@ public class CommonPageTests : ManualMergeTestBase
     }
 
     [Theory]
-    [InlineData("check-answers")]
-    public async Task Get_PersonAttributeSourcesNotSet_RedirectsToMerge(string page)
+    [MemberData(nameof(AllCombinationsOf),
+        "check-answers",
+        TestHttpMethods.GetAndPost)]
+    public async Task PersonAttributeSourcesNotSet_RedirectsToMerge(string page, HttpMethod httpMethod)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -110,9 +112,65 @@ public class CommonPageTests : ManualMergeTestBase
                 .WithInitializedState(personA)
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
+                .WithUploadEvidenceChoice(false)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, page, journeyInstance));
+        var request = new HttpRequestMessage(httpMethod, GetRequestPath(personA, page, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        AssertEx.ResponseIsRedirectTo(response,
+            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+    }
+
+    [Theory]
+    [MemberData(nameof(AllCombinationsOf),
+        "check-answers",
+        TestHttpMethods.GetAndPost)]
+    public async Task UploadEvidenceNotSet_RedirectsToMerge(string page, HttpMethod httpMethod)
+    {
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            new MergeStateBuilder()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
+                .WithPrimaryPerson(personA)
+                .WithAttributeSourcesSet()
+                .Build());
+
+        var request = new HttpRequestMessage(httpMethod, GetRequestPath(personA, page, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        AssertEx.ResponseIsRedirectTo(response,
+            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+    }
+
+    [Theory]
+    [MemberData(nameof(AllCombinationsOf),
+        "check-answers",
+        TestHttpMethods.GetAndPost)]
+    public async Task UploadEvidenceSetToTrue_ButEvidenceFileNotUploaded_RedirectsToMerge(string page, HttpMethod httpMethod)
+    {
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            new MergeStateBuilder()
+                .WithInitializedState(personA)
+                .WithPersonB(personB)
+                .WithPrimaryPerson(personA)
+                .WithAttributeSourcesSet()
+                .WithUploadEvidenceChoice(true, evidenceFileId: null)
+                .Build());
+
+        var request = new HttpRequestMessage(httpMethod, GetRequestPath(personA, page, journeyInstance));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -138,6 +196,7 @@ public class CommonPageTests : ManualMergeTestBase
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
+                .WithUploadEvidenceChoice(false)
                 .Build());
 
         // Act
@@ -173,6 +232,7 @@ public class CommonPageTests : ManualMergeTestBase
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
+                .WithUploadEvidenceChoice(false)
                 .Build());
 
         // Act
@@ -209,6 +269,7 @@ public class CommonPageTests : ManualMergeTestBase
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
+                .WithUploadEvidenceChoice(false)
                 .Build());
 
         // Act
@@ -230,7 +291,7 @@ public class CommonPageTests : ManualMergeTestBase
     [InlineData("matches")]
     [InlineData("merge")]
     [InlineData("check-answers")]
-    public async Task Post_Cancel_RedirectsToPersonDetailPage(string page)
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetailPage(string page)
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences();
@@ -242,6 +303,7 @@ public class CommonPageTests : ManualMergeTestBase
                 .WithPersonB(personB)
                 .WithPrimaryPerson(personA)
                 .WithAttributeSourcesSet()
+                .WithUploadEvidenceChoice(false)
                 .Build());
 
         // Act
@@ -258,80 +320,9 @@ public class CommonPageTests : ManualMergeTestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
-    }
 
-    [Theory]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
-    public async Task Post_OtherTrnNotSelected_RedirectsToEnterTrnPage(string page)
-    {
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, page, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/enter-trn?{journeyInstance.GetUniqueIdQueryParameter()}");
-    }
-
-    [Theory]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
-    public async Task Post_PrimaryPersonNotSelected_RedirectsToMatches(string page)
-    {
-        var (personA, personB) = await CreatePersonsWithNoDifferences();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, page, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
-    }
-
-    [Theory]
-    [InlineData("check-answers")]
-    public async Task Post_PersonAttributeSourcesNotSet_RedirectsToMerge(string page)
-    {
-        var (personA, personB) = await CreatePersonsWithNoDifferences();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .WithPrimaryPerson(personA)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, page, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance);
     }
 
     [Theory]
@@ -415,18 +406,9 @@ public class CommonPageTests : ManualMergeTestBase
     }
 
     [Theory]
-    [InlineData("enter-trn", InductionStatus.InProgress)]
-    [InlineData("enter-trn", InductionStatus.Passed)]
-    [InlineData("enter-trn", InductionStatus.Failed)]
-    [InlineData("matches", InductionStatus.InProgress)]
-    [InlineData("matches", InductionStatus.Passed)]
-    [InlineData("matches", InductionStatus.Failed)]
-    [InlineData("merge", InductionStatus.InProgress)]
-    [InlineData("merge", InductionStatus.Passed)]
-    [InlineData("merge", InductionStatus.Failed)]
-    [InlineData("check-answers", InductionStatus.InProgress)]
-    [InlineData("check-answers", InductionStatus.Passed)]
-    [InlineData("check-answers", InductionStatus.Failed)]
+    [MemberData(nameof(AllCombinationsOf),
+        new[] { "enter-trn", "matches", "merge", "check-answers" },
+        new[] { InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
     public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(string page, InductionStatus status)
     {
         // Arrange
@@ -542,15 +524,9 @@ public class CommonPageTests : ManualMergeTestBase
     }
 
     [Theory]
-    [InlineData("matches", InductionStatus.InProgress)]
-    [InlineData("matches", InductionStatus.Passed)]
-    [InlineData("matches", InductionStatus.Failed)]
-    [InlineData("merge", InductionStatus.InProgress)]
-    [InlineData("merge", InductionStatus.Passed)]
-    [InlineData("merge", InductionStatus.Failed)]
-    [InlineData("check-answers", InductionStatus.InProgress)]
-    [InlineData("check-answers", InductionStatus.Passed)]
-    [InlineData("check-answers", InductionStatus.Failed)]
+    [MemberData(nameof(AllCombinationsOf),
+        new[] { "matches", "merge", "check-answers" },
+        new[] { InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
     public async Task Post_PersonBHasInvalidInductionStatus_ReturnsBadRequest(string page, InductionStatus status)
     {
         // Arrange

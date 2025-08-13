@@ -9,7 +9,8 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// </summary>
 /// <remarks>
 /// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the request is missing the qualicationId route value.</para>
-/// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no Professional status with the specified ID exists.</para>
+/// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the Route exists but the associated Person has been deactivated.</para>
+/// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no Route with the specified ID exists.</para>
 /// <para>Assigns the <see cref="CurrentProfessionalStatusFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
 public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyncResourceFilter
@@ -23,22 +24,37 @@ public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) 
             return;
         }
 
-        var request = dbContext.RouteToProfessionalStatuses
+        var query = dbContext.RouteToProfessionalStatuses
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update") // https://github.com/dotnet/efcore/issues/26042
             .Include(ps => ps.Person)
             .ThenInclude(p => p!.Qualifications);
 
-        var currentProfessionalStatus = await request
+        // Query without query filters first - query filters will filter out deactivated Person
+        // meaning the entire Route is not found, but if Person is deactivated we
+        // we need to return a BadRequest instead of a NotFound result
+        var currentRouteWithPotentiallyDeactivatedPerson = await query
+            .IgnoreQueryFilters()
             .SingleOrDefaultAsync();
 
-        if (currentProfessionalStatus is null)
+        if (currentRouteWithPotentiallyDeactivatedPerson is not null &&
+            currentRouteWithPotentiallyDeactivatedPerson.Person!.Status == PersonStatus.Deactivated)
+        {
+            context.Result = new BadRequestResult();
+            return;
+        }
+
+        // Query again with query filters to make sure deleted Routes are ignored
+        var currentRoute = await query
+            .SingleOrDefaultAsync();
+
+        if (currentRoute is null)
         {
             context.Result = new NotFoundResult();
             return;
         }
 
-        context.HttpContext.SetCurrentProfessionalStatusFeature(new(currentProfessionalStatus));
-        context.HttpContext.SetCurrentPersonFeature(currentProfessionalStatus.Person!);
+        context.HttpContext.SetCurrentProfessionalStatusFeature(new(currentRoute));
+        context.HttpContext.SetCurrentPersonFeature(currentRoute.Person!);
         await next();
     }
 }

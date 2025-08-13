@@ -365,16 +365,27 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains("Change", inductionStatus!.GetElementsByTagName("a")[0].TrimmedText());
     }
 
-    [Fact]
-    public async Task Get_UserHasInductionReadWritePermission_ShowsActions()
+    [Theory]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(null, false)]
+    public async Task Get_InductionExemption_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
+        SetCurrentUser(TestUsers.GetUser(role: userRole));
 
+        var holdsFromDate = Clock.Today;
+        var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId)
+            .Single();
         var person = await TestData.CreatePersonAsync(
             builder => builder
                 .WithQts()
-                .WithInductionStatus(b => b.WithStatus(InductionStatus.Passed)));
+                .WithInductionStatus(InductionStatus.Exempt)
+                .WithRouteToProfessionalStatus(r => r
+                    .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
+                    .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                    .WithHoldsFrom(holdsFromDate)
+                    .WithInductionExemption(true)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -383,16 +394,29 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetElementByTestId("change-induction-completed-date"));
-        Assert.NotNull(doc.GetElementByTestId("change-induction-start-date"));
-        Assert.NotNull(doc.GetElementByTestId("change-induction-status"));
+        var changeLinks = doc.GetAllElementsByTestId(
+            "change-induction-status",
+            "change-induction-exemption-reason",
+            "change-induction-exempted-route"
+        );
+
+        if (canSeeActions)
+        {
+            Assert.Equal(3, changeLinks.Count);
+        }
+        else
+        {
+            Assert.Empty(changeLinks);
+        }
     }
 
-    [Fact]
-    public async Task Get_UserDoesNotHaveInductionReadWritePermission_DoesNotShowActions()
+    [Theory]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(null, false)]
+    public async Task Get_InductionStartAndEndDate_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(TestUsers.GetUser(role: userRole));
 
         var person = await TestData.CreatePersonAsync(
             builder => builder
@@ -406,8 +430,116 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("change-induction-completed-date"));
-        Assert.Null(doc.GetElementByTestId("change-induction-start-date"));
-        Assert.Null(doc.GetElementByTestId("change-induction-status"));
+        var changeLinks = doc.GetAllElementsByTestId(
+            "change-induction-status",
+            "change-induction-start-date",
+            "change-induction-completed-date"
+        );
+
+        if (canSeeActions)
+        {
+            Assert.Equal(3, changeLinks.Count);
+        }
+        else
+        {
+            Assert.Empty(changeLinks);
+        }
+    }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_InductionExemption_PersonStatus_ShowsActionsAsExpected(PersonStatus personStatus, bool canSeeActions)
+    {
+        // Arrange
+        var holdsFromDate = Clock.Today;
+        var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId)
+            .Single();
+        var person = await TestData.CreatePersonAsync(
+            builder => builder
+                .WithQts()
+                .WithInductionStatus(InductionStatus.Exempt)
+                .WithRouteToProfessionalStatus(r => r
+                    .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
+                    .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                    .WithHoldsFrom(holdsFromDate)
+                    .WithInductionExemption(true)));
+
+        if (personStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var changeLinks = doc.GetAllElementsByTestId(
+            "change-induction-status",
+            "change-induction-exemption-reason",
+            "change-induction-exempted-route"
+        );
+
+        if (canSeeActions)
+        {
+            Assert.Equal(3, changeLinks.Count);
+        }
+        else
+        {
+            Assert.Empty(changeLinks);
+        }
+    }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_InductionStartAndEndDate_PersonStatus_ShowsActionsAsExpected(PersonStatus personStatus, bool canSeeActions)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(
+            builder => builder
+                .WithQts()
+                .WithInductionStatus(b => b.WithStatus(InductionStatus.Passed)));
+
+        if (personStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var changeLinks = doc.GetAllElementsByTestId(
+            "change-induction-status",
+            "change-induction-start-date",
+            "change-induction-completed-date"
+        );
+
+        if (canSeeActions)
+        {
+            Assert.Equal(3, changeLinks.Count);
+        }
+        else
+        {
+            Assert.Empty(changeLinks);
+        }
     }
 }

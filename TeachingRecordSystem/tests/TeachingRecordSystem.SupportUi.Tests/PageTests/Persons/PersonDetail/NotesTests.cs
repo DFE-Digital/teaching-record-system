@@ -247,4 +247,40 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(expectedOriginalFileName1, originalFileName.TrimmedText());
             });
     }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_PersonStatus_AddButtonShownAsExpected(PersonStatus personStatus, bool canSeeAddButton)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        if (personStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var button = doc.GetElementByTestId("add-note-button");
+
+        if (canSeeAddButton)
+        {
+            Assert.NotNull(button);
+        }
+        else
+        {
+            Assert.Null(button);
+        }
+    }
 }

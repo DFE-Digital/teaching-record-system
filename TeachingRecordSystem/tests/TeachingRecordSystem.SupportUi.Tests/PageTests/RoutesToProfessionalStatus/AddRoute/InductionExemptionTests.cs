@@ -195,6 +195,47 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var awardDate = Clock.Today;
+        var endDate = awardDate.AddDays(-1);
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.Name == "Graduate Teacher Programme")
+            .First();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync();
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var personId = person.PersonId;
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(httpMethod, $"/route/add/induction-exemption?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
         CreateJourneyInstance(
            JourneyNames.AddRouteToProfessionalStatus,
