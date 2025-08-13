@@ -9,6 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// </summary>
 /// <remarks>
 /// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the request is missing the qualicationId route value.</para>
+/// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the Qualification exists but the associated Person has been deactivated.</para>
 /// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no Mandatory Qualification with the specified ID exists.</para>
 /// <para>Assigns the <see cref="CurrentMandatoryQualificationFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
@@ -23,9 +24,26 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
             return;
         }
 
-        var currentMq = await dbContext.MandatoryQualifications
+        var query = dbContext.MandatoryQualifications
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update")  // https://github.com/dotnet/efcore/issues/26042
-            .Include(mq => mq.Person)
+            .Include(mq => mq.Person);
+
+        // Query without query filters first - query filters will filter out deactivated Person
+        // meaning the entire Qualification is not found, but if Person is deactivated we
+        // we need to return a BadRequest instead of a NotFound result
+        var currentMqWithPotentiallyDeactivatedPerson = await query
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync();
+
+        if (currentMqWithPotentiallyDeactivatedPerson is not null &&
+            currentMqWithPotentiallyDeactivatedPerson.Person!.Status == PersonStatus.Deactivated)
+        {
+            context.Result = new BadRequestResult();
+            return;
+        }
+
+        // Query again with query filters to make sure deleted Qualifications are ignored
+        var currentMq = await query
             .SingleOrDefaultAsync();
 
         if (currentMq is null)

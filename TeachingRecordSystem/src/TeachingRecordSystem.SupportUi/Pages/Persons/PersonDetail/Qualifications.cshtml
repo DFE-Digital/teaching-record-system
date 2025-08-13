@@ -3,13 +3,11 @@
 @using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 @using Microsoft.AspNetCore.Authorization;
 @using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
-@inject IAuthorizationService AuthorizationService
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.QualificationsModel
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonDetailSubNavigationTab.Qualifications;
     var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
-    var canEdit = (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit)).Succeeded;
 }
 
 @section BeforeContent {
@@ -29,14 +27,14 @@ else
         var statusColor = professionalStatus.Status switch {
             RouteToProfessionalStatusStatus.Holds => "green",
             RouteToProfessionalStatusStatus.InTraining => "light-blue",
-            _ => "pink"
+            _ => "red"
         };
         var cardTitle = $"{professionalStatus.RouteToProfessionalStatusType?.ProfessionalStatusType.GetDisplayName()}";
 
             <govuk-summary-card data-testid="professionalstatus-@professionalStatus.QualificationId">
                 <govuk-summary-card-title>@cardTitle</govuk-summary-card-title>
                 <govuk-summary-card-actions>
-                    @if (canEdit)
+                    @if (Model.CanEdit)
                     {
                         <govuk-summary-card-action href="@LinkGenerator.RouteEditDetail(professionalStatus.QualificationId, null)" visually-hidden-text="edit route" data-testid="edit-route-link-@professionalStatus.QualificationId">Edit route</govuk-summary-card-action>
                         <govuk-summary-card-action href="@LinkGenerator.RouteDeleteChangeReason(professionalStatus.QualificationId, null)" visually-hidden-text="delete route" data-testid="delete-route-link-@professionalStatus.QualificationId">Delete route</govuk-summary-card-action>
@@ -153,7 +151,7 @@ else
         }
     }
 
-@if (canEdit)
+@if (Model.CanEdit)
 {
     <govuk-button-link href="@LinkGenerator.RouteAdd(Model.PersonId)" class="govuk-button" data-testid="add-route">Add a route</govuk-button-link>
 }
@@ -172,7 +170,7 @@ else
         <govuk-summary-card data-testid="mq-@mq.QualificationId">
             <govuk-summary-card-title>Mandatory qualification@(mq.Specialism is not null ? $" for {mq.Specialism?.GetName()}" : "")</govuk-summary-card-title>
             <govuk-summary-card-actions>
-                @if (canEdit)
+                @if (Model.CanEdit)
                 {
                     <govuk-summary-card-action href="@LinkGenerator.MqDelete(mq.QualificationId, null)" visually-hidden-text="delete qualification" data-testid="delete-link-@mq.QualificationId">Delete qualification</govuk-summary-card-action>
                 }
@@ -182,7 +180,7 @@ else
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="mq-provider-@mq.QualificationId">@(mq.Provider?.Name ?? "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        @if (canEdit)
+                        @if (Model.CanEdit)
                         {
                             <govuk-summary-list-row-action href="@LinkGenerator.MqEditProvider(mq.QualificationId, null)" class="govuk-link" visually-hidden-text="change training provider" data-testid="provider-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                         }
@@ -192,7 +190,7 @@ else
                     <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="mq-specialism-@mq.QualificationId">@(mq.Specialism is not null ? mq.Specialism?.GetTitle() : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        @if (canEdit)
+                        @if (Model.CanEdit)
                         {
                             <govuk-summary-list-row-action href="@LinkGenerator.MqEditSpecialism(mq.QualificationId, null)" class="govuk-link" visually-hidden-text="change specialism" data-testid="specialism-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                         }
@@ -202,7 +200,7 @@ else
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="mq-start-date-@mq.QualificationId">@(mq.StartDate.HasValue ? mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        @if (canEdit)
+                        @if (Model.CanEdit)
                         {
                             <govuk-summary-list-row-action href="@LinkGenerator.MqEditStartDate(mq.QualificationId, null)" class="govuk-link" visually-hidden-text="change start date" data-testid="start-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                         }
@@ -212,7 +210,7 @@ else
                     <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="mq-status-@mq.QualificationId">@(mq.Status.HasValue ? mq.Status?.GetTitle() : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        @if (canEdit)
+                        @if (Model.CanEdit)
                         {
                             <govuk-summary-list-row-action href="@LinkGenerator.MqEditStatus(mq.QualificationId, null)" visually-hidden-text="change status" data-testid="status-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                         }
@@ -222,7 +220,7 @@ else
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="mq-end-date-@mq.QualificationId">@(mq.EndDate.HasValue ? mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        @if (canEdit)
+                        @if (Model.CanEdit)
                         {
                             <govuk-summary-list-row-action href="@LinkGenerator.MqEditStatus(mq.QualificationId, null)" visually-hidden-text="change end date" data-testid="end-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                         }
@@ -232,7 +230,7 @@ else
         </govuk-summary-card>
     }
 }
-@if (canEdit)
+@if (Model.CanEdit)
 {
     <govuk-button-link href="@LinkGenerator.MqAdd(Model.PersonId)" class="govuk-button" data-testid="add-mandatory-qualification">Add a mandatory qualification</govuk-button-link>
 }

@@ -194,6 +194,31 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var oldStartDate = new DateOnly(2021, 10, 5);
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private async Task<JourneyInstance<EditMqStartDateState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStartDateState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqStartDate,

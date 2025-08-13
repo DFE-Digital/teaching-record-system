@@ -133,6 +133,33 @@ public class Person
         return new(changes, EventModels.PersonAttributes.FromModel(this), oldAttributes);
     }
 
+    public void SetStatus(
+        PersonStatus targetStatus,
+        string? reason,
+        string? reasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo updatedBy,
+        DateTime now,
+        out PersonStatusUpdatedEvent @event)
+    {
+        var oldStatus = Status;
+        Status = targetStatus;
+        UpdatedOn = now;
+
+        @event = new()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = updatedBy,
+            PersonId = PersonId,
+            Status = Status,
+            OldStatus = oldStatus,
+            Reason = reason,
+            ReasonDetail = reasonDetail,
+            EvidenceFile = evidenceFile
+        };
+    }
+
     public void SetCpdInductionStatus(
         InductionStatus status,
         DateOnly? startDate,
@@ -694,6 +721,11 @@ public record CreatePersonResult(
     EventModels.PersonAttributes PersonAttributes);
 
 public record UpdatePersonDetailsResult(
+    PersonAttributesChanges Changes,
+    EventModels.PersonAttributes PersonAttributes,
+    EventModels.PersonAttributes OldPersonAttributes);
+
+public record UpdateStatusResult(
     PersonAttributesChanges Changes,
     EventModels.PersonAttributes PersonAttributes,
     EventModels.PersonAttributes OldPersonAttributes);

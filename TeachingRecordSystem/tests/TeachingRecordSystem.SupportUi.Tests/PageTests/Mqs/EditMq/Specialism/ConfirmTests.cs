@@ -246,6 +246,41 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqSpecialismState()
+            {
+                Initialized = true,
+                Specialism = newMqSpecialism,
+                ChangeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism,
+                ChangeReasonDetail = "Some reason",
+                UploadEvidence = false
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private async Task<JourneyInstance<EditMqSpecialismState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqSpecialismState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqSpecialism,

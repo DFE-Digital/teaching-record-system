@@ -196,6 +196,43 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync();
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(httpMethod, $"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
     CreateJourneyInstance(
         JourneyNames.AddRouteToProfessionalStatus,

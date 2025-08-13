@@ -355,7 +355,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     [InlineData(UserRoles.RecordManager, true)]
     [InlineData(UserRoles.AccessManager, true)]
     [InlineData(UserRoles.Administrator, true)]
-    public async Task Get_RoutesPage_UserRoles_CanViewPageAsExpected(string userRole, bool canViewPage)
+    public async Task Get_UserRoles_CanViewPageAsExpected(string userRole, bool canViewPage)
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
@@ -380,7 +380,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     [InlineData(UserRoles.RecordManager, true)]
     [InlineData(UserRoles.AccessManager, true)]
     [InlineData(UserRoles.Administrator, true)]
-    public async Task Get_RoutesPage_UserRolesWithViewOrEditRoutesPermissions_EditLinkShownAsExpected(string userRole, bool canSeeEditLinks)
+    public async Task Get_UserRolesWithViewOrEditRoutesPermissions_EditLinksShownAsExpected(string userRole, bool canSeeEditLinks)
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
@@ -423,6 +423,90 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithStatus(qualificationStatus, qualificationEndDate)));
         var professionalStatusQualificationId = person.ProfessionalStatuses.First().QualificationId;
         var mandatoryQualificationId = person.MandatoryQualifications.First().QualificationId;
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var editLinks = doc.GetAllElementsByTestId(
+            "add-route",
+            $"edit-route-link-{professionalStatusQualificationId}",
+            $"delete-route-link-{professionalStatusQualificationId}",
+            "add-mandatory-qualification",
+            $"delete-link-{mandatoryQualificationId}",
+            $"provider-change-link-{mandatoryQualificationId}",
+            $"specialism-change-link-{mandatoryQualificationId}",
+            $"start-date-change-link-{mandatoryQualificationId}",
+            $"status-change-link-{mandatoryQualificationId}",
+            $"end-date-change-link-{mandatoryQualificationId}");
+
+        if (canSeeEditLinks)
+        {
+            Assert.NotEmpty(editLinks);
+        }
+        else
+        {
+            Assert.Empty(editLinks);
+        }
+    }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_PersonStatus_EditLinksShownAsExpected(PersonStatus personStatus, bool canSeeEditLinks)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
+        var status = RouteToProfessionalStatusStatus.InTraining;
+        var ageRange = TrainingAgeSpecialismType.KeyStage3;
+        DateOnly? startDate = new DateOnly(2022, 01, 01);
+        DateOnly? endDate = new DateOnly(2023, 01, 01);
+        DateOnly holdsFrom = new DateOnly(2024, 01, 01);
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
+
+        var qualificationProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var qualificationSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var qualificationStatus = MandatoryQualificationStatus.Passed;
+        DateOnly? qualificationStartDate = DateOnly.Parse("2022-01-05");
+        DateOnly? qualificationEndDate = DateOnly.Parse("2022-07-13");
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(status)
+                .WithTrainingStartDate(startDate.Value)
+                .WithTrainingEndDate(endDate.Value)
+                .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
+                .WithTrainingCountryId(country.CountryId)
+                .WithTrainingAgeSpecialismType(ageRange)
+                .WithDegreeTypeId(degreeType.DegreeTypeId)
+                .WithHoldsFrom(holdsFrom))
+            .WithMandatoryQualification(q => q
+                .WithProvider(qualificationProvider?.MandatoryQualificationProviderId)
+                .WithSpecialism(qualificationSpecialism)
+                .WithStartDate(qualificationStartDate)
+                .WithStatus(qualificationStatus, qualificationEndDate)));
+        var professionalStatusQualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var mandatoryQualificationId = person.MandatoryQualifications.First().QualificationId;
+
+        if (personStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 

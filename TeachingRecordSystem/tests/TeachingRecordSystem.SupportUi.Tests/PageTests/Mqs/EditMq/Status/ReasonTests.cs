@@ -375,6 +375,41 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
+        var newEndDate = new DateOnly(2021, 12, 5);
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqStatusState()
+            {
+                Initialized = true,
+                Status = newStatus,
+                EndDate = newEndDate,
+                CurrentStatus = oldStatus,
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {
         var byteArrayContent = new ByteArrayContent(new byte[] { });

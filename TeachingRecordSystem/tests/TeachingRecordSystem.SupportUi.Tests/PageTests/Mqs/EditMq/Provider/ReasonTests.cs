@@ -281,6 +281,38 @@ public class ReasonTests : TestBase
         Assert.Null(journeyInstance);
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqProviderState()
+            {
+                Initialized = true,
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {
         var byteArrayContent = new ByteArrayContent(new byte[] { });

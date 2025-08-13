@@ -245,6 +245,44 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var specialism = MandatoryQualificationSpecialism.Hearing;
+        var startDate = new DateOnly(2021, 3, 1);
+        var status = MandatoryQualificationStatus.Passed;
+        DateOnly? endDate = new DateOnly(2021, 11, 5);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.ContactId,
+            new AddMqState()
+            {
+                ProviderId = provider.MandatoryQualificationProviderId,
+                Specialism = specialism,
+                StartDate = startDate,
+                Status = status,
+                EndDate = endDate
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private async Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, AddMqState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.AddMq,

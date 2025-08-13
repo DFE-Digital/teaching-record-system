@@ -9,7 +9,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(Policy = AuthorizationPolicies.NonPersonOrAlertDataView)]
 [AllowDeactivatedPerson]
-public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache referenceDataCache) : PageModel
+public class QualificationsModel(
+    TrsDbContext dbContext,
+    ReferenceDataCache referenceDataCache,
+    IAuthorizationService authorizationService) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -27,18 +30,22 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
     public RouteToProfessionalStatus[]? ProfessionalStatuses { get; set; }
     public Dictionary<Guid, string>? TrainingSubjects { get; set; }
 
+    public bool CanEdit { get; set; }
+
     public async Task OnGetAsync()
     {
         ProfessionalStatuses = await dbContext.RouteToProfessionalStatuses
             .Where(x => x.PersonId == PersonId)
             .OrderBy(x => x.CreatedOn)
             .ToArrayAsync();
+
         var uniqueSubjectIds = ProfessionalStatuses
             .SelectMany(x => x.TrainingSubjectIds)
             .Distinct()
             .ToArray();
         var trainingSubjectsLookup = (await referenceDataCache.GetTrainingSubjectsAsync())
             .ToDictionary(subject => subject.TrainingSubjectId, subject => $"{subject.Reference} - {subject.Name}");
+
         TrainingSubjects = uniqueSubjectIds.ToDictionary(
             id => id,
             id => trainingSubjectsLookup[id]
@@ -47,5 +54,14 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
         MandatoryQualifications = await dbContext.MandatoryQualifications
             .Where(q => q.PersonId == PersonId)
             .ToArrayAsync();
+
+        var personIsActive = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .Where(p => p.PersonId == PersonId)
+            .Select(p => p.Status == PersonStatus.Active)
+            .SingleAsync();
+
+        CanEdit = personIsActive &&
+            (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit)).Succeeded;
     }
 }

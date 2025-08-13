@@ -1,7 +1,11 @@
 @page "/persons/{personId}"
+@using Microsoft.AspNetCore.Authorization
 @using TeachingRecordSystem.SupportUi.Pages.Common
 @using TeachingRecordSystem.SupportUi.Pages.Shared
+@using TeachingRecordSystem.SupportUi.Infrastructure.Security
+
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel
+
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonDetailSubNavigationTab.General;
@@ -28,7 +32,9 @@
         DateOfBirth = Model.Person.DateOfBirth,
         NationalInsuranceNumber = Model.Person.NationalInsuranceNumber,
         Gender = Model.Person.Gender,
-        Email = Model.Person.Email
+        Email = Model.Person.Email,
+        CanChangeDetails = Model.CanChangeDetails,
+        IsActive = Model.Person.IsActive
     };
 }
 @await Html.PartialAsync("_PersonDetail", personDetailModel)
@@ -90,7 +96,17 @@
     </govuk-summary-card>
 }
 
-@if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated) && Model.ShowMergeButton)
+@if (Model.CanSetStatus)
+{
+    <govuk-button-link
+        data-testid="set-status-button"
+        href="@LinkGenerator.PersonSetStatus(Model.PersonId, Model.Person.IsActive ? PersonStatus.Deactivated : PersonStatus.Active)"
+        class="govuk-button--secondary">
+        @(Model.Person.IsActive ? "Deactivate" : "Reactivate") record
+    </govuk-button-link>
+}
+
+@if (Model.CanMerge)
 {
     <govuk-button-link data-testid="merge-button" href="@LinkGenerator.PersonManualMergeEnterTrn(Model.PersonId)" class="govuk-button--secondary">Merge with another record</govuk-button-link>
 }

@@ -11,6 +11,8 @@ public record PersonDetailViewModel
     public required string? NationalInsuranceNumber { get; init; }
     public required Gender? Gender { get; init; }
     public required string? Email { get; init; }
+    public required bool? IsActive { get; init; }
+    public required bool CanChangeDetails { get; init; }
 }
 
 [Flags]
@@ -19,5 +21,6 @@ public enum PersonDetailViewModelOptions
     None = 0,
     ShowGender = 1 << 1,
     ShowEmail = 1 << 2,
-    ShowAll = ShowGender | ShowEmail
+    ShowStatus = 1 << 3,
+    ShowAll = ShowGender | ShowEmail | ShowStatus
 }

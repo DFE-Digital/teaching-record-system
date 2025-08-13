@@ -241,6 +241,57 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var specialism = MandatoryQualificationSpecialism.Hearing;
+        var status = MandatoryQualificationStatus.Passed;
+        var startDate = new DateOnly(2023, 09, 01);
+        var endDate = new DateOnly(2023, 11, 05);
+        var deletionReason = MqDeletionReasonOption.ProviderRequest;
+        var deletionReasonDetail = "Some details about the deletion reason";
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "test.pdf";
+
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
+            .WithProvider(provider.MandatoryQualificationProviderId)
+            .WithSpecialism(specialism)
+            .WithStartDate(startDate)
+            .WithStatus(status, endDate)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new DeleteMqState()
+            {
+                Initialized = true,
+                DeletionReason = deletionReason,
+                DeletionReasonDetail = deletionReasonDetail,
+                UploadEvidence = true,
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = evidenceFileName,
+                EvidenceFileSizeDescription = "1MB"
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteMqState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.DeleteMq,

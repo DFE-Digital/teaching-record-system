@@ -171,4 +171,92 @@ public abstract class TestBase : IDisposable
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
         return byteArrayContent;
     }
+
+    public static TheoryData<HttpMethod> HttpMethods(TestHttpMethods httpMethods)
+    {
+        var data = new TheoryData<HttpMethod>();
+
+        foreach (var httpMethod in httpMethods.AsHttpMethods())
+        {
+            data.Add(httpMethod);
+        }
+
+        return data;
+    }
+
+    public static IEnumerable<object?[]> AllCombinationsOf(object? param1, object? param2)
+    {
+        foreach (var item1 in ToObjectEnumerable(param1))
+        {
+            foreach (var item2 in ToObjectEnumerable(param2))
+            {
+                yield return new object?[] { item1, item2 };
+            }
+        }
+    }
+
+    public static IEnumerable<object?[]> AllCombinationsOf(object? param1, object? param2, object? param3)
+    {
+        foreach (var item1 in ToObjectEnumerable(param1))
+        {
+            foreach (var item2 in ToObjectEnumerable(param2))
+            {
+                foreach (var item3 in ToObjectEnumerable(param3))
+                {
+                    yield return new object?[] { item1, item2, item3 };
+                }
+            }
+        }
+    }
+
+    public static IEnumerable<object?[]> AllCombinationsOf(object? param1, object? param2, object? param3, object? param4)
+    {
+        foreach (var item1 in ToObjectEnumerable(param1))
+        {
+            foreach (var item2 in ToObjectEnumerable(param2))
+            {
+                foreach (var item3 in ToObjectEnumerable(param3))
+                {
+                    foreach (var item4 in ToObjectEnumerable(param4))
+                    {
+                        yield return new object?[] { item1, item2, item3, item4 };
+                    }
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<object?> ToObjectEnumerable(object? obj) => obj switch
+    {
+        TestHttpMethods httpMethod => httpMethod.AsHttpMethods(),
+        string s => [s],
+        IEnumerable<object?> genericList => genericList,
+        System.Collections.IEnumerable list => list.Cast<object?>(),
+        _ => [obj]
+    };
 }
+
+public enum TestHttpMethods
+{
+    None = 0,
+    Get = 1 << 1,
+    Post = 1 << 2,
+    GetAndPost = Get | Post
+}
+
+public static class TestHttpMethodExtensions
+{
+    public static IEnumerable<HttpMethod> AsHttpMethods(this TestHttpMethods httpMethod)
+    {
+        if ((httpMethod & TestHttpMethods.Get) > 0)
+        {
+            yield return HttpMethod.Get;
+        }
+
+        if ((httpMethod & TestHttpMethods.Post) > 0)
+        {
+            yield return HttpMethod.Post;
+        }
+    }
+}
+

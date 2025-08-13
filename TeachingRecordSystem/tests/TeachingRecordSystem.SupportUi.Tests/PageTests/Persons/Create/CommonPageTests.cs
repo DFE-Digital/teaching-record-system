@@ -205,7 +205,7 @@ public class CommonPageTests : TestBase
     [InlineData("personal-details")]
     [InlineData("create-reason")]
     [InlineData("check-answers")]
-    public async Task Post_Cancel_RedirectsToCreateIndexPage(string page)
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToCreateIndexPage(string page)
     {
         // Arrange
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -234,6 +234,9 @@ public class CommonPageTests : TestBase
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/create", location);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance);
     }
 
     [Theory]

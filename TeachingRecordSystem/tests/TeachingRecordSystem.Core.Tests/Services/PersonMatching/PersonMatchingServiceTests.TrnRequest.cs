@@ -176,13 +176,13 @@ public partial class PersonMatchingServiceTests
         });
 
     public static TheoryData<
-        EmailAddressArgumentOption,
-        FirstNameArgumentOption,
-        MiddleNameArgumentOption,
-        LastNameArgumentOption,
-        DateOfBirthArgumentOption,
-        NationalInsuranceNumberArgumentOption,
-        TrnRequestMatchResultOutcome> GetMatchFromTrnRequestData()
+                EmailAddressArgumentOption,
+                FirstNameArgumentOption,
+                MiddleNameArgumentOption,
+                LastNameArgumentOption,
+                DateOfBirthArgumentOption,
+                NationalInsuranceNumberArgumentOption,
+                TrnRequestMatchResultOutcome> GetMatchFromTrnRequestData()
     {
         var data =
             new TheoryData<

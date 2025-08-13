@@ -88,7 +88,9 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
                 DateOfBirth = m.DateOfBirth,
                 NationalInsuranceNumber = m.NationalInsuranceNumber,
                 Gender = null,  // Not shown
-                Email = m.EmailAddress
+                Email = m.EmailAddress,
+                CanChangeDetails = false,
+                IsActive = null  // Not shown
             })
             .ToArray();
 

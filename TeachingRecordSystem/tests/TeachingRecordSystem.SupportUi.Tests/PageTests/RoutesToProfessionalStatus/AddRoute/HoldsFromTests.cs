@@ -362,6 +362,39 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == "Apply for Qualified Teacher Status in England");
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = startDate.AddMonths(1);
+        var holdsFrom = endDate.AddDays(1);
+        var person = await TestData.CreatePersonAsync();
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(RouteToProfessionalStatusStatus.Holds)
+            .WithHoldsFrom(holdsFrom)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
+
+        var request = new HttpRequestMessage(httpMethod, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
         CreateJourneyInstance(
            JourneyNames.AddRouteToProfessionalStatus,

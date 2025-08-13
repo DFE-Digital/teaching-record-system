@@ -13,6 +13,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// </summary>
 /// <remarks>
 /// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the request is missing the alertId route value.</para>
+/// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the Alert exists but the associated Person has been deactivated.</para>
 /// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no alert with the specified ID exists.</para>
 /// <para>Returns a <see cref="StatusCodes.Status403Forbidden"/> response if the user does not have the required permission to access the alert.</para>
 /// <para>Assigns the <see cref="CurrentAlertFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
@@ -28,9 +29,26 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
             return;
         }
 
-        var currentAlert = await dbContext.Alerts
+        var query = dbContext.Alerts
             .FromSql($"select * from alerts where alert_id = {alertId} for update")  // https://github.com/dotnet/efcore/issues/26042
-            .Include(a => a.Person)
+            .Include(a => a.Person);
+
+        // Query without query filters first - query filters will filter out deactivated Person
+        // meaning the entire Alert is not found, but if Person is deactivated we
+        // we need to return a BadRequest instead of a NotFound result
+        var currentAlertWithPotentiallyDeactivatedPerson = await query
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync();
+
+        if (currentAlertWithPotentiallyDeactivatedPerson is not null &&
+            currentAlertWithPotentiallyDeactivatedPerson.Person!.Status == PersonStatus.Deactivated)
+        {
+            context.Result = new BadRequestResult();
+            return;
+        }
+
+        // Query again with query filters to make sure deleted Alerts are ignored
+        var currentAlert = await query
             .SingleOrDefaultAsync();
 
         if (currentAlert is null)

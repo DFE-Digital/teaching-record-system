@@ -16,9 +16,19 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
     public bool CanViewNotes { get; set; }
 
+    public bool CanAddNotes { get; set; }
+
     public async Task OnGetAsync()
     {
         CanViewNotes = (await authorizationService.AuthorizeAsync(User, PersonId, AuthorizationPolicies.NotesView)) is { Succeeded: true };
+
+        var personIsActive = await dbContext.Persons
+            .IgnoreQueryFilters()
+            .Where(p => p.PersonId == PersonId)
+            .Select(p => p.Status == PersonStatus.Active)
+            .SingleAsync();
+
+        CanAddNotes = CanViewNotes && personIsActive;
 
         var notesResult = await dbContext.Notes
             .Include(n => n.CreatedBy)

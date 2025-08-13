@@ -100,4 +100,33 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.NotNull(noteCreatedEvent.Note.File);
         });
     }
+
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(httpMethod, $"/persons/{person.PersonId}/notes/add");
+        if (httpMethod == HttpMethod.Post)
+        {
+            request.Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Text", Faker.Lorem.Paragraph() }
+            };
+        }
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
 }

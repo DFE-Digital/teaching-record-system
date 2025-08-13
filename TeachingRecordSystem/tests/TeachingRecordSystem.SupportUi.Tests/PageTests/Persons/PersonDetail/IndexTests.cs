@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
@@ -12,7 +14,7 @@ public class IndexTests : TestBase
 
     public override void Dispose()
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
         base.Dispose();
     }
 
@@ -82,7 +84,7 @@ public class IndexTests : TestBase
     public async Task Get_AfterContactsMigrated_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
     {
         // Arrange
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
 
         var randomEmail = TestData.GenerateUniqueEmail();
         if (!EmailAddress.TryParse(randomEmail, out var email))
@@ -93,7 +95,7 @@ public class IndexTests : TestBase
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithTrn()
             .WithEmail((string?)email)
             .WithNationalInsuranceNumber()
@@ -407,7 +409,7 @@ public class IndexTests : TestBase
         SetCurrentUser(user);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithQts());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -429,6 +431,34 @@ public class IndexTests : TestBase
     }
 
     [Fact]
+    public async Task Get_PersonIsDeactivated_ChangeDetailsLinkIsHidden()
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithQts());
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var changeDetailsLink = doc.GetElementByTestId("change-details-link");
+        Assert.Null(changeDetailsLink);
+    }
+
+    [Fact]
     public async Task Get_ContactsNotMigrated_DoesNotShowMergeButton()
     {
         // Arrange
@@ -445,11 +475,14 @@ public class IndexTests : TestBase
         Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
+    // TODO: test user permission
+
     [Fact]
     public async Task Get_PersonIsDeactivated_DoesNotShowMergeButton()
     {
         // Arrange
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
@@ -474,7 +507,8 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasOpenAlert_DoesNotShowMergeButton()
     {
         // Arrange
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithAlert(a => a.WithEndDate(null)));
@@ -493,7 +527,8 @@ public class IndexTests : TestBase
     public async Task Get_PersonDoesNotHaveOpenAlert_ShowsMergeButton()
     {
         // Arrange
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
@@ -518,7 +553,8 @@ public class IndexTests : TestBase
     public async Task Get_PersonWithInductionStatus_ShowsMergeButtonAsExpected(InductionStatus status, bool expectMergeButtonToBeShown)
     {
         // Arrange
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithInductionStatus(i => i
@@ -533,13 +569,256 @@ public class IndexTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+        var mergeButton = doc.GetElementByTestId("merge-button");
         if (expectMergeButtonToBeShown)
         {
-            Assert.NotNull(doc.GetElementByTestId("merge-button"));
+            Assert.NotNull(mergeButton);
         }
         else
         {
-            Assert.Null(doc.GetElementByTestId("merge-button"));
+            Assert.Null(mergeButton);
         }
     }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    public async Task Get_PersonStatus_ShowsMergeButtonAsExpected(PersonStatus currentStatus, bool expectMergeButtonToBeShown)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+
+        if (currentStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var mergeButton = doc.GetElementByTestId("merge-button");
+        if (expectMergeButtonToBeShown)
+        {
+            Assert.NotNull(mergeButton);
+        }
+        else
+        {
+            Assert.Null(mergeButton);
+        }
+    }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, false)]
+    [InlineData(PersonStatus.Deactivated, true)]
+    public async Task Get_ShowsPersonStatusAsExpected(PersonStatus currentStatus, bool expectPersonToBeMarkedAsDeactivated)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Lily")
+            .WithMiddleName("The")
+            .WithLastName("Pink")
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+
+        if (currentStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var pageTitle = doc.GetElementByTestId("page-title");
+        Assert.NotNull(pageTitle);
+        if (expectPersonToBeMarkedAsDeactivated)
+        {
+            Assert.Equal("Lily The Pink (deactivated)", pageTitle.TrimmedText());
+            doc.AssertRowContentMatches("Status", "DEACTIVATED");
+        }
+        else
+        {
+            Assert.Equal("Lily The Pink", pageTitle.TrimmedText());
+            doc.AssertRowContentMatches("Status", "ACTIVE");
+        }
+    }
+
+    [Fact]
+    public async Task Get_ContactsNotMigrated_DoesNotShowSetStatusButton()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("set-status-button"));
+    }
+
+    [Theory]
+    [InlineData(UserRoles.Viewer, false)]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.AlertsManagerTra, false)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, false)]
+    [InlineData(UserRoles.AccessManager, true)]
+    [InlineData(UserRoles.Administrator, true)]
+    [InlineData(null, false)]
+    public async Task Get_UserDoesNotHavePermission_DoesNotShowSetStatusButton(string? role, bool expectButtonToBeVisible)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        SetCurrentUser(TestUsers.GetUser(role));
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
+
+        if (expectButtonToBeVisible)
+        {
+            Assert.NotNull(setStatusButton);
+        }
+        else
+        {
+            Assert.Null(setStatusButton);
+        }
+    }
+
+    [Theory]
+    [InlineData(PersonStatus.Active, "Deactivate record", "Deactivated")]
+    [InlineData(PersonStatus.Deactivated, "Reactivate record", "Active")]
+    public async Task Get_PersonStatus_RendersSetStatusButtonAsExpected(PersonStatus currentStatus, string expectedButtonText, string expectedTargetStatus)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+
+        if (currentStatus == PersonStatus.Deactivated)
+        {
+            await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.Status = PersonStatus.Deactivated;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
+        Assert.NotNull(setStatusButton);
+        Assert.Equal(expectedButtonText, setStatusButton.TrimmedText());
+        Assert.Contains($"/persons/{person.PersonId}/set-status/{expectedTargetStatus}", setStatusButton.Href);
+    }
+
+    [Fact]
+    public async Task Get_PersonWasDeactivatedAsPartOfAMerge_DoesNotShowSetStatusButton()
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        var primaryPerson = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+        var secondaryPerson = await TestData.CreatePersonAsync(p => p
+            .WithPersonDataSource(TestDataPersonDataSource.Trs)
+            .WithTrn());
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(secondaryPerson.Person);
+            secondaryPerson.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var createdByUser = await TestData.CreateUserAsync();
+        var attributes = new PersonAttributes
+        {
+            DateOfBirth = DateOnly.Parse("1 Oct 2003"),
+            FirstName = "Jim",
+            MiddleName = "The",
+            LastName = "Bob",
+            EmailAddress = "jim@bob.com",
+            Gender = Gender.Female,
+            NationalInsuranceNumber = "AB 12 34 56 D"
+        };
+        var mergeEvent = new PersonsMergedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = primaryPerson.PersonId,
+            PersonTrn = primaryPerson.Trn!,
+            SecondaryPersonId = secondaryPerson.PersonId,
+            SecondaryPersonTrn = secondaryPerson.Trn!,
+            SecondaryPersonStatus = PersonStatus.Deactivated,
+            Comments = null,
+            PersonAttributes = attributes,
+            OldPersonAttributes = attributes,
+            Changes = PersonsMergedEventChanges.None,
+            EvidenceFile = new EventModels.File
+            {
+                FileId = Guid.NewGuid(),
+                Name = "evidence.jpg"
+            }
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(mergeEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{secondaryPerson.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
+        Assert.Null(setStatusButton);
+    }
+
+    // * A “Deactivated” status label is added to the top of the record.
+    // * “(deactivated)” is appended to the end of the name on the Record.
 }
