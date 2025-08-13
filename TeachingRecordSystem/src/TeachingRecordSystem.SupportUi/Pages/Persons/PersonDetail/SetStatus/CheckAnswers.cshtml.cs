@@ -25,8 +25,8 @@ public class CheckAnswersModel(
     public string? EvidenceFileSizeDescription { get; set; }
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string BackLink => LinkGenerator.PersonSetStatus(PersonId, TargetStatus, JourneyInstance!.InstanceId);
-    public string ChangeReasonLink => LinkGenerator.PersonSetStatus(PersonId, TargetStatus, JourneyInstance!.InstanceId, fromCheckAnswers: true);
+    public string BackLink => LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance!.InstanceId);
+    public string ChangeReasonLink => LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance!.InstanceId, fromCheckAnswers: true);
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -39,7 +39,7 @@ public class CheckAnswersModel(
             state.UploadEvidence is null ||
             state.UploadEvidence == true && state.EvidenceFileId is null)
         {
-            context.Result = Redirect(LinkGenerator.PersonSetStatus(PersonId, TargetStatus, JourneyInstance.InstanceId));
+            context.Result = Redirect(LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance.InstanceId));
             return;
         }
 

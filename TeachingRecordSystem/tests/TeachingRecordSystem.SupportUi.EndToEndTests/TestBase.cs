@@ -24,6 +24,13 @@ public abstract class TestBase
         return await action(dbContext);
     }
 
+    public virtual Task WithDbContext(Func<TrsDbContext, Task> action) =>
+        WithDbContext(async dbContext =>
+        {
+            await action(dbContext);
+            return 0;
+        });
+
     protected void SetCurrentUser(User user)
     {
         var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentUserProvider>();

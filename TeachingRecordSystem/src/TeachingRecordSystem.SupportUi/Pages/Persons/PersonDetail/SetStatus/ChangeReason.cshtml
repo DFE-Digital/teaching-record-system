@@ -16,7 +16,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.PersonSetStatus(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId) method="post" enctype="multipart/form-data" data-testid="submit-form">
+        <form action=@LinkGenerator.PersonSetStatusChangeReason(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId) method="post" enctype="multipart/form-data" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="set-status-caption">@caption</span>
 
             @if (Model.TargetStatus == PersonStatus.Deactivated)

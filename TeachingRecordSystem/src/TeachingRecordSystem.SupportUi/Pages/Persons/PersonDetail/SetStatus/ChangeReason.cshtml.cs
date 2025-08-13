@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
-[Journey(JourneyNames.SetStatus), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.SetStatus), RequireJourneyInstance]
 [AllowDeactivatedPerson]
 public class ChangeReasonModel(
     TrsLinkGenerator linkGenerator,
@@ -58,7 +58,7 @@ public class ChangeReasonModel(
     public string? UploadedEvidenceFileUrl { get; set; }
 
     public string BackLink => FromCheckAnswers
-        ? LinkGenerator.PersonSetStatusCheckAnswers(PersonId, TargetStatus)
+        ? LinkGenerator.PersonSetStatusCheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId)
         : LinkGenerator.PersonDetail(PersonId);
 
     public async Task OnGetAsync()
@@ -148,6 +148,6 @@ public class ChangeReasonModel(
             state.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
         });
 
-        return Redirect(LinkGenerator.PersonSetStatusCheckAnswers(PersonId, TargetStatus));
+        return Redirect(LinkGenerator.PersonSetStatusCheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId));
     }
 }
