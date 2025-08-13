@@ -260,7 +260,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link")e => e.GetAttribute("rel") == "next");
+        Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "next");
     }
 
     [Fact]
