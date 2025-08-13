@@ -1,4 +1,6 @@
+using System.Text.Json;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
@@ -746,10 +748,21 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         base.WithDbContext(async dbContext =>
     {
         var applicationUserId = PostgresModels.ApplicationUser.NPQApplicationUserGuid;
+        var supportTask = await dbContext.SupportTasks
+            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
+                t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
         var events = await dbContext.Events
             .Where(e => e.EventName == nameof(SupportTaskCreatedEvent))
             .ToListAsync();
         Assert.Single(events);
         var @event = events.Single();
+
+        var supportTaskCreatedEvent = JsonSerializer.Deserialize<SupportTaskCreatedEvent>(@event.Payload);
+        Assert.Equal(supportTask!.SupportTaskReference, supportTaskCreatedEvent!.SupportTask.SupportTaskReference);
+
+        var data = supportTaskCreatedEvent.SupportTask.Data as NpqTrnRequestData;
+        Assert.Null(data!.ResolvedAttributes);
+        Assert.Null(data.SelectedPersonAttributes);
+        Assert.Null(data.SupportRequestOutcome);
     });
 }

@@ -4,7 +4,7 @@ public record NpqTrnRequestData
 {
     public NpqTrnRequestDataPersonAttributes? SelectedPersonAttributes { get; init; }
     public NpqTrnRequestDataPersonAttributes? ResolvedAttributes { get; init; }
-    public SupportRequestOutcome SupportRequestOutcome { get; init; }
+    public SupportRequestOutcome? SupportRequestOutcome { get; init; }
 }
 
 public record NpqTrnRequestDataPersonAttributes
