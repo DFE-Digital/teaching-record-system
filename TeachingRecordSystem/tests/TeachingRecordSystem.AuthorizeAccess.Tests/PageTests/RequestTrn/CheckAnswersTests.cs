@@ -1,7 +1,19 @@
+using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
+using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+[Collection(nameof(DisableParallelization))]
+public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
+    public Task InitializeAsync() => WithDbContext(async dbContext =>
+    {
+        await dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync();
+        await dbContext.TrnRequestMetadata.ExecuteDeleteAsync();
+        await dbContext.Events.ExecuteDeleteAsync();
+    });
+
+    public Task DisposeAsync() => Task.CompletedTask;
+
     [Fact]
     public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
     {
@@ -547,38 +559,197 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.True(reloadedJourneyInstance.State.HasPendingTrnRequest);
     }
 
-    [Fact]
-    public async Task Post_SavesSupportTask()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_NoMatches_SavesSupportTask(bool hasNationalInsuranceNumber)
     {
-        throw new NotImplementedException("This test needs to be implemented.");
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
+
+        var state = CreateNewState();
+        state.HasNationalInsuranceNumber = hasNationalInsuranceNumber;
+        state.NationalInsuranceNumber = hasNationalInsuranceNumber ? Faker.Identification.UkNationalInsuranceNumber() : null;
+        if (!hasNationalInsuranceNumber)
+        {
+            state.AddressLine1 = Faker.Address.StreetAddress();
+            state.AddressLine2 = Faker.Address.SecondaryAddress();
+            state.TownOrCity = Faker.Address.City();
+            state.Country = TestData.GenerateCountry();
+            state.PostalCode = Faker.Address.ZipCode();
+        }
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertSupportTaskCreatedAsync();
+        await AssertMetadataExpectedAsync(state, false);
     }
 
     [Fact]
-    public async Task Post_CreateEvent()
+    public async Task Post_Matches_SavesSupportTask()
     {
-        throw new NotImplementedException();
+        // Arrange
+        var state = CreateNewState();
+        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.HasNationalInsuranceNumber = true;
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var person1 = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithFirstName(state.FirstName!)
+            .WithMiddleName(state.MiddleName)
+            .WithLastName(state!.LastName!));
+        var person2 = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithFirstName(state.FirstName!)
+            .WithMiddleName(state.MiddleName)
+            .WithLastName(state!.LastName!));
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertSupportTaskCreatedAsync();
+        await AssertMetadataExpectedAsync(state, true, new List<Guid>() { person1.PersonId, person2.PersonId });
     }
 
-    private Task AssertSupportTaskCreatedAsync(Guid applicationUserId, string requestId) =>
+    [Fact]
+    public async Task Post_DefiniteMatch_SavesSupportTask()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.HasNationalInsuranceNumber = true;
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithFirstName(state.FirstName!)
+            .WithMiddleName(state.MiddleName)
+            .WithLastName(state!.LastName!)
+            .WithDateOfBirth(state.DateOfBirth!.Value)
+            .WithNationalInsuranceNumber(state.NationalInsuranceNumber!));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertSupportTaskCreatedAsync();
+        await AssertMetadataExpectedAsync(state, true, new List<Guid>() { person.PersonId });
+    }
+
+    [Fact]
+    public async Task Post_CreatesEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
+
+        var state = CreateNewState();
+
+        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.HasNationalInsuranceNumber = true;
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEventCreatedAsync();
+    }
+
+    private Task AssertMetadataExpectedAsync(RequestTrnJourneyState request, bool expectedPotentialDuplicate, List<Guid>? potentialDuplicates = null) =>
         base.WithDbContext(async dbContext =>
     {
+        if (expectedPotentialDuplicate && potentialDuplicates is null)
+        {
+            throw new ArgumentException("Define the list of expected potential duplicates");
+        }
+
+        var applicationUserId = PostgresModels.ApplicationUser.NPQApplicationUserGuid;
+
+        var metadata = await dbContext.TrnRequestMetadata
+            .SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId/* && m.RequestId == command.RequestId*/);
+        Assert.NotNull(metadata);
+
+        var expectedEmailAddress = request.PersonalEmail;
+
+        var expectedName = new[] { request.FirstName, request.MiddleName, request.LastName }
+            .Where(part => !string.IsNullOrEmpty(part));
+
+        Assert.Equal(TrnRequestStatus.Pending, metadata.Status);
+        Assert.False(metadata.IdentityVerified);
+        Assert.Equal(request.PersonalEmail, metadata.EmailAddress);
+        Assert.True(expectedName.SequenceEqual(metadata.Name));
+        Assert.Equal(request.FirstName, metadata.FirstName);
+        Assert.Equal(request.MiddleName, metadata.MiddleName);
+        Assert.Equal(request.LastName, metadata.LastName);
+        Assert.Equal(request.DateOfBirth, metadata.DateOfBirth);
+        Assert.Equal(expectedPotentialDuplicate, metadata.PotentialDuplicate);
+        Assert.Equal(request.NationalInsuranceNumber, metadata.NationalInsuranceNumber);
+        Assert.Equal(request.AddressLine1, metadata.AddressLine1);
+        Assert.Equal(request.AddressLine2, metadata.AddressLine2);
+        Assert.Equal(request.TownOrCity, metadata.City);
+        Assert.Equal(request.PostalCode, metadata.Postcode);
+        Assert.Equal(request.Country, metadata.Country);
+        Assert.Null(metadata.OneLoginUserSubject);
+        Assert.Null(metadata.Gender);
+        Assert.Null(metadata.AddressLine3);
+        Assert.NotNull(metadata.RequestId);
+        Assert.Equal(PostgresModels.ApplicationUser.NPQApplicationUserGuid, metadata.ApplicationUserId);
+        Assert.Equal(request.NpqApplicationId, metadata.NpqApplicationId);
+        Assert.Equal(request.NpqName, metadata.NpqName);
+        Assert.Equal(request.NpqTrainingProvider, metadata.NpqTrainingProvider);
+        Assert.Equal(request.PreviousFirstName, metadata.PreviousFirstName);
+        Assert.Equal(request.PreviousMiddleName, metadata.PreviousMiddleName);
+        Assert.Equal(request.PreviousLastName, metadata.PreviousLastName);
+        Assert.NotNull(metadata.NpqEvidenceFileId);
+        Assert.NotNull(metadata.NpqEvidenceFileName);
+        Assert.Equal(request.WorkEmail, metadata.WorkEmailAddress);
+
+        if (expectedPotentialDuplicate)
+        {
+            Assert.Equivalent(potentialDuplicates!.Select(x => new PostgresModels.TrnRequestMatchedPerson() { PersonId = x }), metadata.Matches!.MatchedPersons);
+        }
+        else
+        {
+            Assert.Equivalent(new List<PostgresModels.TrnRequestMatchedPerson>().AsReadOnly(), metadata.Matches!.MatchedPersons);
+        }
+    });
+
+    private Task AssertSupportTaskCreatedAsync() =>
+        base.WithDbContext(async dbContext =>
+    {
+        var applicationUserId = PostgresModels.ApplicationUser.NPQApplicationUserGuid;
         var supportTask = await dbContext.SupportTasks
-            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
-                t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
-                t.TrnRequestMetadata!.RequestId == requestId);
+            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
+                t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
 
         Assert.NotNull(supportTask);
         Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
     });
 
-    private Task AssertNoSupportTaskCreatedAsync(Guid applicationUserId, string requestId) =>
+    private Task AssertEventCreatedAsync() =>
         base.WithDbContext(async dbContext =>
-        {
-            var supportTask = await dbContext.SupportTasks
-                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
-                    t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
-                    t.TrnRequestMetadata!.RequestId == requestId);
-
-            Assert.Null(supportTask);
-        });
+    {
+        var applicationUserId = PostgresModels.ApplicationUser.NPQApplicationUserGuid;
+        var events = await dbContext.Events
+            .Where(e => e.EventName == nameof(SupportTaskCreatedEvent))
+            .ToListAsync();
+        Assert.Single(events);
+        var @event = events.Single();
+    });
 }

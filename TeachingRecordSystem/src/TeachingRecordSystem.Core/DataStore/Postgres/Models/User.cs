@@ -123,6 +123,13 @@ public class ApplicationUser : UserBase
 
         static string CreateJsonArray(params string[] values) => JsonSerializer.Serialize(values);
     }
+
+    public static ApplicationUser Instance { get; } = new()
+    {
+        UserId = ApplicationUser.NPQApplicationUserGuid,
+        Name = "NPQ",
+        Active = true
+    };
 }
 
 public class SystemUser : UserBase

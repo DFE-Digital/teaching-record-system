@@ -11,7 +11,7 @@ public class RejectionReasonModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public string PersonName => StringHelper.JoinNonEmpty(' ', RequestData!.Name);
 
-    public TrnRequestMetadata? RequestData { get; set; } // CML TODO - needed? or just name needed?
+    public TrnRequestMetadata? RequestData { get; set; }
 
     public JourneyInstance<RejectNpqTrnRequestState>? JourneyInstance { get; set; }
 

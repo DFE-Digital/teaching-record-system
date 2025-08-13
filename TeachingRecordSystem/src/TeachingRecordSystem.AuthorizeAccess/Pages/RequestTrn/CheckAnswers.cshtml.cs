@@ -110,7 +110,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
             PreviousMiddleName = state.PreviousMiddleName,
             PreviousLastName = state.PreviousLastName,
             WorkEmailAddress = state.WorkEmail,
-            Name = new[] { state.FirstName!, state.MiddleName ?? string.Empty, state.LastName! }, // CML TODO - use individual name vars or this array?
+            Name = new[] { state.FirstName!, state.MiddleName ?? string.Empty, state.LastName! },
             EmailAddress = state.PersonalEmail,
             DateOfBirth = state.DateOfBirth!.Value,
             NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber),
@@ -154,7 +154,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
             trnRequestApplicationUserId: ApplicationUser.NPQApplicationUserGuid,
             trnRequestId: requestId,
             createdBy: ApplicationUser.NPQApplicationUserGuid,
-            now: DateTime.UtcNow,
+            now: DateTime.UtcNow, // CML TODO needs a clock service injected?
             out var createdEvent
             );
         dbContext.SupportTasks.Add(supportTask);
