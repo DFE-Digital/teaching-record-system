@@ -103,6 +103,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.EvidenceFileId = null;
 
         var journeyInstance = await CreateJourneyInstance(state);
 
