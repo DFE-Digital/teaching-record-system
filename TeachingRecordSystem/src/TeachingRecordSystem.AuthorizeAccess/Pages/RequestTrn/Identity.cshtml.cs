@@ -77,6 +77,13 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
             return this.PageWithErrors();
         }
 
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.EvidenceFileId = EvidenceFileId;
+            state.EvidenceFileName = EvidenceFileName;
+            state.EvidenceFileSizeDescription = EvidenceFileSizeDescription;
+        });
+
         return FromCheckAnswers == true ?
             Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
             Redirect(linkGenerator.RequestTrnNationalInsuranceNumber(JourneyInstance!.InstanceId));

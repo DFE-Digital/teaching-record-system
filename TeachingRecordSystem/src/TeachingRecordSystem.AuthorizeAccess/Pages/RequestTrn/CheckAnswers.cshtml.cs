@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
@@ -160,18 +159,9 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
         dbContext.SupportTasks.Add(supportTask);
         await dbContext.AddEventAndBroadcastAsync(createdEvent);
         dbContext.SaveChanges(); // CML TODO - what if it fails?
-        // CML TODO - ensure the file upload happens successfully along with the DB update?
 
-        var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
-        if (!fileExtensionContentTypeProvider.TryGetContentType(JourneyInstance!.State.EvidenceFileName!, out var evidenceFileMimeType))
-        {
-            evidenceFileMimeType = "application/octet-stream";
-        }
-
-        using var stream = await fileService.OpenReadStreamAsync(JourneyInstance!.State.EvidenceFileId!.Value);
-
-
-        await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true); // CML TODO understand this - To stop duplicates?, but how is their reference preserved?
+        // CML TODO understand this - To stop duplicates?, but how is their reference preserved?
+        await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 
         return Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
     }

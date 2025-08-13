@@ -108,11 +108,31 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(state);
 
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HasPreviousName", "Select yes if you’ve ever changed your name");
+    }
+
+    [Fact]
+    public async Task Post_WhenHasPreviousNameFalse_NamesAreEntered_NamesNotSaved()
+    {
+        // Arrange
+        var state = CreateNewState();
+
+        var journeyInstance = await CreateJourneyInstance(state);
+
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["PreviousName"] = TestData.GenerateName(),
+                ["HasPreviousName"] = "False",
+                ["FirstName"] = TestData.GenerateFirstName(),
+                ["MiddleName"] = TestData.GenerateMiddleName(),
+                ["LastName"] = TestData.GenerateLastName()
             }),
         };
 
@@ -120,7 +140,11 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasPreviousName", "Select yes if you’ve ever changed your name");
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var reloadedJourneyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(reloadedJourneyInstance.State.PreviousFirstName);
+        Assert.Null(reloadedJourneyInstance.State.PreviousMiddleName);
+        Assert.Null(reloadedJourneyInstance.State.PreviousLastName);
     }
 
     [Fact]
@@ -145,6 +169,33 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "FirstName", "Enter your previous first name");
         await AssertEx.HtmlResponseHasErrorAsync(response, "LastName", "Enter your previous last name");
+    }
+
+    [Fact]
+    public async Task Post_WhenHasPreviousNameIsFalseAndPreviousNameIsEmpty_UpdatesStateAndRedirectsToNextPage()
+    {
+        // Arrange
+        var state = CreateNewState();
+
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["HasPreviousName"] = "False",
+            }),
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        var reloadedJourneyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.False(reloadedJourneyInstance.State.HasPreviousName);
     }
 
     [Fact]

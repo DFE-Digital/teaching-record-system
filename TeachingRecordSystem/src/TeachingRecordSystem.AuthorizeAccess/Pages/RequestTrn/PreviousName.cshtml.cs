@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.WebCommon.DataAnnotations;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -22,7 +23,7 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 
     [BindProperty]
     [Display(Name = "Previous first name")]
-    [Required(ErrorMessage = "Enter your previous first name")]
+    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Enter your previous first name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous first name must be 100 characters or less")]
     public string? FirstName { get; set; }
 
@@ -33,7 +34,7 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 
     [BindProperty]
     [Display(Name = "Previous last name")]
-    [Required(ErrorMessage = "Enter your previous last name")]
+    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Enter your previous last name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous last name must be 100 characters or less")]
     public string? LastName { get; set; }
 
@@ -55,9 +56,10 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.HasPreviousName = HasPreviousName;
-            state.PreviousFirstName = FirstName;
-            state.PreviousMiddleName = MiddleName;
-            state.PreviousLastName = LastName;
+            // don't store previous names if the 'No' selection has been made after the fields were inputted
+            state.PreviousFirstName = HasPreviousName!.Value ? FirstName : null;
+            state.PreviousMiddleName = HasPreviousName!.Value ? MiddleName : null;
+            state.PreviousLastName = HasPreviousName!.Value ? LastName : null;
         });
 
         return FromCheckAnswers == true ?
