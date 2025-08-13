@@ -72,7 +72,7 @@ public abstract class CommonJourneyPage(
         // where they were merged into another Person (i.e. they were the secondary
         // Person and the other Person was primary)
         var personWasDeactivatedAsPartOfAMerge = Person.Status == PersonStatus.Deactivated &&
-            await dbContext.Events.AnyAsync(e =>
+            await DbContext.Events.AnyAsync(e =>
                 e.EventName == nameof(PersonsMergedEvent) &&
                 e.PersonIds.Contains(PersonId) &&
                 e.PersonId != PersonId);

@@ -421,7 +421,7 @@ public class CommonPageTests : SetStatusTestBase
         var expectedBackLink = $"/persons/{person.PersonId}";
         if (expectedPage is not null)
         {
-            expectedBackLink += $"/set-status/{targetStatus}/{expectedPage}";
+            expectedBackLink += $"/set-status/{targetStatus}/{expectedPage}?{journeyInstance?.GetUniqueIdQueryParameter()}";
         }
         Assert.Contains(expectedBackLink, backlink.Href);
     }
@@ -464,16 +464,16 @@ public class CommonPageTests : SetStatusTestBase
         var expectedBackLink = $"/persons/{person.PersonId}";
         if (expectedPage is not null)
         {
-            expectedBackLink += $"/set-status/{targetStatus}/{expectedPage}";
+            expectedBackLink += $"/set-status/{targetStatus}/{expectedPage}?{journeyInstance?.GetUniqueIdQueryParameter()}";
         }
         Assert.Contains(expectedBackLink, backlink.Href);
     }
 
     [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        "change-reason", new[] { PersonStatus.Active, PersonStatus.Deactivated }, "Continue", "Cancel and return to record")]
-    [MemberData(nameof(AllCombinationsOf),
-        "check-answers", new[] { PersonStatus.Active, PersonStatus.Deactivated }, "Confirm and reactivate record", "Cancel")]
+    [InlineData("change-reason", PersonStatus.Active, "Continue", "Cancel and return to record")]
+    [InlineData("change-reason", PersonStatus.Deactivated, "Continue", "Cancel and return to record")]
+    [InlineData("check-answers", PersonStatus.Active, "Confirm and reactivate record", "Cancel")]
+    [InlineData("check-answers", PersonStatus.Deactivated, "Confirm and deactivate record", "Cancel")]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage(string page, PersonStatus targetStatus, string continueButtonText, string cancelButtonText)
     {
         // Arrange
@@ -589,7 +589,7 @@ public class CommonPageTests : SetStatusTestBase
         var expectedRedirect = $"/persons/{person.PersonId}";
         if (expectedPage is not null)
         {
-            expectedRedirect += $"/set-status/{targetStatus}/{expectedPage}";
+            expectedRedirect += $"/set-status/{targetStatus}/{expectedPage}?{journeyInstance?.GetUniqueIdQueryParameter()}";
         }
 
         AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
@@ -632,7 +632,7 @@ public class CommonPageTests : SetStatusTestBase
         var expectedRedirect = $"/persons/{person.PersonId}";
         if (expectedPage is not null)
         {
-            expectedRedirect += $"/set-status/{targetStatus}/{expectedPage}";
+            expectedRedirect += $"/set-status/{targetStatus}/{expectedPage}?{journeyInstance?.GetUniqueIdQueryParameter()}";
         }
 
         AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
