@@ -264,7 +264,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         }
         else
         {
-            Assert.Empty(doc.GetElementsByClassName("govuk-inset-text").Where(e => e.TextContent.Contains("This person has an induction exemption")));
+            Assert.DoesNotContain(doc.GetElementsByClassName("govuk-inset-text"), e => e.TextContent.Contains("This person has an induction exemption"));
         }
     }
 

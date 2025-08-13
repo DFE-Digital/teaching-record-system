@@ -243,7 +243,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotEmpty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "next"));
+        Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "next");
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Empty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "next"));
+        Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link")e => e.GetAttribute("rel") == "next");
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotEmpty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "prev"));
+        Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "prev");
     }
 
     [Fact]
@@ -294,7 +294,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Empty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "prev"));
+        Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "prev");
     }
 
     private async Task CreateTasksAsync(Guid personId, int count)

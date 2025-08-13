@@ -181,7 +181,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
         else
         {
-            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == labelContent));
+            Assert.DoesNotContain(doc.QuerySelectorAll(".govuk-summary-list__key"), e => e.TrimmedText() == labelContent);
         }
     }
 
@@ -247,7 +247,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
         else
         {
-            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == labelContent));
+            Assert.DoesNotContain(doc.QuerySelectorAll(".govuk-summary-list__key"), e => e.TrimmedText() == labelContent);
         }
     }
 
@@ -324,7 +324,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
         else
         {
-            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == labelContent));
+            Assert.DoesNotContain(doc.QuerySelectorAll(".govuk-summary-list__key"), e => e.TrimmedText() == labelContent);
         }
     }
 
