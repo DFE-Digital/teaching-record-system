@@ -24,7 +24,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
         // Remove any results where the request DOB doesn't match the contact's DOB
         // (we can't easily do this in the query itself).
         var matched = persons
-            .Where(t => command.Persons.First(p => p.Trn == t.Trn).DateOfBirth == t.DateOfBirth)
+            .Where(t => command.Persons.First(p => p.Trn == t.Trn, $"TRN {t.Trn} not found").DateOfBirth == t.DateOfBirth)
             .Select(t => t.PersonId)
             .ToArray();
 
