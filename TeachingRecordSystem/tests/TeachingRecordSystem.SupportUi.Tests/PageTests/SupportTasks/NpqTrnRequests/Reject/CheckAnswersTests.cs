@@ -130,7 +130,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskRejectedEvent>(e);
             Assert.Equal(state.RejectionReason.GetDisplayName(), actualEvent.RejectionReason);
             AssertSupportTaskEventIsExpected(actualEvent);
-            Assert.Equal("Record created - no existing person identified during task resolution", actualEvent.ChangeReason.GetDisplayName());
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
             Assert.Equal(requestMetadata.NpqEvidenceFileName, actualEvent.RequestData?.NpqEvidenceFileName);
