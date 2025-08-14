@@ -92,6 +92,7 @@ public class CheckAnswersModel(
             {
                 PersonId = requestData.ResolvedPersonId!.Value,
                 RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+                ChangeReason = "Record created - no existing person identified during task resolution",
                 Changes = NpqTrnRequestSupportTaskResolvedEventChanges.Status,
                 PersonAttributes = EventModels.PersonAttributes.FromModel(person),
                 OldPersonAttributes = oldPersonAttributes,
@@ -163,6 +164,7 @@ public class CheckAnswersModel(
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),
                 OldSupportTask = oldSupportTaskEventModel,
                 RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+                ChangeReason = "Records merged - identified as same person during task resolution",
                 Changes = changes,
                 PersonAttributes = new EventModels.PersonAttributes()
                 {
