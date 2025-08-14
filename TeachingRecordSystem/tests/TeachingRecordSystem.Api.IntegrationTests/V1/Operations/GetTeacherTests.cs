@@ -3,12 +3,15 @@ using TeachingRecordSystem.Api.Properties;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V1.Operations;
 
+[Collection(nameof(DisableParallelization))]
 public class GetTeacherTests : TestBase
 {
     public GetTeacherTests(HostFixture hostFixture)
         : base(hostFixture)
     {
     }
+
+    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
 
     [Theory]
     [InlineData("123456")]
@@ -18,7 +21,7 @@ public class GetTeacherTests : TestBase
     {
         // Arrange
         var birthDate = "1990-04-01";
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate:yyyy-MM-dd}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -33,7 +36,7 @@ public class GetTeacherTests : TestBase
     {
         // Arrange
         var trn = "1234567";
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate:yyyy-MM-dd}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -49,11 +52,7 @@ public class GetTeacherTests : TestBase
         var trn = "1234567";
         var birthDate = "1990-04-01";
 
-        DataverseAdapterMock
-            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
-            .ReturnsAsync(Array.Empty<Contact>());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate:yyyy-MM-dd}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -70,23 +69,7 @@ public class GetTeacherTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithDateOfBirth(birthDate));
 
-        var contact = new Contact()
-        {
-            Id = person.ContactId,
-            BirthDate = birthDate.ToDateTime(),
-            dfeta_TRN = person.Trn,
-            StateCode = ContactState.Active,
-            FormattedValues =
-            {
-                { Contact.Fields.StateCode, "Active" }
-            }
-        };
-
-        DataverseAdapterMock
-            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
-            .ReturnsAsync([contact]);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{person.Trn}?birthdate={birthDate}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{person.Trn}?birthdate={birthDate:yyyy-MM-dd}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -103,38 +86,9 @@ public class GetTeacherTests : TestBase
 
         var personWithMatchingTrn = await TestData.CreatePersonAsync(p => p.WithTrn().WithDateOfBirth(birthDate));
 
-        var contactWithMatchingTrn = new Contact()
-        {
-            Id = personWithMatchingTrn.ContactId,
-            BirthDate = birthDate.ToDateTime(),
-            dfeta_TRN = personWithMatchingTrn.Trn,
-            StateCode = ContactState.Active,
-            FormattedValues =
-            {
-                { Contact.Fields.StateCode, "Active" }
-            }
-        };
-
         var personWithMatchingNino = await TestData.CreatePersonAsync(p => p.WithTrn().WithDateOfBirth(birthDate).WithNationalInsuranceNumber());
 
-        var contactWithMatchingNino = new Contact()
-        {
-            Id = personWithMatchingNino.ContactId,
-            BirthDate = birthDate.ToDateTime(),
-            dfeta_TRN = personWithMatchingNino.Trn,
-            dfeta_NINumber = personWithMatchingNino.NationalInsuranceNumber,
-            StateCode = ContactState.Active,
-            FormattedValues =
-            {
-                { Contact.Fields.StateCode, "Active" }
-            }
-        };
-
-        DataverseAdapterMock
-            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
-            .ReturnsAsync(new[] { contactWithMatchingTrn, contactWithMatchingNino });
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{personWithMatchingTrn.Trn}?birthdate={birthDate}&nino={personWithMatchingNino.NationalInsuranceNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{personWithMatchingTrn.Trn}?birthdate={birthDate:yyyy-MM-dd}&nino={personWithMatchingNino.NationalInsuranceNumber}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
