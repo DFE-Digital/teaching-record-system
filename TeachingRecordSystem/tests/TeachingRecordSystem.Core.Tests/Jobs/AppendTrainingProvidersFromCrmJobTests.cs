@@ -113,10 +113,10 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
 
         // assert
         var appendedProviderList = _trsContext.TrainingProviders?.AsEnumerable();
-        Assert.Single(appendedProviderList!.Where(p => p.Ukprn == "12345672"));
-        Assert.Single(appendedProviderList!.Where(p => p.Name == "provider 1 with null ukprn"));
-        Assert.Single(appendedProviderList!.Where(p => p.Name == "provider 2 with null ukprn"));
-        Assert.Single(appendedProviderList!.Where(p => p.Ukprn == "12345671"));
+        Assert.Single(appendedProviderList!, p => p.Ukprn == "12345672");
+        Assert.Single(appendedProviderList!, p => p.Name == "provider 1 with null ukprn");
+        Assert.Single(appendedProviderList!, p => p.Name == "provider 2 with null ukprn");
+        Assert.Single(appendedProviderList!, p => p.Ukprn == "12345671");
         Assert.Null(appendedProviderList!.Single(p => p.Name == "provider with invalid ukprn").Ukprn);
     }
 }

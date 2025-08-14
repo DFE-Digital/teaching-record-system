@@ -227,7 +227,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == elementText));
+        Assert.DoesNotContain(doc.QuerySelectorAll(".govuk-summary-list__key"), e => e.TrimmedText() == elementText);
     }
 
     [Theory]

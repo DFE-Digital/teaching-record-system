@@ -175,7 +175,14 @@ public partial class PersonMatchingServiceTests
                 r => Assert.Equal(person3.PersonId, r.PersonId));
         });
 
-    public static TheoryData GetMatchFromTrnRequestData()
+    public static TheoryData<
+        EmailAddressArgumentOption,
+        FirstNameArgumentOption,
+        MiddleNameArgumentOption,
+        LastNameArgumentOption,
+        DateOfBirthArgumentOption,
+        NationalInsuranceNumberArgumentOption,
+        TrnRequestMatchResultOutcome> GetMatchFromTrnRequestData()
     {
         var data =
             new TheoryData<
