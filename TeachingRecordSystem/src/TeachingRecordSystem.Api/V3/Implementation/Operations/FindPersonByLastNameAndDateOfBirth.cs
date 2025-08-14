@@ -19,6 +19,7 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                 WHERE p.date_of_birth = :date_of_birth
                 AND (p.last_name = :last_name OR pn.last_name = :last_name)
                 AND p.status = 0
+                AND p.trn IS NOT NULL
                 """,
                 parameters: [
                     new NpgsqlParameter("last_name", command.LastName),
