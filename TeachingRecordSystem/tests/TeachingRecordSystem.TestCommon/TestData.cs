@@ -337,6 +337,12 @@ public partial class TestData
         return countryName;
     }
 
+    public string GenerateNpqApplicationId()
+    {
+        // no knowledge of the actual format of this application reference, so using a substitute
+        return Faker.Identification.SocialSecurityNumber();
+    }
+
     protected async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();

@@ -11,7 +11,12 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDbContext dbContext, IPersonMatchingService matchingService, IFileService fileService) : PageModel
+public class CheckAnswersModel(
+    AuthorizeAccessLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
+    IPersonMatchingService matchingService,
+    IFileService fileService,
+    IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -74,9 +79,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
         DateOfBirth = JourneyInstance!.State.DateOfBirth;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
-            null;
+        UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter);
         HasNationalInsuranceNumber = JourneyInstance!.State.HasNationalInsuranceNumber;
         NationalInsuranceNumber = JourneyInstance!.State.NationalInsuranceNumber;
         AddressLine1 = JourneyInstance!.State.AddressLine1;
@@ -93,12 +96,12 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
     public async Task<IActionResult> OnPostAsync()
     {
         var state = JourneyInstance!.State;
-        var requestId = Guid.NewGuid().ToString(); // CML TODO - does this have to be constructed such that duplicate requests are recognised?
+        var requestId = Guid.NewGuid().ToString();
 
         var trnRequestMetadata = new TrnRequestMetadata
         {
             OneLoginUserSubject = null,
-            CreatedOn = DateTime.UtcNow,
+            CreatedOn = clock.UtcNow,
             RequestId = requestId,
             IdentityVerified = false,
             ApplicationUserId = ApplicationUser.NPQApplicationUserGuid,
@@ -153,14 +156,13 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDb
             trnRequestApplicationUserId: ApplicationUser.NPQApplicationUserGuid,
             trnRequestId: requestId,
             createdBy: ApplicationUser.NPQApplicationUserGuid,
-            now: DateTime.UtcNow, // CML TODO needs a clock service injected?
+            now: clock.UtcNow,
             out var createdEvent
             );
         dbContext.SupportTasks.Add(supportTask);
         await dbContext.AddEventAndBroadcastAsync(createdEvent);
-        dbContext.SaveChanges(); // CML TODO - what if it fails?
+        dbContext.SaveChanges();
 
-        // CML TODO understand this - To stop duplicates?, but how is their reference preserved?
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 
         return Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
