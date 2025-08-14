@@ -14,79 +14,68 @@ public class GetTeacherHandler(IDataverseAdapter dataverseAdapter, TrsDbContext 
 {
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var query = new FindTeachersByTrnBirthDateAndNinoQuery()
-        {
-            BirthDate = request.BirthDate,
-            NationalInsuranceNumber = request.NationalInsuranceNumber,
-            Trn = request.Trn
-        };
-
-        if (!query.BirthDate.HasValue)
+        if (request.BirthDate is null)
         {
             return null;
         }
 
-        var result = await dataverseAdapter.FindTeachersAsync(query);
+        var birthDate = request.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false);
 
-        var teacher = result.FirstOrDefault(match => match.dfeta_TRN == query.Trn) ??
-                      result.FirstOrDefault(match => match.dfeta_NINumber == query.NationalInsuranceNumber);
+        var matched = await dbContext.Persons
+            .Include(p => p.Alerts).AsSplitQuery()
+            .Where(p => p.DateOfBirth == birthDate &&
+                (p.NationalInsuranceNumber == request.NationalInsuranceNumber || p.Trn == request.Trn))
+            .ToArrayAsync();
 
-        if (teacher == null)
+        // Prefer matches on TRN
+        var person = matched.SingleOrDefault(p => p.Trn == request.Trn) ??
+            (matched.Length == 1 ? matched[0] : null);
+
+        if (person is null)
         {
             return null;
         }
-
-        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == teacher.Id);
 
         var qualifications = await dataverseAdapter.GetQualificationsForTeacherAsync(
-            teacher.Id,
-            columnNames: new[]
-            {
+            person.DqtContactId!.Value,
+            columnNames:
+            [
                 dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
                 dfeta_qualification.Fields.dfeta_Type,
                 dfeta_qualification.Fields.dfeta_HE_ClassDivision
-            },
-            heQualificationColumnNames: new[]
-            {
+            ],
+            heQualificationColumnNames:
+            [
                 dfeta_hequalification.PrimaryIdAttribute,
                 dfeta_hequalification.Fields.dfeta_name
-            },
-            heSubjectColumnNames: new[]
-            {
+            ],
+            heSubjectColumnNames:
+            [
                 dfeta_hesubject.PrimaryIdAttribute,
                 dfeta_hesubject.Fields.dfeta_name,
                 dfeta_hesubject.Fields.dfeta_Value
-            });
+            ]);
 
-        if (qualifications.Any())
-        {
-            teacher.dfeta_contact_dfeta_qualification = qualifications;
-        }
-
-        var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
-
-        var response = MapContactToResponse(teacher, hasActiveAlert, person);
-        return response;
+        return MapContactToResponse(person, qualifications);
     }
 
     internal static GetTeacherResponse MapContactToResponse(
-        Contact teacher,
-        bool hasActiveAlert,
-        PostgresModels.Person person)
+        PostgresModels.Person person,
+        IEnumerable<dfeta_qualification> qualifications)
     {
         return new GetTeacherResponse()
         {
-            Trn = teacher.dfeta_TRN,
-            NationalInsuranceNumber = teacher.dfeta_NINumber,
+            Trn = person.Trn,
+            NationalInsuranceNumber = person.NationalInsuranceNumber,
             QualifiedTeacherStatus = MapQualifiedTeacherStatus(),
             Induction = MapInduction(),
             InitialTeacherTraining = null,
             Qualifications = MapQualifications(),
-            Name = teacher.FullName,
-            DateOfBirth = teacher.BirthDate,
-            ActiveAlert = hasActiveAlert,
-            State = teacher.StateCode.Value,
-            StateName = teacher.FormattedValues[Contact.Fields.StateCode]
+            Name = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
+            DateOfBirth = person.DateOfBirth.ToDateTime(),
+            ActiveAlert = person.Alerts!.Any(a => a.IsOpen),
+            State = ContactState.Active,
+            StateName = "Active"
         };
 
         Induction MapInduction()
@@ -121,9 +110,7 @@ public class GetTeacherHandler(IDataverseAdapter dataverseAdapter, TrsDbContext 
             return null;
         }
 
-        Qualification[] MapQualifications() =>
-            teacher.dfeta_contact_dfeta_qualification?.Select(MapQualification)?.ToArray() ??
-            Array.Empty<Qualification>();
+        Qualification[] MapQualifications() => qualifications.Select(MapQualification).ToArray();
 
         Qualification MapQualification(dfeta_qualification qualification)
         {
