@@ -6,13 +6,12 @@
 
 <govuk-summary-card>
     <govuk-summary-card-title>Personal details</govuk-summary-card-title>
-    <govuk-summary-card-actions>
-        @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated) &&
-           (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
-        {
+    @if (Model.CanChangeDetails)
+    {
+        <govuk-summary-card-actions>
             <govuk-summary-card-action data-testid="change-details-link" href=@LinkGenerator.PersonEditDetailsPersonalDetails(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
-        }
-    </govuk-summary-card-actions>
+        </govuk-summary-card-actions>
+    }
     <govuk-summary-list>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
@@ -56,6 +55,27 @@
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
                 <govuk-summary-list-row-value use-empty-fallback>@Model.Email</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        }
+        @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowStatus))
+        {
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value use-empty-fallback>
+                    @if (Model.IsActive == true)
+                    {
+                        <govuk-tag class="govuk-tag--green">
+                            ACTIVE
+                        </govuk-tag>
+                    }
+
+                    @if (Model.IsActive == false)
+                    {
+                        <govuk-tag class="govuk-tag--red">
+                            DEACTIVATED
+                        </govuk-tag>
+                    }
+                </govuk-summary-list-row-value>
             </govuk-summary-list-row>
         }
     </govuk-summary-list>

@@ -1,0 +1,106 @@
+@page "/persons/{PersonId}/set-status/{TargetStatus}/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus.CheckAnswersModel
+@{
+    Layout = "_Layout";
+    ViewBag.Title = Model.TargetStatus == PersonStatus.Deactivated
+        ? "Check details and deactivate record"
+        : "Check details and reactivate record";
+    var caption = Model.TargetStatus == PersonStatus.Deactivated
+        ? $"Deactivate record - {Model.PersonName}"
+        : $"Reactivate record - {Model.PersonName}";
+    var confirmButtonText = Model.TargetStatus == PersonStatus.Deactivated
+        ? "Confirm and deactivate record"
+        : "Confirm and reactivate record";
+}
+
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form action="@LinkGenerator.PersonSetStatusCheckAnswers(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" method="post" data-testid="submit-form">
+            <span class="govuk-caption-l" data-testid="set-status-caption">@caption</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-summary-card>
+                <govuk-summary-card-title>Reason for change</govuk-summary-card-title>
+                <govuk-summary-list>
+                    @if (Model.TargetStatus == PersonStatus.Deactivated)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason for deactivating record</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.DeactivateReason?.GetDisplayName()</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action data-testid="change-deactivate-reason-link" href=@Model.ChangeReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @if (Model.DeactivateReasonDetail is not null)
+                                {
+                                    <multi-line-text text="@Model.DeactivateReasonDetail" />
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </govuk-summary-list-row-value>
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        </govuk-summary-list-row>
+                    }
+                    else
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason for reactivating record</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.ReactivateReason?.GetDisplayName()</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action data-testid="change-reactivate-reason-link" href=@Model.ChangeReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @if (Model.ReactivateReasonDetail is not null)
+                                {
+                                    <multi-line-text text="@Model.ReactivateReasonDetail" />
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </govuk-summary-list-row-value>
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        </govuk-summary-list-row>
+                    }
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence uploaded</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (Model.UploadedEvidenceFileUrl is not null)
+                            {
+                                <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.ChangeReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="confirm-button">@confirmButtonText</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.PersonSetStatusCancel(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

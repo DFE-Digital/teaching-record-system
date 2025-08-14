@@ -55,7 +55,9 @@ public class CheckAnswersModel(
             return;
         }
 
-        if (state.PersonAttributeSourcesSet is false)
+        if (state.PersonAttributeSourcesSet is false ||
+            state.UploadEvidence is not bool uploadEvidence ||
+            uploadEvidence && state.EvidenceFileId is null)
         {
             context.Result = Redirect(GetPageLink(ManualMergeJourneyPage.Merge));
             return;

@@ -80,7 +80,7 @@ public class CommonPageTests : TestBase
     [InlineData("edit-induction/start-date", InductionStatus.Passed)]
     [InlineData("edit-induction/date-completed", InductionStatus.Passed)]
     [InlineData("edit-induction/change-reason", InductionStatus.InProgress)]
-    public async Task Post_Cancel_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus)
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -116,6 +116,9 @@ public class CommonPageTests : TestBase
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/induction", location);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance);
     }
 
     [Theory]
@@ -221,7 +224,7 @@ public class CommonPageTests : TestBase
     [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.FailedInWales, "edit-induction/date-completed")]
     [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Passed, "edit-induction/date-completed")]
     [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.RequiredToComplete, "edit-induction/status")]
-    public async Task SubjectToStartPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
+    public async Task Get_SubjectToStartPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -250,7 +253,7 @@ public class CommonPageTests : TestBase
     [InlineData(InductionJourneyPage.Status, "edit-induction/date-completed", InductionStatus.Passed, "check-answers")]
     [InlineData(InductionJourneyPage.Status, "edit-induction/change-reason", InductionStatus.Passed, "check-answers")]
     [InlineData(InductionJourneyPage.Status, "edit-induction/exemption-reasons", InductionStatus.Exempt, "check-answers")]
-    public async Task FromCheckYourAnswersPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
+    public async Task Get_FromCheckYourAnswersPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
     {
         // Arrange
         var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
@@ -278,7 +281,7 @@ public class CommonPageTests : TestBase
     }
 
     [Fact]
-    public async Task CompletedDate_FromStartDate_FromCya_BacklinkContainsExpected()
+    public async Task Get_CompletedDate_FromStartDate_FromCya_BacklinkContainsExpected()
     {
         // Arrange
         var fromPage = "edit-induction/date-completed";
@@ -311,7 +314,7 @@ public class CommonPageTests : TestBase
     [InlineData("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/check-answers")]
     [InlineData("edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/check-answers")]
     [InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
-    public async Task FromCya_ToPage_Post_RedirectsToExpectedPage(string page, InductionStatus inductionStatus, string expectedNextPageUrl)
+    public async Task Post_FromCya_ToPage_Post_RedirectsToExpectedPage(string page, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
         var startDate = new DateOnly(2000, 2, 1);
@@ -360,7 +363,7 @@ public class CommonPageTests : TestBase
     [Theory]
     [InlineData(InductionStatus.Passed, "2000-02-01", "2002-02-02", "check-answers")] // Start date not within two years of completed date
     [InlineData(InductionStatus.Passed, "2003-02-02", "2002-02-02", "date-completed")] // Start date after completed date
-    public async Task FromCya_ToStartDate_Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string startDateString, string completedDateString, string expectedNextPageUrl)
+    public async Task Post_FromCya_ToStartDate_Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string startDateString, string completedDateString, string expectedNextPageUrl)
     {
         // Arrange
         var startDate = DateOnly.Parse(startDateString);
@@ -404,8 +407,8 @@ public class CommonPageTests : TestBase
     }
 
     [Theory]
-    [MemberData(nameof(GetPagesForUserWithoutInductionWriteRoleData))]
-    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string page, string? role, InductionStatus inductionStatus)
+    [MemberData(nameof(GetPagesForUserWithoutInductionWriteRoleForAllHttpMethodsData))]
+    public async Task UserDoesNotHavePermission_ReturnsForbidden(string page, string? role, InductionStatus inductionStatus, HttpMethod httpMethod)
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
@@ -423,7 +426,7 @@ public class CommonPageTests : TestBase
                 .WithStartDate(Clock.Today.AddYears(-2))
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Post,
+        var request = new HttpRequestMessage(httpMethod,
             $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -433,44 +436,75 @@ public class CommonPageTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
+    [Theory]
+    [MemberData(nameof(GetPagesForAllHttpMethodsData))]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(string page, InductionStatus inductionStatus, HttpMethod httpMethod)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .WithStartDate(Clock.Today.AddYears(-2))
+                .Build());
+
+        var request = new HttpRequestMessage(httpMethod,
+            $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    public static TheoryData<string, InductionStatus, HttpMethod> GetPagesForAllHttpMethodsData()
+    {
+        var data = new TheoryData<string, InductionStatus, HttpMethod>();
+
+        foreach (var (page, status) in _pagesAndValidStatuses)
+        {
+            data.Add(page, status, HttpMethod.Get);
+            data.Add(page, status, HttpMethod.Post);
+        }
+
+        return data;
+    }
+
     public static TheoryData<string, string?, InductionStatus> GetPagesForUserWithoutInductionWriteRoleData()
     {
-        var pagesAndValidStatuses = new[]
-        {
-            ("edit-induction/status", InductionStatus.Exempt),
-            ("edit-induction/status", InductionStatus.InProgress),
-            ("edit-induction/status", InductionStatus.Failed),
-            ("edit-induction/status", InductionStatus.FailedInWales),
-            ("edit-induction/status", InductionStatus.Passed),
-            ("edit-induction/status", InductionStatus.RequiredToComplete),
-            ("edit-induction/exemption-reasons", InductionStatus.Exempt),
-            ("edit-induction/start-date", InductionStatus.InProgress),
-            ("edit-induction/start-date", InductionStatus.Failed),
-            ("edit-induction/start-date", InductionStatus.FailedInWales),
-            ("edit-induction/start-date", InductionStatus.Passed),
-            ("edit-induction/date-completed", InductionStatus.Failed),
-            ("edit-induction/date-completed", InductionStatus.FailedInWales),
-            ("edit-induction/date-completed", InductionStatus.Passed),
-            ("edit-induction/change-reason", InductionStatus.Exempt),
-            ("edit-induction/change-reason", InductionStatus.InProgress),
-            ("edit-induction/change-reason", InductionStatus.Failed),
-            ("edit-induction/change-reason", InductionStatus.FailedInWales),
-            ("edit-induction/change-reason", InductionStatus.Passed),
-            ("edit-induction/change-reason", InductionStatus.RequiredToComplete)
-        };
-
-        var rolesWithoutWritePermission = UserRoles.All
-            .Except([UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])
-            .Append(null)
-            .ToArray();
-
         var data = new TheoryData<string, string?, InductionStatus>();
 
-        foreach (var (page, status) in pagesAndValidStatuses)
+        foreach (var (page, status) in _pagesAndValidStatuses)
         {
-            foreach (var role in rolesWithoutWritePermission)
+            foreach (var role in _rolesWithoutWritePermission)
             {
                 data.Add(page, role, status);
+            }
+        }
+
+        return data;
+    }
+
+    public static TheoryData<string, string?, InductionStatus, HttpMethod> GetPagesForUserWithoutInductionWriteRoleForAllHttpMethodsData()
+    {
+        var data = new TheoryData<string, string?, InductionStatus, HttpMethod>();
+
+        foreach (var (page, status) in _pagesAndValidStatuses)
+        {
+            foreach (var role in _rolesWithoutWritePermission)
+            {
+                data.Add(page, role, status, HttpMethod.Get);
+                data.Add(page, role, status, HttpMethod.Post);
             }
         }
 
@@ -482,4 +516,33 @@ public class CommonPageTests : TestBase
             JourneyNames.EditInduction,
             state ?? new EditInductionState(),
             new KeyValuePair<string, object>("personId", personId));
+
+    private static string?[] _rolesWithoutWritePermission = UserRoles.All
+        .Except([UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])
+        .Append(null)
+        .ToArray();
+
+    private static readonly (string, InductionStatus)[] _pagesAndValidStatuses = new[]
+    {
+        ("edit-induction/status", InductionStatus.Exempt),
+        ("edit-induction/status", InductionStatus.InProgress),
+        ("edit-induction/status", InductionStatus.Failed),
+        ("edit-induction/status", InductionStatus.FailedInWales),
+        ("edit-induction/status", InductionStatus.Passed),
+        ("edit-induction/status", InductionStatus.RequiredToComplete),
+        ("edit-induction/exemption-reasons", InductionStatus.Exempt),
+        ("edit-induction/start-date", InductionStatus.InProgress),
+        ("edit-induction/start-date", InductionStatus.Failed),
+        ("edit-induction/start-date", InductionStatus.FailedInWales),
+        ("edit-induction/start-date", InductionStatus.Passed),
+        ("edit-induction/date-completed", InductionStatus.Failed),
+        ("edit-induction/date-completed", InductionStatus.FailedInWales),
+        ("edit-induction/date-completed", InductionStatus.Passed),
+        ("edit-induction/change-reason", InductionStatus.Exempt),
+        ("edit-induction/change-reason", InductionStatus.InProgress),
+        ("edit-induction/change-reason", InductionStatus.Failed),
+        ("edit-induction/change-reason", InductionStatus.FailedInWales),
+        ("edit-induction/change-reason", InductionStatus.Passed),
+        ("edit-induction/change-reason", InductionStatus.RequiredToComplete)
+    };
 }

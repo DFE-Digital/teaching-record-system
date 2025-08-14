@@ -266,6 +266,29 @@ public class IndexTests : EndDateTestBase
         Assert.Null(journeyInstance);
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
+
+        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/end-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private static FormUrlEncodedContentBuilder CreatePostContent(DateOnly? newEndDate)
     {
         var builder = new FormUrlEncodedContentBuilder();

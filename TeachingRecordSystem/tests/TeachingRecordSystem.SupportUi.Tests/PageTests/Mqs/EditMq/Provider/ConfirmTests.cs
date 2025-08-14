@@ -243,6 +243,42 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqProviderState()
+            {
+                Initialized = true,
+                ProviderId = newProvider.MandatoryQualificationProviderId,
+                CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
+                ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
+                ChangeReasonDetail = "Some reason",
+                UploadEvidence = false,
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqProviderState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqProvider,

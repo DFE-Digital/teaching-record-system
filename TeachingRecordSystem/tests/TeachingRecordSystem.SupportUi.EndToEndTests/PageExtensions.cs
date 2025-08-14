@@ -353,6 +353,16 @@ public static class PageExtensions
         return page.WaitForUrlPathAsync($"/persons/create/check-answers");
     }
 
+    public static Task AssertOnPersonSetStatusChangeReasonPageAsync(this IPage page, Guid personId, PersonStatus targetStatus)
+    {
+        return page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/change-reason");
+    }
+
+    public static Task AssertOnPersonSetStatusCheckAnswersPageAsync(this IPage page, Guid personId, PersonStatus targetStatus)
+    {
+        return page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/check-answers");
+    }
+
     public static async Task AssertOnAddMqProviderPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/mqs/add/provider");

@@ -247,6 +247,42 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var oldStartDate = new DateOnly(2021, 10, 5);
+        var newStartDate = new DateOnly(2021, 10, 6);
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqStartDateState()
+            {
+                Initialized = true,
+                StartDate = newStartDate,
+                CurrentStartDate = oldStartDate,
+                ChangeReason = MqChangeStartDateReasonOption.IncorrectStartDate,
+                ChangeReasonDetail = "Some reason",
+                UploadEvidence = false
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/start-date/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private async Task<JourneyInstance<EditMqStartDateState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStartDateState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqStartDate,

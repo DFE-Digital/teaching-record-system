@@ -27,7 +27,10 @@
 }
 else
 {
-    <govuk-button-link href="@LinkGenerator.AddNote(person.PersonId)" data-testid="add-note-button">Add a note</govuk-button-link>
+    if (Model.CanAddNotes)
+    {
+        <govuk-button-link href="@LinkGenerator.AddNote(person.PersonId)" data-testid="add-note-button">Add a note</govuk-button-link>
+    }
 
     @if (Model.Notes!.Count == 0)
     {

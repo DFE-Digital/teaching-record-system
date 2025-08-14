@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
@@ -10,7 +12,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 public class IndexModel(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
-    IFeatureProvider featureProvider) : PageModel
+    IFeatureProvider featureProvider,
+    IAuthorizationService authorizationService) : PageModel
 {
     private static readonly InductionStatus[] _invalidInductionStatusesForMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
 
@@ -32,7 +35,9 @@ public class IndexModel(
 
     public bool HasOpenAlert { get; set; }
 
-    public bool ShowMergeButton { get; set; }
+    public bool CanChangeDetails { get; set; }
+    public bool CanMerge { get; set; }
+    public bool CanSetStatus { get; set; }
 
     public async Task OnGetAsync()
     {
@@ -41,8 +46,40 @@ public class IndexModel(
         Person = await BuildPersonInfoAsync();
         PersonProfessionalStatus = await BuildPersonStatusInfoAsync();
 
-        ShowMergeButton = !HasOpenAlert && Person!.IsActive &&
-            (PersonProfessionalStatus is not PersonProfessionalStatusInfo professionalStatus || !_invalidInductionStatusesForMerge.Contains(professionalStatus.InductionStatus));
+        var contactsMigrated = featureProvider.IsEnabled(FeatureNames.ContactsMigrated);
+
+        var canEditPersonData = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit))
+            .Succeeded;
+
+        var canEditNonPersonOrAlertData = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit))
+            .Succeeded;
+
+        CanChangeDetails =
+            contactsMigrated &&
+            canEditPersonData &&
+            Person.IsActive;
+
+        CanMerge =
+            contactsMigrated &&
+            canEditNonPersonOrAlertData &&
+            !HasOpenAlert &&
+            Person!.IsActive &&
+            (PersonProfessionalStatus is not PersonProfessionalStatusInfo professionalStatus ||
+                !_invalidInductionStatusesForMerge.Contains(professionalStatus.InductionStatus));
+
+        // Person cannot be reactivated if they were deactivated as part of a merge
+        // where they were merged into another Person (i.e. they were the secondary
+        // Person and the other Person was primary)
+        var personWasDeactivatedAsPartOfAMerge = !Person.IsActive &&
+            await dbContext.Events.AnyAsync(e =>
+                e.EventName == nameof(PersonsMergedEvent) &&
+                e.PersonIds.Contains(PersonId) &&
+                e.PersonId != PersonId);
+
+        CanSetStatus =
+            contactsMigrated &&
+            canEditNonPersonOrAlertData &&
+            !personWasDeactivatedAsPartOfAMerge;
     }
 
     private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()

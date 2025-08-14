@@ -73,6 +73,7 @@ public class CheckAnswersTests : ManualMergeTestBase
             .WithPersonB(personB)
             .WithPrimaryPerson(personA)
             .WithAttributeSourcesSet()
+            .WithUploadEvidenceChoice(false)
             .Build();
         SetPersonAttributeSourceToSecondaryPerson(state, sourcedFromSecondaryPersonAttribute.Attribute);
 

@@ -376,6 +376,45 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
+    [Theory]
+    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
+    {
+        // Arrange
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var oldEndDate = (DateOnly?)null;
+        var newStatus = MandatoryQualificationStatus.Passed;
+        var newEndDate = new DateOnly(2021, 12, 5);
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            new EditMqStatusState()
+            {
+                Initialized = true,
+                Status = newStatus,
+                EndDate = newEndDate,
+                CurrentStatus = oldStatus,
+                CurrentEndDate = oldEndDate,
+                UploadEvidence = false,
+                StatusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus
+            });
+
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
     private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStatusState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqStatus,
