@@ -25,6 +25,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.HasNationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/address?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -42,12 +43,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
-        state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;
+        state.NationalInsuranceNumber = null;
         state.AddressLine1 = Faker.Address.StreetAddress();
         state.AddressLine2 = Faker.Address.SecondaryAddress();
         state.TownOrCity = Faker.Address.City();
@@ -92,6 +89,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
+        state.HasNationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/address?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -113,12 +111,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
-        state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;
+        state.NationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var content = new FormUrlEncodedContentBuilder();
@@ -169,12 +163,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
-        state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;
+        state.NationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var content = new FormUrlEncodedContentBuilder();
@@ -208,12 +198,8 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.WorkEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.PreviousName = TestData.GenerateName();
-        state.HasPreviousName = true;
-        state.DateOfBirth = new DateOnly(1980, 12, 13);
         state.HasNationalInsuranceNumber = false;
+        state.NationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var addressLine1 = Faker.Address.StreetAddress();

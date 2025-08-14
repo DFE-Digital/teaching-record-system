@@ -7,7 +7,7 @@ public class EmailInUseTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.HasPendingTrnRequest = true;
+        state.PersonalEmail = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/emailinuse?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -25,7 +25,8 @@ public class EmailInUseTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var email = Faker.Internet.Email();
-        var state = CreateNewState(email);
+        var state = CreateNewState();
+        state.PersonalEmail = email;
         var journeyInstance = await CreateJourneyInstance(state);
         var person = await TestData.CreatePersonAsync();
         await TestData.CreateCrmTaskAsync(x =>

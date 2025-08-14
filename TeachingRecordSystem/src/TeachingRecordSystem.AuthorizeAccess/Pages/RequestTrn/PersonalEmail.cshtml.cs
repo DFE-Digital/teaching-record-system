@@ -2,15 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.WebCommon.FormFlow;
 using EmailAddress = TeachingRecordSystem.AuthorizeAccess.DataAnnotations.EmailAddressAttribute;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher) : PageModel
+public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -37,10 +36,9 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrm
 
         await JourneyInstance!.UpdateStateAsync(state => state.PersonalEmail = PersonalEmail);
 
-        var openTasks = await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetOpenTasksForEmailAddressQuery(EmailAddress: JourneyInstance!.State.PersonalEmail!));
+        var openTasks = await SearchForOpenTasksForEmailAddressAsync(emailAddress: JourneyInstance!.State.PersonalEmail!);
 
-        if (openTasks.Any())
+        if (openTasks)
         {
             return Redirect(linkGenerator.RequestTrnEmailInUse(JourneyInstance!.InstanceId));
         }
@@ -58,5 +56,14 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrm
             context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
             return;
         }
+    }
+
+    private async Task<bool> SearchForOpenTasksForEmailAddressAsync(string emailAddress)
+    {
+        var openTasks = await dbContext.SupportTasks
+            .Where(s => s.Status == SupportTaskStatus.Open && s.SupportTaskType == SupportTaskType.NpqTrnRequest)
+            .Where(s => s.TrnRequestMetadata!.EmailAddress == emailAddress)
+            .AnyAsync();
+        return openTasks;
     }
 }

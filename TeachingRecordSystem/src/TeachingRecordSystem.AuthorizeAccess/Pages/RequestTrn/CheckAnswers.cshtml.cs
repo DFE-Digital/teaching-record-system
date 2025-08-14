@@ -1,16 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.StaticFiles;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher, IFileService fileService) : PageModel
+public class CheckAnswersModel(
+    AuthorizeAccessLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
+    IPersonMatchingService matchingService,
+    IFileService fileService,
+    IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -20,9 +26,16 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
 
     public string? WorkEmail { get; set; }
 
-    public string? Name { get; set; }
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
 
-    public string? PreviousName { get; set; }
+    public string? PreviousFirstName { get; set; }
+    public string? PreviousMiddleName { get; set; }
+    public string? PreviousLastName { get; set; }
+
+    public string? Name => StringHelper.JoinNonEmpty(' ', new string?[] { FirstName, MiddleName, LastName });
+    public string? PreviousName => StringHelper.JoinNonEmpty(' ', new string?[] { PreviousFirstName, PreviousMiddleName, PreviousLastName });
 
     public DateOnly? DateOfBirth { get; set; }
 
@@ -57,14 +70,16 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
     public async Task OnGetAsync()
     {
         WorkEmail = JourneyInstance!.State.WorkEmail;
-        Name = JourneyInstance!.State.Name;
-        PreviousName = JourneyInstance!.State.PreviousName;
+        FirstName = JourneyInstance!.State.FirstName;
+        MiddleName = JourneyInstance!.State.MiddleName;
+        LastName = JourneyInstance!.State.LastName;
+        PreviousFirstName = JourneyInstance!.State.PreviousFirstName;
+        PreviousMiddleName = JourneyInstance!.State.PreviousMiddleName;
+        PreviousLastName = JourneyInstance!.State.PreviousLastName;
         DateOfBirth = JourneyInstance!.State.DateOfBirth;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
-            null;
+        UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter);
         HasNationalInsuranceNumber = JourneyInstance!.State.HasNationalInsuranceNumber;
         NationalInsuranceNumber = JourneyInstance!.State.NationalInsuranceNumber;
         AddressLine1 = JourneyInstance!.State.AddressLine1;
@@ -81,49 +96,72 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
     public async Task<IActionResult> OnPostAsync()
     {
         var state = JourneyInstance!.State;
+        var requestId = Guid.NewGuid().ToString();
 
-        var description = $"""
-            Working In School or Educational Setting: {(state.WorkingInSchoolOrEducationalSetting == true ? "Yes" : "No")}
-            Personal Email: {state.PersonalEmail}
-            Work Email: {state.WorkEmail}
-            Name: {state.Name}
-            Previous name: {state.PreviousName}
-            Date of birth: {state.DateOfBirth:dd/MM/yyyy}
-            National Insurance number: {Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber)}
-            Registered For NPQ: {(state.HaveRegisteredForAnNpq == true ? "Yes" : "No")}
-            NPQ application ID: {state.NpqApplicationId}
-            NPQ name: {state.NpqName}
-            NPQ training provider: {state.NpqTrainingProvider}
-            """;
-        if (state.HasNationalInsuranceNumber == false)
+        var trnRequestMetadata = new TrnRequestMetadata
         {
-            description += $"""
+            OneLoginUserSubject = null,
+            CreatedOn = clock.UtcNow,
+            RequestId = requestId,
+            IdentityVerified = false,
+            ApplicationUserId = ApplicationUser.NpqApplicationUserGuid,
+            FirstName = state.FirstName,
+            MiddleName = state.MiddleName,
+            LastName = state.LastName,
+            PreviousFirstName = state.PreviousFirstName,
+            PreviousMiddleName = state.PreviousMiddleName,
+            PreviousLastName = state.PreviousLastName,
+            WorkEmailAddress = state.WorkEmail,
+            Name = new[] { state.FirstName!, state.MiddleName ?? string.Empty, state.LastName! },
+            EmailAddress = state.PersonalEmail,
+            DateOfBirth = state.DateOfBirth!.Value,
+            NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber),
+            NpqApplicationId = state.NpqApplicationId,
+            NpqName = state.NpqName,
+            NpqTrainingProvider = state.NpqTrainingProvider,
+            AddressLine1 = state.AddressLine1,
+            AddressLine2 = state.AddressLine2,
+            Postcode = state.PostalCode,
+            City = state.TownOrCity,
+            Country = state.Country,
+            NpqEvidenceFileId = state.EvidenceFileId,
+            NpqEvidenceFileName = state.EvidenceFileName,
+            NpqWorkingInEducationalSetting = state.WorkingInSchoolOrEducationalSetting
+        };
 
-                Address line 1: {state.AddressLine1}
-                Address line 2: {state.AddressLine2}
-                Town or city: {state.TownOrCity}
-                Postal code: {state.PostalCode}
-                Country: {state.Country}
-                """;
-        }
+        // look for potential matches
+        var matchResult = await matchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
+        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is not TrnRequestMatchResultOutcome.NoMatches;
 
-        var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
-        if (!fileExtensionContentTypeProvider.TryGetContentType(JourneyInstance!.State.EvidenceFileName!, out var evidenceFileMimeType))
+        trnRequestMetadata.Matches = new TrnRequestMatches()
         {
-            evidenceFileMimeType = "application/octet-stream";
-        }
-
-        using var stream = await fileService.OpenReadStreamAsync(JourneyInstance!.State.EvidenceFileId!.Value);
-
-        await crmQueryDispatcher.ExecuteQueryAsync(
-            new CreateTrnRequestTaskQuery()
+            MatchedPersons = matchResult.Outcome switch
             {
-                Description = description,
-                EvidenceFileName = JourneyInstance!.State.EvidenceFileName!,
-                EvidenceFileContent = stream,
-                EvidenceFileMimeType = evidenceFileMimeType,
-                EmailAddress = JourneyInstance!.State.PersonalEmail!
-            });
+                TrnRequestMatchResultOutcome.PotentialMatches =>
+                    matchResult.PotentialMatchesPersonIds
+                        .Select(id => new TrnRequestMatchedPerson() { PersonId = id })
+                        .ToList(),
+                TrnRequestMatchResultOutcome.DefiniteMatch => [new TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
+                _ => []
+            }
+        };
+
+        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+
+        var supportTask = SupportTask.Create(
+            supportTaskType: SupportTaskType.NpqTrnRequest,
+            data: new NpqTrnRequestData(),
+            personId: null,
+            oneLoginUserSubject: null,
+            trnRequestApplicationUserId: ApplicationUser.NpqApplicationUserGuid,
+            trnRequestId: requestId,
+            createdBy: ApplicationUser.NpqApplicationUserGuid,
+            now: clock.UtcNow,
+            out var createdEvent
+            );
+        dbContext.SupportTasks.Add(supportTask);
+        await dbContext.AddEventAndBroadcastAsync(createdEvent);
+        dbContext.SaveChanges();
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 
@@ -150,11 +188,11 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
             // personal email is required for either WorkingInSchoolOrEducationalSetting being true or false
             context.Result = Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance.InstanceId));
         }
-        else if (state.Name is null)
+        else if (state.FirstName is null || state.LastName is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
         }
-        else if (state.HasPreviousName is null || (state.HasPreviousName == true && state.PreviousName is null))
+        else if (state.HasPreviousName is null || (state.HasPreviousName == true && (state.PreviousFirstName is null || state.PreviousLastName is null)))
         {
             context.Result = Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance.InstanceId));
         }

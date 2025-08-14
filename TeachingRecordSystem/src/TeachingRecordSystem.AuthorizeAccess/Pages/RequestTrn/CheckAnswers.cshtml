@@ -87,7 +87,9 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Proof of identity</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.EvidenceFileName</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>
+                        <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                    </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnIdentity(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="proof of identity">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

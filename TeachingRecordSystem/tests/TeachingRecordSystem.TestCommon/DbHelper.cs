@@ -4,6 +4,9 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
+//using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
@@ -37,6 +40,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
 
         // Ensure we have the System User around
         dbContext.Set<SystemUser>().Add(SystemUser.Instance);
+        dbContext.Set<ApplicationUser>().Add(ApplicationUser.NpqApplicationUser);
         await dbContext.SaveChangesAsync();
     }
 

@@ -139,6 +139,7 @@ public partial class TestData
 
         public async Task<SupportTask> ExecuteAsync(TestData testData)
         {
+            var supporttaskref = SupportTask.GenerateSupportTaskReference();
             var trnRequestId = _requestId.ValueOr(Guid.NewGuid().ToString);
             var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail);
             var firstName = _firstName.ValueOr(testData.GenerateFirstName);
@@ -147,7 +148,7 @@ public partial class TestData
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
-            var npqApplicationId = _npqApplicationId.ValueOr(testData.GenerateEstablishmentUrn().ToString()); // CML TODO - a realistic NPQ application ID should be used here
+            var npqApplicationId = _npqApplicationId.ValueOr(testData.GenerateNpqApplicationId());
             var npqIsInEducationalSetting = _npqIsInEducationalSetting.ValueOr(Faker.Boolean.Random);
             var npqName = _npqName.ValueOr(Faker.Name.Last);
             var npqTrainingProvider = _npqTrainingProvider.ValueOr(Faker.Company.Name);

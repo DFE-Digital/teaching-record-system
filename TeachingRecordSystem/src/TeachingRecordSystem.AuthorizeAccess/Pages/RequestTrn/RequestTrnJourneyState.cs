@@ -10,9 +10,15 @@ public class RequestTrnJourneyState()
         new JourneyDescriptor(JourneyName, typeof(RequestTrnJourneyState), requestDataKeys: [], appendUniqueKey: true);
 
     public string? WorkEmail { get; set; }
-    public string? Name { get; set; }
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
+
+    public string? PreviousFirstName { get; set; }
+    public string? PreviousMiddleName { get; set; }
+    public string? PreviousLastName { get; set; }
+
     public bool? HasPreviousName { get; set; }
-    public string? PreviousName { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public Guid? EvidenceFileId { get; set; }
     public string? EvidenceFileName { get; set; }

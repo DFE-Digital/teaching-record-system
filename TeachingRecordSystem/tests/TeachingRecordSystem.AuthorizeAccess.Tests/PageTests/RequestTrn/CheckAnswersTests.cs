@@ -1,7 +1,21 @@
+using System.Text.Json;
+using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
+using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+[Collection(nameof(DisableParallelization))]
+public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
+    public Task InitializeAsync() => WithDbContext(async dbContext =>
+    {
+        await dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync();
+        await dbContext.TrnRequestMetadata.ExecuteDeleteAsync();
+        await dbContext.Events.ExecuteDeleteAsync();
+    });
+
+    public Task DisposeAsync() => Task.CompletedTask;
+
     [Fact]
     public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
     {
@@ -25,21 +39,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = null;
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -57,21 +58,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = null;
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -89,21 +76,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = null;
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.LastName = null;
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -121,52 +95,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
         state.HasPreviousName = null;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-        var journeyInstance = await CreateJourneyInstance(state);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task Get_HasPreviousNameMissingFromState_RedirectsToPreviousName()
-    {
-        // Arrange
-        var state = CreateNewState();
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = true;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -184,21 +114,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
         state.DateOfBirth = null;
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = "qq 12 34 56 56 c";
 
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -217,21 +133,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
         state.EvidenceFileId = null;
         state.EvidenceFileName = null;
         state.EvidenceFileSizeDescription = null;
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = "qq 12 34 56 56 c";
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -249,19 +153,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
         state.HasNationalInsuranceNumber = null;
         state.NationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
@@ -281,19 +172,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
         state.HasNationalInsuranceNumber = true;
         state.NationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
@@ -313,19 +191,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
         state.HasNationalInsuranceNumber = false;
         state.NationalInsuranceNumber = null;
         state.AddressLine1 = null;
@@ -348,19 +213,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOMEID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
         state.HasPreviousName = true;
-        state.PreviousName = TestData.GenerateName();
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
+        state.PreviousFirstName = TestData.GenerateFirstName();
+        state.PreviousMiddleName = TestData.GenerateMiddleName();
+        state.PreviousLastName = TestData.GenerateLastName();
+
         state.HasNationalInsuranceNumber = hasNationalInsuranceNumber;
         state.NationalInsuranceNumber = hasNationalInsuranceNumber ? Faker.Identification.UkNationalInsuranceNumber() : null;
 
@@ -384,10 +241,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.WorkEmail, doc.GetSummaryListValueForKey("Work email"));
         Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueForKey("Personal email"));
-        Assert.Equal(state.Name, doc.GetSummaryListValueForKey("Name"));
-        Assert.Equal(state.PreviousName, doc.GetSummaryListValueForKey("Previous name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', new string?[] { state.FirstName, state.MiddleName, state.LastName }), doc.GetSummaryListValueForKey("Name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', new string?[] { state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName }), doc.GetSummaryListValueForKey("Previous name"));
         Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(state.EvidenceFileName, doc.GetSummaryListValueForKey("Proof of identity"));
+        Assert.Contains(state.EvidenceFileName!, doc.GetSummaryListValueForKey("Proof of identity"));
         if (hasNationalInsuranceNumber)
         {
             Assert.Equal(state.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
@@ -412,23 +269,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var npqName = "Some NPQ Name";
         var npqTrainingProvider = "NPQ TRAINING PROVIDER";
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = false;
         state.NpqApplicationId = npqApplicationId;
         state.NpqName = npqName;
         state.NpqTrainingProvider = npqTrainingProvider;
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = "qq 12 34 56 56 c";
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -439,13 +283,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetSummaryListValueForKey("NPQ application ID"));
-        Assert.Equal(state.WorkEmail, doc.GetSummaryListValueForKey("Work email"));
-        Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueForKey("Personal email"));
-        Assert.Equal(state.Name, doc.GetSummaryListValueForKey("Name"));
-        Assert.Null(doc.GetSummaryListValueForKey("Previous name"));
-        Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(state.EvidenceFileName, doc.GetSummaryListValueForKey("Proof of identity"));
-        Assert.Equal(state.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(npqName, doc.GetSummaryListValueForKey("NPQ"));
         Assert.Equal(npqTrainingProvider, doc.GetSummaryListValueForKey("NPQ provider"));
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
@@ -457,21 +294,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var npqApplicationId = "ApplicationId-12345";
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
         state.NpqApplicationId = npqApplicationId;
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = "qq 12 34 56 56 c";
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -482,39 +305,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.NpqApplicationId, doc.GetSummaryListValueForKey("NPQ application ID"));
-        Assert.Equal(state.WorkEmail, doc.GetSummaryListValueForKey("Work email"));
-        Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueForKey("Personal email"));
-        Assert.Equal(state.Name, doc.GetSummaryListValueForKey("Name"));
-        Assert.Null(doc.GetSummaryListValueForKey("Previous name"));
-        Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(state.EvidenceFileName, doc.GetSummaryListValueForKey("Proof of identity"));
-        Assert.Equal(state.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Null(doc.GetSummaryListValueForKey("NPQ"));
         Assert.Null(doc.GetSummaryListValueForKey("NPQ Provider"));
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
     [Fact]
-    public async Task Get_GetValidRequestWorkingInSchoolOrEducationalSettingFalse_HidesWorkEmail()
+    public async Task Get_GetValidRequestWorkEmailIsNull_HidesWorkEmail()
     {
         // Arrange
-        var npqApplicationId = "ApplicationId-12345";
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = npqApplicationId;
         state.WorkingInSchoolOrEducationalSetting = false;
         state.WorkEmail = null;
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -526,14 +329,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.NpqApplicationId, doc.GetSummaryListValueForKey("NPQ application ID"));
         Assert.Null(doc.GetSummaryListValueForKey("Work email"));
-        Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueForKey("Personal email"));
-        Assert.Equal(state.Name, doc.GetSummaryListValueForKey("Name"));
-        Assert.Null(doc.GetSummaryListValueForKey("Previous name"));
-        Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(state.EvidenceFileName, doc.GetSummaryListValueForKey("Proof of identity"));
-        Assert.Equal(state.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
-        Assert.Null(doc.GetSummaryListValueForKey("NPQ"));
-        Assert.Null(doc.GetSummaryListValueForKey("NPQ Provider"));
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
@@ -560,21 +355,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
         state.WorkingInSchoolOrEducationalSetting = true;
         state.WorkEmail = null;
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1998, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "Filename.jpg";
-        state.EvidenceFileSizeDescription = "1.1 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -592,21 +375,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
         state.PersonalEmail = null;
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -624,21 +394,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = null;
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.LastName = null;
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -652,57 +409,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_HasHasPreviousNameMissingFromState_RedirectsToPreviousName()
-    {
-        // Arrange
-        var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = null;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1999, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-        var journeyInstance = await CreateJourneyInstance(state);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Post_HasPreviousNameMissingFromState_RedirectsToPreviousName()
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
         state.HasPreviousName = true;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1998, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "Filename.jpg";
-        state.EvidenceFileSizeDescription = "1.1 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.PreviousFirstName = TestData.GenerateFirstName();
+        state.PreviousMiddleName = null;
+        state.PreviousLastName = null;
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -720,21 +435,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
         state.DateOfBirth = null;
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "evidence-file-name.jpg";
-        state.EvidenceFileSizeDescription = "1.2 MB";
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -752,21 +454,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1998, 01, 01);
         state.EvidenceFileId = null;
         state.EvidenceFileName = null;
         state.EvidenceFileSizeDescription = null;
-        state.HasNationalInsuranceNumber = true;
-        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -784,19 +475,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1998, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "Filename.jpg";
-        state.EvidenceFileSizeDescription = "1.1 MB";
         state.HasNationalInsuranceNumber = null;
         state.NationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
@@ -816,19 +494,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1998, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "Filename.jpg";
-        state.EvidenceFileSizeDescription = "1.1 MB";
         state.HasNationalInsuranceNumber = true;
         state.NationalInsuranceNumber = null;
         var journeyInstance = await CreateJourneyInstance(state);
@@ -848,19 +513,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = false;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1998, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "Filename.jpg";
-        state.EvidenceFileSizeDescription = "1.1 MB";
         state.HasNationalInsuranceNumber = false;
         state.NationalInsuranceNumber = null;
         state.AddressLine1 = null;
@@ -883,19 +535,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsTakingNpq = true;
-        state.HaveRegisteredForAnNpq = true;
-        state.NpqApplicationId = "SOME ID";
-        state.WorkingInSchoolOrEducationalSetting = true;
-        state.WorkEmail = Faker.Internet.Email();
-        state.PersonalEmail = Faker.Internet.Email();
-        state.Name = TestData.GenerateName();
-        state.HasPreviousName = false;
-        state.PreviousName = null;
-        state.DateOfBirth = new DateOnly(1998, 01, 01);
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = "Filename.jpg";
-        state.EvidenceFileSizeDescription = "1.1 MB";
         state.HasNationalInsuranceNumber = hasNationalInsuranceNumber;
         state.NationalInsuranceNumber = hasNationalInsuranceNumber ? Faker.Identification.UkNationalInsuranceNumber() : null;
         if (!hasNationalInsuranceNumber)
@@ -921,4 +560,209 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var reloadedJourneyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(reloadedJourneyInstance.State.HasPendingTrnRequest);
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_NoMatches_SavesSupportTask(bool hasNationalInsuranceNumber)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
+
+        var state = CreateNewState();
+        state.HasNationalInsuranceNumber = hasNationalInsuranceNumber;
+        state.NationalInsuranceNumber = hasNationalInsuranceNumber ? Faker.Identification.UkNationalInsuranceNumber() : null;
+        if (!hasNationalInsuranceNumber)
+        {
+            state.AddressLine1 = Faker.Address.StreetAddress();
+            state.AddressLine2 = Faker.Address.SecondaryAddress();
+            state.TownOrCity = Faker.Address.City();
+            state.Country = TestData.GenerateCountry();
+            state.PostalCode = Faker.Address.ZipCode();
+        }
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertSupportTaskCreatedAsync();
+        await AssertMetadataExpectedAsync(state, false);
+    }
+
+    [Fact]
+    public async Task Post_Matches_SavesSupportTask()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.HasNationalInsuranceNumber = true;
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var person1 = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithFirstName(state.FirstName!)
+            .WithMiddleName(state.MiddleName)
+            .WithLastName(state!.LastName!));
+        var person2 = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithFirstName(state.FirstName!)
+            .WithMiddleName(state.MiddleName)
+            .WithLastName(state!.LastName!));
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertSupportTaskCreatedAsync();
+        await AssertMetadataExpectedAsync(state, true, new List<Guid>() { person1.PersonId, person2.PersonId });
+    }
+
+    [Fact]
+    public async Task Post_DefiniteMatch_SavesSupportTask()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.HasNationalInsuranceNumber = true;
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithFirstName(state.FirstName!)
+            .WithMiddleName(state.MiddleName)
+            .WithLastName(state!.LastName!)
+            .WithDateOfBirth(state.DateOfBirth!.Value)
+            .WithNationalInsuranceNumber(state.NationalInsuranceNumber!));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertSupportTaskCreatedAsync();
+        await AssertMetadataExpectedAsync(state, true, new List<Guid>() { person.PersonId });
+    }
+
+    [Fact]
+    public async Task Post_CreatesEvent()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
+
+        var state = CreateNewState();
+
+        state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        state.HasNationalInsuranceNumber = true;
+        state.HasPendingTrnRequest = false;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEventCreatedAsync();
+    }
+
+    private Task AssertMetadataExpectedAsync(RequestTrnJourneyState request, bool expectedPotentialDuplicate, List<Guid>? potentialDuplicates = null) =>
+        base.WithDbContext(async dbContext =>
+    {
+        if (expectedPotentialDuplicate && potentialDuplicates is null)
+        {
+            throw new ArgumentException("Define the list of expected potential duplicates");
+        }
+
+        var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
+
+        var metadata = await dbContext.TrnRequestMetadata
+            .SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId);
+        Assert.NotNull(metadata);
+
+        var expectedEmailAddress = request.PersonalEmail;
+
+        var expectedName = new[] { request.FirstName, request.MiddleName, request.LastName }
+            .Where(part => !string.IsNullOrEmpty(part));
+
+        Assert.Equal(TrnRequestStatus.Pending, metadata.Status);
+        Assert.False(metadata.IdentityVerified);
+        Assert.Equal(request.PersonalEmail, metadata.EmailAddress);
+        Assert.True(expectedName.SequenceEqual(metadata.Name));
+        Assert.Equal(request.FirstName, metadata.FirstName);
+        Assert.Equal(request.MiddleName, metadata.MiddleName);
+        Assert.Equal(request.LastName, metadata.LastName);
+        Assert.Equal(request.DateOfBirth, metadata.DateOfBirth);
+        Assert.Equal(expectedPotentialDuplicate, metadata.PotentialDuplicate);
+        Assert.Equal(request.NationalInsuranceNumber, metadata.NationalInsuranceNumber);
+        Assert.Equal(request.AddressLine1, metadata.AddressLine1);
+        Assert.Equal(request.AddressLine2, metadata.AddressLine2);
+        Assert.Equal(request.TownOrCity, metadata.City);
+        Assert.Equal(request.PostalCode, metadata.Postcode);
+        Assert.Equal(request.Country, metadata.Country);
+        Assert.Null(metadata.OneLoginUserSubject);
+        Assert.Null(metadata.Gender);
+        Assert.Null(metadata.AddressLine3);
+        Assert.NotNull(metadata.RequestId);
+        Assert.Equal(PostgresModels.ApplicationUser.NpqApplicationUserGuid, metadata.ApplicationUserId);
+        Assert.Equal(request.NpqApplicationId, metadata.NpqApplicationId);
+        Assert.Equal(request.NpqName, metadata.NpqName);
+        Assert.Equal(request.NpqTrainingProvider, metadata.NpqTrainingProvider);
+        Assert.Equal(request.PreviousFirstName, metadata.PreviousFirstName);
+        Assert.Equal(request.PreviousMiddleName, metadata.PreviousMiddleName);
+        Assert.Equal(request.PreviousLastName, metadata.PreviousLastName);
+        Assert.NotNull(metadata.NpqEvidenceFileId);
+        Assert.NotNull(metadata.NpqEvidenceFileName);
+        Assert.Equal(request.WorkEmail, metadata.WorkEmailAddress);
+
+        if (expectedPotentialDuplicate)
+        {
+            Assert.Equivalent(potentialDuplicates!.Select(x => new PostgresModels.TrnRequestMatchedPerson() { PersonId = x }), metadata.Matches!.MatchedPersons);
+        }
+        else
+        {
+            Assert.Equivalent(new List<PostgresModels.TrnRequestMatchedPerson>().AsReadOnly(), metadata.Matches!.MatchedPersons);
+        }
+    });
+
+    private Task AssertSupportTaskCreatedAsync() =>
+        base.WithDbContext(async dbContext =>
+    {
+        var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
+        var supportTask = await dbContext.SupportTasks
+            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
+                t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
+
+        Assert.NotNull(supportTask);
+        Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+    });
+
+    private Task AssertEventCreatedAsync() =>
+        base.WithDbContext(async dbContext =>
+    {
+        var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
+        var supportTask = await dbContext.SupportTasks
+            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
+                t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
+        var events = await dbContext.Events
+            .Where(e => e.EventName == nameof(SupportTaskCreatedEvent))
+            .ToListAsync();
+        Assert.Single(events);
+        var @event = events.Single();
+
+        var supportTaskCreatedEvent = JsonSerializer.Deserialize<SupportTaskCreatedEvent>(@event.Payload);
+        Assert.Equal(supportTask!.SupportTaskReference, supportTaskCreatedEvent!.SupportTask.SupportTaskReference);
+
+        var data = supportTaskCreatedEvent.SupportTask.Data as NpqTrnRequestData;
+        Assert.Null(data!.ResolvedAttributes);
+        Assert.Null(data.SelectedPersonAttributes);
+        Assert.Null(data.SupportRequestOutcome);
+    });
 }

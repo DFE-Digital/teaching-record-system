@@ -10,11 +10,13 @@ public class TrnRequestMetadata
     public required DateTime CreatedOn { get; init; }
     public required bool? IdentityVerified { get; init; }
     public required string? EmailAddress { get; init; }
+    public string? WorkEmailAddress { get; init; }
     public required string? OneLoginUserSubject { get; init; }
     public required string? FirstName { get; init; }
     public required string? MiddleName { get; init; }
     public required string? LastName { get; init; }
     public string? PreviousFirstName { get; init; }
+    public string? PreviousMiddleName { get; init; }
     public string? PreviousLastName { get; init; }
     public required string[] Name { get; init; }
     public required DateOnly DateOfBirth { get; init; }

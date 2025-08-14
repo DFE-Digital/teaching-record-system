@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
 public class PersonalEmailTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -28,11 +30,10 @@ public class PersonalEmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
         var person = await TestData.CreatePersonAsync();
-        await TestData.CreateCrmTaskAsync(x =>
-        {
-            x.WithPersonId(person.ContactId);
-            x.WithEmailAddress(email);
-        });
+
+        await TestData.CreateNpqTrnRequestSupportTaskAsync(ApplicationUser.NpqApplicationUserGuid, configure => configure
+            .WithEmailAddress(email)
+            .WithStatus(SupportTaskStatus.Open));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/personal-email?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
