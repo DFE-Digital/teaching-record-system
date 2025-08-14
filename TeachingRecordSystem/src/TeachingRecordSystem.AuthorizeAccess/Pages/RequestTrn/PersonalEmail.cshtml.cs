@@ -36,7 +36,7 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsD
 
         await JourneyInstance!.UpdateStateAsync(state => state.PersonalEmail = PersonalEmail);
 
-        var openTasks = SearchForOpenTasksForEmailAddress(emailAddress: JourneyInstance!.State.PersonalEmail!);
+        var openTasks = await SearchForOpenTasksForEmailAddressAsync(emailAddress: JourneyInstance!.State.PersonalEmail!);
 
         if (openTasks)
         {
@@ -58,13 +58,12 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsD
         }
     }
 
-    private bool SearchForOpenTasksForEmailAddress(string emailAddress)
+    private async Task<bool> SearchForOpenTasksForEmailAddressAsync(string emailAddress)
     {
-        var openTasks = dbContext.SupportTasks
+        var openTasks = await dbContext.SupportTasks
             .Where(s => s.Status == SupportTaskStatus.Open && s.SupportTaskType == SupportTaskType.NpqTrnRequest)
-            .Include(s => s.TrnRequestMetadata)
             .Where(s => s.TrnRequestMetadata!.EmailAddress == emailAddress)
-            .Any();
+            .AnyAsync();
         return openTasks;
     }
 }

@@ -31,7 +31,7 @@ public class PersonalEmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
         var person = await TestData.CreatePersonAsync();
 
-        await TestData.CreateNpqTrnRequestSupportTaskAsync(ApplicationUser.NPQApplicationUserGuid, configure => configure
+        await TestData.CreateNpqTrnRequestSupportTaskAsync(ApplicationUser.NpqApplicationUserGuid, configure => configure
             .WithEmailAddress(email)
             .WithStatus(SupportTaskStatus.Open));
 

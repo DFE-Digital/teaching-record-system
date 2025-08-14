@@ -104,7 +104,7 @@ public class CheckAnswersModel(
             CreatedOn = clock.UtcNow,
             RequestId = requestId,
             IdentityVerified = false,
-            ApplicationUserId = ApplicationUser.NPQApplicationUserGuid,
+            ApplicationUserId = ApplicationUser.NpqApplicationUserGuid,
             FirstName = state.FirstName,
             MiddleName = state.MiddleName,
             LastName = state.LastName,
@@ -153,9 +153,9 @@ public class CheckAnswersModel(
             data: new NpqTrnRequestData(),
             personId: null,
             oneLoginUserSubject: null,
-            trnRequestApplicationUserId: ApplicationUser.NPQApplicationUserGuid,
+            trnRequestApplicationUserId: ApplicationUser.NpqApplicationUserGuid,
             trnRequestId: requestId,
-            createdBy: ApplicationUser.NPQApplicationUserGuid,
+            createdBy: ApplicationUser.NpqApplicationUserGuid,
             now: clock.UtcNow,
             out var createdEvent
             );

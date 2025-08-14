@@ -49,7 +49,7 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
         builder.HasIndex(e => e.ClientId).IsUnique().HasDatabaseName(ApplicationUser.ClientIdUniqueIndexName).HasFilter("client_id is not null");
         builder.Property(e => e.ShortName).HasMaxLength(ApplicationUser.ShortNameMaxLength);
 
-        builder.HasData(new ApplicationUser { UserId = ApplicationUser.NPQApplicationUserGuid, Name = "NPQ", Active = true });
+        builder.HasData(new ApplicationUser { UserId = ApplicationUser.NpqApplicationUserGuid, Name = "NPQ", Active = true });
     }
 }
 

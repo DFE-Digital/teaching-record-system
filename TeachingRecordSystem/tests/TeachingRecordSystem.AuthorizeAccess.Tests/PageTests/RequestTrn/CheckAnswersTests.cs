@@ -681,10 +681,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
             throw new ArgumentException("Define the list of expected potential duplicates");
         }
 
-        var applicationUserId = PostgresModels.ApplicationUser.NPQApplicationUserGuid;
+        var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
 
         var metadata = await dbContext.TrnRequestMetadata
-            .SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId/* && m.RequestId == command.RequestId*/);
+            .SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId);
         Assert.NotNull(metadata);
 
         var expectedEmailAddress = request.PersonalEmail;
@@ -711,7 +711,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         Assert.Null(metadata.Gender);
         Assert.Null(metadata.AddressLine3);
         Assert.NotNull(metadata.RequestId);
-        Assert.Equal(PostgresModels.ApplicationUser.NPQApplicationUserGuid, metadata.ApplicationUserId);
+        Assert.Equal(PostgresModels.ApplicationUser.NpqApplicationUserGuid, metadata.ApplicationUserId);
         Assert.Equal(request.NpqApplicationId, metadata.NpqApplicationId);
         Assert.Equal(request.NpqName, metadata.NpqName);
         Assert.Equal(request.NpqTrainingProvider, metadata.NpqTrainingProvider);
@@ -735,7 +735,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
     private Task AssertSupportTaskCreatedAsync() =>
         base.WithDbContext(async dbContext =>
     {
-        var applicationUserId = PostgresModels.ApplicationUser.NPQApplicationUserGuid;
+        var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
         var supportTask = await dbContext.SupportTasks
             .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
                 t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
@@ -747,7 +747,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
     private Task AssertEventCreatedAsync() =>
         base.WithDbContext(async dbContext =>
     {
-        var applicationUserId = PostgresModels.ApplicationUser.NPQApplicationUserGuid;
+        var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
         var supportTask = await dbContext.SupportTasks
             .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
                 t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);

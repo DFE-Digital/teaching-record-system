@@ -40,7 +40,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
 
         // Ensure we have the System User around
         dbContext.Set<SystemUser>().Add(SystemUser.Instance);
-        dbContext.Set<ApplicationUser>().Add(ApplicationUser.Instance);
+        dbContext.Set<ApplicationUser>().Add(ApplicationUser.NpqApplicationUser);
         await dbContext.SaveChangesAsync();
     }
 
