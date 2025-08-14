@@ -28,5 +28,6 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.Property(p => p.InductionStatusWithoutExemption).IsRequired();
         builder.Property(p => p.CreatedByTps).IsRequired().HasDefaultValue(false);
         builder.HasOne(p => p.MergedWithPerson).WithMany().HasForeignKey(p => p.MergedWithPersonId);
+        builder.HasOne<TrnRequestMetadata>().WithMany().HasForeignKey(p => new { p.SourceApplicationUserId, p.SourceTrnRequestId });
     }
 }

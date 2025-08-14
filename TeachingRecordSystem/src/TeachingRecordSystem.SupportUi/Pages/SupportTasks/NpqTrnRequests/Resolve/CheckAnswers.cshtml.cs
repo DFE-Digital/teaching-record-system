@@ -68,7 +68,8 @@ public class CheckAnswersModel(
                 requestData.EmailAddress is not null ? Core.EmailAddress.Parse(requestData.EmailAddress) : null,
                 requestData.NationalInsuranceNumber is not null ? Core.NationalInsuranceNumber.Parse(requestData.NationalInsuranceNumber) : null,
                 requestData.Gender,
-                clock.UtcNow);
+                clock.UtcNow,
+                sourceTrnRequest: (requestData.ApplicationUserId, requestData.RequestId));
 
             DbContext.Add(person);
 

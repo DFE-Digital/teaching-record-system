@@ -51,6 +51,9 @@ public class Person
     public ICollection<Qualification>? Qualifications { get; protected set; }
     public ICollection<Alert>? Alerts { get; }
     public ICollection<PreviousName>? PreviousNames { get; }
+    public bool CreatedByTps { get; set; }
+    public Guid? SourceApplicationUserId { get; set; }
+    public string? SourceTrnRequestId { get; set; }
 
     public Guid? DqtContactId { get; init; }
     public DateTime? DqtFirstSync { get; set; }
@@ -63,7 +66,6 @@ public class Person
     public string? DqtLastName { get; set; }
     public DateTime? DqtInductionLastSync { get; set; }
     public DateTime? DqtInductionModifiedOn { get; set; }
-    public bool CreatedByTps { get; set; }
 
     public static CreatePersonResult Create(
         string trn,
@@ -75,6 +77,7 @@ public class Person
         NationalInsuranceNumber? nationalInsuranceNumber,
         Gender? gender,
         DateTime now,
+        (Guid ApplicationUserId, string RequestId)? sourceTrnRequest = null,
         bool createdByTps = false)
     {
         var person = new Person
@@ -90,6 +93,8 @@ public class Person
             Gender = gender,
             CreatedOn = now,
             UpdatedOn = now,
+            SourceApplicationUserId = sourceTrnRequest?.ApplicationUserId,
+            SourceTrnRequestId = sourceTrnRequest?.RequestId,
             CreatedByTps = createdByTps
         };
 
