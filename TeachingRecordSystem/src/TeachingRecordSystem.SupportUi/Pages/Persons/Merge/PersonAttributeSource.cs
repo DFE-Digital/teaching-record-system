@@ -1,5 +1,5 @@
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 public enum PersonAttributeSource
 {

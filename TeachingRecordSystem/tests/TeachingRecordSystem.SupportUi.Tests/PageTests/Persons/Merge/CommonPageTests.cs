@@ -1,10 +1,10 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 [Collection(nameof(DisableParallelization))]
-public class CommonPageTests : ManualMergeTestBase
+public class CommonPageTests : MergeTestBase
 {
     public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -70,7 +70,7 @@ public class CommonPageTests : ManualMergeTestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/enter-trn?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/persons/{personA.PersonId}/merge/enter-trn?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Theory]
@@ -95,7 +95,7 @@ public class CommonPageTests : ManualMergeTestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Theory]
@@ -122,7 +122,7 @@ public class CommonPageTests : ManualMergeTestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Theory]
@@ -149,7 +149,7 @@ public class CommonPageTests : ManualMergeTestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Theory]
@@ -177,7 +177,7 @@ public class CommonPageTests : ManualMergeTestBase
 
         // Assert
         AssertEx.ResponseIsRedirectTo(response,
-            $"/persons/{personA.PersonId}/manual-merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Theory]
@@ -211,7 +211,7 @@ public class CommonPageTests : ManualMergeTestBase
         var expectedBackLink = $"/persons/{personA.PersonId}";
         if (expectedPage is not null)
         {
-            expectedBackLink += "/manual-merge/" + expectedPage;
+            expectedBackLink += "/merge/" + expectedPage;
         }
         Assert.Contains(expectedBackLink, backlink.Href);
     }
@@ -247,7 +247,7 @@ public class CommonPageTests : ManualMergeTestBase
         var expectedBackLink = $"/persons/{personA.PersonId}";
         if (expectedPage is not null)
         {
-            expectedBackLink += "/manual-merge/" + expectedPage;
+            expectedBackLink += "/merge/" + expectedPage;
         }
         Assert.Contains(expectedBackLink, backlink.Href);
     }
@@ -599,7 +599,7 @@ public class CommonPageTests : ManualMergeTestBase
         var expectedRedirect = $"/persons/{personA.PersonId}";
         if (expectedPage is not null)
         {
-            expectedRedirect = $"{expectedRedirect}/manual-merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
+            expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
         AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
@@ -641,18 +641,18 @@ public class CommonPageTests : ManualMergeTestBase
         var expectedRedirect = $"/persons/{personA.PersonId}";
         if (expectedPage is not null)
         {
-            expectedRedirect = $"{expectedRedirect}/manual-merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
+            expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
         AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, string page, JourneyInstance<ManualMergeState>? journeyInstance = null, bool? fromCheckAnswers = null) =>
-        $"/persons/{person.PersonId}/manual-merge/{page}?{journeyInstance?.GetUniqueIdQueryParameter()}{(fromCheckAnswers is bool f ? $"&fromCheckAnswers={f}" : "")}";
+    private string GetRequestPath(TestData.CreatePersonResult person, string page, JourneyInstance<MergeState>? journeyInstance = null, bool? fromCheckAnswers = null) =>
+        $"/persons/{person.PersonId}/merge/{page}?{journeyInstance?.GetUniqueIdQueryParameter()}{(fromCheckAnswers is bool f ? $"&fromCheckAnswers={f}" : "")}";
 
-    private Task<JourneyInstance<ManualMergeState>> CreateJourneyInstanceAsync(Guid personId, ManualMergeState? state = null) =>
+    private Task<JourneyInstance<MergeState>> CreateJourneyInstanceAsync(Guid personId, MergeState? state = null) =>
         CreateJourneyInstance(
-            JourneyNames.ManualMergePerson,
-            state ?? new ManualMergeState(),
+            JourneyNames.MergePerson,
+            state ?? new MergeState(),
             new KeyValuePair<string, object>("personId", personId));
 }

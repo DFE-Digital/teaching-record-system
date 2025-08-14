@@ -1,5 +1,5 @@
-@page "/persons/{personId}/manual-merge/enter-trn"
-@model TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge.EnterTrnModel
+@page "/persons/{personId}/merge/enter-trn"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.Merge.EnterTrnModel
 @{
     Layout = "_Layout";
     ViewBag.Title = Html.DisplayNameFor(m => m.OtherTrn);
@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@Model.GetPageLink(ManualMergeJourneyPage.EnterTrn)" method="post" data-testid="submit-form">
+        <form action="@Model.GetPageLink(MergeJourneyPage.EnterTrn)" method="post" data-testid="submit-form">
             <govuk-input asp-for="OtherTrn" data-testid="other-trn">
                 <govuk-input-label is-page-heading="true" class="govuk-label--l" />
                 <govuk-input-hint class="govuk-inset-text">You&rsquo;re merging into the record with the TRN <strong data-testid="this-trn">@Model.ThisTrn</strong>. You&rsquo;ll be able to review both records before completing the merge.</govuk-input-hint>

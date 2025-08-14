@@ -5,17 +5,17 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
-[Journey(JourneyNames.ManualMergePerson), RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class MatchesModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    public string BackLink => GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : ManualMergeJourneyPage.EnterTrn);
+    public string BackLink => GetPageLink(FromCheckAnswers ? MergeJourneyPage.CheckAnswers : MergeJourneyPage.EnterTrn);
 
     public string? CannotMergeReason { get; private set; }
 
@@ -32,7 +32,7 @@ public class MatchesModel(
 
         if (JourneyInstance!.State.PersonAId is not Guid personAId || JourneyInstance!.State.PersonBId is not Guid personBId)
         {
-            context.Result = Redirect(GetPageLink(ManualMergeJourneyPage.EnterTrn));
+            context.Result = Redirect(GetPageLink(MergeJourneyPage.EnterTrn));
             return;
         }
 
@@ -105,6 +105,6 @@ public class MatchesModel(
             state.PrimaryPersonId = PrimaryPersonId;
         });
 
-        return Redirect(GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : ManualMergeJourneyPage.Merge));
+        return Redirect(GetPageLink(FromCheckAnswers ? MergeJourneyPage.CheckAnswers : MergeJourneyPage.Merge));
     }
 }

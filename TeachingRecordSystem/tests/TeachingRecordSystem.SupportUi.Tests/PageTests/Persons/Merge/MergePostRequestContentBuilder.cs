@@ -1,6 +1,6 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 public class MergePostRequestContentBuilder : PostRequestContentBuilder
 {

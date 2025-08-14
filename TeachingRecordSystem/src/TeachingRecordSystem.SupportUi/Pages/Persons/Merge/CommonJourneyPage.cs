@@ -5,14 +5,14 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Services.Files;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService) : PageModel
 {
-    public JourneyInstance<ManualMergeState>? JourneyInstance { get; set; }
+    public JourneyInstance<MergeState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
     protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
@@ -24,17 +24,17 @@ public abstract class CommonJourneyPage(
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
 
-    public string CancelLink => LinkGenerator.PersonManualMergeCancel(PersonId, JourneyInstance!.InstanceId);
+    public string CancelLink => LinkGenerator.PersonMergeCancel(PersonId, JourneyInstance!.InstanceId);
 
-    public string GetPageLink(ManualMergeJourneyPage? pageName, bool? fromCheckAnswers = null)
+    public string GetPageLink(MergeJourneyPage? pageName, bool? fromCheckAnswers = null)
     {
         fromCheckAnswers ??= FromCheckAnswers ? true : null;
         return pageName switch
         {
-            ManualMergeJourneyPage.EnterTrn => LinkGenerator.PersonManualMergeEnterTrn(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            ManualMergeJourneyPage.Matches => LinkGenerator.PersonManualMergeMatches(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            ManualMergeJourneyPage.Merge => LinkGenerator.PersonManualMergeMerge(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            ManualMergeJourneyPage.CheckAnswers => LinkGenerator.PersonManualMergeCheckAnswers(PersonId, JourneyInstance!.InstanceId),
+            MergeJourneyPage.EnterTrn => LinkGenerator.PersonMergeEnterTrn(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            MergeJourneyPage.Matches => LinkGenerator.PersonMergeMatches(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            MergeJourneyPage.Merge => LinkGenerator.PersonMergeMerge(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            MergeJourneyPage.CheckAnswers => LinkGenerator.PersonMergeCheckAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonDetail(PersonId)
         };
     }
