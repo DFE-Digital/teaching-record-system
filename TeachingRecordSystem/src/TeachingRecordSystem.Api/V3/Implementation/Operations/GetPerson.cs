@@ -1,11 +1,7 @@
-using Microsoft.Xrm.Sdk.Query;
 using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 using EytsInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.EytsInfo;
 using InductionInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.InductionInfo;
 using QtlsStatus = TeachingRecordSystem.Core.Models.QtlsStatus;
@@ -177,11 +173,7 @@ public record GetPersonResultRouteToProfessionalStatusInductionExemption
     public required IReadOnlyCollection<PostgresModels.InductionExemptionReason> ExemptionReasons { get; init; }
 }
 
-public class GetPersonHandler(
-    TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    ReferenceDataCache referenceDataCache,
-    IDataverseAdapter dataverseAdapter)
+public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referenceDataCache)
 {
     public async Task<ApiResult<GetPersonResult>> HandleAsync(GetPersonCommand command)
     {
@@ -201,86 +193,27 @@ public class GetPersonHandler(
             }
         }
 
-        var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveContactDetailByTrnQuery(
-                command.Trn,
-                new ColumnSet(
-                    Contact.Fields.FirstName,
-                    Contact.Fields.MiddleName,
-                    Contact.Fields.LastName,
-                    Contact.Fields.dfeta_StatedFirstName,
-                    Contact.Fields.dfeta_StatedMiddleName,
-                    Contact.Fields.dfeta_StatedLastName,
-                    Contact.Fields.BirthDate,
-                    Contact.Fields.dfeta_NINumber,
-                    Contact.Fields.dfeta_NINumber,
-                    Contact.Fields.dfeta_QTSDate,
-                    Contact.Fields.dfeta_EYTSDate,
-                    Contact.Fields.EMailAddress1,
-                    Contact.Fields.dfeta_AllowIDSignInWithProhibitions,
-                    Contact.Fields.dfeta_InductionStatus,
-                    Contact.Fields.dfeta_QtlsDateHasBeenSet,
-                    Contact.Fields.dfeta_qtlsdate)));
-
-        if (contactDetail is null)
-        {
-            return ApiError.PersonNotFound(command.Trn);
-        }
-
-        // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches
-        if (command.DateOfBirth is DateOnly dateOfBirth &&
-            contactDetail.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dateOfBirth)
-        {
-            return ApiError.PersonNotFound(command.Trn, dateOfBirth: dateOfBirth);
-        }
-        if (command.NationalInsuranceNumber is not null)
-        {
-            // Check the NINO in DQT first. If that fails, check workforce data in TRS (which may have different NINO(s) for the person).
-
-            var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
-            var dqtNino = contactDetail.Contact.dfeta_NINumber;
-
-            if (string.IsNullOrEmpty(dqtNino) || !dqtNino.Equals(normalizedNino, StringComparison.OrdinalIgnoreCase))
-            {
-                var employmentNinos = await dbContext.TpsEmployments
-                    .Where(e => e.PersonId == contactDetail.Contact.Id && e.NationalInsuranceNumber != null)
-                    .Select(e => e.NationalInsuranceNumber)
-                    .Distinct()
-                    .ToArrayAsync();
-
-                if (!employmentNinos.Any(n => n!.Equals(normalizedNino, StringComparison.OrdinalIgnoreCase)))
-                {
-                    return ApiError.PersonNotFound(command.Trn, nationalInsuranceNumber: command.NationalInsuranceNumber);
-                }
-            }
-        }
-
-        var contact = contactDetail.Contact;
-        var personId = contact.Id;
-
         var personQuery = dbContext.Persons
-            .Where(p => p.PersonId == personId)
+            .Where(p => p.Trn == command.Trn)
             .Include(p => p.Qualifications).AsSplitQuery()
             .Include(p => p.PreviousNames).AsSplitQuery();
 
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
-            var nameChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Name");
-            var dateOfBirthChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Date of Birth");
+            var openTaskTypes = await dbContext.SupportTasks
+                .Where(t => t.Person!.Trn == command.Trn &&
+                    t.Status == SupportTaskStatus.Open &&
+                    (t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest || t.SupportTaskType == SupportTaskType.ChangeNameRequest))
+                .Select(t => t.SupportTaskType)
+                .Distinct()
+                .ToArrayAsync();
 
-            var incidents = await dataverseAdapter.GetIncidentsByContactIdAsync(
-                contact.Id,
-                IncidentState.Active,
-                columnNames: [Incident.Fields.SubjectId, Incident.Fields.StateCode]);
-
-            var pendingNameChange = incidents.Any(i => i.SubjectId.Id == nameChangeSubject.Id);
-            var pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
-
-            return (pendingNameChange, pendingDateOfBirthChange);
+            return (openTaskTypes.Any(t => t == SupportTaskType.ChangeNameRequest),
+                    openTaskTypes.Any(t => t == SupportTaskType.ChangeDateOfBirthRequest));
         }
 
-        var getPendingDetailChangesTask = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ?
-            GetPendingDetailChangesAsync() :
+        (bool PendingNameRequest, bool PendingDateOfBirthRequest)? pendingDetailChanges = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ?
+            (await GetPendingDetailChangesAsync()) :
             null;
 
         if (command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts))
@@ -288,14 +221,42 @@ public class GetPersonHandler(
             personQuery = personQuery.Include(p => p.Alerts).AsSplitQuery();
         }
 
-        var person = await personQuery.SingleAsync();
+        var person = await personQuery.SingleOrDefaultAsync();
 
-        var firstName = contact.ResolveFirstName();
-        var middleName = contact.ResolveMiddleName();
-        var lastName = contact.ResolveLastName();
+        if (person is null)
+        {
+            return ApiError.PersonNotFound(command.Trn);
+        }
+
+        // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches
+        if (command.DateOfBirth is DateOnly dateOfBirth && person.DateOfBirth != dateOfBirth)
+        {
+            return ApiError.PersonNotFound(command.Trn, dateOfBirth: dateOfBirth);
+        }
+        if (command.NationalInsuranceNumber is not null)
+        {
+            // Check the NINO on the Person first. If that fails, check workforce data (which may have different NINO(s) for the person).
+
+            var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
+            var personNino = person.NationalInsuranceNumber;
+
+            if (string.IsNullOrEmpty(personNino) || NationalInsuranceNumber.Normalize(personNino) != normalizedNino)
+            {
+                var employmentNinos = await dbContext.TpsEmployments
+                    .Where(e => e.PersonId == person.PersonId && e.NationalInsuranceNumber != null)
+                    .Select(e => e.NationalInsuranceNumber)
+                    .Distinct()
+                    .ToArrayAsync();
+
+                if (!employmentNinos.Any(n => NationalInsuranceNumber.Normalize(n) == normalizedNino))
+                {
+                    return ApiError.PersonNotFound(command.Trn, nationalInsuranceNumber: command.NationalInsuranceNumber);
+                }
+            }
+        }
 
         var allowIdSignInWithProhibitions = command.Include.HasFlag(GetPersonCommandIncludes.AllowIdSignInWithProhibitions) ?
-            Option.Some(contact.dfeta_AllowIDSignInWithProhibitions == true) :
+            Option.Some(person.DqtAllowTeacherIdentitySignInWithProhibitions) :
             default;
 
         Option<GetPersonResultDqtInduction?> dqtInduction = default;
@@ -309,18 +270,18 @@ public class GetPersonHandler(
 
         return new GetPersonResult()
         {
-            Trn = command.Trn,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            DateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
-            NationalInsuranceNumber = contact.dfeta_NINumber,
-            PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingNameRequest) : default,
-            PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
+            Trn = person.Trn!,
+            FirstName = person.FirstName,
+            MiddleName = person.MiddleName,
+            LastName = person.LastName,
+            DateOfBirth = person.DateOfBirth!.Value,
+            NationalInsuranceNumber = person.NationalInsuranceNumber,
+            PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some(pendingDetailChanges!.Value.PendingNameRequest) : default,
+            PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some(pendingDetailChanges!.Value.PendingDateOfBirthRequest) : default,
             Qts = QtsInfo.Create(person),
             QtlsStatus = person.QtlsStatus,
             Eyts = EytsInfo.Create(person),
-            EmailAddress = contact.EMailAddress1,
+            EmailAddress = person.EmailAddress,
             Induction = induction,
             DqtInduction = dqtInduction,
             InitialTeacherTraining = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
@@ -403,16 +364,6 @@ public class GetPersonHandler(
                         .AsReadOnly()) :
                 default,
             AllowIdSignInWithProhibitions = allowIdSignInWithProhibitions
-        };
-    }
-
-    private static QtlsStatus MapQtlsStatus_Dqt(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
-    {
-        return (qtlsDate, qtlsDateHasBeenSet) switch
-        {
-            (not null, _) => QtlsStatus.Active,
-            (null, true) => QtlsStatus.Expired,
-            _ => QtlsStatus.None
         };
     }
 

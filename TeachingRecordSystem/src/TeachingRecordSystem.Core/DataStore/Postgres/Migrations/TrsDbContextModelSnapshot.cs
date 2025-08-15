@@ -19981,7 +19981,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasForeignKey("OneLoginUserSubject")
                         .HasConstraintName("fk_support_tasks_one_login_user");
 
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .HasConstraintName("fk_support_tasks_person");
@@ -19990,6 +19990,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("TrnRequestApplicationUserId", "TrnRequestId")
                         .HasConstraintName("fk_support_tasks_trn_request_metadata_trn_request_application_");
+
+                    b.Navigation("Person");
 
                     b.Navigation("TrnRequestMetadata");
                 });
