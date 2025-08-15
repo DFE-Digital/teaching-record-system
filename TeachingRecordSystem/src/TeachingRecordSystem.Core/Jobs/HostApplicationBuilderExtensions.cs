@@ -32,11 +32,6 @@ public static class HostApplicationBuilderExtensions
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
-                builder.Services.AddOptions<CapitaTpsUserOption>()
-                    .Bind(builder.Configuration.GetSection("RecurringJobs:CapitaTpsImport"))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
-
                 builder.Services.AddStartupTask(sp =>
                 {
                     var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
@@ -56,6 +51,11 @@ public static class HostApplicationBuilderExtensions
                     return Task.CompletedTask;
                 });
             }
+
+            builder.Services.AddOptions<CapitaTpsUserOption>()
+                .BindConfiguration("RecurringJobs:CapitaTpsImport")
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
 
@@ -280,6 +280,11 @@ public static class HostApplicationBuilderExtensions
                     nameof(AllocateTrnsToPersonsWithEypsJob),
                     job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                     Cron.Never);
+
+                recurringJobManager.AddOrUpdate<CapitaImportJob>(
+                    nameof(CapitaImportJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    CapitaImportJob.JobSchedule);
 
                 return Task.CompletedTask;
             });

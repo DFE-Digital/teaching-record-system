@@ -10,6 +10,8 @@ public enum SupportTaskCategory
     ChangeRequests = 2,
     [SupportTaskCategoryInfo("TRN requests")]
     TrnRequests = 3,
+    [SupportTaskCategoryInfo("Capita import")]
+    CapitaImport = 4,
 }
 
 public static class SupportTaskCategoryRegistry

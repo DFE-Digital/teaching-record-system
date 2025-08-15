@@ -12,6 +12,7 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.PublishApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -64,7 +65,8 @@ builder.Services
     .AddWorkforceData()
     .AddMemoryCache()
     .AddFileService()
-    .AddTrnGeneration();
+    .AddTrnGeneration()
+    .AddPersonMatching();
 
 var host = builder.Build();
 
