@@ -67,6 +67,7 @@ public class Person
     public string? DqtLastName { get; set; }
     public DateTime? DqtInductionLastSync { get; set; }
     public DateTime? DqtInductionModifiedOn { get; set; }
+    public bool DqtAllowTeacherIdentitySignInWithProhibitions { get; set; }
 
     public static CreatePersonResult Create(
         string trn,
