@@ -12,8 +12,6 @@ public interface IDataverseAdapter
 
     Task<Contact> GetTeacherAsync(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
-    Task<Contact> GetTeacherByTrnAsync(string trn, string[] columnNames, bool activeOnly = true);
-
     Task<Contact[]> FindTeachersAsync(FindTeachersQuery query);
 
     Task<Contact[]> FindTeachersStrictAsync(FindTeachersQuery query);
