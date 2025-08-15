@@ -432,7 +432,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskUpdatedEventIsExpected(actualEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
-
+            Assert.Equal("Records merged - identified as same person during task resolution", actualEvent.ChangeReason.GetDisplayName());
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileId, actualEvent.RequestData?.NpqEvidenceFileId);
             Assert.Equal(supportTask.TrnRequestMetadata!.NpqEvidenceFileName, actualEvent.RequestData?.NpqEvidenceFileName);
@@ -632,7 +632,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskUpdatedEventIsExpected(actualEvent, expectedPersonId: personId, expectOldPersonAttributes: false, comments: comments);
-
+            Assert.Equal("Record created - no existing person identified during task resolution", actualEvent.ChangeReason.GetDisplayName());
             AssertTrnRequestMetadataMatches(expectedMetadata, actualEvent.RequestData);
             Assert.Equal(requestMetadata.NpqEvidenceFileId, actualEvent.RequestData.NpqEvidenceFileId);
             Assert.Equal(requestMetadata.NpqEvidenceFileName, actualEvent.RequestData.NpqEvidenceFileName);

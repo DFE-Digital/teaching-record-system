@@ -89,6 +89,7 @@ public class CheckAnswersModel(
         {
             PersonId = requestData.ResolvedPersonId!.Value,
             RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+            ChangeReason = NpqTrnRequestResolvedReason.RecordCreated,
             Changes = 0,
             PersonAttributes = EventModels.PersonAttributes.FromModel(person),
             OldPersonAttributes = null,
