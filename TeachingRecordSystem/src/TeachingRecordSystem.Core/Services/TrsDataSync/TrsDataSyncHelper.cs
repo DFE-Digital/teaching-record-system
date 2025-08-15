@@ -2379,7 +2379,8 @@ public class TrsDataSyncHelper(
             "created_by_tps",
             "source_application_user_id",
             "source_trn_request_id",
-            "allow_details_updates_from_source_application"
+            "allow_details_updates_from_source_application",
+            "dqt_allow_teacher_identity_sign_in_with_prohibitions"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -2425,7 +2426,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_MergedWith,
             Contact.Fields.dfeta_CapitaTRNChangedOn,
             Contact.Fields.dfeta_TrnRequestID,
-            Contact.Fields.dfeta_AllowPiiUpdatesFromRegister
+            Contact.Fields.dfeta_AllowPiiUpdatesFromRegister,
+            Contact.Fields.dfeta_AllowIDSignInWithProhibitions
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -2454,6 +2456,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.SourceApplicationUserId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.SourceTrnRequestId, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.AllowDetailsUpdatesFromSourceApplication, NpgsqlDbType.Boolean);
+            writer.WriteValueOrNull(person.DqtAllowTeacherIdentitySignInWithProhibitions, NpgsqlDbType.Boolean);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -2808,7 +2811,8 @@ public class TrsDataSyncHelper(
             CreatedByTps = c.dfeta_CapitaTRNChangedOn == null ? true : false,
             SourceApplicationUserId = c.dfeta_TrnRequestID is not null ? Guid.Parse(c.dfeta_TrnRequestID[..Guid.Empty.ToString().Length]) : null,
             SourceTrnRequestId = c.dfeta_TrnRequestID?[(Guid.Empty.ToString().Length + 2)..],
-            AllowDetailsUpdatesFromSourceApplication = c.dfeta_AllowPiiUpdatesFromRegister == true
+            AllowDetailsUpdatesFromSourceApplication = c.dfeta_AllowPiiUpdatesFromRegister == true,
+            DqtAllowTeacherIdentitySignInWithProhibitions = c.dfeta_AllowIDSignInWithProhibitions == true
         })
         .ToList();
 
@@ -4662,6 +4666,7 @@ public class TrsDataSyncHelper(
         public required Guid? SourceApplicationUserId { get; init; }
         public required string? SourceTrnRequestId { get; init; }
         public required bool AllowDetailsUpdatesFromSourceApplication { get; init; }
+        public required bool DqtAllowTeacherIdentitySignInWithProhibitions { get; init; }
     }
 
     private record InductionInfo
