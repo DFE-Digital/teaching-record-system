@@ -15,5 +15,9 @@ public enum IntegrationTransactionInterfaceType
 
     [Description("Capita Export Amend")]
     [Display(Name = "Capita Export Amend")]
-    CapitaExportAmend = 3
+    CapitaExportAmend = 3,
+
+    [Description("Capita Import")]
+    [Display(Name = "Capita Import")]
+    CapitaImport = 4
 }
