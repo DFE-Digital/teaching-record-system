@@ -14,8 +14,5 @@ public record TimelineItem<TModel>(TimelineItemType ItemType, DateTime Timestamp
 
 public enum TimelineItemType
 {
-    Annotation,
-    IncidentResolution,
-    Task,
     Event
 }
