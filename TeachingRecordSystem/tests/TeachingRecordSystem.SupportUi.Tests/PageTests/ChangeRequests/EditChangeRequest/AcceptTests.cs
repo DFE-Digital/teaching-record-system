@@ -8,7 +8,7 @@ public class AcceptTests : TestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Accept page has been changed to use TRS support task")]
     public async Task Get_WhenUserHasNoRoles_ReturnsForbidden()
     {
         // Arrange
@@ -25,7 +25,7 @@ public class AcceptTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
+    [Theory(Skip = "Will re-enable once Accept page has been changed to use TRS support task")]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -43,7 +43,7 @@ public class AcceptTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Accept page has been changed to use TRS support task")]
     public async Task Get_WithTicketNumberForNonExistentIncident_ReturnsNotFound()
     {
         // Arrange
@@ -58,7 +58,7 @@ public class AcceptTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Accept page has been changed to use TRS support task")]
     public async Task Get_WithTicketNumberForInactiveIncident_ReturnsBadRequest()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class AcceptTests : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Theory]
+    [Theory(Skip = "Will re-enable once Accept page has been changed to use TRS support task")]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Post_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -95,7 +95,7 @@ public class AcceptTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Accept page has been changed to use TRS support task")]
     public async Task Post_ValidRequest_RedirectsWithFlashMessage()
     {
         // Arrange

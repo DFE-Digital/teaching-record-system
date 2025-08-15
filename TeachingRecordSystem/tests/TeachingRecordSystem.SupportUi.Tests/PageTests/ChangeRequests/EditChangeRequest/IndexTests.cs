@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Models.SupportTaskData;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
 
 public class IndexTests : TestBase
@@ -13,10 +15,12 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: null));
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -31,10 +35,12 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -44,12 +50,12 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_WithTicketNumberForNonExistentIncident_ReturnsNotFound()
+    public async Task Get_WithSupportTaskReferenceForNonExistentSupportTask_ReturnsNotFound()
     {
         // Arrange
-        var nonExistentTicketNumber = Guid.NewGuid().ToString();
+        var nonExistentSupportTaskReference = Guid.NewGuid().ToString();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{nonExistentTicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{nonExistentSupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -59,44 +65,45 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_WithTicketNumberForInactiveIncident_ReturnsBadRequest()
+    public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsBadRequest()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
     [Theory]
-    [InlineData(true, false, false)]
-    [InlineData(false, true, false)]
-    [InlineData(false, false, true)]
-    [InlineData(true, true, false)]
-    [InlineData(true, false, true)]
-    [InlineData(false, true, true)]
-    [InlineData(true, true, true)]
-    public async Task Get_WithTicketNumberForActiveNameChangeIncident_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName)
+    [InlineData(true, false, false, false)]
+    [InlineData(false, true, false, true)]
+    [InlineData(false, false, true, false)]
+    [InlineData(true, true, false, true)]
+    [InlineData(true, false, true, false)]
+    [InlineData(false, true, true, true)]
+    [InlineData(true, true, true, true)]
+    public async Task Get_WithSupportTaskReferenceForOpenChangeNameRequestSupportTask_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName, bool evidenceIsPdf)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(
-            b => b.WithCustomerId(createPersonResult.ContactId)
-                .WithNewFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
-                .WithNewMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(createPersonResult.MiddleName) : createPersonResult.MiddleName)
-                .WithNewLastName(hasNewLastName ? TestData.GenerateChangedLastName(createPersonResult.LastName) : createPersonResult.LastName)
-                .WithMultipleEvidenceFiles());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
+                .WithMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(createPersonResult.MiddleName) : createPersonResult.MiddleName)
+                .WithLastName(hasNewLastName ? TestData.GenerateChangedLastName(createPersonResult.LastName) : createPersonResult.LastName)
+                .WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg"));
 
-        var imageEvidence = createIncidentResult.Evidence.Single(e => e.MimeType == "image/jpeg");
-        var pdfEvidence = createIncidentResult.Evidence.Single(e => e.MimeType == "application/pdf");
+        var changeNameRequestData = (ChangeNameRequestData)supportTask.Data;
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -104,14 +111,14 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
+        Assert.Equal($"Change of Name - {createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
 
         var firstNameRow = doc.GetElementByTestId("first-name");
         if (hasNewFirstName)
         {
             Assert.NotNull(firstNameRow);
             Assert.Equal(createPersonResult.FirstName, firstNameRow.GetElementByTestId("first-name-current")!.TrimmedText());
-            Assert.Equal(createIncidentResult.NewFirstName, firstNameRow.GetElementByTestId("first-name-new")!.TrimmedText());
+            Assert.Equal(changeNameRequestData.FirstName, firstNameRow.GetElementByTestId("first-name-new")!.TrimmedText());
         }
         else
         {
@@ -123,7 +130,7 @@ public class IndexTests : TestBase
         {
             Assert.NotNull(middleNameRow);
             Assert.Equal(createPersonResult.MiddleName, middleNameRow.GetElementByTestId("middle-name-current")!.TrimmedText());
-            Assert.Equal(createIncidentResult.NewMiddleName, middleNameRow.GetElementByTestId("middle-name-new")!.TrimmedText());
+            Assert.Equal(changeNameRequestData.MiddleName, middleNameRow.GetElementByTestId("middle-name-new")!.TrimmedText());
         }
         else
         {
@@ -135,27 +142,37 @@ public class IndexTests : TestBase
         {
             Assert.NotNull(lastNameRow);
             Assert.Equal(createPersonResult.LastName, lastNameRow.GetElementByTestId("last-name-current")!.TrimmedText());
-            Assert.Equal(createIncidentResult.NewLastName, lastNameRow.GetElementByTestId("last-name-new")!.TrimmedText());
+            Assert.Equal(changeNameRequestData.LastName, lastNameRow.GetElementByTestId("last-name-new")!.TrimmedText());
         }
         else
         {
             Assert.Null(lastNameRow);
         }
 
-        var imageDocument = doc.GetElementByTestId($"image-{imageEvidence.DocumentId}");
-        Assert.NotNull(imageDocument);
-        var pdfDocument = doc.GetElementByTestId($"pdf-{pdfEvidence.DocumentId}");
-        Assert.NotNull(pdfDocument);
+        if (evidenceIsPdf)
+        {
+            Assert.NotNull(doc.GetElementByTestId($"pdf-{changeNameRequestData.EvidenceFileId}"));
+            Assert.Null(doc.GetElementByTestId($"image-{changeNameRequestData.EvidenceFileId}"));
+        }
+        else
+        {
+            Assert.NotNull(doc.GetElementByTestId($"image-{changeNameRequestData.EvidenceFileId}"));
+            Assert.Null(doc.GetElementByTestId($"pdf-{changeNameRequestData.EvidenceFileId}"));
+        }
     }
 
     [Fact]
-    public async Task Get_WithTicketNumberForActiveDateOfBirthChangeIncident_RendersExpectedContent()
+    public async Task Get_WithSupportTaskReferenceForOpenChangeDateOfBirthRequestSupportTask_RendersExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            createPersonResult.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
+        var changeDateOfBirthRequestData = (ChangeDateOfBirthRequestData)supportTask.Data;
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -163,14 +180,14 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
+        Assert.Equal($"Change of Date of Birth - {createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);
         Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TrimmedText());
-        Assert.Equal(createIncidentResult.NewDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TrimmedText());
+        Assert.Equal(changeDateOfBirthRequestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TrimmedText());
 
-        var imageDocument = doc.GetElementByTestId($"image-{createIncidentResult.Evidence.DocumentId}");
+        var imageDocument = doc.GetElementByTestId($"image-{changeDateOfBirthRequestData.EvidenceFileId}");
         Assert.NotNull(imageDocument);
     }
 }

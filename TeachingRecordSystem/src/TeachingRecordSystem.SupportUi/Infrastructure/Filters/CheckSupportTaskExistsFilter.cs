@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly, SupportTaskType supportTaskType) : IAsyncResourceFilter
+public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly, params SupportTaskType[] supportTaskTypes) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -17,7 +17,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
         var currentSupportTaskQuery = dbContext.SupportTasks
             .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update");  // https://github.com/dotnet/efcore/issues/26042
 
-        if (supportTaskType is SupportTaskType.ApiTrnRequest or SupportTaskType.TrnRequestManualChecksNeeded or SupportTaskType.NpqTrnRequest)
+        if (supportTaskTypes.Contains(SupportTaskType.ApiTrnRequest) || supportTaskTypes.Contains(SupportTaskType.TrnRequestManualChecksNeeded) || supportTaskTypes.Contains(SupportTaskType.NpqTrnRequest))
         {
             currentSupportTaskQuery = currentSupportTaskQuery
                 .Include(t => t.TrnRequestMetadata)
@@ -27,7 +27,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
         var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync();
 
         if (currentSupportTask is null ||
-            currentSupportTask.SupportTaskType != supportTaskType ||
+            !supportTaskTypes.Contains(currentSupportTask.SupportTaskType) ||
             (openOnly && currentSupportTask.Status != SupportTaskStatus.Open))
         {
             context.Result = new NotFoundResult();
@@ -40,12 +40,12 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
     }
 }
 
-public class CheckSupportTaskExistsFilterFactory(bool openOnly, SupportTaskType? supportTaskType = null) : IFilterFactory, IOrderedFilter
+public class CheckSupportTaskExistsFilterFactory(bool openOnly, params SupportTaskType[] supportTaskTypes) : IFilterFactory, IOrderedFilter
 {
     public bool IsReusable => false;
 
     public int Order => -200;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
-        ActivatorUtilities.CreateInstance<CheckSupportTaskExistsFilter>(serviceProvider, openOnly, supportTaskType!);
+        ActivatorUtilities.CreateInstance<CheckSupportTaskExistsFilter>(serviceProvider, openOnly, supportTaskTypes);
 }

@@ -1,23 +1,20 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
-public partial class IndexModel : PageModel
+public class IndexModel(
+    TrsDbContext dbContext,
+    IFileService fileService) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-
-    public IndexModel(ICrmQueryDispatcher crmQueryDispatcher)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-    }
-
-    public string? ChangeType { get; set; }
+    public SupportTaskType? ChangeType { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -25,100 +22,82 @@ public partial class IndexModel : PageModel
 
     public DateOfBirthChangeRequestInfo? DateOfBirthChangeRequest { get; set; }
 
-    public EvidenceInfo[]? Evidence { get; set; }
+    public EvidenceInfo? Evidence { get; set; }
 
     [FromRoute]
-    public string TicketNumber { get; set; } = null!;
+    public string? SupportTaskReference { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public void OnGet()
     {
-        var incidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(TicketNumber));
-        if (incidentDetail is null)
-        {
-            return NotFound();
-        }
-
-        if (incidentDetail.Incident.StateCode != IncidentState.Active)
-        {
-            return BadRequest();
-        }
-
-        SetModelFromIncidentDetail(incidentDetail);
-
-        return Page();
-    }
-    public async Task<IActionResult> OnGetDocumentsAsync(Guid id)
-    {
-        var document = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetDocumentByIdQuery(id));
-        var annotation = document?.Extract<Annotation>("annotation", Annotation.PrimaryIdAttribute);
-
-        if (document is null || annotation is null)
-        {
-            return NotFound();
-        }
-
-        if (document.StateCode != dfeta_documentState.Active)
-        {
-            return BadRequest();
-        }
-
-        var bytes = Convert.FromBase64String(annotation.DocumentBody);
-        return File(bytes, annotation.MimeType);
     }
 
-    private void SetModelFromIncidentDetail(IncidentDetail incidentDetail)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var incident = incidentDetail.Incident;
-        var customer = incidentDetail.Contact;
-        var subject = incidentDetail.Subject;
-        var incidentDocuments = incidentDetail.IncidentDocuments;
-
-        ChangeType = subject.Title;
-        PersonName = customer.ResolveFullName(includeMiddleName: false);
-
-        if (subject.Title == DqtConstants.NameChangeSubjectTitle)
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var person = await dbContext.Persons
+            .AsNoTracking()
+            .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId);
+        if (person is null)
         {
+            context.Result = NotFound();
+            return;
+        }
+
+        PersonName = StringHelper.JoinNonEmpty(
+            ' ',
+            person.FirstName,
+            person.MiddleName,
+            person.LastName);
+
+        ChangeType = supportTask.SupportTaskType;
+        if (supportTask.SupportTaskType == SupportTaskType.ChangeNameRequest)
+        {
+            var data = (ChangeNameRequestData)supportTask.Data;
             NameChangeRequest = new NameChangeRequestInfo()
             {
-                CurrentFirstName = customer.FirstName,
-                CurrentMiddleName = customer.MiddleName,
-                CurrentLastName = customer.LastName,
-                NewFirstName = incident.dfeta_NewFirstName,
-                NewMiddleName = incident.dfeta_NewMiddleName,
-                NewLastName = incident.dfeta_NewLastName
+                CurrentFirstName = person!.FirstName,
+                CurrentMiddleName = person.MiddleName,
+                CurrentLastName = person.LastName,
+                NewFirstName = data.FirstName,
+                NewMiddleName = data.MiddleName,
+                NewLastName = data.LastName
+            };
+
+            Evidence = new EvidenceInfo()
+            {
+                FileId = data.EvidenceFileId,
+                FileName = data.EvidenceFileName,
+                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, FileUploadDefaults.FileUrlExpiry),
+                IsPdf = data.EvidenceFileName?.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ?? false
             };
         }
 
-        if (subject.Title == DqtConstants.DateOfBirthChangeSubjectTitle)
+        if (supportTask.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest)
         {
+            var data = (ChangeDateOfBirthRequestData)supportTask.Data;
             DateOfBirthChangeRequest = new DateOfBirthChangeRequestInfo()
             {
-                CurrentDateOfBirth = customer.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value,
-                NewDateOfBirth = incident.dfeta_NewDateofBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true)!.Value
+                CurrentDateOfBirth = person.DateOfBirth!.Value,
+                NewDateOfBirth = data.DateOfBirth
+            };
+
+            Evidence = new EvidenceInfo()
+            {
+                FileId = data.EvidenceFileId,
+                FileName = data.EvidenceFileName,
+                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, FileUploadDefaults.FileUrlExpiry),
+                IsPdf = data.EvidenceFileName?.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ?? false
             };
         }
 
-        if (incidentDocuments.Length > 0)
-        {
-            var evidence = new List<EvidenceInfo>();
-            foreach (var incidentDocument in incidentDocuments)
-            {
-                evidence.Add(new EvidenceInfo()
-                {
-                    DocumentId = incidentDocument.Document.dfeta_documentId!.Value,
-                    FileName = incidentDocument.Annotation.FileName,
-                    MimeType = incidentDocument.Annotation.MimeType
-                });
-            }
-
-            Evidence = evidence.ToArray();
-        }
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public record EvidenceInfo
     {
-        public required Guid DocumentId { get; init; }
+        public required Guid FileId { get; init; }
         public required string FileName { get; init; }
-        public required string MimeType { get; init; }
+        public required string FileUrl { get; init; }
+        public required bool IsPdf { get; init; }
     }
 }
