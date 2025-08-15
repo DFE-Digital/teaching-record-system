@@ -54,6 +54,7 @@ public class Person
     public bool CreatedByTps { get; set; }
     public Guid? SourceApplicationUserId { get; set; }
     public string? SourceTrnRequestId { get; set; }
+    public bool AllowDetailsUpdatesFromSourceApplication { get; set; }
 
     public Guid? DqtContactId { get; init; }
     public DateTime? DqtFirstSync { get; set; }
