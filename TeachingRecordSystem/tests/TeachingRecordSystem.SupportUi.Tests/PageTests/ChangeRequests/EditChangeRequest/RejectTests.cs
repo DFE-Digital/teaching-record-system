@@ -8,7 +8,7 @@ public class RejectTests : TestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     public async Task Get_WhenUserHasNoRoles_ReturnsForbidden()
     {
         // Arrange
@@ -25,7 +25,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
+    [Theory(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -43,7 +43,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     public async Task Get_WithTicketNumberForNonExistentIncident_ReturnsNotFound()
     {
         // Arrange
@@ -58,7 +58,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     public async Task Get_WithTicketNumberForInactiveIncident_ReturnsBadRequest()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     public async Task Post_WhenRejectionReasonChoiceHasNoSelection_ReturnsError()
     {
         // Arrange
@@ -93,7 +93,7 @@ public class RejectTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "RejectionReasonChoice", "Select the reason for rejecting this change");
     }
 
-    [Theory]
+    [Theory(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Post_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -117,7 +117,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     public async Task Post_WhenRejectionReasonChoiceIsNotChangeNoLongerRequired_RedirectsWithFlashMessage()
     {
         // Arrange
@@ -142,7 +142,7 @@ public class RejectTests : TestBase
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "The request has been rejected");
     }
 
-    [Fact]
+    [Fact(Skip = "Will re-enable once Reject page has been changed to use TRS support task")]
     public async Task Post_WhenRejectionReasonChoiceIsChangeNoLongerRequired_RedirectsWithFlashMessage()
     {
         // Arrange

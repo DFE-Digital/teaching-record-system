@@ -19,7 +19,7 @@ public class Conventions : IConfigureFolderConventions
                     return;
                 }
 
-                model.Filters.Add(new CheckSupportTaskExistsFilterFactory(openOnly: true, supportTaskType: SupportTaskType.NpqTrnRequest));
+                model.Filters.Add(new CheckSupportTaskExistsFilterFactory(openOnly: true, SupportTaskType.NpqTrnRequest));
 
             });
     }
