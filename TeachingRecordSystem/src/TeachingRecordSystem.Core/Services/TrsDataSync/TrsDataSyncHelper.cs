@@ -2376,7 +2376,9 @@ public class TrsDataSyncHelper(
             "dqt_first_name",
             "dqt_middle_name",
             "dqt_last_name",
-            "created_by_tps"
+            "created_by_tps",
+            "source_application_user_id",
+            "source_trn_request_id"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -2420,7 +2422,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.GenderCode,
             Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_MergedWith,
-            Contact.Fields.dfeta_CapitaTRNChangedOn
+            Contact.Fields.dfeta_CapitaTRNChangedOn,
+            Contact.Fields.dfeta_TrnRequestID
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -2446,6 +2449,8 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.CreatedByTps, NpgsqlDbType.Boolean);
+            writer.WriteValueOrNull(person.SourceApplicationUserId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(person.SourceTrnRequestId, NpgsqlDbType.Varchar);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -2797,7 +2802,9 @@ public class TrsDataSyncHelper(
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
             DqtLastName = c.LastName ?? string.Empty,
-            CreatedByTps = c.dfeta_CapitaTRNChangedOn == null ? true : false
+            CreatedByTps = c.dfeta_CapitaTRNChangedOn == null ? true : false,
+            SourceApplicationUserId = c.dfeta_TrnRequestID is not null ? Guid.Parse(c.dfeta_TrnRequestID[..Guid.Empty.ToString().Length]) : null,
+            SourceTrnRequestId = c.dfeta_TrnRequestID?[(Guid.Empty.ToString().Length + 2)..]
         })
         .ToList();
 
@@ -4648,6 +4655,8 @@ public class TrsDataSyncHelper(
         public required string? DqtMiddleName { get; init; }
         public required string? DqtLastName { get; init; }
         public required bool CreatedByTps { get; init; }
+        public required Guid? SourceApplicationUserId { get; init; }
+        public required string? SourceTrnRequestId { get; init; }
     }
 
     private record InductionInfo
