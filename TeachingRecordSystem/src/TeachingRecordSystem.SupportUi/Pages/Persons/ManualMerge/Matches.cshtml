@@ -84,7 +84,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Alerts</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value><a href="@LinkGenerator.PersonAlerts(match.PersonId)" target="_blank">(@match.ActiveAlertCount) open alert@(match.ActiveAlertCount == 1 ? "" : "s") (opens in a new tab)</a></govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value><a href="@LinkGenerator.PersonAlerts(match.PersonId)" target="_blank" class="govuk-link">(@match.ActiveAlertCount) open alert@(match.ActiveAlertCount == 1 ? "" : "s") (opens in a new tab)</a></govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                     </govuk-summary-list>
