@@ -70,7 +70,7 @@ builder.Services.AddAuthentication(options =>
     });
 });
 
-if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
     builder.Services
         .TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OneLoginOptions>, OneLoginPostConfigureOptions>());
@@ -166,7 +166,7 @@ builder.Services
         options.Filters.Add(new AssignViewDataFromFormFlowJourneyResultFilterFactory());
     });
 
-if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
     var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
     {
@@ -225,7 +225,7 @@ app.UseWhen(
             a.UseDeveloperExceptionPage();
             a.UseMigrationsEndPoint();
         }
-        else if (!app.Environment.IsUnitTests())
+        else if (!app.Environment.IsTests())
         {
             a.UseExceptionHandler("/error");
             a.UseStatusCodePagesWithReExecute("/error", "?code={0}");

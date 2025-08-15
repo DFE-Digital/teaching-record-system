@@ -13,7 +13,7 @@ public static class HostApplicationBuilderExtensions
 {
     public static IHostApplicationBuilder AddBackgroundJobs(this IHostApplicationBuilder builder)
     {
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             if (builder.Configuration.GetValue<bool>("RecurringJobsEnabled"))
             {
