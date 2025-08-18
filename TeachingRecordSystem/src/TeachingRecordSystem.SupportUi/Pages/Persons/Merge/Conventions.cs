@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 public class Conventions : IConfigureFolderConventions
 {

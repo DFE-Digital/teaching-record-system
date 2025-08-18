@@ -1,4 +1,3 @@
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class CheckAnswersTests : AddAlertTestBase

@@ -1,8 +1,8 @@
 using static TeachingRecordSystem.TestCommon.TestData;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
-public class ManualMergeTestBase(HostFixture hostFixture)
+public class MergeTestBase(HostFixture hostFixture)
     : TestBase(hostFixture)
 {
     protected async Task<(CreatePersonResult PersonA, CreatePersonResult PersonB)> CreatePersonsWithNoDifferences(

@@ -1,5 +1,5 @@
-@page "/persons/{personId}/manual-merge/matches"
-@model TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge.MatchesModel
+@page "/persons/{personId}/merge/matches"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.Merge.MatchesModel
 @{
     Layout = "_Layout";
     ViewBag.Title = "Compare matching records";
@@ -92,7 +92,7 @@
             }
         </div>
 
-        <form action="@Model.GetPageLink(ManualMergeJourneyPage.Matches)" method="post" data-testid="submit-form">
+        <form action="@Model.GetPageLink(MergeJourneyPage.Matches)" method="post" data-testid="submit-form">
             @if (Model.CannotMergeReason is null)
             {
                 <govuk-radios asp-for="PrimaryPersonId" data-testid="primary-person-options">

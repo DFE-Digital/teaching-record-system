@@ -6,10 +6,10 @@ using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
-[Journey(JourneyNames.ManualMergePerson), RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
@@ -17,9 +17,9 @@ public class CheckAnswersModel(
     IClock clock)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    public string BackLink => GetPageLink(ManualMergeJourneyPage.Merge);
-    public string ChangePrimaryPersonLink => GetPageLink(ManualMergeJourneyPage.Matches, fromCheckAnswers: true);
-    public string ChangeDetailsLink => GetPageLink(ManualMergeJourneyPage.Merge, fromCheckAnswers: true);
+    public string BackLink => GetPageLink(MergeJourneyPage.Merge);
+    public string ChangePrimaryPersonLink => GetPageLink(MergeJourneyPage.Matches, fromCheckAnswers: true);
+    public string ChangeDetailsLink => GetPageLink(MergeJourneyPage.Merge, fromCheckAnswers: true);
 
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -45,13 +45,13 @@ public class CheckAnswersModel(
 
         if (state.PersonAId is not Guid personAId || state.PersonBId is not Guid personBId)
         {
-            context.Result = Redirect(GetPageLink(ManualMergeJourneyPage.EnterTrn));
+            context.Result = Redirect(GetPageLink(MergeJourneyPage.EnterTrn));
             return;
         }
 
         if (state.PrimaryPersonId is not Guid primaryPersonId)
         {
-            context.Result = Redirect(GetPageLink(ManualMergeJourneyPage.Matches));
+            context.Result = Redirect(GetPageLink(MergeJourneyPage.Matches));
             return;
         }
 
@@ -59,7 +59,7 @@ public class CheckAnswersModel(
             state.UploadEvidence is not bool uploadEvidence ||
             uploadEvidence && state.EvidenceFileId is null)
         {
-            context.Result = Redirect(GetPageLink(ManualMergeJourneyPage.Merge));
+            context.Result = Redirect(GetPageLink(MergeJourneyPage.Merge));
             return;
         }
 
@@ -139,6 +139,7 @@ public class CheckAnswersModel(
 
         var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
         secondaryPerson.Status = PersonStatus.Deactivated;
+        secondaryPerson.MergedWithPersonId = primaryPersonId;
 
         var @event = new PersonsMergedEvent()
         {

@@ -1,5 +1,5 @@
-@page "/persons/{personId}/manual-merge/check-answers"
-@model TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge.CheckAnswersModel
+@page "/persons/{personId}/merge/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.Merge.CheckAnswersModel
 @{
     Layout = "_Layout";
     ViewBag.Title = "Check details before updating the primary record";
@@ -9,7 +9,7 @@
     <govuk-back-link data-testid="back-link" href="@Model.BackLink" />
 }
 
-<form action="@Model.GetPageLink(ManualMergeJourneyPage.CheckAnswers)" method="post" data-testid="submit-form">
+<form action="@Model.GetPageLink(MergeJourneyPage.CheckAnswers)" method="post" data-testid="submit-form">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>

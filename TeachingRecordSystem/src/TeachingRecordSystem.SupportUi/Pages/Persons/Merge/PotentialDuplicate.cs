@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Events.Models;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 public record PotentialDuplicate
 {

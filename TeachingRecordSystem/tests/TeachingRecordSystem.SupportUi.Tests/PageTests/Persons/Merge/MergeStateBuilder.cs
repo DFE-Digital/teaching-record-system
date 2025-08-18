@@ -1,6 +1,6 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 public class MergeStateBuilder
 {
@@ -111,9 +111,9 @@ public class MergeStateBuilder
         return this;
     }
 
-    public ManualMergeState Build()
+    public MergeState Build()
     {
-        return new ManualMergeState
+        return new MergeState
         {
             Initialized = Initialized,
             PersonAId = PersonAId,

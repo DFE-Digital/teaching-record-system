@@ -1,6 +1,6 @@
-@page "/persons/{personId}/manual-merge/merge"
+@page "/persons/{personId}/merge/merge"
 @using TeachingRecordSystem.SupportUi.Pages.Shared
-@model TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge.MergeModel
+@model TeachingRecordSystem.SupportUi.Pages.Persons.Merge.MergeModel
 @{
     Layout = "_Layout";
     ViewBag.Title = "Select the details to merge into the primary record";
@@ -36,7 +36,7 @@
 #pragma warning restore CS1998
 }
 
-<form action="@Model.GetPageLink(ManualMergeJourneyPage.Merge)" method="post" data-testid="submit-form">
+<form action="@Model.GetPageLink(MergeJourneyPage.Merge)" method="post" data-testid="submit-form">
     <span class="govuk-caption-l">Support tasks</span>
     <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 

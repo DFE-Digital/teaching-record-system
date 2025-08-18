@@ -1,11 +1,11 @@
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
-public class ManualMergeState : IRegisterJourney
+public class MergeState : IRegisterJourney
 {
     public static JourneyDescriptor Journey => new(
-        JourneyNames.ManualMergePerson,
-        typeof(ManualMergeState),
+        JourneyNames.MergePerson,
+        typeof(MergeState),
         requestDataKeys: ["personId"],
         appendUniqueKey: true);
 

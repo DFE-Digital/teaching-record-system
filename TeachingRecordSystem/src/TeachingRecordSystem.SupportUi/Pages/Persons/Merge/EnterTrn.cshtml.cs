@@ -6,10 +6,10 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.ManualMerge;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
-[Journey(JourneyNames.ManualMergePerson), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson), ActivatesJourney, RequireJourneyInstance]
 public class EnterTrnModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
@@ -26,7 +26,7 @@ public class EnterTrnModel(
     [BindProperty]
     public string? OtherTrn { get; set; }
 
-    public string BackLink => GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : null);
+    public string BackLink => GetPageLink(FromCheckAnswers ? MergeJourneyPage.CheckAnswers : null);
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -83,7 +83,7 @@ public class EnterTrnModel(
                 state.PersonBTrn = otherPerson.Trn;
             });
 
-            return Redirect(GetPageLink(FromCheckAnswers ? ManualMergeJourneyPage.CheckAnswers : ManualMergeJourneyPage.Matches));
+            return Redirect(GetPageLink(FromCheckAnswers ? MergeJourneyPage.CheckAnswers : MergeJourneyPage.Matches));
         }
     }
 }

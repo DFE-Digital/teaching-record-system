@@ -1,5 +1,4 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
@@ -145,45 +144,9 @@ public class CommonPageTests : SetStatusTestBase
         var primaryPerson = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithTrn());
-        var secondaryPerson = await CreatePersonWithCurrentStatus(PersonStatus.Deactivated, p => p.WithTrn());
-
-        var createdByUser = await TestData.CreateUserAsync();
-        var attributes = new PersonAttributes
-        {
-            DateOfBirth = DateOnly.Parse("1 Oct 2003"),
-            FirstName = "Jim",
-            MiddleName = "The",
-            LastName = "Bob",
-            EmailAddress = "jim@bob.com",
-            Gender = Gender.Female,
-            NationalInsuranceNumber = "AB 12 34 56 D"
-        };
-        var mergeEvent = new PersonsMergedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
-            RaisedBy = createdByUser.UserId,
-            PersonId = primaryPerson.PersonId,
-            PersonTrn = primaryPerson.Trn!,
-            SecondaryPersonId = secondaryPerson.PersonId,
-            SecondaryPersonTrn = secondaryPerson.Trn!,
-            SecondaryPersonStatus = PersonStatus.Deactivated,
-            Comments = null,
-            PersonAttributes = attributes,
-            OldPersonAttributes = attributes,
-            Changes = PersonsMergedEventChanges.None,
-            EvidenceFile = new EventModels.File
-            {
-                FileId = Guid.NewGuid(),
-                Name = "evidence.jpg"
-            }
-        };
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(mergeEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        var secondaryPerson = await CreatePersonWithCurrentStatus(PersonStatus.Deactivated, p => p
+            .WithTrn()
+            .WithMergedWithPersonId(primaryPerson.PersonId));
 
         var stateBuilder = new SetStatusStateBuilder()
             .WithInitializedState()
