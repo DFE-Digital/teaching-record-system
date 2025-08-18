@@ -1,4 +1,4 @@
-@page "/change-requests/{ticketNumber}/reject"
+@page "/change-requests/{supportTaskReference}/reject"
 @using static TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel;
 @model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel
 @{
@@ -6,15 +6,15 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.EditChangeRequest(Model.TicketNumber)" />
+    <govuk-back-link href="@LinkGenerator.EditChangeRequest(Model.SupportTaskReference)" />
 }
 
-<span class="govuk-caption-l">@Model.ChangeType - @Model.PersonName</span>
+<span class="govuk-caption-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Change of Name" : "Change of Date of Birth") - @Model.PersonName</span>
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">        
-        <form action="@LinkGenerator.RejectChangeRequest(Model.TicketNumber)" method="post">
+        <form action="@LinkGenerator.RejectChangeRequest(Model.SupportTaskReference)" method="post">
             <govuk-radios asp-for="RejectionReasonChoice">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>

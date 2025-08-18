@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -75,6 +76,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<ReferenceDataCache, TestReferenceDataCache>();
             services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
             services.AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions));
+            services.AddSingleton<INotificationSender, NoopNotificationSender>();
         });
     }
 
