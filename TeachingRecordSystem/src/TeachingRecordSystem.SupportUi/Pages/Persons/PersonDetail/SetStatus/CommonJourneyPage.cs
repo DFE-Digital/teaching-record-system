@@ -71,13 +71,7 @@ public abstract class CommonJourneyPage(
         // Person cannot be reactivated if they were deactivated as part of a merge
         // where they were merged into another Person (i.e. they were the secondary
         // Person and the other Person was primary)
-        var personWasDeactivatedAsPartOfAMerge = Person.Status == PersonStatus.Deactivated &&
-            await DbContext.Events.AnyAsync(e =>
-                e.EventName == nameof(PersonsMergedEvent) &&
-                e.PersonIds.Contains(PersonId) &&
-                e.PersonId != PersonId);
-
-        if (personWasDeactivatedAsPartOfAMerge)
+        if (Person.Status == PersonStatus.Deactivated && Person.MergedWithPersonId is not null)
         {
             context.Result = BadRequest();
             return;

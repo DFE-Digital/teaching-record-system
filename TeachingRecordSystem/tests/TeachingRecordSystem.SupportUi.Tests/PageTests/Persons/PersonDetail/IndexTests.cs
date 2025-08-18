@@ -761,49 +761,13 @@ public class IndexTests : TestBase
             .WithTrn());
         var secondaryPerson = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithTrn()
+            .WithMergedWithPersonId(primaryPerson.PersonId));
+
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(secondaryPerson.Person);
             secondaryPerson.Person.Status = PersonStatus.Deactivated;
-            await dbContext.SaveChangesAsync();
-        });
-
-        var createdByUser = await TestData.CreateUserAsync();
-        var attributes = new PersonAttributes
-        {
-            DateOfBirth = DateOnly.Parse("1 Oct 2003"),
-            FirstName = "Jim",
-            MiddleName = "The",
-            LastName = "Bob",
-            EmailAddress = "jim@bob.com",
-            Gender = Gender.Female,
-            NationalInsuranceNumber = "AB 12 34 56 D"
-        };
-        var mergeEvent = new PersonsMergedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
-            RaisedBy = createdByUser.UserId,
-            PersonId = primaryPerson.PersonId,
-            PersonTrn = primaryPerson.Trn!,
-            SecondaryPersonId = secondaryPerson.PersonId,
-            SecondaryPersonTrn = secondaryPerson.Trn!,
-            SecondaryPersonStatus = PersonStatus.Deactivated,
-            Comments = null,
-            PersonAttributes = attributes,
-            OldPersonAttributes = attributes,
-            Changes = PersonsMergedEventChanges.None,
-            EvidenceFile = new EventModels.File
-            {
-                FileId = Guid.NewGuid(),
-                Name = "evidence.jpg"
-            }
-        };
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(mergeEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -818,7 +782,4 @@ public class IndexTests : TestBase
         var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
         Assert.Null(setStatusButton);
     }
-
-    // * A “Deactivated” status label is added to the top of the record.
-    // * “(deactivated)” is appended to the end of the name on the Record.
 }

@@ -139,6 +139,7 @@ public class CheckAnswersModel(
 
         var secondaryPerson = await DbContext.Persons.SingleAsync(p => p.PersonId == secondaryPersonId);
         secondaryPerson.Status = PersonStatus.Deactivated;
+        secondaryPerson.MergedWithPersonId = primaryPersonId;
 
         var @event = new PersonsMergedEvent()
         {

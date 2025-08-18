@@ -161,13 +161,17 @@ public class CheckAnswersTests : MergeTestBase
 
         var primaryPerson = await WithDbContext(dbContext => dbContext.Persons
             .IgnoreQueryFilters()
+            .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personA.PersonId));
         Assert.Equal(PersonStatus.Active, primaryPerson.Status);
+        Assert.Null(primaryPerson.MergedWithPersonId);
 
         var secondaryPerson = await WithDbContext(dbContext => dbContext.Persons
             .IgnoreQueryFilters()
+            .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personB.PersonId));
         Assert.Equal(PersonStatus.Deactivated, secondaryPerson.Status);
+        Assert.Equal(primaryPerson.PersonId, secondaryPerson.MergedWithPersonId);
 
         static object? FormatValue(object? value) =>
             value switch

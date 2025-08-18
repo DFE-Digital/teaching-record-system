@@ -58,6 +58,7 @@ public partial class TestData
         private CreatePersonInductionBuilder? _inductionBuilder;
         private QtlsStatus? _qtlsStatus;
         private TestDataPersonDataSource? _personDataSource;
+        private Guid? _mergedWithPersonId;
         private bool? _createdByTps;
 
         internal CreatePersonBuilder(ReferenceData referenceData)
@@ -404,6 +405,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithMergedWithPersonId(Guid mergedWithPersonId)
+        {
+            _mergedWithPersonId = mergedWithPersonId;
+            return this;
+        }
+
         public CreatePersonBuilder WithCreatedByTps(bool? createdByTps)
         {
             if (_createdByTps is not null && _createdByTps != createdByTps)
@@ -497,7 +504,6 @@ public partial class TestData
                     CreatedOn = mappedPersonInfo.CreatedOn,
                     UpdatedOn = mappedPersonInfo.UpdatedOn,
                     Status = mappedPersonInfo.Status,
-                    MergedWithPersonId = null,
                     Trn = mappedPersonInfo.Trn,
                     FirstName = mappedPersonInfo.FirstName,
                     MiddleName = mappedPersonInfo.MiddleName,
@@ -513,7 +519,8 @@ public partial class TestData
                     DqtMiddleName = mappedPersonInfo.DqtMiddleName,
                     DqtLastName = mappedPersonInfo.DqtLastName,
                     Gender = mappedPersonInfo.Gender,
-                    CreatedByTps = mappedPersonInfo.CreatedByTps
+                    CreatedByTps = mappedPersonInfo.CreatedByTps,
+                    MergedWithPersonId = _mergedWithPersonId,
                 });
 
                 await dbContext.SaveChangesAsync();
@@ -692,6 +699,7 @@ public partial class TestData
                 PreviousNames = previousNames
             };
         }
+
 
         private void EnsureTrn()
         {

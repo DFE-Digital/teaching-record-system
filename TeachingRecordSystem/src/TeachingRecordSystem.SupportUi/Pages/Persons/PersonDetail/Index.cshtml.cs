@@ -70,11 +70,7 @@ public class IndexModel(
         // Person cannot be reactivated if they were deactivated as part of a merge
         // where they were merged into another Person (i.e. they were the secondary
         // Person and the other Person was primary)
-        var personWasDeactivatedAsPartOfAMerge = !Person.IsActive &&
-            await dbContext.Events.AnyAsync(e =>
-                e.EventName == nameof(PersonsMergedEvent) &&
-                e.PersonIds.Contains(PersonId) &&
-                e.PersonId != PersonId);
+        var personWasDeactivatedAsPartOfAMerge = !Person.IsActive && Person.MergedWithPersonId is not null;
 
         CanSetStatus =
             contactsMigrated &&
@@ -133,7 +129,8 @@ public class IndexModel(
                     .OrderByDescending(n => n.CreatedOn)
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
                     .ToArray(),
-                IsActive = person.Status == PersonStatus.Active
+                IsActive = person.Status == PersonStatus.Active,
+                MergedWithPersonId = person.MergedWithPersonId
             };
         }
         else
@@ -171,7 +168,8 @@ public class IndexModel(
                     .OrderByDescending(n => n.CreatedOn)
                     .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
                     .ToArray(),
-                IsActive = contact.StatusCode == Contact_StatusCode.Alive
+                IsActive = contact.StatusCode == Contact_StatusCode.Alive,
+                MergedWithPersonId = null
             };
         }
     }
@@ -187,6 +185,7 @@ public class IndexModel(
         public required bool HasActiveAlert { get; init; }
         public required string[] PreviousNames { get; init; }
         public required bool IsActive { get; init; }
+        public required Guid? MergedWithPersonId { get; init; }
     }
 
     public record PersonProfessionalStatusInfo
