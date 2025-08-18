@@ -67,6 +67,11 @@ public class ChangeLogSetStatusEventTests : TestBase
 
         var item = doc.GetElementByTestId("timeline-item-status-updated-event");
         Assert.NotNull(item);
+
+        var title = item.QuerySelector(".moj-timeline__title");
+        Assert.NotNull(title);
+        Assert.Equal($"Record deactivated", title.TrimmedText());
+
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
@@ -119,6 +124,11 @@ public class ChangeLogSetStatusEventTests : TestBase
 
         var item = doc.GetElementByTestId("timeline-item-status-updated-event");
         Assert.NotNull(item);
+
+        var title = item.QuerySelector(".moj-timeline__title");
+        Assert.NotNull(title);
+        Assert.Equal($"Record reactivated", title.TrimmedText());
+
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
