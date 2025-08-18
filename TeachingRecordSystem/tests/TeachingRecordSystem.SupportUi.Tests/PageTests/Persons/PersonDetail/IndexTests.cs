@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
