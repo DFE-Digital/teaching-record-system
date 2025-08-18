@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.RouteToProfessionalStatus;
 
 public static class RouteToProfessionalStatusPageExtensions
 {

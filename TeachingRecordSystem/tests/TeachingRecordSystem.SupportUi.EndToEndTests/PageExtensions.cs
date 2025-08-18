@@ -674,6 +674,10 @@ public static class PageExtensions
         .Locator("xpath=following-sibling::label")
         .ClickAsync();
 
+    public static Task ClickRadioByLabelAsync(this IPage page, string labelText) =>
+        page.Locator($"input[type='radio'] + label:text-is('{labelText}')")
+            .ClickAsync();
+
     public static async Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null)
     {
         var section = page.GetByTestId("has-additional-reason_detail-options");
