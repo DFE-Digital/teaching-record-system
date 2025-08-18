@@ -1,4 +1,5 @@
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -13,14 +14,84 @@ public record SetPiiCommand
     public required string? MiddleName { get; init; }
     public required string LastName { get; init; }
     public required DateOnly DateOfBirth { get; init; }
-    public required string? EmailAddresses { get; init; }
+    public required string? EmailAddress { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
     public required Gender? Gender { get; init; }
 }
 
-public class SetPiiHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
+public class SetPiiHandler(
+    TrsDbContext dbContext,
+    ICurrentUserProvider currentUserProvider,
+    IClock clock,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IFeatureProvider featureProvider)
 {
     public async Task<ApiResult<Unit>> HandleAsync(SetPiiCommand command)
+    {
+        if (!featureProvider.IsEnabled(FeatureNames.ContactsMigrated))
+        {
+            return await HandleOverDqtAsync(command);
+        }
+
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
+
+        if (person is null)
+        {
+            return ApiError.PersonNotFound(command.Trn);
+        }
+
+        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+        if (!person.AllowDetailsUpdatesFromSourceApplication ||
+            person.SourceApplicationUserId != currentUserId)
+        {
+            return ApiError.PiiUpdatesForbidden();
+        }
+
+        if (person.QtsDate is not null)
+        {
+            return ApiError.PiiUpdatesForbiddenPersonHasQts();
+        }
+
+        if (person.EytsDate is not null)
+        {
+            return ApiError.PiiUpdatesForbiddenPersonHasEyts();
+        }
+
+        var now = clock.UtcNow;
+
+        var updateResult = person.UpdateDetails(
+            command.FirstName,
+            command.MiddleName ?? string.Empty,
+            command.LastName,
+            command.DateOfBirth,
+            command.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
+            command.NationalInsuranceNumber is string nino ? NationalInsuranceNumber.Parse(nino) : null,
+            command.Gender,
+            now);
+
+        var personUpdatedEvent = new PersonDetailsUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = currentUserId,
+            PersonId = person.PersonId,
+            PersonAttributes = updateResult.PersonAttributes,
+            OldPersonAttributes = updateResult.OldPersonAttributes,
+            NameChangeReason = null,
+            NameChangeEvidenceFile = null,
+            DetailsChangeReason = null,
+            DetailsChangeReasonDetail = null,
+            DetailsChangeEvidenceFile = null,
+            Changes = PersonDetailsUpdatedEventChanges.None
+        };
+        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent);
+
+        await dbContext.SaveChangesAsync();
+
+        return Unit.Instance;
+    }
+
+    private async Task<ApiResult<Unit>> HandleOverDqtAsync(SetPiiCommand command)
     {
         var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(
@@ -68,7 +139,7 @@ public class SetPiiHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryD
                 DateOfBirth: command.DateOfBirth,
                 NationalInsuranceNumber: NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber),
                 Gender: command.Gender?.ToContact_GenderCode(),
-                EmailAddress: command.EmailAddresses));
+                EmailAddress: command.EmailAddress));
 
         return Unit.Instance;
     }
