@@ -13,7 +13,7 @@
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-details-updated-event">
     <div class="moj-timeline__header">
-        <h2 class="moj-timeline__title">TRN request from @(applicationUser?.Name ?? "unknown source") - records merged</h2>
+        <h2 class="moj-timeline__title">TRN request from @(applicationUser?.Name ?? "unknown source")</h2>
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
@@ -73,7 +73,7 @@
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>Identified as same person during task resolution</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value>@updatedEvent.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
