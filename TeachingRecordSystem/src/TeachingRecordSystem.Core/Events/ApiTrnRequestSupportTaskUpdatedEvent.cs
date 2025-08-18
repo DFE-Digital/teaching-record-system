@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Events;
 
-public record ApiTrnRequestSupportTaskUpdatedEvent : SupportTaskUpdatedEvent, IEventWithPersonAttributes
+public record ApiTrnRequestSupportTaskUpdatedEvent : SupportTaskUpdatedEvent, IEventWithPersonId, IEventWithPersonAttributes
 {
     public required Guid PersonId { get; init; }
     public required EventModels.TrnRequestMetadata RequestData { get; init; }

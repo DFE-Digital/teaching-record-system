@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record PersonsMergedEvent : EventBase, IEventWithPersonAttributes, IEventWithSecondaryPersonId
+public record PersonsMergedEvent : EventBase, IEventWithPersonId, IEventWithPersonAttributes, IEventWithSecondaryPersonId
 {
     public required Guid PersonId { get; init; }
     public required string PersonTrn { get; init; }
@@ -26,5 +26,6 @@ public enum PersonsMergedEventChanges
     DateOfBirth = PersonAttributesChanges.DateOfBirth,
     EmailAddress = PersonAttributesChanges.EmailAddress,
     NationalInsuranceNumber = PersonAttributesChanges.NationalInsuranceNumber,
-    Gender = PersonAttributesChanges.Gender
+    Gender = PersonAttributesChanges.Gender,
+    NameChange = FirstName | MiddleName | LastName
 }

@@ -3,7 +3,7 @@ using File = TeachingRecordSystem.Core.Events.Models.File;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record RouteToProfessionalStatusDeletedEvent : EventBase, IEventWithPersonId, IEventWithRouteToProfessionalStatus
+public record RouteToProfessionalStatusDeletedEvent : EventBase, IEventWithPersonId, IEventWithRouteToProfessionalStatus, IEventWithInduction
 {
     public required Guid PersonId { get; init; }
     public required RouteToProfessionalStatus RouteToProfessionalStatus { get; init; }

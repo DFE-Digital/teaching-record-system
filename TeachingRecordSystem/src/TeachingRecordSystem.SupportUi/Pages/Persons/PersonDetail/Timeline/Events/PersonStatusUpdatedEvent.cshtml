@@ -1,0 +1,82 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@model TimelineItem<TimelineEvent<PersonStatusUpdatedEvent>>
+@{
+    var statusUpdatedEvent = Model.ItemModel.Event;
+    var (actionPastParticiple, actionNoun) = statusUpdatedEvent.Status == PersonStatus.Deactivated
+        ? ("deactivated", "deactivation")
+        : ("reactivated", "reactivation");
+    var evidenceFileUrl = statusUpdatedEvent.EvidenceFile is not null
+        ? await FileService.GetFileUrlAsync(statusUpdatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15))
+        : null;
+}
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-status-updated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Record @actionPastParticiple</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <div data-testid="details">
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@statusUpdatedEvent.Status.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+        </div>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for @actionNoun</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@statusUpdatedEvent.Reason</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (statusUpdatedEvent.ReasonDetail is not null)
+                            {
+                                <multi-line-text text="@statusUpdatedEvent.ReasonDetail" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{statusUpdatedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@statusUpdatedEvent.OldStatus.GetDisplayName()</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>
