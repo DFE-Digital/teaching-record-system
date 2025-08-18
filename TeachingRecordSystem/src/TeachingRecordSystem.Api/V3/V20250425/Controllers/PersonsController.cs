@@ -74,7 +74,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
             MiddleName = request.MiddleName,
             LastName = request.LastName,
             DateOfBirth = request.DateOfBirth,
-            EmailAddresses = request.EmailAddress,
+            EmailAddress = request.EmailAddress,
             NationalInsuranceNumber = request.NationalInsuranceNumber,
             Gender = request.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null,
         };
