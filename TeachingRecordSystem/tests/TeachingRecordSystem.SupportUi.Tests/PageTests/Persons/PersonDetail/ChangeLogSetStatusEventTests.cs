@@ -70,8 +70,6 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
-        doc.AssertRow("details", "Status", v => Assert.Equal("Deactivated", v.TrimmedText()));
-        doc.AssertRow("previous-details", "Status", v => Assert.Equal("Active", v.TrimmedText()));
         doc.AssertRow("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
         doc.AssertRow("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertRow("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
@@ -124,8 +122,6 @@ public class ChangeLogSetStatusEventTests : TestBase
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
-        doc.AssertRow("details", "Status", v => Assert.Equal("Active", v.TrimmedText()));
-        doc.AssertRow("previous-details", "Status", v => Assert.Equal("Deactivated", v.TrimmedText()));
         doc.AssertRow("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
         doc.AssertRow("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertRow("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));

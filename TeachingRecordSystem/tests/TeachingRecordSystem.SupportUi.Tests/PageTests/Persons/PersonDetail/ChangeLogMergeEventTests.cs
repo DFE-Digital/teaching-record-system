@@ -7,18 +7,18 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
     private string _oldFirstName;
     private string _oldMiddleName;
     private string _oldLastName;
-    private DateOnly? _oldDateOfBirth;
-    private string? _oldEmailAddress;
-    private string? _oldNationalInsuranceNumber;
-    private Gender? _oldGender;
+    private DateOnly _oldDateOfBirth;
+    private string _oldEmailAddress;
+    private string _oldNationalInsuranceNumber;
+    private Gender _oldGender;
 
     private string _firstName;
     private string _middleName;
     private string _lastName;
-    private DateOnly? _dateOfBirth;
+    private DateOnly _dateOfBirth;
     private string _emailAddress;
-    private string? _nationalInsuranceNumber;
-    private Gender? _gender;
+    private string _nationalInsuranceNumber;
+    private Gender _gender;
 
     private Core.DataStore.Postgres.Models.User? _createdByUser;
     private TestData.CreatePersonResult? _person;
@@ -178,8 +178,8 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
 
         if (changes.HasFlag(PersonsMergedEventChanges.DateOfBirth))
         {
-            doc.AssertRow("details", "Date of birth", v => Assert.Equal(_dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertRow("previous-details", "Date of birth", v => Assert.Equal(_oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertRow("details", "Date of birth", v => Assert.Equal(_dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertRow("previous-details", "Date of birth", v => Assert.Equal(_oldDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {

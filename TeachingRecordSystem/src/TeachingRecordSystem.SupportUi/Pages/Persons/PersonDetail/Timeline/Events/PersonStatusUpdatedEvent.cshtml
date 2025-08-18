@@ -20,15 +20,6 @@
         <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
     </p>
     <div class="moj-timeline__description">
-        <div data-testid="details">
-            <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@statusUpdatedEvent.Status.GetDisplayName()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            </govuk-summary-list>
-        </div>
-
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
             <govuk-details-summary>Reason for @actionNoun</govuk-details-summary>
             <govuk-details-text>
@@ -62,18 +53,6 @@
                                 <span use-empty-fallback></span>
                             }
                         </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
-
-        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
-            <govuk-details-summary>Previous data</govuk-details-summary>
-            <govuk-details-text>
-                <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@statusUpdatedEvent.OldStatus.GetDisplayName()</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-details-text>
