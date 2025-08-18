@@ -6,8 +6,8 @@
     var mergedEvent = Model.ItemModel.Event;
 
     var title = Model.PersonId == mergedEvent.PersonId
-        ? "Records merged"
-        : "Record deactivated";
+        ? $"Record merged with TRN {mergedEvent.SecondaryPersonTrn}"
+        : $"Record merged into TRN {mergedEvent.PersonTrn} and deactivated";
 
     var evidenceFileUrl = mergedEvent.EvidenceFile is not null
         ? await FileService.GetFileUrlAsync(mergedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15))
@@ -84,9 +84,12 @@
                     }
                 </govuk-summary-list>
             </div>
+        }
 
+        @if (mergedEvent.Comments is not null || mergedEvent.EvidenceFile is not null)
+        {
             <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-                <govuk-details-summary>Reason for merge</govuk-details-summary>
+                <govuk-details-summary>Reason for change</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
                         <govuk-summary-list-row>
@@ -109,7 +112,10 @@
                     </govuk-summary-list>
                 </govuk-details-text>
             </govuk-details>
+        }
 
+        @if (Model.PersonId == mergedEvent.PersonId)
+        {
             <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
                 <govuk-details-summary>Previous data</govuk-details-summary>
                 <govuk-details-text>
@@ -149,60 +155,6 @@
                                 <govuk-summary-list-row-value use-empty-fallback>@oldDetails.Gender</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-                    </govuk-summary-list>
-                </govuk-details-text>
-            </govuk-details>
-        }
-        else
-        {
-            <div data-testid="details">
-                <govuk-summary-list>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>Deactivated</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                </govuk-summary-list>
-            </div>
-            <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-                <govuk-details-summary>Reason for deactivation</govuk-details-summary>
-                <govuk-details-text>
-                    <govuk-summary-list>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>This record was identified as a duplicate and deactivated after a merge</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>TRN of other record</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@mergedEvent.PersonTrn</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@mergedEvent.Comments</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value>
-                                @if (evidenceFileUrl is not null)
-                                {
-                                    <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{mergedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    </govuk-summary-list>
-                </govuk-details-text>
-            </govuk-details>
-            <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
-                <govuk-details-summary>Previous data</govuk-details-summary>
-                <govuk-details-text>
-                    <govuk-summary-list>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>Active</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
                     </govuk-summary-list>
                 </govuk-details-text>
             </govuk-details>
