@@ -1,36 +1,35 @@
 using System.ComponentModel.DataAnnotations;
+using System.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
-public class RejectModel : PageModel
+public class RejectModel(
+    TrsDbContext dbContext,
+    IBackgroundJobScheduler backgroundJobScheduler,
+    TrsLinkGenerator linkGenerator,
+    IClock clock) : PageModel
 {
-    private readonly TrsLinkGenerator _linkGenerator;
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-
-    public RejectModel(
-        TrsLinkGenerator linkGenerator,
-        ICrmQueryDispatcher crmQueryDispatcher)
-    {
-        _linkGenerator = linkGenerator;
-        _crmQueryDispatcher = crmQueryDispatcher;
-    }
-
     [FromRoute]
-    public string TicketNumber { get; set; } = null!;
+    public required string SupportTaskReference { get; init; }
 
-    public string? ChangeType { get; set; }
+    public SupportTaskType? ChangeType { get; set; }
 
     public string? PersonName { get; set; }
 
-    IncidentDetail? IncidentDetail { get; set; }
+    SupportTask? SupportTask { get; set; }
+
+    Person? Person { get; set; }
 
     [BindProperty]
     [Display(Name = " ")]
@@ -46,44 +45,157 @@ public class RejectModel : PageModel
 
         var requestStatus = "rejected";
         var flashMessage = "The user’s record has not been changed and they have been notified.";
+
+        var changeNameRequestData = ChangeType == SupportTaskType.ChangeNameRequest ? EventModels.ChangeNameRequestData.FromModel((ChangeNameRequestData)SupportTask!.Data) : null;
+        var changeDateOfBirthRequestData = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? EventModels.ChangeDateOfBirthRequestData.FromModel((ChangeDateOfBirthRequestData)SupportTask!.Data) : null;
+        var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
+        SupportTask!.Status = SupportTaskStatus.Closed;
+        SupportTask.UpdatedOn = clock.UtcNow;
+
+        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
         if (RejectionReasonChoice!.Value == CaseRejectionReasonOption.ChangeNoLongerRequired)
         {
             requestStatus = "cancelled";
             flashMessage = "The user’s record has not been changed and they have not been notified.";
 
-            _ = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new CancelIncidentQuery(IncidentDetail!.Incident.Id));
+            EventBase cancelledEvent = null!;
+            if (ChangeType == SupportTaskType.ChangeNameRequest)
+            {
+                SupportTask.UpdateData<ChangeNameRequestData>(data => data with
+                {
+                    ChangeRequestOutcome = SupportRequestOutcome.Cancelled
+                });
+
+                cancelledEvent = new ChangeNameRequestSupportTaskCancelledEvent()
+                {
+                    RequestData = changeNameRequestData!,
+                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
+                    OldSupportTask = oldSupportTask,
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = clock.UtcNow,
+                    RaisedBy = User.GetUserId()
+                };
+            }
+            else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
+            {
+                SupportTask.UpdateData<ChangeDateOfBirthRequestData>(data => data with
+                {
+                    ChangeRequestOutcome = SupportRequestOutcome.Cancelled
+                });
+
+                cancelledEvent = new ChangeDateOfBirthRequestSupportTaskCancelledEvent()
+                {
+                    RequestData = changeDateOfBirthRequestData!,
+                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
+                    OldSupportTask = oldSupportTask,
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = clock.UtcNow,
+                    RaisedBy = User.GetUserId()
+                };
+            }
+
+            await dbContext.AddEventAndBroadcastAsync(cancelledEvent);
         }
         else
         {
-            _ = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new RejectIncidentQuery(IncidentDetail!.Incident.Id, RejectionReasonChoice.Value.GetDisplayName()!));
+            EventBase rejectedEvent = null!;
+            string? emailAddress = null;
+            string emailTemplateId = null!;
+            if (ChangeType == SupportTaskType.ChangeNameRequest)
+            {
+                SupportTask.UpdateData<ChangeNameRequestData>(data => data with
+                {
+                    ChangeRequestOutcome = SupportRequestOutcome.Rejected
+                });
+                rejectedEvent = new ChangeNameRequestSupportTaskRejectedEvent()
+                {
+                    RequestData = changeNameRequestData!,
+                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
+                    OldSupportTask = oldSupportTask,
+                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = clock.UtcNow,
+                    RaisedBy = User.GetUserId()
+                };
+
+                emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
+                emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfNameRejectedEmailConfirmationTemplateId;
+            }
+            else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
+            {
+                SupportTask.UpdateData<ChangeDateOfBirthRequestData>(data => data with
+                {
+                    ChangeRequestOutcome = SupportRequestOutcome.Rejected
+                });
+
+                rejectedEvent = new ChangeDateOfBirthRequestSupportTaskRejectedEvent()
+                {
+                    RequestData = changeDateOfBirthRequestData!,
+                    SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
+                    OldSupportTask = oldSupportTask,
+                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = clock.UtcNow,
+                    RaisedBy = User.GetUserId()
+                };
+
+                emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
+                emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmationTemplateId;
+            }
+
+            await dbContext.AddEventAndBroadcastAsync(rejectedEvent);
+
+            if (!string.IsNullOrEmpty(emailAddress))
+            {
+                var email = new Email
+                {
+                    EmailId = Guid.NewGuid(),
+                    TemplateId = emailTemplateId,
+                    EmailAddress = emailAddress!,
+                    Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, Person!.FirstName } },
+                    EmailReplyToId = ChangeRequestEmailConstants.EmailReplyToId
+                };
+
+                dbContext.Emails.Add(email);
+                await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
+            }
         }
+
+        await dbContext.SaveChangesAsync();
+        transaction.Complete();
 
         TempData.SetFlashSuccess(
             $"The request has been {requestStatus}",
             flashMessage);
 
-        return Redirect(_linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.SupportTasks());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        IncidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(TicketNumber));
-        if (IncidentDetail is null)
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var person = await dbContext.Persons
+           .AsNoTracking()
+           .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId);
+        if (person is null)
         {
             context.Result = NotFound();
             return;
         }
 
-        if (IncidentDetail.Incident.StateCode != IncidentState.Active)
-        {
-            context.Result = BadRequest();
-            return;
-        }
+        PersonName = StringHelper.JoinNonEmpty(
+            ' ',
+            person.FirstName,
+            person.MiddleName,
+            person.LastName);
 
-        ChangeType = IncidentDetail.Subject.Title;
-        PersonName = IncidentDetail.Contact.ResolveFullName(includeMiddleName: false);
+        ChangeType = supportTask.SupportTaskType;
+        SupportTask = supportTask;
+        Person = person;
 
-        await next();
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public enum CaseRejectionReasonOption

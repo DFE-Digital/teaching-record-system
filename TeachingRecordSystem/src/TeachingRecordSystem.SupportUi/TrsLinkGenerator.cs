@@ -177,7 +177,7 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string AcceptChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Accept", routeValues: new { ticketNumber });
 
-    public string RejectChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Reject", routeValues: new { ticketNumber });
+    public string RejectChangeRequest(string supportTaskReference) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Reject", routeValues: new { supportTaskReference });
 
     public string MqAdd(Guid personId) =>
         GetRequiredPathByPage("/Mqs/AddMq/Index", routeValues: new { personId });
@@ -323,13 +323,14 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
         GetRequiredPathByPage("/SupportTasks/Index", routeValues: new { category = categories, sortBy, reference, _f = filtersApplied == true ? "1" : null });
 
     public string SupportTaskDetail(string supportTaskReference, SupportTaskType supportTaskType) =>
-        supportTaskReference.StartsWith("CAS-") ? EditChangeRequest(supportTaskReference) :
         supportTaskType switch
         {
             SupportTaskType.ConnectOneLoginUser => ConnectOneLoginUserSupportTask(supportTaskReference),
             SupportTaskType.ApiTrnRequest => ApiTrnRequestMatches(supportTaskReference),
             SupportTaskType.TrnRequestManualChecksNeeded => ResolveTrnRequestManualChecksNeeded(supportTaskReference),
             SupportTaskType.NpqTrnRequest => NpqTrnRequestDetailsPage(supportTaskReference),
+            SupportTaskType.ChangeDateOfBirthRequest => EditChangeRequest(supportTaskReference),
+            SupportTaskType.ChangeNameRequest => EditChangeRequest(supportTaskReference),
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 

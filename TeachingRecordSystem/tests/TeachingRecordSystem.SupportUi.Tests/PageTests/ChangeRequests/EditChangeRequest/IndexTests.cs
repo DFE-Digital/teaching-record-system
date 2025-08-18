@@ -65,7 +65,7 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsBadRequest()
+    public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
