@@ -180,7 +180,8 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
     public string GetFileName(IClock now)
     {
-        return $"Reg01_DTR_{now.UtcNow.ToString("yyyyMMdd")}_{now.UtcNow.ToString("HHmmss")}_New.txt";
+        var gmt = now.UtcNow.ToGmt();
+        return $"Reg01_DTR_{gmt.ToString("yyyyMMdd")}_{gmt.ToString("HHmmss", CultureInfo.InvariantCulture)}_New.txt";
     }
 
     /// <summary>
