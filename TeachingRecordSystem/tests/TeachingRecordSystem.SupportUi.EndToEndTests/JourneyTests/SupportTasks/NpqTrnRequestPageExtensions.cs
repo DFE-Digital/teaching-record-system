@@ -29,6 +29,21 @@ public static class NpqTrnRequestPageExtensions
         return page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/check-answers");
     }
 
+    public static Task AssertOnNoMatchesCheckYourAnswersPageAsync(this IPage page, string taskReference)
+    {
+        return page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/no-matches/check-answers");
+    }
+
+    public static Task AssertOnRejectionReasonPageAsync(this IPage page, string taskReference)
+    {
+        return page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/reject/reason");
+    }
+
+    public static Task AssertOnRejectCheckYourAnswersPageAsync(this IPage page, string taskReference)
+    {
+        return page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/reject/check-answers");
+    }
+
     public static void AssertOnAPersonDetailPage(this IPage page)
     {
         var asUri = new Uri(page.Url);
@@ -37,15 +52,22 @@ public static class NpqTrnRequestPageExtensions
         Assert.True(Guid.TryParse(guid, out _));
     }
 
-    public static async Task AssertSuccessBannerAsync(this IPage page, string name)
+    public static async Task AssertSuccessBannerAsync(this IPage page)
     {
         var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
         var bannerText = page.Locator("h3.govuk-notification-banner__heading");
 
         Assert.Equal("Success", await bannerTitle.TextContentAsync());
         Assert.Equal("NPQ request completed", await bannerText.TextContentAsync());
-        var link = page.GetByRole(AriaRole.Link, new() { Name = $"Record created for {name}" });
-        Assert.NotNull(link);
+    }
+
+    public static async Task AssertRejectBannerAsync(this IPage page, string name)
+    {
+        var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
+        var bannerText = page.Locator("h3.govuk-notification-banner__heading");
+
+        Assert.Equal("Success", await bannerTitle.TextContentAsync());
+        Assert.Equal($"TRN request for {name} rejected", await bannerText.TextContentAsync());
     }
 
     public static Task ClickChangeLink(this IPage page)
@@ -53,9 +75,9 @@ public static class NpqTrnRequestPageExtensions
         return page.GetByTestId("change-link").ClickAsync();
     }
 
-    public static Task FollowBannerLink(this IPage page)
+    public static Task FollowBannerLink(this IPage page, string message)
     {
-        var link = page.Locator("div.govuk-notification-banner__content >> a.govuk-link");
+        var link = page.GetByRole(AriaRole.Link, new() { Name = message });
         return link.ClickAsync();
     }
 }

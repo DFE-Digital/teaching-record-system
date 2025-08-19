@@ -58,7 +58,7 @@ public class CheckAnswersModel(
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"{SourceApplicationUserName} request for {PersonName} rejected");
+            $"TRN request for {PersonName} rejected");
 
         await JourneyInstance!.CompleteAsync();
         return Redirect(linkGenerator.NpqTrnRequests());

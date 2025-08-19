@@ -105,13 +105,13 @@ public class CheckAnswersModel(
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"Record created for {FirstName} {MiddleName} {LastName}",
+            $"{SourceApplicationUserName} request completed",
             buildMessageHtml: b =>
             {
                 var link = new TagBuilder("a");
                 link.AddCssClass("govuk-link");
                 link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
-                link.InnerHtml.Append("View record");
+                link.InnerHtml.Append($"Record created for {FirstName} {MiddleName} {LastName}");
                 b.AppendHtml(link);
             });
 
