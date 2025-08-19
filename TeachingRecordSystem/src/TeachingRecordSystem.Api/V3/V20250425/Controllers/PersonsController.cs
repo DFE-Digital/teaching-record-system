@@ -62,6 +62,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
+    [RequireContactWritesEnabled]
     public async Task<IActionResult> SetPiiAsync(
         [FromRoute] string trn,
         [FromBody] SetPiiRequest request,

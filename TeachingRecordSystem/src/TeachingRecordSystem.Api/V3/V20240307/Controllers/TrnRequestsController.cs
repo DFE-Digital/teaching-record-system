@@ -10,6 +10,7 @@ namespace TeachingRecordSystem.Api.V3.V20240307.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
+[RequireContactWritesEnabled]
 public class TrnRequestsController(IMapper mapper) : ControllerBase
 {
     [HttpPost("")]
