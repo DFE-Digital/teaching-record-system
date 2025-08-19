@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class ChangeRequestTests : TestBase
 {
