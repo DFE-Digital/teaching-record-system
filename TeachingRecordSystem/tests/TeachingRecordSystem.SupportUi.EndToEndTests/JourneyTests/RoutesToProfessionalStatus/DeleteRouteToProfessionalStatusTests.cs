@@ -1,7 +1,6 @@
-using TeachingRecordSystem.SupportUi.EndToEndTests.RouteToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProfessionalStatus;
 
 public class DeleteRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {

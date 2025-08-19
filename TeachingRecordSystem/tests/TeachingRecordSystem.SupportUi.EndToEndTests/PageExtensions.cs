@@ -566,6 +566,10 @@ public static class PageExtensions
         Assert.Empty(await page.InputValueAsync("label:text-is('Month')"));
         Assert.Empty(await page.InputValueAsync("label:text-is('Year')"));
     }
+    public static Task AssertOnRouteDetailPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/detail");
+    }
 
     public static async Task FillDateInputAsync(this IPage page, string id, DateOnly date)
     {
@@ -674,9 +678,14 @@ public static class PageExtensions
         .Locator("xpath=following-sibling::label")
         .ClickAsync();
 
-    public static Task ClickRadioByLabelAsync(this IPage page, string labelText) =>
-        page.Locator($"input[type='radio'] + label:text-is('{labelText}')")
-            .ClickAsync();
+    public static async Task ClickRadioByLabelAsync(this IPage page, string labelText)
+    {
+        var label = page.Locator($"label:has-text('{labelText}')");
+        var forAttr = await label.GetAttributeAsync("for");
+
+        var radio = page.Locator($"input[id='{forAttr}']");
+        await radio.CheckAsync();
+    }
 
     public static async Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null)
     {

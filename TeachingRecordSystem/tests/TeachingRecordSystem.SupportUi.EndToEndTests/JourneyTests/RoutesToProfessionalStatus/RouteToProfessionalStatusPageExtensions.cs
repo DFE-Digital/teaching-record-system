@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.RouteToProfessionalStatus;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProfessionalStatus;
 
 public static class RouteToProfessionalStatusPageExtensions
 {
@@ -55,11 +55,6 @@ public static class RouteToProfessionalStatusPageExtensions
     public static Task AssertOnRouteEditHoldsFromPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/holds-from");
-    }
-
-    public static Task AssertOnRouteDetailPageAsync(this IPage page, Guid qualificationId)
-    {
-        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/detail");
     }
 
     public static Task AssertOnRouteEditDegreeTypePageAsync(this IPage page, Guid qualificationId)

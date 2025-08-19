@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.NpqTrnRequests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
 public static class NpqTrnRequestPageExtensions
 {
