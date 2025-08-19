@@ -7,7 +7,7 @@ public class ChangeRequestTests : TestBase
     {
     }
 
-    [Theory(Skip = "Will re-enable once Support Tasks Index page has been changed to use TRS support task")]
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task SelectChangeRequestAndApprove(bool isNameChange)
@@ -51,7 +51,7 @@ public class ChangeRequestTests : TestBase
         await page.AssertFlashMessageAsync("The request has been accepted");
     }
 
-    [Theory(Skip = "Will re-enable once Support Tasks Index page has been changed to use TRS support task")]
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task SelectChangeRequestAndReject(bool isNameChange)
@@ -97,7 +97,7 @@ public class ChangeRequestTests : TestBase
         await page.AssertFlashMessageAsync("The request has been rejected");
     }
 
-    [Theory(Skip = "Will re-enable once Support Tasks Index page has been changed to use TRS support task")]
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task SelectChangeRequestAndCancel(bool isNameChange)
