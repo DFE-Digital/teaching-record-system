@@ -175,7 +175,7 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string ChangeRequestDocument(string ticketNumber, Guid documentId) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", "documents", routeValues: new { ticketNumber, id = documentId });
 
-    public string AcceptChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Accept", routeValues: new { ticketNumber });
+    public string AcceptChangeRequest(string supportTaskReference) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Accept", routeValues: new { supportTaskReference });
 
     public string RejectChangeRequest(string supportTaskReference) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Reject", routeValues: new { supportTaskReference });
 

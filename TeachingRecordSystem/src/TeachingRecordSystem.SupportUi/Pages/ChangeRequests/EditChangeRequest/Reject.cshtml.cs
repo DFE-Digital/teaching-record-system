@@ -70,6 +70,7 @@ public class RejectModel(
 
                 cancelledEvent = new ChangeNameRequestSupportTaskCancelledEvent()
                 {
+                    PersonId = Person!.PersonId,
                     RequestData = changeNameRequestData!,
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
@@ -87,6 +88,7 @@ public class RejectModel(
 
                 cancelledEvent = new ChangeDateOfBirthRequestSupportTaskCancelledEvent()
                 {
+                    PersonId = Person!.PersonId,
                     RequestData = changeDateOfBirthRequestData!,
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
@@ -111,6 +113,7 @@ public class RejectModel(
                 });
                 rejectedEvent = new ChangeNameRequestSupportTaskRejectedEvent()
                 {
+                    PersonId = Person!.PersonId,
                     RequestData = changeNameRequestData!,
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
@@ -132,6 +135,7 @@ public class RejectModel(
 
                 rejectedEvent = new ChangeDateOfBirthRequestSupportTaskRejectedEvent()
                 {
+                    PersonId = Person!.PersonId,
                     RequestData = changeDateOfBirthRequestData!,
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
