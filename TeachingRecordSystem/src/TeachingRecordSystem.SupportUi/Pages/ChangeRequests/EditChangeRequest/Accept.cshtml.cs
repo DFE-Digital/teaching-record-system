@@ -147,7 +147,7 @@ public class AcceptModel(
             $"The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.SupportTasks(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

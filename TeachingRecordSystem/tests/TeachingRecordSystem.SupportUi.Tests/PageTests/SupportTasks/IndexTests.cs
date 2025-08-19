@@ -19,9 +19,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_NoSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
-        Clock.UtcNow = dobChangeRequest.CreatedOn.ToUniversalTime().AddMinutes(1);  // CRM entity creations don't use IClock
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -32,16 +33,17 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        AssertResults(doc, dobChangeRequest.TicketNumber, connectOneLoginUser.SupportTaskReference);
+        AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
     [Fact]
     public async Task Get_DateRequestedSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
-        Clock.UtcNow = dobChangeRequest.CreatedOn.ToUniversalTime().AddMinutes(1);  // CRM entity creations don't use IClock
+        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -52,7 +54,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        AssertResults(doc, dobChangeRequest.TicketNumber, connectOneLoginUser.SupportTaskReference);
+        AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
     [Fact]
@@ -60,8 +62,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
-        Clock.UtcNow = dobChangeRequest.CreatedOn.ToUniversalTime().AddMinutes(1);  // CRM entity creations don't use IClock
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -72,7 +75,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        AssertResults(doc, dobChangeRequest.TicketNumber, connectOneLoginUser.SupportTaskReference);
+        AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
     [Fact]
@@ -80,7 +83,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -92,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var references = GetTaskReferences(doc);
-        Assert.Contains(dobChangeRequest.TicketNumber, references);
+        Assert.Contains(dobChangeRequest.SupportTaskReference, references);
         Assert.Contains(connectOneLoginUser.SupportTaskReference, references);
     }
 
@@ -121,7 +126,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -133,7 +140,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var references = GetTaskReferences(doc);
-        Assert.Contains(dobChangeRequest.TicketNumber, references);
+        Assert.Contains(dobChangeRequest.SupportTaskReference, references);
         Assert.DoesNotContain(connectOneLoginUser.SupportTaskReference, references);
     }
 
@@ -142,7 +149,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
+        var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -154,7 +163,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var references = GetTaskReferences(doc);
-        Assert.DoesNotContain(dobChangeRequest.TicketNumber, references);
+        Assert.DoesNotContain(dobChangeRequest.SupportTaskReference, references);
         Assert.Contains(connectOneLoginUser.SupportTaskReference, references);
     }
 
