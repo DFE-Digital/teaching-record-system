@@ -19,6 +19,7 @@ using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.TestCommon.Infrastructure;
+using TeachingRecordSystem.WebCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
@@ -81,6 +82,7 @@ public class Startup
                     .AddPersonMatching()
                     .AddTrnRequestService(context.Configuration)
                     .AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>()
+                    .Decorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>()
                     .AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions))
                     .AddSingleton<INotificationSender, NoopNotificationSender>();
 

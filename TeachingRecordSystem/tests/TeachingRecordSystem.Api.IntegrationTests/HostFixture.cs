@@ -17,6 +17,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
+using TeachingRecordSystem.WebCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
@@ -95,6 +96,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<OutboxMessageHandler>();
             services.AddSingleton<MessageSerializer>();
             services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
+            services.Decorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>();
 
             services.Configure<GetAnIdentityOptions>(options =>
             {

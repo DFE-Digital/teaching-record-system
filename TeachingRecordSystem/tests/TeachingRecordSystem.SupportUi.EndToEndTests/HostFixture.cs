@@ -13,7 +13,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Infrastructure;
-using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+using TeachingRecordSystem.WebCommon.Infrastructure;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -92,6 +92,7 @@ public sealed class HostFixture : IAsyncDisposable
                     services.AddSingleton(GetMockGetAnIdentityApiClient());
                     services.AddStartupTask<SeedLookupData>();
                     services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
+                    services.Decorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>();
 
                     IFileService GetMockFileService()
                     {
