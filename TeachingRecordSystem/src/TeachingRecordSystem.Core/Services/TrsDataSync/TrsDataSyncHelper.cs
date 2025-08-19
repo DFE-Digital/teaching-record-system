@@ -45,7 +45,6 @@ public class TrsDataSyncHelper(
         new Dictionary<string, ModelTypeSyncInfo>()
         {
             { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
-            { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
             { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() },
             { ModelTypes.DqtNote, GetModelTypeSyncInfoForNotes() },
             { ModelTypes.Route, GetModelTypeSyncInfoForRoute() },
@@ -1384,24 +1383,6 @@ public class TrsDataSyncHelper(
             .Select(e => e.ToEntity<dfeta_previousname>())
             .GroupBy(r => r.GetAttributeValue<EntityReference>(dfeta_previousname.Fields.dfeta_PersonId).Id)
             .ToDictionary(g => g.Key, g => g.ToArray());
-    }
-
-    public async Task<int> SyncEventsAsync(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun, CancellationToken cancellationToken = default)
-    {
-        var mapped = events.Select(e => EventInfo.Deserialize(e.dfeta_Payload).Event).ToArray();
-
-        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
-        await txn.SaveEventsAsync(mapped, tempTableSuffix: "events_import", clock, cancellationToken);
-
-        if (!dryRun)
-        {
-            await txn.CommitAsync();
-        }
-
-        _syncedEntitiesSubject.OnNext(events.ToArray());
-        return events.Count;
     }
 
     private async Task<Guid[]> EnsurePersonsSyncedAsync(Guid[] personIds, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
@@ -2746,31 +2727,6 @@ public class TrsDataSyncHelper(
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) => Task.CompletedTask,
             WriteRecord = writeRecord
-        };
-    }
-
-    private static ModelTypeSyncInfo GetModelTypeSyncInfoForEvent()
-    {
-        var attributeNames = new[]
-        {
-            dfeta_TRSEvent.Fields.dfeta_TRSEventId,
-            dfeta_TRSEvent.Fields.dfeta_EventName,
-            dfeta_TRSEvent.Fields.dfeta_Payload,
-        };
-
-        return new ModelTypeSyncInfo<EventInfo>()
-        {
-            CreateTempTableStatement = null,
-            CopyStatement = null,
-            UpsertStatement = null,
-            DeleteStatement = null,
-            IgnoreDeletions = false,
-            GetLastModifiedOnStatement = null,
-            EntityLogicalName = dfeta_TRSEvent.EntityLogicalName,
-            AttributeNames = attributeNames,
-            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
-                helper.SyncEventsAsync(entities.Select(e => e.ToEntity<dfeta_TRSEvent>()).ToArray(), dryRun, ct),
-            WriteRecord = null
         };
     }
 
@@ -4711,7 +4667,6 @@ public class TrsDataSyncHelper(
     public static class ModelTypes
     {
         public const string Person = "Person";
-        public const string Event = "Event";
         public const string Induction = "Induction";
         public const string DqtNote = "Annotation";
         public const string Route = "Route";
