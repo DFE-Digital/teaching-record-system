@@ -7,17 +7,17 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
     private string _oldFirstName;
     private string _oldMiddleName;
     private string _oldLastName;
-    private DateOnly _oldDateOfBirth;
-    private string _oldEmailAddress;
-    private string _oldNationalInsuranceNumber;
+    private DateOnly _oldDob;
+    private string _oldEmail;
+    private string _oldNino;
     private Gender _oldGender;
 
     private string _firstName;
     private string _middleName;
     private string _lastName;
-    private DateOnly _dateOfBirth;
-    private string _emailAddress;
-    private string _nationalInsuranceNumber;
+    private DateOnly _dob;
+    private string _email;
+    private string _nino;
     private Gender _gender;
 
     private Core.DataStore.Postgres.Models.User? _createdByUser;
@@ -37,17 +37,17 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
         _oldFirstName = "Alfred";
         _oldMiddleName = "The";
         _oldLastName = "Great";
-        _oldDateOfBirth = Clock.Today.AddYears(-30);
-        _oldEmailAddress = "old@email-address.com";
-        _oldNationalInsuranceNumber = "AB 12 34 56 D";
+        _oldDob = Clock.Today.AddYears(-30);
+        _oldEmail = "old@email-address.com";
+        _oldNino = "AB 12 34 56 D";
         _oldGender = Gender.Male;
 
         _firstName = "Megan";
         _middleName = "Thee";
         _lastName = "Stallion";
-        _dateOfBirth = Clock.Today.AddYears(-20);
-        _emailAddress = "new@email-address.com";
-        _nationalInsuranceNumber = "XY 98 76 54 A";
+        _dob = Clock.Today.AddYears(-20);
+        _email = "new@email-address.com";
+        _nino = "XY 98 76 54 A";
         _gender = Gender.Female;
     }
 
@@ -92,9 +92,21 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
     public async Task Person_WithPersonsMergedEvent_AsPrimaryPerson_RendersExpectedContent(PersonsMergedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
-        var updatedFirstName = changes.HasFlag(PersonsMergedEventChanges.FirstName) ? _firstName : _oldFirstName;
-        var updatedMiddleName = changes.HasFlag(PersonsMergedEventChanges.MiddleName) ? _middleName : _oldMiddleName;
-        var updatedLastName = changes.HasFlag(PersonsMergedEventChanges.LastName) ? _lastName : _oldLastName;
+        string? oldEmail = previousValueIsDefault ? null : _oldEmail;
+        string? oldNino = previousValueIsDefault ? null : _oldNino;
+        Gender? oldGender = previousValueIsDefault ? null : _oldGender;
+
+        string? email = newValueIsDefault ? null : _email;
+        string? nino = newValueIsDefault ? null : _nino;
+        Gender? gender = newValueIsDefault ? null : _gender;
+
+        var newFirstName = changes.HasFlag(PersonsMergedEventChanges.FirstName) ? _firstName : _oldFirstName;
+        var newMiddleName = changes.HasFlag(PersonsMergedEventChanges.MiddleName) ? _middleName : _oldMiddleName;
+        var newLastName = changes.HasFlag(PersonsMergedEventChanges.LastName) ? _lastName : _oldLastName;
+        var newDob = changes.HasFlag(PersonsMergedEventChanges.DateOfBirth) ? _dob : _oldDob;
+        var newEmail = changes.HasFlag(PersonsMergedEventChanges.EmailAddress) ? email : oldEmail;
+        var newNino = changes.HasFlag(PersonsMergedEventChanges.NationalInsuranceNumber) ? nino : oldNino;
+        var newGender = changes.HasFlag(PersonsMergedEventChanges.Gender) ? gender : oldGender;
 
         var comments = "Some comments";
         var evidenceFile = new EventModels.File
@@ -103,50 +115,15 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
             Name = "evidence.jpg"
         };
 
-        var details = new EventModels.PersonAttributes
-        {
-            FirstName = updatedFirstName,
-            MiddleName = updatedMiddleName,
-            LastName = updatedLastName,
-            DateOfBirth = changes.HasFlag(PersonsMergedEventChanges.DateOfBirth) ? _dateOfBirth : _oldDateOfBirth,
-            EmailAddress = changes.HasFlag(PersonsMergedEventChanges.EmailAddress) && !newValueIsDefault ? _emailAddress : null,
-            NationalInsuranceNumber = changes.HasFlag(PersonsMergedEventChanges.NationalInsuranceNumber) && !newValueIsDefault ? _nationalInsuranceNumber : null,
-            Gender = changes.HasFlag(PersonsMergedEventChanges.Gender) && !newValueIsDefault ? _gender : null,
-        };
-
-        var oldDetails = new EventModels.PersonAttributes
-        {
-            FirstName = _oldFirstName,
-            MiddleName = _oldMiddleName,
-            LastName = _oldLastName,
-            DateOfBirth = _oldDateOfBirth,
-            EmailAddress = changes.HasFlag(PersonsMergedEventChanges.EmailAddress) && !previousValueIsDefault ? _oldEmailAddress : null,
-            NationalInsuranceNumber = changes.HasFlag(PersonsMergedEventChanges.NationalInsuranceNumber) && !previousValueIsDefault ? _oldNationalInsuranceNumber : null,
-            Gender = changes.HasFlag(PersonsMergedEventChanges.Gender) && !previousValueIsDefault ? _oldGender : null,
-        };
-
-        var mergedEvent = new PersonsMergedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
-            RaisedBy = _createdByUser!.UserId,
-            PersonId = _person!.PersonId,
-            PersonTrn = _person!.Trn!,
-            SecondaryPersonId = _secondaryPerson!.PersonId,
-            SecondaryPersonTrn = _secondaryPerson!.Trn!,
-            SecondaryPersonStatus = PersonStatus.Deactivated,
-            PersonAttributes = details,
-            OldPersonAttributes = oldDetails,
-            Changes = changes,
-            Comments = comments,
-            EvidenceFile = evidenceFile
-        };
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(mergedEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        await CreateEvent(
+            newFirstName, _oldFirstName,
+            newMiddleName, _oldMiddleName,
+            newLastName, _oldLastName,
+            newDob, _oldDob,
+            newEmail, oldEmail,
+            newNino, oldNino,
+            newGender, oldGender,
+            changes, comments, evidenceFile);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{_person!.PersonId}/change-history");
 
@@ -167,7 +144,7 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
 
         if (changes.HasAnyFlag(PersonsMergedEventChanges.NameChange))
         {
-            doc.AssertRow("details", "Name", v => Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", v.TrimmedText()));
+            doc.AssertRow("details", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
             doc.AssertRow("previous-details", "Name", v => Assert.Equal($"{_oldFirstName} {_oldMiddleName} {_oldLastName}", v.TrimmedText()));
         }
         else
@@ -178,8 +155,8 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
 
         if (changes.HasFlag(PersonsMergedEventChanges.DateOfBirth))
         {
-            doc.AssertRow("details", "Date of birth", v => Assert.Equal(_dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertRow("previous-details", "Date of birth", v => Assert.Equal(_oldDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertRow("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertRow("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
@@ -189,35 +166,35 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
 
         if (changes.HasFlag(PersonsMergedEventChanges.EmailAddress))
         {
-            doc.AssertRow("details", "Email address", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : _emailAddress, v.TrimmedText()));
-            doc.AssertRow("previous-details", "Email address", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : _oldEmailAddress, v.TrimmedText()));
+            item.AssertRow("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertRow("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Email address");
-            doc.AssertRowDoesNotExist("previous-details", "Email address");
+            item.AssertRowDoesNotExist("details", "Email address");
+            item.AssertRowDoesNotExist("previous-details", "Email address");
         }
 
         if (changes.HasFlag(PersonsMergedEventChanges.NationalInsuranceNumber))
         {
-            doc.AssertRow("details", "National Insurance number", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : _nationalInsuranceNumber, v.TrimmedText()));
-            doc.AssertRow("previous-details", "National Insurance number", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : _oldNationalInsuranceNumber, v.TrimmedText()));
+            item.AssertRow("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertRow("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "National Insurance number");
-            doc.AssertRowDoesNotExist("previous-details", "National Insurance number");
+            item.AssertRowDoesNotExist("details", "National Insurance number");
+            item.AssertRowDoesNotExist("previous-details", "National Insurance number");
         }
 
         if (changes.HasFlag(PersonsMergedEventChanges.Gender))
         {
-            doc.AssertRow("details", "Gender", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : _gender.GetDisplayName(), v.TrimmedText()));
-            doc.AssertRow("previous-details", "Gender", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : _oldGender.GetDisplayName(), v.TrimmedText()));
+            item.AssertRow("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertRow("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Gender");
-            doc.AssertRowDoesNotExist("previous-details", "Gender");
+            item.AssertRowDoesNotExist("details", "Gender");
+            item.AssertRowDoesNotExist("previous-details", "Gender");
         }
 
         doc.AssertRow("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
@@ -228,8 +205,6 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
     public async Task Person_WithPersonsMergedEvent_AsSecondaryPerson_RendersExpectedContent()
     {
         // Arrange
-        var changes = PersonsMergedEventChanges.NameChange;
-
         var comments = "Some comments";
         var evidenceFile = new EventModels.File
         {
@@ -237,50 +212,11 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
             Name = "evidence.jpg"
         };
 
-        var details = new EventModels.PersonAttributes
-        {
-            FirstName = _firstName,
-            MiddleName = _middleName,
-            LastName = _lastName,
-            DateOfBirth = null,
-            EmailAddress = null,
-            NationalInsuranceNumber = null,
-            Gender = null,
-        };
-
-        var oldDetails = new EventModels.PersonAttributes
-        {
-            FirstName = _oldFirstName,
-            MiddleName = _oldMiddleName,
-            LastName = _oldLastName,
-            DateOfBirth = null,
-            EmailAddress = null,
-            NationalInsuranceNumber = null,
-            Gender = null
-        };
-
-        var updatedEvent = new PersonsMergedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
-            RaisedBy = _createdByUser!.UserId,
-            PersonId = _person!.PersonId,
-            PersonTrn = _person!.Trn!,
-            SecondaryPersonId = _secondaryPerson!.PersonId,
-            SecondaryPersonTrn = _secondaryPerson!.Trn!,
-            SecondaryPersonStatus = PersonStatus.Deactivated,
-            PersonAttributes = details,
-            OldPersonAttributes = oldDetails,
-            Changes = changes,
-            Comments = comments,
-            EvidenceFile = evidenceFile
-        };
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        await CreateEvent(
+            _firstName, _oldFirstName,
+            _middleName, _oldMiddleName,
+            _lastName, _oldLastName,
+            PersonsMergedEventChanges.NameChange, comments, evidenceFile);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{_secondaryPerson!.PersonId}/change-history");
 
@@ -308,50 +244,11 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
     public async Task Person_WithPersonsMergedEvent_AsPrimaryPerson_WhenCommentsAndEvidenceEmpty_DoesNotRenderReasonForChangeSection()
     {
         // Arrange
-        var details = new EventModels.PersonAttributes
-        {
-            FirstName = _firstName,
-            MiddleName = _middleName,
-            LastName = _lastName,
-            DateOfBirth = null,
-            EmailAddress = null,
-            NationalInsuranceNumber = null,
-            Gender = null,
-        };
-
-        var oldDetails = new EventModels.PersonAttributes
-        {
-            FirstName = _oldFirstName,
-            MiddleName = _oldMiddleName,
-            LastName = _oldLastName,
-            DateOfBirth = null,
-            EmailAddress = null,
-            NationalInsuranceNumber = null,
-            Gender = null
-        };
-
-        var updatedEvent = new PersonsMergedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
-            RaisedBy = _createdByUser!.UserId,
-            PersonId = _person!.PersonId,
-            PersonTrn = _person!.Trn!,
-            SecondaryPersonId = _secondaryPerson!.PersonId,
-            SecondaryPersonTrn = _secondaryPerson!.Trn!,
-            SecondaryPersonStatus = PersonStatus.Deactivated,
-            PersonAttributes = details,
-            OldPersonAttributes = oldDetails,
-            Changes = PersonsMergedEventChanges.NameChange,
-            Comments = null,
-            EvidenceFile = null
-        };
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        await CreateEvent(
+            _firstName, _oldFirstName,
+            _middleName, _oldMiddleName,
+            _lastName, _oldLastName,
+            PersonsMergedEventChanges.NameChange, comments: null, evidenceFile: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{_person!.PersonId}/change-history");
 
@@ -372,50 +269,11 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
     public async Task Person_WithPersonsMergedEvent_AsSecondaryPerson_WhenCommentsAndEvidenceEmpty_DoesNotRenderReasonForChangeSection()
     {
         // Arrange
-        var details = new EventModels.PersonAttributes
-        {
-            FirstName = _firstName,
-            MiddleName = _middleName,
-            LastName = _lastName,
-            DateOfBirth = null,
-            EmailAddress = null,
-            NationalInsuranceNumber = null,
-            Gender = null,
-        };
-
-        var oldDetails = new EventModels.PersonAttributes
-        {
-            FirstName = _oldFirstName,
-            MiddleName = _oldMiddleName,
-            LastName = _oldLastName,
-            DateOfBirth = null,
-            EmailAddress = null,
-            NationalInsuranceNumber = null,
-            Gender = null
-        };
-
-        var updatedEvent = new PersonsMergedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = Clock.UtcNow,
-            RaisedBy = _createdByUser!.UserId,
-            PersonId = _person!.PersonId,
-            PersonTrn = _person!.Trn!,
-            SecondaryPersonId = _secondaryPerson!.PersonId,
-            SecondaryPersonTrn = _secondaryPerson!.Trn!,
-            SecondaryPersonStatus = PersonStatus.Deactivated,
-            PersonAttributes = details,
-            OldPersonAttributes = oldDetails,
-            Changes = PersonsMergedEventChanges.NameChange,
-            Comments = null,
-            EvidenceFile = null
-        };
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        await CreateEvent(
+            _firstName, _oldFirstName,
+            _middleName, _oldMiddleName,
+            _lastName, _oldLastName,
+            PersonsMergedEventChanges.NameChange, comments: null, evidenceFile: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{_secondaryPerson!.PersonId}/change-history");
 
@@ -430,5 +288,73 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
 
         var changeReasonSection = item.GetElementByTestId("change-reason");
         Assert.Null(changeReasonSection);
+    }
+
+    private async Task CreateEvent(
+        string firstName, string oldFirstName,
+        string middleName, string oldMiddleName,
+        string lastName, string oldLastName,
+        PersonsMergedEventChanges changes, string? comments, EventModels.File? evidenceFile)
+    {
+        await CreateEvent(
+            firstName, oldFirstName, middleName, oldMiddleName, lastName, oldLastName,
+            null, null, null, null, null, null, null, null,
+            changes, comments, evidenceFile);
+    }
+
+    private async Task CreateEvent(
+        string firstName, string oldFirstName,
+        string middleName, string oldMiddleName,
+        string lastName, string oldLastName,
+        DateOnly? dob, DateOnly? oldDob,
+        string? email, string? oldEmail,
+        string? nino, string? oldNino,
+        Gender? gender, Gender? oldGender,
+        PersonsMergedEventChanges changes, string? comments, EventModels.File? evidenceFile)
+    {
+        var details = new EventModels.PersonAttributes
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dob,
+            EmailAddress = email,
+            NationalInsuranceNumber = nino,
+            Gender = gender,
+        };
+
+        var oldDetails = new EventModels.PersonAttributes
+        {
+            FirstName = oldFirstName,
+            MiddleName = oldMiddleName,
+            LastName = oldLastName,
+            DateOfBirth = oldDob,
+            EmailAddress = oldEmail,
+            NationalInsuranceNumber = oldNino,
+            Gender = oldGender,
+        };
+
+        var mergedEvent = new PersonsMergedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = _createdByUser!.UserId,
+            PersonId = _person!.PersonId,
+            PersonTrn = _person!.Trn!,
+            SecondaryPersonId = _secondaryPerson!.PersonId,
+            SecondaryPersonTrn = _secondaryPerson!.Trn!,
+            SecondaryPersonStatus = PersonStatus.Deactivated,
+            PersonAttributes = details,
+            OldPersonAttributes = oldDetails,
+            Changes = changes,
+            Comments = comments,
+            EvidenceFile = evidenceFile
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(mergedEvent);
+            await dbContext.SaveChangesAsync();
+        });
     }
 }

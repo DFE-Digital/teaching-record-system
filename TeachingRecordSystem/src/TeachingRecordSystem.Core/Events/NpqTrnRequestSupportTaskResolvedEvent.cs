@@ -32,6 +32,8 @@ public enum NpqTrnRequestSupportTaskResolvedEventChanges
     PersonDateOfBirth = PersonAttributesChanges.DateOfBirth,
     PersonEmailAddress = PersonAttributesChanges.EmailAddress,
     PersonNationalInsuranceNumber = PersonAttributesChanges.NationalInsuranceNumber,
-    PersonGender = PersonAttributesChanges.Gender
+    PersonGender = PersonAttributesChanges.Gender,
+    PersonNameChange = PersonFirstName | PersonMiddleName | PersonLastName,
+    AllChanges = PersonNameChange | PersonDateOfBirth | PersonEmailAddress | PersonNationalInsuranceNumber | PersonGender
 }
 
