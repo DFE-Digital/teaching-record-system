@@ -21,7 +21,7 @@ public class RejectTests : TestBase
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}/reject");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -41,7 +41,7 @@ public class RejectTests : TestBase
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}/reject");
 
         // Act
         var response = await HttpClient.SendAsync(request);

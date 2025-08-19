@@ -1,105 +1,200 @@
+using System.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
-public class AcceptModel : PageModel
+public class AcceptModel(
+    TrsDbContext dbContext,
+    IBackgroundJobScheduler backgroundJobScheduler,
+    TrsLinkGenerator linkGenerator,
+    IClock clock) : PageModel
 {
-    private readonly TrsLinkGenerator _linkGenerator;
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-
-    public AcceptModel(
-        TrsLinkGenerator linkGenerator,
-        ICrmQueryDispatcher crmQueryDispatcher)
-    {
-        _linkGenerator = linkGenerator;
-        _crmQueryDispatcher = crmQueryDispatcher;
-    }
-
     [FromRoute]
-    public string TicketNumber { get; set; } = null!;
+    public required string SupportTaskReference { get; init; }
 
-    public string? CaseType { get; set; }
+    public SupportTaskType? ChangeType { get; set; }
 
     public string? PersonName { get; set; }
 
-    IncidentDetail? IncidentDetail { get; set; }
+    SupportTask? SupportTask { get; set; }
+
+    Person? Person { get; set; }
 
     public NameChangeRequestInfo? NameChangeRequest { get; set; }
 
     public DateOfBirthChangeRequestInfo? DateOfBirthChangeRequest { get; set; }
 
-    public IActionResult OnGet()
-    {
-        SetModelFromIncidentDetail();
-
-        return Page();
-    }
-
     public async Task<IActionResult> OnPostAsync()
     {
-        await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new ApproveIncidentQuery(IncidentDetail!.Incident.Id));
+        var now = clock.UtcNow;
+        var changeNameRequestData = ChangeType == SupportTaskType.ChangeNameRequest ? EventModels.ChangeNameRequestData.FromModel((ChangeNameRequestData)SupportTask!.Data) : null;
+        var changeDateOfBirthRequestData = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? EventModels.ChangeDateOfBirthRequestData.FromModel((ChangeDateOfBirthRequestData)SupportTask!.Data) : null;
+        var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
+        SupportTask!.Status = SupportTaskStatus.Closed;
+        SupportTask.UpdatedOn = now;
+
+        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+        var updateResult = Person!.UpdateDetails(
+            ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.FirstName : Person.FirstName,
+            ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.MiddleName : Person.MiddleName,
+            ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.LastName : Person.LastName,
+            ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? changeDateOfBirthRequestData!.DateOfBirth : Person.DateOfBirth,
+            Person.EmailAddress is string personEmailAddress ? EmailAddress.Parse(personEmailAddress) : null,
+            Person.NationalInsuranceNumber is string nationalInsuranceNumber ? NationalInsuranceNumber.Parse(nationalInsuranceNumber) : null,
+            Person.Gender,
+            now);
+
+        string? emailAddress = null;
+        string emailTemplateId = null!;
+        if (ChangeType == SupportTaskType.ChangeNameRequest)
+        {
+            SupportTask.UpdateData<ChangeNameRequestData>(data => data with
+            {
+                ChangeRequestOutcome = SupportRequestOutcome.Approved
+            });
+
+            var approvedEvent = new ChangeNameRequestSupportTaskApprovedEvent()
+            {
+                PersonId = Person!.PersonId,
+                RequestData = changeNameRequestData!,
+                SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
+                OldSupportTask = oldSupportTask,
+                PersonAttributes = updateResult.PersonAttributes,
+                OldPersonAttributes = updateResult.OldPersonAttributes,
+                EventId = Guid.NewGuid(),
+                CreatedUtc = now,
+                RaisedBy = User.GetUserId(),
+                Changes = (ChangeNameRequestSupportTaskApprovedEventChanges)updateResult.Changes
+            };
+
+            if (approvedEvent.Changes.HasAnyFlag(ChangeNameRequestSupportTaskApprovedEventChanges.NameChange))
+            {
+                dbContext.PreviousNames.Add(new PreviousName
+                {
+                    PreviousNameId = Guid.NewGuid(),
+                    PersonId = Person!.PersonId,
+                    FirstName = updateResult.OldPersonAttributes.FirstName,
+                    MiddleName = updateResult.OldPersonAttributes.MiddleName,
+                    LastName = updateResult.OldPersonAttributes.LastName,
+                    CreatedOn = now,
+                    UpdatedOn = now
+                });
+            }
+
+            emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
+            emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfNameApprovedEmailConfirmationTemplateId;
+
+            await dbContext.AddEventAndBroadcastAsync(approvedEvent);
+        }
+        else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
+        {
+            SupportTask.UpdateData<ChangeDateOfBirthRequestData>(data => data with
+            {
+                ChangeRequestOutcome = SupportRequestOutcome.Approved
+            });
+
+            var approvedEvent = new ChangeDateOfBirthRequestSupportTaskApprovedEvent()
+            {
+                PersonId = Person!.PersonId,
+                RequestData = changeDateOfBirthRequestData!,
+                SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
+                OldSupportTask = oldSupportTask,
+                PersonAttributes = updateResult.PersonAttributes,
+                OldPersonAttributes = updateResult.OldPersonAttributes,
+                EventId = Guid.NewGuid(),
+                CreatedUtc = now,
+                RaisedBy = User.GetUserId(),
+                Changes = (ChangeDateOfBirthRequestSupportTaskApprovedEventChanges)updateResult.Changes
+            };
+
+            emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
+            emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmationTemplateId;
+
+            await dbContext.AddEventAndBroadcastAsync(approvedEvent);
+        }
+
+        if (!string.IsNullOrEmpty(emailAddress))
+        {
+            var email = new Email
+            {
+                EmailId = Guid.NewGuid(),
+                TemplateId = emailTemplateId,
+                EmailAddress = emailAddress!,
+                Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, Person!.FirstName } },
+                EmailReplyToId = ChangeRequestEmailConstants.EmailReplyToId
+            };
+
+            dbContext.Emails.Add(email);
+            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
+        }
+
+        await dbContext.SaveChangesAsync();
+        transaction.Complete();
 
         TempData.SetFlashSuccess(
             $"The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 
-        return Redirect(_linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.SupportTasks());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        IncidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(TicketNumber));
-        if (IncidentDetail is null)
+        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        var person = await dbContext.Persons
+            .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId);
+        if (person is null)
         {
             context.Result = NotFound();
             return;
         }
 
-        if (IncidentDetail.Incident.StateCode != IncidentState.Active)
+        PersonName = StringHelper.JoinNonEmpty(
+            ' ',
+            person.FirstName,
+            person.MiddleName,
+            person.LastName);
+
+        ChangeType = supportTask.SupportTaskType;
+        SupportTask = supportTask;
+        Person = person;
+
+        if (supportTask.SupportTaskType == SupportTaskType.ChangeNameRequest)
         {
-            context.Result = BadRequest();
-            return;
-        }
-
-        await next();
-    }
-
-    private void SetModelFromIncidentDetail()
-    {
-        var incident = IncidentDetail!.Incident;
-        var customer = IncidentDetail.Contact;
-        var subject = IncidentDetail.Subject;
-
-        CaseType = subject.Title;
-        PersonName = customer.ResolveFullName(includeMiddleName: false);
-
-        if (subject.Title == DqtConstants.NameChangeSubjectTitle)
-        {
+            var data = (ChangeNameRequestData)supportTask.Data;
             NameChangeRequest = new NameChangeRequestInfo()
             {
-                CurrentFirstName = customer.FirstName,
-                CurrentMiddleName = customer.MiddleName,
-                CurrentLastName = customer.LastName,
-                NewFirstName = incident.dfeta_NewFirstName,
-                NewMiddleName = incident.dfeta_NewMiddleName,
-                NewLastName = incident.dfeta_NewLastName
+                CurrentFirstName = person!.FirstName,
+                CurrentMiddleName = person.MiddleName,
+                CurrentLastName = person.LastName,
+                NewFirstName = data.FirstName,
+                NewMiddleName = data.MiddleName,
+                NewLastName = data.LastName
             };
         }
 
-        if (subject.Title == DqtConstants.DateOfBirthChangeSubjectTitle)
+        if (supportTask.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest)
         {
+            var data = (ChangeDateOfBirthRequestData)supportTask.Data;
             DateOfBirthChangeRequest = new DateOfBirthChangeRequestInfo()
             {
-                CurrentDateOfBirth = customer.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value,
-                NewDateOfBirth = incident.dfeta_NewDateofBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true)!.Value
+                CurrentDateOfBirth = person.DateOfBirth!.Value,
+                NewDateOfBirth = data.DateOfBirth
             };
         }
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

@@ -1,19 +1,19 @@
-@page "/change-requests/{ticketNumber}/accept"
+@page "/change-requests/{supportTaskReference}/accept"
 @model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.AcceptModel
 @{
     ViewBag.Title = "Confirm the change";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.EditChangeRequest(Model.TicketNumber)" />
+    <govuk-back-link href="@LinkGenerator.EditChangeRequest(Model.SupportTaskReference)" />
 }
 
-<span class="govuk-caption-l">@Model.CaseType - @Model.PersonName</span>
+<span class="govuk-caption-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Change of Name" : "Change of Date of Birth") - @Model.PersonName</span>
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">        
-        <form action="@LinkGenerator.AcceptChangeRequest(Model.TicketNumber)" method="post">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.AcceptChangeRequest(Model.SupportTaskReference)" method="post">
             <table class="govuk-table">                
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -22,7 +22,7 @@
                         <th scope="col" class="govuk-table__header">New</th>
                     </tr>
                 </thead>
-                @if (Model.CaseType == DqtConstants.NameChangeSubjectTitle)
+                @if (Model.ChangeType == SupportTaskType.ChangeNameRequest)
                 {
                     <tbody class="govuk-table__body">
                         @if (Model.NameChangeRequest!.CurrentFirstName != Model.NameChangeRequest!.NewFirstName)
@@ -51,7 +51,7 @@
                         }
                     </tbody>
                 }
-                @if (Model.CaseType == DqtConstants.DateOfBirthChangeSubjectTitle)
+                @if (Model.ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
                 {
                     <tbody class="govuk-table__body">
                         <tr class="govuk-table__row" data-testid="date-of-birth">
