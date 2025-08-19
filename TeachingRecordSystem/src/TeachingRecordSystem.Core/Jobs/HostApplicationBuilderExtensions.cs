@@ -109,10 +109,7 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<DeleteOldAttachmentsJob>(
-                    nameof(DeleteOldAttachmentsJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    DeleteOldAttachmentsJob.JobSchedule);
+                recurringJobManager.RemoveIfExists("DeleteOldAttachmentsJob");
 
                 recurringJobManager.AddOrUpdate<BackfillDqtReportingQualifications>(
                     nameof(BackfillDqtReportingQualifications),
