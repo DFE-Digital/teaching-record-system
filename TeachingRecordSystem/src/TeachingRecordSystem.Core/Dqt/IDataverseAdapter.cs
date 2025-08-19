@@ -9,12 +9,4 @@ public interface IDataverseAdapter
         string[] columnNames,
         string[] heQualificationColumnNames = null,
         string[] heSubjectColumnNames = null);
-
-    Task<Contact[]> FindTeachersAsync(FindTeachersQuery query);
-
-    Task<Contact[]> FindTeachersStrictAsync(FindTeachersQuery query);
-
-    Task<Account[]> GetIttProviderOrganizationsByNameAsync(string ukprn, string[] columnNames, bool activeOnly);
-
-    Task<Account[]> GetIttProviderOrganizationsByUkprnAsync(string ukprn, string[] columnNames, bool activeOnly);
 }
