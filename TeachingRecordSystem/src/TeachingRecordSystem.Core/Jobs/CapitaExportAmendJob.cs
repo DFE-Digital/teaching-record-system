@@ -156,7 +156,8 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
 
     public string GetFileName(IClock now)
     {
-        return $"Reg01_DTR_{now.UtcNow.ToString("yyyyMMdd")}_{now.UtcNow.ToString("HHmmss")}_Amend.txt";
+        var gmt = now.UtcNow.ToGmt();
+        return $"Reg01_DTR_{gmt.ToString("yyyyMMdd")}_{gmt.ToString("HHmmss", CultureInfo.InvariantCulture)}_Amend.txt";
     }
 
     public string GetPersonAmendedRow(CapitaExportAmendJobResult person, CapitaAmendExportType type)
@@ -236,7 +237,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
 
     public async Task<(DateTime?, JobMetadata?)> GetLastRunDateAsync()
     {
-        var item = await dbContext.JobMetadata.AsNoTracking()
+        var item = await dbContext.JobMetadata
             .FirstOrDefaultAsync(i => i.JobName == nameof(CapitaExportAmendJob));
 
         DateTime? lastRunDate = null;
