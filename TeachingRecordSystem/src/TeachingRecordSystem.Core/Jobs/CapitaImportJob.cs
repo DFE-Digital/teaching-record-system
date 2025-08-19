@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Text;
 using Azure.Storage.Blobs;
@@ -23,13 +24,14 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             using (var downloadStream = await GetDownloadStreamAsync(file))
             using (var reader = new StreamReader(downloadStream))
             {
-                await ImportAsync(reader);
+                await ImportAsync(reader, file);
             }
         }
     }
 
-    public async Task<long> ImportAsync(StreamReader reader)
+    public async Task<long> ImportAsync(StreamReader reader, string fileName)
     {
+        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
         var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             Delimiter = ";",
@@ -50,13 +52,13 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         var integrationJob = new IntegrationTransaction()
         {
             IntegrationTransactionId = 0,
-            InterfaceType = IntegrationTransactionInterfaceType.EwcWales,
+            InterfaceType = IntegrationTransactionInterfaceType.CapitaImport,
             ImportStatus = IntegrationTransactionImportStatus.InProgress,
             TotalCount = 0,
             SuccessCount = 0,
             FailureCount = 0,
             DuplicateCount = 0,
-            FileName = "fileName.txt",
+            FileName = fileName,
             CreatedDate = clock.UtcNow,
             IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
@@ -64,13 +66,61 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         await dbContext.SaveChangesAsync();
         var integrationId = integrationJob.IntegrationTransactionId;
 
+
         foreach (var row in records)
         {
-            //insert or update person
-            //insert ITR
+            try
+            {
 
+                //insert or update person
+                //insert ITR
+                var persons = await GetPersonAsync(row.TRN!);
+                if(persons.Count() == 0)
+                {
+                    //inser
+                }
+
+                NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
+                var person = Person.Create(row.TRN!, row.FirstNameOrMiddleName!, row.FirstNameOrMiddleName!, row.LastName!, row.DateOfBirth, null, ni, row.Gender, clock.UtcNow);
+                dbContext.Persons.Add(person.Person);
+
+                //write current person exported row to integrationtransactionrecord
+                integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
+                {
+                    IntegrationTransactionRecordId = 0,
+                    CreatedDate = clock.UtcNow,
+                    RowData = "",
+                    Status = IntegrationTransactionRecordStatus.Success,
+                    PersonId = person.Person.PersonId,
+                    FailureMessage = null,
+                    Duplicate = null,
+                    HasActiveAlert = null
+                });
+                totalRowCount++;
+                successCount++;
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation($"{nameof(CapitaImportJob)} - {ex.Message}");
+                failureRowCount++;
+            }
         }
+        // mark job as complete
+        integrationJob.TotalCount = totalRowCount;
+        integrationJob.SuccessCount = successCount;
+        integrationJob.FailureCount = failureRowCount;
+        integrationJob.DuplicateCount = duplicateRowCount;
+        integrationJob.ImportStatus = IntegrationTransactionImportStatus.Success;
+
+        await dbContext.SaveChangesAsync();
+        await txn.CommitAsync();
         return integrationId;
+    }
+
+    public async Task<List<Person>> GetPersonAsync(string trn)
+    {
+        var persons = await dbContext.Persons.Where(x => x.Trn == trn).ToListAsync();
+        return persons;
     }
 
     public async Task<Stream> GetDownloadStreamAsync(string fileName)
@@ -109,7 +159,9 @@ public class CapitaImportMap : ClassMap<CapitaImportRecord>
         Map(m => m.LastName).Index(2).Optional();
         Map(m => m.FirstNameOrMiddleName).Index(3).Optional();
         Map(m => m.PreviousLastName).Index(4).Optional();
-        Map(m => m.DateOfBirth).Index(5).Optional();
+        Map(m => m.DateOfBirth).Index(5)
+            .TypeConverterOption.Format("yyyyMMdd")
+            .TypeConverterOption.NullValues(string.Empty, null); 
         Map(m => m.NINumber).Index(6).Optional();
         Map(m => m.DateOfDeath).Index(7).Optional();
     }
@@ -118,11 +170,11 @@ public class CapitaImportMap : ClassMap<CapitaImportRecord>
 public class CapitaImportRecord
 {
     public required string? TRN { get; set; }
-    public required string? Gender { get; set; }
+    public required Gender? Gender { get; set; }
     public required string? LastName { get; set; }
     public required string? FirstNameOrMiddleName { get; set; }
     public required string? PreviousLastName { get; set; }
-    public required string? DateOfBirth { get; set; }
+    public required DateOnly? DateOfBirth { get; set; }
     public required string? NINumber { get; set; }
     public required string? DateOfDeath { get; set; }
 }
