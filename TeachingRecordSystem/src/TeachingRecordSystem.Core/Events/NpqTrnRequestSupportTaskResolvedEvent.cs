@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record NpqTrnRequestSupportTaskResolvedEvent : SupportTaskUpdatedEvent, IEventWithPersonAttributes
+public record NpqTrnRequestSupportTaskResolvedEvent : SupportTaskUpdatedEvent, IEventWithPersonId, IEventWithPersonAttributes
 {
     public required Guid PersonId { get; init; }
     public required EventModels.TrnRequestMetadata RequestData { get; init; }

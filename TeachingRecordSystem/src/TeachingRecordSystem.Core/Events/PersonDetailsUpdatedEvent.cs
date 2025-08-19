@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Events;
 
-public record PersonDetailsUpdatedEvent : EventBase, IEventWithPersonAttributes
+public record PersonDetailsUpdatedEvent : EventBase, IEventWithPersonId, IEventWithPersonAttributes
 {
     public required Guid PersonId { get; init; }
     public required EventModels.PersonAttributes PersonAttributes { get; init; }

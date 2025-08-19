@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Events;
 
-public record PersonInductionUpdatedEvent : EventBase, IEventWithPersonId
+public record PersonInductionUpdatedEvent : EventBase, IEventWithPersonId, IEventWithInduction
 {
     public required Guid PersonId { get; init; }
     public required EventModels.Induction Induction { get; init; }

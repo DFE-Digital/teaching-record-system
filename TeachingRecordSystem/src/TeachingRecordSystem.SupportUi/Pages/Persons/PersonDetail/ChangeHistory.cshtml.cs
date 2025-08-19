@@ -86,7 +86,9 @@ public class ChangeHistoryModel(
             nameof(DqtInitialTeacherTrainingCreatedEvent),
             nameof(DqtInitialTeacherTrainingUpdatedEvent),
             nameof(DqtQtsRegistrationCreatedEvent),
-            nameof(DqtQtsRegistrationUpdatedEvent)
+            nameof(DqtQtsRegistrationUpdatedEvent),
+            nameof(PersonStatusUpdatedEvent),
+            nameof(PersonsMergedEvent)
         };
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();
@@ -143,14 +145,17 @@ public class ChangeHistoryModel(
         var allResults = notesResult
             .Annotations.Select(n => (TimelineItem)new TimelineItem<Annotation>(
                 TimelineItemType.Annotation,
+                PersonId,
                 n.ModifiedOn!.Value.ToGmt(),
                 n))
             .Concat(notesResult.IncidentResolutions.Select(r => new TimelineItem<(IncidentResolution, Incident)>(
                 TimelineItemType.IncidentResolution,
+                PersonId,
                 r.Resolution.ModifiedOn!.Value.ToGmt(),
                 r)))
             .Concat(notesResult.Tasks.Select(t => new TimelineItem<CrmTask>(
                 TimelineItemType.Task,
+                PersonId,
                 t.ModifiedOn!.Value.ToGmt(),
                 t)))
             .Concat(eventsWithUser.Select(MapTimelineEvent))
@@ -202,7 +207,7 @@ public class ChangeHistoryModel(
         var timelineEventType = typeof(TimelineEvent<>).MakeGenericType(@event.GetType()!);
         var timelineEvent = (TimelineEvent)Activator.CreateInstance(timelineEventType, @event, raisedByUser, applicationUser)!;
         var timelineItemType = typeof(TimelineItem<>).MakeGenericType(timelineEventType);
-        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, timelineEvent.Event.CreatedUtc.ToGmt(), timelineEvent)!;
+        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, PersonId, timelineEvent.Event.CreatedUtc.ToGmt(), timelineEvent)!;
     }
 
     /// <summary>
