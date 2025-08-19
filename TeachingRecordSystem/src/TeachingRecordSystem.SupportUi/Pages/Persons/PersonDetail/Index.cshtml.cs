@@ -20,15 +20,6 @@ public class IndexModel(
     [FromRoute]
     public Guid PersonId { get; set; }
 
-    [FromQuery]
-    public string? Search { get; set; }
-
-    [FromQuery]
-    public int? PageNumber { get; set; }
-
-    [FromQuery]
-    public PersonSearchSortByOption? SortBy { get; set; }
-
     public PersonInfo? Person { get; set; }
 
     public PersonProfessionalStatusInfo? PersonProfessionalStatus { get; set; }
