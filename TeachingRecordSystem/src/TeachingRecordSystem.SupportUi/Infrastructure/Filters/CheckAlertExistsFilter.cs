@@ -29,12 +29,14 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
             return;
         }
 
+        await context.HttpContext.EnsureDbTransactionAsync();
+
         var query = dbContext.Alerts
             .FromSql($"select * from alerts where alert_id = {alertId} for update")  // https://github.com/dotnet/efcore/issues/26042
             .Include(a => a.Person);
 
         // Query without query filters first - query filters will filter out deactivated Person
-        // meaning the entire Alert is not found, but if Person is deactivated we
+        // meaning the entire Alert is not found, but if Person is deactivated
         // we need to return a BadRequest instead of a NotFound result
         var currentAlertWithPotentiallyDeactivatedPerson = await query
             .IgnoreQueryFilters()

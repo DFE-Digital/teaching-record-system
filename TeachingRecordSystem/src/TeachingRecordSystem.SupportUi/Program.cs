@@ -31,7 +31,6 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
-using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Filters;
 using TeachingRecordSystem.WebCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
@@ -230,8 +229,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseMiddleware<TransactionScopeMiddleware>();
 
 app.MapRazorPages();
 app.MapControllers();
