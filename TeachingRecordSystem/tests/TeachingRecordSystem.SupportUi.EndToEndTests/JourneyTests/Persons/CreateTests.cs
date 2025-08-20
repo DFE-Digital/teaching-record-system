@@ -3,9 +3,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public class CreatePersonTests : TestBase
+public class CreateTests : TestBase
 {
-    public CreatePersonTests(HostFixture hostFixture)
+    public CreateTests(HostFixture hostFixture)
         : base(hostFixture)
     {
     }

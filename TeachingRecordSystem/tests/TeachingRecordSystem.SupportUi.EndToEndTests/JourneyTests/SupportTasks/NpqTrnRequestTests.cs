@@ -1,8 +1,9 @@
+using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
-public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task Resolve_CreateNewRecord()

@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
-public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task CreateNewRecord()

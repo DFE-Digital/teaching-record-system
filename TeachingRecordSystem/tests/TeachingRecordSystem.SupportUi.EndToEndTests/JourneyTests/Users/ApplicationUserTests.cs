@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Users;
 
 public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixture)
 {

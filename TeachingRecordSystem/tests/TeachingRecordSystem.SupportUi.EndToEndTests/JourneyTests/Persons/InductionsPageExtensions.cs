@@ -1,9 +1,9 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public static class EditInductionPageExtensions
+public static class InductionsPageExtensions
 {
     public static Task GoToPersonInductionPageAsync(this IPage page, Guid personId)
     {

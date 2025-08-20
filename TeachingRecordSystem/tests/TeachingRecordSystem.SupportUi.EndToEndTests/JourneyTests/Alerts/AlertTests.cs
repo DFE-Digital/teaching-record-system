@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
@@ -7,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Alerts;
 
 public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 {

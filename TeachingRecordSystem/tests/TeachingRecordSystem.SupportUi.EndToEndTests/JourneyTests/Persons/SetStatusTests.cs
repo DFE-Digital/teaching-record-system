@@ -1,6 +1,6 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public class SetStatusTests : TestBase
 {
