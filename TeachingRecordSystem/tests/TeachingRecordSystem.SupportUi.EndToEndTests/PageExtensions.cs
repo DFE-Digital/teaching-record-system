@@ -566,6 +566,15 @@ public static class PageExtensions
         Assert.Empty(await page.InputValueAsync("label:text-is('Month')"));
         Assert.Empty(await page.InputValueAsync("label:text-is('Year')"));
     }
+    public static async Task AssertBannerAsync(this IPage page, string title, string text)
+    {
+        var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
+        var bannerText = page.Locator("h3.govuk-notification-banner__heading");
+
+        Assert.Equal(title, await bannerTitle.TextContentAsync());
+        Assert.Equal(text, await bannerText.TextContentAsync());
+    }
+
     public static Task AssertOnRouteDetailPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/detail");
@@ -685,6 +694,17 @@ public static class PageExtensions
 
         var radio = page.Locator($"input[id='{forAttr}']");
         await radio.CheckAsync();
+    }
+
+    public static Task ClickChangeLink(this IPage page)
+    {
+        return page.GetByTestId("change-link").ClickAsync();
+    }
+
+    public static Task FollowBannerLink(this IPage page, string message)
+    {
+        var link = page.GetByRole(AriaRole.Link, new() { Name = message });
+        return link.ClickAsync();
     }
 
     public static async Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null)

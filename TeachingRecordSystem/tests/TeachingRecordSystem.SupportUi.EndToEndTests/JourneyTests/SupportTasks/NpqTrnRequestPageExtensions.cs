@@ -51,33 +51,4 @@ public static class NpqTrnRequestPageExtensions
         var guid = parts[0];
         Assert.True(Guid.TryParse(guid, out _));
     }
-
-    public static async Task AssertSuccessBannerAsync(this IPage page)
-    {
-        var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
-        var bannerText = page.Locator("h3.govuk-notification-banner__heading");
-
-        Assert.Equal("Success", await bannerTitle.TextContentAsync());
-        Assert.Equal("NPQ request completed", await bannerText.TextContentAsync());
-    }
-
-    public static async Task AssertRejectBannerAsync(this IPage page, string name)
-    {
-        var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
-        var bannerText = page.Locator("h3.govuk-notification-banner__heading");
-
-        Assert.Equal("Success", await bannerTitle.TextContentAsync());
-        Assert.Equal($"TRN request for {name} rejected", await bannerText.TextContentAsync());
-    }
-
-    public static Task ClickChangeLink(this IPage page)
-    {
-        return page.GetByTestId("change-link").ClickAsync();
-    }
-
-    public static Task FollowBannerLink(this IPage page, string message)
-    {
-        var link = page.GetByRole(AriaRole.Link, new() { Name = message });
-        return link.ClickAsync();
-    }
 }

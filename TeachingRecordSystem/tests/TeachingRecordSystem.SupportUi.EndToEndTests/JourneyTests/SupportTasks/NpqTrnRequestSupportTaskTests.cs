@@ -46,7 +46,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and create record");
         await page.AssertOnListPageAsync();
-        await page.AssertSuccessBannerAsync();
+        await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
         page.AssertOnAPersonDetailPage();
@@ -76,7 +76,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
             applicationUser.UserId,
             t =>
             {
-                t.WithMatchedPersons(new Guid[] { matchedPerson1.PersonId, matchedPerson2.PersonId });
+                t.WithMatchedPersons([matchedPerson1.PersonId, matchedPerson2.PersonId]);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
                 t.WithEmailAddress(matchedPerson1.Email);
@@ -117,7 +117,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and update existing record");
         await page.AssertOnListPageAsync();
-        await page.AssertSuccessBannerAsync();
+        await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record updated for {matchedPerson1.FirstName} {matchedPerson1.MiddleName} {matchedPerson1.LastName}");
         await page.AssertOnPersonDetailPageAsync(matchedPerson1.PersonId);
@@ -148,7 +148,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
             applicationUser.UserId,
             t =>
             {
-                t.WithMatchedPersons(new Guid[] { matchedPerson1.PersonId, matchedPerson2.PersonId });
+                t.WithMatchedPersons([matchedPerson1.PersonId, matchedPerson2.PersonId]);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
                 t.WithEmailAddress(matchedPerson1.Email);
@@ -196,7 +196,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and update existing record");
         await page.AssertOnListPageAsync();
-        await page.AssertSuccessBannerAsync();
+        await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record updated for {matchedPerson2.FirstName} {matchedPerson2.MiddleName} {matchedPerson2.LastName}");
         await page.AssertOnPersonDetailPageAsync(matchedPerson2.PersonId);
@@ -227,7 +227,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
             applicationUser.UserId,
             t =>
             {
-                t.WithMatchedPersons(new Guid[] { matchedPerson1.PersonId, matchedPerson2.PersonId });
+                t.WithMatchedPersons([matchedPerson1.PersonId, matchedPerson2.PersonId]);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
                 t.WithEmailAddress(matchedPerson1.Email);
@@ -301,7 +301,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.AssertOnListPageAsync();
-        await page.AssertSuccessBannerAsync();
+        await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
         page.AssertOnAPersonDetailPage();
@@ -355,6 +355,6 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickButtonAsync("Confirm and reject request");
 
         await page.AssertOnListPageAsync();
-        await page.AssertRejectBannerAsync($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
+        await page.AssertBannerAsync("Success", $"TRN request for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName} rejected");
     }
 }
