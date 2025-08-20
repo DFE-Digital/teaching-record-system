@@ -1,6 +1,6 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public class EditDetailsTests : TestBase
 {

@@ -32,7 +32,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add comments")]
+    [Display(Name = "Add comments (optional)")]
     public string? Comments { get; set; }
 
     public void OnGet()

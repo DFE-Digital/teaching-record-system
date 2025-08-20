@@ -142,7 +142,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
 
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"NPQ request for {StringHelper.JoinNonEmpty(' ', new string?[] { requestMetadata.FirstName, requestMetadata.MiddleName, requestMetadata.LastName })} rejected");
+            $"TRN request for {StringHelper.JoinNonEmpty(' ', new string?[] { requestMetadata.FirstName, requestMetadata.MiddleName, requestMetadata.LastName })} rejected");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);

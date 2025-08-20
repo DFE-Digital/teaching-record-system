@@ -1,7 +1,7 @@
 using TeachingRecordSystem.SupportUi.Pages.Common;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProfessionalStatus;
 
 public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {

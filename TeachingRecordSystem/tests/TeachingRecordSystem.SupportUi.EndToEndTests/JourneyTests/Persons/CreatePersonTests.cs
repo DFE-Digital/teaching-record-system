@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public class CreatePersonTests : TestBase
 {
