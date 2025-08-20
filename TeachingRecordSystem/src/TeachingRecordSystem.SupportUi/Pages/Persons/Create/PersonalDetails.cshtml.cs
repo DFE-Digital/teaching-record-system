@@ -75,6 +75,12 @@ public class PersonalDetailsModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        // NotAvailable is not a value the user is allowed to select in the UI.
+        if (Gender == Core.Models.Gender.NotAvailable)
+        {
+            return BadRequest();
+        }
+
         if (DateOfBirth.HasValue && DateOfBirth.Value > clock.Today)
         {
             ModelState.AddModelError(nameof(DateOfBirth), "Person\u2019s date of birth must be in the past");

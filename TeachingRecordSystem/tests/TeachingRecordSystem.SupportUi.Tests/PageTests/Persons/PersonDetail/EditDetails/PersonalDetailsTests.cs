@@ -193,11 +193,11 @@ public class PersonalDetailsTests : TestBase
     }
 
     [Theory]
-    [InlineData(Gender.Male, new string[] { "Male", "Female", "Other" })]
-    [InlineData(Gender.Female, new string[] { "Male", "Female", "Other" })]
-    [InlineData(Gender.Other, new string[] { "Male", "Female", "Other" })]
-    [InlineData(null, new string[] { "Male", "Female", "Other" })]
-    [InlineData(Gender.NotAvailable, new string[] { "Male", "Female", "Other", "NotAvailable" })]
+    [InlineData(Gender.Male, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [InlineData(Gender.Female, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [InlineData(Gender.Other, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [InlineData(null, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [InlineData(Gender.NotAvailable, new string[] { "Male", "Female", "Other", "Not available", "Not provided" })]
     public async Task Get_NotAvailableGender_OptionNotVisible_UnlessPreExistingValueOnPersonRecord(Gender? preExistingGenderValue, string[] expectedOptions)
     {
         // Arrange
@@ -218,10 +218,10 @@ public class PersonalDetailsTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
         var genderOptions = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']");
 
-        Action<IHtmlInputElement> AssertRadioButtonValue(string expectedValue) =>
-            radio => Assert.Equal(expectedValue, radio.Value);
+        Action<IHtmlInputElement> AssertRadioButtonLabel(string expectedValue) =>
+            radio => Assert.Equal(expectedValue, radio.NextElementSibling!.TrimmedText());
 
-        Assert.Collection(genderOptions, expectedOptions.Select(AssertRadioButtonValue).ToArray());
+        Assert.Collection(genderOptions, expectedOptions.Select(AssertRadioButtonLabel).ToArray());
     }
 
     [Fact]
@@ -756,6 +756,52 @@ public class PersonalDetailsTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(Gender.NotAvailable, journeyInstance.State.Gender);
+    }
+
+    [Fact]
+    public async Task Post_UpdatingGenderToNotProvided_Succeeds()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("test@test.com")
+            .WithNationalInsuranceNumber("AB123456C")
+            .WithGender(Gender.Male));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("test@test.com")
+                .WithMobileNumber("447891234567")
+                .WithNationalInsuranceNumber("AB123456C")
+                .WithGender(null)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance.State.Gender);
     }
 
     [Fact]

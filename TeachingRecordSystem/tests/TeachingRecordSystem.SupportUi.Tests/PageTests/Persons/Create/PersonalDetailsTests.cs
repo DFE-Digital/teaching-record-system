@@ -84,6 +84,28 @@ public class PersonalDetailsTests : TestBase
     }
 
     [Fact]
+    public async Task Get_GenderOptionsAsExpected()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new CreateStateBuilder()
+                .WithInitializedState()
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var genderOptions = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']")
+            .Select(radio => radio.NextElementSibling!.TrimmedText());
+
+        Assert.Equal(genderOptions, ["Male", "Female", "Other", "Not provided"]);
+    }
+
+    [Fact]
     public async Task Post_FirstNameMissing_ShowsPageError()
     {
         // Arrange
@@ -509,6 +531,63 @@ public class PersonalDetailsTests : TestBase
         {
             await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
         }
+    }
+
+    [Fact]
+    public async Task Post_GenderNotAvailable_ReturnsBadRequest()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new CreateStateBuilder()
+                .WithInitializedState()
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
+        {
+            Content = new CreatePostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithGender(Gender.NotAvailable)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_GenderNotProvided_Succeeds()
+    {
+        // Arrange
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            new CreateStateBuilder()
+                .WithInitializedState()
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
+        {
+            Content = new CreatePostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithGender(null)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance.State.Gender);
     }
 
     [Fact]
