@@ -39,7 +39,7 @@ public static class PageExtensions
         }
     }
 
-    public static void AssertErrorSummary(this IPage page)
+    public static void AssertErrorSummaryAsync(this IPage page)
     {
         var element = page.Locator("h2:text('There is a problem')");
         Assert.NotNull(element);
@@ -102,19 +102,19 @@ public static class PageExtensions
     public static Task FillEmailInputAsync(this IPage page, string email) =>
         page.FillAsync("input[type='email']", email);
 
-    public static async Task AssertContentEquals(this IPage page, string content, string label)
+    public static async Task AssertContentEqualsAsync(this IPage page, string content, string label)
     {
-        var ddText = await page.FindContentForLabel(label);
+        var ddText = await page.FindContentForLabelAsync(label);
         Assert.Equal(content, ddText);
     }
 
-    public static async Task AssertContentContains(this IPage page, string content, string label)
+    public static async Task AssertContentContainsAsync(this IPage page, string content, string label)
     {
-        var ddText = await page.FindContentForLabel(label);
+        var ddText = await page.FindContentForLabelAsync(label);
         Assert.Contains(content, ddText);
     }
 
-    public static Task<string> FindContentForLabel(this IPage page, string label)
+    public static Task<string> FindContentForLabelAsync(this IPage page, string label)
     {
         var dtElement = page.Locator($"dt{TestBase.HasTextSelector(label)}");
         var ddElement = dtElement.Locator("xpath=following-sibling::dd[1]");
@@ -162,10 +162,10 @@ public static class PageExtensions
     public static Task ClickButtonAsync(this IPage page, string text) =>
         page.ClickAsync($".govuk-button{TestBase.TextIsSelector(text)}");
 
-    public static Task ClickBackLink(this IPage page) =>
+    public static Task ClickBackLinkAsync(this IPage page) =>
         page.ClickAsync($".govuk-back-link");
 
-    public static Task ClickCancelLink(this IPage page) =>
+    public static Task ClickCancelLinkAsync(this IPage page) =>
         page.ClickAsync("a.govuk-link:contains('Cancel')");
 
     public static Task ClickRadioAsync(this IPage page, string value) =>
@@ -182,7 +182,7 @@ public static class PageExtensions
         await radio.CheckAsync();
     }
 
-    public static Task ClickChangeLink(this IPage page) =>
+    public static Task ClickChangeLinkAsync(this IPage page) =>
         page.GetByTestId("change-link").ClickAsync();
 
     public static Task FollowBannerLink(this IPage page, string message)
@@ -217,7 +217,7 @@ public static class PageExtensions
         }
     }
 
-    public static async Task SelectReasonFileUploadAsync(this IPage page, bool uploadFile, string? evidenceFileName = null)
+    public static async Task SelectUploadEvidenceAsync(this IPage page, bool uploadFile, string? evidenceFileName = null)
     {
         var radioButton = page.GetByTestId("upload-evidence-options").Locator($"input[type='radio'][value='{uploadFile}']");
         await radioButton.ClickAsync();

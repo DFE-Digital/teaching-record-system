@@ -63,7 +63,7 @@ public static class InductionsPageExtensions
         return page.WaitForUrlPathAsync($"/persons/{personId}/edit-induction/check-answers");
     }
 
-    public static Task AssertInductionStatusSelected(this IPage page, InductionStatus status)
+    public static Task AssertInductionStatusSelectedAsync(this IPage page, InductionStatus status)
     {
         var radioButton = page.Locator($"input[type='radio'][value='{status}']");
         return radioButton.Locator("xpath=following-sibling::label").IsCheckedAsync();

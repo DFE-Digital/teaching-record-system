@@ -26,7 +26,7 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
@@ -53,7 +53,7 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
@@ -81,12 +81,12 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
@@ -113,18 +113,18 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsPageAsync(person.PersonId);
         await page.AssertNameInputAsync("Alfred", "The", "Great");
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
@@ -146,18 +146,18 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsPageAsync(person.PersonId);
         await page.AssertDateInputAsync(DateOnly.Parse("1 Nov 1990"));
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
@@ -180,27 +180,27 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsPageAsync(person.PersonId);
         await page.AssertNameInputAsync("Alfred", "The", "Great");
         await page.AssertDateInputAsync(DateOnly.Parse("1 Nov 1990"));
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
@@ -223,12 +223,12 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
@@ -270,43 +270,43 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
         await page.ClickLinkForElementWithTestIdAsync("change-details-link");
 
         await page.AssertOnPersonEditDetailsPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
         await page.ClickLinkForElementWithTestIdAsync("name-change-reason-link");
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
         await page.ClickLinkForElementWithTestIdAsync("other-details-change-reason-link");
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonEditDetailsPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
@@ -328,7 +328,7 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
@@ -340,7 +340,7 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
@@ -369,7 +369,7 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsNameChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsNameChangeReasonOption.CorrectingAnError);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
@@ -381,7 +381,7 @@ public class EditDetailsTests : TestBase
 
         await page.AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync("change-reason-options", EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason");
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);

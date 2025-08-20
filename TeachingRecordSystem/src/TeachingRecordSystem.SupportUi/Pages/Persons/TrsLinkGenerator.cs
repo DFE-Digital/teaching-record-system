@@ -92,6 +92,9 @@ public partial class TrsLinkGenerator
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
 
+    public string PersonMerge(Guid personId) =>
+        GetRequiredPathByPage("/Persons/Merge/Index", routeValues: new { personId });
+
     public string PersonMergeEnterTrn(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/Merge/EnterTrn", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
@@ -107,8 +110,8 @@ public partial class TrsLinkGenerator
     public string PersonMergeCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Persons/Merge/EnterTrn", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string PersonSetStatus(Guid personId, PersonStatus targetStatus, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/Index", routeValues: new { personId, targetStatus, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string PersonSetStatus(Guid personId, PersonStatus targetStatus) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/Index", routeValues: new { personId, targetStatus });
 
     public string PersonSetStatusChangeReason(Guid personId, PersonStatus targetStatus, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/ChangeReason", routeValues: new { personId, targetStatus, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);

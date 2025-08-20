@@ -18,7 +18,7 @@
             <govuk-summary-card>
                 <govuk-summary-card-title>Primary record (TRN @Model.Trn)</govuk-summary-card-title>
                 <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@Model.ChangePrimaryPersonLink" data-testid="change-primary-person-link">Change</govuk-summary-card-action>
+                    <govuk-summary-card-action href="@Model.ChangePrimaryPersonLink" data-testid="change-primary-person-link" visually-hidden-text="primary person">Change</govuk-summary-card-action>
                 </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>
@@ -32,42 +32,42 @@
                         <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.MiddleName</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="middle name">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="middle name">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="last name">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="last name">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="email address">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="email address">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="national insurance number">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="national insurance number">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.Gender?.GetDisplayName()</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangeDetailsLink visually-hidden-text="gender">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeDetailsLink visually-hidden-text="gender">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>

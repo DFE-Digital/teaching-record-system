@@ -25,7 +25,7 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
         await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
@@ -58,7 +58,7 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
         await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
@@ -84,14 +84,14 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
         await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
@@ -119,14 +119,14 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
         await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
@@ -147,7 +147,7 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
         await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
@@ -182,7 +182,7 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
         await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
@@ -210,20 +210,20 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
         await page.SelectChangeReasonAsync("deactivate-reason-options", DeactivateReasonOption.ProblemWithTheRecord);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
         await page.ClickLinkForElementWithTestIdAsync("change-deactivate-reason-link");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
@@ -251,20 +251,20 @@ public class SetStatusTests : TestBase
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
         await page.SelectChangeReasonAsync("reactivate-reason-options", ReactivateReasonOption.DeactivatedByMistake);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
         await page.ClickLinkForElementWithTestIdAsync("change-reactivate-reason-link");
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }

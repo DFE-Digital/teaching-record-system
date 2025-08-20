@@ -66,4 +66,19 @@ public static class PersonsPageExtensions
 
     public static Task AssertOnPersonSetStatusCheckAnswersPageAsync(this IPage page, Guid personId, PersonStatus targetStatus) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/check-answers");
+
+    public static Task AssertOnPersonMergeEnterTrnPageAsync(this IPage page, Guid personId) =>
+        page.WaitForUrlPathAsync($"/persons/{personId}/merge/enter-trn");
+
+    public static Task AssertOnPersonMergeMatchesPageAsync(this IPage page, Guid personId) =>
+        page.WaitForUrlPathAsync($"/persons/{personId}/merge/matches");
+
+    public static Task AssertOnPersonMergeMergePageAsync(this IPage page, Guid personId) =>
+        page.WaitForUrlPathAsync($"/persons/{personId}/merge/merge");
+
+    public static Task AssertOnPersonMergeChangeReasonPageAsync(this IPage page, Guid personId) =>
+        page.WaitForUrlPathAsync($"/persons/{personId}/merge/change-reason");
+
+    public static Task AssertOnPersonMergeCheckAnswersPageAsync(this IPage page, Guid personId) =>
+        page.WaitForUrlPathAsync($"/persons/{personId}/merge/check-answers");
 }
