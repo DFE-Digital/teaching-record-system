@@ -93,17 +93,27 @@ public static partial class AssertEx
         HtmlDocumentHasSummaryError(doc, expectedMessage);
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, string? expected)
+    public static void AssertRowContentMatches(this IElement doc, string keyContent, string? expected)
     {
         doc.AssertRow(keyContent, el => Assert.Equal(expected, el.TrimmedText()));
     }
 
-    public static void AssertRowContentContains(this IHtmlDocument doc, string keyContent, string expected)
+    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, string? expected)
+    {
+        doc.Body!.AssertRowContentMatches(keyContent, expected);
+    }
+
+    public static void AssertRowContentContains(this IElement doc, string keyContent, string expected)
     {
         doc.AssertRow(keyContent, el => Assert.Contains(expected, el.TrimmedText()));
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, IEnumerable<string> expected)
+    public static void AssertRowContentContains(this IHtmlDocument doc, string keyContent, string expected)
+    {
+        doc.Body!.AssertRowContentContains(keyContent, expected);
+    }
+
+    public static void AssertRowContentMatches(this IElement doc, string keyContent, IEnumerable<string> expected)
     {
         doc.AssertRow(keyContent, el =>
         {
@@ -113,17 +123,32 @@ public static partial class AssertEx
         });
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, string? expected)
+    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, IEnumerable<string> expected)
+    {
+        doc.Body!.AssertRowContentMatches(keyContent, expected);
+    }
+
+    public static void AssertRowContentMatches(this IElement doc, string containerTestId, string keyContent, string? expected)
     {
         doc.AssertRow(containerTestId, keyContent, el => Assert.Equal(expected, el.TrimmedText()));
     }
 
-    public static void AssertRowContentContains(this IHtmlDocument doc, string containerTestId, string keyContent, string expected)
+    public static void AssertRowContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, string? expected)
+    {
+        doc.Body!.AssertRowContentMatches(containerTestId, keyContent, expected);
+    }
+
+    public static void AssertRowContentContains(this IElement doc, string containerTestId, string keyContent, string expected)
     {
         doc.AssertRow(containerTestId, keyContent, el => Assert.Contains(expected, el.TrimmedText()));
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, IEnumerable<string> expected)
+    public static void AssertRowContentContains(this IHtmlDocument doc, string containerTestId, string keyContent, string expected)
+    {
+        doc.Body!.AssertRowContentContains(containerTestId, keyContent, expected);
+    }
+
+    public static void AssertRowContentMatches(this IElement doc, string containerTestId, string keyContent, IEnumerable<string> expected)
     {
         doc.AssertRow(containerTestId, keyContent, el =>
         {
@@ -133,57 +158,112 @@ public static partial class AssertEx
         });
     }
 
-    public static void AssertRow(this IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
+    public static void AssertRowContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, IEnumerable<string> expected)
+    {
+        doc.Body!.AssertRowContentMatches(containerTestId, keyContent, expected);
+    }
+
+    public static void AssertRow(this IElement doc, string keyContent, Action<IElement> valueAssertion)
     {
         doc.AssertRowCore(null, keyContent, valueAssertion);
+    }
+
+    public static void AssertRow(this IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
+    {
+        doc.Body!.AssertRow(keyContent, valueAssertion);
+    }
+
+    public static void AssertRow(this IElement doc, string containerTestId, string keyContent, Action<IElement> valueAssertion)
+    {
+        doc.AssertRowCore(containerTestId, keyContent, valueAssertion);
     }
 
     public static void AssertRow(this IHtmlDocument doc, string containerTestId, string keyContent, Action<IElement> valueAssertion)
     {
-        doc.AssertRowCore(containerTestId, keyContent, valueAssertion);
+        doc.Body!.AssertRow(containerTestId, keyContent, valueAssertion);
     }
 
-    public static void AssertRow<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
+    public static void AssertRow<T>(this IElement doc, string keyContent, Action<T> valueAssertion)
     {
         doc.AssertRowCore(null, keyContent, valueAssertion);
     }
 
-    public static void AssertRow<T>(this IHtmlDocument doc, string containerTestId, string keyContent, Action<T> valueAssertion)
+    public static void AssertRow<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
+    {
+        doc.Body!.AssertRow(keyContent, valueAssertion);
+    }
+
+    public static void AssertRow<T>(this IElement doc, string containerTestId, string keyContent, Action<T> valueAssertion)
     {
         doc.AssertRowCore(containerTestId, keyContent, valueAssertion);
     }
 
-    public static void AssertRows(this IHtmlDocument doc, string keyContent, params Action<IElement>[] valueAssertions)
+    public static void AssertRow<T>(this IHtmlDocument doc, string containerTestId, string keyContent, Action<T> valueAssertion)
+    {
+        doc.Body!.AssertRow(containerTestId, keyContent, valueAssertion);
+    }
+
+    public static void AssertRows(this IElement doc, string keyContent, params Action<IElement>[] valueAssertions)
     {
         doc.AssertRowsCore(null, keyContent, valueAssertions);
+    }
+
+    public static void AssertRows(this IHtmlDocument doc, string keyContent, params Action<IElement>[] valueAssertions)
+    {
+        doc.Body!.AssertRows(keyContent, valueAssertions);
+    }
+
+    public static void AssertRows(this IElement doc, string containerTestId, string keyContent, params Action<IElement>[] valueAssertions)
+    {
+        doc.AssertRowsCore(containerTestId, keyContent, valueAssertions);
     }
 
     public static void AssertRows(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<IElement>[] valueAssertions)
     {
-        doc.AssertRowsCore(containerTestId, keyContent, valueAssertions);
+        doc.Body!.AssertRows(containerTestId, keyContent, valueAssertions);
     }
 
-    public static void AssertRows<T>(this IHtmlDocument doc, string keyContent, params Action<T>[] valueAssertions)
+    public static void AssertRows<T>(this IElement doc, string keyContent, params Action<T>[] valueAssertions)
     {
         doc.AssertRowsCore(null, keyContent, valueAssertions);
     }
 
-    public static void AssertRows<T>(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
+    public static void AssertRows<T>(this IHtmlDocument doc, string keyContent, params Action<T>[] valueAssertions)
+    {
+        doc.Body!.AssertRows(keyContent, valueAssertions);
+    }
+
+    public static void AssertRows<T>(this IElement doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
     {
         doc.AssertRowsCore(containerTestId, keyContent, valueAssertions);
     }
 
-    public static void AssertRowDoesNotExist(this IHtmlDocument doc, string keyContent)
+    public static void AssertRows<T>(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
+    {
+        doc.Body!.AssertRows(containerTestId, keyContent, valueAssertions);
+    }
+
+    public static void AssertRowDoesNotExist(this IElement doc, string keyContent)
     {
         doc.AssertRowDoesNotExistCore(null, keyContent);
     }
 
-    public static void AssertRowDoesNotExist(this IHtmlDocument doc, string containerTestId, string keyContent)
+    public static void AssertRowDoesNotExist(this IHtmlDocument doc, string keyContent)
+    {
+        doc.Body!.AssertRowDoesNotExist(keyContent);
+    }
+
+    public static void AssertRowDoesNotExist(this IElement doc, string containerTestId, string keyContent)
     {
         doc.AssertRowDoesNotExistCore(containerTestId, keyContent);
     }
 
-    public static void AssertMatchRowHasExpectedHighlight(this IHtmlDocument doc, string detailsId, string summaryListKey, bool expectHighlight)
+    public static void AssertRowDoesNotExist(this IHtmlDocument doc, string containerTestId, string keyContent)
+    {
+        doc.Body!.AssertRowDoesNotExist(containerTestId, keyContent);
+    }
+
+    public static void AssertMatchRowHasExpectedHighlight(this IElement doc, string detailsId, string summaryListKey, bool expectHighlight)
     {
         var details = doc.GetAllElementsByTestId(detailsId).First();
         var valueElement = details.GetSummaryListValueElementForKey(summaryListKey);
@@ -200,7 +280,12 @@ public static partial class AssertEx
         }
     }
 
-    public static void AssertChangeLinkExists(this IHtmlDocument doc, string keyContent)
+    public static void AssertMatchRowHasExpectedHighlight(this IHtmlDocument doc, string detailsId, string summaryListKey, bool expectHighlight)
+    {
+        doc.Body!.AssertMatchRowHasExpectedHighlight(detailsId, summaryListKey, expectHighlight);
+    }
+
+    public static void AssertChangeLinkExists(this IElement doc, string keyContent)
     {
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
         Assert.NotNull(label);
@@ -208,12 +293,22 @@ public static partial class AssertEx
         Assert.NotNull(value!.NextElementSibling!.GetElementsByTagName("a").First());
     }
 
-    public static void AssertNoChangeLink(this IHtmlDocument doc, string keyContent)
+    public static void AssertChangeLinkExists(this IHtmlDocument doc, string keyContent)
+    {
+        doc.Body!.AssertChangeLinkExists(keyContent);
+    }
+
+    public static void AssertNoChangeLink(this IElement doc, string keyContent)
     {
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
         Assert.NotNull(label);
         var value = label.NextElementSibling;
         Assert.Null(value!.NextElementSibling);
+    }
+
+    public static void AssertNoChangeLink(this IHtmlDocument doc, string keyContent)
+    {
+        doc.Body!.AssertNoChangeLink(keyContent);
     }
 
     public static async Task<Guid> AssertFileWasUploadedAsync(this Mock<IFileService> fileServiceMock)
@@ -232,7 +327,7 @@ public static partial class AssertEx
         fileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
     }
 
-    private static void AssertRowCore<T>(this IHtmlDocument doc, string? containerTestId, string keyContent, Action<T> valueAssertion)
+    private static void AssertRowCore<T>(this IElement doc, string? containerTestId, string keyContent, Action<T> valueAssertion)
     {
         IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
         Assert.NotNull(container);
@@ -241,7 +336,7 @@ public static partial class AssertEx
         AssertRowValueCore<T>(label, valueAssertion);
     }
 
-    private static void AssertRowsCore<T>(this IHtmlDocument doc, string? containerTestId, string keyContent, params Action<T>[] valueAssertions)
+    private static void AssertRowsCore<T>(this IElement doc, string? containerTestId, string keyContent, params Action<T>[] valueAssertions)
     {
         IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
         Assert.NotNull(container);
@@ -262,7 +357,7 @@ public static partial class AssertEx
         valueAssertion(value);
     }
 
-    private static void AssertRowDoesNotExistCore(this IHtmlDocument doc, string? containerTestId, string keyContent)
+    private static void AssertRowDoesNotExistCore(this IElement doc, string? containerTestId, string keyContent)
     {
         IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
         Assert.NotNull(container);

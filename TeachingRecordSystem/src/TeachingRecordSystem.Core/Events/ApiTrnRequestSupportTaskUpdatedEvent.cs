@@ -22,5 +22,6 @@ public enum ApiTrnRequestSupportTaskUpdatedEventChanges
     PersonEmailAddress = PersonAttributesChanges.EmailAddress,
     PersonNationalInsuranceNumber = PersonAttributesChanges.NationalInsuranceNumber,
     PersonGender = PersonAttributesChanges.Gender,
-    PersonNameChange = PersonFirstName | PersonMiddleName | PersonLastName
+    PersonNameChange = PersonFirstName | PersonMiddleName | PersonLastName,
+    AllChanges = PersonNameChange | PersonDateOfBirth | PersonEmailAddress | PersonNationalInsuranceNumber | PersonGender
 }
