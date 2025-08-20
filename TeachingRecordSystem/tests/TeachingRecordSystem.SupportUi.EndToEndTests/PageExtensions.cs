@@ -1,5 +1,4 @@
 using Microsoft.Playwright;
-using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Alerts;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -80,8 +79,6 @@ public static class PageExtensions
         await dateInputScope.GetByLabel("Day").FillAsync(date.Day.ToString());
         await dateInputScope.GetByLabel("Month").FillAsync(date.Month.ToString());
         await dateInputScope.GetByLabel("Year").FillAsync(date.Year.ToString());
-        //await page.FillAsync("label:text-is('Month')", date.Month.ToString());
-        //await page.FillAsync("label:text-is('Year')", date.Year.ToString());
     }
 
     public static async Task FillDateInputAsync(this IPage page, DateOnly date)
@@ -125,20 +122,6 @@ public static class PageExtensions
     {
         var element = page.Locator($"dt{TestBase.HasTextSelector(label)}");
         Assert.False(await element.IsVisibleAsync());
-    }
-
-    public static async Task SubmitAddAlertIndexPageAsync(this IPage page, string alertType, string? details, string link, DateOnly startDate)
-    {
-        await page.AssertOnAddAlertTypePageAsync();
-        await page.FillAsync("label:text-is('Alert type')", alertType);
-        if (details != null)
-        {
-            await page.FillAsync("label:text-is('Details')", details);
-        }
-
-        await page.FillAsync("label:text-is('Link')", link);
-        await page.FillDateInputAsync(startDate);
-        await page.ClickContinueButtonAsync();
     }
 
     public static Task ClickAcceptChangeButtonAsync(this IPage page) =>

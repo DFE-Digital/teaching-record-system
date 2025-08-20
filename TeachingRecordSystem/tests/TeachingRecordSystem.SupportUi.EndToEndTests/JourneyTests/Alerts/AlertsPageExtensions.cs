@@ -126,4 +126,18 @@ public static class AlertsPageExtensions
 
     public static Task ClickReactivateButtonAsync(this IPage page) =>
         page.ClickButtonAsync("Remove inactive status");
+
+    public static async Task SubmitAddAlertIndexPageAsync(this IPage page, string alertType, string? details, string link, DateOnly startDate)
+    {
+        await page.AssertOnAddAlertTypePageAsync();
+        await page.FillAsync("label:text-is('Alert type')", alertType);
+        if (details != null)
+        {
+            await page.FillAsync("label:text-is('Details')", details);
+        }
+
+        await page.FillAsync("label:text-is('Link')", link);
+        await page.FillDateInputAsync(startDate);
+        await page.ClickContinueButtonAsync();
+    }
 }
