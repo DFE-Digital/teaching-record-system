@@ -1,18 +1,19 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 public record GetTrnRequestCommand(string RequestId);
 
-public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider)
+public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider)
 {
     public async Task<ApiResult<TrnRequestInfo>> HandleAsync(GetTrnRequestCommand command)
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
+        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(dbContext, currentApplicationUserId, command.RequestId);
         if (trnRequest is null)
         {
             return ApiError.TrnRequestDoesNotExist(command.RequestId);

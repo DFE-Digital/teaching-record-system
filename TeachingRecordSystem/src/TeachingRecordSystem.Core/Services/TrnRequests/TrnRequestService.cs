@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk.Query;
 using Optional;
@@ -11,7 +12,6 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
 public class TrnRequestService(
-    TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     IGetAnIdentityApiClient idApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
@@ -26,7 +26,7 @@ public class TrnRequestService(
     public string GetAccessYourTeachingQualificationsLink(string trnToken) =>
         $"{aytqOptionsAccessor.Value.BaseAddress}{aytqOptionsAccessor.Value.StartUrlPath}?trn_token={Uri.EscapeDataString(trnToken)}";
 
-    public async Task<GetTrnRequestResult?> GetTrnRequestInfoAsync(Guid applicationUserId, string requestId)
+    public async Task<GetTrnRequestResult?> GetTrnRequestInfoAsync(TrsDbContext dbContext, Guid applicationUserId, string requestId)
     {
         // If we have a support task for this request, we don't need to check CRM and figure out its status here.
         // This is a little clunky currently as we can't have an FK from TrnRequestMetadata.ResolvedPersonId to Person
@@ -44,7 +44,7 @@ public class TrnRequestService(
 
         // If we get here then there's no support task in TRS for this request, so it must be in CRM (or not exist at all).
 
-        var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
+        var metadata = await GetRequestMetadataAsync(dbContext, applicationUserId, requestId);
 
         if (metadata is null)
         {
@@ -116,7 +116,7 @@ public class TrnRequestService(
         return new GetTrnRequestResult(metadata, contact.dfeta_TRN);
     }
 
-    public async Task<bool> RequiresFurtherChecksNeededSupportTaskAsync(Guid personId, Guid trnRequestApplicationUserId)
+    public async Task<bool> RequiresFurtherChecksNeededSupportTaskAsync(TrsDbContext dbContext, Guid personId, Guid trnRequestApplicationUserId)
     {
         if (!trnRequestOptionsAccessor.Value.FlagFurtherChecksRequiredFromUserIds.Contains(trnRequestApplicationUserId))
         {
@@ -136,9 +136,9 @@ public class TrnRequestService(
         return true;
     }
 
-    public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId, string trn)
+    public async Task CreateContactFromTrnRequestAsync(TrsDbContext dbContext, Guid applicationUserId, string requestId, Guid newContactId, string trn)
     {
-        var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
+        var metadata = await GetRequestMetadataAsync(dbContext, applicationUserId, requestId);
 
         if (metadata is null)
         {
@@ -146,6 +146,54 @@ public class TrnRequestService(
         }
 
         await CreateContactFromTrnRequestAsync(metadata, newContactId, trn);
+    }
+
+    public CreatePersonResult CreatePersonFromTrnRequest(TrnRequestMetadata requestData, string trn, DateTime now) =>
+        Person.Create(
+            trn,
+            requestData.FirstName!,
+            requestData.MiddleName ?? string.Empty,
+            requestData.LastName!,
+            requestData.DateOfBirth,
+            requestData.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
+            requestData.NationalInsuranceNumber is string nationalInsuranceNumber ? NationalInsuranceNumber.Parse(nationalInsuranceNumber) : null,
+            requestData.Gender,
+            now,
+            (requestData.ApplicationUserId, requestData.RequestId));
+
+    public UpdatePersonDetailsResult UpdatePersonFromTrnRequest(
+        Person person,
+        TrnRequestMetadata requestData,
+        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
+        DateTime now)
+    {
+        Debug.Assert(person.PersonId == requestData.ResolvedPersonId);
+
+        return person.UpdateDetails(
+            firstName: attributesToUpdate.Contains(PersonMatchedAttribute.FirstName)
+                ? Option.Some(requestData.FirstName!)
+                : Option.None<string>(),
+            middleName: attributesToUpdate.Contains(PersonMatchedAttribute.MiddleName)
+                ? Option.Some(requestData.MiddleName ?? string.Empty)
+                : Option.None<string>(),
+            lastName: attributesToUpdate.Contains(PersonMatchedAttribute.LastName)
+                ? Option.Some(requestData.LastName!)
+                : Option.None<string>(),
+            dateOfBirth: attributesToUpdate.Contains(PersonMatchedAttribute.DateOfBirth)
+                ? Option.Some<DateOnly?>(requestData.DateOfBirth)
+                : Option.None<DateOnly?>(),
+            emailAddress: attributesToUpdate.Contains(PersonMatchedAttribute.EmailAddress)
+                ? Option.Some(requestData.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null)
+                : Option.None<EmailAddress?>(),
+            nationalInsuranceNumber: attributesToUpdate.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
+                ? Option.Some(requestData.NationalInsuranceNumber is string nationalInsuranceNumber
+                    ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
+                    : null)
+                : Option.None<NationalInsuranceNumber?>(),
+            gender: attributesToUpdate.Contains(PersonMatchedAttribute.Gender)
+                ? Option.Some(requestData.Gender)
+                : Option.None<Gender?>(),
+            now);
     }
 
     public async Task CreateContactFromTrnRequestAsync(TrnRequestMetadata requestData, Guid newContactId, string trn)
@@ -173,11 +221,12 @@ public class TrnRequestService(
     }
 
     public async Task UpdateContactFromTrnRequestAsync(
+        TrsDbContext dbContext,
         Guid applicationUserId,
         string requestId,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate)
     {
-        var metadata = await GetRequestMetadataAsync(applicationUserId, requestId);
+        var metadata = await GetRequestMetadataAsync(dbContext, applicationUserId, requestId);
 
         if (metadata is null)
         {
@@ -229,7 +278,7 @@ public class TrnRequestService(
     public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>
         $"{currentApplicationUserId}::{requestId}";
 
-    private Task<TrnRequestMetadata?> GetRequestMetadataAsync(Guid applicationUserId, string requestId) =>
+    private Task<TrnRequestMetadata?> GetRequestMetadataAsync(TrsDbContext dbContext, Guid applicationUserId, string requestId) =>
         dbContext.TrnRequestMetadata
             .Include(m => m.ApplicationUser)
             .SingleOrDefaultAsync(r => r.ApplicationUserId == applicationUserId && r.RequestId == requestId);

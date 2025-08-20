@@ -2,12 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
-public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBackgroundJobScheduler backgroundJobScheduler) : PageModel
+public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
 {
     private const int TasksPerPage = 20;
 
@@ -27,24 +26,12 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
-    [BindProperty(SupportsGet = true)]
-    [FromQuery]
-    public string? WaitForJobId { get; set; }
-
     public ResultPage<Result>? Results { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
-        if (WaitForJobId is not null)
-        {
-            using var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(5));
-            await backgroundJobScheduler.WaitForJobToCompleteAsync(WaitForJobId, cts.Token)
-                .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
-        }
-
         var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
         var sortBy = SortBy ??= ApiTrnRequestsSortByOption.RequestedOn;
 

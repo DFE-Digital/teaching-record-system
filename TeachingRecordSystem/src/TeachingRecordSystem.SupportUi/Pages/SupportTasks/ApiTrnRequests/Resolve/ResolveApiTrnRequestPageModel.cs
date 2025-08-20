@@ -121,6 +121,18 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
         }
     }
 
+    protected ApiTrnRequestDataPersonAttributes GetPersonAttributes(Person person) =>
+        new()
+        {
+            FirstName = person.FirstName,
+            MiddleName = person.MiddleName,
+            LastName = person.LastName,
+            DateOfBirth = person.DateOfBirth,
+            EmailAddress = person.EmailAddress,
+            NationalInsuranceNumber = person.NationalInsuranceNumber,
+            Gender = person.Gender
+        };
+
     protected async Task<ApiTrnRequestDataPersonAttributes> GetPersonAttributesAsync(Guid personId)
     {
         var personAttributes = await dbContext.Persons

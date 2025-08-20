@@ -334,8 +334,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 
-    public string ApiTrnRequests(string? search = null, ApiTrnRequestsSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null, string? waitForJobId = null) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search, sortBy, sortDirection, pageNumber, waitForJobId });
+    public string ApiTrnRequests(string? search = null, ApiTrnRequestsSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search, sortBy, sortDirection, pageNumber });
 
     public string ApiTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);

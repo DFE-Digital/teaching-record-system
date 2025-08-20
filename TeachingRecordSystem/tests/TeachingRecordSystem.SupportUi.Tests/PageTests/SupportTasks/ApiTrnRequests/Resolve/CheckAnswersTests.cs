@@ -1,10 +1,7 @@
-using FakeXrmEasy.Extensions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
@@ -353,7 +350,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Post_CreatingNewRecord_CreatesNewRecordInCrmUpdatesSupportTaskStatusAndRedirects()
+    public async Task Post_CreatingNewRecord_CreatesNewRecordUpdatesSupportTaskStatusAndRedirects()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -385,34 +382,33 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith("/support-tasks/api-trn-requests?waitForJobId=", response.Headers.Location?.OriginalString);
+        Assert.StartsWith("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
 
-        var expectedCrmRequestId = TrnRequestService.GetCrmTrnRequestId(applicationUser.UserId, requestData.RequestId);
-        var crmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.dfeta_TrnRequestID == expectedCrmRequestId);
-        Assert.NotEqual(matchedPerson.ContactId, crmContact.Id);
-        Assert.Equal(requestData.FirstName, crmContact.FirstName);
-        Assert.Equal(requestData.MiddleName, crmContact.MiddleName);
-        Assert.Equal(requestData.LastName, crmContact.LastName);
-        Assert.Equal(requestData.DateOfBirth, crmContact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
-        Assert.Equal(requestData.EmailAddress, crmContact.EMailAddress1);
-        Assert.Equal(requestData.NationalInsuranceNumber, crmContact.dfeta_NINumber);
-        Assert.Equal(requestData.Gender, crmContact.GenderCode.ToGender());
-        Assert.NotNull(crmContact.dfeta_TRN);
+        var person = await WithDbContext(dbContext => dbContext.Persons.SingleOrDefaultAsync(p => p.SourceTrnRequestId == requestData.RequestId));
+        Assert.NotNull(person);
+        Assert.Equal(requestData.FirstName, person.FirstName);
+        Assert.Equal(requestData.MiddleName, person.MiddleName);
+        Assert.Equal(requestData.LastName, person.LastName);
+        Assert.Equal(requestData.DateOfBirth, person.DateOfBirth);
+        Assert.Equal(requestData.EmailAddress, person.EmailAddress);
+        Assert.Equal(requestData.NationalInsuranceNumber, person.NationalInsuranceNumber);
+        Assert.Equal(requestData.Gender, person.Gender);
+        Assert.NotNull(person.Trn);
 
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
-        Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+        Assert.Equal(person.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
-        AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
+        AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
         Assert.Null(supportTaskData.SelectedPersonAttributes);
 
         EventPublisher.AssertEventsSaved(@event =>
         {
             var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
-            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: false, expectedPersonId: crmContact.Id, comments);
+            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: false, expectedPersonId: person.PersonId, comments);
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
@@ -423,7 +419,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
     }
 
     [Fact]
-    public async Task Post_UpdatingExistingRecord_UpdatesRecordInCrmUpdatesSupportTaskAndRedirects()
+    public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskAndRedirects()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -459,20 +455,20 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith("/support-tasks/api-trn-requests?waitForJobId=", response.Headers.Location?.OriginalString);
+        Assert.StartsWith("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
 
-        var crmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
-        Assert.Equal(requestData.MiddleName, crmContact.MiddleName);
+        var person = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == matchedPerson.PersonId));
+        Assert.Equal(requestData.MiddleName, person.MiddleName);
 
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
-        Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+        Assert.Equal(person.PersonId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
-        AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
-        AssertPersonAttributesMatchContact(supportTaskData.SelectedPersonAttributes, originalContact);
+        AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
+        AssertPersonAttributesMatchPerson(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
 
         EventPublisher.AssertEventsSaved(@event =>
         {
@@ -485,63 +481,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
             $"Records merged successfully for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
-    }
-
-    [Theory]
-    [MemberData(nameof(PersonAttributeInfoData))]
-    public async Task Post_UpdatingExistingRecord_OnlyUpdatesAttributesSourcedFromRequestData(PersonAttributeInfo attributeSourcedFromRequestData)
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
-            applicationUser.UserId,
-            attributeSourcedFromRequestData.Attribute);
-        var requestData = supportTask.TrnRequestMetadata!;
-
-        var state = new ResolveApiTrnRequestState()
-        {
-            PersonId = matchedPerson.PersonId,
-            PersonAttributeSourcesSet = true
-        };
-        SetPersonAttributeSourceToTrnRequest(state, attributeSourcedFromRequestData.Attribute);
-
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        var matchedCrmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId).Clone();
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var updatedContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
-
-        static object? FormatValue(object? value) => value switch
-        {
-            DateOnly dateOnly => dateOnly.ToDateTimeWithDqtBstFix(isLocalTime: false),
-            Gender gender => gender.ToContact_GenderCode()!,
-            _ => value
-        };
-
-        var allAttributes = PersonAttributeInfos.SelectMany(i => i.CrmAttributes);
-        foreach (var attr in allAttributes)
-        {
-            if (attributeSourcedFromRequestData.CrmAttributes.Contains(attr))
-            {
-                Assert.Equal(
-                    FormatValue(attributeSourcedFromRequestData.GetValueFromRequestData(requestData)),
-                    updatedContact.Attributes[attr]);
-            }
-            else
-            {
-                Assert.Equal(matchedCrmContact.Attributes[attr], updatedContact.Attributes[attr]);
-            }
-        }
     }
 
     [Fact]
@@ -651,18 +590,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         state.GenderSource = attribute is PersonMatchedAttribute.Gender ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
     }
 
-    private void AssertPersonAttributesMatchContact(
+    private void AssertPersonAttributesMatchPerson(
         ApiTrnRequestDataPersonAttributes? personAttributes,
-        Contact contact)
+        Person person)
     {
         Assert.NotNull(personAttributes);
-        Assert.Equal(personAttributes.FirstName, contact.FirstName);
-        Assert.Equal(personAttributes.MiddleName, contact.MiddleName);
-        Assert.Equal(personAttributes.LastName, contact.LastName);
-        Assert.Equal(personAttributes.DateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
-        Assert.Equal(personAttributes.EmailAddress, contact.EMailAddress1);
-        Assert.Equal(personAttributes.NationalInsuranceNumber, contact.dfeta_NINumber);
-        Assert.Equal(personAttributes.Gender, contact.GenderCode.ToGender());
+        Assert.Equal(personAttributes.FirstName, person.FirstName);
+        Assert.Equal(personAttributes.MiddleName, person.MiddleName);
+        Assert.Equal(personAttributes.LastName, person.LastName);
+        Assert.Equal(personAttributes.DateOfBirth, person.DateOfBirth);
+        Assert.Equal(personAttributes.EmailAddress, person.EmailAddress);
+        Assert.Equal(personAttributes.NationalInsuranceNumber, person.NationalInsuranceNumber);
+        Assert.Equal(personAttributes.Gender, person.Gender);
     }
 
     private void AssertEventIsExpected(

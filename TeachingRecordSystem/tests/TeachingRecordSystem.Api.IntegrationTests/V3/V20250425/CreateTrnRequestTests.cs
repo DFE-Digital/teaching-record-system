@@ -2,7 +2,6 @@ using System.Net;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V3.V20250425.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -14,7 +13,7 @@ public class CreateTrnRequestTests : TestBase
     public CreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.CreateTrn]);
-        XrmFakedContext.DeleteAllEntities<Contact>();
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
 
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
@@ -26,6 +25,8 @@ public class CreateTrnRequestTests : TestBase
                 TrnToken = Guid.NewGuid().ToString()
             });
     }
+
+    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
     public async Task Post_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
@@ -412,10 +413,9 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
-        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
-        Assert.NotNull(contact);
-        Assert.NotEmpty(contact.dfeta_TRN);
+        var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync());
+        Assert.NotNull(person);
+        Assert.NotNull(person.Trn);
 
         var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
 
@@ -424,7 +424,7 @@ public class CreateTrnRequestTests : TestBase
             expected: new
             {
                 requestId,
-                trn = contact.dfeta_TRN,
+                trn = person.Trn,
                 status = "Completed",
                 potentialDuplicate = false,
                 accessYourTeachingQualificationsLink = aytqLink

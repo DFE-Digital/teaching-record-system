@@ -8,4 +8,5 @@ public record PersonCreatedEvent : EventBase, IEventWithPersonId, IEventWithPers
     public required string? CreateReason { get; init; }
     public required string? CreateReasonDetail { get; init; }
     public required EventModels.File? EvidenceFile { get; init; }
+    public required EventModels.TrnRequestMetadata? TrnRequestMetadata { get; init; }
 }
