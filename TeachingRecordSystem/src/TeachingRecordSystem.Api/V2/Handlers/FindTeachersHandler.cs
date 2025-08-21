@@ -46,13 +46,11 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
                  WITH matches AS (
                     SELECT person_id FROM person_search_attributes
                     WHERE
-                        COALESCE(attribute_value, '') <> '' AND (
-                            (attribute_type IN ('FullName', 'PreviousFullName') AND attribute_value = ANY((:names collate "case_insensitive"))) OR
-                            (attribute_type = 'DateOfBirth' AND attribute_value = (:date_of_birth collate "case_insensitive")) OR
-                            (attribute_type = 'EmailAddress' AND attribute_value = (:email_address collate "case_insensitive")) OR
-                            (attribute_type = 'Trn' AND attribute_value = (:trn collate "case_insensitive")) OR
-                            (attribute_type = 'NationalInsuranceNumber' AND attribute_value = (:national_insurance_number collate "case_insensitive"))
-                        )
+                        (attribute_type IN ('FullName', 'PreviousFullName') AND attribute_value = ANY((:names collate "case_insensitive"))) OR
+                        (attribute_type = 'DateOfBirth' AND attribute_value = (:date_of_birth collate "case_insensitive")) OR
+                        (attribute_type = 'EmailAddress' AND attribute_value = (:email_address collate "case_insensitive")) OR
+                        (attribute_type = 'Trn' AND attribute_value = (:trn collate "case_insensitive")) OR
+                        (attribute_type = 'NationalInsuranceNumber' AND attribute_value = (:national_insurance_number collate "case_insensitive"))
                     GROUP BY person_id
                     HAVING COUNT(DISTINCT CASE WHEN attribute_type IN ('FullName', 'PreviousFullName') THEN 'Name' ELSE attribute_type END) >= 3
                  )
