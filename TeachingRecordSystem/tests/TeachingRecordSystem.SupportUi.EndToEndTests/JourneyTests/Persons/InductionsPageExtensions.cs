@@ -1,9 +1,9 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public static class EditInductionPageExtensions
+public static class InductionsPageExtensions
 {
     public static Task GoToPersonInductionPageAsync(this IPage page, Guid personId)
     {
@@ -63,7 +63,7 @@ public static class EditInductionPageExtensions
         return page.WaitForUrlPathAsync($"/persons/{personId}/edit-induction/check-answers");
     }
 
-    public static Task AssertInductionStatusSelected(this IPage page, InductionStatus status)
+    public static Task AssertInductionStatusSelectedAsync(this IPage page, InductionStatus status)
     {
         var radioButton = page.Locator($"input[type='radio'][value='{status}']");
         return radioButton.Locator("xpath=following-sibling::label").IsCheckedAsync();

@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
@@ -44,7 +45,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
@@ -80,7 +81,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
@@ -114,17 +115,17 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
     }
@@ -168,25 +169,25 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
         await page.AssertDateInputAsync(setCompletedDate);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
         await page.AssertDateInputAsync(setStartDate);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
-        await page.AssertInductionStatusSelected(inductionStatusToSelect);
+        await page.AssertInductionStatusSelectedAsync(inductionStatusToSelect);
     }
 
     [Fact]
@@ -223,22 +224,22 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
         await page.AssertDateInputAsync(setCompletedDate);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
         await page.AssertDateInputAsync(setStartDate);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
@@ -272,18 +273,18 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(true, TestData.GenerateLoremIpsum());
-        await page.SelectReasonFileUploadAsync(true, "document.jpeg");
+        await page.SelectUploadEvidenceAsync(true, "document.jpeg");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
         await page.AssertDateInputAsync(setCompletedDate);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
@@ -351,7 +352,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
@@ -369,7 +370,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
@@ -411,7 +412,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
@@ -468,28 +469,28 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction status");
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction started on");
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction completed on");
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Reason details");
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
     }
@@ -517,12 +518,12 @@ public class InductionTests : TestBase
         var page = await context.NewPageAsync();
 
         await page.GoToPersonInductionPageAsync(personId);
-        await page.AssertContentContains(routeType.InductionExemptionReason!.Name, "Route induction exemption reason");
+        await page.AssertContentContainsAsync(routeType.InductionExemptionReason!.Name, "Route induction exemption reason");
 
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Route induction exemption reason");
 
         await page.AssertOnRouteDetailPageAsync(person.ProfessionalStatuses.Single().QualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
@@ -553,17 +554,17 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
         await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }

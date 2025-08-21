@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
-[Journey(JourneyNames.MergePerson), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class EnterTrnModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,

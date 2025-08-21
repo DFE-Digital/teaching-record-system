@@ -1,12 +1,13 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Qualifications;
 
 public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 {

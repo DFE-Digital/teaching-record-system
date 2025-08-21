@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Common;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -130,17 +131,17 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEquals(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Start date");
-        await page.AssertContentEquals(setEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
-        await page.AssertContentContains(setDegreeType.Name, "Degree type");
-        await page.AssertContentEquals(setAgeRange.GetDisplayName()!, "Age range");
-        await page.AssertContentContains(setCountry.Name, "Country of training");
-        await page.AssertContentContains(setSubject.Name, "Subjects");
-        await page.AssertContentContains(setTrainingProvider.Name, "Training provider");
+        await page.AssertContentEqualsAsync(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Start date");
+        await page.AssertContentEqualsAsync(setEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
+        await page.AssertContentContainsAsync(setDegreeType.Name, "Degree type");
+        await page.AssertContentEqualsAsync(setAgeRange.GetDisplayName()!, "Age range");
+        await page.AssertContentContainsAsync(setCountry.Name, "Country of training");
+        await page.AssertContentContainsAsync(setSubject.Name, "Subjects");
+        await page.AssertContentContainsAsync(setTrainingProvider.Name, "Training provider");
 
         // check each edit link from cya page
         var editEndDate = setEndDate.AddDays(1);
@@ -161,7 +162,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
         await page.AssertOnRouteEditStartAndEndDatePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-end-date-link");
@@ -171,7 +172,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-end-date-link");
         await page.AssertOnRouteEditStartAndEndDatePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
@@ -182,7 +183,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
         await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
@@ -193,7 +194,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
@@ -204,7 +205,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-age-range-link");
@@ -215,7 +216,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-age-range-link");
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-subjects-link");
@@ -226,16 +227,16 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-subjects-link");
         await page.AssertOnRouteEditSubjectsPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEquals(editStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Start date");
-        await page.AssertContentEquals(editEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
-        await page.AssertContentContains(editDegreeType.Name, "Degree type");
-        await page.AssertContentEquals(editAgeRange.GetDisplayName()!, "Age range");
-        await page.AssertContentContains(editCountry.Name, "Country of training");
-        await page.AssertContentContains(editSubject.Name, "Subjects");
-        await page.AssertContentContains(editTrainingProvider.Name, "Training provider");
+        await page.AssertContentEqualsAsync(editStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Start date");
+        await page.AssertContentEqualsAsync(editEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
+        await page.AssertContentContainsAsync(editDegreeType.Name, "Degree type");
+        await page.AssertContentEqualsAsync(editAgeRange.GetDisplayName()!, "Age range");
+        await page.AssertContentContainsAsync(editCountry.Name, "Country of training");
+        await page.AssertContentContainsAsync(editSubject.Name, "Subjects");
+        await page.AssertContentContainsAsync(editTrainingProvider.Name, "Training provider");
 
         await page.ClickButtonAsync("Confirm and update route");
         await page.AssertOnPersonQualificationsPageAsync(personId);
@@ -271,7 +272,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
     }
@@ -325,7 +326,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
@@ -388,7 +389,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
@@ -444,7 +445,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-end-date-link");
 
         await page.AssertOnRouteEditStartAndEndDatePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-end-date-link");
@@ -459,14 +460,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-end-date-link");
 
         await page.AssertOnRouteEditStartAndEndDatePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickButtonAsync("Confirm and update route");
@@ -512,7 +513,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
 
         await page.AssertOnRouteEditStartAndEndDatePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
@@ -527,14 +528,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
 
         await page.AssertOnRouteEditStartAndEndDatePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickButtonAsync("Confirm and update route");
@@ -577,7 +578,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-holds-from-link");
 
         await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-holds-from-link");
@@ -592,14 +593,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-holds-from-link");
 
         await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickButtonAsync("Confirm and update route");
@@ -637,7 +638,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
 
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
@@ -648,14 +649,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.AssertContentContains(setDegreeType, "Degree type");
+        await page.AssertContentContainsAsync(setDegreeType, "Degree type");
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
 
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
         await page.EnterDegreeTypeAsync("");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
-        page.AssertErrorSummary();
+        page.AssertErrorSummaryAsync();
         await page.EnterDegreeTypeAsync(setDegreeType);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -694,7 +695,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
 
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
@@ -705,19 +706,19 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.AssertContentContains(setCountry.Name, "Country");
+        await page.AssertContentContainsAsync(setCountry.Name, "Country");
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
 
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
         await page.EnterCountryAsync("");
         await page.ClickContinueButtonAsync();
-        page.AssertErrorSummary();
+        page.AssertErrorSummaryAsync();
         await page.EnterCountryAsync(setCountry.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.AssertContentContains(setCountry.Name, "Country");
+        await page.AssertContentContainsAsync(setCountry.Name, "Country");
     }
 
     [Fact]
@@ -750,20 +751,20 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertErrorSummary();
+        page.AssertErrorSummaryAsync();
         await page.SelectAgeRangeAsync(TrainingAgeSpecialismType.Range);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertErrorSummary();
+        page.AssertErrorSummaryAsync();
         await page.FillAsync($"label:text-is('From')", "6");
         await page.FillAsync($"label:text-is('To')", "1");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertErrorSummary();
+        page.AssertErrorSummaryAsync();
         await page.FillAsync($"label:text-is('To')", "11");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -801,7 +802,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
 
         await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
@@ -812,7 +813,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.AssertContentContains(newTrainingProvider.Name, "Training provider");
+        await page.AssertContentContainsAsync(newTrainingProvider.Name, "Training provider");
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
 
         await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
@@ -821,7 +822,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.AssertContentContains("Not provided", "Training provider");
+        await page.AssertContentContainsAsync("Not provided", "Training provider");
     }
 
     [Fact]
@@ -860,7 +861,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-subjects-link");
 
         await page.AssertOnRouteEditSubjectsPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-subjects-link");
@@ -882,14 +883,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-subjects-link");
 
         await page.AssertOnRouteEditSubjectsPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
     }
@@ -929,7 +930,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-induction-exemption-link");
 
         await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-induction-exemption-link");
@@ -945,14 +946,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-induction-exemption-link");
 
         await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickButtonAsync("Confirm and update route");
@@ -1003,10 +1004,10 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
         await page.ClickContinueButtonAsync();
@@ -1074,12 +1075,12 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
         await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEquals(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), "Professional status date");
-        await page.AssertContentEquals("Yes", "Induction exemption");
+        await page.AssertContentEqualsAsync(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), "Professional status date");
+        await page.AssertContentEqualsAsync("Yes", "Induction exemption");
 
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
@@ -1087,7 +1088,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEquals("Deferred", "Status");
+        await page.AssertContentEqualsAsync("Deferred", "Status");
         await page.ClickButtonAsync("Confirm and update route");
     }
 
@@ -1173,16 +1174,16 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
     }

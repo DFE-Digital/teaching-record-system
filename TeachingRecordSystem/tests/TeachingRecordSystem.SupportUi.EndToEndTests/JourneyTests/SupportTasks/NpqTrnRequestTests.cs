@@ -1,8 +1,9 @@
+using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
-public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task Resolve_CreateNewRecord()
@@ -32,13 +33,13 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLink();
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnMatchesPageAsync(supportTaskReference);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLink();
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnMatchesPageAsync(supportTaskReference);
         await page.ClickContinueButtonAsync();
@@ -49,7 +50,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
-        page.AssertOnAPersonDetailPage();
+        page.AssertOnAPersonDetailPageAsync();
     }
 
     [Fact]
@@ -103,13 +104,13 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLink();
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnMergePageAsync(supportTaskReference);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLink();
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnMergePageAsync(supportTaskReference);
         await page.ClickContinueButtonAsync();
@@ -179,16 +180,16 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.AssertContentEquals(matchedPerson2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEquals(matchedPerson2.Email!, "Email");
-        await page.AssertContentEquals(matchedPerson2.NationalInsuranceNumber!, "National Insurance number");
-        await page.ClickChangeLink();
+        await page.AssertContentEqualsAsync(matchedPerson2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
+        await page.AssertContentEqualsAsync(matchedPerson2.Email!, "Email");
+        await page.AssertContentEqualsAsync(matchedPerson2.NationalInsuranceNumber!, "National Insurance number");
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnMergePageAsync(supportTaskReference);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLink();
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnMergePageAsync(supportTaskReference);
         await page.ClickContinueButtonAsync();
@@ -258,9 +259,9 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.AssertContentEquals(requestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEquals(requestData.EmailAddress!, "Email");
-        await page.AssertContentEquals(requestData.NationalInsuranceNumber!, "National Insurance number");
+        await page.AssertContentEqualsAsync(requestData.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
+        await page.AssertContentEqualsAsync(requestData.EmailAddress!, "Email");
+        await page.AssertContentEqualsAsync(requestData.NationalInsuranceNumber!, "National Insurance number");
     }
 
     [Fact]
@@ -291,7 +292,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnNoMatchesCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnDetailsPageAsync(supportTaskReference);
         await page.ClickRadioByLabelAsync("Yes"); // select create new record (as opposed to reject request)
@@ -304,7 +305,7 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
-        page.AssertOnAPersonDetailPage();
+        page.AssertOnAPersonDetailPageAsync();
     }
 
     [Fact]
@@ -339,14 +340,14 @@ public class NpqTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRejectCheckYourAnswersPageAsync(supportTaskReference);
-        await page.AssertContentContains("NPQ details do not match", "Reason");
-        await page.ClickChangeLink();
+        await page.AssertContentContainsAsync("NPQ details do not match", "Reason");
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnRejectionReasonPageAsync(supportTaskReference);
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnRejectCheckYourAnswersPageAsync(supportTaskReference);
-        await page.ClickChangeLink();
+        await page.ClickChangeLinkAsync();
 
         await page.AssertOnRejectionReasonPageAsync(supportTaskReference);
         await page.ClickContinueButtonAsync();

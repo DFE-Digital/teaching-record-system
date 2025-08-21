@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProfessionalStatus;
@@ -24,7 +25,7 @@ public class DeleteRouteToProfessionalStatusTests(HostFixture hostFixture) : Tes
         await page.AssertOnRouteDeleteChangeReasonPage(qualificationId);
         await page.SelectRouteChangeReasonOption(deletionReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDeleteCheckYourAnswersPageAsync(qualificationId);

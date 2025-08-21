@@ -3,9 +3,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public class CreatePersonTests : TestBase
+public class CreateTests : TestBase
 {
-    public CreatePersonTests(HostFixture hostFixture)
+    public CreateTests(HostFixture hostFixture)
         : base(hostFixture)
     {
     }
@@ -25,7 +25,7 @@ public class CreatePersonTests : TestBase
 
         await page.AssertOnPersonCreateCreateReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", CreateReasonOption.MandatoryQualification);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonCreateCheckAnswersPageAsync();
@@ -52,14 +52,14 @@ public class CreatePersonTests : TestBase
 
         await page.AssertOnPersonCreateCreateReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", CreateReasonOption.MandatoryQualification);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonCreateCheckAnswersPageAsync();
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonCreateCreateReasonPageAsync();
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.AssertNameInputAsync("Alfred", "The", "Great");
@@ -82,7 +82,7 @@ public class CreatePersonTests : TestBase
 
         await page.AssertOnPersonCreateCreateReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", CreateReasonOption.MandatoryQualification);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonCreateCheckAnswersPageAsync();
@@ -118,7 +118,7 @@ public class CreatePersonTests : TestBase
 
         await page.AssertOnPersonCreateCreateReasonPageAsync();
         await page.SelectChangeReasonAsync("create-reason-options", CreateReasonOption.MandatoryQualification);
-        await page.SelectReasonFileUploadAsync(false);
+        await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnPersonCreateCheckAnswersPageAsync();
@@ -126,19 +126,19 @@ public class CreatePersonTests : TestBase
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.FillNameInputsAsync("Megan", "Thee", "Stallion");
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonCreateCheckAnswersPageAsync();
         await page.ClickLinkForElementWithTestIdAsync("change-create-reason-link");
 
         await page.AssertOnPersonCreateCreateReasonPageAsync();
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonCreateCheckAnswersPageAsync();
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonCreateCreateReasonPageAsync();
-        await page.ClickBackLink();
+        await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonCreatePersonalDetailsPageAsync();
         await page.AssertNameInputAsync("Alfred", "The", "Great");
