@@ -174,7 +174,10 @@ public static class PageExtensions
         return link.ClickAsync();
     }
 
-    public static async Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null)
+    public static Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null) =>
+        page.SelectReasonMoreDetailsAsync("Add additional detail", addAdditionalDetail, details);
+
+    public static async Task SelectReasonMoreDetailsAsync(this IPage page, string additionalDetailLabel, bool addAdditionalDetail, string? details = null)
     {
         var section = page.GetByTestId("has-additional-reason_detail-options");
         var radioButton = section.Locator($"input[type='radio'][value='{addAdditionalDetail}']");
@@ -182,7 +185,7 @@ public static class PageExtensions
 
         if (details != null)
         {
-            await page.FillAsync("label:text-is('Add additional detail')", details);
+            await page.FillAsync($"label{TestBase.TextIsSelector(additionalDetailLabel)}", details);
         }
     }
 

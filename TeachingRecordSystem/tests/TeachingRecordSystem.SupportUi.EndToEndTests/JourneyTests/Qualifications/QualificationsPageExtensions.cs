@@ -29,7 +29,7 @@ public static class QualificationsPageExtensions
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/change-reason");
 
     public static Task AssertOnEditMqProviderConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/confirm");
+        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/check-answers");
 
     public static Task AssertOnEditMqSpecialismPageAsync(this IPage page, Guid qualificationId) =>
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism");
@@ -38,7 +38,7 @@ public static class QualificationsPageExtensions
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/change-reason");
 
     public static Task AssertOnEditMqSpecialismConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/confirm");
+        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/check-answers");
 
     public static Task AssertOnEditMqStartDatePageAsync(this IPage page, Guid qualificationId) =>
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date");
@@ -47,7 +47,7 @@ public static class QualificationsPageExtensions
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/change-reason");
 
     public static Task AssertOnEditMqStartDateConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/confirm");
+        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/check-answers");
 
     public static Task AssertOnEditMqStatusPageAsync(this IPage page, Guid qualificationId) =>
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status");
@@ -56,11 +56,11 @@ public static class QualificationsPageExtensions
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/change-reason");
 
     public static Task AssertOnEditMqStatusConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/confirm");
+        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/check-answers");
 
     public static Task AssertOnDeleteMqPageAsync(this IPage page, Guid qualificationId) =>
         page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete");
 
     public static Task AssertOnDeleteMqConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/confirm");
+        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/check-answers");
 }

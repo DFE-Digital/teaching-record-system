@@ -3,9 +3,9 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
 
-public class ReasonTests : TestBase
+public class ChangeReasonTests : TestBase
 {
-    public ReasonTests(HostFixture hostFixture)
+    public ChangeReasonTests(HostFixture hostFixture)
         : base(hostFixture)
     {
     }
@@ -118,7 +118,7 @@ public class ReasonTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason for change");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public class ReasonTests : TestBase
     }
 
     [Fact]
-    public async Task Post_ValidInput_RedirectsToConfirmPage()
+    public async Task Post_ValidInput_RedirectsToCheckAnswersPage()
     {
         // Arrange
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
@@ -235,6 +235,7 @@ public class ReasonTests : TestBase
 
         var multipartContent = CreateFormFileUpload(".png");
         multipartContent.Add(new StringContent(MqChangeProviderReasonOption.ChangeOfTrainingProvider.ToString()), "ChangeReason");
+        multipartContent.Add(new StringContent("True"), "HasAdditionalReasonDetail");
         multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
         multipartContent.Add(new StringContent("True"), "UploadEvidence");
 
@@ -248,7 +249,7 @@ public class ReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/provider/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

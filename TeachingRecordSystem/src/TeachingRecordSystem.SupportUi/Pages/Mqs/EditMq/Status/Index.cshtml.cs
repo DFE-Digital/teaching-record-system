@@ -59,7 +59,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
 
-        return Redirect(linkGenerator.MqEditStatusReason(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditStatusChangeReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()

@@ -1,16 +1,16 @@
-@page "/mqs/{qualificationId}/status/confirm/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.ConfirmModel
+@page "/mqs/{qualificationId}/status/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.CheckAnswersModel
 @{
     ViewBag.Title = "Check details and confirm change";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditStatusReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.MqEditStatusChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqEditStatusConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.MqEditStatusCheckAnswersConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
@@ -72,7 +72,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqEditStatusConfirmCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditStatusCheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

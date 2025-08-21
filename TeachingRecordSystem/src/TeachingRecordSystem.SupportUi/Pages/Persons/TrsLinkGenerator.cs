@@ -92,6 +92,9 @@ public partial class TrsLinkGenerator
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
 
+    public string AddNote(Guid personId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/AddNote", routeValues: new { personId });
+
     public string PersonMerge(Guid personId) =>
         GetRequiredPathByPage("/Persons/Merge/Index", routeValues: new { personId });
 

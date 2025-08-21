@@ -27,22 +27,28 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     [BindProperty]
-    [Display(Name = "Reason for deleting")]
-    [Required(ErrorMessage = "Select a reason for deleting")]
+    [Display(Name = "Why are you changing this mandatory qualification?")]
+    [Required(ErrorMessage = "Select a reason")]
     public MqDeletionReasonOption? DeletionReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "More detail about the reason for deleting")]
+    [Display(Name = "Do you want to provide more information?")]
+    [Required(ErrorMessage = "Select yes if you want to add more information")]
+    public bool? HasAdditionalReasonDetail { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Enter details about this change")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? DeletionReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Upload evidence")]
+    [Display(Name = "Do you want to upload evidence?")]
     [Required(ErrorMessage = "Select yes if you want to upload evidence")]
     public bool? UploadEvidence { get; set; }
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -112,7 +118,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(linkGenerator.MqDeleteConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqDeleteCheckAnswers(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
