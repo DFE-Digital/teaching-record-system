@@ -230,7 +230,7 @@ public partial class PersonMatchingServiceTests
             "DateOfBirth",
             "EmailAddress",
             "NationalInsuranceNumber",
-            "EmploymentNationalInsuranceNumber"
+            "WorkforceNationalInsuranceNumber"
         ];
 
         static ISet<string> GetDistinctAttributeTypes(IEnumerable<string> attributes)
@@ -245,7 +245,7 @@ public partial class PersonMatchingServiceTests
                     continue;
                 }
 
-                if (attr == "EmploymentNationalInsuranceNumber")
+                if (attr == "WorkforceNationalInsuranceNumber")
                 {
                     attrNames.Add("NationalInsuranceNumber");
                     continue;
@@ -272,7 +272,7 @@ public partial class PersonMatchingServiceTests
 
             // Exclude definite match cases
             if (matchedAttrs.Contains("DateOfBirth") &&
-                (matchedAttrs.Contains("NationalInsuranceNumber") || matchedAttrs.Contains("EmploymentNationalInsuranceNumber")))
+                (matchedAttrs.Contains("NationalInsuranceNumber") || matchedAttrs.Contains("WorkforceNationalInsuranceNumber")))
             {
                 continue;
             }
@@ -284,7 +284,7 @@ public partial class PersonMatchingServiceTests
                 matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
-                matchedAttrs.Contains("NationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesPersonNino : matchedAttrs.Contains("EmploymentNationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino : NationalInsuranceNumberArgumentOption.DoesNotMatch);
+                matchedAttrs.Contains("NationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesPersonNino : matchedAttrs.Contains("WorkforceNationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino : NationalInsuranceNumberArgumentOption.DoesNotMatch);
         }
 
         // Match on 2 or fewer attributes
@@ -304,7 +304,15 @@ public partial class PersonMatchingServiceTests
 
             // Exclude definite match cases
             if (matchedAttrs.Contains("DateOfBirth") &&
-                (matchedAttrs.Contains("NationalInsuranceNumber") || matchedAttrs.Contains("EmploymentNationalInsuranceNumber")))
+                (matchedAttrs.Contains("NationalInsuranceNumber") || matchedAttrs.Contains("WorkforceNationalInsuranceNumber")))
+            {
+                continue;
+            }
+
+            // NINO and email matches are always potential matches
+            if (matchedAttrs.Contains("NationalInsuranceNumber") ||
+                matchedAttrs.Contains("WorkforceNationalInsuranceNumber") ||
+                matchedAttrs.Contains("EmailAddress"))
             {
                 continue;
             }
@@ -316,7 +324,7 @@ public partial class PersonMatchingServiceTests
                 matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
-                matchedAttrs.Contains("NationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesPersonNino : matchedAttrs.Contains("EmploymentNationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino : NationalInsuranceNumberArgumentOption.DoesNotMatch);
+                matchedAttrs.Contains("NationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesPersonNino : matchedAttrs.Contains("WorkforceNationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino : NationalInsuranceNumberArgumentOption.DoesNotMatch);
         }
 
         return data;
