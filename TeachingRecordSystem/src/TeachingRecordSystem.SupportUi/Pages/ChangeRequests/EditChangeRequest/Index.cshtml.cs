@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.Files;
@@ -31,6 +32,16 @@ public class IndexModel(
     {
     }
 
+    public async Task<IActionResult> OnGetEvidenceAsync()
+    {
+        using var stream = await fileService.OpenReadStreamAsync(Evidence!.FileId);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        var bytes = ms.ToArray();
+
+        return File(bytes, Evidence.MimeType);
+    }
+
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
@@ -50,6 +61,7 @@ public class IndexModel(
             person.LastName);
 
         ChangeType = supportTask.SupportTaskType;
+        var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (supportTask.SupportTaskType == SupportTaskType.ChangeNameRequest)
         {
             var data = (ChangeNameRequestData)supportTask.Data;
@@ -63,12 +75,17 @@ public class IndexModel(
                 NewLastName = data.LastName
             };
 
+            if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))
+            {
+                evidenceFileMimeType = "application/octet-stream";
+            }
+
             Evidence = new EvidenceInfo()
             {
                 FileId = data.EvidenceFileId,
                 FileName = data.EvidenceFileName,
                 FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, FileUploadDefaults.FileUrlExpiry),
-                IsPdf = data.EvidenceFileName?.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ?? false
+                MimeType = evidenceFileMimeType
             };
         }
 
@@ -81,12 +98,17 @@ public class IndexModel(
                 NewDateOfBirth = data.DateOfBirth
             };
 
+            if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))
+            {
+                evidenceFileMimeType = "application/octet-stream";
+            }
+
             Evidence = new EvidenceInfo()
             {
                 FileId = data.EvidenceFileId,
                 FileName = data.EvidenceFileName,
                 FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, FileUploadDefaults.FileUrlExpiry),
-                IsPdf = data.EvidenceFileName?.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ?? false
+                MimeType = evidenceFileMimeType
             };
         }
 
@@ -98,6 +120,6 @@ public class IndexModel(
         public required Guid FileId { get; init; }
         public required string FileName { get; init; }
         public required string FileUrl { get; init; }
-        public required bool IsPdf { get; init; }
+        public required string MimeType { get; init; }
     }
 }
