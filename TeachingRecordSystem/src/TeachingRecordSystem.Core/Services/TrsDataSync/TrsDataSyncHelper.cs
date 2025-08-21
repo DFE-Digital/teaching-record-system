@@ -2361,7 +2361,8 @@ public class TrsDataSyncHelper(
             "source_application_user_id",
             "source_trn_request_id",
             "allow_details_updates_from_source_application",
-            "dqt_allow_teacher_identity_sign_in_with_prohibitions"
+            "dqt_allow_teacher_identity_sign_in_with_prohibitions",
+            "date_of_death"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -2408,7 +2409,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_CapitaTRNChangedOn,
             Contact.Fields.dfeta_TrnRequestID,
             Contact.Fields.dfeta_AllowPiiUpdatesFromRegister,
-            Contact.Fields.dfeta_AllowIDSignInWithProhibitions
+            Contact.Fields.dfeta_AllowIDSignInWithProhibitions,
+            Contact.Fields.dfeta_DateofDeath
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -2438,6 +2440,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.SourceTrnRequestId, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.AllowDetailsUpdatesFromSourceApplication, NpgsqlDbType.Boolean);
             writer.WriteValueOrNull(person.DqtAllowTeacherIdentitySignInWithProhibitions, NpgsqlDbType.Boolean);
+            writer.WriteValueOrNull(person.DateOfDeath, NpgsqlDbType.Date);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -2768,7 +2771,8 @@ public class TrsDataSyncHelper(
             SourceApplicationUserId = c.dfeta_TrnRequestID is not null ? Guid.Parse(c.dfeta_TrnRequestID[..Guid.Empty.ToString().Length]) : null,
             SourceTrnRequestId = c.dfeta_TrnRequestID?[(Guid.Empty.ToString().Length + 2)..],
             AllowDetailsUpdatesFromSourceApplication = c.dfeta_AllowPiiUpdatesFromRegister == true,
-            DqtAllowTeacherIdentitySignInWithProhibitions = c.dfeta_AllowIDSignInWithProhibitions == true
+            DqtAllowTeacherIdentitySignInWithProhibitions = c.dfeta_AllowIDSignInWithProhibitions == true,
+            DateOfDeath = c.dfeta_DateofDeath?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
         })
         .ToList();
 
@@ -4623,6 +4627,7 @@ public class TrsDataSyncHelper(
         public required string? SourceTrnRequestId { get; init; }
         public required bool AllowDetailsUpdatesFromSourceApplication { get; init; }
         public required bool DqtAllowTeacherIdentitySignInWithProhibitions { get; init; }
+        public required DateOnly? DateOfDeath { get; set; }
     }
 
     private record InductionInfo
