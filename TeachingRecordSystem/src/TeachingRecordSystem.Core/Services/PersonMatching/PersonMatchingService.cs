@@ -218,6 +218,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     m => m switch
                     {
                         "NationalInsuranceNumber" => 10,
+                        "EmailAddress" => 5,
                         _ => 1
                     });
 
@@ -242,7 +243,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
     {
         // Find all Active records with a TRN that match on:
         // - at least three of first name, middle name, last name, DOB, email address, NINO *OR*
-        // - both DOB & NINO.
+        // - NINO *OR*
+        // - email address.
 
         var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty();
         var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty();
@@ -256,12 +258,13 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                         array_agg(DISTINCT a.attribute_type) matched_attr_keys,
                         json_agg(json_build_object('attribute_type', a.attribute_type, 'attribute_value', a.attribute_value)) matched_attrs
                     FROM person_search_attributes a
-                    WHERE (a.attribute_type = 'FirstName' AND a.attribute_value = ANY(:first_names))
-                    OR (a.attribute_type = 'MiddleName' AND a.attribute_value = ANY(:middle_names))
-                    OR (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
-                    OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dates_of_birth))
-                    OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = ANY(:ni_numbers))
-                    OR (a.attribute_type = 'EmailAddress' AND a.attribute_value = ANY(:email_addresses))
+                    WHERE
+                        (a.attribute_type = 'FirstName' AND a.attribute_value = ANY((:first_names COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'MiddleName' AND a.attribute_value = ANY((:middle_names COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'LastName' AND a.attribute_value = ANY((:last_names COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY((:dates_of_birth COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = ANY((:ni_numbers COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'EmailAddress' AND a.attribute_value = ANY((:email_addresses COLLATE "case_insensitive")))
                     GROUP BY a.person_id
                 )
                 SELECT
@@ -277,7 +280,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 FROM matches m
                 JOIN persons p ON m.person_id = p.person_id
                 WHERE (
-                    ARRAY['NationalInsuranceNumber', 'DateOfBirth']::varchar[] <@ m.matched_attr_keys
+                    ARRAY['NationalInsuranceNumber', 'EmailAddress']::varchar[] && m.matched_attr_keys
                     OR array_length(m.matched_attr_keys, 1) >= 3)
                 AND p.status = 0 AND p.trn IS NOT NULL
                 """,

@@ -118,7 +118,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
                 .WithLastName(matchedFields.Contains(MatchedField.LastName) ? lastName : TestData.GenerateChangedLastName(lastName))
                 .WithDateOfBirth(matchedFields.Contains(MatchedField.DateOfBirth) ? dateOfBirth : TestData.GenerateChangedDateOfBirth(dateOfBirth))
                 .WithEmail(matchedFields.Contains(MatchedField.EmailAddress) ? emailAddress : TestData.GenerateUniqueEmail())
-                .WithNationalInsuranceNumber(matchedFields.Contains(MatchedField.DqtNationalInsuranceNumber)
+                .WithNationalInsuranceNumber(matchedFields.Contains(MatchedField.TrsNationalInsuranceNumber)
                     ? nino
                     : TestData.GenerateChangedNationalInsuranceNumber(nino)));
 
@@ -166,7 +166,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
         });
 
     [Fact]
-    public Task HandleAsync_MatchingExistingPersonOnDqtNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePersonOrSupportTask() =>
+    public Task HandleAsync_MatchingExistingPersonOnTrsNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePersonOrSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
             // Arrange
@@ -205,7 +205,84 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
         });
 
     [Fact]
-    public Task HandleAsync_MatchingMultipleExistingPersonsOnDqtNinoAndDob_CreatesSupportTask() =>
+    public Task HandleAsync_MatchingExistingPersonOnTrsNinoOnly_CreatesSupportTask() =>
+        WithHandler<CreateTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            var dateOfBirth = new DateOnly(1990, 01, 01);
+            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+            var matchedPerson = await TestData.CreatePersonAsync(p => p
+                .WithTrn()
+                .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
+                .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+            var command = CreateCommand() with
+            {
+                DateOfBirth = dateOfBirth,
+                NationalInsuranceNumber = nationalInsuranceNumber
+            };
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var success = AssertSuccess(result);
+
+            Assert.Equal(command.RequestId, success.RequestId);
+            Assert.Equal(TrnRequestStatus.Pending, success.Status);
+            Assert.Null(success.Trn);
+            Assert.Null(success.AccessYourTeachingQualificationsLink);
+            AssertResultPersonMatchesCommand(command, success.Person);
+
+            var persons = await DbFixture.WithDbContextAsync(dbContext =>
+                dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+            Assert.Empty(persons);
+
+            await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+
+            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+        });
+
+    [Fact]
+    public Task HandleAsync_MatchingExistingPersonOnEmailOnly_CreatesSupportTask() =>
+        WithHandler<CreateTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            var emailAddress = TestData.GenerateUniqueEmail();
+
+            var matchedPerson = await TestData.CreatePersonAsync(p => p
+                .WithTrn()
+                .WithEmail(emailAddress));
+
+            var command = CreateCommand() with
+            {
+                EmailAddresses = [emailAddress]
+            };
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var success = AssertSuccess(result);
+
+            Assert.Equal(command.RequestId, success.RequestId);
+            Assert.Equal(TrnRequestStatus.Pending, success.Status);
+            Assert.Null(success.Trn);
+            Assert.Null(success.AccessYourTeachingQualificationsLink);
+            AssertResultPersonMatchesCommand(command, success.Person);
+
+            var persons = await DbFixture.WithDbContextAsync(dbContext =>
+                dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+            Assert.Empty(persons);
+
+            await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+
+            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+        });
+
+    [Fact]
+    public Task HandleAsync_MatchingMultipleExistingPersonsOnTrsNinoAndDob_CreatesSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
             // Arrange
@@ -568,8 +645,8 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
         PreviousLastName,
         DateOfBirth,
         EmailAddress,
-        DqtNationalInsuranceNumber,
-        WorkforceNationalInsuranceNumber  // Can't support matching on this until query is done against TRS DB
+        TrsNationalInsuranceNumber,
+        WorkforceNationalInsuranceNumber
     }
 
     public static IEnumerable<object[]> GetPotentialMatchCombinationsData()
@@ -583,7 +660,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             { "LastName", [MatchedField.LastName, MatchedField.PreviousLastName] },
             { "DateOfBirth", [MatchedField.DateOfBirth] },
             { "EmailAddress", [MatchedField.EmailAddress] },
-            { "NationalInsuranceNumber", [MatchedField.DqtNationalInsuranceNumber, MatchedField.WorkforceNationalInsuranceNumber] }
+            { "NationalInsuranceNumber", [MatchedField.TrsNationalInsuranceNumber, MatchedField.WorkforceNationalInsuranceNumber] }
         };
 
         return allMatchFields
@@ -595,7 +672,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             .Where(c => c.Select(field => fieldGroups.Single(g => g.Value.Contains(field))).Distinct().Count() >= 3)
             // DateOfBirth and Nino are considered a direct match rather than potential match
             .Where(c => !(c.Contains(MatchedField.DateOfBirth) &&
-                          (c.Contains(MatchedField.DqtNationalInsuranceNumber) || c.Contains(MatchedField.WorkforceNationalInsuranceNumber))))
+                          (c.Contains(MatchedField.TrsNationalInsuranceNumber) || c.Contains(MatchedField.WorkforceNationalInsuranceNumber))))
             .Select(c => new object[] { c });
     }
 }

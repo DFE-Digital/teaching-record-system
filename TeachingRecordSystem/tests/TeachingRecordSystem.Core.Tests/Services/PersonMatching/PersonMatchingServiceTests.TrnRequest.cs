@@ -309,6 +309,14 @@ public partial class PersonMatchingServiceTests
                 continue;
             }
 
+            // NINO and email matches are always potential matches
+            if (matchedAttrs.Contains("NationalInsuranceNumber") ||
+                matchedAttrs.Contains("EmploymentNationalInsuranceNumber") ||
+                matchedAttrs.Contains("EmailAddress"))
+            {
+                continue;
+            }
+
             AddCase(
                 TrnRequestMatchResultOutcome.NoMatches,
                 matchedAttrs.Contains("EmailAddress") ? EmailAddressArgumentOption.Matches : EmailAddressArgumentOption.DoesNotMatch,
