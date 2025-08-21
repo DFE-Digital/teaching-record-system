@@ -34,12 +34,8 @@ public class IndexModel(
 
     public async Task<IActionResult> OnGetEvidenceAsync()
     {
-        using var stream = await fileService.OpenReadStreamAsync(Evidence!.FileId);
-        using var ms = new MemoryStream();
-        await stream.CopyToAsync(ms);
-        var bytes = ms.ToArray();
-
-        return File(bytes, Evidence.MimeType);
+        var stream = await fileService.OpenReadStreamAsync(Evidence!.FileId);
+        return File(stream, Evidence.MimeType);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
