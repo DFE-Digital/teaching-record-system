@@ -80,7 +80,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 t.WithMatchedPersons([matchedPerson1.PersonId, matchedPerson2.PersonId]);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
-                t.WithEmailAddress(matchedPerson1.Email);
+                t.WithEmailAddress(matchedPerson1.Email!);
             });
         var requestData = supportTask.TrnRequestMetadata!;
         var supportTaskReference = supportTask.SupportTaskReference;
@@ -152,7 +152,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 t.WithMatchedPersons([matchedPerson1.PersonId, matchedPerson2.PersonId]);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
-                t.WithEmailAddress(matchedPerson1.Email);
+                t.WithEmailAddress(matchedPerson1.Email!);
             });
 
         var requestData = supportTask.TrnRequestMetadata!;
@@ -231,7 +231,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 t.WithMatchedPersons([matchedPerson1.PersonId, matchedPerson2.PersonId]);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
-                t.WithEmailAddress(matchedPerson1.Email);
+                t.WithEmailAddress(matchedPerson1.Email!);
             });
 
         var requestData = supportTask.TrnRequestMetadata!;
