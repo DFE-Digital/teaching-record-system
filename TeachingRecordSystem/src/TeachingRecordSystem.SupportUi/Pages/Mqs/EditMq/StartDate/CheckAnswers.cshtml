@@ -1,27 +1,27 @@
-@page "/mqs/{qualificationId}/provider/confirm/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider.ConfirmModel
+@page "/mqs/{qualificationId}/start-date/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate.CheckAnswersModel
 @{
     ViewBag.Title = "Check details and confirm change";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditProviderReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.MqEditStartDateChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
-        <form action="@LinkGenerator.MqEditProviderConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
-            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+        <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
+        <form action="@LinkGenerator.MqEditStartDateCheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-summary-list data-testid="change-summary">
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Current training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="current-provider">@(@Model.CurrentProviderName ?? "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-key>Current start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="current-start-date">@(Model.CurrentStartDate.HasValue ? Model.CurrentStartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>New training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="new-provider">@Model.ProviderName</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-key>New start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="new-start-date">@Model.NewStartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
@@ -48,7 +48,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqEditProviderConfirmCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditStartDateCheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

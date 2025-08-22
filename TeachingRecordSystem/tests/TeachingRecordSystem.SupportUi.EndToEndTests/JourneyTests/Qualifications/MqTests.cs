@@ -1,4 +1,3 @@
-using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
@@ -90,27 +89,14 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqProviderPageAsync(qualificationId);
 
         await page.FillAsync($"label:text-is('Training provider')", newMqEstablishment.dfeta_name);
-
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditMqProviderReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason.GetDisplayName())}");
-
-        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
-
-        await page.CheckAsync($"label:text-is('Yes')");
-
-        await page.SetInputFilesAsync(
-            "label:text-is('Upload a file')",
-            new FilePayload()
-            {
-                Name = "evidence.jpg",
-                MimeType = "image/jpeg",
-                Buffer = TestData.JpegImage
-            });
-
+        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditMqProviderConfirmPageAsync(qualificationId);
@@ -153,20 +139,8 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqSpecialismReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason.GetDisplayName())}");
-
-        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
-
-        await page.CheckAsync($"label:text-is('Yes')");
-
-        await page.SetInputFilesAsync(
-            "label:text-is('Upload a file')",
-            new FilePayload()
-            {
-                Name = "evidence.jpg",
-                MimeType = "image/jpeg",
-                Buffer = TestData.JpegImage
-            });
-
+        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditMqSpecialismConfirmPageAsync(qualificationId);
@@ -207,20 +181,8 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqStartDateReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason.GetDisplayName())}");
-
-        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
-
-        await page.CheckAsync($"label:text-is('Yes')");
-
-        await page.SetInputFilesAsync(
-            "label:text-is('Upload a file')",
-            new FilePayload()
-            {
-                Name = "evidence.jpg",
-                MimeType = "image/jpeg",
-                Buffer = TestData.JpegImage
-            });
-
+        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditMqStartDateConfirmPageAsync(qualificationId);
@@ -307,20 +269,8 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditMqStatusReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(changeReason)}");
-
-        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
-
-        await page.CheckAsync($"label:text-is('Yes')");
-
-        await page.SetInputFilesAsync(
-           "label:text-is('Upload a file')",
-           new FilePayload()
-           {
-               Name = "evidence.jpg",
-               MimeType = "image/jpeg",
-               Buffer = TestData.JpegImage
-           });
-
+        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, changeReasonDetail);
+        await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditMqStatusConfirmPageAsync(qualificationId);
@@ -353,20 +303,8 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnDeleteMqPageAsync(qualificationId);
 
         await page.CheckAsync($"label{TextIsSelector(deletionReason.GetDisplayName())}");
-
-        await page.FillAsync("label:text-is('More detail about the reason for deleting')", deletionReasonDetail);
-
-        await page.CheckAsync($"label:text-is('Yes')");
-
-        await page.SetInputFilesAsync(
-            "label:text-is('Upload a file')",
-            new FilePayload()
-            {
-                Name = "evidence.jpg",
-                MimeType = "image/jpeg",
-                Buffer = TestData.JpegImage
-            });
-
+        await page.SelectReasonMoreDetailsAsync("Enter details about this change", true, deletionReasonDetail);
+        await page.SelectUploadEvidenceAsync(true, "evidence.jpg");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnDeleteMqConfirmPageAsync(qualificationId);

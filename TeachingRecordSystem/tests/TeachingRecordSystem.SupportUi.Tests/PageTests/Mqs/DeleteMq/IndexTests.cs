@@ -117,7 +117,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "DeletionReason", "Select a reason for deleting");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "DeletionReason", "Select a reason");
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Post_ValidInput_RedirectsToConfirmPage()
+    public async Task Post_ValidInput_RedirectsToCheckAnswersPage()
     {
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
@@ -201,6 +201,7 @@ public class IndexTests : TestBase
 
         var multipartContent = CreateFormFileUpload(".png");
         multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
+        multipartContent.Add(new StringContent("True"), "HasAdditionalReasonDetail");
         multipartContent.Add(new StringContent("My deletion reason detail"), "DeletionReasonDetail");
         multipartContent.Add(new StringContent("True"), "UploadEvidence");
 
@@ -214,7 +215,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualification.QualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualification.QualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

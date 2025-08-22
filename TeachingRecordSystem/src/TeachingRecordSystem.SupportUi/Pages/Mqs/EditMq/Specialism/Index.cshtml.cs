@@ -43,7 +43,7 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
 
         await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
 
-        return Redirect(linkGenerator.MqEditSpecialismReason(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditSpecialismChangeReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()

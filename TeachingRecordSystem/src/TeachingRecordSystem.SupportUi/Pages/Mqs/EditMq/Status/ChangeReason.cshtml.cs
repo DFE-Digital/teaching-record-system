@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 [Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
-public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
 
@@ -25,25 +25,31 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Reason for change")]
+    [Display(Name = "Why are you changing the status?")]
     public MqChangeStatusReasonOption? StatusChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Reason for change")]
+    [Display(Name = "Why are you changing the end date?")]
     public MqChangeEndDateReasonOption? EndDateChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "More detail about the reason for change")]
+    [Display(Name = "Do you want to provide more information?")]
+    [Required(ErrorMessage = "Select yes if you want to add more information")]
+    public bool? HasAdditionalReasonDetail { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Enter details about this change")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Upload evidence")]
+    [Display(Name = "Do you want to upload evidence?")]
     [Required(ErrorMessage = "Select yes if you want to upload evidence")]
     public bool? UploadEvidence { get; set; }
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -73,12 +79,12 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     {
         if (IsEndDateChange == true && IsStatusChange == false && EndDateChangeReason is null)
         {
-            ModelState.AddModelError(nameof(EndDateChangeReason), "Select a reason for change");
+            ModelState.AddModelError(nameof(EndDateChangeReason), "Select a reason");
         }
 
         if (IsStatusChange == true && StatusChangeReason is null)
         {
-            ModelState.AddModelError(nameof(StatusChangeReason), "Select a reason for change");
+            ModelState.AddModelError(nameof(StatusChangeReason), "Select a reason");
         }
 
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
@@ -129,7 +135,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(linkGenerator.MqEditStatusConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditStatusCheckAnswersConfirm(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()

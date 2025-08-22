@@ -46,7 +46,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.StartDate = StartDate);
 
-        return Redirect(linkGenerator.MqEditStartDateReason(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditStartDateChangeReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()

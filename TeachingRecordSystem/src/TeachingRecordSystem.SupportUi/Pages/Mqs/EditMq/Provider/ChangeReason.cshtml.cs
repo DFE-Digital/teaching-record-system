@@ -6,16 +6,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
+namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
-[Journey(JourneyNames.EditMqSpecialism), RequireJourneyInstance]
-public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+[Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
+public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
-    public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
+    public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -25,22 +25,28 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Reason for change")]
-    [Required(ErrorMessage = "Select a reason for change")]
-    public MqChangeSpecialismReasonOption? ChangeReason { get; set; }
+    [Display(Name = "Why are you changing the training provider?")]
+    [Required(ErrorMessage = "Select a reason")]
+    public MqChangeProviderReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "More detail about the reason for change")]
+    [Display(Name = "Do you want to provide more information?")]
+    [Required(ErrorMessage = "Select yes if you want to add more information")]
+    public bool? HasAdditionalReasonDetail { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Enter details about this change")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Upload evidence")]
+    [Display(Name = "Do you want to upload evidence?")]
     [Required(ErrorMessage = "Select yes if you want to upload evidence")]
     public bool? UploadEvidence { get; set; }
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -110,7 +116,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(linkGenerator.MqEditSpecialismConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditProviderCheckAnswers(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -126,9 +132,9 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.Specialism is null)
+        if (!JourneyInstance!.State.ProviderId.HasValue)
         {
-            context.Result = Redirect(linkGenerator.MqEditSpecialism(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqEditProvider(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 

@@ -1,5 +1,5 @@
-@page "/mqs/{qualificationId}/delete/confirm/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.ConfirmModel
+@page "/mqs/{qualificationId}/delete/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.CheckAnswersModel
 @{
     ViewBag.Title = "Delete qualification";
 }
@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqDeleteConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.MqDeleteCheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">Confirm deletion of mandatory qualification</h1>
 
@@ -54,7 +54,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit">Delete qualification</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqDeleteConfirmCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqDeleteCheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

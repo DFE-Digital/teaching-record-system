@@ -2,7 +2,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
@@ -155,7 +155,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, "Select a reason for change");
+        await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, "Select a reason");
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(true, false)]
     [InlineData(false, true)]
     [InlineData(true, true)]
-    public async Task Post_ValidInput_RedirectsToConfirmPage(
+    public async Task Post_ValidInput_RedirectsToCheckAnswersPage(
         bool isStatusChange,
         bool isEndDateChange)
     {
@@ -325,6 +325,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var multipartContent = CreateFormFileUpload(".png");
         multipartContent.Add(new StringContent(changeReason), changeReasonKey);
+        multipartContent.Add(new StringContent("True"), "HasAdditionalReasonDetail");
         multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
         multipartContent.Add(new StringContent("True"), "UploadEvidence");
 
@@ -338,7 +339,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/status/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
