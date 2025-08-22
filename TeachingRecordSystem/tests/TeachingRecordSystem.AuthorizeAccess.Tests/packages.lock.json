@@ -2518,11 +2518,26 @@
           "xunit.assert": "[2.9.3, )"
         }
       },
+      "teachingrecordsystem.testcommon.xunit": {
+        "type": "Project",
+        "dependencies": {
+          "TeachingRecordSystem.TestCommon": "[1.0.0, )",
+          "xunit.assert": "[2.9.3, )"
+        }
+      },
       "teachingrecordsystem.uitestcommon": {
         "type": "Project",
         "dependencies": {
           "TeachingRecordSystem.TestCommon": "[1.0.0, )",
           "TeachingRecordSystem.WebCommon": "[1.0.0, )"
+        }
+      },
+      "teachingrecordsystem.uitestcommon.xunit": {
+        "type": "Project",
+        "dependencies": {
+          "TeachingRecordSystem.TestCommon": "[1.0.0, )",
+          "TeachingRecordSystem.TestCommon.XUnit": "[1.0.0, )",
+          "TeachingRecordSystem.UiTestCommon": "[1.0.0, )"
         }
       },
       "teachingrecordsystem.webcommon": {

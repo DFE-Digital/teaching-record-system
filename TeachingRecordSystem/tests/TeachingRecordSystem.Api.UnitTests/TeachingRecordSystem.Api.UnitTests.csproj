@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.Api\TeachingRecordSystem.Api.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.TestCommon.XUnit\TeachingRecordSystem.TestCommon.XUnit.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>
 

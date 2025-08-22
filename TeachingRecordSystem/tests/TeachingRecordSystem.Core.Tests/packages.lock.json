@@ -2105,6 +2105,13 @@
           "xunit.assert": "[2.9.3, )"
         }
       },
+      "teachingrecordsystem.testcommon.xunit": {
+        "type": "Project",
+        "dependencies": {
+          "TeachingRecordSystem.TestCommon": "[1.0.0, )",
+          "xunit.assert": "[2.9.3, )"
+        }
+      },
       "AngleSharp": {
         "type": "CentralTransitive",
         "requested": "[1.1.2, )",

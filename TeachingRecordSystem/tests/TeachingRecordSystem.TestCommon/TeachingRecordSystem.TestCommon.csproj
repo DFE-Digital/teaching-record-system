@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectCapability Remove="TestContainer" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Faker.Net" />
     <PackageReference Include="FakeXrmEasy.v9" />
     <PackageReference Include="Moq" />
