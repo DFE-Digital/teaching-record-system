@@ -1,8 +1,8 @@
-using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
@@ -31,9 +31,14 @@ public static class Extensions
 
         if (builder.Environment.IsProduction())
         {
+            var deployedEnvironmentName = Environment.GetEnvironmentVariable("ENVIRONMENT_NAME")
+                ?? throw new InvalidOperationException("ENVIRONMENT_NAME environment variable is not set.");
+
             builder.Configuration
                 .AddJsonEnvironmentVariable("AppConfig")
-                .AddJsonEnvironmentVariable("SharedConfig");
+                .AddJsonEnvironmentVariable("SharedConfig")
+                .AddJsonFile($"appsettings.Production_{deployedEnvironmentName}.json")
+                .AddJsonFile($"appsettings.Production_{deployedEnvironmentName}_shared.json");
 
             builder.Services.Configure<ForwardedHeadersOptions>(options =>
             {

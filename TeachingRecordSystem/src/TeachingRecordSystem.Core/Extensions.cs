@@ -17,7 +17,7 @@ public static class Extensions
 {
     public static IHostApplicationBuilder AddBackgroundWorkScheduler(this IHostApplicationBuilder builder)
     {
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
         }
@@ -63,7 +63,7 @@ public static class Extensions
             prepareSchemaIfNecessary = false;
         }
 
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddHangfire((sp, configuration) => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)

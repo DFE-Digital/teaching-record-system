@@ -9,7 +9,7 @@ module "migrations_job_configuration" {
   secret_key_vault_short = "inf"
 
   config_variables = {
-    DUMMY = ""
+    ENVIRONMENT_NAME = var.environment_name
   }
   secret_variables = {
     CONNECTION_STRING = module.postgres.dotnet_connection_string
@@ -46,6 +46,7 @@ module "api_application_configuration" {
   config_variables = {
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
     DistributedLockContainerName    = azurerm_storage_container.locks.name
+    ENVIRONMENT_NAME                = var.environment_name
     RecurringJobs__Enabled          = var.run_recurring_jobs
     SENTRY_ENVIRONMENT              = local.app_name_suffix
   }
@@ -99,8 +100,8 @@ module "authz_application_configuration" {
 
   config_variables = merge({
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
+    ENVIRONMENT_NAME                = var.environment_name
     SENTRY_ENVIRONMENT              = local.app_name_suffix
-    DUMMY                           = "Dummy variable to force new Kubernetes config map to be created"
   }, local.federated_auth_configmap)
 
   secret_variables = merge({
@@ -152,6 +153,7 @@ module "ui_application_configuration" {
 
   config_variables = {
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
+    ENVIRONMENT_NAME                = var.environment_name
     SENTRY_ENVIRONMENT              = local.app_name_suffix
   }
 
@@ -205,6 +207,7 @@ module "worker_application_configuration" {
   config_variables = {
     DistributedLockContainerName = azurerm_storage_container.locks.name
     DqtReporting__RunService     = var.run_dqt_reporting_service
+    ENVIRONMENT_NAME             = var.environment_name
     SENTRY_ENVIRONMENT           = local.app_name_suffix
   }
 
