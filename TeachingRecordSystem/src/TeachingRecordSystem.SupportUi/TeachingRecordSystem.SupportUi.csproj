@@ -30,6 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="TeachingRecordSystem.WebCommon" />
+  </ItemGroup>
+
+  <ItemGroup>
     <SassFile Include="wwwroot/Styles/site.scss" Exclude="wwwroot/lib/**/*" />
   </ItemGroup>
 
