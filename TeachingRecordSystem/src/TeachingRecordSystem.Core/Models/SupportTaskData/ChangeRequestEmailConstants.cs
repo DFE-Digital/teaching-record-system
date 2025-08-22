@@ -2,12 +2,11 @@ namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
 public static class ChangeRequestEmailConstants
 {
-    public const string GetAnIdentityChangeOfDateOfBirthSubmittedEmailConfirmationTemplateId = "d83d28e8-fc4c-4728-ac62-e58a0dd1622e";
-    public const string GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmationTemplateId = "214c838c-0f8e-44da-8b97-3041d2bfec91";
-    public const string GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmationTemplateId = "96ed1a90-3398-4f96-bd37-eedf18297337";
-    public const string GetAnIdentityChangeOfNameSubmittedEmailConfirmationTemplateId = "664fd278-3af8-4011-9f58-b4d44c733402";
-    public const string GetAnIdentityChangeOfNameApprovedEmailConfirmationTemplateId = "7b0a2a7f-4e6c-4c75-a6b8-61f69ea273eb";
-    public const string GetAnIdentityChangeOfNameRejectedEmailConfirmationTemplateId = "bee1f8b8-fcb2-4e47-876d-509e60064bd4";
+    public const string GetAnIdentityChangeOfDateOfBirthSubmittedEmailConfirmationTemplateId = "6b734de9-0ff4-4f06-beeb-b10199aeae63";
+    public const string GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmationTemplateId = "95977d42-7bdd-4c9b-938c-76d934618694";
+    public const string GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmationTemplateId = "abe622ac-79b0-40b3-a29d-94f359a0f03e";
+    public const string GetAnIdentityChangeOfNameSubmittedEmailConfirmationTemplateId = "c20e4147-a6b9-46cd-a940-c9d6392eee50";
+    public const string GetAnIdentityChangeOfNameApprovedEmailConfirmationTemplateId = "cf4b00de-8a2e-4e9c-a913-23725e7a2334";
+    public const string GetAnIdentityChangeOfNameRejectedEmailConfirmationTemplateId = "bc790721-11c7-42e0-8f88-41ea96296602";
     public const string FirstNameEmailPersonalisationKey = "first name";
-    public const string EmailReplyToId = "3ac9a271-449e-4fc6-8bba-2acd833d6901";
 }
