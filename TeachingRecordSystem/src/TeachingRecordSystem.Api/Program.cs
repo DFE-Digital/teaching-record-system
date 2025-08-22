@@ -213,7 +213,6 @@ public class Program
             var crmServiceClient = GetCrmServiceClient();
             services.AddApiTrnGeneration(configuration);
             services.AddPooledDefaultServiceClient(crmServiceClient, size: 200);
-            services.AddTransient<IDataverseAdapter, DataverseAdapter>();
 
             services.AddHealthChecks()
                 .AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());

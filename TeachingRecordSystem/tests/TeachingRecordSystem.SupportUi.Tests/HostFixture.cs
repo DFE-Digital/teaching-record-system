@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -56,7 +55,6 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<TestUsers>();
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
-            services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
             services.AddTestScoped<IAadUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
             services.AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
