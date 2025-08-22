@@ -5,6 +5,7 @@ RG_TAGS={"Product" : "Teaching Record System"}
 ARM_TEMPLATE_TAG=1.1.10
 REGION=UK South
 SERVICE_SHORT=trs
+SERVICE_NAME=teaching-record-system
 
 .PHONY: help
 help: ## Show this help
@@ -137,3 +138,8 @@ get-cluster-credentials: set-azure-account
 dev-cluster:
 	$(eval CLUSTER_RESOURCE_GROUP_NAME=s189d01-tsc-dv-rg)
 	$(eval CLUSTER_NAME=s189d01-tsc-${CLUSTER}-aks)
+
+action-group: set-azure-account # make production action-group ACTION_GROUP_EMAIL=notificationemail@domain.com . Must be run before setting enable_monitoring=true. Use any non-prod environment to create in the test subscription.
+	$(if $(ACTION_GROUP_EMAIL), , $(error Please specify a notification email for the action group))
+	az group create -l uksouth -g ${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-mn-rg --tags "Product=${SERVICE_NAME}"
+	az monitor action-group create -n ${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT} -g ${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-mn-rg --action email ${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-email ${ACTION_GROUP_EMAIL}
