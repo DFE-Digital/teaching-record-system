@@ -186,7 +186,8 @@ public class Person
             OldStatus = oldStatus,
             Reason = reason,
             ReasonDetail = reasonDetail,
-            EvidenceFile = evidenceFile
+            EvidenceFile = evidenceFile,
+            DateOfDeath = null
         };
     }
 

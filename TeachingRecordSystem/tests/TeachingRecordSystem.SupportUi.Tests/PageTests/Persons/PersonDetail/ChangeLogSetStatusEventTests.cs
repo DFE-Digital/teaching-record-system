@@ -48,7 +48,8 @@ public class ChangeLogSetStatusEventTests : TestBase
             OldStatus = PersonStatus.Active,
             Reason = reason,
             ReasonDetail = reasonDetail,
-            EvidenceFile = evidenceFile
+            EvidenceFile = evidenceFile,
+            DateOfDeath = null
         };
 
         await WithDbContext(async dbContext =>
@@ -105,7 +106,8 @@ public class ChangeLogSetStatusEventTests : TestBase
             OldStatus = PersonStatus.Deactivated,
             Reason = reason,
             ReasonDetail = reasonDetail,
-            EvidenceFile = evidenceFile
+            EvidenceFile = evidenceFile,
+            DateOfDeath = null
         };
 
         await WithDbContext(async dbContext =>
