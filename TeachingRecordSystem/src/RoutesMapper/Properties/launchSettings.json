@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "RoutesMapper Andrew": {
-      "commandName": "Project",
-      "commandLineArgs": "C:/dfe/routes/mapping/routes-mapper.csv"
-    }
-  }
-}
