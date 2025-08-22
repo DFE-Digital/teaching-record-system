@@ -77,7 +77,6 @@ await host.RunAsync();
 
 void AddLegacyDataverseAdapterServices()
 {
-    builder.Services.AddTransient<IDataverseAdapter, DataverseAdapter>();
     builder.Services.AddSingleton<ITrnGenerator, DummyTrnGenerationApiClient>();
 }
 

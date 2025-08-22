@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -16,7 +15,6 @@ public class TestScopedServices
     public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new();
-        DataverseAdapterMock = new();
         AzureActiveDirectoryUserServiceMock = new();
         EventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
@@ -45,8 +43,6 @@ public class TestScopedServices
     }
 
     public TestableClock Clock { get; }
-
-    public Mock<IDataverseAdapter> DataverseAdapterMock { get; }
 
     public Mock<IAadUserService> AzureActiveDirectoryUserServiceMock { get; }
 

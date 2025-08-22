@@ -74,7 +74,6 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddMvc().AddApplicationPart(typeof(HostFixture).Assembly);
             services.AddSingleton<CurrentApiClientProvider>();
             services.AddTestScoped<IClock>(tss => tss.Clock);
-            services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
             services.AddTestScoped<IOptions<AccessYourTeachingQualificationsOptions>>(tss => tss.AccessYourTeachingQualificationsOptions);
             services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);

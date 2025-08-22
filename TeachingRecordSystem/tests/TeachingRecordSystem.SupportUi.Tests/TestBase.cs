@@ -1,10 +1,8 @@
-using System.Reactive.Linq;
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -46,8 +44,6 @@ public abstract class TestBase : IDisposable
     public HostFixture HostFixture { get; }
 
     public CaptureEventObserver EventPublisher => _testServices.EventObserver;
-
-    public Mock<IDataverseAdapter> DataverseAdapterMock => _testServices.DataverseAdapterMock;
 
     public TestableClock Clock => _testServices.Clock;
 

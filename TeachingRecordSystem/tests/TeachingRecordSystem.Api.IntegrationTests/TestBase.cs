@@ -52,8 +52,6 @@ public abstract class TestBase : IAsyncLifetime
 
     public CrmQueryDispatcherSpy CrmQueryDispatcherSpy => _testServices.CrmQueryDispatcherSpy;
 
-    public Mock<IDataverseAdapter> DataverseAdapterMock => _testServices.DataverseAdapterMock;
-
     public TestableClock Clock => _testServices.Clock;
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;

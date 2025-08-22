@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -14,7 +13,6 @@ public class TestScopedServices
     public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new();
-        DataverseAdapterMock = new();
         GetAnIdentityApiClientMock = new();
         CrmQueryDispatcherSpy = new();
         BlobStorageFileServiceMock = new();
@@ -52,8 +50,6 @@ public class TestScopedServices
     }
 
     public TestableClock Clock { get; }
-
-    public Mock<IDataverseAdapter> DataverseAdapterMock { get; }
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
