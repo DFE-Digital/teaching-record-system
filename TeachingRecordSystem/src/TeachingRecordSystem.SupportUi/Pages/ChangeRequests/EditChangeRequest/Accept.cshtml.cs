@@ -132,8 +132,7 @@ public class AcceptModel(
                 EmailId = Guid.NewGuid(),
                 TemplateId = emailTemplateId,
                 EmailAddress = emailAddress!,
-                Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, Person!.FirstName } },
-                EmailReplyToId = ChangeRequestEmailConstants.EmailReplyToId
+                Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, Person!.FirstName } }
             };
 
             dbContext.Emails.Add(email);

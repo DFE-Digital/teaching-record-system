@@ -104,8 +104,7 @@ public partial class CreateDateOfBirthChangeRequestHandler(
                 EmailId = Guid.NewGuid(),
                 TemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthSubmittedEmailConfirmationTemplateId,
                 EmailAddress = emailAddress!,
-                Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, person.FirstName } },
-                EmailReplyToId = ChangeRequestEmailConstants.EmailReplyToId
+                Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, person.FirstName } }
             };
 
             dbContext.Emails.Add(email);
