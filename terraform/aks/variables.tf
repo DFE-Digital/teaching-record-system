@@ -159,6 +159,12 @@ variable "enable_dfe_analytics_federated_auth" {
   description = "Create the resources in Google cloud for federated authentication and enable in application"
   default     = false
 }
+
+variable "enable_logical_replication" {
+   type = bool
+   default = false
+}
+
 locals {
   app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
 

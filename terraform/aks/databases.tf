@@ -37,12 +37,7 @@ module "postgres" {
   azure_sku_name                 = var.postgres_flexible_server_sku
   azure_enable_high_availability = var.postgres_enable_high_availability
   azure_storage_mb               = var.postgres_azure_storage_mb
-}
-
-resource "azurerm_postgresql_flexible_server_configuration" "wal_level" {
-  name      = "wal_level"
-  server_id = module.postgres.azure_server_id
-  value     = "logical"
+  enable_logical_replication     = var.enable_logical_replication
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "shared_preload_libraries" {
