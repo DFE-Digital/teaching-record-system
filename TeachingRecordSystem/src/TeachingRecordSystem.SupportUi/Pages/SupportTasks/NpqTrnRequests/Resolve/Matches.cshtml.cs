@@ -3,18 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
-using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.Matches;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
+public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFileService fileService) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
+
+    public Guid? NpqEvidenceFileId { get; set; }
+    public string? NpqEvidenceFileName { get; set; }
+    public string? NpqEvidenceFileUrl { get; set; }
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
@@ -115,6 +119,13 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
                     r.NationalInsuranceNumber)
             })
             .ToArray();
+
+        NpqEvidenceFileId = RequestData.NpqEvidenceFileId;
+        NpqEvidenceFileName = RequestData.NpqEvidenceFileName;
+
+        NpqEvidenceFileUrl = NpqEvidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

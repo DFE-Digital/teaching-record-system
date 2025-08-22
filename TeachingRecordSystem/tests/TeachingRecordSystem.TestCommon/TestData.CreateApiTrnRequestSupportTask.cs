@@ -44,7 +44,7 @@ public partial class TestData
         private Option<string> _requestId;
         private Option<string?> _emailAddress;
         private Option<string> _firstName;
-        private Option<string> _middleName;
+        private Option<string?> _middleName;
         private Option<string> _lastName;
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
@@ -63,7 +63,7 @@ public partial class TestData
 
         public CreateApiTrnRequestSupportTaskBuilder WithMiddleName(string? middleName)
         {
-            _middleName = Option.Some(middleName ?? string.Empty);
+            _middleName = Option.Some(middleName);
             return this;
         }
 
@@ -132,7 +132,7 @@ public partial class TestData
             var trnRequestId = _requestId.ValueOr(Guid.NewGuid().ToString);
             var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail);
             var firstName = _firstName.ValueOr(testData.GenerateFirstName);
-            var middleName = _middleName.ValueOr(testData.GenerateMiddleName);
+            var middleName = _middleName.ValueOrDefault();
             var lastName = _lastName.ValueOr(testData.GenerateLastName);
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
@@ -154,7 +154,7 @@ public partial class TestData
                             p
                                 .WithTrn()
                                 .WithFirstName(firstName)
-                                .WithMiddleName(middleName)
+                                .WithMiddleName(middleName ?? string.Empty)
                                 .WithLastName(lastName)
                                 .WithDateOfBirth(dateOfBirth)
                                 .WithEmail(emailAddress);
@@ -192,7 +192,7 @@ public partial class TestData
                 LastName = lastName,
                 PreviousFirstName = null,
                 PreviousLastName = null,
-                Name = [firstName, middleName, lastName],
+                Name = (new List<string?> { firstName, middleName, lastName }).OfType<string>().ToArray(),
                 DateOfBirth = dateOfBirth,
                 PotentialDuplicate = potentialDuplicate,
                 NationalInsuranceNumber = nationalInsuranceNumber,
