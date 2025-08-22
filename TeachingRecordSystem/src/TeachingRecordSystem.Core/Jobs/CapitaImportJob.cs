@@ -1,12 +1,15 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
+using Parquet.Rows;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -119,12 +122,56 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
 
     public (List<string> Errors, List<string> Warnings) ValidateRow(CapitaImportRecord record)
     {
+        //hard errors
         var errors = new List<string>();
         var warnings = new List<string>();
 
+        var trnRegex = new Regex(@"^\d{7}$");
+        var DATE_FORMAT = "yyyyMMdd";
+
+        //trn
         if (string.IsNullOrEmpty(record.TRN))
         {
             errors.Add("Missing required field: TRN");
+            return (errors, warnings);
+        }
+        else if (!trnRegex.IsMatch(record.TRN))
+        {
+            errors.Add("Validation failed on field: TRN");
+            return (errors, warnings);
+        }
+
+        //dob
+        if (string.IsNullOrEmpty(record.DateOfBirth))
+        {
+            errors.Add("Missing required field: Date of birth");
+            return (errors, warnings);
+        }
+        else
+        {
+            if (!DateOnly.TryParseExact(record.DateOfBirth, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfBirth))
+            {
+                errors.Add("Validation Failed: Invalid Date of Birth");
+            }
+            else if (dateOfBirth > clock.UtcNow.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+            {
+                errors.Add("Validation Failed: Date of Birth cannot be in the future");
+            }
+        }
+
+        //gender
+        if (!record.Gender.HasValue)
+        {
+            errors.Add("Missing required field: Gender");
+            return (errors, warnings);
+        }
+        else
+        {
+            var validGendoers = new List<int> { (int)Gender.Male, (int)Gender.Female };
+            if (!validGendoers.Any(x => x == record.Gender.Value))
+            {
+                errors.Add($"Invalid Gender: {record.Gender.Value}");
+            }
         }
 
         return (errors, warnings);
