@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
@@ -12,12 +10,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [AllowDeactivatedPerson]
 public class ChangeHistoryModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IAuthorizationService authorizationService,
-    TrsLinkGenerator linkGenerator,
-    IFeatureProvider featureProvider) : PageModel
+    TrsLinkGenerator linkGenerator) : PageModel
 {
     private const int PageSize = 10;
 
@@ -46,10 +42,6 @@ public class ChangeHistoryModel(
         {
             return BadRequest();
         }
-
-        var personInfo = HttpContext.GetCurrentPersonFeature();
-
-        var notesResult = await crmQueryDispatcher.ExecuteQueryAsync(new GetNotesByContactIdQuery(PersonId));
 
         var eventTypes = new[]
         {
@@ -142,35 +134,10 @@ public class ChangeHistoryModel(
                 """)
             .ToListAsync();
 
-        var allResults = notesResult
-            .Annotations.Select(n => (TimelineItem)new TimelineItem<Annotation>(
-                TimelineItemType.Annotation,
-                PersonId,
-                n.ModifiedOn!.Value.ToGmt(),
-                n))
-            .Concat(notesResult.IncidentResolutions.Select(r => new TimelineItem<(IncidentResolution, Incident)>(
-                TimelineItemType.IncidentResolution,
-                PersonId,
-                r.Resolution.ModifiedOn!.Value.ToGmt(),
-                r)))
-            .Concat(notesResult.Tasks.Select(t => new TimelineItem<CrmTask>(
-                TimelineItemType.Task,
-                PersonId,
-                t.ModifiedOn!.Value.ToGmt(),
-                t)))
-            .Concat(eventsWithUser.Select(MapTimelineEvent))
-            .OrderByDescending(i => i.Timestamp)
-            .ToArray();
-
-        //exclude all crm annotations if dqtnote is enabled.
-        //
-        //NOTE: When the backfilling of dqtnotes has been ran, adding annotations can be removed entirely from this page.
-        if (featureProvider.IsEnabled(FeatureNames.DqtNotes))
-        {
-            allResults = allResults.Where(x => x.ItemType != TimelineItemType.Annotation).ToArray();
-        }
+        var allResults = eventsWithUser.Select(MapTimelineEvent).ToArray();
 
         TimelineItems = allResults
+            .OrderByDescending(i => i.Timestamp)
             .Skip((PageNumber!.Value - 1) * PageSize)
             .Take(PageSize)
             .ToArray();
@@ -217,9 +184,9 @@ public class ChangeHistoryModel(
     {
         public required string EventName { get; init; }
         public required string EventPayload { get; init; }
-        public required string? TrsUserName { get; set; }
-        public required string? DqtUserName { get; set; }
-        public required string? ApplicationUserName { get; set; }
-        public required string? ApplicationUserShortName { get; set; }
+        public required string? TrsUserName { get; init; }
+        public required string? DqtUserName { get; init; }
+        public required string? ApplicationUserName { get; init; }
+        public required string? ApplicationUserShortName { get; init; }
     }
 }
