@@ -627,7 +627,7 @@ public class TrsDataSyncHelper(
     private async Task<DqtNoteInfo?> MapNoteFromDqtAnnotationAsync(
         Annotation annotation)
     {
-        var ignoredTerms = GetIgnoreNotesContainingTerms();
+        var ignoredTerms = new List<string>();
         var lowerInput = await annotation.GetNoteTextWithoutHtmlAsync() ?? string.Empty;
         if (ignoredTerms.Any(term => lowerInput.ToLower().Contains(term)) &&
             (!string.IsNullOrEmpty(annotation.Subject) && annotation.Subject.Contains("Entered by REG", StringComparison.InvariantCultureIgnoreCase)))
