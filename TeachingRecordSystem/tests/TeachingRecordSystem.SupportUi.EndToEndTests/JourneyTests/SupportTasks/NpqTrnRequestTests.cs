@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks
 
 public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Resolve_CreateNewRecord()
     {
         await WithDbContext(dbContext =>
@@ -50,10 +50,10 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
-        page.AssertOnAPersonDetailPageAsync();
+        await page.AssertOnAPersonDetailPageAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task Resolve_MergeWithExistingRecord_FieldValuesMatchExisting()
     {
         await WithDbContext(dbContext =>
@@ -124,7 +124,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(matchedPerson1.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Resolve_MergeWithExistingRecord_FieldValuesDifferFromExisting_SelectExistingRecordData()
     {
         await WithDbContext(dbContext =>
@@ -203,7 +203,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(matchedPerson2.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Resolve_MergeWithExistingRecord_FieldValuesDifferFromExisting_SelectSupportRequestData()
     {
         await WithDbContext(dbContext =>
@@ -264,7 +264,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(requestData.NationalInsuranceNumber!, "National Insurance number");
     }
 
-    [Fact]
+    [Test]
     public async Task NoMatches_CreateRecord()
     {
         await WithDbContext(dbContext =>
@@ -305,10 +305,10 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerAsync("Success", "NPQ request completed");
 
         await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
-        page.AssertOnAPersonDetailPageAsync();
+        await page.AssertOnAPersonDetailPageAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task RejectRequest()
     {
         await WithDbContext(dbContext =>

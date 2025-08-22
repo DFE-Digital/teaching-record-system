@@ -7,7 +7,7 @@ public class UserTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task AddUser()
     {
         var testAzAdUser = TestUsers.TestAzureActiveDirectoryUser;
@@ -38,7 +38,7 @@ public class UserTests : TestBase
         await page.AssertFlashMessageAsync(expectedMessage: $"{testAzAdUser.Name} has been added as a record manager.");
     }
 
-    [Fact]
+    [Test]
     public async Task EditUser()
     {
         var azAdUserId = Guid.NewGuid();
@@ -64,7 +64,7 @@ public class UserTests : TestBase
         await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name} has been changed to a record manager.");
     }
 
-    [Fact]
+    [Test]
     public async Task DeactivateUser()
     {
         var azAdUserId = Guid.NewGuid();
@@ -96,7 +96,7 @@ public class UserTests : TestBase
         await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name}\u2019s account has been deactivated.");
     }
 
-    [Fact]
+    [Test]
     public async Task ReactivateUser()
     {
         var azAdUserId = Guid.NewGuid();

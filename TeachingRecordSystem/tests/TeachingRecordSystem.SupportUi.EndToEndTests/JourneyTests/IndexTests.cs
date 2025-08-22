@@ -7,12 +7,12 @@ public class IndexTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task IndexReturnsOk()
     {
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
         var response = await page.GotoAsync("/");
-        Assert.Equal(StatusCodes.Status200OK, response?.Status);
+        await Assert.That(response?.Status).IsEqualTo(StatusCodes.Status200OK);
     }
 }

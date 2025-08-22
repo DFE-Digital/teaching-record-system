@@ -9,7 +9,7 @@ public class SetStatusTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Deactivate()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -35,7 +35,7 @@ public class SetStatusTests : TestBase
         await page.AssertFlashMessageAsync(expectedMessage: "Ethelred The Unready’s record has been deactivated.");
     }
 
-    [Fact]
+    [Test]
     public async Task Reactivate()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -68,7 +68,7 @@ public class SetStatusTests : TestBase
         await page.AssertFlashMessageAsync(expectedMessage: "Ethelred The Unready’s record has been reactivated.");
     }
 
-    [Fact]
+    [Test]
     public async Task Deactivate_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -96,7 +96,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Reactivate_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -131,7 +131,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Deactivate_CYA_ChangeReason_ContinuesToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -159,7 +159,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
     }
 
-    [Fact]
+    [Test]
     public async Task Reactivate_CYA_ChangeReason_ContinuesToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -194,7 +194,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
     }
 
-    [Fact]
+    [Test]
     public async Task Deactivate_CYA_NavigatesBackToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -228,7 +228,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Reactivate_CYA_NavigatesBackToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p

@@ -13,10 +13,11 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Infrastructure;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
-public sealed class HostFixture : IAsyncDisposable, IStartupTask
+public sealed class HostFixture : IAsyncDisposable
 {
     public const string BaseUrl = "http://localhost:55642";
 
@@ -150,7 +151,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
         }
     }
 
-    async Task IStartupTask.ExecuteAsync()
+    public async Task InitializeAsync()
     {
         _host = CreateHost();
 
@@ -174,7 +175,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
         _initialized = true;
     }
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (_disposed)
         {

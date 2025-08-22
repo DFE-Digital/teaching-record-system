@@ -4,27 +4,26 @@ using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
-public abstract class TestBase
+[SharedDependenciesDataSource]
+[RetryOnCI(3)]
+[NotInParallel]
+public abstract class TestBase(HostFixture hostFixture)
 {
-    public TestBase(HostFixture hostFixture)
-    {
-        HostFixture = hostFixture;
+    [Before(Test)]
+    public void SetInitialUser() => SetCurrentUser(TestUsers.Administrator);
 
-        SetCurrentUser(TestUsers.Administrator);
-    }
+    protected HostFixture HostFixture { get; } = hostFixture;
 
-    public HostFixture HostFixture { get; }
+    protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
-    public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
-
-    public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
+    protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
         var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 
-    public virtual Task WithDbContext(Func<TrsDbContext, Task> action) =>
+    protected Task WithDbContext(Func<TrsDbContext, Task> action) =>
         WithDbContext(async dbContext =>
         {
             await action(dbContext);

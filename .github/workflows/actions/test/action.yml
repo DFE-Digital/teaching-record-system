@@ -25,7 +25,13 @@ runs:
           exit 1
         fi
 
-        cd $PROJECT_PATH && dotnet test --blame-hang-timeout 10m --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
+        cd $PROJECT_PATH
+
+        if [ "$(basename $PWD)" == "TeachingRecordSystem.SupportUi.EndToEndTests" ]; then
+          dotnet test --configuration Release ${{ inputs.dotnet_test_args }} -- --report-trx
+        else
+          dotnet test --blame-hang-timeout 10m --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
+        fi
       shell: bash
       env:
         PROJECT_PATH: ${{ inputs.test_project_path }}
