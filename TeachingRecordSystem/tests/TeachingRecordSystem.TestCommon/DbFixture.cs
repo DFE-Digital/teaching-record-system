@@ -4,32 +4,21 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
+public class DbFixture(DbHelper dbHelper, IServiceProvider services)
 {
     public DbHelper DbHelper { get; } = dbHelper;
 
-    public IServiceProvider Services { get; } = serviceProvider;
+    public NpgsqlDataSource GetDataSource() => services.GetRequiredService<NpgsqlDataSource>();
 
-    public NpgsqlDataSource GetDataSource() => Services.GetRequiredService<NpgsqlDataSource>();
+    public IDbContextFactory<TrsDbContext> GetDbContextFactory() => services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    public Task CreateReplicationSlotAsync(string slot) => WithDbContextAsync(dbContext =>
-        dbContext.Database.ExecuteSqlAsync($"select * from pg_create_logical_replication_slot({slot}, 'pgoutput');"));
-
-    public Task DropReplicationSlotAsync(string slot) => WithDbContextAsync(dbContext =>
-        dbContext.Database.ExecuteSqlAsync($"select pg_drop_replication_slot({slot});"));
-
-    public Task AdvanceReplicationSlotToCurrentWalLsnAsync(string slot) => WithDbContextAsync(dbContext =>
-        dbContext.Database.ExecuteSqlAsync($"select * from pg_replication_slot_advance({slot}, pg_current_wal_lsn());"));
-
-    public IDbContextFactory<TrsDbContext> GetDbContextFactory() => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
-
-    public virtual async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
+    public async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
         await using var dbContext = await GetDbContextFactory().CreateDbContextAsync();
         return await action(dbContext);
     }
 
-    public virtual Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+    public Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
         WithDbContextAsync(async dbContext =>
         {
             await action(dbContext);
