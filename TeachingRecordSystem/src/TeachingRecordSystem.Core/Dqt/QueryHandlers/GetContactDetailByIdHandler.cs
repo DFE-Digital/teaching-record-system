@@ -5,13 +5,12 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetActiveContactDetailByIdHandler : ICrmQueryHandler<GetActiveContactDetailByIdQuery, ContactDetail?>
+public class GetContactDetailByIdHandler : ICrmQueryHandler<GetContactDetailByIdQuery, ContactDetail?>
 {
-    public async Task<ContactDetail?> ExecuteAsync(GetActiveContactDetailByIdQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<ContactDetail?> ExecuteAsync(GetContactDetailByIdQuery query, IOrganizationServiceAsync organizationService)
     {
         var contactFilter = new FilterExpression();
         contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, query.ContactId);
-        contactFilter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
         var contactQueryExpression = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = query.ColumnSet,

@@ -127,7 +127,7 @@ public class IndexModel(
         else
         {
             var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
-                new GetActiveContactDetailByIdQuery(
+                new GetContactDetailByIdQuery(
                     PersonId,
                     new ColumnSet(
                         Contact.Fields.dfeta_TRN,
