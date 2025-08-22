@@ -215,7 +215,7 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<ResyncAllPersonsJob>(
                     nameof(ResyncAllPersonsJob),
-                    job => job.ExecuteAsync(new DateTime(2025, 8, 16, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None),
+                    job => job.ExecuteAsync(new DateTime(2025, 8, 22, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None),
                     Cron.Never);
 
                 recurringJobManager.AddOrUpdate<FixIncorrectOttRouteMigrationMappingsJob>(
