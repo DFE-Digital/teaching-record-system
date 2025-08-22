@@ -112,7 +112,7 @@ public class CheckAnswersModel(
             PreviousMiddleName = state.PreviousMiddleName,
             PreviousLastName = state.PreviousLastName,
             WorkEmailAddress = state.WorkEmail,
-            Name = new[] { state.FirstName!, state.MiddleName ?? string.Empty, state.LastName! },
+            Name = GetNonEmptyValues(state.FirstName, state.MiddleName, state.LastName),
             EmailAddress = state.PersonalEmail,
             DateOfBirth = state.DateOfBirth!.Value,
             NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber),
@@ -166,6 +166,21 @@ public class CheckAnswersModel(
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 
         return Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+
+        static string[] GetNonEmptyValues(params string?[] values)
+        {
+            var result = new List<string>(values.Length);
+
+            foreach (var value in values)
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    result.Add(value);
+                }
+            }
+
+            return result.ToArray();
+        }
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

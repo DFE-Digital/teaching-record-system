@@ -51,7 +51,7 @@
                         <govuk-summary-list-row-value data-testid="evidence">
                             @if (Model.NpqEvidenceFileId is not null)
                             {
-                                <a href="@Model.NpqEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="evidence-link">@($"{Model.NpqEvidenceFileName} (opens in new tab)")</a>
+                                <a href="@Model.NpqEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="evidence-link">@($"{Model.NpqEvidenceFileName} (opens in a new tab)")</a>
                             }
                             else
                             {

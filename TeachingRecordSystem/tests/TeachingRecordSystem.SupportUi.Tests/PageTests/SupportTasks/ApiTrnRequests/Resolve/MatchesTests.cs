@@ -44,7 +44,10 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
+            .WithMiddleName(TestData.GenerateMiddleName())
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -59,13 +62,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(requestDetails.GetSummaryListValueForKey("First name"), supportTask.TrnRequestMetadata!.FirstName);
-        Assert.Equal(requestDetails.GetSummaryListValueForKey("Middle name"), supportTask.TrnRequestMetadata!.MiddleName);
-        Assert.Equal(requestDetails.GetSummaryListValueForKey("Last name"), supportTask.TrnRequestMetadata!.LastName);
-        Assert.Equal(requestDetails.GetSummaryListValueForKey("Date of birth"), supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        Assert.Equal(requestDetails.GetSummaryListValueForKey("Email"), supportTask.TrnRequestMetadata!.EmailAddress);
-        Assert.Equal(requestDetails.GetSummaryListValueForKey("National Insurance number"), supportTask.TrnRequestMetadata!.NationalInsuranceNumber);
-        Assert.Equal(requestDetails.GetSummaryListValueForKey("Gender"), supportTask.TrnRequestMetadata!.Gender?.GetDisplayName());
+        Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueForKey("First name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueForKey("Middle name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueForKey("Last name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueForKey("Date of birth"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueForKey("Email"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueForKey("Gender"));
     }
 
     [Fact]
@@ -73,7 +76,10 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
+            .WithMiddleName(TestData.GenerateMiddleName())
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var firstMatch = await WithDbContext(
             dbContext => dbContext.Persons.SingleAsync(
@@ -92,13 +98,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("First name"), firstMatch.FirstName);
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Middle name"), firstMatch.MiddleName);
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Last name"), firstMatch.LastName);
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Date of birth"), firstMatch.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat));
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Email"), firstMatch.EmailAddress);
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("National Insurance number"), firstMatch.NationalInsuranceNumber);
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Gender"), firstMatch.Gender?.GetDisplayName());
+        Assert.Equal(firstMatch.FirstName, firstMatchDetails.GetSummaryListValueForKey("First name"));
+        Assert.Equal(firstMatch.MiddleName, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
+        Assert.Equal(firstMatch.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
+        Assert.Equal(firstMatch.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueForKey("Date of birth"));
+        Assert.Equal(firstMatch.EmailAddress, firstMatchDetails.GetSummaryListValueForKey("Email"));
+        Assert.Equal(firstMatch.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(firstMatch.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
     }
 
     [Fact]
@@ -234,6 +240,64 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             doc.GetElementsByName("PersonId")
                 .Single(e => e.GetAttribute("value") == ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel.ToString())
                 .IsChecked());
+    }
+
+    [Fact]
+    public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordAndEmptyInRequest_ShowsNotProvidedNotHighlighted()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithEmail(null)
+            .WithNationalInsuranceNumber(false)
+            .WithMiddleName(""));
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
+        {
+            configure.WithMiddleName(null);
+            configure.WithEmailAddress(null);
+            configure.WithNationalInsuranceNumber(null);
+            configure.WithMatchedPersons(matchedPerson.PersonId);
+        });
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
+        Assert.NotNull(firstMatchDetails);
+        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Email"));
+        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Middle name"));
+        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+
+        AssertMatchRowHasExpectedHighlight("Middle name", false);
+        AssertMatchRowHasExpectedHighlight("National Insurance number", false);
+        AssertMatchRowHasExpectedHighlight("Email", false);
+
+        void AssertMatchRowHasExpectedHighlight(string summaryListKey, bool expectHighlight)
+        {
+            var valueElement = firstMatchDetails.GetSummaryListValueElementForKey(summaryListKey);
+            Assert.NotNull(valueElement);
+            var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
+
+            if (expectHighlight)
+            {
+                Assert.False(highlightElement == null, $"{summaryListKey} should be highlighted");
+            }
+            else
+            {
+                Assert.True(highlightElement == null, $"{summaryListKey} should not be highlighted");
+            }
+        }
     }
 
     public static TheoryData<PersonMatchedAttribute[]> HighlightedDifferencesData { get; } = new()

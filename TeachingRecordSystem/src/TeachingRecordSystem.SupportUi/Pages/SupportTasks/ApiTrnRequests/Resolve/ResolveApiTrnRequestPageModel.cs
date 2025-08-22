@@ -39,7 +39,7 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
                 yield return PersonMatchedAttribute.FirstName;
             }
 
-            if (middleName == requestData.MiddleName)
+            if (middleName == requestData.MiddleName || (string.IsNullOrWhiteSpace(requestData.MiddleName) && string.IsNullOrWhiteSpace(middleName)))
             {
                 yield return PersonMatchedAttribute.MiddleName;
             }

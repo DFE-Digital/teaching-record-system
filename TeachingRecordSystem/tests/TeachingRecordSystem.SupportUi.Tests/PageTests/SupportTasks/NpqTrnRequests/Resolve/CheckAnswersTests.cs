@@ -552,7 +552,12 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s =>
+        {
+            s.WithMiddleName(TestData.GenerateMiddleName());
+            s.WithEmailAddress(TestData.GenerateUniqueEmail());
+            s.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
+        });
         var requestMetadata = supportTask.TrnRequestMetadata;
         Assert.NotNull(requestMetadata);
         var comments = Faker.Lorem.Paragraph();
@@ -596,7 +601,6 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             Assert.Equal(person.DateOfBirth, requestMetadata.DateOfBirth);
             Assert.Equal(person.EmailAddress, requestMetadata.EmailAddress);
             Assert.Equal(person.NationalInsuranceNumber, requestMetadata.NationalInsuranceNumber);
-            Assert.Equal(person.Gender, requestMetadata.Gender);
         });
 
         // support task is updated

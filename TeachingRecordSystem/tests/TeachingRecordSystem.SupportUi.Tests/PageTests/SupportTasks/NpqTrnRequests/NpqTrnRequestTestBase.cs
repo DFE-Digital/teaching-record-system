@@ -38,7 +38,7 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
                         : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(
                     differentAttribute != PersonMatchedAttribute.EmailAddress
-                        ? matchedPerson.Email
+                        ? matchedPerson.Email!
                         : TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(
                     differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber

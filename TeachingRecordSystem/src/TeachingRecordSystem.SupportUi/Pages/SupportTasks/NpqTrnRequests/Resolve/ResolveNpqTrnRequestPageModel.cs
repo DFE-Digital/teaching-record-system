@@ -28,8 +28,6 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var supportTaskFeature = context.HttpContext.GetCurrentSupportTaskFeature();
-
         base.OnPageHandlerExecuting(context);
     }
 
@@ -126,7 +124,7 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
                 yield return PersonMatchedAttribute.FirstName;
             }
 
-            if (middleName == requestData.MiddleName)
+            if (middleName == requestData.MiddleName || (string.IsNullOrWhiteSpace(requestData.MiddleName) && string.IsNullOrWhiteSpace(middleName)))
             {
                 yield return PersonMatchedAttribute.MiddleName;
             }

@@ -11,7 +11,10 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
+            .WithMiddleName(TestData.GenerateMiddleName())
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
         var metadata = supportTask.TrnRequestMetadata!;
 
         var request = new HttpRequestMessage(
@@ -25,11 +28,11 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         doc.AssertRowContentMatches("Name", $"{metadata.FirstName} {metadata.MiddleName} {metadata.LastName}");
         doc.AssertRowContentMatches("Date of birth", metadata.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Working in school or educational setting", metadata.NpqWorkingInEducationalSetting.HasValue ? metadata.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : "Not provided");
+        doc.AssertRowContentMatches("Working in school or educational setting", metadata.NpqWorkingInEducationalSetting.HasValue ? metadata.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : UiDefaults.EmptyDisplayContent);
         doc.AssertRowContentMatches("NPQ application ID", metadata.NpqApplicationId);
         doc.AssertRowContentMatches("NPQ name", metadata.NpqName);
         doc.AssertRowContentMatches("NPQ training provider", metadata.NpqTrainingProvider);
-        doc.AssertRowContentMatches("Evidence", metadata.NpqEvidenceFileId.HasValue ? $"{metadata.NpqEvidenceFileName} (opens in new tab)" : "not provided");
+        doc.AssertRowContentMatches("Evidence", $"{metadata.NpqEvidenceFileName} (opens in a new tab)");
     }
 
     [Fact]

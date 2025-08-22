@@ -54,6 +54,9 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var supportTask = await new CreateNpqTrnRequestSupportTaskBuilder(applicationUser.UserId)
             .WithMatches(false)
+            .WithMiddleName(TestData.GenerateMiddleName())
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .ExecuteAsync(TestData);
 
         var requestMetadata = supportTask.TrnRequestMetadata;
