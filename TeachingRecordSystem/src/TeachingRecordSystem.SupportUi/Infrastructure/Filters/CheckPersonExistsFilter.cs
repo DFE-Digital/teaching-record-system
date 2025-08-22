@@ -42,7 +42,7 @@ public class CheckPersonExistsFilter(
         {
             // If person isn't in the TRS DB it may be because we haven't synced it yet..
 
-            var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(personId, new ColumnSet()));
+            var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(new GetContactDetailByIdQuery(personId, new ColumnSet()));
 
             if (dqtContact is not null)
             {
