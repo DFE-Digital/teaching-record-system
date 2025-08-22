@@ -317,9 +317,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
-        {
-            configure.WithMatches(false);
-        });
+            configure.WithMatches(false).WithMiddleName(TestData.GenerateMiddleName()));
 
         var requestData = supportTask.TrnRequestMetadata!;
         var supportTaskReference = supportTask.SupportTaskReference;
