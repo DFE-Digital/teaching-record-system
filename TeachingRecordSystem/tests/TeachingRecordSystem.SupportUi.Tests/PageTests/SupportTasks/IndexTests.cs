@@ -23,6 +23,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
+        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -44,6 +45,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
+        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -65,6 +67,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
+        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -86,6 +89,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
+        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -107,6 +111,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
+        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -129,6 +134,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
+        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -152,6 +158,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
+        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
