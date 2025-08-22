@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.AuthorizeAccess\TeachingRecordSystem.AuthorizeAccess.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon.XUnit\TeachingRecordSystem.UiTestCommon.XUnit.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon\TeachingRecordSystem.UiTestCommon.csproj" />
   </ItemGroup>
 

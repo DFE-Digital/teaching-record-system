@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TeachingRecordSystem.TestCommon.XUnit\TeachingRecordSystem.TestCommon.XUnit.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>
 
