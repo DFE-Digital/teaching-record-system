@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Text;
 using Azure.Storage.Blobs;
@@ -71,17 +70,18 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         {
             try
             {
+                var (errors, warnings) = ValidateRow(row);
 
                 //insert or update person
                 //insert ITR
                 var persons = await GetPersonAsync(row.TRN!);
-                if(persons.Count() == 0)
+                if (persons.Count() == 0)
                 {
                     //inser
                 }
 
                 NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
-                var person = Person.Create(row.TRN!, row.FirstNameOrMiddleName!, row.FirstNameOrMiddleName!, row.LastName!, row.DateOfBirth, null, ni, row.Gender, clock.UtcNow);
+                var person = Person.Create(row.TRN!, row.FirstNameOrMiddleName!, row.FirstNameOrMiddleName!, row.LastName!, null, null, ni, null, clock.UtcNow);
                 dbContext.Persons.Add(person.Person);
 
                 //write current person exported row to integrationtransactionrecord
@@ -115,6 +115,19 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         await dbContext.SaveChangesAsync();
         await txn.CommitAsync();
         return integrationId;
+    }
+
+    public (List<string> Errors, List<string> Warnings) ValidateRow(CapitaImportRecord record)
+    {
+        var errors = new List<string>();
+        var warnings = new List<string>();
+
+        if (string.IsNullOrEmpty(record.TRN))
+        {
+            errors.Add("Missing required field: TRN");
+        }
+
+        return (errors, warnings);
     }
 
     public async Task<List<Person>> GetPersonAsync(string trn)
@@ -161,7 +174,7 @@ public class CapitaImportMap : ClassMap<CapitaImportRecord>
         Map(m => m.PreviousLastName).Index(4).Optional();
         Map(m => m.DateOfBirth).Index(5)
             .TypeConverterOption.Format("yyyyMMdd")
-            .TypeConverterOption.NullValues(string.Empty, null); 
+            .TypeConverterOption.NullValues(string.Empty, null);
         Map(m => m.NINumber).Index(6).Optional();
         Map(m => m.DateOfDeath).Index(7).Optional();
     }
@@ -170,11 +183,11 @@ public class CapitaImportMap : ClassMap<CapitaImportRecord>
 public class CapitaImportRecord
 {
     public required string? TRN { get; set; }
-    public required Gender? Gender { get; set; }
+    public required int? Gender { get; set; }
     public required string? LastName { get; set; }
     public required string? FirstNameOrMiddleName { get; set; }
     public required string? PreviousLastName { get; set; }
-    public required DateOnly? DateOfBirth { get; set; }
+    public required string? DateOfBirth { get; set; }
     public required string? NINumber { get; set; }
     public required string? DateOfDeath { get; set; }
 }

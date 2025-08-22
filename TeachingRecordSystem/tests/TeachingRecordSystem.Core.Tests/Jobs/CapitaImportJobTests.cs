@@ -100,7 +100,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var integrationTransactionId = await Job.ImportAsync(reader, fileName);
 
         // Assert
-        var integrationTransaction = dbContext.IntegrationTransactions.Include(x=>x.IntegrationTransactionRecords).Single(x=>x.IntegrationTransactionId == integrationTransactionId);
+        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
         Assert.NotNull(integrationTransaction);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
@@ -110,6 +110,29 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(fileName, integrationTransaction.FileName);
         Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
         Assert.Empty(integrationTransaction.IntegrationTransactionRecords);
+    }
+
+    [Fact]
+    public void Validate_MissingTrn_ReturnsValidationError()
+    {
+        // Arrange
+        var record = new CapitaImportRecord()
+        {
+            TRN = null,
+            Gender = null,
+            LastName = null,
+            FirstNameOrMiddleName = null,
+            PreviousLastName = null,
+            DateOfBirth = null,
+            NINumber = null,
+            DateOfDeath = null
+        };
+
+        // Act
+        var (errors, warnings) = Job.ValidateRow(record);
+
+        // Assert
+        Assert.Contains("Missing required field: TRN", errors);
     }
 
     public async Task InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
