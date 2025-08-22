@@ -7,7 +7,7 @@ public class LegacyUserTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task AddUser()
     {
         var testAzAdUser = TestUsers.TestLegacyAzureActiveDirectoryUser;
@@ -39,7 +39,7 @@ public class LegacyUserTests : TestBase
         await page.AssertFlashMessageAsync("User added");
     }
 
-    [Fact]
+    [Test]
     public async Task EditUser()
     {
         var azAdUserId = Guid.NewGuid();
@@ -67,7 +67,7 @@ public class LegacyUserTests : TestBase
         await page.AssertFlashMessageAsync("User updated");
     }
 
-    [Fact]
+    [Test]
     public async Task DeactivateUser()
     {
         var azAdUserId = Guid.NewGuid();
@@ -92,7 +92,7 @@ public class LegacyUserTests : TestBase
         await page.AssertFlashMessageAsync("User deactivated");
     }
 
-    [Fact]
+    [Test]
     public async Task ReactivateUser()
     {
         var azAdUserId = Guid.NewGuid();

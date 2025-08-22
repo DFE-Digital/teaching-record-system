@@ -30,47 +30,52 @@ public static class PageExtensions
     {
         if (expectedHeader != null)
         {
-            Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading{TestBase.TextIsSelector(expectedHeader)}"));
+            await Assert.That(expectedHeader).IsEqualTo(await page.InnerTextAsync($".govuk-notification-banner__heading{TestBase.TextIsSelector(expectedHeader)}"));
         }
         if (expectedMessage != null)
         {
-            Assert.Equal(expectedMessage, await page.InnerTextAsync($".govuk-notification-banner p{TestBase.TextIsSelector(expectedMessage)}"));
+            await Assert.That(expectedMessage).IsEqualTo(await page.InnerTextAsync($".govuk-notification-banner p{TestBase.TextIsSelector(expectedMessage)}"));
         }
     }
 
-    public static void AssertErrorSummaryAsync(this IPage page)
+    public static async Task AssertHasErrorSummaryAsync(this IPage page)
     {
         var element = page.Locator("h2:text('There is a problem')");
-        Assert.NotNull(element);
+        await Assert.That(element).IsNotNull();
     }
 
     public static async Task AssertDateInputAsync(this IPage page, DateOnly date)
     {
-        Assert.Equal(date.Day.ToString(), await page.InputValueAsync("label:text-is('Day')"));
-        Assert.Equal(date.Month.ToString(), await page.InputValueAsync("label:text-is('Month')"));
-        Assert.Equal(date.Year.ToString(), await page.InputValueAsync("label:text-is('Year')"));
+        using var _ = Assert.Multiple();
+        await Assert.That(date.Day.ToString()).IsEqualTo(await page.InputValueAsync("label:text-is('Day')"));
+        await Assert.That(date.Month.ToString()).IsEqualTo(await page.InputValueAsync("label:text-is('Month')"));
+        await Assert.That(date.Year.ToString()).IsEqualTo(await page.InputValueAsync("label:text-is('Year')"));
     }
 
     public static async Task AssertNameInputAsync(this IPage page, string firstName, string middleName, string lastName)
     {
-        Assert.Equal(firstName, await page.InputValueAsync("text=First Name"));
-        Assert.Equal(middleName, await page.InputValueAsync("text=Middle Name"));
-        Assert.Equal(lastName, await page.InputValueAsync("text=Last Name"));
+        using var _ = Assert.Multiple();
+        await Assert.That(firstName).IsEqualTo(await page.InputValueAsync("text=First Name"));
+        await Assert.That(middleName).IsEqualTo(await page.InputValueAsync("text=Middle Name"));
+        await Assert.That(lastName).IsEqualTo(await page.InputValueAsync("text=Last Name"));
     }
 
     public static async Task AssertDateInputEmptyAsync(this IPage page)
     {
-        Assert.Empty(await page.InputValueAsync("label:text-is('Day')"));
-        Assert.Empty(await page.InputValueAsync("label:text-is('Month')"));
-        Assert.Empty(await page.InputValueAsync("label:text-is('Year')"));
+        using var _ = Assert.Multiple();
+        await Assert.That(await page.InputValueAsync("label:text-is('Day')")).IsEmpty();
+        await Assert.That(await page.InputValueAsync("label:text-is('Month')")).IsEmpty();
+        await Assert.That(await page.InputValueAsync("label:text-is('Year')")).IsEmpty();
     }
+
     public static async Task AssertBannerAsync(this IPage page, string title, string text)
     {
         var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
         var bannerText = page.Locator("h3.govuk-notification-banner__heading");
 
-        Assert.Equal(title, await bannerTitle.TextContentAsync());
-        Assert.Equal(text, await bannerText.TextContentAsync());
+        using var _ = Assert.Multiple();
+        await Assert.That(title).IsEqualTo(await bannerTitle.TextContentAsync());
+        await Assert.That(text).IsEqualTo(await bannerText.TextContentAsync());
     }
 
     public static async Task FillDateInputAsync(this IPage page, string id, DateOnly date)
@@ -102,13 +107,13 @@ public static class PageExtensions
     public static async Task AssertContentEqualsAsync(this IPage page, string content, string label)
     {
         var ddText = await page.FindContentForLabelAsync(label);
-        Assert.Equal(content, ddText);
+        await Assert.That(content).IsEqualTo(ddText);
     }
 
     public static async Task AssertContentContainsAsync(this IPage page, string content, string label)
     {
         var ddText = await page.FindContentForLabelAsync(label);
-        Assert.Contains(content, ddText);
+        await Assert.That(ddText).Contains(content);
     }
 
     public static Task<string> FindContentForLabelAsync(this IPage page, string label)
@@ -121,7 +126,7 @@ public static class PageExtensions
     public static async Task AssertNoListElementAsync(this IPage page, string label)
     {
         var element = page.Locator($"dt{TestBase.HasTextSelector(label)}");
-        Assert.False(await element.IsVisibleAsync());
+        await Assert.That(await element.IsVisibleAsync()).IsFalse();
     }
 
     public static Task ClickAcceptChangeButtonAsync(this IPage page) =>

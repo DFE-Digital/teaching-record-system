@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Merge_PersonsMatchOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -50,7 +50,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person2.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Merge_PersonsDifferOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -106,7 +106,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Merge_NavigateBack()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -167,7 +167,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Merge_CYA_ChangePrimaryPerson_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -228,7 +228,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Merge_CYA_ChangeDetails_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -289,7 +289,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Merge_CYA_ChangePrimaryPerson_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -361,7 +361,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
-    [Fact]
+    [Test]
     public async Task Merge_CYA_ChangeDetails_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p

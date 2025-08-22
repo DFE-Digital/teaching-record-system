@@ -13,7 +13,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task EditEachField_Cya_ShowsEditedContent()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -242,7 +242,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
 
-    [Fact]
+    [Test]
     public async Task Details_BackLink_QualificationPage()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -277,7 +277,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditEndDate_ToCya_EditEndDate_Continue()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -340,7 +340,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickButtonAsync("Confirm and update route");
     }
 
-    [Fact]
+    [Test]
     public async Task EditStartDate_ToCya_EditStartDate_Continue()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -405,7 +405,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditEndDate_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -473,7 +473,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickButtonAsync("Confirm and update route");
     }
 
-    [Fact]
+    [Test]
     public async Task EditStartDate_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -541,7 +541,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickButtonAsync("Confirm and update route");
     }
 
-    [Fact]
+    [Test]
     public async Task EditHoldsFrom_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -608,7 +608,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditDegreeType_CanClearField_BackLinkReturnsToDetails()
     {
         // this route-status combo makes the degree type field mandatory
@@ -656,7 +656,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.EnterDegreeTypeAsync("");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
-        page.AssertErrorSummaryAsync();
+        await page.AssertHasErrorSummaryAsync();
         await page.EnterDegreeTypeAsync(setDegreeType);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -664,7 +664,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditCountry_CanClearField_BackLinkReturnsToDetails()
     {
         // this route - status combo makes the country field mandatory
@@ -712,7 +712,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
         await page.EnterCountryAsync("");
         await page.ClickContinueButtonAsync();
-        page.AssertErrorSummaryAsync();
+        await page.AssertHasErrorSummaryAsync();
         await page.EnterCountryAsync(setCountry.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -721,7 +721,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertContentContainsAsync(setCountry.Name, "Country");
     }
 
-    [Fact]
+    [Test]
     public async Task EditAgeRangeSpecialism_IncompleteInformation_ShowsError()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -751,20 +751,20 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertErrorSummaryAsync();
+        await page.AssertHasErrorSummaryAsync();
         await page.SelectAgeRangeAsync(TrainingAgeSpecialismType.Range);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertErrorSummaryAsync();
+        await page.AssertHasErrorSummaryAsync();
         await page.FillAsync($"label:text-is('From')", "6");
         await page.FillAsync($"label:text-is('To')", "1");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertErrorSummaryAsync();
+        await page.AssertHasErrorSummaryAsync();
         await page.FillAsync($"label:text-is('To')", "11");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -772,7 +772,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditTrainingProvider_CanClearField_BackLinkReturnsToDetails()
     {
         // this route - status combo makes the provider field optional
@@ -825,7 +825,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertContentContainsAsync("Not provided", "Training provider");
     }
 
-    [Fact]
+    [Test]
     public async Task EditSubjectSpecialisms_CanClearField_BackLinkReturnsToDetails()
     {
         // this route-status combo makes the subjects field optional
@@ -895,7 +895,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionExemption_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -959,7 +959,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickButtonAsync("Confirm and update route");
     }
 
-    [Fact]
+    [Test]
     public async Task EditStatus_Holds_Continue_Exemption_Continue()
     {
         var holdsFrom = new DateOnly(2021, 1, 1);
@@ -1024,7 +1024,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditStatusRouteWithImplicitExemption_Holds_Continue_Cya_EditStatus_Continue_Cya()
     {
         var holdsFrom = new DateOnly(2021, 1, 1);
@@ -1092,9 +1092,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickButtonAsync("Confirm and update route");
     }
 
-    [Theory]
-    [InlineData("Deferred")]
-    [InlineData("Holds")]
+    [Test]
+    [Arguments("Deferred")]
+    [Arguments("Holds")]
     public async Task EditStatus_StatusAlreadyHolds_Continue_Details(string status)
     {
         var holdsFrom = new DateOnly(2021, 1, 1);
@@ -1129,7 +1129,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditStatus_Holds_Continue_Exemption_Back()
     {
         var holdsFrom = new DateOnly(2021, 1, 1);

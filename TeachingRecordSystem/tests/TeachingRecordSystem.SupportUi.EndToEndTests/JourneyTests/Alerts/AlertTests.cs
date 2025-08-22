@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Alerts;
 
 public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task AddAlert()
     {
         var person = await TestData.CreatePersonAsync();
@@ -86,7 +86,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Alert added");
     }
 
-    [Fact]
+    [Test]
     public async Task EditAlertDetails()
     {
         var startDate = new DateOnly(2023, 1, 1);
@@ -138,7 +138,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Alert changed");
     }
 
-    [Fact]
+    [Test]
     public async Task EditAlertStartDate()
     {
         var startDate = new DateOnly(2023, 1, 1);
@@ -189,7 +189,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Alert changed");
     }
 
-    [Fact]
+    [Test]
     public async Task EditAlertEndDate()
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -241,9 +241,9 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Alert changed");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task EditAlertLink(bool hasCurrentLink)
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -304,7 +304,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Alert changed");
     }
 
-    [Fact]
+    [Test]
     public async Task CloseAlert()
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -355,7 +355,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Alert closed");
     }
 
-    [Fact]
+    [Test]
     public async Task ReopenAlert()
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -400,7 +400,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Alert re-opened");
     }
 
-    [Fact]
+    [Test]
     public async Task DeleteAlert()
     {
         var startDate = TestData.Clock.Today.AddDays(-50);

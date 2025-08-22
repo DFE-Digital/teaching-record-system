@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Qualificatio
 
 public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task AddMq()
     {
         var person = await TestData.CreatePersonAsync();
@@ -67,7 +67,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Mandatory qualification added");
     }
 
-    [Fact]
+    [Test]
     public async Task EditMqProvider()
     {
         var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("959"); // University of Leeds
@@ -122,7 +122,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
-    [Fact]
+    [Test]
     public async Task EditMqSpecialism()
     {
         var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
@@ -178,7 +178,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
-    [Fact]
+    [Test]
     public async Task EditMqStartDate()
     {
         var oldStartDate = new DateOnly(2021, 10, 5);
@@ -232,10 +232,10 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
-    [Theory]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(true, true)]
+    [Test]
+    [Arguments(true, false)]
+    [Arguments(false, true)]
+    [Arguments(true, true)]
     public async Task EditMqStatus(
         bool isStatusChange,
         bool isEndDateChange)
@@ -332,7 +332,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
-    [Fact]
+    [Test]
     public async Task DeleteMq()
     {
         var deletionReason = MqDeletionReasonOption.ProviderRequest;

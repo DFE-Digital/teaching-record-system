@@ -7,9 +7,9 @@ public class ChangeRequestTests : TestBase
     {
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task SelectChangeRequestAndApprove(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePersonAsync();
@@ -51,9 +51,9 @@ public class ChangeRequestTests : TestBase
         await page.AssertFlashMessageAsync("The request has been accepted");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task SelectChangeRequestAndReject(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePersonAsync();
@@ -97,9 +97,9 @@ public class ChangeRequestTests : TestBase
         await page.AssertFlashMessageAsync("The request has been rejected");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task SelectChangeRequestAndCancel(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePersonAsync();

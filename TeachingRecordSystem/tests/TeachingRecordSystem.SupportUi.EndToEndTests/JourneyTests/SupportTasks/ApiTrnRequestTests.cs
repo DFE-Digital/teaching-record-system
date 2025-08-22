@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks
 
 public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task CreateNewRecord()
     {
         // Start with a blank slate of tasks
@@ -31,7 +31,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForUrlPathAsync("/support-tasks/api-trn-requests");
     }
 
-    [Fact]
+    [Test]
     public async Task UpdateExisting()
     {
         // Start with a blank slate of tasks

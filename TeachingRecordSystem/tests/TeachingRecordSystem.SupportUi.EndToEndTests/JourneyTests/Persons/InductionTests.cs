@@ -10,7 +10,7 @@ public class InductionTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStatus_InductionStatusPassed()
     {
         var startDate = new DateOnly(2021, 1, 1);
@@ -53,7 +53,7 @@ public class InductionTests : TestBase
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStatus_InductionStatusExempt()
     {
         var exemptionReasonId = InductionExemptionReason.ExemptId;
@@ -87,7 +87,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStatusExempt_NavigateBack()
     {
         var exemptionReasonId = InductionExemptionReason.ExemptDataLossOrErrorCriteriaId;
@@ -130,7 +130,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStatus_NavigateBack()
     {
         var inductionStatusToSelect = InductionStatus.Failed;
@@ -190,7 +190,7 @@ public class InductionTests : TestBase
         await page.AssertInductionStatusSelectedAsync(inductionStatusToSelect);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStartDate_NavigateBack()
     {
         var startDate = new DateOnly(2021, 1, 1);
@@ -244,7 +244,7 @@ public class InductionTests : TestBase
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionCompletedDate_NavigateBack()
     {
         var startDate = new DateOnly(2021, 1, 1);
@@ -289,7 +289,7 @@ public class InductionTests : TestBase
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditStartDate_CYA_ChangeStartDateThatInvalidatesCompletedDate_ContinueToCompletedDate()
     {
         var startDate = new DateOnly(2021, 1, 1);
@@ -317,7 +317,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStatus_CYA_ChangeAnyFieldOtherThanStatus_ContinueToCYA()
     {
         var startDate = new DateOnly(2021, 1, 1);
@@ -376,7 +376,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStatus_CYA_ChangeStatus_ContinueThroughJourneyToCYA()
     {
         var startDate = new DateOnly(2021, 1, 1);
@@ -433,7 +433,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionStatus_CYA_ChangeSomething_NavigatesBackToCYA()
     {
         var startDate = new DateOnly(2021, 1, 1);
@@ -495,7 +495,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task PersonHasRouteInductionExemption_Edit_NavigateBack()
     {
         var holdsFromDate = new DateOnly(2024, 1, 1);
@@ -528,7 +528,7 @@ public class InductionTests : TestBase
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task EditInductionExemptionReason_NavigateBack()
     {
         var exemptionReasonId = InductionExemptionReason.PassedInductionInIsleOfManId;

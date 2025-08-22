@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProf
 
 public class DeleteRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task DeleteRouteToProfessionalStatus()
     {
         var deletionReason = ChangeReasonOption.CreatedInError;

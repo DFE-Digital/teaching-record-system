@@ -10,7 +10,7 @@ public class CreateTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Create_Success()
     {
         await using var context = await HostFixture.CreateBrowserContext();
@@ -35,7 +35,7 @@ public class CreateTests : TestBase
         await page.AssertFlashMessageAsync(expectedMessage: "Record created successfully for Alfred The Great.");
     }
 
-    [Fact]
+    [Test]
     public async Task Create_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync();
@@ -65,7 +65,7 @@ public class CreateTests : TestBase
         await page.AssertNameInputAsync("Alfred", "The", "Great");
     }
 
-    [Fact]
+    [Test]
     public async Task Create_CYA_ChangeDetailsOrReason_ContinuesToCYA()
     {
         var person = await TestData.CreatePersonAsync();
@@ -101,7 +101,7 @@ public class CreateTests : TestBase
         await page.AssertOnPersonCreateCheckAnswersPageAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task Create_CYA_ChangeDetailsOrReason_NavigatesBackToCYA()
     {
         var person = await TestData.CreatePersonAsync();
