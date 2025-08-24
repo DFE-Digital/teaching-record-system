@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using Azure.Storage.Blobs;
@@ -6,14 +7,16 @@ using Azure.Storage.Blobs.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
-using Parquet.Rows;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240307.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events.Models;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock)
+public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, PersonMatchingService personMatchingService)
 {
     public const string JobSchedule = "0 3 * * *";
     public const string StorageContainer = "dqt-integrations";
@@ -74,17 +77,22 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             try
             {
                 var (errors, warnings) = ValidateRow(row);
-
-                //insert or update person
-                //insert ITR
-                var persons = await GetPersonAsync(row.TRN!);
-                if (persons.Count() == 0)
+                if (errors.Any())
                 {
-                    //inser
+
+                }
+                else
+                {
+                    var persons = await GetPersonAsync(row);
+                    if (persons.Count() == 0)
+                    {
+                        //inser
+                    }
                 }
 
+
                 NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
-                var person = Person.Create(row.TRN!, row.FirstNameOrMiddleName!, row.FirstNameOrMiddleName!, row.LastName!, null, null, ni, null, clock.UtcNow);
+                var person = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, null, null, ni, null, clock.UtcNow);
                 dbContext.Persons.Add(person.Person);
 
                 //write current person exported row to integrationtransactionrecord
@@ -159,6 +167,18 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             }
         }
 
+        if (!string.IsNullOrEmpty(record.DateOfDeath))
+        {
+            if (!DateOnly.TryParseExact(record.DateOfDeath, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
+            {
+                errors.Add("Validation Failed: Invalid Date of death");
+            }
+            else if (dateOfDeath > clock.UtcNow.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+            {
+                errors.Add("Validation Failed: Date of death cannot be in the future");
+            }
+        }
+
         //gender
         if (!record.Gender.HasValue)
         {
@@ -177,10 +197,28 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         return (errors, warnings);
     }
 
-    public async Task<List<Person>> GetPersonAsync(string trn)
+    public async Task<TrnRequestMatchResult> GetPersonAsync(CapitaImportRecord row)
     {
-        var persons = await dbContext.Persons.Where(x => x.Trn == trn).ToListAsync();
-        return persons;
+        
+        var requestData = new DataStore.Postgres.Models.TrnRequestMetadata()
+        {
+            ApplicationUserId = DataStore.Postgres.Models.SystemUser.SystemUserId,
+            RequestId = Guid.NewGuid().ToString(),
+            CreatedOn = clock.UtcNow,
+            IdentityVerified = null,
+            EmailAddress = null,
+            OneLoginUserSubject = null,
+            FirstName = row.GetFirstName(),
+            MiddleName = row.GetMiddletName(),
+            LastName = row.LastName,
+            PreviousFirstName = null,
+            PreviousLastName = row.PreviousLastName,
+            Name = [row.GetFirstName()!, row.GetMiddletName()!, row.LastName!],
+            DateOfBirth = row.GetDateOfBirth()!.Value,
+            NationalInsuranceNumber = row.NINumber
+        };
+       var matches = await personMatchingService.MatchFromTrnRequestAsync(requestData);
+        return matches;
     }
 
     public async Task<Stream> GetDownloadStreamAsync(string fileName)
@@ -237,4 +275,27 @@ public class CapitaImportRecord
     public required string? DateOfBirth { get; set; }
     public required string? NINumber { get; set; }
     public required string? DateOfDeath { get; set; }
+
+    public string? GetFirstName()
+    {
+        var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts?.Length > 0)
+            return parts[0];
+        return null;
+    }
+
+    public string? GetMiddletName()
+    {
+        var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts?.Length > 0)
+            return string.Join(" ", parts, 1, parts.Length-1);
+        return null;
+    }
+
+    public DateOnly? GetDateOfBirth()
+    {
+        if (!DateOnly.TryParseExact(DateOfBirth, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfBirth))
+            return dateOfBirth;
+        return null;
+    }
 }

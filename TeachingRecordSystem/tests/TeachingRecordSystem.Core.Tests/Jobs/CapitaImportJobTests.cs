@@ -25,8 +25,10 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     private CapitaImportJob Job => Fixture.Job;
 
 
-    [Fact]
-    public async Task Import_WithNoMatchesCreatesPerson_ReturnsExpectedRecords()
+    [Theory]
+    [InlineData(Gender.Male)]
+    [InlineData(Gender.Female)]
+    public async Task Import_WithNoMatchesCreatesPerson_ReturnsExpectedRecords(Gender gender)
     {
         // Arrange
         var fileName = "SingleFile.txt";
@@ -37,7 +39,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedTrn = "9988776";
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1981, 08, 20);
-        var expectedGender = Gender.Female;
+        var expectedGender = gender;
         var expectedLastName = Faker.Name.Last();
         var expectedStatus = IntegrationTransactionImportStatus.Success;
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
@@ -163,29 +165,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     }
 
     [Fact]
-    public void Validate_MissingDateOfBirth_ReturnsValidationError()
-    {
-        // Arrange
-        var record = new CapitaImportRecord()
-        {
-            TRN = "1234567",
-            Gender = null,
-            LastName = null,
-            FirstNameOrMiddleName = null,
-            PreviousLastName = null,
-            DateOfBirth = null,
-            NINumber = null,
-            DateOfDeath = null
-        };
-
-        // Act
-        var (errors, warnings) = Job.ValidateRow(record);
-
-        // Assert
-        Assert.Contains("Missing required field: Date of birth", errors);
-    }
-
-    [Fact]
     public void Validate_MissingGender_ReturnsValidationError()
     {
         // Arrange
@@ -234,54 +213,128 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Contains($"Invalid Gender: {record.Gender.Value}", errors);
     }
 
-    //[Fact]
-    //public void Validate_IncorrectDateFormat_ReturnsValidationError()
-    //{
-    //    // Arrange
-    //    var dateOfBirth = "20112801";
-    //    var record = new CapitaImportRecord()
-    //    {
-    //        TRN = "1234567",
-    //        Gender = (int)Gender.Male,
-    //        LastName = null,
-    //        FirstNameOrMiddleName = null,
-    //        PreviousLastName = null,
-    //        DateOfBirth = dateOfBirth,
-    //        NINumber = null,
-    //        DateOfDeath = null
-    //    };
+    [Theory]
+    [InlineData("08011972")] //invalid month
+    [InlineData("19900231")] //invalid day
+    public void Validate_DateOfBirthIncorrectFormat_ReturnsValidationError(string dateOfBirth)
+    {
+        // Arrange
+        var record = new CapitaImportRecord()
+        {
+            TRN = "1234567",
+            Gender = (int)Gender.Male,
+            LastName = null,
+            FirstNameOrMiddleName = null,
+            PreviousLastName = null,
+            DateOfBirth = dateOfBirth,
+            NINumber = null,
+            DateOfDeath = null
+        };
 
-    //    // Act
-    //    var (errors, warnings) = Job.ValidateRow(record);
+        // Act
+        var (errors, warnings) = Job.ValidateRow(record);
 
-    //    // Assert
-    //    Assert.Contains($"Validation Failed: Invalid Date of Birth", errors);
-    //}
+        // Assert
+        Assert.Contains($"Validation Failed: Invalid Date of Birth", errors);
+    }
 
-    //[Fact]
-    //public void Validate_DateOfBirthInFuture_ReturnsValidationError()
-    //{
-    //    // Arrange
-    //    var dateOfBirth = Clock.UtcNow.AddDays(25);
-    //    var record = new CapitaImportRecord()
-    //    {
-    //        TRN = "1234567",
-    //        Gender = (int)Gender.Male,
-    //        LastName = null,
-    //        FirstNameOrMiddleName = null,
-    //        PreviousLastName = null,
-    //        DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyddmm"),
-    //        NINumber = null,
-    //        DateOfDeath = null
-    //    };
+    [Fact]
+    public void Validate_DateOfBirthMissing_ReturnsValidationError()
+    {
+        // Arrange
+        var record = new CapitaImportRecord()
+        {
+            TRN = "1234567",
+            Gender = null,
+            LastName = null,
+            FirstNameOrMiddleName = null,
+            PreviousLastName = null,
+            DateOfBirth = null,
+            NINumber = null,
+            DateOfDeath = null
+        };
 
-    //    // Act
-    //    var (errors, warnings) = Job.ValidateRow(record);
+        // Act
+        var (errors, warnings) = Job.ValidateRow(record);
 
-    //    // Assert
-    //    Assert.Contains($"Validation Failed: Date of Birth cannot be in the future", errors);
-    //}
+        // Assert
+        Assert.Contains("Missing required field: Date of birth", errors);
+    }
 
+    [Fact]
+    public void Validate_DateOfBirthInFuture_ReturnsValidationError()
+    {
+        // Arrange
+        var dateOfBirth = Clock.UtcNow.AddDays(25);
+        var record = new CapitaImportRecord()
+        {
+            TRN = "1234567",
+            Gender = (int)Gender.Male,
+            LastName = null,
+            FirstNameOrMiddleName = null,
+            PreviousLastName = null,
+            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            NINumber = null,
+            DateOfDeath = null
+        };
+
+        // Act
+        var (errors, warnings) = Job.ValidateRow(record);
+
+        // Assert
+        Assert.Contains($"Validation Failed: Date of Birth cannot be in the future", errors);
+    }
+
+    [Fact]
+    public void Validate_DateOfDeathInFuture_ReturnsValidationError()
+    {
+        // Arrange
+        var dateOfBirth = Clock.UtcNow.AddYears(-25);
+        var dateOfDeath = Clock.UtcNow.AddDays(25);
+        var record = new CapitaImportRecord()
+        {
+            TRN = "1234567",
+            Gender = (int)Gender.Male,
+            LastName = null,
+            FirstNameOrMiddleName = null,
+            PreviousLastName = null,
+            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            NINumber = null,
+            DateOfDeath = dateOfDeath.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd")
+        };
+
+        // Act
+        var (errors, warnings) = Job.ValidateRow(record);
+
+        // Assert
+        Assert.Contains($"Validation Failed: Date of death cannot be in the future", errors);
+    }
+
+    [Theory]
+    [InlineData("01022025")] //invalid month
+    [InlineData("19900931")] //invalid day
+    public void Validate_DateOfDeathInvalid_ReturnsValidationError(string dateOfDeath)
+    {
+        // Arrange
+        var dateOfBirth = Clock.UtcNow.AddYears(-25);
+        var record = new CapitaImportRecord()
+        {
+            TRN = "1234567",
+            Gender = (int)Gender.Male,
+            LastName = null,
+            FirstNameOrMiddleName = null,
+            PreviousLastName = null,
+            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            NINumber = null,
+            DateOfDeath = dateOfDeath
+        };
+
+        // Act
+        var (errors, warnings) = Job.ValidateRow(record);
+
+        // Assert
+        Assert.Contains($"Validation Failed: Invalid Date of death", errors);
+    }
 
 
     public async Task InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
