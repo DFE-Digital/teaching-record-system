@@ -6,9 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -41,9 +43,10 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedDob = new DateOnly(1981, 08, 20);
         var expectedGender = gender;
         var expectedLastName = Faker.Name.Last();
+        var expectedFirstName = Faker.Name.First();
         var expectedStatus = IntegrationTransactionImportStatus.Success;
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};;;{expectedDob.ToString("yyyyMMdd")};{expectedNI};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+        var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};{expectedFirstName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -58,10 +61,9 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTrn, person.Trn);
         Assert.Equal(expectedDob, person.DateOfBirth);
         Assert.Equal(expectedGender, person.Gender);
-        Assert.Equal(expectedLastName, person.LastName);
         Assert.Equal(expectedNI, person.NationalInsuranceNumber);
-        //FirstName
-        //MiddleName
+        Assert.Equal(expectedFirstName, person.FirstName);
+        Assert.Equal(expectedLastName, person.LastName);
 
         Assert.NotNull(integrationTransaction);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
@@ -79,7 +81,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.Equal(person.PersonId, item1.PersonId);
                     Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
                     Assert.Null(item1.HasActiveAlert);
-                    //Assert.NotNull(item1.RowData);
+                    Assert.False(item1.Duplicate);
+                    //Assert.NotNull(item1.RowData); 
                 });
     }
 
@@ -391,7 +394,10 @@ public class CapitaImportJobFixture : IAsyncLifetime
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock);
+        var personMatchingService = ActivatorUtilities.CreateInstance<PersonMatchingService>(provider);
+
+
+        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock, personMatchingService!);
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
             OrganizationService,

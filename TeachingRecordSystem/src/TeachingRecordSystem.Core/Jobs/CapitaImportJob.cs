@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using Azure.Storage.Blobs;
@@ -7,11 +6,10 @@ using Azure.Storage.Blobs.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20240307.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Events.Models;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -76,24 +74,53 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         {
             try
             {
+                var personId = default(Guid?);
+                var recordStatus = IntegrationTransactionRecordStatus.Success;
+                var potentialDuplicate = false;
+
                 var (errors, warnings) = ValidateRow(row);
                 if (errors.Any())
                 {
-
+                    recordStatus = IntegrationTransactionRecordStatus.Failure;
                 }
                 else
                 {
                     var persons = await GetPersonAsync(row);
-                    if (persons.Count() == 0)
+                    if (persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || persons.Outcome == TrnRequestMatchResultOutcome.NoMatches)
                     {
-                        //inser
+                        NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
+                        var person = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow);
+                        dbContext.Persons.Add(person.Person);
+                        personId = person.Person.PersonId;
+
+                        //create task
+                        if(persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
+                        {
+                            potentialDuplicate = true;
+                            //var supportTask = SupportTask.Create(
+                            //    SupportTaskType.CapitaImportPotentialDuplicate,
+                            //    new ApiTrnRequestData(),
+                            //    personId: personId.Value,
+                            //    null,
+                            //    null,
+                            //    SystemUser.Instance,
+                            //    null,
+                            //    clock.UtcNow,
+                            //    out var createdEvent);
+                            //dbContext.SupportTasks.Add(supportTask);
+                            //await dbContext.AddEventAndBroadcastAsync(createdEvent);
+                        }
                     }
+                    else
+                    {
+                        var person = dbContext.Persons.First(x => x.Trn == persons.Trn);
+                        personId = person.PersonId;
+                    }
+
                 }
 
 
-                NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
-                var person = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, null, null, ni, null, clock.UtcNow);
-                dbContext.Persons.Add(person.Person);
+
 
                 //write current person exported row to integrationtransactionrecord
                 integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
@@ -101,10 +128,10 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     IntegrationTransactionRecordId = 0,
                     CreatedDate = clock.UtcNow,
                     RowData = "",
-                    Status = IntegrationTransactionRecordStatus.Success,
-                    PersonId = person.Person.PersonId,
+                    Status = recordStatus,
+                    PersonId = personId,
                     FailureMessage = null,
-                    Duplicate = null,
+                    Duplicate = potentialDuplicate,
                     HasActiveAlert = null
                 });
                 totalRowCount++;
@@ -199,7 +226,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
 
     public async Task<TrnRequestMatchResult> GetPersonAsync(CapitaImportRecord row)
     {
-        
+
         var requestData = new DataStore.Postgres.Models.TrnRequestMetadata()
         {
             ApplicationUserId = DataStore.Postgres.Models.SystemUser.SystemUserId,
@@ -217,7 +244,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             DateOfBirth = row.GetDateOfBirth()!.Value,
             NationalInsuranceNumber = row.NINumber
         };
-       var matches = await personMatchingService.MatchFromTrnRequestAsync(requestData);
+        var matches = await personMatchingService.MatchFromTrnRequestAsync(requestData);
         return matches;
     }
 
@@ -288,13 +315,13 @@ public class CapitaImportRecord
     {
         var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts?.Length > 0)
-            return string.Join(" ", parts, 1, parts.Length-1);
+            return string.Join(" ", parts, 1, parts.Length - 1);
         return null;
     }
 
     public DateOnly? GetDateOfBirth()
     {
-        if (!DateOnly.TryParseExact(DateOfBirth, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfBirth))
+        if (DateOnly.TryParseExact(DateOfBirth, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfBirth))
             return dateOfBirth;
         return null;
     }
