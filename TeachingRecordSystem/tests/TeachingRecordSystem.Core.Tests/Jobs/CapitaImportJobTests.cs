@@ -50,6 +50,15 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
+        var expectedRow = $"{expectedTrn};" +
+                          $"{(int)gender};" +
+                          $"{expectedLastName};" +
+                          $"{expectedFirstName};" +
+                          $";" +
+                          $"{expectedDob.ToString("yyyyMMdd")};" +
+                          $"{expectedNI};" +
+                          $";" +
+                          $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
 
         // Act
         var integrationTransactionId = await Job.ImportAsync(reader, fileName);
@@ -82,7 +91,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
                     Assert.Null(item1.HasActiveAlert);
                     Assert.False(item1.Duplicate);
-                    //Assert.NotNull(item1.RowData); 
+                    Assert.NotNull(item1.RowData);
+                    Assert.Equal(expectedRow, item1.RowData);
                 });
     }
 

@@ -88,6 +88,8 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     var persons = await GetPersonAsync(row);
                     if (persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || persons.Outcome == TrnRequestMatchResultOutcome.NoMatches)
                     {
+                        //create person if it's a potential duplicate or person is not known in trs
+
                         NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
                         var person = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow);
                         dbContext.Persons.Add(person.Person);
@@ -113,21 +115,20 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     }
                     else
                     {
+                        //Update person
                         var person = dbContext.Persons.First(x => x.Trn == persons.Trn);
                         personId = person.PersonId;
+
+
                     }
-
                 }
-
-
-
 
                 //write current person exported row to integrationtransactionrecord
                 integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                 {
                     IntegrationTransactionRecordId = 0,
                     CreatedDate = clock.UtcNow,
-                    RowData = "",
+                    RowData = row.ToString(),
                     Status = recordStatus,
                     PersonId = personId,
                     FailureMessage = null,
@@ -324,5 +325,19 @@ public class CapitaImportRecord
         if (DateOnly.TryParseExact(DateOfBirth, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfBirth))
             return dateOfBirth;
         return null;
+    }
+
+    public override string ToString()
+    {
+        var trn = TRN ?? string.Empty;
+        var gender = Gender.HasValue ? Gender.Value.ToString() : string.Empty;
+        var lastName = LastName ?? string.Empty;
+        var firstOrMiddleName = FirstNameOrMiddleName ?? string.Empty;
+        var previousLastName = PreviousLastName ?? string.Empty;
+        var dateOfBirth = DateOfBirth ?? string.Empty;
+        var niNumber = NINumber ?? string.Empty;
+        var dateOfDeath = DateOfDeath ?? string.Empty;
+
+        return $"{trn};{gender};{lastName};{firstOrMiddleName};{previousLastName};{dateOfBirth};{niNumber};{dateOfDeath};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
     }
 }
