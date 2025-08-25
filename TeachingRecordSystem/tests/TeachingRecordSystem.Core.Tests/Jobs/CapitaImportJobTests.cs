@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -6,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
@@ -26,6 +26,224 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
 
     private CapitaImportJob Job => Fixture.Job;
 
+
+    [Fact]
+    public async Task Import_ExistingPersonSetDateOfDeath_DeactivatesPersonAndReturnsExpectedContent()
+    {
+        // Arrange
+        var fileName = "SingleFile.txt";
+        var expectedTotalRowCount = 1;
+        var expectedSuccessCount = 1;
+        var expectedDuplicateRowCount = 0;
+        var expectedFailureRowCount = 0;
+        var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
+        var expectedDob = new DateOnly(1981, 08, 20);
+        var expectedGender = Gender.Male;
+        var expectedLastName = Faker.Name.Last();
+        var expectedFirstName = Faker.Name.First();
+        var expectedStatus = IntegrationTransactionImportStatus.Success;
+        var expectedDateOfDeath = Clock.UtcNow.AddDays(-1);
+        var existingPerson = await TestData.CreatePersonAsync(item =>
+        {
+            item.WithNationalInsuranceNumber(expectedNI);
+            item.WithDateOfBirth(expectedDob);
+            item.WithTrn();
+        });
+        var expectedTrn = existingPerson.Trn;
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};{expectedFirstName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};{expectedDateOfDeath.ToString("yyyyMMdd")};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+        var expectedRow = $"{expectedTrn};" +
+                          $"{(int)expectedGender};" +
+                          $"{expectedLastName};" +
+                          $"{expectedFirstName};" +
+                          $";" +
+                          $"{expectedDob.ToString("yyyyMMdd")};" +
+                          $"{expectedNI};" +
+                          $"{expectedDateOfDeath.ToString("yyyyMMdd")};" +
+                          $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync(reader, fileName);
+
+        // Assert
+        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
+        var person = dbContext.Persons.FirstOrDefault(x => x.Trn == expectedTrn);
+        var events = await dbContext.Events
+            .Where(e => e.EventName == nameof(PersonStatusUpdatedEvent) && e.PersonIds.Contains(existingPerson.PersonId)).ToListAsync();
+        var ev1 = events
+            .Select(e => JsonSerializer.Deserialize<PersonStatusUpdatedEvent>(e.Payload)).Single();
+
+        Assert.Null(person);
+        Assert.NotNull(ev1);
+        Assert.Equal("Date of death received from capita import", ev1.Reason);
+        Assert.Equal(PersonStatus.Active, ev1.OldStatus);
+        Assert.Equal(PersonStatus.Deactivated, ev1.Status);
+
+        Assert.NotNull(integrationTransaction);
+        Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+        Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
+        Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+        Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
+        Assert.Equal(fileName, integrationTransaction.FileName);
+        Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
+        Assert.NotEmpty(integrationTransaction.IntegrationTransactionRecords);
+        Assert.Collection(integrationTransaction.IntegrationTransactionRecords!,
+                item1 =>
+                {
+                    Assert.NotNull(item1.PersonId);
+                    Assert.Equal(existingPerson.PersonId, item1.PersonId);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Null(item1.HasActiveAlert);
+                    Assert.False(item1.Duplicate);
+                    Assert.NotNull(item1.RowData);
+                    Assert.Equal(expectedRow, item1.RowData);
+                    Assert.NotNull(item1.FailureMessage);
+                    Assert.Empty(item1.FailureMessage);
+                });
+    }
+
+    [Fact]
+    public async Task Import_NewPersonSetDateOfDeath_DeactivatesPersonAndReturnsExpectedContent()
+    {
+        // Arrange
+        var fileName = "SingleFile.txt";
+        var expectedTotalRowCount = 1;
+        var expectedSuccessCount = 1;
+        var expectedDuplicateRowCount = 0;
+        var expectedFailureRowCount = 0;
+        var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
+        var expectedDob = new DateOnly(1981, 08, 20);
+        var expectedGender = Gender.Male;
+        var expectedLastName = Faker.Name.Last();
+        var expectedFirstName = Faker.Name.First();
+        var expectedStatus = IntegrationTransactionImportStatus.Success;
+        var expectedDateOfDeath = Clock.UtcNow.AddDays(-1);
+        var expectedTrn = "1234567"; ;
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};{expectedFirstName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};{expectedDateOfDeath.ToString("yyyyMMdd")};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+        var expectedRow = $"{expectedTrn};" +
+                          $"{(int)expectedGender};" +
+                          $"{expectedLastName};" +
+                          $"{expectedFirstName};" +
+                          $";" +
+                          $"{expectedDob.ToString("yyyyMMdd")};" +
+                          $"{expectedNI};" +
+                          $"{expectedDateOfDeath.ToString("yyyyMMdd")};" +
+                          $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync(reader, fileName);
+
+        // Assert
+        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
+        var person = dbContext.Persons.FirstOrDefault(x => x.Trn == expectedTrn);
+        Assert.Null(person);
+        Assert.NotNull(integrationTransaction);
+        Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+        Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
+        Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+        Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
+        Assert.Equal(fileName, integrationTransaction.FileName);
+        Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
+        Assert.NotEmpty(integrationTransaction.IntegrationTransactionRecords);
+        Assert.Collection(integrationTransaction.IntegrationTransactionRecords!,
+                item1 =>
+                {
+                    Assert.NotNull(item1.PersonId);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Null(item1.HasActiveAlert);
+                    Assert.False(item1.Duplicate);
+                    Assert.NotNull(item1.RowData);
+                    Assert.Equal(expectedRow, item1.RowData);
+                    Assert.NotNull(item1.FailureMessage);
+                    Assert.Empty(item1.FailureMessage);
+                });
+    }
+
+
+    //[Fact]
+    //public async Task Import_MatchesOnNinoAndDoB_CreatesDuplicateTaskAndReturnsExpectedRecords()
+    //{
+    //    // Arrange
+    //    var fileName = "SingleFile.txt";
+    //    var expectedTotalRowCount = 1;
+    //    var expectedSuccessCount = 1;
+    //    var expectedDuplicateRowCount = 0;
+    //    var expectedFailureRowCount = 0;
+    //    var expectedTrn = "9988776";
+    //    var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
+    //    var expectedDob = new DateOnly(1981, 08, 20);
+    //    var expectedGender = Gender.Male;
+    //    var expectedLastName = Faker.Name.Last();
+    //    var expectedFirstName = Faker.Name.First();
+    //    var expectedStatus = IntegrationTransactionImportStatus.Success;
+    //    await TestData.CreatePersonAsync(item =>
+    //    {
+    //        item.WithNationalInsuranceNumber(expectedNI);
+    //        item.WithDateOfBirth(expectedDob);
+    //        item.WithTrn();
+    //    });
+    //    await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+    //    var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};{expectedFirstName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+    //    var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+    //    var stream = new MemoryStream(csvBytes);
+    //    var reader = new StreamReader(stream);
+    //    var expectedRow = $"{expectedTrn};" +
+    //                      $"{(int)expectedGender};" +
+    //                      $"{expectedLastName};" +
+    //                      $"{expectedFirstName};" +
+    //                      $";" +
+    //                      $"{expectedDob.ToString("yyyyMMdd")};" +
+    //                      $"{expectedNI};" +
+    //                      $";" +
+    //                      $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+
+    //    // Act
+    //    var integrationTransactionId = await Job.ImportAsync(reader, fileName);
+
+    //    // Assert
+    //    var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
+    //    var person = dbContext.Persons.FirstOrDefault(x => x.Trn == expectedTrn);
+    //    Assert.NotNull(person);
+    //    Assert.Equal(expectedTrn, person.Trn);
+    //    Assert.Equal(expectedDob, person.DateOfBirth);
+    //    Assert.Equal(expectedGender, person.Gender);
+    //    Assert.Equal(expectedNI, person.NationalInsuranceNumber);
+    //    Assert.Equal(expectedFirstName, person.FirstName);
+    //    Assert.Equal(expectedLastName, person.LastName);
+    //    Assert.True(person.CreatedByTps);
+
+    //    Assert.NotNull(integrationTransaction);
+    //    Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+    //    Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
+    //    Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+    //    Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+    //    Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
+    //    Assert.Equal(fileName, integrationTransaction.FileName);
+    //    Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
+    //    Assert.NotEmpty(integrationTransaction.IntegrationTransactionRecords);
+    //    Assert.Collection(integrationTransaction.IntegrationTransactionRecords!,
+    //            item1 =>
+    //            {
+    //                Assert.NotNull(item1.PersonId);
+    //                Assert.Equal(person.PersonId, item1.PersonId);
+    //                Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+    //                Assert.Null(item1.HasActiveAlert);
+    //                Assert.False(item1.Duplicate);
+    //                Assert.NotNull(item1.RowData);
+    //                Assert.Equal(expectedRow, item1.RowData);
+    //                Assert.NotNull(item1.FailureMessage);
+    //                Assert.Empty(item1.FailureMessage);
+    //            });
+    //}
 
     [Theory]
     [InlineData(Gender.Male)]
@@ -73,6 +291,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedNI, person.NationalInsuranceNumber);
         Assert.Equal(expectedFirstName, person.FirstName);
         Assert.Equal(expectedLastName, person.LastName);
+        Assert.True(person.CreatedByTps);
 
         Assert.NotNull(integrationTransaction);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
@@ -93,6 +312,79 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.False(item1.Duplicate);
                     Assert.NotNull(item1.RowData);
                     Assert.Equal(expectedRow, item1.RowData);
+                    Assert.NotNull(item1.FailureMessage);
+                    Assert.Empty(item1.FailureMessage);
+                });
+    }
+
+    [Theory]
+    [InlineData(Gender.Male)]
+    [InlineData(Gender.Female)]
+    public async Task Import_WithInvalidNino_CreatesPersonAndReturnsExpectedWarning(Gender gender)
+    {
+        // Arrange
+        var fileName = "SingleFile.txt";
+        var expectedTotalRowCount = 1;
+        var expectedSuccessCount = 1;
+        var expectedDuplicateRowCount = 0;
+        var expectedFailureRowCount = 0;
+        var expectedTrn = "9988776";
+        var expectedNI = "JL5618AAB";
+        var expectedDob = new DateOnly(1981, 08, 20);
+        var expectedGender = gender;
+        var expectedLastName = Faker.Name.Last();
+        var expectedFirstName = Faker.Name.First();
+        var expectedStatus = IntegrationTransactionImportStatus.Success;
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};{expectedFirstName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+        var expectedRow = $"{expectedTrn};" +
+                          $"{(int)gender};" +
+                          $"{expectedLastName};" +
+                          $"{expectedFirstName};" +
+                          $";" +
+                          $"{expectedDob.ToString("yyyyMMdd")};" +
+                          $"{expectedNI};" +
+                          $";" +
+                          $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync(reader, fileName);
+
+        // Assert
+        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
+        var person = dbContext.Persons.FirstOrDefault(x => x.Trn == expectedTrn);
+        Assert.NotNull(person);
+        Assert.Equal(expectedTrn, person.Trn);
+        Assert.Equal(expectedDob, person.DateOfBirth);
+        Assert.Equal(expectedGender, person.Gender);
+        Assert.Null(person.NationalInsuranceNumber);
+        Assert.Equal(expectedFirstName, person.FirstName);
+        Assert.Equal(expectedLastName, person.LastName);
+        Assert.True(person.CreatedByTps);
+
+        Assert.NotNull(integrationTransaction);
+        Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+        Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
+        Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+        Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
+        Assert.Equal(fileName, integrationTransaction.FileName);
+        Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
+        Assert.NotEmpty(integrationTransaction.IntegrationTransactionRecords);
+        Assert.Collection(integrationTransaction.IntegrationTransactionRecords!,
+                item1 =>
+                {
+                    Assert.NotNull(item1.PersonId);
+                    Assert.Equal(person.PersonId, item1.PersonId);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Null(item1.HasActiveAlert);
+                    Assert.False(item1.Duplicate);
+                    Assert.NotNull(item1.RowData);
+                    Assert.Equal(expectedRow, item1.RowData);
+                    Assert.Contains("Invalid National Insurance number", item1.FailureMessage);
                 });
     }
 
@@ -405,16 +697,16 @@ public class CapitaImportJobFixture : IAsyncLifetime
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
         var personMatchingService = ActivatorUtilities.CreateInstance<PersonMatchingService>(provider);
+        var matchingService = new PersonMatchingService(dbFixture.GetDbContextFactory().CreateDbContext());
 
-
-        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock, personMatchingService!);
+        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock, matchingService!);
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
             OrganizationService,
             referenceDataCache,
             Clock,
             trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            TestDataPersonDataSource.Trs);
     }
 
     public DbFixture DbFixture { get; }

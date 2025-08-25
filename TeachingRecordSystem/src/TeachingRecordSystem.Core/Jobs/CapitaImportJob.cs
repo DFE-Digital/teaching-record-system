@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using AngleSharp.Dom.Events;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using CsvHelper;
@@ -74,11 +75,15 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         {
             try
             {
+                var p1 = dbContext.Persons.Where(x => x.NationalInsuranceNumber == row.NINumber);
+                var (errors, warnings) = ValidateRow(row);
                 var personId = default(Guid?);
                 var recordStatus = IntegrationTransactionRecordStatus.Success;
                 var potentialDuplicate = false;
+                var rowFailureMessage = new StringBuilder();
+                rowFailureMessage.Append(string.Join(Environment.NewLine, errors));
+                rowFailureMessage.Append(string.Join(Environment.NewLine, warnings));
 
-                var (errors, warnings) = ValidateRow(row);
                 if (errors.Any())
                 {
                     recordStatus = IntegrationTransactionRecordStatus.Failure;
@@ -86,39 +91,59 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                 else
                 {
                     var persons = await GetPersonAsync(row);
-                    if (persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || persons.Outcome == TrnRequestMatchResultOutcome.NoMatches)
+                    if (persons.Outcome == TrnRequestMatchResultOutcome.NoMatches)
                     {
-                        //create person if it's a potential duplicate or person is not known in trs
-
+                        //create person if incoming record is not known in trs
                         NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
                         var person = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow);
+                        person.Person.CreatedByTps = true;
+                        if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
+                        {
+                            person.Person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            if (@event is not null)
+                            {
+                                await dbContext.AddEventAndBroadcastAsync(@event);
+                                await dbContext.SaveChangesAsync();
+                            }
+                        }
                         dbContext.Persons.Add(person.Person);
                         personId = person.Person.PersonId;
 
-                        //create task
-                        if(persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
-                        {
-                            potentialDuplicate = true;
-                            //var supportTask = SupportTask.Create(
-                            //    SupportTaskType.CapitaImportPotentialDuplicate,
-                            //    new ApiTrnRequestData(),
-                            //    personId: personId.Value,
-                            //    null,
-                            //    null,
-                            //    SystemUser.Instance,
-                            //    null,
-                            //    clock.UtcNow,
-                            //    out var createdEvent);
-                            //dbContext.SupportTasks.Add(supportTask);
-                            //await dbContext.AddEventAndBroadcastAsync(createdEvent);
-                        }
+                        ////create task
+                        //if(persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || persons.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
+                        //{
+                        //    potentialDuplicate = true;
+                        //    var supportTask = SupportTask.Create(
+                        //        SupportTaskType.CapitaImportPotentialDuplicate,
+                        //        new ApiTrnRequestData(),
+                        //        personId: personId.Value,
+                        //        null,
+                        //        null,
+                        //        null,
+                        //        DataStore.Postgres.Models.SystemUser.SystemUserId,
+                        //        clock.UtcNow,
+                        //        out var createdEvent);
+                        //    dbContext.SupportTasks.Add(supportTask);
+                        //    await dbContext.AddEventAndBroadcastAsync(createdEvent);
+                        //}
                     }
-                    else
+                    else if (persons.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
                     {
                         //Update person
                         var person = dbContext.Persons.First(x => x.Trn == persons.Trn);
                         personId = person.PersonId;
 
+                        // Deactivate person if date of death is provided
+                        if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
+                        {
+                            person.DateOfDeath = dateOfDeath;
+                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            if (@event is not null)
+                            {
+                                await dbContext.AddEventAndBroadcastAsync(@event);
+                                await dbContext.SaveChangesAsync();
+                            }
+                        }
 
                     }
                 }
@@ -131,7 +156,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     RowData = row.ToString(),
                     Status = recordStatus,
                     PersonId = personId,
-                    FailureMessage = null,
+                    FailureMessage = rowFailureMessage.ToString(),
                     Duplicate = potentialDuplicate,
                     HasActiveAlert = null
                 });
@@ -220,6 +245,12 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             {
                 errors.Add($"Invalid Gender: {record.Gender.Value}");
             }
+        }
+
+        //NI Number
+        if (!string.IsNullOrEmpty(record.NINumber) && !NationalInsuranceNumber.TryParse(record.NINumber, out var ni))
+        {
+            warnings.Add("Invalid National Insurance number");
         }
 
         return (errors, warnings);
