@@ -219,7 +219,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 when singleMatch.matched_attr_keys
                     .Select(Enum.Parse<PersonMatchedAttribute>)
                     .ToHashSet()
-                    .IsSupersetOf([PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber, PersonMatchedAttribute.Trn]) =>
+                    .IsSupersetOf([PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber]) =>
                 TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
 #pragma warning restore format
             [] => TrnRequestMatchResult.NoMatches(),
@@ -286,7 +286,6 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                         OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY((:dates_of_birth COLLATE "case_insensitive")))
                         OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = ANY((:ni_numbers COLLATE "case_insensitive")))
                         OR (a.attribute_type = 'EmailAddress' AND a.attribute_value = ANY((:email_addresses COLLATE "case_insensitive")))
-                        OR (a.attribute_type = 'Trn' AND a.attribute_value = ANY((:trn COLLATE "case_insensitive")))
                     GROUP BY a.person_id
                 )
                 SELECT

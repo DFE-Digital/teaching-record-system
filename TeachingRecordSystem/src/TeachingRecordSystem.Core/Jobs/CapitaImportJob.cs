@@ -68,7 +68,6 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         await dbContext.SaveChangesAsync();
         var integrationId = integrationJob.IntegrationTransactionId;
 
-
         foreach (var row in records)
         {
             try
@@ -87,27 +86,28 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                 }
                 else
                 {
-                    var persons = await GetPersonAsync(row);
-                    if (persons.Outcome == TrnRequestMatchResultOutcome.NoMatches || persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
+                    var person = await dbContext.Persons.FirstOrDefaultAsync(x=>x.Trn == row.TRN);
+                    NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
+                    var potentialMatches = await GetPersonAsync(row);
+                    if (person is null)
                     {
                         //create person if incoming record is not known in trs
-                        NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
-                        var person = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow);
-                        person.Person.CreatedByTps = true;
+                        var newPerson = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow);
+                        newPerson.Person.CreatedByTps = true;
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
-                            person.Person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            newPerson.Person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
                             if (@event is not null)
                             {
                                 await dbContext.AddEventAndBroadcastAsync(@event);
                                 await dbContext.SaveChangesAsync();
                             }
                         }
-                        dbContext.Persons.Add(person.Person);
-                        personId = person.Person.PersonId;
+                        dbContext.Persons.Add(newPerson.Person);
+                        personId = newPerson.Person.PersonId;
 
                         //create task
-                        if (persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
+                        if (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
                         {
                             potentialDuplicate = true;
                             var supportTask = SupportTask.Create(
@@ -124,10 +124,8 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                             await dbContext.AddEventAndBroadcastAsync(createdEvent);
                         }
                     }
-                    else if (persons.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
+                    else if(person is not null)
                     {
-                        //Update person
-                        var person = dbContext.Persons.First(x => x.Trn == persons.Trn);
                         personId = person.PersonId;
 
                         // Deactivate person if date of death is provided
@@ -141,10 +139,22 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 await dbContext.SaveChangesAsync();
                             }
                         }
-                    }
-                    else if (persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
-                    {
 
+                        // update ni only if ni is not present && is valid.
+                        if(ni is not null && person.NationalInsuranceNumber is null)
+                        {
+                            person.NationalInsuranceNumber = row.NINumber;
+                        }
+                        else if(ni is not null && person.NationalInsuranceNumber is not null && !person.NationalInsuranceNumber.Equals(row.NINumber))
+                        {
+                            rowFailureMessage.Append($"Attempted to update NationalInsuranceNumber from {person.NationalInsuranceNumber} to {row.NINumber}");
+                        }
+
+                        // Gender is different to incomming record.
+                        if (person.Gender is not null && (int?)person.Gender != row.Gender)
+                        {
+                            rowFailureMessage.Append($"Attempted to update gender from {person.Gender} to {(Gender?)row.Gender}");
+                        }
                     }
                 }
 
