@@ -96,3 +96,8 @@ public record TrnRequestMatchedPerson
 {
     public required Guid PersonId { get; init; }
 }
+
+public class CapitaImportRequest : TrnRequestMetadata
+{
+    public string? Trn { get; set; }
+}

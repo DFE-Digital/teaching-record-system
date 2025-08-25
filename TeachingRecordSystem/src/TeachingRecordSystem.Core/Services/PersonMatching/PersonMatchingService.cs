@@ -207,6 +207,26 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         };
     }
 
+
+    public async Task<TrnRequestMatchResult> MatchFromCapitaTrnRequestAsync(CapitaImportRequest request)
+    {
+        var results = await GetMatchesFromTrnCapitaImportRequestAsync(request);
+
+        return results switch
+        {
+#pragma warning disable format
+            [var singleMatch]
+                when singleMatch.matched_attr_keys
+                    .Select(Enum.Parse<PersonMatchedAttribute>)
+                    .ToHashSet()
+                    .IsSupersetOf([PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber, PersonMatchedAttribute.Trn]) =>
+                TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
+#pragma warning restore format
+            [] => TrnRequestMatchResult.NoMatches(),
+            _ => TrnRequestMatchResult.PotentialMatches(results.Select(r => r.person_id))
+        };
+    }
+
     public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedMatchesFromTrnRequestAsync(TrnRequestMetadata request)
     {
         var results = await GetMatchesFromTrnRequestAsync(request);
@@ -237,6 +257,69 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 r.date_of_birth,
                 r.national_insurance_number))
             .AsReadOnly();
+    }
+
+    private Task<SuggestionsQueryResult[]> GetMatchesFromTrnCapitaImportRequestAsync(CapitaImportRequest request)
+    {
+        // Find all Active records with a TRN that match on:
+        // - at least three of first name, middle name, last name, DOB, email address, NINO *OR*
+        // - NINO *OR*
+        // - email address.
+        // - Trn *OR*
+
+        var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty();
+        var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty();
+        var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
+
+        return dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
+                """
+                WITH matches AS (
+                    SELECT
+                        a.person_id,
+                        array_agg(DISTINCT a.attribute_type) matched_attr_keys,
+                        json_agg(json_build_object('attribute_type', a.attribute_type, 'attribute_value', a.attribute_value)) matched_attrs
+                    FROM person_search_attributes a
+                    WHERE
+                        (a.attribute_type = 'FirstName' AND a.attribute_value = ANY((:first_names COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'MiddleName' AND a.attribute_value = ANY((:middle_names COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'LastName' AND a.attribute_value = ANY((:last_names COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY((:dates_of_birth COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = ANY((:ni_numbers COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'EmailAddress' AND a.attribute_value = ANY((:email_addresses COLLATE "case_insensitive")))
+                        OR (a.attribute_type = 'Trn' AND a.attribute_value = ANY((:trn COLLATE "case_insensitive")))
+                    GROUP BY a.person_id
+                )
+                SELECT
+                    m.matched_attr_keys,
+                    p.person_id,
+                    p.trn,
+                    p.email_address,
+                    p.first_name,
+                    p.middle_name,
+                    p.last_name,
+                    p.date_of_birth,
+                    p.national_insurance_number
+                FROM matches m
+                JOIN persons p ON m.person_id = p.person_id
+                WHERE (
+                    ARRAY['NationalInsuranceNumber', 'EmailAddress','Trn']::varchar[] && m.matched_attr_keys
+                    OR array_length(m.matched_attr_keys, 1) >= 3)
+                AND p.status = 0 AND p.trn IS NOT NULL
+                """,
+                parameters:
+                [
+                    CreateArrayParameter("first_names", firstNames),
+                    CreateArrayParameter("middle_names", request.MiddleName.ToSingleItemCollectionIfNotEmpty()),
+                    CreateArrayParameter("last_names", lastNames),
+                    CreateArrayParameter("dates_of_birth", request.DateOfBirth.ToSingleItemCollectionIfNotEmpty().Select(d => d.ToString("yyyy-MM-dd"))),
+                    CreateArrayParameter("ni_numbers", nationalInsuranceNumber.ToSingleItemCollectionIfNotEmpty()),
+                    CreateArrayParameter("email_addresses", request.EmailAddress.ToSingleItemCollectionIfNotEmpty()),
+                    CreateArrayParameter("trn", request.Trn.ToSingleItemCollectionIfNotEmpty())
+                ]
+            ).ToArrayAsync();
+
+        static NpgsqlParameter CreateArrayParameter(string name, IEnumerable<string> values) =>
+            new(name, NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Varchar) { Value = values.ToArray() };
     }
 
     private Task<SuggestionsQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)

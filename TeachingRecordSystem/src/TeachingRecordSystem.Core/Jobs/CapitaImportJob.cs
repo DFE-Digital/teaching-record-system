@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using AngleSharp.Dom.Events;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using CsvHelper;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -75,7 +73,6 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         {
             try
             {
-                var p1 = dbContext.Persons.Where(x => x.NationalInsuranceNumber == row.NINumber);
                 var (errors, warnings) = ValidateRow(row);
                 var personId = default(Guid?);
                 var recordStatus = IntegrationTransactionRecordStatus.Success;
@@ -91,7 +88,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                 else
                 {
                     var persons = await GetPersonAsync(row);
-                    if (persons.Outcome == TrnRequestMatchResultOutcome.NoMatches)
+                    if (persons.Outcome == TrnRequestMatchResultOutcome.NoMatches || persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
                     {
                         //create person if incoming record is not known in trs
                         NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
@@ -109,23 +106,23 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         dbContext.Persons.Add(person.Person);
                         personId = person.Person.PersonId;
 
-                        ////create task
-                        //if(persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || persons.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
-                        //{
-                        //    potentialDuplicate = true;
-                        //    var supportTask = SupportTask.Create(
-                        //        SupportTaskType.CapitaImportPotentialDuplicate,
-                        //        new ApiTrnRequestData(),
-                        //        personId: personId.Value,
-                        //        null,
-                        //        null,
-                        //        null,
-                        //        DataStore.Postgres.Models.SystemUser.SystemUserId,
-                        //        clock.UtcNow,
-                        //        out var createdEvent);
-                        //    dbContext.SupportTasks.Add(supportTask);
-                        //    await dbContext.AddEventAndBroadcastAsync(createdEvent);
-                        //}
+                        //create task
+                        if (persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
+                        {
+                            potentialDuplicate = true;
+                            var supportTask = SupportTask.Create(
+                                SupportTaskType.CapitaImportPotentialDuplicate,
+                                new Models.SupportTaskData.ApiTrnRequestData(),
+                                personId: personId.Value,
+                                null,
+                                null,
+                                null,
+                                DataStore.Postgres.Models.SystemUser.SystemUserId,
+                                clock.UtcNow,
+                                out var createdEvent);
+                            dbContext.SupportTasks.Add(supportTask);
+                            await dbContext.AddEventAndBroadcastAsync(createdEvent);
+                        }
                     }
                     else if (persons.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
                     {
@@ -144,6 +141,9 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 await dbContext.SaveChangesAsync();
                             }
                         }
+                    }
+                    else if (persons.Outcome == TrnRequestMatchResultOutcome.PotentialMatches)
+                    {
 
                     }
                 }
@@ -259,7 +259,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
     public async Task<TrnRequestMatchResult> GetPersonAsync(CapitaImportRecord row)
     {
 
-        var requestData = new DataStore.Postgres.Models.TrnRequestMetadata()
+        var requestData = new DataStore.Postgres.Models.CapitaImportRequest()
         {
             ApplicationUserId = DataStore.Postgres.Models.SystemUser.SystemUserId,
             RequestId = Guid.NewGuid().ToString(),
@@ -274,9 +274,10 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             PreviousLastName = row.PreviousLastName,
             Name = [row.GetFirstName()!, row.GetMiddletName()!, row.LastName!],
             DateOfBirth = row.GetDateOfBirth()!.Value,
-            NationalInsuranceNumber = row.NINumber
+            NationalInsuranceNumber = row.NINumber,
+            Trn = row.TRN
         };
-        var matches = await personMatchingService.MatchFromTrnRequestAsync(requestData);
+        var matches = await personMatchingService.MatchFromCapitaTrnRequestAsync(requestData);
         return matches;
     }
 
