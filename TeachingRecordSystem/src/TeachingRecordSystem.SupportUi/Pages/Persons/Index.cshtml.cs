@@ -88,7 +88,8 @@ public class IndexModel(
         }
 
         var groupedByStatus = await query
-            .GroupBy(p => p.Status)
+            .Select(p => p.Status)
+            .GroupBy(p => p)
             .Select(g => new { Status = g.Key, Count = g.Count() })
             .ToArrayAsync();
 
