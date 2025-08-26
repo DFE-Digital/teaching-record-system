@@ -8,7 +8,7 @@ public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContex
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         using var readDbContext = await dbContextFactory.CreateDbContextAsync();
-        readDbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
+        readDbContext.Database.SetCommandTimeout(0);
 
         var personIds = readDbContext.Database
             .SqlQuery<Guid>(
@@ -22,10 +22,17 @@ public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContex
         await foreach (var chunk in personIds.ChunkAsync(250).WithCancellation(cancellationToken))
         {
             using var writeDbContext = await dbContextFactory.CreateDbContextAsync();
-            writeDbContext.Database.SetCommandTimeout(TimeSpan.FromSeconds(60));
+            writeDbContext.Database.SetCommandTimeout(0);
 
             await writeDbContext.Database.ExecuteSqlRawAsync(
                 "CALL p_refresh_person_search_attributes(:person_ids)",
+                parameters: new object[]
+                {
+                    new NpgsqlParameter("person_ids", value: chunk)
+                });
+
+            await writeDbContext.Database.ExecuteSqlRawAsync(
+                "CALL p_refresh_previous_names_person_search_attributes(:person_ids)",
                 parameters: new object[]
                 {
                     new NpgsqlParameter("person_ids", value: chunk)
