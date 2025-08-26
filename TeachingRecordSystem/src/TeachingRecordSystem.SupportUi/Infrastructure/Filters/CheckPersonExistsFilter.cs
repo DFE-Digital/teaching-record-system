@@ -1,10 +1,7 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -18,10 +15,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// </para>
 /// <para>Assigns the <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
-public class CheckPersonExistsFilter(
-    TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    TrsDataSyncHelper syncHelper) : IAsyncResourceFilter
+public class CheckPersonExistsFilter(TrsDbContext dbContext) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -42,28 +36,8 @@ public class CheckPersonExistsFilter(
         }
         else
         {
-            // If person isn't in the TRS DB it may be because we haven't synced it yet..
-
-            var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(new GetContactDetailByIdQuery(personId, new ColumnSet()));
-
-            if (dqtContact is not null)
-            {
-                var synced = await syncHelper.SyncPersonAsync(personId, /* syncAudit: */ true, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None);
-                if (!synced)
-                {
-                    throw new Exception($"Could not sync Person with contact ID: '{personId}'.");
-                }
-
-                person = await GetPersonAsync();
-                Debug.Assert(person is not null);
-
-                context.HttpContext.SetCurrentPersonFeature(person);
-            }
-            else
-            {
-                context.Result = new NotFoundResult();
-                return;
-            }
+            context.Result = new NotFoundResult();
+            return;
         }
 
         await next();

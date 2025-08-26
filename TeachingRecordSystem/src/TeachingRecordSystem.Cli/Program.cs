@@ -13,7 +13,6 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateMigrateReportingDbCommand(configuration),
     Commands.CreateGenerateReportingDbTableCommand(configuration),
     Commands.CreateCreateAdminCommand(configuration),
-    Commands.CreateSyncPersonCommand(configuration),
     Commands.CreateGenerateKeyCommand(configuration),
     Commands.CreateDropDqtReportingReplicationSlotCommand(configuration),
     Commands.CreateGenerateWebhookSignatureCertificateCommand(configuration),
