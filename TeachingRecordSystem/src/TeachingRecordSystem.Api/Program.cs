@@ -211,7 +211,7 @@ public class Program
         if (!env.IsUnitTests())
         {
             var crmServiceClient = GetCrmServiceClient();
-            services.AddApiTrnGeneration(configuration);
+            services.AddTrnGeneration(configuration);
             services.AddPooledDefaultServiceClient(crmServiceClient, size: 200);
 
             services.AddHealthChecks()
