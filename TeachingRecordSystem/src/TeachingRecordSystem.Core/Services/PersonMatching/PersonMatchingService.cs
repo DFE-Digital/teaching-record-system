@@ -9,11 +9,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 {
     public async Task<OneLoginUserMatchResult?> MatchOneLoginUserAsync(OneLoginUserMatchRequest request)
     {
-        var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
-        if (fullNames.Length == 0 || !request.DatesOfBirth.Any() || (request.NationalInsuranceNumber is null && request.Trn is null))
-        {
-            return null;
-        }
+        var firstNames = request.Names.Select(parts => parts.First()).ToArray();
+        var lastNames = request.Names.Where(parts => parts.Length > 1).Select(parts => parts.Last()).ToArray();
 
         var trn = NormalizeTrn(request.Trn);
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
@@ -26,7 +23,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                         array_agg(a.attribute_type) matched_attr_keys,
                         json_agg(json_build_object('attribute_type', a.attribute_type, 'attribute_value', a.attribute_value)) matched_attrs
                     FROM person_search_attributes a
-                	WHERE (a.attribute_type = 'FullName' AND a.attribute_value = ANY(:full_names))
+                	WHERE (a.attribute_type = 'FirstName' AND a.attribute_value = ANY(:first_names))
+                	OR (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
                 	OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
                 	OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
                 	OR (a.attribute_type = 'Trn' AND a.attribute_value = :trn)
@@ -35,13 +33,15 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 SELECT p.person_id, p.trn, m.matched_attrs
                 FROM matches m
                 JOIN persons p ON m.person_id = p.person_id
-                WHERE ARRAY['FullName', 'DateOfBirth']::varchar[] <@ m.matched_attr_keys
+                WHERE ARRAY['DateOfBirth', 'FirstName', 'LastName']::varchar[] <@ m.matched_attr_keys
                 AND ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attr_keys
                 AND p.status = 0
                 """,
                 parameters:
+                // ReSharper disable once FormatStringProblem
                 [
-                    new NpgsqlParameter("full_names", fullNames),
+                    new NpgsqlParameter("first_names", firstNames),
+                    new NpgsqlParameter("last_names", lastNames),
                     new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
                     new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
                     {
@@ -146,7 +146,6 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
     public async Task<IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedOneLoginUserMatchesRequest request, Guid personId)
     {
-        var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
         var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
         var firstNames = request.Names.Select(parts => parts.First()).ToArray();
         var trns = new[] { request.Trn, request.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().Select(NormalizeTrn).ToArray();
@@ -158,8 +157,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     a.attribute_type,
                     a.attribute_value
                 FROM person_search_attributes a
-                WHERE ((a.attribute_type = 'FullName' AND a.attribute_value = ANY(:full_names))
-                OR (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
+                WHERE ((a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
                 OR (a.attribute_type = 'FirstName' AND a.attribute_value = ANY(:first_names))
                 OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
                 OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
@@ -167,9 +165,9 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 AND a.person_id = :person_id
                 """,
                 parameters:
+                // ReSharper disable once FormatStringProblem
                 [
                     new NpgsqlParameter("person_id", personId),
-                    new NpgsqlParameter("full_names", fullNames),
                     new NpgsqlParameter("last_names", lastNames),
                     new NpgsqlParameter("first_names", firstNames),
                     new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
@@ -285,6 +283,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 AND p.status = 0 AND p.trn IS NOT NULL
                 """,
                 parameters:
+                // ReSharper disable once FormatStringProblem
                 [
                     CreateArrayParameter("first_names", firstNames),
                     CreateArrayParameter("middle_names", request.MiddleName.ToSingleItemCollectionIfNotEmpty()),

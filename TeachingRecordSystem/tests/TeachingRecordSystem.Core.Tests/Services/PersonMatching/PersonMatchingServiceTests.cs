@@ -62,7 +62,6 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
             // Assert
             Assert.Collection(
                 result,
-                m => AssertAttributeMatch(PersonMatchedAttribute.FullName, $"{firstName} {lastName}", m),
                 m => AssertAttributeMatch(PersonMatchedAttribute.LastName, lastName, m),
                 m => AssertAttributeMatch(PersonMatchedAttribute.DateOfBirth, dateOfBirth.ToString("yyyy-MM-dd"), m),
                 m => AssertAttributeMatch(PersonMatchedAttribute.NationalInsuranceNumber, nationalInsuranceNumber, m),

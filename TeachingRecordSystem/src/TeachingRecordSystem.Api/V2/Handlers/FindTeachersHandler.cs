@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using MediatR;
-using MoreLinq;
 using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Api.V2.Requests;
@@ -37,28 +36,38 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
         {
             Debug.Assert(request.MatchPolicy.GetValueOrDefault() == FindTeachersMatchPolicy.Default);
 
-            var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty();
-            var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty();
-            var names = firstNames.Cartesian(lastNames, (f, l) => $"{f} {l}").ToArray();
+            var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty().SelectMany(PostgresModels.PersonSearchAttribute.SplitName);
+            var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty().SelectMany(PostgresModels.PersonSearchAttribute.SplitName);
 
             return await dbContext.Persons.FromSqlRaw(
                 $"""
                  WITH matches AS (
-                    SELECT person_id FROM person_search_attributes
+                    SELECT
+                        person_id,
+                        array_agg(DISTINCT attribute_type) attribute_types,
+                        array_agg(DISTINCT attribute_type) FILTER (WHERE attribute_type IN ('FirstName', 'LastName')) name_attribute_types,
+                        array_agg(DISTINCT attribute_type) FILTER (WHERE attribute_type NOT IN ('FirstName', 'LastName')) non_name_attribute_types
+                    FROM person_search_attributes
                     WHERE
-                        (attribute_type IN ('FullName', 'PreviousFullName') AND attribute_value = ANY((:names collate "case_insensitive"))) OR
+                        (attribute_type = 'FirstName' AND attribute_value = ANY((:first_names collate "case_insensitive"))) OR
+                        (attribute_type = 'LastName' AND attribute_value = ANY((:last_names collate "case_insensitive"))) OR
                         (attribute_type = 'DateOfBirth' AND attribute_value = (:date_of_birth collate "case_insensitive")) OR
                         (attribute_type = 'EmailAddress' AND attribute_value = (:email_address collate "case_insensitive")) OR
                         (attribute_type = 'Trn' AND attribute_value = (:trn collate "case_insensitive")) OR
                         (attribute_type = 'NationalInsuranceNumber' AND attribute_value = (:national_insurance_number collate "case_insensitive"))
                     GROUP BY person_id
-                    HAVING COUNT(DISTINCT CASE WHEN attribute_type IN ('FullName', 'PreviousFullName') THEN 'Name' ELSE attribute_type END) >= 3
                  )
                  SELECT p.* FROM matches m
                  JOIN persons p ON p.person_id = m.person_id
+                 -- Only return persons that match on at least 3 distinct attributes, counting full name (first + last) as a single attribute
+                 WHERE
+                    CASE WHEN ARRAY['FirstName', 'LastName']::varchar[] <@ m.name_attribute_types THEN 1 ELSE 0 END +
+                    array_length(m.non_name_attribute_types, 1) >= 3
                  """,
+                // ReSharper disable once FormatStringProblem
                 parameters: [
-                    new NpgsqlParameter("names", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = names.ToArray() },
+                    new NpgsqlParameter("first_names", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = firstNames.ToArray() },
+                    new NpgsqlParameter("last_names", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = lastNames.ToArray() },
                     new NpgsqlParameter("date_of_birth", NpgsqlDbType.Varchar) { Value = (object?)request.DateOfBirth?.ToString("yyyy-MM-dd") ?? DBNull.Value },
                     new NpgsqlParameter("email_address", NpgsqlDbType.Varchar) { Value = (object?)request.EmailAddress ?? DBNull.Value },
                     new NpgsqlParameter("trn", NpgsqlDbType.Varchar) { Value = (object?)request.Trn ?? DBNull.Value },
