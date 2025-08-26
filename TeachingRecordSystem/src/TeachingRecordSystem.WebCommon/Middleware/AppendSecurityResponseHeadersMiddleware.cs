@@ -8,7 +8,7 @@ public class AppendSecurityResponseHeadersMiddleware(RequestDelegate next)
     {
         var response = context.Response;
 
-        response.Headers["X-Frame-Options"] = "DENY";
+        response.Headers["X-Frame-Options"] = "SAMEORIGIN";
         response.Headers["X-Xss-Protection"] = "0";
         response.Headers["X-Content-Type-Options"] = "nosniff";
         response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
