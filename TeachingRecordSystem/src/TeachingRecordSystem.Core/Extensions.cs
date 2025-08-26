@@ -69,8 +69,7 @@ public static class Extensions
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(o => o.UseConnectionFactory(
-                    new DbDataSourceConnectionFactory(sp.GetRequiredService<NpgsqlDataSource>())),
+                .UsePostgreSqlStorage(o => o.UseConnectionFactory(new DbDataSourceConnectionFactory(sp.GetRequiredService<NpgsqlDataSource>())),
                     new PostgreSqlStorageOptions()
                     {
                         PrepareSchemaIfNecessary = prepareSchemaIfNecessary,

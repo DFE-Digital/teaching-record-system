@@ -14,6 +14,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
+[TransactionScope]
 public class RejectModel(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
@@ -51,9 +52,6 @@ public class RejectModel(
         var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
         SupportTask!.Status = SupportTaskStatus.Closed;
         SupportTask.UpdatedOn = clock.UtcNow;
-
-        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         if (RejectionReasonChoice!.Value == CaseRejectionReasonOption.ChangeNoLongerRequired)
         {
@@ -167,7 +165,6 @@ public class RejectModel(
         }
 
         await dbContext.SaveChangesAsync();
-        transaction.Complete();
 
         TempData.SetFlashSuccess(
             $"The request has been {requestStatus}",

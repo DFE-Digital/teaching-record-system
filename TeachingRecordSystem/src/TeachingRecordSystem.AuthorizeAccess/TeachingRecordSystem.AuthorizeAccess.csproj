@@ -34,7 +34,11 @@
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <Using Include="TeachingRecordSystem.WebCommon" />
+  </ItemGroup>
+
   <ItemGroup>
     <SassFile Include="wwwroot/Styles/site.scss" Exclude="wwwroot/lib/**/*" />
   </ItemGroup>

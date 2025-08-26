@@ -32,6 +32,8 @@ public class CheckPersonExistsFilter(
             return;
         }
 
+        await context.HttpContext.EnsureDbTransactionAsync();
+
         var person = await GetPersonAsync();
 
         if (person is not null)

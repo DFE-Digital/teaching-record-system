@@ -13,6 +13,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
+[TransactionScope]
 public class AcceptModel(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
@@ -42,9 +43,6 @@ public class AcceptModel(
         var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
         SupportTask!.Status = SupportTaskStatus.Closed;
         SupportTask.UpdatedOn = now;
-
-        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
         var updateResult = Person!.UpdateDetails(
             ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.FirstName : Person.FirstName,
@@ -140,7 +138,6 @@ public class AcceptModel(
         }
 
         await dbContext.SaveChangesAsync();
-        transaction.Complete();
 
         TempData.SetFlashSuccess(
             $"The request has been accepted",

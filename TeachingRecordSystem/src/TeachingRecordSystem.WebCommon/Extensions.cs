@@ -1,4 +1,3 @@
-using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +7,10 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Prometheus;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.WebCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
+using TeachingRecordSystem.WebCommon.Middleware;
 
 namespace TeachingRecordSystem.WebCommon;
 
@@ -28,6 +30,7 @@ public static class Extensions
         builder.Services.AddHealthChecks().AddNpgSql(sp => sp.GetRequiredService<NpgsqlDataSource>());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         builder.Services.AddSingleton<UrlRedactor>();
+        builder.Services.TryDecorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>();
 
         if (builder.Environment.IsProduction())
         {
@@ -85,6 +88,14 @@ public static class Extensions
 
         app.MapMetrics();
         app.UseHttpMetrics();
+
+        return app;
+    }
+
+    public static IApplicationBuilder UseTransactions(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<TransactionScopeMiddleware>();
+        app.UseMiddleware<CommitDbTransactionMiddleware>();
 
         return app;
     }

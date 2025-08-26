@@ -31,7 +31,6 @@ using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
-using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Filters;
 using TeachingRecordSystem.WebCommon.FormFlow;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
@@ -269,6 +268,7 @@ if (builder.Environment.IsProduction())
 app.UseMiddleware<AddAnalyticsDataMiddleware>();
 
 app.UseRouting();
+app.UseTransactions();
 
 app.UseAuthentication();
 app.UseAuthorization();
