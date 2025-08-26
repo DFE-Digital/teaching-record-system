@@ -194,7 +194,8 @@ public partial class PersonMatchingServiceTests
 
     private static readonly PersonMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =
     [
-        PersonMatchedAttribute.FullName,
+        PersonMatchedAttribute.FirstName,
+        PersonMatchedAttribute.LastName,
         PersonMatchedAttribute.DateOfBirth,
         PersonMatchedAttribute.NationalInsuranceNumber,
         PersonMatchedAttribute.Trn
@@ -202,14 +203,16 @@ public partial class PersonMatchingServiceTests
 
     private static readonly PersonMatchedAttribute[] _matchNameDobAndNinoAttributes =
     [
-        PersonMatchedAttribute.FullName,
+        PersonMatchedAttribute.FirstName,
+        PersonMatchedAttribute.LastName,
         PersonMatchedAttribute.DateOfBirth,
         PersonMatchedAttribute.NationalInsuranceNumber
     ];
 
     private static readonly PersonMatchedAttribute[] _matchNameDobAndTrnAttributes =
     [
-        PersonMatchedAttribute.FullName,
+        PersonMatchedAttribute.FirstName,
+        PersonMatchedAttribute.LastName,
         PersonMatchedAttribute.DateOfBirth,
         PersonMatchedAttribute.Trn
     ];

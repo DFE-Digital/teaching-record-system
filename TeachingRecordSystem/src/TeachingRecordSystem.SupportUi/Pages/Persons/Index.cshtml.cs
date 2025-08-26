@@ -76,6 +76,7 @@ public class IndexModel(
                         having count(distinct x.name) = array_length(:names, 1)
                         """,
                         parameters:
+                        // ReSharper disable once FormatStringProblem
                         [
                             new NpgsqlParameter("names", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Varchar)
                             {

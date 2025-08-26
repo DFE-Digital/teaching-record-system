@@ -19,4 +19,6 @@ public class PersonSearchAttribute
     public required string[] Tags { get; init; }
 
     public string? AttributeKey { get; init; }
+
+    public static string[] SplitName(string name) => name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 }
