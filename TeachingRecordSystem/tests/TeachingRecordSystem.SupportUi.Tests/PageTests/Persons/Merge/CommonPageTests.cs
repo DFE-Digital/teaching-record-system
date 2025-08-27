@@ -4,49 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 [Collection(nameof(DisableParallelization))]
-public class CommonPageTests : MergeTestBase
+public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
-    public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
-    public override void Dispose()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
-
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] { "enter-trn", "matches", "merge", "check-answers" },
-        TestHttpMethods.GetAndPost)]
-    public async Task FeatureFlagDisabled_ReturnsNotFound(string page, HttpMethod httpMethod)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-
-        // Arrange
-        var (personA, personB) = await CreatePersonsWithNoDifferences();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergeStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .WithPrimaryPerson(personA)
-                .WithAttributeSourcesSet()
-                .Build());
-
-        // Act
-        var request = new HttpRequestMessage(httpMethod, GetRequestPath(personA, page, journeyInstance));
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
     [Theory]
     [MemberData(nameof(AllCombinationsOf),
         new[] { "matches", "merge", "check-answers" },

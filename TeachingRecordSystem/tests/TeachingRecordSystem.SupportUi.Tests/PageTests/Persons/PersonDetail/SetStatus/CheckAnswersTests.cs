@@ -5,20 +5,9 @@ using static TeachingRecordSystem.TestCommon.TestData;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
 [Collection(nameof(DisableParallelization))]
-public class CheckAnswersTests : SetStatusTestBase
+public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
     private const string _changeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
-
-    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
-    public override void Dispose()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
 
     // TODO: extra BL from ticket:
     //   * The record must be read-only when deactivated, so we need to confirm if this needs anything further than simply removing and edit/change/add/delete link

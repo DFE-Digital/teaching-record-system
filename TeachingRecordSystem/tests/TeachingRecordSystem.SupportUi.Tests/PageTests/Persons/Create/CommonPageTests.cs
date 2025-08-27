@@ -7,43 +7,7 @@ public class CommonPageTests : TestBase
 {
     public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         FileServiceMock.Invocations.Clear();
-    }
-
-    public override void Dispose()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
-
-    [Theory]
-    [InlineData("personal-details")]
-    [InlineData("create-reason")]
-    [InlineData("check-answers")]
-    public async Task Get_FeatureFlagDisabled_ReturnsNotFound(string page)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            new CreateStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .Build());
-
-        // Act
-        var request = new HttpRequestMessage(HttpMethod.Get,
-            $"/persons/create/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
     }
 
     [Theory]

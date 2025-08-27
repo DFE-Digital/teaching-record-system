@@ -4,58 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
 [Collection(nameof(DisableParallelization))]
-public class CommonPageTests : SetStatusTestBase
+public class CommonPageTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
-    public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
-    public override void Dispose()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
-
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] { "change-reason", "check-answers" },
-        new[] { PersonStatus.Deactivated, PersonStatus.Active },
-        TestHttpMethods.GetAndPost)]
-    public async Task FeatureFlagDisabled_ReturnsNotFound(string page, PersonStatus targetStatus, HttpMethod httpMethod)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-
-        // Arrange
-        var person = await CreatePersonToBecomeStatus(targetStatus);
-
-        var stateBuilder = new SetStatusStateBuilder()
-            .WithInitializedState()
-            .WithUploadEvidenceChoice(false);
-
-        if (targetStatus == PersonStatus.Deactivated)
-        {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.ProblemWithTheRecord);
-        }
-        else
-        {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.DeactivatedByMistake);
-        }
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            stateBuilder.Build());
-
-        // Act
-        var request = new HttpRequestMessage(httpMethod, GetRequestPath(person, targetStatus, page, journeyInstance));
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
     [Theory]
     [MemberData(nameof(AllCombinationsOf),
         new[] { "change-reason", "check-answers" },

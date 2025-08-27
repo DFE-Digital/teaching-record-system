@@ -56,8 +56,6 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
 
     public async Task InitializeAsync()
     {
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         _route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && r.InductionExemptionRequired != FieldRequirement.NotApplicable)
             .First();
@@ -76,12 +74,7 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
         _qualificationId = person.ProfessionalStatuses.First().QualificationId;
     }
 
-    public Task DisposeAsync()
-    {
-        FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-
-        return Task.CompletedTask;
-    }
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Theory]
     [MemberData(nameof(GetData))]

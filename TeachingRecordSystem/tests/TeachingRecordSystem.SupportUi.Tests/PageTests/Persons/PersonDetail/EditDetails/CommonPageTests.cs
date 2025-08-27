@@ -7,41 +7,7 @@ public class CommonPageTests : TestBase
 {
     public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
     {
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         FileServiceMock.Invocations.Clear();
-    }
-
-    public override void Dispose()
-    {
-        FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
-
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] {
-            "/edit-details",
-            "/edit-details/other-details-change-reason",
-            "/edit-details/name-change-reason",
-            "/edit-details/check-answers"
-        },
-        TestHttpMethods.GetAndPost
-    )]
-    public async Task FeatureFlagDisabled_ReturnsNotFound(string page, HttpMethod httpMethod)
-    {
-        FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        // Act
-        var request = new HttpRequestMessage(httpMethod, $"/persons/{person.PersonId}{page}");
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
     }
 
     [Theory]

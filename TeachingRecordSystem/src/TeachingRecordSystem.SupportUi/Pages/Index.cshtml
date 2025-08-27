@@ -25,14 +25,14 @@
     </form>
 </div>
 
-@if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated) && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
+@if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
 {
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Create a record</h2>
     <govuk-button-link href="@LinkGenerator.PersonCreate()">Create a record</govuk-button-link>
 }
 
 <div class="trs-tiles govuk-!-margin-top-5">
-    @if (FeatureProvider.IsEnabled(FeatureNames.ApiTrnRequestsInTrs) && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
+    @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
     {
         <div class="trs-tile-section">
             <h2 class="govuk-heading-m">TRN requests</h2>
@@ -53,7 +53,7 @@
         </div>
     }
 
-    @if (FeatureProvider.IsEnabled(FeatureNames.ChangeRequestsInTrs) && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
+    @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)
     {
         <div class="trs-tile-section">
             <h2 class="govuk-heading-m">Change requests</h2>
