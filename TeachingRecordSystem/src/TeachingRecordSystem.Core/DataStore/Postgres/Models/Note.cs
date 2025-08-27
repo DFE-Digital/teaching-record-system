@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text;
 using AngleSharp;
 using AngleSharp.Dom;
