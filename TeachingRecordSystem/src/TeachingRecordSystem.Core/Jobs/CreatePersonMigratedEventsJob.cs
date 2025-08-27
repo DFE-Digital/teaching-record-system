@@ -36,7 +36,6 @@ public class CreatePersonMigratedEventsJob(NpgsqlDataSource dataSource)
                 from persons p
                 left join events e on p.person_id = e.person_id and e.event_name = 'PersonMigratedEvent'
                 where e.person_id is null
-                limit 5000
                 """);
             cmd.CommandTimeout = 0;
             eventsCreated = await cmd.ExecuteNonQueryAsync(cancellationToken);
