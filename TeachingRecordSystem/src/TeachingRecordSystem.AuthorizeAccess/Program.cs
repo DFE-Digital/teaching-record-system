@@ -202,7 +202,7 @@ builder.Services
     .AddFileService()
     .AddPersonMatching()
     .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
-    .AddApiTrnGeneration(builder.Configuration);
+    .AddTrnGeneration(builder.Configuration);
 
 builder.Services.AddOptions<AuthorizeAccessOptions>()
     .Bind(builder.Configuration)

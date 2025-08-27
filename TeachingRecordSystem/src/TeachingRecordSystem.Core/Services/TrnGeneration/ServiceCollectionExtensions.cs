@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Services.TrnGeneration;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddApiTrnGeneration(
+    public static IServiceCollection AddTrnGeneration(
         this IServiceCollection services,
         IConfiguration configuration)
     {

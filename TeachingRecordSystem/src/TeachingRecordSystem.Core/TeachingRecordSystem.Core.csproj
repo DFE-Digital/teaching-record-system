@@ -8,6 +8,7 @@
     <None Remove="DataStore\Postgres\Procedures\fn_delete_person_employments_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_delete_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_delete_tps_employments_person_search_attributes_v1.sql" />
+    <None Remove="DataStore\Postgres\Procedures\fn_generate_trn_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_insert_person_employments_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_insert_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_insert_tps_employments_person_search_attributes_v1.sql" />
@@ -114,6 +115,7 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_delete_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_delete_previous_names_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_delete_tps_employments_person_search_attributes_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_generate_trn_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_person_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_previous_names_person_search_attributes.sql" />

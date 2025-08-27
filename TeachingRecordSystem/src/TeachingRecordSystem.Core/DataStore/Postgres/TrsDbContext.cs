@@ -133,6 +133,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<Email> Emails => Set<Email>();
 
+    public DbSet<TrnRange> TrnRanges => Set<TrnRange>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
