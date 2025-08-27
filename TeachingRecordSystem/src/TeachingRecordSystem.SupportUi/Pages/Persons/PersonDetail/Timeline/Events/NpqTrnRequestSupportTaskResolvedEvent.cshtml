@@ -5,11 +5,18 @@
 @{
     var applicationUser = Model.ItemModel.ApplicationUser;
 
-    var title = applicationUser is ApplicationUserInfo userInfo
-        ? $"Record updated from {userInfo.Name} TRN request"
-        : $"Record updated from TRN request of unknown source";
-
     var updatedEvent = Model.ItemModel.Event;
+
+    var verb = updatedEvent.ChangeReason == NpqTrnRequestResolvedReason.RecordCreated
+        ? "created"
+        : "updated";
+
+    var source = applicationUser is ApplicationUserInfo userInfo
+        ? $"{userInfo.Name} TRN request"
+        : "TRN request of unknown source";
+
+    var title = $"Record {verb} from {source}";
+
     var requestData = updatedEvent.RequestData;
     var attributes = updatedEvent.PersonAttributes;
     var oldAttributes = updatedEvent.OldPersonAttributes;
