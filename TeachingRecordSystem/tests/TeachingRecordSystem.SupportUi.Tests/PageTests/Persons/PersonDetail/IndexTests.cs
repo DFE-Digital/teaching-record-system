@@ -4,19 +4,8 @@ using AngleSharp.Html.Dom;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 [Collection(nameof(DisableParallelization))]
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
-    public override void Dispose()
-    {
-        FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
-
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -83,8 +72,6 @@ public class IndexTests : TestBase
     public async Task Get_AfterContactsMigrated_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var randomEmail = TestData.GenerateUniqueEmail();
         if (!EmailAddress.TryParse(randomEmail, out var email))
         {
@@ -214,7 +201,6 @@ public class IndexTests : TestBase
     public async Task Get_NotesTab_IsRendered()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.DqtNotes);
         var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}");
@@ -403,7 +389,6 @@ public class IndexTests : TestBase
     public async Task Get_UserRolesWithViewOrEditPersonDataPermissions_ChangeDetailsLinkShownAsExpected(string userRole, bool canSeeChangeDetailsLink)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 
@@ -433,8 +418,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonIsDeactivated_ChangeDetailsLinkIsHidden()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithQts());
@@ -457,31 +440,12 @@ public class IndexTests : TestBase
         Assert.Null(changeDetailsLink);
     }
 
-    [Fact]
-    public async Task Get_ContactsNotMigrated_DoesNotShowMergeButton()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("merge-button"));
-    }
-
     // TODO: test user permission
 
     [Fact]
     public async Task Get_PersonIsDeactivated_DoesNotShowMergeButton()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
@@ -506,8 +470,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasOpenAlert_DoesNotShowMergeButton()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithAlert(a => a.WithEndDate(null)));
@@ -526,8 +488,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonDoesNotHaveOpenAlert_ShowsMergeButton()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
@@ -552,8 +512,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonWithInductionStatus_ShowsMergeButtonAsExpected(InductionStatus status, bool expectMergeButtonToBeShown)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithInductionStatus(i => i
@@ -585,8 +543,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonStatus_ShowsMergeButtonAsExpected(PersonStatus currentStatus, bool expectMergeButtonToBeShown)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
@@ -624,8 +580,6 @@ public class IndexTests : TestBase
     public async Task Get_ShowsPersonStatusAsExpected(PersonStatus currentStatus, bool expectPersonToBeMarkedAsDeactivated)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithFirstName("Lily")
             .WithMiddleName("The")
@@ -663,23 +617,6 @@ public class IndexTests : TestBase
         }
     }
 
-    [Fact]
-    public async Task Get_ContactsNotMigrated_DoesNotShowSetStatusButton()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("set-status-button"));
-    }
-
     [Theory]
     [InlineData(UserRoles.Viewer, false)]
     [InlineData(UserRoles.RecordManager, true)]
@@ -691,7 +628,6 @@ public class IndexTests : TestBase
     public async Task Get_UserDoesNotHavePermission_DoesNotShowSetStatusButton(string? role, bool expectButtonToBeVisible)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         SetCurrentUser(TestUsers.GetUser(role));
 
         var person = await TestData.CreatePersonAsync(p => p
@@ -722,8 +658,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonStatus_RendersSetStatusButtonAsExpected(PersonStatus currentStatus, string expectedButtonText, string expectedTargetStatus)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
@@ -754,7 +688,6 @@ public class IndexTests : TestBase
     public async Task Get_PersonWasDeactivatedAsPartOfAMerge_DoesNotShowSetStatusButton()
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         var primaryPerson = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithTrn());

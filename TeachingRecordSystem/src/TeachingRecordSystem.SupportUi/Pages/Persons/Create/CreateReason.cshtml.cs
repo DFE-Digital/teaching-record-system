@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
-[RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
 [Journey(JourneyNames.CreatePerson), RequireJourneyInstance]
 public class CreateReasonModel(
     TrsLinkGenerator linkGenerator,

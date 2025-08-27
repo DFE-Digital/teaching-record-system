@@ -2,13 +2,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
-public abstract class ResolveApiTrnRequestTestBase : TestBase
+public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected ResolveApiTrnRequestTestBase(HostFixture hostFixture) : base(hostFixture)
-    {
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
     protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());

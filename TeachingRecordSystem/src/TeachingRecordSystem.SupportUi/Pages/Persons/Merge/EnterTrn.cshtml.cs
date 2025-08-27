@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
-[RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
 [Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class EnterTrnModel(
     TrsDbContext dbContext,

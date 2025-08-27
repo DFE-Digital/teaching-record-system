@@ -4,13 +4,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public override void Dispose()
-    {
-        FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-
-        base.Dispose();
-    }
-
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -358,7 +351,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_UserRoles_CanViewPageAsExpected(string userRole, bool canViewPage)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 
@@ -383,7 +375,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_UserRolesWithViewOrEditRoutesPermissions_EditLinksShownAsExpected(string userRole, bool canSeeEditLinks)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 
@@ -459,8 +450,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonStatus_EditLinksShownAsExpected(PersonStatus personStatus, bool canSeeEditLinks)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();

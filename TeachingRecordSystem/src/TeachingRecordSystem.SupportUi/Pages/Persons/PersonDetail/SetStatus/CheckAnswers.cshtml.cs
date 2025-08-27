@@ -2,11 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
-[RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
 [Journey(JourneyNames.SetStatus), RequireJourneyInstance]
 [AllowDeactivatedPerson]
 public class CheckAnswersModel(

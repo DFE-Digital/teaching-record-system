@@ -4,19 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Create;
 
 [Collection(nameof(DisableParallelization))]
-public class PersonalDetailsTests : TestBase
+public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public PersonalDetailsTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
-    public override void Dispose()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
-
     [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {

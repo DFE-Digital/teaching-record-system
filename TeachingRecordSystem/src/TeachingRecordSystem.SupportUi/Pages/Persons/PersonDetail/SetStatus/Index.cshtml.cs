@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
-[RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
 [Journey(JourneyNames.SetStatus), ActivatesJourney, RequireJourneyInstance]
 [AllowDeactivatedPerson]
 public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel

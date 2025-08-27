@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
-[RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
 [Journey(JourneyNames.CreatePerson), ActivatesJourney, RequireJourneyInstance]
 public class PersonalDetailsModel(
     TrsDbContext dbContext,

@@ -6,19 +6,8 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
 [Collection(nameof(DisableParallelization))]
-public class CheckAnswersTests : MergeTestBase
+public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
-    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
-    }
-
-    public override void Dispose()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
-        base.Dispose();
-    }
-
     [Fact]
     public async Task Get_RendersNonAttributeValues()
     {

@@ -6,10 +6,7 @@
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-@if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
-{
-    <govuk-button-link href="@LinkGenerator.PersonCreate()">Create a record</govuk-button-link>
-}
+<govuk-button-link href="@LinkGenerator.PersonCreate()">Create a record</govuk-button-link>
 
 <filter-layout>
     <filter-layout-filter>
