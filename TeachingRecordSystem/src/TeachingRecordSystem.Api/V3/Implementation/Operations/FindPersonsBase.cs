@@ -1,7 +1,5 @@
-using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -30,26 +28,13 @@ public abstract class FindPersonsHandlerBase(
 {
     protected TrsDbContext DbContext => dbContext;
 
-    protected static ColumnSet ContactColumnSet { get; } = new(
-        Contact.Fields.dfeta_TRN,
-        Contact.Fields.BirthDate,
-        Contact.Fields.FirstName,
-        Contact.Fields.MiddleName,
-        Contact.Fields.LastName,
-        Contact.Fields.dfeta_StatedFirstName,
-        Contact.Fields.dfeta_StatedMiddleName,
-        Contact.Fields.dfeta_StatedLastName,
-        Contact.Fields.dfeta_InductionStatus,
-        Contact.Fields.dfeta_qtlsdate,
-        Contact.Fields.dfeta_QtlsDateHasBeenSet);
-
     protected async Task<FindPersonsResult> CreateResultAsync(IReadOnlyCollection<Guid> matchedPersonIds)
     {
         var persons = await dbContext.Persons
             .Include(p => p.Alerts!).AsSplitQuery()
             .Include(p => p.Qualifications!).AsSplitQuery()
             .Include(p => p.PreviousNames).AsSplitQuery()
-            .Where(p => matchedPersonIds.Contains(p.PersonId))
+            .Where(p => matchedPersonIds.Contains(p.PersonId) && p.Trn != null)
             .ToDictionaryAsync(p => p.PersonId, p => p);
 
         var items = await matchedPersonIds
