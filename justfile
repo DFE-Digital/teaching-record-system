@@ -129,10 +129,6 @@ create-admin email name:
 make *ARGS:
   @make {{ARGS}}
 
-# Generates CRM model types
-generate-crm-models *ARGS:
-  @dotnet pwsh -nop -file ../scripts/Generate-CrmModels.ps1 {{ARGS}}
-
 # Removes the cached DB schema version file for tests
 remove-tests-schema-cache:
   @dotnet pwsh -nop -file ../scripts/Remove-TestsSchemaCache.ps1
