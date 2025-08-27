@@ -33,7 +33,11 @@ public class Note
         }
 
         var text = ContentHtml;
-        Debug.Assert(text is not null);
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
 
         using var context = BrowsingContext.New(Configuration.Default);
         using var doc = (IHtmlDocument)await context.OpenAsync(req => req.Content(text));
