@@ -48,23 +48,25 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
     }
 
     [Theory]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonFirstName, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonMiddleName, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonLastName, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress, true, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress, false, true)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber, false, true)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber, true, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender, false, true)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender, true, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.AllChanges, false, false)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.AllChanges, false, true)]
-    [InlineData(NpqTrnRequestSupportTaskResolvedEventChanges.AllChanges, true, false)]
-    public async Task Person_WithPersonDetailsUpdatedEvent_RendersExpectedContent(NpqTrnRequestSupportTaskResolvedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
+    [MemberData(nameof(AllCombinationsOf),
+        new[] {
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonFirstName,
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonMiddleName,
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonLastName,
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth,
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress,
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber,
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender,
+            NpqTrnRequestSupportTaskResolvedEventChanges.AllChanges
+        },
+        new[] { false, true },
+        new[] { false, true },
+        new[] { NpqTrnRequestResolvedReason.RecordCreated, NpqTrnRequestResolvedReason.RecordMerged })]
+    public async Task Person_WithNpqTrnRequestSupportTaskResolvedEvent_RendersExpectedContent(
+        NpqTrnRequestSupportTaskResolvedEventChanges changes,
+        bool previousValueIsDefault,
+        bool newValueIsDefault,
+        NpqTrnRequestResolvedReason reason)
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
@@ -95,7 +97,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             newEmail, oldEmail,
             newNino, oldNino,
             newGender, oldGender,
-            changes, NpqTrnRequestResolvedReason.RecordCreated, "Some comments");
+            changes, reason, "Some comments");
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -109,8 +111,17 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         Assert.NotNull(item);
 
         var title = item.QuerySelector(".moj-timeline__title");
+
         Assert.NotNull(title);
-        Assert.Equal("Record updated from Apply for QTS TRN request", title.TrimmedText());
+
+        if (reason == NpqTrnRequestResolvedReason.RecordCreated)
+        {
+            Assert.Equal("Record created from Apply for QTS TRN request", title.TrimmedText());
+        }
+        else
+        {
+            Assert.Equal("Record updated from Apply for QTS TRN request", title.TrimmedText());
+        }
 
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
@@ -182,8 +193,10 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         item.AssertRow("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
     }
 
-    [Fact]
-    public async Task Person_WithUnknownApplicationSource_RendersExpectedContent()
+    [Theory]
+    [InlineData(NpqTrnRequestResolvedReason.RecordCreated)]
+    [InlineData(NpqTrnRequestResolvedReason.RecordMerged)]
+    public async Task Person_WithNpqTrnRequestSupportTaskResolvedEvent_WithUnknownApplicationSource_RendersExpectedContent(NpqTrnRequestResolvedReason reason)
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
@@ -193,7 +206,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             _firstName, _oldFirstName,
             _middleName, _oldMiddleName,
             _lastName, _oldLastName,
-            NpqTrnRequestSupportTaskResolvedEventChanges.PersonNameChange, NpqTrnRequestResolvedReason.RecordCreated, "Some comments");
+            NpqTrnRequestSupportTaskResolvedEventChanges.PersonNameChange, reason, "Some comments");
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -208,7 +221,15 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
 
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
-        Assert.Equal("Record updated from TRN request of unknown source", title.TrimmedText());
+
+        if (reason == NpqTrnRequestResolvedReason.RecordCreated)
+        {
+            Assert.Equal("Record created from TRN request of unknown source", title.TrimmedText());
+        }
+        else
+        {
+            Assert.Equal("Record updated from TRN request of unknown source", title.TrimmedText());
+        }
 
         item.AssertRow("request-data", "Source", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
@@ -216,7 +237,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
     [Theory]
     [InlineData(NpqTrnRequestResolvedReason.RecordCreated)]
     [InlineData(NpqTrnRequestResolvedReason.RecordMerged)]
-    public async Task Person_ChangeReason_RendersExpectedContent(NpqTrnRequestResolvedReason reason)
+    public async Task Person_WithNpqTrnRequestSupportTaskResolvedEvent_ChangeReason_RendersExpectedContent(NpqTrnRequestResolvedReason reason)
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
