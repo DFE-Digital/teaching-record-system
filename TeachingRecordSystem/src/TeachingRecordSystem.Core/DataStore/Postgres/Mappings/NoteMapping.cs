@@ -16,5 +16,6 @@ public class NoteMapping : IEntityTypeConfiguration<Note>
         builder.Property(x => x.CreatedOn).IsRequired();
         builder.HasOne(x => x.CreatedBy).WithMany().HasForeignKey(x => x.CreatedByUserId);
         builder.HasOne<Person>().WithMany().HasForeignKey(q => q.PersonId);
+        builder.HasIndex(x => x.PersonId).IsCreatedConcurrently();
     }
 }
