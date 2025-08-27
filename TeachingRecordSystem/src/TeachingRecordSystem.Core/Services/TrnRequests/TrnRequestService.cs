@@ -38,7 +38,14 @@ public class TrnRequestService(
 
         if (fromSupportTask is not null)
         {
-            var resolvedPersonTrn = await dbContext.Persons.Where(p => p.PersonId == fromSupportTask.ResolvedPersonId).Select(p => p.Trn).SingleAsync();
+            var resolvedPersonTrn = fromSupportTask.ResolvedPersonId is not null ?
+                await dbContext.Persons
+                    .IgnoreQueryFilters()
+                    .Where(p => p.PersonId == fromSupportTask.ResolvedPersonId)
+                    .Select(p => p.Trn)
+                    .SingleAsync() :
+                null;
+
             return new GetTrnRequestResult(fromSupportTask, resolvedPersonTrn);
         }
 
