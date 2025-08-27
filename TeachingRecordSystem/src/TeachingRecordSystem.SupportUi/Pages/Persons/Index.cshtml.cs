@@ -4,18 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
 [RedactParameters("Search")]
-public class IndexModel(
-    TrsDbContext dbContext,
-    TrsDataSyncHelper syncHelper,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
 {
     private const int PageSize = 15;
 
@@ -136,37 +130,19 @@ public class IndexModel(
             query = query.OrderByDescending(p => p.DateOfBirth);
         }
 
-        async Task AssignSearchResultsAsync() =>
-            SearchResults = await query
-                .Select(p => new PersonInfo
-                {
-                    PersonId = p.PersonId,
-                    FirstName = p.FirstName,
-                    MiddleName = p.MiddleName,
-                    LastName = p.LastName,
-                    DateOfBirth = p.DateOfBirth,
-                    Trn = p.Trn,
-                    NationalInsuranceNumber = p.NationalInsuranceNumber,
-                    PersonStatus = p.Status
-                })
-                .GetPageAsync(PageNumber, PageSize, totalPersonCount);
-
-        await AssignSearchResultsAsync();
-
-        // There's a chance that records haven't synced from DQT yet;
-        // if searching by TRN perform an on-demand sync to ensure the record can be gotten to.
-        if (SearchTextIsTrn() && SearchResults!.Count == 0)
-        {
-            var contact = await crmQueryDispatcher.ExecuteQueryAsync(
-                new GetContactByTrnQuery(
-                    Search,
-                    new(syncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames)));
-
-            if (contact is not null && await syncHelper.SyncPersonAsync(contact, syncAudit: false, ignoreInvalid: false))
+        SearchResults = await query
+            .Select(p => new PersonInfo
             {
-                await AssignSearchResultsAsync();
-            }
-        }
+                PersonId = p.PersonId,
+                FirstName = p.FirstName,
+                MiddleName = p.MiddleName,
+                LastName = p.LastName,
+                DateOfBirth = p.DateOfBirth,
+                Trn = p.Trn,
+                NationalInsuranceNumber = p.NationalInsuranceNumber,
+                PersonStatus = p.Status
+            })
+            .GetPageAsync(PageNumber, PageSize, totalPersonCount);
 
         Pagination = PaginationViewModel.Create(
             SearchResults!,

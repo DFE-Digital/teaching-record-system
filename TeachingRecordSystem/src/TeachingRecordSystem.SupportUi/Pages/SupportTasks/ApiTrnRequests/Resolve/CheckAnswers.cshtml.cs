@@ -232,11 +232,6 @@ public class CheckAnswers(
         {
             Debug.Assert(state.PersonId is not null);
 
-            if (Request.Method == HttpMethod.Get.Method)
-            {
-                await this.TrySyncPersonAsync(personId);
-            }
-
             var selectedPerson = await DbContext.Persons
                 .Where(p => p.PersonId == state.PersonId)
                 .Select(p => new
