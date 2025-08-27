@@ -17,12 +17,34 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             return null;
         }
 
-        var birthDate = request.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false);
+        var birthDate = request.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value.ToString("yyyy-MM-dd");
+        var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
-        var matched = await dbContext.Persons
-            .Include(p => p.Alerts).AsSplitQuery()
-            .Where(p => p.DateOfBirth == birthDate &&
-                (p.NationalInsuranceNumber == request.NationalInsuranceNumber || p.Trn == request.Trn))
+        var matched = await dbContext.Database.SqlQuery<PersonIdResult>(
+                $"""
+                SELECT person_id FROM person_search_attributes
+                WHERE (attribute_type = 'DateOfBirth' AND attribute_value = ({birthDate} COLLATE "case_insensitive"))
+                OR (attribute_type = 'Trn' AND attribute_value = ({request.Trn} COLLATE "case_insensitive"))
+                OR (attribute_type = 'NationalInsuranceNumber' AND attribute_value = ({nationalInsuranceNumber} COLLATE "case_insensitive"))
+                GROUP BY person_id
+                HAVING 'DateOfBirth' = ANY(array_agg(attribute_type)) AND
+                ARRAY['Trn', 'NationalInsuranceNumber']::varchar[] && array_agg(attribute_type)
+                """)
+            .Join(dbContext.Persons, id => id.person_id, p => p.PersonId, (id, p) => p)
+            .Select(p => new
+            {
+                p.Trn,
+                p.FirstName,
+                p.MiddleName,
+                p.LastName,
+                p.NationalInsuranceNumber,
+                p.QtsDate,
+                p.DateOfBirth,
+                p.InductionStatus,
+                p.InductionStartDate,
+                p.InductionCompletedDate,
+                HasOpenAlert = p.Alerts.Any(a => a.IsOpen)
+            })
             .ToArrayAsync();
 
         // Prefer matches on TRN
@@ -34,11 +56,6 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             return null;
         }
 
-        return MapContactToResponse(person);
-    }
-
-    internal static GetTeacherResponse MapContactToResponse(PostgresModels.Person person)
-    {
         return new GetTeacherResponse()
         {
             Trn = person.Trn,
@@ -49,7 +66,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             Qualifications = [],
             Name = StringHelper.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName),
             DateOfBirth = person.DateOfBirth.ToDateTime(),
-            ActiveAlert = person.Alerts!.Any(a => a.IsOpen),
+            ActiveAlert = person.HasOpenAlert,
             State = ContactState.Active,
             StateName = "Active"
         };
@@ -86,4 +103,8 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             return null;
         }
     }
+
+#pragma warning disable IDE1006 // Naming Styles
+    private record PersonIdResult(Guid person_id);
+#pragma warning restore IDE1006 // Naming Styles
 }
