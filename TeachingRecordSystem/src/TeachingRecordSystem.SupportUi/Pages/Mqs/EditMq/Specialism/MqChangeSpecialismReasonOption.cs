@@ -4,12 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 public enum MqChangeSpecialismReasonOption
 {
-    [Display(Name = "Incorrect specialism")]
+    [Display(Name = "Specialism was entered incorrectly")]
     IncorrectSpecialism,
-    [Display(Name = "Change of specialism")]
+    [Display(Name = "Specialism has changed")]
     ChangeOfSpecialism,
-    [Display(Name = "Unble to confirm if the data is correct")]
-    UnableToConfirmIfTheDataIsCorrect,
     [Display(Name = "Another reason")]
     AnotherReason
 }

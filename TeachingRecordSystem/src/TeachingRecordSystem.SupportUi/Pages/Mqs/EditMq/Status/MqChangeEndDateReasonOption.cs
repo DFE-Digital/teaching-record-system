@@ -4,12 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 public enum MqChangeEndDateReasonOption
 {
-    [Display(Name = "Incorrect end date")]
+    [Display(Name = "End date was entered incorrectly")]
     IncorrectEndDate,
-    [Display(Name = "Change of end date")]
+    [Display(Name = "End date has changed")]
     ChangeOfEndDate,
-    [Display(Name = "Unble to confirm if the data is correct")]
-    UnableToConfirmIfTheDataIsCorrect,
     [Display(Name = "Another reason")]
     AnotherReason
 }

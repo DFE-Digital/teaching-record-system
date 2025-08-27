@@ -12,7 +12,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+            <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
 
             <govuk-radios asp-for="Status" data-testid="result-options">
                 <govuk-radios-fieldset>

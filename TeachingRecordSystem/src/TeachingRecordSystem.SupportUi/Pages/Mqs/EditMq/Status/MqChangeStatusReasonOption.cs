@@ -4,12 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 public enum MqChangeStatusReasonOption
 {
-    [Display(Name = "Incorrect status")]
+    [Display(Name = "Status was entered incorrectly")]
     IncorrectStatus,
-    [Display(Name = "Change of status")]
+    [Display(Name = "Status has changed")]
     ChangeOfStatus,
-    [Display(Name = "Unble to confirm if the data is correct")]
-    UnableToConfirmIfTheDataIsCorrect,
     [Display(Name = "Another reason")]
     AnotherReason
 }

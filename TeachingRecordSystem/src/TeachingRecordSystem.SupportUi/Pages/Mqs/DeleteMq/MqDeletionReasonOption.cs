@@ -4,12 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 public enum MqDeletionReasonOption
 {
-    [Display(Name = "Added in error")]
+    [Display(Name = "It was added in error")]
     AddedInError,
-    [Display(Name = "Provider request")]
+    [Display(Name = "It was requested by a provider")]
     ProviderRequest,
-    [Display(Name = "Unable to confirm if the data is correct")]
-    UnableToConfirmIfTheDataIsCorrect,
     [Display(Name = "Another reason")]
     AnotherReason
 }

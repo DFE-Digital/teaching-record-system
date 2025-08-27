@@ -4,12 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 public enum MqChangeProviderReasonOption
 {
-    [Display(Name = "Incorrect training provider")]
+    [Display(Name = "Training provider was entered incorrectly")]
     IncorrectTrainingProvider,
-    [Display(Name = "Change of training provider")]
+    [Display(Name = "Training provider has changed")]
     ChangeOfTrainingProvider,
-    [Display(Name = "Unble to confirm if the data is correct")]
-    UnableToConfirmIfTheDataIsCorrect,
     [Display(Name = "Another reason")]
     AnotherReason
 }

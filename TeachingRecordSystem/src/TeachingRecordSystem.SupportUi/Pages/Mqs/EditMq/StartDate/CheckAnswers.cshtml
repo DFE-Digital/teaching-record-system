@@ -1,7 +1,7 @@
 @page "/mqs/{qualificationId}/start-date/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details and confirm change";
+    ViewBag.Title = "Check details before changing start date";
 }
 
 @section BeforeContent {
@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+        <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
         <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
         <form action="@LinkGenerator.MqEditStartDateCheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
@@ -24,11 +24,11 @@
                     <govuk-summary-list-row-value data-testid="new-start-date">@Model.NewStartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="change-reason">@Model.ChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More detail about the reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="change-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")" /></govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>

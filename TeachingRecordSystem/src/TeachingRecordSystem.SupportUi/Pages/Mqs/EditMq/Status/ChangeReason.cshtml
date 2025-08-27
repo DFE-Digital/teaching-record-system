@@ -13,7 +13,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqEditStatusChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+            <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
 
             @if (Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)
             {
@@ -25,9 +25,6 @@
                         </govuk-radios-item>
                         <govuk-radios-item value="@MqChangeEndDateReasonOption.ChangeOfEndDate">
                             @MqChangeEndDateReasonOption.ChangeOfEndDate.GetDisplayName()
-                        </govuk-radios-item>
-                        <govuk-radios-item value="@MqChangeEndDateReasonOption.UnableToConfirmIfTheDataIsCorrect">
-                            @MqChangeEndDateReasonOption.UnableToConfirmIfTheDataIsCorrect.GetDisplayName()
                         </govuk-radios-item>
                         <govuk-radios-item value="@MqChangeEndDateReasonOption.AnotherReason">
                             @MqChangeEndDateReasonOption.AnotherReason.GetDisplayName()
@@ -46,9 +43,6 @@
                         <govuk-radios-item value="@MqChangeStatusReasonOption.ChangeOfStatus">
                             @MqChangeStatusReasonOption.ChangeOfStatus.GetDisplayName()
                         </govuk-radios-item>
-                        <govuk-radios-item value="@MqChangeStatusReasonOption.UnableToConfirmIfTheDataIsCorrect">
-                            @MqChangeStatusReasonOption.UnableToConfirmIfTheDataIsCorrect.GetDisplayName()
-                        </govuk-radios-item>
                         <govuk-radios-item value="@MqChangeStatusReasonOption.AnotherReason">
                             @MqChangeStatusReasonOption.AnotherReason.GetDisplayName()
                         </govuk-radios-item>
@@ -62,7 +56,7 @@
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional data-testid="additional-detail">
-                            <govuk-character-count asp-for="ChangeReasonDetail" label-class="govuk-label--m" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count asp-for="ChangeReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

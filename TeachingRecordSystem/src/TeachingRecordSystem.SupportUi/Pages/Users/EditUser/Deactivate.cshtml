@@ -1,4 +1,4 @@
-﻿@page "/users/{userId}/deactivate/{handler?}"
+@page "/users/{userId}/deactivate/{handler?}"
 @using TeachingRecordSystem.Core
 @model TeachingRecordSystem.SupportUi.Pages.Users.EditUser.DeactivateModel
 @{
@@ -26,7 +26,6 @@
                         <govuk-radios-item-conditional>
                             <govuk-character-count asp-for="AdditionalReasonDetail"
                                                    textarea-class="govuk-!-width-one-half"
-                                                   label-class="govuk-label--s"
                                                    max-length="FileUploadDefaults.DetailMaxCharacterCount"
                                                    rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
@@ -45,7 +44,6 @@
                         <govuk-radios-item-conditional>
                             <govuk-character-count asp-for="MoreInformationDetail"
                                                    textarea-class="govuk-!-width-one-half"
-                                                   label-class="govuk-label--s"
                                                    max-length="FileUploadDefaults.DetailMaxCharacterCount"
                                                    rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
