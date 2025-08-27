@@ -7,9 +7,7 @@ using FakeXrmEasy.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure.Json;
-using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -145,32 +143,6 @@ public abstract class TestBase : IAsyncLifetime
             await action(dbContext);
             return 0;
         });
-
-    public async Task<int> ProcessOutboxMessages<TQuery, TResult>(Func<TQuery, object?> extractMessage)
-        where TQuery : ICrmQuery<TResult>
-    {
-        var queries = CrmQueryDispatcherSpy.GetAllQueries<TQuery, TResult>();
-        var outboxMessageHandler = HostFixture.Services.GetRequiredService<OutboxMessageHandler>();
-        var messageSerializer = HostFixture.Services.GetRequiredService<MessageSerializer>();
-
-        int processed = 0;
-
-        foreach (var (query, _) in queries)
-        {
-            var message = extractMessage(query);
-
-            if (message is null)
-            {
-                continue;
-            }
-
-            var messageEntity = messageSerializer.CreateCrmOutboxMessage(message);
-            await outboxMessageHandler.HandleOutboxMessageAsync(messageEntity);
-            processed++;
-        }
-
-        return processed;
-    }
 
     public virtual Task InitializeAsync() => Task.CompletedTask;
 

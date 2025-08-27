@@ -10,7 +10,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class SyncDqtContactAuditsMopUpJob(
-    [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+    [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper,
     ILogger<SyncDqtContactAuditsMopUpJob> logger)
 {

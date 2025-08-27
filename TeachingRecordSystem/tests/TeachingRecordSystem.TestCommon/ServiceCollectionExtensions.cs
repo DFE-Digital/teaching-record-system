@@ -54,7 +54,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
         var organizationService = fakedXrmContext.GetAsyncOrganizationService2();
         services.AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService);
-        services.AddNamedServiceClient(TrsDataSyncService.CrmClientName, ServiceLifetime.Singleton, _ => organizationService);
+        services.AddNamedServiceClient(TrsDataSyncHelper.CrmClientName, ServiceLifetime.Singleton, _ => organizationService);
 
         fakedXrmContext.CallerProperties.CallerId = CreateTestUser();
 
