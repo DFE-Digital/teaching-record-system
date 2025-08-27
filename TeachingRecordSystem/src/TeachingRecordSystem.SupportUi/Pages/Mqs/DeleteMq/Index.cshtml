@@ -34,7 +34,7 @@
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional data-testid="additional-detail">
-                            <govuk-character-count asp-for="DeletionReasonDetail" label-class="govuk-label--m" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count asp-for="DeletionReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">
