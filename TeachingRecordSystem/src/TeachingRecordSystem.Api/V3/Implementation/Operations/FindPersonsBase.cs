@@ -35,12 +35,13 @@ public abstract class FindPersonsHandlerBase(
             .Include(p => p.Qualifications!).AsSplitQuery()
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Where(p => matchedPersonIds.Contains(p.PersonId))
+            .Where(p => p.Trn != null)
             .ToDictionaryAsync(p => p.PersonId, p => p);
 
         var items = await matchedPersonIds
             .ToAsyncEnumerable()
+            .Where(id => persons.ContainsKey(id))
             .Select(id => persons[id])
-            .Where(p => p.Trn != null)
             .SelectAwait(async person => new FindPersonsResultItem()
             {
                 Trn = person.Trn!,
