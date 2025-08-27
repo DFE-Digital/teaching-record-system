@@ -14,7 +14,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    [Migration("20250827090305_TrnRanges")]
+    [Migration("20250827122152_TrnRanges")]
     partial class TrnRanges
     {
         /// <inheritdoc />
@@ -3453,15 +3453,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteImplicitExemption = true,
                             RouteOnlyExemption = true
                         });
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntReturn", b =>
-                {
-                    b.Property<int?>("Value")
-                        .HasColumnType("integer")
-                        .HasColumnName("value");
-
-                    b.ToTable((string)null);
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransaction", b =>

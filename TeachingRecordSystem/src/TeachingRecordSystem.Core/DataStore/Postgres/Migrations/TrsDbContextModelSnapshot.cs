@@ -3452,15 +3452,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntReturn", b =>
-                {
-                    b.Property<int?>("Value")
-                        .HasColumnType("integer")
-                        .HasColumnName("value");
-
-                    b.ToTable((string)null);
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransaction", b =>
                 {
                     b.Property<long>("IntegrationTransactionId")

@@ -13,8 +13,8 @@ public class DbTrnGenerator(TrsDbContext dbContext) : ITrnGenerator
         }
 
         var nextTrn = await dbContext
-            .Set<IntReturn>()
-            .FromSqlRaw("SELECT \"fn_generate_trn\" as Value FROM fn_generate_trn()")
+            .Database
+            .SqlQueryRaw<IntReturn>("SELECT \"fn_generate_trn\" as Value FROM fn_generate_trn()")
             .FirstOrDefaultAsync();
 
         if (nextTrn?.Value is null)
