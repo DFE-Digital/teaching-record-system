@@ -27,7 +27,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you changing this mandatory qualification?")]
+    [Display(Name = "Why are you deleting this mandatory qualification?")]
     [Required(ErrorMessage = "Select a reason")]
     public MqDeletionReasonOption? DeletionReason { get; set; }
 
