@@ -4,11 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 public enum MqChangeStartDateReasonOption
 {
-    [Display(Name = "Incorrect start date")]
+    [Display(Name = "Start date was entered incorrectly")]
     IncorrectStartDate,
-    [Display(Name = "Change of start date")]
+    [Display(Name = "Start date has changed")]
     ChangeOfStartDate,
-    [Display(Name = "Unble to confirm if the data is correct")]
     UnableToConfirmIfTheDataIsCorrect,
     [Display(Name = "Another reason")]
     AnotherReason
