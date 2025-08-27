@@ -1,7 +1,9 @@
 @page "/mqs/{qualificationId}/status/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details and confirm change";
+    ViewBag.Title = Model.IsEndDateChange && !Model.IsStatusChange
+        ? "Check details before changing end date"
+        : "Check details before changing status";
 }
 
 @section BeforeContent {
@@ -37,22 +39,19 @@
                         <govuk-summary-list-row-value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
-                @if (Model.IsEndDateChange && !Model.IsStatusChange)
-                {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="change-reason">@Model.EndDateChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                }
-                else
-                {
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="change-reason">@Model.StatusChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                }
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More detail about the reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                    @if (Model.IsEndDateChange && !Model.IsStatusChange)
+                    {
+                        <govuk-summary-list-row-value data-testid="change-reason">@Model.EndDateChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
+                    }
+                    else
+                    {
+                        <govuk-summary-list-row-value data-testid="change-reason">@Model.StatusChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
+                    }
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="change-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")" /></govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>

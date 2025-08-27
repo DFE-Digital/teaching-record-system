@@ -1,7 +1,7 @@
 @page "/mqs/{qualificationId}/delete/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.CheckAnswersModel
 @{
-    ViewBag.Title = "Delete qualification";
+    ViewBag.Title = "Confirm you want to delete this mandatory qualification";
 }
 
 @section BeforeContent {
@@ -11,16 +11,16 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqDeleteCheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
-            <h1 class="govuk-heading-l" data-testid="title">Confirm deletion of mandatory qualification</h1>
+            <span class="govuk-caption-l">Delete mandatory qualification - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="deletion-summary">
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for deleting</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="deletion-reason">@Model.DeletionReason!.GetDisplayName()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More detail about the reason for deleting</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="deletion-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.DeletionReasonDetail) ? Model.DeletionReasonDetail : "None")"/></govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>

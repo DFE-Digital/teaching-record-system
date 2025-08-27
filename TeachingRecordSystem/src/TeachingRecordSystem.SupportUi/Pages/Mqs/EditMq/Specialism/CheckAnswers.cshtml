@@ -1,7 +1,7 @@
 @page "/mqs/{qualificationId}/specialism/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details and confirm change";
+    ViewBag.Title = "Check details before changing specialism";
 }
 
 @section BeforeContent {
@@ -24,11 +24,11 @@
                     <govuk-summary-list-row-value data-testid="new-specialism">@Model.NewSpecialism!.Value.GetTitle()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="change-reason">@Model.ChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>More detail about the reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="change-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")" /></govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
