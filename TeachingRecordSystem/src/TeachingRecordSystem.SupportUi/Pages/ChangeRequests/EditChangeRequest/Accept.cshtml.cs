@@ -45,9 +45,9 @@ public class AcceptModel(
         SupportTask.UpdatedOn = now;
 
         var updateResult = Person!.UpdateDetails(
-            ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.FirstName : Person.FirstName,
-            ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.MiddleName : Person.MiddleName,
-            ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.LastName : Person.LastName,
+            (ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.FirstName : Person.FirstName) ?? string.Empty,
+            (ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.MiddleName : Person.MiddleName) ?? string.Empty,
+            (ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.LastName : Person.LastName) ?? string.Empty,
             ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? changeDateOfBirthRequestData!.DateOfBirth : Person.DateOfBirth,
             Person.EmailAddress is string personEmailAddress ? EmailAddress.Parse(personEmailAddress) : null,
             Person.NationalInsuranceNumber is string nationalInsuranceNumber ? NationalInsuranceNumber.Parse(nationalInsuranceNumber) : null,
