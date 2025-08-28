@@ -8,12 +8,10 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Merge_PersonsMatchOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithFirstName(person1.FirstName)
             .WithMiddleName(person1.MiddleName)
             .WithLastName(person1.LastName)
@@ -54,12 +52,10 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Merge_PersonsDifferOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
@@ -110,12 +106,10 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Merge_NavigateBack()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
@@ -171,12 +165,10 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Merge_CYA_ChangePrimaryPerson_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
@@ -232,12 +224,10 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Merge_CYA_ChangeDetails_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
@@ -293,12 +283,10 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Merge_CYA_ChangePrimaryPerson_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
@@ -365,12 +353,10 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Merge_CYA_ChangeDetails_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 

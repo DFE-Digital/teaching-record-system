@@ -17,7 +17,7 @@ public class SetQtlsDateRequestTests : TestBase
         // Arrange
         SetCurrentApiClient(roles);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var requestBody = CreateJsonContent(new { qtsDate = new DateOnly(1990, 01, 01) });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -36,7 +36,7 @@ public class SetQtlsDateRequestTests : TestBase
     public async Task Put_QtlsDateInFuture_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var futureDate = Clock.Today.AddDays(1);
 
@@ -77,7 +77,7 @@ public class SetQtlsDateRequestTests : TestBase
     public async Task Put_ValidQtsDateWithNoExistingQtsDate_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var qtlsDate = new DateOnly(2020, 01, 01);
 
@@ -104,9 +104,7 @@ public class SetQtlsDateRequestTests : TestBase
     public async Task Put_NullQtlsDateWithExistingQtlsDate_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQtls(new DateOnly(2020, 01, 01)));
+        var person = await TestData.CreatePersonAsync(p => p.WithQtls(new DateOnly(2020, 01, 01)));
 
         DateOnly? qtlsDate = null;
 

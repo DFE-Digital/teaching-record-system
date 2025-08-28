@@ -13,9 +13,7 @@ public class SetWelshInductionStatusTests : TestBase
         // Arrange
         SetCurrentApiClient(roles: []);
 
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
         var completedDate = startDate.AddMonths(12);
@@ -67,8 +65,7 @@ public class SetWelshInductionStatusTests : TestBase
     public async Task Put_PersonDoesNotHaveQts_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var startDate = new DateOnly(2022, 1, 1);
         var completedDate = startDate.AddMonths(12);
@@ -95,7 +92,6 @@ public class SetWelshInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(InductionStatus.RequiredToComplete));
 
@@ -130,7 +126,6 @@ public class SetWelshInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(InductionStatus.RequiredToComplete));
 
@@ -165,7 +160,6 @@ public class SetWelshInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(InductionStatus.Passed));
 
@@ -200,7 +194,6 @@ public class SetWelshInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(InductionStatus.Passed));
 

@@ -26,7 +26,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var applicationUserId = CurrentUserProvider.GetCurrentApplicationUser().UserId;
 
             await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithFirstName(command.FirstName)
                 .WithMiddleName(command.MiddleName)
                 .WithLastName(command.LastName)
@@ -112,7 +111,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var nino = TestData.GenerateNationalInsuranceNumber();
 
             var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithFirstName(matchedFields.Contains(MatchedField.FirstName) ? firstName : TestData.GenerateChangedFirstName(firstName))
                 .WithMiddleName(matchedFields.Contains(MatchedField.MiddleName) ? middleName : TestData.GenerateChangedMiddleName(middleName))
                 .WithLastName(matchedFields.Contains(MatchedField.LastName) ? lastName : TestData.GenerateChangedLastName(lastName))
@@ -174,7 +172,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithDateOfBirth(dateOfBirth)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber));
 
@@ -213,7 +210,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
                 .WithNationalInsuranceNumber(nationalInsuranceNumber));
 
@@ -251,9 +247,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             // Arrange
             var emailAddress = TestData.GenerateUniqueEmail();
 
-            var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
-                .WithEmail(emailAddress));
+            var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmail(emailAddress));
 
             var command = CreateCommand() with
             {
@@ -290,12 +284,10 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             var matchedPerson1 = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithDateOfBirth(dateOfBirth)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber));
 
             var matchedPerson2 = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithDateOfBirth(dateOfBirth)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber));
 
@@ -335,7 +327,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithDateOfBirth(dateOfBirth));
             Debug.Assert(matchedPerson.NationalInsuranceNumber is null);
 
@@ -388,7 +379,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithDateOfBirth(dateOfBirth)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber));
             Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
@@ -440,7 +430,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithDateOfBirth(dateOfBirth)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithAlert());

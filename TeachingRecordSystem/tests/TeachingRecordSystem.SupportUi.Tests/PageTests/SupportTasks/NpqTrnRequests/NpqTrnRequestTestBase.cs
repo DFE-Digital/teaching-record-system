@@ -6,7 +6,7 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
 {
     protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUserId,
@@ -24,7 +24,6 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
         PersonMatchedAttribute differentAttribute)
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithNationalInsuranceNumber()
             .WithEmail(TestData.GenerateUniqueEmail()));
 

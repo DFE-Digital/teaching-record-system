@@ -112,7 +112,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithAlert());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert());
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithMatchedPersons(matchedPerson.PersonId));
@@ -249,7 +249,6 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(null)
             .WithNationalInsuranceNumber(false)
             .WithMiddleName(""));
@@ -318,7 +317,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,

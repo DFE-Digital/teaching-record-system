@@ -24,7 +24,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         WithHandler<SetQtlsHandler>(async handler =>
         {
             // Arrange
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
 
             var command = new SetQtlsCommand(person.Trn!, QtsDate: null);
 
@@ -42,7 +42,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         {
             // Arrange
             var existingQtlsDate = new DateOnly(2025, 4, 1);
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQtls(existingQtlsDate));
+            var person = await TestData.CreatePersonAsync(p => p.WithQtls(existingQtlsDate));
 
             var command = new SetQtlsCommand(person.Trn!, QtsDate: null);
 
@@ -74,7 +74,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         WithHandler<SetQtlsHandler>(async handler =>
         {
             // Arrange
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
 
             var qtlsDate = new DateOnly(2025, 4, 1);
             var command = new SetQtlsCommand(person.Trn!, qtlsDate);
@@ -111,7 +111,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         {
             // Arrange
             var qtlsDate = new DateOnly(2025, 4, 1);
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQtls(qtlsDate));
+            var person = await TestData.CreatePersonAsync(p => p.WithQtls(qtlsDate));
 
             var command = new SetQtlsCommand(person.Trn!, qtlsDate);
 
@@ -132,7 +132,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         {
             // Arrange
             var existingQtsDate = new DateOnly(2025, 4, 1);
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQtls(existingQtsDate));
+            var person = await TestData.CreatePersonAsync(p => p.WithQtls(existingQtsDate));
 
             var newQtlsDate = new DateOnly(2025, 4, 10);
             var command = new SetQtlsCommand(person.Trn!, newQtlsDate);

@@ -19,7 +19,7 @@ public class CreateDateOfBirthChangeTests_Dqt(HostFixture hostFixture) : TestBas
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
 
         var newDateOfBirth = newDateOfBirthString is not null ? DateOnly.ParseExact(newDateOfBirthString, "yyyy-MM-dd") : (DateOnly?)null;
 
@@ -90,7 +90,7 @@ public class CreateDateOfBirthChangeTests_Dqt(HostFixture hostFixture) : TestBas
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";
@@ -117,7 +117,7 @@ public class CreateDateOfBirthChangeTests_Dqt(HostFixture hostFixture) : TestBas
     public async Task Post_ValidRequest_CreatesIncidentAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";

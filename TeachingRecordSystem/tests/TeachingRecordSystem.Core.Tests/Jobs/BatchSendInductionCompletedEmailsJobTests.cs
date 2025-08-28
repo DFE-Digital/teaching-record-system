@@ -28,7 +28,6 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
         var inductionCompletedDate = new DateOnly(2021, 10, 10);
 
         var inductionCompletee1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithEmail(TestData.GenerateUniqueEmail()));
 

@@ -55,11 +55,9 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
     {
         _createdByUser = await TestData.CreateUserAsync();
         _person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
         _secondaryPerson = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         await WithDbContext(async dbContext =>
         {

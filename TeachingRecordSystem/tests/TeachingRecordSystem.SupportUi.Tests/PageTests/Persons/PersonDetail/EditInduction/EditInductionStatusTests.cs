@@ -152,7 +152,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
         // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
-            p => p.WithTrn().WithQts());
+            p => p.WithQts());
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
@@ -324,7 +324,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
         // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
-            p => p.WithTrn().WithQts());
+            p => p.WithQts());
 
         await WithDbContext(async dbContext =>
         {
@@ -390,7 +390,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
         // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
-            p => p.WithTrn().WithQts());
+            p => p.WithQts());
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);

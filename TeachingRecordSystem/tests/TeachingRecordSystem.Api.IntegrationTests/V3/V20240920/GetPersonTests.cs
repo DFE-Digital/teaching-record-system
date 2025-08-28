@@ -10,7 +10,6 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertType = alertTypes.Where(at => !at.InternalOnly).RandomOne();
 
         var person = await TestData.CreatePersonAsync(x => x
-            .WithTrn()
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var alert = person.Alerts.Single();

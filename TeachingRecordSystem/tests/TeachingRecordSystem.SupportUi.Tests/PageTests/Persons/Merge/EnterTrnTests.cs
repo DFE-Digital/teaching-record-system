@@ -10,8 +10,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Get_PopulatesThisTrnFromPersonRecord()
     {
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -36,12 +35,10 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Get_OtherTrnAlreadyEntered_ShowsOtherTrn()
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -68,8 +65,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -98,8 +94,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -128,8 +123,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -156,8 +150,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -184,8 +177,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var newTrn = await TestData.GenerateTrnAsync();
 
@@ -214,12 +206,10 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         await WithDbContext(async dbContext =>
         {
@@ -253,8 +243,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         await WithDbContext(async dbContext =>
         {
@@ -264,8 +253,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         });
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -293,12 +281,10 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
             .WithAlert(a => a.WithEndDate(null)));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -329,15 +315,13 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
             .WithInductionStatus(i => i
                 .WithStatus(status)
                 .WithStartDate(new DateOnly(2024, 1, 1))
                 .WithCompletedDate(new DateOnly(2024, 1, 1))));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -365,12 +349,10 @@ public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,

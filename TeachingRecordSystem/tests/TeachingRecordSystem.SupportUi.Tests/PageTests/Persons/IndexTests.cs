@@ -88,9 +88,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithSearchThatLooksLikeATrn_DisplaysMatchOnTrn()
     {
         // Arrange
-        var person1 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithTrn());
-        var person2 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithTrn());
-        var person3 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithTrn());
+        var person1 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person2 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person3 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var search = person1.Trn;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");

@@ -92,10 +92,8 @@ public class CommonPageTests(HostFixture hostFixture) : SetStatusTestBase(hostFi
     {
         // Arrange
         var primaryPerson = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
         var secondaryPerson = await CreatePersonWithCurrentStatus(PersonStatus.Deactivated, p => p
-            .WithTrn()
             .WithMergedWithPersonId(primaryPerson.PersonId));
 
         var stateBuilder = new SetStatusStateBuilder()

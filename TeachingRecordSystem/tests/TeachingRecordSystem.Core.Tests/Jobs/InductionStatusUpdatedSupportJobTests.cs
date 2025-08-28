@@ -80,7 +80,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         {
             {"LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", CultureInfo.InvariantCulture) }
         };
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trsPerson = context.Persons.Single(x => x.Trn == person.Trn);
         trsPerson.SetInductionStatus(
             fromInductionStatus,
@@ -132,7 +132,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         {
             { "LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", CultureInfo.InvariantCulture) }
         };
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trsPerson = context.Persons.Single(x => x.Trn == person.Trn);
         trsPerson.SetInductionStatus(
             fromInductionStatus,
@@ -185,7 +185,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
         {
             { "LastRunDate", Clock.UtcNow.AddDays(-1).ToString("s", CultureInfo.InvariantCulture) }
         };
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trsPerson = context.Persons.Single(x => x.Trn == person.Trn);
         trsPerson.SetInductionStatus(
             fromInductionStatus,

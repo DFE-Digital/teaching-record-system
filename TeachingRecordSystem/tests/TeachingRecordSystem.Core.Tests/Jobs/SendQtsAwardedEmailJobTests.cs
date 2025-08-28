@@ -23,7 +23,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
                     BaseAddress = "https://aytq.com"
                 });
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithEmail(TestData.GenerateUniqueEmail()));
+            var person = await TestData.CreatePersonAsync(p => p.WithEmail(TestData.GenerateUniqueEmail()));
 
             var templateId = Guid.NewGuid().ToString();
 

@@ -25,9 +25,7 @@ public class SetCpdInductionStatusTests : TestBase
         // Arrange
         SetCurrentApiClient(roles: []);
 
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/persons/{person.Trn}/cpd-induction")
         {
@@ -71,8 +69,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_PersonDoesNotHaveQts_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/persons/{person.Trn}/cpd-induction")
         {
@@ -97,9 +94,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_StatusIsInvalid_ReturnsError(InductionStatus status)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/persons/{person.Trn}/cpd-induction")
         {
@@ -121,9 +116,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_TimestampIsBeforePreviousUpdate_ReturnsConflict()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
 
@@ -167,9 +160,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_RequiredToCompleteWithStartDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
 
@@ -194,9 +185,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_RequiredToCompleteWithCompletedDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
         var completedDate = startDate.AddMonths(12);
@@ -222,9 +211,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_InProgressWithoutStartDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/persons/{person.Trn}/cpd-induction")
         {
@@ -246,9 +233,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_InProgressWithCompletedDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
         var completedDate = startDate.AddMonths(12);
@@ -275,9 +260,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_FailedWithoutStartDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
         var completedDate = startDate.AddMonths(12);
@@ -303,9 +286,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_FailedWithoutCompletedDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
         var completedDate = startDate.AddMonths(12);
@@ -331,9 +312,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_PassedWithoutStartDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
         var completedDate = startDate.AddMonths(12);
@@ -359,9 +338,7 @@ public class SetCpdInductionStatusTests : TestBase
     public async Task Put_PassedWithoutCompletedDate_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var startDate = person.QtsDate!.Value.AddDays(6);
 
@@ -388,7 +365,6 @@ public class SetCpdInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(currentStatus));
 
@@ -414,7 +390,6 @@ public class SetCpdInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(currentStatus));
 
@@ -443,7 +418,6 @@ public class SetCpdInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(currentStatus));
 
@@ -474,7 +448,6 @@ public class SetCpdInductionStatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithInductionStatus(currentStatus));
 

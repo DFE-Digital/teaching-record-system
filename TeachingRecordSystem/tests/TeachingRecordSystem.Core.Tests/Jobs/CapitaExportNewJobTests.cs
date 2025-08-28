@@ -45,12 +45,10 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var lastRunDate = DateTime.UtcNow.AddDays(-2);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(Gender.Male);
         });
         var person2 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(Gender.Male);
         });
 
@@ -84,7 +82,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var lastRunDate = DateTime.UtcNow.AddDays(-2);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(gender);
         });
 
@@ -134,7 +131,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(gender);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -169,7 +165,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var newLastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(gender);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -222,7 +217,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         Gender gender = Gender.Male;
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(gender);
             x.WithLastName(lastName);
         });
@@ -255,7 +249,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(Gender.Male);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -288,7 +281,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(Gender.Male);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -323,7 +315,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(Gender.Male);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -362,7 +353,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var originalastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithGender(gender);
             x.WithLastName(originalastName);
         });
@@ -410,7 +400,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var originalastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithLastName(originalastName);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -456,7 +445,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var originalastName = new string('a', 75);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithLastName(originalastName);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -504,7 +492,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var originalastName = new string('a', 75);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithLastName(originalastName);
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
@@ -606,7 +593,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var originalastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithLastName(originalastName);
             x.WithGender(Gender.Male);
         });
@@ -712,7 +698,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var originalastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithLastName(originalastName);
             x.WithGender(Gender.Male);
         });
@@ -810,7 +795,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var updateLastName1 = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithLastName(originalastName1);
             x.WithGender(Gender.Male);
         });
@@ -818,7 +802,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var updateLastName2 = Faker.Name.Last();
         var person2 = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithLastName(originalastName2);
             x.WithGender(Gender.Male);
         });

@@ -142,7 +142,6 @@ public class InductionImporterTests : IAsyncLifetime
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
                 .WithHoldsFrom(person1AwardedDate)
@@ -181,7 +180,6 @@ public class InductionImporterTests : IAsyncLifetime
         var qtsDate = Clock.Today.AddDays(-110);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithQtls(qtsDate);
             x.WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
@@ -325,7 +323,6 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
                 .WithHoldsFrom(Clock.Today.AddDays(-10))
@@ -412,7 +409,7 @@ public class InductionImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn!;
@@ -472,7 +469,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId).First();
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person = await TestData.CreatePersonAsync(p => p
             .WithQtls()
             .WithHoldsRouteToProfessionalStatus(route.RouteToProfessionalStatusTypeId, person1AwardedDate));
         var row = GetDefaultRow(x =>

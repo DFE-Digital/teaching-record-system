@@ -71,7 +71,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

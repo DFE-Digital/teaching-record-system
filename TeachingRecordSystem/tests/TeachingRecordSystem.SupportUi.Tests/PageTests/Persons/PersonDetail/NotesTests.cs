@@ -23,7 +23,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithoutNotes_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}/notes");
 
@@ -42,7 +42,6 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.DbsAlertTypeId)
                 .WithStartDate(Clock.Today.AddDays(-30))
@@ -75,7 +74,6 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.DbsAlertTypeId)
                 .WithStartDate(Clock.Today.AddDays(-30))
@@ -104,7 +102,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoteWithoutAttachment_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var expectedNoteText = "Note without attachment";
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
@@ -136,7 +134,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoteWithAttachment_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var expectedNoteText = "Note without attachment";
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
@@ -170,7 +168,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoteWithHtml_ReturnsPlaintext()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var expectedNoteText = "Note without attachment";
         var htmlNote = $"<html><b>{expectedNoteText}<b><html>";
         var expectedCreatedBy = TestData.GenerateName();
@@ -194,7 +192,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_MultipleNotes_ReturnsContentInCorrectOrder()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var expectedNoteText1 = "Note without attachment";
         var expectedCreatedBy1 = TestData.GenerateName();
         var createdByUserId1 = Guid.NewGuid();
@@ -254,7 +252,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonStatus_AddButtonShownAsExpected(PersonStatus personStatus, bool canSeeAddButton)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         if (personStatus == PersonStatus.Deactivated)
         {
             await WithDbContext(async dbContext =>

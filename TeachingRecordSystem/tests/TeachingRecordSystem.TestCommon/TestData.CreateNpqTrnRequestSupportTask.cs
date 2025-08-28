@@ -168,7 +168,6 @@ public partial class TestData
                         var person = await testData.CreatePersonAsync(p =>
                         {
                             p
-                                .WithTrn()
                                 .WithFirstName(firstName)
                                 .WithMiddleName(middleName)
                                 .WithLastName(lastName)

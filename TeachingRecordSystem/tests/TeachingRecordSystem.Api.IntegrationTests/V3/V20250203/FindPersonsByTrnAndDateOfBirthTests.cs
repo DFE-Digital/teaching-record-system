@@ -19,7 +19,6 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth));
 
@@ -58,7 +57,6 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var inductionCompletedDate = new DateOnly(1996, 6, 7);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithInductionStatus(i => i
@@ -99,7 +97,6 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithQtls(qtlsDate));
@@ -136,7 +133,6 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth));
 
@@ -172,7 +168,6 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithQtlsStatus(Core.Models.QtlsStatus.Expired));

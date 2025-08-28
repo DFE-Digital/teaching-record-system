@@ -38,7 +38,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(dbContext =>
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
 
-        var match = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var match = await TestData.CreatePersonAsync();
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 

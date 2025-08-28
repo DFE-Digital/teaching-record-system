@@ -44,7 +44,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
@@ -148,7 +148,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
@@ -335,7 +335,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: null,
             verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));

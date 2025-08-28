@@ -97,7 +97,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
@@ -236,7 +236,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
@@ -256,7 +256,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidRequest_CreatesSupportTicketAndRedirectsToSupportRequestedSubmitted()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trnToken = await CreateTrnTokenAsync(person.Trn!);
         var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true);
         var state = CreateNewState(clientApplicationUserId: applicationUser.UserId, trnToken: trnToken);

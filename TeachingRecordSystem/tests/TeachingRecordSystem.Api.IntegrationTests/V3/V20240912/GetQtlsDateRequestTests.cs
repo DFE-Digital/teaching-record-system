@@ -15,8 +15,7 @@ public class GetQtlsDateRequestTests : TestBase
     {
         // Arrange
         SetCurrentApiClient(roles);
-        var existingContact = await TestData.CreatePersonAsync(p => p
-            .WithTrn());
+        var existingContact = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v3/persons/{existingContact.Trn}/qtls");
 
@@ -46,7 +45,7 @@ public class GetQtlsDateRequestTests : TestBase
     public async Task Get_NoQtls_ReturnsExpectedResult()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var request = new HttpRequestMessage(HttpMethod.Get, $"v3/persons/{person.Trn}/qtls");
 
         // Act
@@ -59,7 +58,6 @@ public class GetQtlsDateRequestTests : TestBase
             {
                 person.Trn,
                 qtsDate = (DateOnly?)null
-
             },
             expectedStatusCode: 200);
     }
@@ -69,9 +67,8 @@ public class GetQtlsDateRequestTests : TestBase
     {
         // Arrange
         var qtlsDate = new DateOnly(2020, 01, 01);
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQtls(qtlsDate));
+        var person = await TestData.CreatePersonAsync(p => p.WithQtls(qtlsDate));
+
         var request = new HttpRequestMessage(HttpMethod.Get, $"v3/persons/{person.Trn}/qtls");
 
         // Act

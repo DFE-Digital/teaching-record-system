@@ -23,7 +23,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task HandleAsync_PersonExistsButIsNotActive_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         await WithDbContextAsync(dbContext =>
             dbContext.Persons
@@ -43,8 +43,8 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task HandleAsync_PersonIsMerged_ReturnsRedirect()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
-        var anotherPerson = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
+        var anotherPerson = await TestData.CreatePersonAsync();
 
         await WithDbContextAsync(dbContext =>
             dbContext.Persons
@@ -67,7 +67,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task HandleAsync_PersonExistsAndIsActive_ReturnsNoContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         Debug.Assert(person.Person.Status is PersonStatus.Active);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/trns/{person.Trn}");

@@ -433,7 +433,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         DateTime? createdOn = null,
         Action<TestData.CreateApiTrnRequestSupportTaskBuilder>? configureApiTrnRequest = null)
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithEmail(TestData.GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmail(TestData.GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
 
         if (applicationUserId is null)
         {

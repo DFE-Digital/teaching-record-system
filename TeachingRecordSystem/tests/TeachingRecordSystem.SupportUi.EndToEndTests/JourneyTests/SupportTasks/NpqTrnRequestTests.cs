@@ -63,13 +63,11 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Set up two records to merge with, where one has no conflicting info, one does have known conflicting info
         var matchedPerson1 = await TestData.CreatePersonAsync(p =>
         {
-            p.WithTrn();
             p.WithEmail(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });
         var matchedPerson2 = await TestData.CreatePersonAsync(p =>
         {
-            p.WithTrn();
             p.WithEmail(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });
@@ -135,13 +133,11 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Set up two records to merge with, where one has no conflicting info, one does have known conflicting info
         var matchedPerson1 = await TestData.CreatePersonAsync(p =>
             {
-                p.WithTrn();
                 p.WithEmail(TestData.GenerateUniqueEmail());
                 p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
             });
         var matchedPerson2 = await TestData.CreatePersonAsync(p =>
         {
-            p.WithTrn();
             p.WithEmail(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });
@@ -214,13 +210,11 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Set up two records to merge with, where one has no conflicting info, one does have known conflicting info
         var matchedPerson1 = await TestData.CreatePersonAsync(p =>
         {
-            p.WithTrn();
             p.WithEmail(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });
         var matchedPerson2 = await TestData.CreatePersonAsync(p =>
         {
-            p.WithTrn();
             p.WithEmail(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });

@@ -19,7 +19,7 @@ public class SetProfessionalStatusTests : TestBase
         // Arrange
         SetCurrentApiClient(roles);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(CreateRequest());
@@ -58,7 +58,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsOverseasAndStatusIsNotApproved_ReturnsBadRequest(ProfessionalStatusStatus status)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -79,7 +79,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNotOverseasAndStatusIsApproved_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -100,7 +100,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsAssessmentOnlyRouteAndStatusIsInTraining_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -121,7 +121,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNotAssessmentOnlyRouteAndStatusIsUnderAssessment_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -144,7 +144,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_StatusIsApprovedAndAwardedDateIsNotSpecified_ReturnsBadRequest(bool isOverseasRouteType)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var status = isOverseasRouteType ? ProfessionalStatusStatus.Approved : ProfessionalStatusStatus.Awarded;
@@ -172,7 +172,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_StatusIsNotApprovedAndAwardedDateIsSpecified_ReturnsBadRequest(ProfessionalStatusStatus status)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -194,7 +194,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_AwardedDateIsInTheFuture_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -216,7 +216,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_WithoutTrainingStartDate_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -238,7 +238,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_WithoutTrainingEndDate_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -260,7 +260,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_WithTrainingEndDateBeforeTrainingStartDate_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -283,7 +283,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_WithMoreThanThreeTrainingSubjectReferences_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -305,7 +305,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_TrainingAgeSpecialismTypeIsRangeWithoutFromAge_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -332,7 +332,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_TrainingAgeSpecialismTypeIsRangeWithoutToAge_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -359,7 +359,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_TrainingAgeSpecialismTypeIsRangeWithToAgeLessThanFromAge_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -386,7 +386,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_TrainingAgeSpecialismTypeIsRangeWithToOrFromAgeNotBetween0And19_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -419,7 +419,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNotOverseasOrInternationalQualifiedTeacherStatusWithNonGBTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -442,7 +442,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsOverseasWithoutTrainingCountryReference_ReturnsBadRequest(Guid routeTypeId)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -465,7 +465,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsInternationalQualifiedTeacherStatusWithoutTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
         var routeTypeId = RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId;
 
@@ -489,7 +489,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsOverseasWithGBTrainingCountryReference_ReturnsBadRequest(Guid routeTypeId)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -512,7 +512,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsScotlandWithNonScotlandTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -535,7 +535,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNotScotlandWithScotlandTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -558,7 +558,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNorthernIrelandWithNonNorthernIrelandTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -581,7 +581,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNotNorthernIrelandWithNorthernIrelandTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -604,7 +604,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsWalesWithNonWalesTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -629,7 +629,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNotWalesWithWalesTrainingCountryReference_ReturnsBadRequest(string trainingCountryReference)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -651,7 +651,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsNotOverseasWithoutTrainingProviderUkprn_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -674,7 +674,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeIsOverseasWithTrainingProviderUkprn_ReturnsBadRequest(Guid routeTypeId)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -698,7 +698,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeWhichCanHaveInductionExemptionWithoutIsExemptFromInduction_ReturnsBadRequest(Guid routeTypeId, string? trainingCountryReference)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -722,7 +722,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeWhichCannotHaveInductionExemptionWithIsExemptFromInduction_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -743,7 +743,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_RouteTypeDoesNotMapToIttProgrammeType_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
         var legacyIttRouteTypeId = Guid.Parse("4514EC65-20B0-4465-B66F-4718963C5B80");
 
@@ -767,7 +767,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_TrainingSubjectReferenceDoesNotMapToIttSubject_ReturnsBadRequest(string subject1, string subject2, string subject3)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -788,7 +788,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_TrainingCountryReferenceDoesNotMapToDqtCountry_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -813,7 +813,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_TrainingProviderUkprnDoesNotMapToIttProvider_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(
@@ -835,7 +835,7 @@ public class SetProfessionalStatusTests : TestBase
     public async Task Put_DegreeTypeDoesNotMapToIttQualification_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
 
         var request = CreateJsonContent(

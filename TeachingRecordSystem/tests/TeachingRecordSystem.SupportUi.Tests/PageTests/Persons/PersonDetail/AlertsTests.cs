@@ -499,7 +499,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonStatus_EditLinksShownAsExpected(PersonStatus personStatus, bool canSeeEditLinks)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null))
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 

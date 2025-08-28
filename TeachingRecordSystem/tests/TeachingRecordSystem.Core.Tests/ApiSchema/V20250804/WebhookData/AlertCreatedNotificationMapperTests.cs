@@ -13,7 +13,6 @@ public class AlertCreatedNotificationMapperTests(EventMapperFixture fixture) : E
                 .RandomOneExcept(a => a.InternalOnly);
 
             var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
@@ -44,7 +43,6 @@ public class AlertCreatedNotificationMapperTests(EventMapperFixture fixture) : E
                 .RandomOneExcept(a => !a.InternalOnly);
 
             var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
             var alert = person.Alerts.Single();
