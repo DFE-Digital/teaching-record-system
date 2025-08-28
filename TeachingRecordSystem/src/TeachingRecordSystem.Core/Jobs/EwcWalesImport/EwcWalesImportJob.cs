@@ -33,24 +33,6 @@ public class EwcWalesImportJob(BlobServiceClient blobServiceClient, InductionImp
         return fileNames.ToArray();
     }
 
-    private async Task<string[]> GetFileNamesAsync(CancellationToken cancellationToken)
-    {
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageContainer);
-        var fileNames = new List<string>();
-        var resultSegment = blobContainerClient.GetBlobsByHierarchyAsync(prefix: "", delimiter: PickupFolder, cancellationToken: cancellationToken).AsPages();
-
-        // Enumerate the blobs returned for each page.
-        await foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
-        {
-            foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
-            {
-                fileNames.Add(blobhierarchyItem.Blob.Name);
-            }
-        }
-
-        return fileNames.ToArray();
-    }
-
     public async Task<Stream> GetDownloadStreamAsync(string fileName)
     {
         BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(StorageContainer);

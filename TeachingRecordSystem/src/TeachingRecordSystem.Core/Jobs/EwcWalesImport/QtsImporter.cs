@@ -319,7 +319,6 @@ public class QtsImporter
                     errors.Add($"{lookups.Person.Trn} already holds welshr route with holdsfrom {qtsDate}");
                 }
             }
-
         }
 
         switch (lookups.PersonMatchStatus)
@@ -340,62 +339,6 @@ public class QtsImporter
                 break;
         }
         return (validationFailures, errors);
-    }
-
-    public async Task<(EwcWalesMatchStatus, Guid? OrganisationId)> FindMatchingOrganisationsRecordAsync(string OrgNumber)
-    {
-        var results = await _dbContext.TrainingProviders.Where(x => x.Ukprn == OrgNumber).ToArrayAsync();
-
-        if (results.Length == 0)
-        {
-            return (EwcWalesMatchStatus.NoMatch, null);
-        }
-
-        if (results.Length > 1)
-        {
-            return (EwcWalesMatchStatus.MultipleMatchesFound, null);
-        }
-
-        var organisationId = results.First().TrainingProviderId;
-        return (EwcWalesMatchStatus.OneMatch, organisationId);
-    }
-
-    public async Task<(EwcWalesMatchStatus, Guid? HeQualificationId)> GetHEQualificationAsync(string qualificationCode)
-    {
-        var results = await _cache.GetHeQualificationsAsync();
-        var qualifications = results.Where(x => x.dfeta_Value == qualificationCode).ToArray();
-
-        if (qualifications.Length == 0)
-        {
-            return (EwcWalesMatchStatus.NoMatch, null);
-        }
-
-        if (qualifications.Length > 1)
-        {
-            return (EwcWalesMatchStatus.MultipleMatchesFound, null);
-        }
-
-        var subjectId = qualifications.First().Id;
-        return (EwcWalesMatchStatus.OneMatch, subjectId);
-    }
-
-    public async Task<(EwcWalesMatchStatus, Guid? SubjectId)> GetMatchingHESubjectAsync(string subjectCode)
-    {
-        var results = await _cache.GetHeSubjectsAsync();
-        var subjects = results.Where(x => x.dfeta_Value == subjectCode).ToArray();
-
-        if (subjects.Length == 0)
-        {
-            return (EwcWalesMatchStatus.NoMatch, null);
-        }
-
-        if (subjects.Length > 1)
-        {
-            return (EwcWalesMatchStatus.MultipleMatchesFound, null);
-        }
-
-        var subjectId = subjects.First().Id;
-        return (EwcWalesMatchStatus.OneMatch, subjectId);
     }
 
     public async Task<(EwcWalesMatchStatus, Guid? SubjectId)> GetTeacherStatusAsync(string qtsStatus)
@@ -428,98 +371,6 @@ public class QtsImporter
         {
             return (EwcWalesMatchStatus.NoMatch, null);
         }
-    }
-
-    public dfeta_classdivision? GetHEClassDivision(string classCode)
-    {
-        switch (classCode)
-        {
-            case "1":
-            case "01":
-                return dfeta_classdivision.Firstclasshonours;
-            case "2":
-            case "02":
-                return dfeta_classdivision.Uppersecondclasshonours;
-            case "3":
-            case "03":
-                return dfeta_classdivision.Lowersecondclasshonours;
-            case "4":
-            case "04":
-                return dfeta_classdivision.Undividedsecondclasshonours;
-            case "5":
-            case "05":
-                return dfeta_classdivision.Thirdclasshonours;
-            case "6":
-            case "06":
-                return dfeta_classdivision.Fourthclasshonours;
-            case "7":
-            case "07":
-                return dfeta_classdivision.Unclassifiedhonours;
-            case "8":
-            case "08":
-                return dfeta_classdivision.Aegrotat_whethertohonoursorpass;
-            case "9":
-            case "09":
-                return dfeta_classdivision.Passdegreeawardedwithouthonoursfollowinganhonourscourse;
-            case "10":
-                return dfeta_classdivision.Ordinary_includingdivisionsofordinaryifanydegreeawardedafterfollowinganonhonourscourse;
-            case "11":
-                return dfeta_classdivision.GeneralDegreedegreeawardedafterfollowinganonhonourscoursedegreethatwasnotavailabletobeclassified;
-            case "12":
-                return dfeta_classdivision.Distinction;
-            case "13":
-                return dfeta_classdivision.Merit;
-            case "14":
-                return dfeta_classdivision.Pass;
-            case "98":
-                return dfeta_classdivision.Notapplicable;
-            case "99":
-                return dfeta_classdivision.NotKnown;
-            default:
-                return null;
-        }
-    }
-
-    public async Task<(EwcWalesMatchStatus, Guid? IttQualificationId)> GetIttQualificationAsync(string ittQualificationcode)
-    {
-        var results = await _cache.GetIttQualificationsAsync();
-        var qualifications = results.Where(x => x.dfeta_Value == ittQualificationcode).ToArray();
-
-        if (qualifications.Length == 0)
-        {
-            return (EwcWalesMatchStatus.NoMatch, null);
-        }
-
-        if (qualifications.Length > 1)
-        {
-            return (EwcWalesMatchStatus.MultipleMatchesFound, null);
-        }
-
-        var qualificationId = qualifications.First().Id;
-        return (EwcWalesMatchStatus.OneMatch, qualificationId);
-    }
-
-    public async Task<(EwcWalesMatchStatus, Guid? SubjectId)> FindIttSubjectAsync(string subjectCode)
-    {
-        var subject = await _cache.GetIttSubjectBySubjectCodeAsync(subjectCode);
-
-        if (subject is null)
-        {
-            return (EwcWalesMatchStatus.NoMatch, null);
-        }
-
-        return (EwcWalesMatchStatus.OneMatch, subject.Id);
-    }
-
-    public async Task<(EwcWalesMatchStatus, Guid? SubjectId)> GetMatchingCountryAsync(string countryCode)
-    {
-        var country = await _cache.GetCountryByCountryCodeAsync(countryCode);
-        if (country is null)
-        {
-            return (EwcWalesMatchStatus.NoMatch, null);
-        }
-
-        return (EwcWalesMatchStatus.OneMatch, country.Id);
     }
 
     public async Task<(EwcWalesMatchStatus, Person? person)> FindMatchingTeacherRecordAsync(EwcWalesQtsFileImportData item)
