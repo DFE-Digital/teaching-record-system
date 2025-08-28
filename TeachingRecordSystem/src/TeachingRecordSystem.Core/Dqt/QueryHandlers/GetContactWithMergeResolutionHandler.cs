@@ -11,7 +11,7 @@ public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactW
     {
         // Ensure we have MasterId in the columns requested
         var columns = query.ColumnSet.AllColumns ? query.ColumnSet :
-            new ColumnSet([Contact.Fields.MasterId, .. query.ColumnSet.Columns]);
+            new ColumnSet([Contact.Fields.MasterId, Contact.Fields.Merged, .. query.ColumnSet.Columns]);
 
         return await FetchContactAsync(query.ContactId);
 

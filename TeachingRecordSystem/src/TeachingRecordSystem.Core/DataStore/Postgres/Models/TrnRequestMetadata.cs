@@ -30,8 +30,8 @@ public class TrnRequestMetadata
     public string? Postcode { get; init; }
     public string? Country { get; init; }
     public string? TrnToken { get; set; }
-    public Guid? ResolvedPersonId { get; private set; }
-    public TrnRequestStatus? Status { get; private set; } = TrnRequestStatus.Pending;
+    public Guid? ResolvedPersonId { get; set; }
+    public TrnRequestStatus? Status { get; set; } = TrnRequestStatus.Pending;
     public TrnRequestMatches? Matches { get; set; }
     public bool? NpqWorkingInEducationalSetting { get; init; }
     public string? NpqApplicationId { get; init; }
