@@ -7,7 +7,6 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.Files;
@@ -17,7 +16,6 @@ using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PublishApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
@@ -38,7 +36,6 @@ builder
     .AddBlobStorage()
     .AddDistributedLocks()
     .AddDqtReporting()
-    .AddTrsSyncService()
     .AddGias()
     .AddHangfire()
     .AddBackgroundJobs()
@@ -46,7 +43,6 @@ builder
     .AddEmail()
     .AddIdentityApi()
     .AddNameSynonyms()
-    .AddDqtOutboxMessageProcessorService()
     .AddWebhookDeliveryService()
     .AddWebhookMessageFactory()
     .AddPublishApi()

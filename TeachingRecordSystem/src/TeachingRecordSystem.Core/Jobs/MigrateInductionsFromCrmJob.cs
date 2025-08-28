@@ -19,7 +19,7 @@ public class MigrateInductionsFromCrmJob(
     {
         const int pageSize = 1000;
 
-        var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
+        var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncHelper.CrmClientName);
         var columns = new ColumnSet(trsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames);
 
         var query = new QueryExpression(Contact.EntityLogicalName)

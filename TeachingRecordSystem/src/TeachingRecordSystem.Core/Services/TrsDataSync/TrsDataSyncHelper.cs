@@ -26,7 +26,7 @@ namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 #pragma warning disable CS9113 // Parameter is unread.
 public class TrsDataSyncHelper(
     NpgsqlDataSource trsDbDataSource,
-    [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+    [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     ReferenceDataCache referenceDataCache,
     IClock clock,
     IAuditRepository auditRepository,
@@ -36,6 +36,8 @@ public class TrsDataSyncHelper(
 #pragma warning restore CS9113 // Parameter is unread.
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
+
+    public const string CrmClientName = "TrsDataSync";
 
     private const string NowParameterName = "@now";
     private const string IdsParameterName = "@ids";

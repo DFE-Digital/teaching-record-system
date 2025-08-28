@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
-using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -95,8 +94,6 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
             Clock,
             trnGenerator,
             TestDataPersonDataSource.CrmAndTrs);
-
-        MessageSerializer = ActivatorUtilities.CreateInstance<MessageSerializer>(provider);
     }
 
     public DbFixture DbFixture { get; }
@@ -114,8 +111,6 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
     public IOrganizationServiceAsync2 OrganizationService { get; }
 
     public EwcWalesImportJob Job { get; }
-
-    public MessageSerializer MessageSerializer { get; }
 
     public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 }

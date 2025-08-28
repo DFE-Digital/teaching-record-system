@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class BackfillDqtIttQtsBusinessEventAuditsJob(
-    [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+    [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper,
     ILogger<BackfillDqtIttQtsBusinessEventAuditsJob> logger)
 {

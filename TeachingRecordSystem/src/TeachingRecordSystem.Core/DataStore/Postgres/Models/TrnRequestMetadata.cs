@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
-
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class TrnRequestMetadata
@@ -56,35 +54,6 @@ public class TrnRequestMetadata
 
         Status = TrnRequestStatus.Completed;
     }
-
-    public static TrnRequestMetadata FromOutboxMessage(TrnRequestMetadataMessage message) =>
-        new()
-        {
-            ApplicationUserId = message.ApplicationUserId,
-            RequestId = message.RequestId,
-            CreatedOn = message.CreatedOn,
-            IdentityVerified = message.IdentityVerified,
-            OneLoginUserSubject = message.OneLoginUserSubject,
-            EmailAddress = message.EmailAddress,
-            Name = message.Name,
-            FirstName = message.FirstName,
-            MiddleName = message.MiddleName,
-            LastName = message.LastName,
-            PreviousFirstName = message.PreviousFirstName,
-            PreviousLastName = message.PreviousLastName,
-            DateOfBirth = message.DateOfBirth,
-            PotentialDuplicate = message.PotentialDuplicate,
-            NationalInsuranceNumber = message.NationalInsuranceNumber,
-            Gender = message.Gender,
-            AddressLine1 = message.AddressLine1,
-            AddressLine2 = message.AddressLine2,
-            AddressLine3 = message.AddressLine3,
-            City = message.City,
-            Postcode = message.Postcode,
-            Country = message.Country,
-            TrnToken = message.TrnToken,
-            Status = null  // Requests resolved in DQT have their status deduced later
-        };
 }
 
 public record TrnRequestMatches

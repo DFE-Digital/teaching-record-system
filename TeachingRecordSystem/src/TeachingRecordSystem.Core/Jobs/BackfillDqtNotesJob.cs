@@ -10,7 +10,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncService.CrmClientName)]
+public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncHelper.CrmClientName)]
     IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper,
     ILogger<BackfillDqtNotesJob> logger,

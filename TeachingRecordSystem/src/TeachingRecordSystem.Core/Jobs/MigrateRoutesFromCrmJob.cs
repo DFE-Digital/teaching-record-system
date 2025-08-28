@@ -12,7 +12,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class MigrateRoutesFromCrmJob(
-    [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+    [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper,
     IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor,
     ILogger<MigrateRoutesFromCrmJob> logger)

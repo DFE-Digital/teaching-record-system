@@ -16,7 +16,7 @@ public class SyncAllPreviousNamesFromCrmJob(
     {
         const int pageSize = 1000;
 
-        var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
+        var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncHelper.CrmClientName);
         var columns = new ColumnSet(dfeta_previousname.Fields.dfeta_previousnameId, dfeta_previousname.Fields.dfeta_PersonId);
 
         var query = new QueryExpression(dfeta_previousname.EntityLogicalName)
