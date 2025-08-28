@@ -13,7 +13,6 @@ public class CreateTrnRequestTests : TestBase
     public CreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.CreateTrn]);
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
 
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
