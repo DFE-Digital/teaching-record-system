@@ -7,6 +7,7 @@ using Azure.Storage.Blobs.Specialized;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -14,7 +15,7 @@ using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService)
+public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaImportUserOption> capitaUser)
 {
     public const string JobSchedule = "0 4 * * *";
     public const string StorageContainer = "dqt-integrations";
@@ -61,6 +62,20 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         await sourceBlobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
     }
 
+    static string[] GetNonEmptyValues(params string?[] values)
+    {
+        var result = new List<string>(values.Length);
+
+        foreach (var value in values)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                result.Add(value);
+            }
+        }
+
+        return result.ToArray();
+    }
     public async Task<long> ImportAsync(StreamReader reader, string fileName)
     {
         await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
@@ -123,8 +138,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     if (person is null)
                     {
                         //create person if incoming record is not known in trs
-                        var newPerson = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddletName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow);
-                        newPerson.Person.CreatedByTps = true;
+                        var newPerson = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddleName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow, createdByTps: true);
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
                             newPerson.Person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
@@ -140,17 +154,42 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         //create task
                         if (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
                         {
+                            var trnRequestMetadata = new TrnRequestMetadata()
+                            {
+                                ApplicationUserId = capitaUser.Value.UserId,
+                                RequestId = Guid.NewGuid().ToString(),
+                                CreatedOn = clock.UtcNow,
+                                IdentityVerified = null,
+                                OneLoginUserSubject = null,
+                                Name = GetNonEmptyValues(
+                                    newPerson.Person.FirstName,
+                                    newPerson.Person.MiddleName,
+                                    newPerson.Person.LastName),
+                                FirstName = newPerson.Person.FirstName,
+                                MiddleName = newPerson.Person.MiddleName,
+                                LastName = newPerson.Person.LastName,
+                                DateOfBirth = newPerson.Person.DateOfBirth!.Value!,
+                                EmailAddress = null,
+                                NationalInsuranceNumber = newPerson.Person.NationalInsuranceNumber,
+                                Gender = newPerson.Person.Gender,
+                                PotentialDuplicate = true,
+
+                                Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] }
+                            };
+                            dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+
                             potentialDuplicate = true;
                             var supportTask = SupportTask.Create(
                                 SupportTaskType.CapitaImportPotentialDuplicate,
-                                new Models.SupportTaskData.ApiTrnRequestData(),
+                                new Models.SupportTaskData.CapitaPotentialDuplicateData(),
                                 personId: personId.Value,
                                 null,
                                 null,
-                                null,
-                                DataStore.Postgres.Models.SystemUser.SystemUserId,
+                                trnRequestMetadata.RequestId,
+                                capitaUser.Value.UserId,
                                 clock.UtcNow,
                                 out var createdEvent);
+
                             dbContext.SupportTasks.Add(supportTask);
                             await dbContext.AddEventAndBroadcastAsync(createdEvent);
                             duplicateRowCount++;
@@ -322,11 +361,11 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             EmailAddress = null,
             OneLoginUserSubject = null,
             FirstName = row.GetFirstName(),
-            MiddleName = row.GetMiddletName(),
+            MiddleName = row.GetMiddleName(),
             LastName = row.LastName,
             PreviousFirstName = null,
             PreviousLastName = row.PreviousLastName,
-            Name = [row.GetFirstName()!, row.GetMiddletName()!, row.LastName!],
+            Name = [row.GetFirstName()!, row.GetMiddleName()!, row.LastName!],
             DateOfBirth = row.GetDateOfBirth()!.Value,
             NationalInsuranceNumber = row.NINumber
         };
@@ -397,7 +436,7 @@ public class CapitaImportRecord
         return null;
     }
 
-    public string? GetMiddletName()
+    public string? GetMiddleName()
     {
         var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts?.Length > 0)

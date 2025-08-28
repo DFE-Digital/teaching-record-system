@@ -6,7 +6,9 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Files;
@@ -99,6 +101,10 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                 });
         var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.NotNull(task);
+        var trnRequest = dbContext.TrnRequestMetadata.Single(x => x.RequestId == task.TrnRequestId);
+        Assert.NotNull(trnRequest);
+        Assert.True(trnRequest.PotentialDuplicate);
+        Assert.Contains(trnRequest.Matches?.MatchedPersons!, p => p.PersonId == existingPerson.PersonId);
     }
 
     [Fact]
@@ -175,6 +181,9 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                 });
         var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.NotNull(task);
+        var trnRequest = dbContext.TrnRequestMetadata.Single(x => x.RequestId == task.TrnRequestId);
+        Assert.NotNull(trnRequest);
+        Assert.True(trnRequest.PotentialDuplicate);
     }
 
     [Fact]
@@ -550,6 +559,10 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                 });
         var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.NotNull(task);
+        var trnRequest = dbContext.TrnRequestMetadata.Single(x => x.RequestId == task.TrnRequestId);
+        Assert.NotNull(trnRequest);
+        Assert.True(trnRequest.PotentialDuplicate);
+        Assert.Contains(trnRequest.Matches?.MatchedPersons!, p => p.PersonId == existingPerson.PersonId);
     }
 
     [Fact]
@@ -1268,10 +1281,13 @@ public class CapitaImportJobFixture : IAsyncLifetime
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
+
         var personMatchingService = ActivatorUtilities.CreateInstance<PersonMatchingService>(provider);
         var matchingService = new PersonMatchingService(dbFixture.GetDbContextFactory().CreateDbContext());
+        var user = new CapitaImportUserOption() { UserId = ApplicationUser.CapitaTpsImportUser.UserId };
+        var option = Options.Create(user);
 
-        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock, matchingService!);
+        Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock, matchingService!, option);
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
             OrganizationService,
