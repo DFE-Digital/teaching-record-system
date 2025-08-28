@@ -29,7 +29,7 @@ public class CreateTrnRequestHandler(
     IPersonMatchingService personMatchingService,
     TrnRequestService trnRequestService,
     ICurrentUserProvider currentUserProvider,
-    ITrnGenerator trnGenerationApiClient,
+    ITrnGenerator trnGenerator,
     IClock clock)
 {
     public async Task<ApiResult<TrnRequestInfo>> HandleAsync(CreateTrnRequestCommand command)
@@ -68,6 +68,8 @@ public class CreateTrnRequestHandler(
         };
 
         var matchResult = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
+
+        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
 
         string? trn = null;
 
@@ -118,7 +120,7 @@ public class CreateTrnRequestHandler(
         {
             Debug.Assert(matchResult.Outcome is TrnRequestMatchResultOutcome.NoMatches);
 
-            trn = await trnGenerationApiClient.GenerateTrnAsync();
+            trn = await trnGenerator.GenerateTrnAsync();
 
             var createPersonResult = trnRequestService.CreatePersonFromTrnRequest(trnRequestMetadata, trn, now);
             dbContext.Persons.Add(createPersonResult.Person);
@@ -164,6 +166,7 @@ public class CreateTrnRequestHandler(
         await trnRequestService.TryEnsureTrnTokenAsync(trnRequestMetadata, trn);
 
         await dbContext.SaveChangesAsync();
+        await txn.CommitAsync();
 
         var status = trnRequestMetadata.Status!.Value;
 
