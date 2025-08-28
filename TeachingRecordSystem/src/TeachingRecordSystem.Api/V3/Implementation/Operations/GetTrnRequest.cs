@@ -13,13 +13,28 @@ public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnR
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(dbContext, currentApplicationUserId, command.RequestId);
-        if (trnRequest is null)
+        var requestData = await dbContext.TrnRequestMetadata
+            .SingleOrDefaultAsync(m => m.ApplicationUserId == currentApplicationUserId && m.RequestId == command.RequestId);
+
+        if (requestData is null)
         {
             return ApiError.TrnRequestDoesNotExist(command.RequestId);
         }
 
-        var metadata = trnRequest.Metadata;
+        var resolvedPersonTrn = requestData.ResolvedPersonId is Guid resolvedPersonId ?
+            await dbContext.Persons
+                .Where(p => p.PersonId == resolvedPersonId)
+                .Select(p => p.Trn)
+                .SingleAsync() :
+            null;
+
+        var status = requestData.Status ?? TrnRequestStatus.Pending;
+        var trn = status == TrnRequestStatus.Completed ? resolvedPersonTrn : null;
+
+        if (await trnRequestService.TryEnsureTrnTokenAsync(requestData, resolvedPersonTrn))
+        {
+            await dbContext.SaveChangesAsync();
+        }
 
         return new TrnRequestInfo()
         {
@@ -28,17 +43,17 @@ public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnR
             Person = new TrnRequestInfoPerson()
 #pragma warning restore TRS0001
             {
-                FirstName = metadata.FirstName!,
-                LastName = metadata.LastName!,
-                MiddleName = metadata.MiddleName,
-                EmailAddress = metadata.EmailAddress,
-                NationalInsuranceNumber = metadata.NationalInsuranceNumber,
-                DateOfBirth = metadata.DateOfBirth
+                FirstName = requestData.FirstName!,
+                LastName = requestData.LastName!,
+                MiddleName = requestData.MiddleName,
+                EmailAddress = requestData.EmailAddress,
+                NationalInsuranceNumber = requestData.NationalInsuranceNumber,
+                DateOfBirth = requestData.DateOfBirth
             },
-            Trn = trnRequest.ResolvedPersonTrn,
-            Status = metadata.Status ?? TrnRequestStatus.Pending,
-            PotentialDuplicate = metadata.PotentialDuplicate ?? false,
-            AccessYourTeachingQualificationsLink = metadata is { TrnToken: string trnToken, Status: TrnRequestStatus.Completed } ?
+            Trn = trn,
+            Status = status,
+            PotentialDuplicate = requestData.PotentialDuplicate ?? false,
+            AccessYourTeachingQualificationsLink = requestData is { TrnToken: string trnToken, Status: TrnRequestStatus.Completed } ?
                 trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) :
                 null
         };

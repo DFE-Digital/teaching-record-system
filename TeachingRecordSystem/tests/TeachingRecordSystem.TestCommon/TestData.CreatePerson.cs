@@ -51,7 +51,7 @@ public partial class TestData
         private readonly List<CreatePersonRouteToProfessionalStatusBuilder> _routeToProfessionalStatusBuilders = [];
         private readonly List<(string FirstName, string MiddleName, string LastName, DateTime Created)> _previousNames = [];
         private DateOnly? _qtlsDate;
-        private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject, bool? PotentialDuplicate)? _trnRequest;
+        private (Guid ApplicationUserId, string RequestId, bool? IdentityVerified, string? OneLoginUserSubject, bool? PotentialDuplicate)? _trnRequest;
         private string? _trnToken;
         private string? _slugId;
         private int? _loginFailedCounter;
@@ -333,10 +333,9 @@ public partial class TestData
             string requestId,
             bool? identityVerified = null,
             string? oneLoginUserSubject = null,
-            bool writeMetadata = true,
             bool? potentialDuplicate = null)
         {
-            _trnRequest = (applicationUserId, requestId, writeMetadata, identityVerified, oneLoginUserSubject, potentialDuplicate);
+            _trnRequest = (applicationUserId, requestId, identityVerified, oneLoginUserSubject, potentialDuplicate);
             return this;
         }
 
@@ -631,12 +630,12 @@ public partial class TestData
 
                 void AddTrnRequestMetadata()
                 {
-                    if (_trnRequest is not { WriteMetadata: true } trnRequest)
+                    if (_trnRequest is not { } trnRequest)
                     {
                         return;
                     }
 
-                    dbContext.TrnRequestMetadata.Add(new TrnRequestMetadata()
+                    var trnRequestMetadata = new TrnRequestMetadata()
                     {
                         ApplicationUserId = trnRequest.ApplicationUserId,
                         RequestId = trnRequest.RequestId,
@@ -652,7 +651,10 @@ public partial class TestData
                         NationalInsuranceNumber = _nationalInsuranceNumber,
                         TrnToken = _trnToken,
                         PotentialDuplicate = trnRequest.PotentialDuplicate ?? _hasTrn != true
-                    });
+                    };
+                    trnRequestMetadata.SetResolvedPerson(PersonId);
+
+                    dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
                 }
             });
 

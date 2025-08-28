@@ -91,7 +91,6 @@ public class CheckAnswers(
             var existingPersonId = state.PersonId!.Value;
 
             var furtherChecksNeeded = await trnRequestService.RequiresFurtherChecksNeededSupportTaskAsync(
-                DbContext,
                 existingPersonId,
                 requestData.ApplicationUserId);
 

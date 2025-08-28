@@ -9,7 +9,6 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.WebCommon.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
@@ -23,8 +22,7 @@ public class SignInJourneyHelper(
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     IUserInstanceStateProvider userInstanceStateProvider,
-    IClock clock,
-    TrnRequestService trnRequestService)
+    IClock clock)
 {
     public const string AuthenticationOnlyVtr = @"[""Cl.Cm""]";
     public const string AuthenticationAndIdentityVerificationVtr = @"[""Cl.Cm.P2""]";
@@ -342,11 +340,12 @@ public class SignInJourneyHelper(
     {
         Debug.Assert(oneLoginUser.Email is not null);
 
-        var trnRequestMetadataForUser = await dbContext.TrnRequestMetadata
-            .Where(m => m.OneLoginUserSubject == oneLoginUser.Subject || m.EmailAddress == oneLoginUser.Email)
+        var requestAndResolvedPerson = await dbContext.TrnRequestMetadata
+            .Join(dbContext.Persons, r => r.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequestMetadata = m, ResolvedPerson = p })
+            .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject || m.TrnRequestMetadata.EmailAddress == oneLoginUser.Email)
             .ToArrayAsync();
 
-        if (trnRequestMetadataForUser is not [var trnRequestMetadata])
+        if (requestAndResolvedPerson is not [{ TrnRequestMetadata: var trnRequestMetadata, ResolvedPerson: var resolvedPerson }])
         {
             return null;
         }
@@ -356,19 +355,12 @@ public class SignInJourneyHelper(
             return null;
         }
 
-        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(dbContext, trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
-        if (trnRequest is null)
-        {
-            Debug.Fail("TRN request does not exist.");
-            return null;
-        }
-
-        if (trnRequest.Metadata.Status is not TrnRequestStatus.Completed)
+        if (trnRequestMetadata.Status is not TrnRequestStatus.Completed)
         {
             return null;
         }
-        Debug.Assert(trnRequest.Metadata.ResolvedPersonId.HasValue);
-        Debug.Assert(trnRequest.ResolvedPersonTrn is not null);
+        Debug.Assert(trnRequestMetadata.ResolvedPersonId.HasValue);
+        Debug.Assert(resolvedPerson.Trn is not null);
 
         oneLoginUser.SetVerified(
             verifiedOn: trnRequestMetadata.CreatedOn,
@@ -378,11 +370,11 @@ public class SignInJourneyHelper(
             verifiedDatesOfBirth: [trnRequestMetadata.DateOfBirth]);
 
         oneLoginUser.SetMatched(
-            trnRequest.Metadata.ResolvedPersonId!.Value,
+            trnRequestMetadata.ResolvedPersonId!.Value,
             route: OneLoginUserMatchRoute.TrnRequest,
             matchedAttributes: null);
 
-        return new(trnRequest.ResolvedPersonTrn!);
+        return new(resolvedPerson.Trn);
     }
 
     public void Complete(SignInJourneyState state, string trn)

@@ -5,9 +5,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactWithMergeResolutionQuery, Contact>
+public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactWithMergeResolutionQuery, Contact?>
 {
-    public async Task<Contact> ExecuteAsync(GetContactWithMergeResolutionQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact?> ExecuteAsync(GetContactWithMergeResolutionQuery query, IOrganizationServiceAsync organizationService)
     {
         // Ensure we have MasterId in the columns requested
         var columns = query.ColumnSet.AllColumns ? query.ColumnSet :
@@ -15,7 +15,7 @@ public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactW
 
         return await FetchContactAsync(query.ContactId);
 
-        async Task<Contact> FetchContactAsync(Guid id)
+        async Task<Contact?> FetchContactAsync(Guid id)
         {
             var filter = new FilterExpression();
             filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, id);
@@ -32,14 +32,19 @@ public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactW
             };
 
             var result = (RetrieveMultipleResponse)await organizationService.ExecuteAsync(request);
-            var teacher = result.EntityCollection.Entities.Select(entity => entity.ToEntity<Contact>()).Single();
+            var contact = result.EntityCollection.Entities.Select(entity => entity.ToEntity<Contact>()).SingleOrDefault();
 
-            if (teacher.Merged == true)
+            if (contact is null)
             {
-                return await FetchContactAsync(teacher.MasterId.Id);
+                return null;
             }
 
-            return teacher;
+            if (contact.Merged == true)
+            {
+                return await FetchContactAsync(contact.MasterId.Id);
+            }
+
+            return contact;
         }
     }
 }

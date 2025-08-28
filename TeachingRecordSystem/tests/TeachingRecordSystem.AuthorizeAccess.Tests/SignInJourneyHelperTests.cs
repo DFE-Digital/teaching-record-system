@@ -148,9 +148,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
-            var person = await TestData.CreatePersonAsync(p => p
-                .WithoutTrn()
-                .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true, oneLoginUserSubject: subject));
+            await TestData.CreateApiTrnRequestSupportTaskAsync(
+                trnRequestFromApplicationUser.UserId,
+                s => s.WithStatus(SupportTaskStatus.Open).WithIdentityVerified(true).WithOneLoginUserSubject(subject));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
 

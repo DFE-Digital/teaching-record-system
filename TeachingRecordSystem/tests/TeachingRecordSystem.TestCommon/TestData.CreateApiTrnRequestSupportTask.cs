@@ -54,6 +54,8 @@ public partial class TestData
         private Option<DateTime> _createdOn;
         private Option<TrnRequestStatus> _trnRequestStatus;
         private Option<Guid?> _resolvedPersonId;
+        private Option<bool> _identityVerified;
+        private Option<string> _oneLoginUserSubject;
 
         public CreateApiTrnRequestSupportTaskBuilder WithFirstName(string firstName)
         {
@@ -121,9 +123,27 @@ public partial class TestData
             return this;
         }
 
+        public CreateApiTrnRequestSupportTaskBuilder WithRequestId(string requestId)
+        {
+            _requestId = Option.Some(requestId);
+            return this;
+        }
+
         public CreateApiTrnRequestSupportTaskBuilder WithTrnRequestStatus(TrnRequestStatus status)
         {
             _trnRequestStatus = Option.Some(status);
+            return this;
+        }
+
+        public CreateApiTrnRequestSupportTaskBuilder WithIdentityVerified(bool identityVerified)
+        {
+            _identityVerified = Option.Some(identityVerified);
+            return this;
+        }
+
+        public CreateApiTrnRequestSupportTaskBuilder WithOneLoginUserSubject(string oneLoginUserSubject)
+        {
+            _oneLoginUserSubject = Option.Some(oneLoginUserSubject);
             return this;
         }
 
@@ -184,9 +204,9 @@ public partial class TestData
                 ApplicationUserId = applicationUserId,
                 RequestId = trnRequestId,
                 CreatedOn = createdOn,
-                IdentityVerified = null,
+                IdentityVerified = _identityVerified.ValueOr(false),
                 EmailAddress = emailAddress,
-                OneLoginUserSubject = null,
+                OneLoginUserSubject = _oneLoginUserSubject.ValueOrDefault(),
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
