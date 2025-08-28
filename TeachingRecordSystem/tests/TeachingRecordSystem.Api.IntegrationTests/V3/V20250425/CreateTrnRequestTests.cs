@@ -184,7 +184,6 @@ public class CreateTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var existingContact = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithTrnRequest(ApplicationUserId, requestId)
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -244,7 +243,6 @@ public class CreateTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var existingContact = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -292,7 +290,6 @@ public class CreateTrnRequestTests : TestBase
         var invalidNino = "IvalidNi";
 
         var existingContact = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -445,7 +442,6 @@ public class CreateTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)

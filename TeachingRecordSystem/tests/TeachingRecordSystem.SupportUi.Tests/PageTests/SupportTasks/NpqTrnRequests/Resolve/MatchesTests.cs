@@ -115,7 +115,6 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber());
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure => configure.WithMatchedPersons(matchedPerson.PersonId));
@@ -148,7 +147,6 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithNationalInsuranceNumber(false)
             .WithMiddleName(""));
 
@@ -190,7 +188,6 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithNationalInsuranceNumber(false)
             .WithMiddleName(""));
 
@@ -230,7 +227,6 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail("something+test@education.gov.uk"));
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
@@ -263,7 +259,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithAlert());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert());
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithMatchedPersons(matchedPerson.PersonId));
@@ -410,7 +406,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUser.UserId,

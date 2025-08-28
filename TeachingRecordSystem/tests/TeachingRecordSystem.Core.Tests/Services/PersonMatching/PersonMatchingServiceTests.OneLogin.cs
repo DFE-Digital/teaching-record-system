@@ -31,7 +31,7 @@ public partial class PersonMatchingServiceTests
                 await dbContext.SaveChangesAsync();
             }
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName));
+            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName));
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
             var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
@@ -98,8 +98,8 @@ public partial class PersonMatchingServiceTests
             var lastName = TestData.GenerateLastName();
             var dateOfBirth = TestData.GenerateDateOfBirth();
 
-            var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-            var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person1 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
             string[][] names = [[firstName, lastName]];
             DateOnly[] datesOfBirth = [dateOfBirth];
@@ -130,7 +130,7 @@ public partial class PersonMatchingServiceTests
             });
             await dbContext.SaveChangesAsync();
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName));
+            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName));
 
             string[][] names = [[person.FirstName, person.LastName], [alias, person.LastName]];
             DateOnly[] datesOfBirth = [person.DateOfBirth];
@@ -160,19 +160,19 @@ public partial class PersonMatchingServiceTests
             var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
 
             // Person who matches on last name & DOB
-            var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
             // Person who matches on NINO
-            var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
+            var person2 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var personEmployment = await TestData.CreateTpsEmploymentAsync(person2, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
 
             // Person who matches on TRN
-            var person3 = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person3 = await TestData.CreatePersonAsync();
             var trn = person3.Trn!;
 
             // Person who matches on last name, DOB & TRN
-            var person4 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person4 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
             var trnTokenHintTrn = person4.Trn!;
 
             string[][] names = [[firstName, lastName]];

@@ -19,7 +19,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(person);
             Clock.Advance();
 
@@ -56,7 +56,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(person, email: Option.Some((string?)null));
             Clock.Advance();
 
@@ -108,7 +108,6 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true, oneLoginUserSubject: subject));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
@@ -186,7 +185,6 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithEmail(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
 
@@ -229,7 +227,6 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithoutTrn()
                 .WithEmail(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
 
@@ -266,7 +263,6 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithoutTrn()
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: false, oneLoginUserSubject: subject));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
@@ -303,7 +299,6 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithEmail(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: false));
 
@@ -505,7 +500,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -564,7 +559,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -623,7 +618,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -682,7 +677,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -731,7 +726,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -780,7 +775,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -829,7 +824,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -888,7 +883,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -938,7 +933,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -988,7 +983,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -1034,7 +1029,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -1084,7 +1079,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
@@ -1180,65 +1175,6 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         });
 
     [Fact]
-    public Task TryMatchToTeachingRecord_MatchesWithoutTrn_ReturnsFalseAndDoesNotSetAuthenticationTicket() =>
-        WithDbContextAsync(async dbContext =>
-        {
-            // Arrange
-            var personMatchingServiceMock = new Mock<IPersonMatchingService>();
-            var helper = CreateHelper(dbContext, personMatchingServiceMock.Object);
-
-            var firstName = Faker.Name.Last();
-            var lastName = Faker.Name.Last();
-            var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var person = await TestData.CreatePersonAsync(p => p.WithoutTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
-
-            var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
-            Clock.Advance();
-
-            var state = new SignInJourneyState(
-                redirectUri: "/",
-                serviceName: "Test Service",
-                serviceUrl: "https://service",
-                oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstanceAsync(state);
-
-            var authenticationTicket = CreateOneLoginAuthenticationTicket(
-                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
-                sub: user.Subject,
-                createCoreIdentityVc: false);
-            await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
-
-            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
-
-            personMatchingServiceMock
-                .Setup(mock => mock.MatchOneLoginUserAsync(It.Is<OneLoginUserMatchRequest>(r =>
-                    r.Names.SequenceEqual(state.VerifiedNames!) &&
-                    r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
-                    r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
-                    r.Trn == state.Trn)))
-                .ReturnsAsync(new OneLoginUserMatchResult(
-                    person.PersonId,
-                    person.Trn!,
-                    new Dictionary<PersonMatchedAttribute, string>()
-                    {
-                        { PersonMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
-                        { PersonMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
-                    }));
-
-            // Act
-            var result = await helper.TryMatchToTeachingRecordAsync(journeyInstance);
-
-            // Assert
-            Assert.False(result);
-
-            user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject);
-            Assert.Null(user.PersonId);
-
-            Assert.Null(state.AuthenticationTicket);
-        });
-
-    [Fact]
     public Task TryMatchToTeachingRecord_Matches_ReturnsTrueAndUpdatesOneLoginUserAssignsAuthenticationTicket() =>
         WithDbContextAsync(async dbContext =>
         {
@@ -1249,7 +1185,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var firstName = Faker.Name.Last();
             var lastName = Faker.Name.Last();
             var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
+            var person = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
 
             var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
             Clock.Advance();

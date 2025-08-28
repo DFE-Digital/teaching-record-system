@@ -23,7 +23,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUser_MatchesWithNino()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -52,7 +52,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithUnmatchedNino_MatchesWithTrn()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -86,7 +86,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithoutNino_MatchesWithTrn()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -119,7 +119,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUser_DoesNotMatchWithNinoOrTrn()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -156,7 +156,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithNeitherNinoNorTrn_DoesNotMatch()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -191,7 +191,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithTrnTokenAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -226,7 +226,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -264,7 +264,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedByTrnTokenAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -303,7 +303,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedBySupportAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -342,7 +342,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_KnownUser()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
@@ -364,7 +364,6 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var subject = TestData.CreateOneLoginUserSubject();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true, oneLoginUserSubject: subject));
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(subject: Option.Some(subject));
@@ -388,7 +387,6 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var email = TestData.GenerateUniqueEmail();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithEmail(email)
             .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true));
 

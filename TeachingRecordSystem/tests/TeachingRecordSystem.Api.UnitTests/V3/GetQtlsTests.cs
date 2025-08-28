@@ -24,7 +24,7 @@ public partial class GetQtlsTests(OperationTestFixture operationTestFixture) : O
         WithHandler<GetQtlsHandler>(async handler =>
         {
             // Arrange
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
 
             var command = new GetQtlsCommand(person.Trn!);
 
@@ -45,7 +45,6 @@ public partial class GetQtlsTests(OperationTestFixture operationTestFixture) : O
             var qtlsDate = new DateOnly(2025, 5, 1);
 
             var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithRouteToProfessionalStatus(s => s
                     .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId)
                     .WithStatus(RouteToProfessionalStatusStatus.Holds)

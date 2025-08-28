@@ -25,7 +25,7 @@ public class CreateNameChangeTests : TestBase
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/v3/person/name-changes")
         {
@@ -50,7 +50,7 @@ public class CreateNameChangeTests : TestBase
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -81,7 +81,7 @@ public class CreateNameChangeTests : TestBase
     public async Task Post_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();

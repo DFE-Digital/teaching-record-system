@@ -114,7 +114,7 @@
 //     public async Task Get_ValidRequestWithInductionAndPersonHasNullDqtStatus_ReturnsNullInductionContent()
 //     {
 //         // Arrange
-//         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+//         var person = await TestData.CreatePersonAsync();
 //
 //         // Arrange
 //         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
@@ -279,7 +279,7 @@
 //     public async Task Get_DateOfBirthDoesNotMatchTeachingRecord_ReturnsNotFound()
 //     {
 //         // Arrange
-//         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+//         var person = await TestData.CreatePersonAsync();
 //         var dateOfBirth = person.DateOfBirth.AddDays(1);
 //
 //         var httpClient = GetHttpClientWithApiKey();
@@ -296,7 +296,7 @@
 //     public async Task Get_DateOfBirthMatchesTeachingRecord_ReturnsOk()
 //     {
 //         // Arrange
-//         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+//         var person = await TestData.CreatePersonAsync();
 //
 //         var httpClient = GetHttpClientWithApiKey();
 //         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}");
@@ -312,7 +312,7 @@
 //     public async Task Get_DateOfBirthNotProvided_ReturnsOk()
 //     {
 //         // Arrange
-//         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+//         var person = await TestData.CreatePersonAsync();
 //
 //         var httpClient = GetHttpClientWithApiKey();
 //         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");

@@ -6,7 +6,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
 {
     protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUserId,
@@ -32,7 +32,6 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         {
             p
                 .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-                .WithTrn()
                 .WithNationalInsuranceNumber()
                 .WithEmail(TestData.GenerateUniqueEmail())
                 .WithGender(TestData.GenerateGender());

@@ -34,7 +34,7 @@ public partial class PersonMatchingServiceTests
                 await dbContext.SaveChangesAsync();
             }
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(personFirstName).WithEmail(TestData.GenerateUniqueEmail()));
+            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(personFirstName).WithEmail(TestData.GenerateUniqueEmail()));
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
             var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
@@ -124,14 +124,12 @@ public partial class PersonMatchingServiceTests
 
             // Person matching on NINO, first name and last name
             var person1 = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithFirstName(firstName)
                 .WithLastName(lastName));
 
             // Person matching on first name, last name, DOB and email
             var person2 = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithFirstName(firstName)
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
@@ -139,7 +137,6 @@ public partial class PersonMatchingServiceTests
 
             // Person matching on first name, middle name and last name
             var person3 = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithFirstName(firstName)
                 .WithMiddleName(middleName)
                 .WithLastName(lastName));

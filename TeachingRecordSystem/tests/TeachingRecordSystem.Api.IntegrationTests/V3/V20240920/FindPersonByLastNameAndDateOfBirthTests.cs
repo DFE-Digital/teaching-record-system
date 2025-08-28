@@ -21,7 +21,6 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var alertType = alertTypes.Where(at => !at.InternalOnly).RandomOne();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));

@@ -56,7 +56,6 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
             var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
 
             var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
                 .WithTrnRequest(applicationUserId, requestId)
                 .WithEmail(TestData.GenerateUniqueEmail()));
 

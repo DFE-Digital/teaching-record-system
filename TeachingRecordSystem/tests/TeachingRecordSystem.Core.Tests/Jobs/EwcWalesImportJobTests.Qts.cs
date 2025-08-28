@@ -17,7 +17,7 @@ public partial class EwcWalesImportJobTests
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 1;
         var fileName = "QTS.csv";
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trn = person.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString(QtsImporter.DATE_FORMAT)},{qtsStatus},04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -58,7 +58,7 @@ public partial class EwcWalesImportJobTests
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
         var fileName = "QTS.csv";
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trn = person.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString(QtsImporter.DATE_FORMAT)},{qtsStatus},{awardedDate.ToString(QtsImporter.DATE_FORMAT)},,,,,,,,,,,,,,,,,,,,,,,,\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -105,7 +105,7 @@ public partial class EwcWalesImportJobTests
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
         var fileName = "QTS.csv";
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trn = person.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString(QtsImporter.DATE_FORMAT)},{qtsStatus},{awardedDate.ToString(QtsImporter.DATE_FORMAT)},,,,,,,,,,,,,,,,,,,,,,,,\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -152,7 +152,7 @@ public partial class EwcWalesImportJobTests
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
         var fileName = "QTS.csv";
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trn = person.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString(QtsImporter.DATE_FORMAT)},{qtsStatus},{awardedDate.ToString(QtsImporter.DATE_FORMAT)},,,,,,,,,,,,,,,,,,,,,,,,\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -198,7 +198,7 @@ public partial class EwcWalesImportJobTests
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
         var fileName = "QTS.csv";
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trn = person.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString(QtsImporter.DATE_FORMAT)},{qtsStatus},{awardedDate.ToString(QtsImporter.DATE_FORMAT)},,,,,,,,,,,,,,,,,,,,,,,,\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -244,7 +244,7 @@ public partial class EwcWalesImportJobTests
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
         var fileName = "QTS.csv";
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trn = person.Trn;
         var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,CODE,QTS_DATE\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString(QtsImporter.DATE_FORMAT)},{qtsStatus},{awardedDate.ToString(QtsImporter.DATE_FORMAT)}\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -290,7 +290,6 @@ public partial class EwcWalesImportJobTests
         var fileName = "QTS.csv";
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithAlert();
         });
         var trn = person.Trn;
@@ -336,10 +335,10 @@ public partial class EwcWalesImportJobTests
         var expectedFailureRowCount = 1;
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var person2AwardedDate = new DateOnly(2014, 04, 04);
-        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person1 = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.WelshRId, person1AwardedDate));
-        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person2 = await TestData.CreatePersonAsync();
         var expectedValueMessage = $"For TRN {person1.Trn} Date of Birth does not match";
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{person1.Trn},firstname,lastname,{person1.DateOfBirth.AddYears(-1).ToString(QtsImporter.DATE_FORMAT)},49,04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,\r\n{person2.Trn},firstname,lastname,{person2.DateOfBirth.ToString(QtsImporter.DATE_FORMAT)},49,{person2AwardedDate.ToString(QtsImporter.DATE_FORMAT)},,,,,,,,,,,,,,,,,,,,,,,,\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -393,12 +392,12 @@ public partial class EwcWalesImportJobTests
         var person4AwardedDate = new DateOnly(2000, 03, 08);
         var person1QtsDate = new DateOnly(2000, 05, 04);
         var person2QtsDate = new DateOnly(2001, 08, 11);
-        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person1 = await TestData.CreatePersonAsync(p => p
             .WithQts(person1QtsDate));
-        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person2 = await TestData.CreatePersonAsync(p => p
             .WithQts(person2QtsDate));
-        var person3 = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var person4 = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person3 = await TestData.CreatePersonAsync();
+        var person4 = await TestData.CreatePersonAsync();
         var expectedTotalRowCount = 4;
         var expectedSuccessCount = 2;
         var expectedDuplicateRowCount = 0;
@@ -470,7 +469,7 @@ public partial class EwcWalesImportJobTests
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 1;
-        var person1 = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person1 = await TestData.CreatePersonAsync();
         var trn1 = person1.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},{qtsStatus},04/04/2024,,,,,,,,,,,,,,,,,,,,,,,,";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -510,7 +509,7 @@ public partial class EwcWalesImportJobTests
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
-        var person1 = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person1 = await TestData.CreatePersonAsync();
         var trn1 = person1.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},{qtsStatus},{Clock.Today.AddDays(-10).ToString(QtsImporter.DATE_FORMAT)},,,,,,,,,,,,,,,,,,,,,,,,";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
@@ -553,7 +552,7 @@ public partial class EwcWalesImportJobTests
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
-        var person1 = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person1 = await TestData.CreatePersonAsync();
         var trn1 = person1.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},{qtsStatus},04/04/1999,,,,,,,,,,,,,,,,,,,,,,,,";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);

@@ -144,7 +144,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithLastName(lastName);
-            x.WithTrn();
             x.WithDateOfBirth(new DateOnly(1983, 01, 07));
             x.WithGender(Gender.Male);
             x.WithCreatedByTps(true);
@@ -258,7 +257,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithLastName(lastName);
-            x.WithTrn();
             x.WithDateOfBirth(new DateOnly(1983, 01, 07));
             x.WithGender(Gender.Male);
             x.WithCreatedByTps(true);
@@ -372,7 +370,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithLastName(lastName);
-            x.WithTrn();
             x.WithDateOfBirth(new DateOnly(1983, 01, 07));
             x.WithGender(Gender.Male);
             x.WithCreatedByTps(true);
@@ -480,7 +477,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithLastName(lastName);
-            x.WithTrn();
             x.WithDateOfBirth(new DateOnly(1983, 01, 07));
             x.WithGender(Gender.Male);
         });
@@ -560,7 +556,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithLastName(lastName);
-            x.WithTrn();
             x.WithDateOfBirth(new DateOnly(1983, 01, 07));
             x.WithGender(Gender.Male);
         });
@@ -640,7 +635,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithDateOfBirth(new DateOnly(1983, 01, 07));
             x.WithGender(gender);
         });
@@ -723,7 +717,6 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
             var person = await TestData.CreatePersonAsync(x =>
             {
-                x.WithTrn();
                 x.WithDateOfBirth(new DateOnly(1983, 01, 07));
                 x.WithGender(gender);
                 x.WithNationalInsuranceNumber(true);

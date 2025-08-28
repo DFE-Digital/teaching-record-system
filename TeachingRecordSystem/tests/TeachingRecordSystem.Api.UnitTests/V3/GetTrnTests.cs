@@ -25,7 +25,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
         WithHandler<GetTrnHandler>(async handler =>
         {
             // Arrange
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
 
             await DbFixture.WithDbContextAsync(dbContext =>
                 dbContext.Persons
@@ -46,8 +46,8 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
         WithHandler<GetTrnHandler>(async handler =>
         {
             // Arrange
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
-            var anotherPerson = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
+            var anotherPerson = await TestData.CreatePersonAsync();
 
             await DbFixture.WithDbContextAsync(dbContext =>
                 dbContext.Persons
@@ -77,7 +77,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
         WithHandler<GetTrnHandler>(async handler =>
         {
             // Arrange
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var person = await TestData.CreatePersonAsync();
             Debug.Assert(person.Person.Status is PersonStatus.Active);
             var command = new GetTrnCommand(person.Trn!);
 

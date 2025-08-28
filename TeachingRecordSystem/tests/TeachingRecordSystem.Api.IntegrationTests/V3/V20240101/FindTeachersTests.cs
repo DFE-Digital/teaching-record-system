@@ -24,8 +24,8 @@ public class FindTeachersTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePersonAsync(b => b.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePersonAsync(b => b.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person1 = await TestData.CreatePersonAsync(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePersonAsync(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -91,13 +91,13 @@ public class FindTeachersTests : TestBase
         var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
+
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
+
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
@@ -169,9 +169,9 @@ public class FindTeachersTests : TestBase
         var lastName = TestData.GenerateLastName();
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var person3 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
+        var person1 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person3 = await TestData.CreatePersonAsync(p => p.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
         var updatedLastName = TestData.GenerateChangedLastName(lastName);
         await TestData.UpdatePersonAsync(b => b.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName));
 
@@ -241,7 +241,6 @@ public class FindTeachersTests : TestBase
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync(sanctionCode);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));

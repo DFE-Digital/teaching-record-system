@@ -90,7 +90,7 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_WithMalformedDateOfBirth_ReturnsErrorMessages()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -110,7 +110,7 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_WithMalformedQTSDate_ReturnsErrorMessages()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -130,7 +130,7 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_ExistingTeacherDateOfBirthDoesNotMatch_ReturnsErrorMessage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -156,7 +156,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -186,7 +186,6 @@ public class QtsImporterTests : IAsyncLifetime
         });
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
                 .WithHoldsFrom(holdsDate)
@@ -222,7 +221,6 @@ public class QtsImporterTests : IAsyncLifetime
         });
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
                 .WithHoldsFrom(holdsDate)
@@ -257,7 +255,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -286,7 +284,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -315,7 +313,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -344,7 +342,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -403,7 +401,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -432,7 +430,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -488,7 +486,6 @@ public class QtsImporterTests : IAsyncLifetime
         });
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithAlert();
         });
         var row = GetDefaultRow(x =>
@@ -518,7 +515,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithAccountNumber(accountNumber);
         });
         var person1AwardedDate = new DateOnly(2011, 01, 04);
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.WelshRId)
                 .WithHoldsFrom(Clock.Today.AddDays(-10))

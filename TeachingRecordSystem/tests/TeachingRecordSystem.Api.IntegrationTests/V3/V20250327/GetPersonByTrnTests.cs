@@ -13,7 +13,6 @@ public class GetPersonByTrnTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithQts()
             .WithQtls(Clock.Today));
 

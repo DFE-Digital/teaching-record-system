@@ -17,8 +17,7 @@ public class SetPiiTests : TestBase
         // Arrange
         SetCurrentApiClient(roles);
 
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"/v3/persons/{person.Trn}")
         {
@@ -67,8 +66,7 @@ public class SetPiiTests : TestBase
     public async Task Put_PiiUpdatesNotPermitted_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         XrmFakedContext.UpdateEntity(new Contact()
         {
@@ -98,9 +96,7 @@ public class SetPiiTests : TestBase
     public async Task Put_PersonHasQts_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var content = CreateJsonContent(new
         {
@@ -124,9 +120,7 @@ public class SetPiiTests : TestBase
     public async Task Put_PersonHasEyts_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithEyts(new DateOnly(2000, 01, 10)));
+        var person = await TestData.CreatePersonAsync(p => p.WithEyts(new DateOnly(2000, 01, 10)));
 
         var content = CreateJsonContent(new
         {
@@ -150,9 +144,7 @@ public class SetPiiTests : TestBase
     public async Task Put_ValidRequest_ReturnsNoContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithGender(Core.Models.Gender.Male));
+        var person = await TestData.CreatePersonAsync(p => p.WithGender(Core.Models.Gender.Male));
 
         var updatedFirstName = Faker.Name.First();
         var updatedMiddleName = Faker.Name.Middle();
@@ -197,7 +189,6 @@ public class SetPiiTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithGender(Core.Models.Gender.Male)
             .WithEmail(Faker.Internet.Email())
             .WithNationalInsuranceNumber(Faker.Identification.UkNationalInsuranceNumber()));

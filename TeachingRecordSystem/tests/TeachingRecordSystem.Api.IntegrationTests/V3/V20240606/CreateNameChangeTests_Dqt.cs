@@ -21,7 +21,7 @@ public class CreateNameChangeTests_Dqt(HostFixture hostFixture) : TestBase(hostF
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/v3/person/name-changes")
         {
@@ -46,7 +46,7 @@ public class CreateNameChangeTests_Dqt(HostFixture hostFixture) : TestBase(hostF
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -77,7 +77,7 @@ public class CreateNameChangeTests_Dqt(HostFixture hostFixture) : TestBase(hostF
     public async Task Post_ValidRequest_CreatesIncidentAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();

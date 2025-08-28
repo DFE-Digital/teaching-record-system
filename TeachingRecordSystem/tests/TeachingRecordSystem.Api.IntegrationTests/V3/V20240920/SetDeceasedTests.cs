@@ -18,7 +18,7 @@ public class SetDeceasedTests : TestBase
     {
         // Arrange
         SetCurrentApiClient(roles);
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestBody = CreateJsonContent(new { DateOfDeath = new DateOnly(1990, 01, 01) });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/deceased/{person.Trn}")
         {
@@ -37,7 +37,7 @@ public class SetDeceasedTests : TestBase
     {
         // Arrange
         var futureDate = Clock.UtcNow.AddYears(1).ToDateOnlyWithDqtBstFix(isLocalTime: false);
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestBody = CreateJsonContent(new { DateOfDeath = futureDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/deceased/{person.Trn}")
         {
@@ -59,7 +59,7 @@ public class SetDeceasedTests : TestBase
     {
         // Arrange
         var futureDate = Clock.UtcNow.AddYears(1).ToDateOnlyWithDqtBstFix(isLocalTime: false);
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestBody = CreateJsonContent(new { DateOfDeath = default(DateOnly?) });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/deceased/{person.Trn}")
         {
@@ -95,7 +95,7 @@ public class SetDeceasedTests : TestBase
     public async Task Put_ExistingDateOfDeath_ReturnsNoContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestBody1 = CreateJsonContent(new { DateOfDeath = new DateOnly(1990, 01, 01) });
         var requestBody2 = CreateJsonContent(new { DateOfDeath = new DateOnly(1980, 01, 01) });
         var request1 = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/deceased/{person.Trn}")
@@ -120,7 +120,7 @@ public class SetDeceasedTests : TestBase
     public async Task Put_ValidDateOfDeath_ReturnsNoContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var requestBody = CreateJsonContent(new { DateOfDeath = new DateOnly(1990, 01, 01) });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/deceased/{person.Trn}")
         {

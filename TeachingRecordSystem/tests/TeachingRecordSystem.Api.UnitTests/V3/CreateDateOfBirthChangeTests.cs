@@ -30,7 +30,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
         WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
         {
             // Arrange
-            var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var createPersonResult = await TestData.CreatePersonAsync();
             var command = await CreateCommand() with
             {
                 Trn = createPersonResult!.Trn!,
@@ -49,7 +49,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
         WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
         {
             // Arrange
-            var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var createPersonResult = await TestData.CreatePersonAsync();
             var command = await CreateCommand() with
             {
                 Trn = createPersonResult!.Trn!

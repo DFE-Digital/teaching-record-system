@@ -7,7 +7,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact(Skip = "Flaky on CI")]
     public async Task SignInAndOut()
     {
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);

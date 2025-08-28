@@ -6,7 +6,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ContentIsEmpty_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/notes/add")
         {
@@ -27,7 +27,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ContentWithoutFile_CreatesNoteAndEventAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var text = Faker.Lorem.Paragraph();
 
@@ -65,7 +65,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ContentWithFile_CreatesNoteAndEventAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
 
         var text = Faker.Lorem.Paragraph();
 
@@ -106,7 +106,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);

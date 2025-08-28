@@ -17,7 +17,6 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
             .WithEmail(TestData.GenerateUniqueEmail()));
 
@@ -56,7 +55,6 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, holdsFrom: Clock.Today)
             .WithEmail(TestData.GenerateUniqueEmail()));
 
@@ -95,7 +93,6 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, holdsFrom: Clock.Today)
             .WithEmail(TestData.GenerateUniqueEmail()));
 
@@ -134,7 +131,6 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
             .WithEmail(TestData.GenerateUniqueEmail()));
 

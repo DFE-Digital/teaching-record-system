@@ -67,7 +67,7 @@ public class GetTeacherTests : TestBase
         // Arrange
         var birthDate = new DateOnly(1990, 4, 1);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithDateOfBirth(birthDate));
+        var person = await TestData.CreatePersonAsync(p => p.WithDateOfBirth(birthDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{person.Trn}?birthdate={birthDate:yyyy-MM-dd}");
 
@@ -84,9 +84,9 @@ public class GetTeacherTests : TestBase
         // Arrange
         var birthDate = new DateOnly(1990, 4, 1);
 
-        var personWithMatchingTrn = await TestData.CreatePersonAsync(p => p.WithTrn().WithDateOfBirth(birthDate));
+        var personWithMatchingTrn = await TestData.CreatePersonAsync(p => p.WithDateOfBirth(birthDate));
 
-        var personWithMatchingNino = await TestData.CreatePersonAsync(p => p.WithTrn().WithDateOfBirth(birthDate).WithNationalInsuranceNumber());
+        var personWithMatchingNino = await TestData.CreatePersonAsync(p => p.WithDateOfBirth(birthDate).WithNationalInsuranceNumber());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{personWithMatchingTrn.Trn}?birthdate={birthDate:yyyy-MM-dd}&nino={personWithMatchingNino.NationalInsuranceNumber}");
 

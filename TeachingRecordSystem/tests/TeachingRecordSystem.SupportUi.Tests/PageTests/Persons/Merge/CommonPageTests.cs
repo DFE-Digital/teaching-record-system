@@ -13,8 +13,7 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
     public async Task OtherTrnNotSelected_RedirectsToEnterTrnPage(string page, HttpMethod httpMethod)
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,

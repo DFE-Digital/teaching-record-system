@@ -35,7 +35,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn()
             .WithEmail((string?)email)
             .WithNationalInsuranceNumber()
             .WithGender());
@@ -82,7 +81,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
             .WithEmail((string?)email)
             .WithNationalInsuranceNumber()
             .WithGender());
@@ -122,8 +120,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var createPersonResult = await TestData.CreatePersonAsync(b => b
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithoutTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
 
@@ -136,7 +133,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetSummaryListValueForKey("Name"));
         Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Email"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Gender"));
@@ -165,8 +161,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         Debug.Assert(person.Alerts.Count == 0);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -238,7 +233,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn()
             .WithQts(awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -268,7 +262,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn()
             .WithQtls(awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -298,7 +291,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -328,7 +320,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -358,7 +349,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
-            .WithTrn()
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus, awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -689,11 +679,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var primaryPerson = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn());
+            .WithPersonDataSource(TestDataPersonDataSource.Trs));
         var secondaryPerson = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithTrn()
             .WithMergedWithPersonId(primaryPerson.PersonId));
 
         await WithDbContext(async dbContext =>

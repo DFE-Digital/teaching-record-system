@@ -20,7 +20,6 @@ public partial class EwcWalesImportJobTests
         var passDate = new DateOnly(2019, 09, 28);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.WelshRId, holdDate);
             x.WithAlert();
         });
@@ -70,7 +69,6 @@ public partial class EwcWalesImportJobTests
         var passDate = Clock.Today.AddYears(-1).AddDays(2);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithRouteToProfessionalStatus(s => s
                 .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId)
                 .WithHoldsFrom(holdsDate)
@@ -125,7 +123,6 @@ public partial class EwcWalesImportJobTests
         var passDate = new DateOnly(2017, 09, 28);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.WelshRId, holdsFrom);
         });
         var trn = person.Trn;
@@ -174,7 +171,7 @@ public partial class EwcWalesImportJobTests
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 1;
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var trn1 = person.Trn;
         var inductionStartDate = new DateOnly(2024, 05, 01);
         var inductionPassDate = new DateOnly(2024, 10, 07);
@@ -228,7 +225,6 @@ public partial class EwcWalesImportJobTests
         });
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithQts(qtsDate);
             x.WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.WelshRId, holdsFrom);
         });
@@ -330,7 +326,6 @@ public partial class EwcWalesImportJobTests
         var passDate = DateTime.ParseExact("28/09/2017", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithTrn();
             x.WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.WelshRId, passDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
         });
 

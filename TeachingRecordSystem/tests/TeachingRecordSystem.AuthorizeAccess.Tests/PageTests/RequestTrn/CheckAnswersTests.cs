@@ -599,12 +599,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithFirstName(state.FirstName!)
             .WithMiddleName(state.MiddleName)
             .WithLastName(state!.LastName!));
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithFirstName(state.FirstName!)
             .WithMiddleName(state.MiddleName)
             .WithLastName(state!.LastName!));
@@ -629,7 +627,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
             .WithFirstName(state.FirstName!)
             .WithMiddleName(state.MiddleName)
             .WithLastName(state!.LastName!)

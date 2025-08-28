@@ -95,7 +95,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);

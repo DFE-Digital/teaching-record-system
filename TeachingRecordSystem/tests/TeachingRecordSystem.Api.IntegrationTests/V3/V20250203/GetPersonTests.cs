@@ -43,7 +43,7 @@
 //     public async Task Get_WithNullDqtInductionStatus_ReturnsNoneInductionStatus()
 //     {
 //         // Arrange
-//         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+//         var person = await TestData.CreatePersonAsync();
 //
 //         // Arrange
 //         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");

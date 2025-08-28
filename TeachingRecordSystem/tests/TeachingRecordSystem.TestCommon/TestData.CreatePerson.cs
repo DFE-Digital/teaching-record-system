@@ -36,7 +36,6 @@ public partial class TestData
 
         private readonly ReferenceData _referenceData;
         private DateOnly? _dateOfBirth;
-        private bool? _hasTrn;
         private string? _firstName;
         private string? _middleName;
         private string? _lastName;
@@ -113,8 +112,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithAlert(Action<CreatePersonAlertBuilder>? configure = null)
         {
-            EnsureTrn();
-
             var alertBuilder = new CreatePersonAlertBuilder();
             configure?.Invoke(alertBuilder);
             _alertBuilders.Add(alertBuilder);
@@ -124,8 +121,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithMandatoryQualification(Action<CreatePersonMandatoryQualificationBuilder>? configure = null)
         {
-            EnsureTrn();
-
             var mqBuilder = new CreatePersonMandatoryQualificationBuilder();
             configure?.Invoke(mqBuilder);
             _mqBuilders.Add(mqBuilder);
@@ -135,8 +130,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithRouteToProfessionalStatus(Action<CreatePersonRouteToProfessionalStatusBuilder> configure)
         {
-            EnsureTrn();
-
             var builder = new CreatePersonRouteToProfessionalStatusBuilder();
             configure.Invoke(builder);
             _routeToProfessionalStatusBuilders.Add(builder);
@@ -162,8 +155,6 @@ public partial class TestData
             Guid routeToProfessionalStatusTypeId,
             DateOnly holdsFrom)
         {
-            EnsureTrn();
-
             var routeType = _referenceData.RouteTypes.Single(r => r.RouteToProfessionalStatusTypeId == routeToProfessionalStatusTypeId);
 
             return WithRouteToProfessionalStatus(b =>
@@ -215,27 +206,6 @@ public partial class TestData
             });
         }
 
-        public CreatePersonBuilder WithoutTrn()
-        {
-            if (_alertBuilders.Any() ||
-                _mqBuilders.Any() ||
-                _qtlsDate.HasValue ||
-                _routeToProfessionalStatusBuilders.Any() ||
-                _inductionBuilder?.HasStatusRequiringQts == true)
-            {
-                throw new InvalidOperationException("Person requires a TRN.");
-            }
-
-            _hasTrn = false;
-            return this;
-        }
-
-        public CreatePersonBuilder WithTrn()
-        {
-            _hasTrn = true;
-            return this;
-        }
-
         public CreatePersonBuilder WithGender(bool hasGender = true)
         {
             _hasGender = hasGender;
@@ -278,8 +248,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithQts(DateOnly holdsFrom)
         {
-            EnsureTrn();
-
             WithHoldsRouteToProfessionalStatus(
                 routeToProfessionalStatusTypeId: new("4163C2FB-6163-409F-85FD-56E7C70A54DD"),
                 holdsFrom);
@@ -291,8 +259,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithQtls(DateOnly holdsFrom)
         {
-            EnsureTrn();
-
             _qtlsDate = holdsFrom;
 
             WithRouteToProfessionalStatus(p => p
@@ -305,8 +271,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithQtlsStatus(QtlsStatus qtlsStatus)
         {
-            EnsureTrn();
-
             if (qtlsStatus is QtlsStatus.Active)
             {
                 return WithQtls();
@@ -321,8 +285,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithEyts(DateOnly holdsFrom)
         {
-            EnsureTrn();
-
             WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, holdsFrom);
 
             return this;
@@ -384,8 +346,6 @@ public partial class TestData
 
         public CreatePersonBuilder WithInductionStatus(Action<CreatePersonInductionBuilder> configure)
         {
-            EnsureTrn();
-
             _inductionBuilder ??= new();
             configure(_inductionBuilder);
 
@@ -424,7 +384,7 @@ public partial class TestData
 
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
-            var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
+            var trn = await testData.GenerateTrnAsync();
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
             var statedMiddleName = _middleName ?? testData.GenerateMiddleName();
             var firstAndMiddleNames = $"{statedFirstName} {statedMiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -650,7 +610,7 @@ public partial class TestData
                         DateOfBirth = dateOfBirth,
                         NationalInsuranceNumber = _nationalInsuranceNumber,
                         TrnToken = _trnToken,
-                        PotentialDuplicate = trnRequest.PotentialDuplicate ?? _hasTrn != true
+                        PotentialDuplicate = false
                     };
                     trnRequestMetadata.SetResolvedPerson(PersonId);
 
@@ -700,17 +660,6 @@ public partial class TestData
                 ProfessionalStatuses = routes,
                 PreviousNames = previousNames
             };
-        }
-
-
-        private void EnsureTrn()
-        {
-            _hasTrn ??= true;
-
-            if (_hasTrn != true)
-            {
-                throw new InvalidOperationException("Person requires a TRN.");
-            }
         }
 
         internal DateOnly? GetQtsDate() =>
