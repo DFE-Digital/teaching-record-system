@@ -7,12 +7,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 [Collection(nameof(DisableParallelization))]
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    public Task InitializeAsync() => WithDbContext(async dbContext =>
-    {
-        await dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync();
-        await dbContext.TrnRequestMetadata.ExecuteDeleteAsync();
-        await dbContext.Events.ExecuteDeleteAsync();
-    });
+    public Task InitializeAsync() => HostFixture.Services.GetRequiredService<DbHelper>().ClearDataAsync();
 
     public Task DisposeAsync() => Task.CompletedTask;
 

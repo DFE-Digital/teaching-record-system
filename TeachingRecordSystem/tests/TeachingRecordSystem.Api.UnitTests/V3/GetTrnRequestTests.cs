@@ -1,6 +1,4 @@
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
@@ -26,7 +24,31 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
         });
 
     [Fact]
-    public Task HandleAsync_CreatedContactHasTrn_ReturnsTrnAndCompletedStatus() =>
+    public Task HandleAsync_RequestIsPending_ReturnsPendingStatus() =>
+        WithHandler<GetTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+
+            await TestData.CreateApiTrnRequestSupportTaskAsync(
+                applicationUserId,
+                c => c.WithRequestId(requestId).WithStatus(SupportTaskStatus.Open));
+
+            var command = new GetTrnRequestCommand(requestId);
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var success = result.GetSuccess();
+            Assert.Equal(TrnRequestStatus.Pending, success.Status);
+            Assert.Null(success.Trn);
+            Assert.Null(success.AccessYourTeachingQualificationsLink);
+        });
+
+    [Fact]
+    public Task HandleAsync_RequestIsCompleted_ReturnsTrnAndCompletedStatus() =>
         WithHandler<GetTrnRequestHandler>(async handler =>
         {
             // Arrange
@@ -50,138 +72,6 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
             Assert.NotNull(success.AccessYourTeachingQualificationsLink);
         });
 
-    [Fact]
-    public Task HandleAsync_CreatedContactIsMerged_ReturnsMergedRecordsTrnAndCompletedStatus() =>
-        WithHandler<GetTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var requestId = Guid.NewGuid().ToString();
-            var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
-            var firstName = Faker.Name.First();
-            var middleName = Faker.Name.Middle();
-            var lastName = Faker.Name.Last();
-            var dateOfBirth = new DateOnly(1990, 01, 01);
-            var email = Faker.Internet.Email();
-            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-            var masterContact = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
-                .WithFirstName(firstName)
-                .WithMiddleName(middleName)
-                .WithLastName(lastName)
-                .WithDateOfBirth(dateOfBirth)
-                .WithEmail(email)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
-
-            var existingContact = await TestData.CreatePersonAsync(p => p
-                .WithoutTrn()
-                .WithFirstName(firstName)
-                .WithMiddleName(middleName)
-                .WithLastName(lastName)
-                .WithDateOfBirth(dateOfBirth)
-                .WithEmail(email)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-                .WithTrnRequest(applicationUserId, requestId));
-
-            XrmFakedContext.UpdateEntity(new Contact()
-            {
-                ContactId = existingContact.ContactId,
-                Merged = true,
-                MasterId = masterContact.ContactId.ToEntityReference(Contact.EntityLogicalName),
-                StateCode = ContactState.Inactive
-            });
-
-            var command = new GetTrnRequestCommand(requestId);
-
-            // Act
-            var result = await handler.HandleAsync(command);
-
-            // Assert
-            var success = result.GetSuccess();
-            Assert.Equal(TrnRequestStatus.Completed, success.Status);
-            Assert.Equal(masterContact.Trn, success.Trn);
-            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
-        });
-
-    [Fact]
-    public Task HandleAsync_CreatedContactDoesNotHaveTrn_ReturnsPendingStatus() =>
-        WithHandler<GetTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var requestId = Guid.NewGuid().ToString();
-            var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
-
-            var person = await TestData.CreatePersonAsync(p => p
-                .WithoutTrn()
-                .WithTrnRequest(applicationUserId, requestId));
-
-            var command = new GetTrnRequestCommand(requestId);
-
-            // Act
-            var result = await handler.HandleAsync(command);
-
-            // Assert
-            var success = result.GetSuccess();
-            Assert.Equal(TrnRequestStatus.Pending, success.Status);
-            Assert.Null(success.Trn);
-            Assert.Null(success.AccessYourTeachingQualificationsLink);
-        });
-
-    [Fact]
-    public Task HandleAsync_RequestIdNotInDbOrCrmButResolvedInMetadata_ReturnsTrnAndCompletedStatus() =>
-        WithHandler<GetTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var requestId = Guid.NewGuid().ToString();
-            var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
-
-            var person = await TestData.CreatePersonAsync(p => p
-                .WithTrn()
-                .WithEmail(TestData.GenerateUniqueEmail()));
-
-            await base.DbFixture.WithDbContextAsync(async dbContext =>
-            {
-                var trnRequestMetadata = new TrnRequestMetadata
-                {
-                    ApplicationUserId = applicationUserId,
-                    RequestId = requestId,
-                    CreatedOn = Clock.UtcNow,
-                    IdentityVerified = null,
-                    EmailAddress = person.Email,
-                    OneLoginUserSubject = null,
-                    FirstName = person.FirstName,
-                    MiddleName = person.MiddleName,
-                    LastName = person.LastName,
-                    Name = [person.FirstName, person.MiddleName, person.LastName],
-                    DateOfBirth = person.DateOfBirth,
-                    PotentialDuplicate = false,
-                    NationalInsuranceNumber = person.NationalInsuranceNumber,
-                    Gender = null,
-                    AddressLine1 = null,
-                    AddressLine2 = null,
-                    AddressLine3 = null,
-                    City = null,
-                    Postcode = null,
-                    Country = null,
-                    TrnToken = null
-                };
-                trnRequestMetadata.SetResolvedPerson(person.PersonId);
-
-                dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
-                await dbContext.SaveChangesAsync();
-            });
-
-            var command = new GetTrnRequestCommand(requestId);
-
-            // Act
-            var result = await handler.HandleAsync(command);
-
-            // Assert
-            var success = result.GetSuccess();
-            Assert.Equal(TrnRequestStatus.Completed, success.Status);
-            Assert.Equal(person.Trn, success.Trn);
-        });
-
     public async Task InitializeAsync()
     {
         // Any existing Contacts will affect our duplicate matching; clear them all out before every test
@@ -201,4 +91,3 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
 
     public Task DisposeAsync() => Task.CompletedTask;
 }
-

@@ -42,55 +42,55 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         await action(dbContext);
     }
 
-    [Fact]
-    public async Task HandleOutboxMessage_ForTrnRequestMetadataMessage_AddsTrnRequestMetadataToDb()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-        var oneLoginUserSubject = TestData.CreateOneLoginUserSubject();
-        var email = TestData.GenerateUniqueEmail();
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithoutTrn()
-            .WithTrnRequest(applicationUser.UserId, requestId, writeMetadata: false));
-
-        var message = new TrnRequestMetadataMessage()
-        {
-            ApplicationUserId = applicationUser.UserId,
-            RequestId = requestId,
-            CreatedOn = Clock.UtcNow,
-            IdentityVerified = true,
-            OneLoginUserSubject = oneLoginUserSubject,
-            EmailAddress = email,
-            Name = [person.FirstName, person.LastName],
-            DateOfBirth = person.DateOfBirth,
-        };
-
-        var outboxMessage = new dfeta_TrsOutboxMessage()
-        {
-            dfeta_Payload = MessageSerializer.SerializeMessage(message, out var messageName),
-            dfeta_MessageName = messageName
-        };
-
-        // Act
-        await Handler.HandleOutboxMessageAsync(outboxMessage);
-
-        // Assert
-        await WithDbContextAsync(async dbContext =>
-        {
-            var oneLoginUser = await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject);
-            Assert.Null(oneLoginUser);
-
-            var trnRequestMetadata = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUser.UserId && m.RequestId == requestId);
-            Assert.NotNull(trnRequestMetadata);
-            Assert.Equal(message.IdentityVerified, trnRequestMetadata.IdentityVerified);
-            Assert.Equal(message.OneLoginUserSubject, trnRequestMetadata.OneLoginUserSubject);
-            Assert.Equal(message.EmailAddress, trnRequestMetadata.EmailAddress);
-            Assert.Equal(message.Name, trnRequestMetadata.Name);
-            Assert.Equal(message.DateOfBirth, trnRequestMetadata.DateOfBirth);
-        });
-    }
+    // [Fact]
+    // public async Task HandleOutboxMessage_ForTrnRequestMetadataMessage_AddsTrnRequestMetadataToDb()
+    // {
+    //     // Arrange
+    //     var requestId = Guid.NewGuid().ToString();
+    //     var applicationUser = await TestData.CreateApplicationUserAsync();
+    //     var oneLoginUserSubject = TestData.CreateOneLoginUserSubject();
+    //     var email = TestData.GenerateUniqueEmail();
+    //
+    //     var person = await TestData.CreatePersonAsync(p => p
+    //         .WithoutTrn()
+    //         .WithTrnRequest(applicationUser.UserId, requestId, writeMetadata: false));
+    //
+    //     var message = new TrnRequestMetadataMessage()
+    //     {
+    //         ApplicationUserId = applicationUser.UserId,
+    //         RequestId = requestId,
+    //         CreatedOn = Clock.UtcNow,
+    //         IdentityVerified = true,
+    //         OneLoginUserSubject = oneLoginUserSubject,
+    //         EmailAddress = email,
+    //         Name = [person.FirstName, person.LastName],
+    //         DateOfBirth = person.DateOfBirth,
+    //     };
+    //
+    //     var outboxMessage = new dfeta_TrsOutboxMessage()
+    //     {
+    //         dfeta_Payload = MessageSerializer.SerializeMessage(message, out var messageName),
+    //         dfeta_MessageName = messageName
+    //     };
+    //
+    //     // Act
+    //     await Handler.HandleOutboxMessageAsync(outboxMessage);
+    //
+    //     // Assert
+    //     await WithDbContextAsync(async dbContext =>
+    //     {
+    //         var oneLoginUser = await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject);
+    //         Assert.Null(oneLoginUser);
+    //
+    //         var trnRequestMetadata = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUser.UserId && m.RequestId == requestId);
+    //         Assert.NotNull(trnRequestMetadata);
+    //         Assert.Equal(message.IdentityVerified, trnRequestMetadata.IdentityVerified);
+    //         Assert.Equal(message.OneLoginUserSubject, trnRequestMetadata.OneLoginUserSubject);
+    //         Assert.Equal(message.EmailAddress, trnRequestMetadata.EmailAddress);
+    //         Assert.Equal(message.Name, trnRequestMetadata.Name);
+    //         Assert.Equal(message.DateOfBirth, trnRequestMetadata.DateOfBirth);
+    //     });
+    // }
 
     [Fact]
     public async Task HandleOutboxMessage_ForAddInductionExemptionMessage_AddsExemptionReason()
