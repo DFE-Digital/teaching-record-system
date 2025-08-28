@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
@@ -45,13 +46,13 @@ public class AcceptModel(
         SupportTask.UpdatedOn = now;
 
         var updateResult = Person!.UpdateDetails(
-            (ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.FirstName : Person.FirstName) ?? string.Empty,
-            (ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.MiddleName : Person.MiddleName) ?? string.Empty,
-            (ChangeType == SupportTaskType.ChangeNameRequest ? changeNameRequestData!.LastName : Person.LastName) ?? string.Empty,
-            ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? changeDateOfBirthRequestData!.DateOfBirth : Person.DateOfBirth,
-            Person.EmailAddress is string personEmailAddress ? EmailAddress.Parse(personEmailAddress) : null,
-            Person.NationalInsuranceNumber is string nationalInsuranceNumber ? NationalInsuranceNumber.Parse(nationalInsuranceNumber) : null,
-            Person.Gender,
+            ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.FirstName ?? string.Empty) : Option.None<string>(),
+            ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.MiddleName ?? string.Empty) : Option.None<string>(),
+            ChangeType == SupportTaskType.ChangeNameRequest ? Option.Some(changeNameRequestData!.LastName ?? string.Empty) : Option.None<string>(),
+            ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? Option.Some<DateOnly?>(changeDateOfBirthRequestData!.DateOfBirth) : Option.None<DateOnly?>(),
+            Option.None<EmailAddress?>(),
+            Option.None<NationalInsuranceNumber?>(),
+            Option.None<Gender?>(),
             now);
 
         string? emailAddress = null;
