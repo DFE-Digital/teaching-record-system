@@ -50,7 +50,7 @@ public class CheckAnswersModel(
     {
         var now = clock.UtcNow;
 
-        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        await using var txn = await DbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
 
         var trn = await trnGenerator.GenerateTrnAsync();
 
