@@ -23,6 +23,7 @@ public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnR
 
         var resolvedPersonTrn = requestData.ResolvedPersonId is Guid resolvedPersonId ?
             await dbContext.Persons
+                .IgnoreQueryFilters()
                 .Where(p => p.PersonId == resolvedPersonId)
                 .Select(p => p.Trn)
                 .SingleAsync() :
