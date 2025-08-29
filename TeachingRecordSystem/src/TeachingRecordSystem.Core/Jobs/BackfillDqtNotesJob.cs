@@ -23,6 +23,9 @@ public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncHelper.CrmClientN
         var defaultMinCreatedOn = new DateTime(2014, 01, 01);
         var minCreatedOn = await dbContext.Notes.MaxAsync(n => (DateTime?)n.CreatedOn);
 
+        DateTime startDate = new DateTime(2025, 08, 25);
+        DateTime endDate = new DateTime(2025, 08, 29);
+
         var query = new QueryExpression(Annotation.EntityLogicalName)
         {
             ColumnSet = new ColumnSet(
@@ -53,7 +56,7 @@ public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncHelper.CrmClientN
         };
         query.Criteria.AddCondition(Annotation.Fields.ObjectId, ConditionOperator.NotNull);
         query.Criteria.AddCondition(Annotation.Fields.ObjectTypeCode, ConditionOperator.Equal, Contact.EntityLogicalName);
-        query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.GreaterThan, minCreatedOn ?? defaultMinCreatedOn);
+        query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.Between, new object[] { startDate, endDate });
 
         var fetched = 0;
 
