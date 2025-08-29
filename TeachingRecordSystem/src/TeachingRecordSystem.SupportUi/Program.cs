@@ -194,4 +194,4 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
 app.Run();
 
-public partial class Program { }
+public partial class Program;
