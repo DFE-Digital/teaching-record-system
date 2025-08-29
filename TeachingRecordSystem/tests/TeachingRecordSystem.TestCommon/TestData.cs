@@ -11,38 +11,17 @@ public partial class TestData
     private static readonly HashSet<string> _mobileNumbers = [];
     private static int _applicationUserNumber = 1;
 
-    private readonly Func<Task<string>> _generateTrn;
-
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
         IClock clock,
-        FakeTrnGenerator trnGenerator,
-        TestDataPersonDataSource personDataSource)
-        : this(
-              dbContextFactory,
-              organizationService,
-              referenceDataCache,
-              clock,
-              generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()),
-              personDataSource)
-    {
-    }
-
-    private TestData(
-        IDbContextFactory<TrsDbContext> dbContextFactory,
-        IOrganizationServiceAsync organizationService,
-        ReferenceDataCache referenceDataCache,
-        IClock clock,
-        Func<Task<string>> generateTrn,
         TestDataPersonDataSource personDataSource)
     {
         DbContextFactory = dbContextFactory;
         OrganizationService = organizationService;
         ReferenceDataCache = referenceDataCache;
         Clock = clock;
-        _generateTrn = generateTrn;
         PersonDataSource = personDataSource;
     }
 
@@ -73,10 +52,9 @@ public partial class TestData
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
         IClock clock,
-        Func<Task<string>> generateTrn,
         TestDataPersonDataSource personDataSource)
     {
-        return new TestData(dbContextFactory, organizationService, referenceDataCache, clock, generateTrn, personDataSource);
+        return new TestData(dbContextFactory, organizationService, referenceDataCache, clock, personDataSource);
     }
 
     public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)

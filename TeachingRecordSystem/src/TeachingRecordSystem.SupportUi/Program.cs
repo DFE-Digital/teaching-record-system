@@ -18,7 +18,6 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi;
@@ -128,8 +127,6 @@ builder.Services.AddRedis(builder.Environment, builder.Configuration);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
-    builder.Services.AddTrnGeneration(builder.Configuration);
-
     var crmConnectionString = $"""
         AuthType=ClientSecret;
         Url={builder.Configuration.GetRequiredValue("CrmUrl")};

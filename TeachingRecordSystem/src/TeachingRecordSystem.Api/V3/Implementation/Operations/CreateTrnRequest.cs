@@ -4,7 +4,6 @@ using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using Gender = TeachingRecordSystem.Core.Models.Gender;
 
@@ -29,7 +28,6 @@ public class CreateTrnRequestHandler(
     IPersonMatchingService personMatchingService,
     TrnRequestService trnRequestService,
     ICurrentUserProvider currentUserProvider,
-    ITrnGenerator trnGenerator,
     IClock clock)
 {
     public async Task<ApiResult<TrnRequestInfo>> HandleAsync(CreateTrnRequestCommand command)
@@ -120,9 +118,8 @@ public class CreateTrnRequestHandler(
         {
             Debug.Assert(matchResult.Outcome is TrnRequestMatchResultOutcome.NoMatches);
 
-            trn = await trnGenerator.GenerateTrnAsync();
-
-            var createPersonResult = trnRequestService.CreatePersonFromTrnRequest(trnRequestMetadata, trn, now);
+            var createPersonResult = trnRequestService.CreatePersonFromTrnRequest(trnRequestMetadata, now);
+            trn = createPersonResult.Person.Trn!;
             dbContext.Persons.Add(createPersonResult.Person);
 
             var personCreatedEvent = new PersonCreatedEvent
