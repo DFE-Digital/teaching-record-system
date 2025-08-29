@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages.Common;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
@@ -11,7 +10,6 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-[RequireFeatureEnabledFilterFactory(FeatureNames.NewUserRoles)]
 public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
 {
     private const int UsersPerPage = 10;

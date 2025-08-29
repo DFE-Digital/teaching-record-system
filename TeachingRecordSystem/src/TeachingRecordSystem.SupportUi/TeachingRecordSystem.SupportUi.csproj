@@ -991,6 +991,10 @@
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\vendor\_sass-mq.scss.map" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\_base.scss" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\_base.scss.map" />
+    <_ContentIncludedByDefault Remove="Pages\LegacyUsers\AddUser\Confirm.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\LegacyUsers\AddUser\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\LegacyUsers\EditUser.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\LegacyUsers\Index.cshtml" />
   </ItemGroup>
 
 </Project>

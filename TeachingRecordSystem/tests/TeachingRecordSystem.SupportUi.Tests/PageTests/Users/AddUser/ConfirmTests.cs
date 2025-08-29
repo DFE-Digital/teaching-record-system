@@ -1,13 +1,8 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
 [Collection(nameof(DisableParallelization))]
-public class ConfirmTests : TestBase, IAsyncLifetime
+public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    public ConfirmTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
-    }
-
     public async Task InitializeAsync()
     {
         await WithDbContext(async dbContext =>
@@ -19,11 +14,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewUserRoles);
-        return Task.CompletedTask;
-    }
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()

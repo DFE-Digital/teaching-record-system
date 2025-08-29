@@ -3,14 +3,9 @@ using AngleSharp.Dom;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
 [Collection(nameof(DisableParallelization))]
-public class UsersTests : TestBase, IAsyncLifetime
+public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
     private const string RequestPath = "/users";
-
-    public UsersTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
-    }
 
     public async Task InitializeAsync()
     {
@@ -23,30 +18,7 @@ public class UsersTests : TestBase, IAsyncLifetime
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewUserRoles);
-        return Task.CompletedTask;
-    }
-
-    [Fact]
-    public async Task Get_FeatureFlagDisabled_ReturnsNotFound()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewUserRoles);
-
-        // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
-        SetCurrentUser(user);
-
-        // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
-    }
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
