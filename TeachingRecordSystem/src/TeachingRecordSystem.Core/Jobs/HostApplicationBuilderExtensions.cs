@@ -258,6 +258,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportAmendJob.JobSchedule);
 
+                recurringJobManager.AddOrUpdate<SyncAllDateOfDeathsJob>(
+                    nameof(SyncAllDateOfDeathsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
