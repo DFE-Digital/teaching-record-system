@@ -10,7 +10,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class BackfillDqtNotesJob(
+public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncHelper.CrmClientName)]
     IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper,
     ILogger<BackfillDqtNotesJob> logger,
@@ -56,7 +56,7 @@ public class BackfillDqtNotesJob(
         };
         query.Criteria.AddCondition(Annotation.Fields.ObjectId, ConditionOperator.NotNull);
         query.Criteria.AddCondition(Annotation.Fields.ObjectTypeCode, ConditionOperator.Equal, Contact.EntityLogicalName);
-        query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.Between, new object[] { startDate, endDate });
+        query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.Between, minCreatedOn ?? defaultMinCreatedOn);
 
         var fetched = 0;
 
