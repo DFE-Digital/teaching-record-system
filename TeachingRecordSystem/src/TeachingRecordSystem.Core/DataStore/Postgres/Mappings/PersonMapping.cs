@@ -13,7 +13,7 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.HasIndex(p => p.DqtContactId).HasFilter("dqt_contact_id is not null").IsUnique();
         builder.HasIndex(p => p.MergedWithPersonId).HasFilter("merged_with_person_id is not null");
         builder.HasIndex(p => p.Trn).HasFilter("trn is not null").IsUnique();
-        builder.Property(p => p.Trn).HasMaxLength(Person.TrnExactLength).IsFixedLength();
+        builder.Property(p => p.Trn).HasMaxLength(Person.TrnExactLength).IsFixedLength().HasDefaultValueSql("fn_generate_trn()");
         builder.Property(p => p.FirstName).HasMaxLength(Person.FirstNameMaxLength).UseCollation("case_insensitive");
         builder.Property(p => p.MiddleName).HasMaxLength(Person.MiddleNameMaxLength).UseCollation("case_insensitive");
         builder.Property(p => p.LastName).HasMaxLength(Person.LastNameMaxLength).UseCollation("case_insensitive");

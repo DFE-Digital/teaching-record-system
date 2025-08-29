@@ -54,9 +54,8 @@ public class TrnRequestService(
         return true;
     }
 
-    public CreatePersonResult CreatePersonFromTrnRequest(TrnRequestMetadata requestData, string trn, DateTime now) =>
+    public CreatePersonResult CreatePersonFromTrnRequest(TrnRequestMetadata requestData, DateTime now) =>
         Person.Create(
-            trn,
             requestData.FirstName!,
             requestData.MiddleName ?? string.Empty,
             requestData.LastName!,

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
@@ -15,7 +14,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 public class CheckAnswers(
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
-    ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
     IClock clock) :
     ResolveApiTrnRequestPageModel(dbContext)

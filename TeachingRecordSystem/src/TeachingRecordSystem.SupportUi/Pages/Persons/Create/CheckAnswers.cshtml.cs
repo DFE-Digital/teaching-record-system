@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.Create;
@@ -13,8 +12,7 @@ public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    IFileService fileService,
-    ITrnGenerator trnGenerator)
+    IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
     public string? FirstName { get; set; }
@@ -52,10 +50,7 @@ public class CheckAnswersModel(
 
         await using var txn = await DbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
 
-        var trn = await trnGenerator.GenerateTrnAsync();
-
         var (person, personAttributes) = Person.Create(
-            trn,
             FirstName ?? string.Empty,
             MiddleName ?? string.Empty,
             LastName ?? string.Empty,

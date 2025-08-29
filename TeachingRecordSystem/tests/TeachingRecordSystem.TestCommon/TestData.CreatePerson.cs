@@ -463,7 +463,6 @@ public partial class TestData
                     CreatedOn = mappedPersonInfo.CreatedOn,
                     UpdatedOn = mappedPersonInfo.UpdatedOn,
                     Status = mappedPersonInfo.Status,
-                    Trn = mappedPersonInfo.Trn,
                     FirstName = mappedPersonInfo.FirstName,
                     MiddleName = mappedPersonInfo.MiddleName,
                     LastName = mappedPersonInfo.LastName,
