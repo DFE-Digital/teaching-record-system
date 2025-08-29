@@ -16,6 +16,7 @@ using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PublishApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
@@ -46,7 +47,8 @@ builder
     .AddWebhookDeliveryService()
     .AddWebhookMessageFactory()
     .AddPublishApi()
-    .AddTrnRequestService();
+    .AddTrnRequestService()
+    .AddTrsSyncHelper();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
