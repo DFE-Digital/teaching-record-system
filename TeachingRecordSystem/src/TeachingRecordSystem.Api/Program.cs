@@ -31,7 +31,6 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -209,7 +208,6 @@ public class Program
         if (!env.IsUnitTests())
         {
             var crmServiceClient = GetCrmServiceClient();
-            services.AddTrnGeneration(configuration);
             services.AddPooledDefaultServiceClient(crmServiceClient, size: 200);
 
             services.AddHealthChecks()
