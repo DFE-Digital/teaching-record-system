@@ -8,4 +8,5 @@ public record PersonStatusUpdatedEvent : EventBase, IEventWithPersonId
     public required string? Reason { get; init; }
     public required string? ReasonDetail { get; init; }
     public required EventModels.File? EvidenceFile { get; init; }
+    public required DateOnly? DateOfDeath { get; init; }
 }

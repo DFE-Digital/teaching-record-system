@@ -1,26 +1,45 @@
-using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 public record SetDeceasedCommand(string Trn, DateOnly DateOfDeath);
 
-public class SetDeceasedHandler(ICrmQueryDispatcher crmQueryDispatcher)
+public class SetDeceasedHandler(
+    TrsDbContext dbContext,
+    ICurrentUserProvider currentUserProvider,
+    IClock clock)
 {
     public async Task<ApiResult<Unit>> HandleAsync(SetDeceasedCommand command)
     {
-        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveContactByTrnQuery(
-                command.Trn,
-                new ColumnSet()));
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
 
-        if (contact is null)
+        if (person is null)
         {
             return ApiError.PersonNotFound(command.Trn);
         }
 
-        await crmQueryDispatcher.ExecuteQueryAsync(new SetDeceasedQuery(contact.Id, command.DateOfDeath))!;
+        var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+
+        person.Status = PersonStatus.Deactivated;
+        person.DateOfDeath = command.DateOfDeath;
+
+        var @event = new PersonStatusUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = clock.UtcNow,
+            RaisedBy = currentUserId,
+            PersonId = person.PersonId,
+            Status = PersonStatus.Deactivated,
+            OldStatus = PersonStatus.Active,
+            Reason = "Deceased",
+            ReasonDetail = null,
+            EvidenceFile = null,
+            DateOfDeath = command.DateOfDeath
+        };
+        await dbContext.AddEventAndBroadcastAsync(@event);
+
+        await dbContext.SaveChangesAsync();
 
         return Unit.Instance;
     }
