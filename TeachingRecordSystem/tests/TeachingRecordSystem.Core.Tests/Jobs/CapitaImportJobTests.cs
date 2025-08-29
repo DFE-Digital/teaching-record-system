@@ -48,7 +48,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         {
             item.WithGender(Gender.Male);
             item.WithDateOfBirth(expectedDob);
-            item.WithTrn();
             item.WithFirstName(expectedFirstName);
             item.WithLastName(expectedLastName);
         });
@@ -128,7 +127,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             item.WithFirstName(Faker.Name.First());
             item.WithLastName(Faker.Name.Last());
             item.WithGender(Gender.Male);
-            item.WithTrn();
             item.WithNationalInsuranceNumber(expectedNI);
             item.WithDateOfBirth(expectedDob);
         });
@@ -207,7 +205,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             item.WithFirstName(Faker.Name.First());
             item.WithLastName(Faker.Name.Last());
             item.WithGender(Gender.Male);
-            item.WithTrn();
             item.WithDateOfBirth(expectedDob);
         });
         var expectedTrn = existingPerson.Trn;
@@ -283,7 +280,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             item.WithFirstName(Faker.Name.First());
             item.WithLastName(expectedLastName);
             item.WithGender(Gender.Male);
-            item.WithTrn();
             item.WithDateOfBirth(expectedDob);
         });
         var expectedTrn = existingPerson.Trn;
@@ -358,7 +354,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             item.WithFirstName(Faker.Name.First());
             item.WithLastName(expectedLastName);
             item.WithGender(Gender.Male);
-            item.WithTrn();
             item.WithDateOfBirth(expectedDob);
         });
         var expectedTrn = existingPerson.Trn;
@@ -433,7 +428,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
             item.WithFirstName(Faker.Name.First());
             item.WithLastName(expectedLastName);
             item.WithGender(Gender.Male);
-            item.WithTrn();
             item.WithDateOfBirth(expectedDob);
             item.WithNationalInsuranceNumber();
         });
@@ -507,7 +501,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var existingPerson = await TestData.CreatePersonAsync(item =>
         {
             item.WithGender(Gender.Male);
-            item.WithTrn();
             item.WithNationalInsuranceNumber(expectedNI);
         });
         var expectedTrn = "1234567";
@@ -585,7 +578,6 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         {
             item.WithNationalInsuranceNumber(expectedNI);
             item.WithDateOfBirth(expectedDob);
-            item.WithTrn();
             item.WithLastName(expectedLastName);
         });
         var expectedTrn = existingPerson.Trn;
@@ -1107,7 +1099,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     public async Task GetPotentialMatchingPersonsAsync_WithNoMatchingCriteria_ReturnsNoMatches()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync();
         var row = new CapitaImportRecord()
         {
             DateOfBirth = "19990101",
@@ -1131,7 +1123,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     public async Task GetPotentialMatchingPersonsAsync_WithMatchingNationalInsuranceNumberAndDob_ReturnsDefiniteMatch()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
         var row = new CapitaImportRecord()
         {
             DateOfBirth = person.DateOfBirth.ToString("yyyyMMdd"),
@@ -1155,8 +1147,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     public async Task GetPotentialMatchingPersonsAsync_WithMatchingFirstNameLastNameAndDateOfBirth_ReturnsPotentialMatches()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
-        var person2 = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
         var row = new CapitaImportRecord()
         {
             DateOfBirth = person.DateOfBirth.ToString("yyyyMMdd"),
@@ -1181,8 +1173,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     public async Task GetPotentialMatchingPersonsAsync_WithMatchingOnOnlyNINumber_ReturnsPotentialMatches()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
-        var person2 = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
         var row = new CapitaImportRecord()
         {
             DateOfBirth = "20110101",
@@ -1206,8 +1198,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     public async Task GetPotentialMatchingPersonsAsync_WithMatchingOnlyDateOfBirth_ReturnsNoMatches()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
-        var person2 = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+        var person2 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
         var row = new CapitaImportRecord()
         {
             DateOfBirth = person.DateOfBirth.ToString("yyyyMMdd"),
