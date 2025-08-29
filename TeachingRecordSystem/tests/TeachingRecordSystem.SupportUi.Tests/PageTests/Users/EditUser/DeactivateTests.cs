@@ -7,7 +7,6 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 {
     public DeactivateTests(HostFixture hostFixture) : base(hostFixture)
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
         FileServiceMock.Invocations.Clear();
     }
 
@@ -22,11 +21,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync()
-    {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewUserRoles);
-        return Task.CompletedTask;
-    }
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
