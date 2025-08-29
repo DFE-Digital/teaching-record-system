@@ -8,7 +8,6 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
 {
     public CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
     {
-        FeatureProvider.Features.Add(FeatureNames.ChangeRequestsInTrs);
     }
 
     [Fact]

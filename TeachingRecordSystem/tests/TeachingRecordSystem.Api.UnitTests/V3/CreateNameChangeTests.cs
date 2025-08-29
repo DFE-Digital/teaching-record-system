@@ -8,7 +8,6 @@ public class CreateNameChangeTests : OperationTestBase
 {
     public CreateNameChangeTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
     {
-        FeatureProvider.Features.Add(FeatureNames.ChangeRequestsInTrs);
     }
 
     [Fact]

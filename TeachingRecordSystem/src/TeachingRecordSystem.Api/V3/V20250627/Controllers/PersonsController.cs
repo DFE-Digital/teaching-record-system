@@ -101,7 +101,6 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [RemovesFromApi]
     public IActionResult SetProfessionalStatus() => throw null!;
 
-    [RequireRouteWritesEnabled]
     [HttpPut("{trn}/routes-to-professional-statuses/{reference}")]
     [SwaggerOperation(
         OperationId = "SetRouteToProfessionalStatus",

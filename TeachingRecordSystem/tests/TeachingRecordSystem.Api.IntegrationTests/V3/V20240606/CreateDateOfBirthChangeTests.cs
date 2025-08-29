@@ -9,7 +9,6 @@ public class CreateDateOfBirthChangeTests : TestBase
 {
     public CreateDateOfBirthChangeTests(HostFixture hostFixture) : base(hostFixture)
     {
-        FeatureProvider.Features.Add(FeatureNames.ChangeRequestsInTrs);
     }
 
     [Theory]

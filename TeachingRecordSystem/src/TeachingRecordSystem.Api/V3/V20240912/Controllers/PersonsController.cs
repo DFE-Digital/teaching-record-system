@@ -11,7 +11,6 @@ namespace TeachingRecordSystem.Api.V3.V20240912.Controllers;
 [Route("persons")]
 public class PersonsController(IMapper mapper) : ControllerBase
 {
-    [RequireRouteWritesEnabled]
     [HttpPut("{trn}/qtls")]
     [SwaggerOperation(
         OperationId = "SetQtls",

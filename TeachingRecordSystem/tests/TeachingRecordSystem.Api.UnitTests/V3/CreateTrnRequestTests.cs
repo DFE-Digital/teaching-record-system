@@ -14,7 +14,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
 {
     public CreateTrnRequestTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
     {
-        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
     }
 
     [Fact]

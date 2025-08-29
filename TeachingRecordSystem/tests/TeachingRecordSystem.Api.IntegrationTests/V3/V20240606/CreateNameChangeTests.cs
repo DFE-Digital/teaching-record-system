@@ -9,7 +9,6 @@ public class CreateNameChangeTests : TestBase
 {
     public CreateNameChangeTests(HostFixture hostFixture) : base(hostFixture)
     {
-        FeatureProvider.Features.Add(FeatureNames.ChangeRequestsInTrs);
     }
 
     [Theory]

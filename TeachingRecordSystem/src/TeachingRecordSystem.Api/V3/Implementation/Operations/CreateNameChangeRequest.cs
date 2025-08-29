@@ -2,7 +2,6 @@ using System.Transactions;
 using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
@@ -23,25 +22,18 @@ public record CreateNameChangeRequestCommand
 
 public record CreateNameChangeRequestResult(string CaseNumber);
 
-public partial class CreateNameChangeRequestHandler(
+public class CreateNameChangeRequestHandler(
     IConfiguration configuration,
     IBackgroundJobScheduler backgroundJobScheduler,
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
     IFileService fileService,
-    IClock clock,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    IFeatureProvider featureProvider)
+    IClock clock)
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
     public async Task<ApiResult<CreateNameChangeRequestResult>> HandleAsync(CreateNameChangeRequestCommand command)
     {
-        if (!featureProvider.IsEnabled(FeatureNames.ChangeRequestsInTrs))
-        {
-            return await HandleOverDqtAsync(command);
-        }
-
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)
             .SingleOrDefaultAsync();
