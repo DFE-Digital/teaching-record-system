@@ -72,6 +72,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         var createdByUser = await TestData.CreateUserAsync();
         var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS", "AfQTS");
         var person = await TestData.CreatePersonAsync();
+        var updateComments = TestData.GenerateLoremIpsum();
 
         string? oldEmail = previousValueIsDefault ? null : _oldEmail;
         string? oldNino = previousValueIsDefault ? null : _oldNino;
@@ -97,7 +98,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             newEmail, oldEmail,
             newNino, oldNino,
             newGender, oldGender,
-            changes, reason, "Some comments");
+            changes, reason, reason == NpqTrnRequestResolvedReason.RecordMerged ? updateComments : null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -181,7 +182,14 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             item.AssertRowDoesNotExist("previous-details", "Gender");
         }
 
-        item.AssertRow("change-reason", "Comments", v => Assert.Equal("Some comments", v.TrimmedText()));
+        if (reason == NpqTrnRequestResolvedReason.RecordCreated)
+        {
+            item.AssertRowDoesNotExist("change-reason", "Comments");
+        }
+        else
+        {
+            item.AssertRow("change-reason", "Comments", v => Assert.Equal(updateComments, v.TrimmedText()));
+        }
 
         item.AssertRow("request-data", "Source", v => Assert.Equal("AfQTS", v.TrimmedText()));
         item.AssertRow("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
@@ -263,19 +271,19 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         item.AssertRow("change-reason", "Reason", v => Assert.Equal(reason.GetDisplayName(), v.TrimmedText()));
     }
 
-    private async Task CreateEvent(Guid createdByUserId, Guid personId, Guid applicationUserId,
+    private Task CreateEvent(Guid createdByUserId, Guid personId, Guid applicationUserId,
         string firstName, string oldFirstName,
         string middleName, string oldMiddleName,
         string lastName, string oldLastName,
         NpqTrnRequestSupportTaskResolvedEventChanges changes, NpqTrnRequestResolvedReason changeReason, string? comments)
     {
-        await CreateEvent(createdByUserId, personId, applicationUserId,
+        return CreateEvent(createdByUserId, personId, applicationUserId,
             firstName, oldFirstName, middleName, oldMiddleName, lastName, oldLastName,
             null, null, null, null, null, null, null, null,
             changes, changeReason, comments);
     }
 
-    private async Task CreateEvent(Guid createdByUserId, Guid personId, Guid applicationUserId,
+    private Task CreateEvent(Guid createdByUserId, Guid personId, Guid applicationUserId,
         string firstName, string oldFirstName,
         string middleName, string oldMiddleName,
         string lastName, string oldLastName,
@@ -376,7 +384,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             Comments = comments
         };
 
-        await WithDbContext(async dbContext =>
+        return WithDbContext(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();

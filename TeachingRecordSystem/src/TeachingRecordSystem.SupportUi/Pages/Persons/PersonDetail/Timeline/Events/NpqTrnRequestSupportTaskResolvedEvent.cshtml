@@ -16,6 +16,9 @@
         : "TRN request of unknown source";
 
     var title = $"Record {verb} from {source}";
+    var changesHeading = updatedEvent.ChangeReason == NpqTrnRequestResolvedReason.RecordCreated
+        ? "Reason record was created"
+        : "Reason for change";
 
     var requestData = updatedEvent.RequestData;
     var attributes = updatedEvent.PersonAttributes;
@@ -78,17 +81,20 @@
         </div>
 
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-summary>@changesHeading</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@updatedEvent.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.Comments</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                    @if (updatedEvent.ChangeReason == NpqTrnRequestResolvedReason.RecordMerged)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.Comments</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
