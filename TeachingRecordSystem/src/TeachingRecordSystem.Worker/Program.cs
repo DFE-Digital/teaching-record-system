@@ -13,6 +13,7 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.PublishApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -65,7 +66,8 @@ builder.Services
     .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
     .AddWorkforceData()
     .AddMemoryCache()
-    .AddFileService();
+    .AddFileService()
+    .AddPersonMatching();
 
 var host = builder.Build();
 

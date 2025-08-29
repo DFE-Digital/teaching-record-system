@@ -258,6 +258,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportAmendJob.JobSchedule);
 
+                recurringJobManager.AddOrUpdate<CapitaImportJob>(
+                    nameof(CapitaImportJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    CapitaImportJob.JobSchedule);
+
                 return Task.CompletedTask;
             });
         }
