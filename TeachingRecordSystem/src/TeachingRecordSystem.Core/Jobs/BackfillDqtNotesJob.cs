@@ -23,8 +23,8 @@ public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncHelper.CrmClientN
         var defaultMinCreatedOn = new DateTime(2014, 01, 01);
         var minCreatedOn = await dbContext.Notes.MaxAsync(n => (DateTime?)n.CreatedOn);
 
-        DateTime startDate = new DateTime(2025, 08, 25);
-        DateTime endDate = new DateTime(2025, 08, 29);
+        DateTime startDate = new DateTime(2014, 03, 21);
+        DateTime endDate = new DateTime(2014, 03, 23);
 
         var query = new QueryExpression(Annotation.EntityLogicalName)
         {
