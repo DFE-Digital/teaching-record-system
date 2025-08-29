@@ -1276,7 +1276,7 @@ public class CapitaImportJobFixture : IAsyncLifetime
 
         var personMatchingService = ActivatorUtilities.CreateInstance<PersonMatchingService>(provider);
         var matchingService = new PersonMatchingService(dbFixture.GetDbContextFactory().CreateDbContext());
-        var user = new CapitaImportUserOption() { UserId = ApplicationUser.CapitaTpsImportUser.UserId };
+        var user = new CapitaTpsUserOption() { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId };
         var option = Options.Create(user);
 
         Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock, matchingService!, option);

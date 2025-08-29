@@ -15,7 +15,7 @@ using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaImportUserOption> capitaUser)
+public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 4 * * *";
     public const string StorageContainer = "dqt-integrations";
@@ -156,7 +156,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         {
                             var trnRequestMetadata = new TrnRequestMetadata()
                             {
-                                ApplicationUserId = capitaUser.Value.UserId,
+                                ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
                                 RequestId = Guid.NewGuid().ToString(),
                                 CreatedOn = clock.UtcNow,
                                 IdentityVerified = null,
@@ -186,7 +186,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 null,
                                 null,
                                 trnRequestMetadata.RequestId,
-                                capitaUser.Value.UserId,
+                                capitaUser.Value.CapitaTpsUserId,
                                 clock.UtcNow,
                                 out var createdEvent);
 
