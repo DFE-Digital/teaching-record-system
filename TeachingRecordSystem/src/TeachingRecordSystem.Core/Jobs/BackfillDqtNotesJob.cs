@@ -56,7 +56,7 @@ public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncHelper.CrmClientN
         };
         query.Criteria.AddCondition(Annotation.Fields.ObjectId, ConditionOperator.NotNull);
         query.Criteria.AddCondition(Annotation.Fields.ObjectTypeCode, ConditionOperator.Equal, Contact.EntityLogicalName);
-        query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.Between, minCreatedOn ?? defaultMinCreatedOn);
+        query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.Between, new object[] { startDate, endDate });
 
         var fetched = 0;
 
