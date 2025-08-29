@@ -244,8 +244,9 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         // - NINO *OR*
         // - email address.
 
-        var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty();
-        var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty();
+        var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty().SelectMany(PersonSearchAttribute.SplitName);
+        var middleNames = new[] { request.MiddleName }.ExceptEmpty().SelectMany(PersonSearchAttribute.SplitName);
+        var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty().SelectMany(PersonSearchAttribute.SplitName);
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
         return dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
@@ -286,7 +287,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 // ReSharper disable once FormatStringProblem
                 [
                     CreateArrayParameter("first_names", firstNames),
-                    CreateArrayParameter("middle_names", request.MiddleName.ToSingleItemCollectionIfNotEmpty()),
+                    CreateArrayParameter("middle_names", middleNames),
                     CreateArrayParameter("last_names", lastNames),
                     CreateArrayParameter("dates_of_birth", request.DateOfBirth.ToSingleItemCollectionIfNotEmpty().Select(d => d.ToString("yyyy-MM-dd"))),
                     CreateArrayParameter("ni_numbers", nationalInsuranceNumber.ToSingleItemCollectionIfNotEmpty()),
