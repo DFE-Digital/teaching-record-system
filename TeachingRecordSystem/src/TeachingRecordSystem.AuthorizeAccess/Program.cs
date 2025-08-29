@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using OpenIddict.EntityFrameworkCore.Models;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
@@ -23,7 +22,6 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -167,15 +165,6 @@ builder.Services
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
-    var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
-    {
-        DisableCrossThreadSafeties = true,
-        EnableAffinityCookie = true,
-        MaxRetryCount = 2,
-        RetryPauseTime = TimeSpan.FromSeconds(1)
-    };
-    builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
-
     builder.Services.AddDbContext<IdDbContext>(options => options.UseNpgsql(builder.Configuration.GetRequiredConnectionString("Id")));
 }
 
