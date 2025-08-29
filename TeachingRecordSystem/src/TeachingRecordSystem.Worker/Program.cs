@@ -14,7 +14,6 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PublishApi;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Services.WorkforceData;
@@ -56,7 +55,6 @@ var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue(
     RetryPauseTime = TimeSpan.FromSeconds(1)
 };
 builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
-AddLegacyDataverseAdapterServices();
 
 builder.Services.AddHangfireServer();
 
@@ -70,13 +68,3 @@ builder.Services
 var host = builder.Build();
 
 await host.RunAsync();
-
-void AddLegacyDataverseAdapterServices()
-{
-    builder.Services.AddSingleton<ITrnGenerator, DummyTrnGenerationApiClient>();
-}
-
-sealed class DummyTrnGenerationApiClient : ITrnGenerator
-{
-    public Task<string> GenerateTrnAsync() => throw new NotImplementedException();
-}
