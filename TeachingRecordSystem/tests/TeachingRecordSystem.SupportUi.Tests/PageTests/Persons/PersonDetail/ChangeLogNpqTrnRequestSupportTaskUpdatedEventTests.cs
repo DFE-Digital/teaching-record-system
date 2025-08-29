@@ -181,7 +181,14 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             item.AssertRowDoesNotExist("previous-details", "Gender");
         }
 
-        item.AssertRow("change-reason", "Comments", v => Assert.Equal("Some comments", v.TrimmedText()));
+        if (reason == NpqTrnRequestResolvedReason.RecordCreated)
+        {
+            item.AssertRowDoesNotExist("change-reason", "Comments");
+        }
+        else
+        {
+            item.AssertRow("change-reason", "Comments", v => Assert.Equal(reason.GetDisplayName(), v.TrimmedText()));
+        }
 
         item.AssertRow("request-data", "Source", v => Assert.Equal("AfQTS", v.TrimmedText()));
         item.AssertRow("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
