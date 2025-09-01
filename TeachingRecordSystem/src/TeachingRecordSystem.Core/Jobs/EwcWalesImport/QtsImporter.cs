@@ -5,23 +5,20 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class QtsImporter
 {
     public const string DATE_FORMAT = "dd/MM/yyyy";
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly ReferenceDataCache _cache;
     public DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate => new DateOnly(2023, 02, 01);
     private readonly IClock _clock;
 
-    public QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock)
+    public QtsImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock)
     {
-        _crmQueryDispatcher = crmQueryDispatcher;
         _dbContext = dbContext;
         _logger = logger;
         _cache = cache;
@@ -78,7 +75,6 @@ public class QtsImporter
         {
             totalRowCount++;
             var itrFailureMessage = new StringBuilder();
-            using var rowTransaction = _crmQueryDispatcher.CreateTransactionRequestBuilder();
 
             try
             {
@@ -219,7 +215,7 @@ public class QtsImporter
     {
         //contact
         var (personMatchStatus, person) = await FindMatchingTeacherRecordAsync(row);
-        var (teacherStatusMatchStatus, teacherStatusId) = await GetTeacherStatusAsync(row.QtsStatus);
+        var teacherStatusMatchStatus = GetTeacherStatus(row.QtsStatus);
         var hasActiveAlerts = false;
 
         if (person != null)
@@ -232,7 +228,6 @@ public class QtsImporter
         {
             Person = person,
             PersonMatchStatus = personMatchStatus,
-            TeacherStatusId = teacherStatusId,
             TeacherStatusMatchStatus = teacherStatusMatchStatus,
             HasActiveAlerts = hasActiveAlerts
         };
@@ -341,35 +336,33 @@ public class QtsImporter
         return (validationFailures, errors);
     }
 
-    public async Task<(EwcWalesMatchStatus, Guid? SubjectId)> GetTeacherStatusAsync(string qtsStatus)
+    public EwcWalesMatchStatus GetTeacherStatus(string qtsStatus)
     {
-        var results = await _cache.GetTeacherStatusesAsync();
-
         if (qtsStatus != null && (qtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase)))
         {
-            var status = results.Single(x => x.dfeta_Value == qtsStatus); //67 - Qualified Teacher: under the EC Directive
-            return (EwcWalesMatchStatus.OneMatch, status.Id);
+            //67 - Qualified Teacher: under the EC Directive
+            return (EwcWalesMatchStatus.OneMatch);
         }
         else if (qtsStatus != null && (qtsStatus.Equals("71", StringComparison.InvariantCultureIgnoreCase) ||
             qtsStatus.Equals("49", StringComparison.InvariantCultureIgnoreCase)))
         {
-            var status = results.Single(x => x.dfeta_Value == "213"); //213 - Qualified Teacher: QTS awarded in Wales
-            return (EwcWalesMatchStatus.OneMatch, status.Id);
+            //213 - Qualified Teacher: QTS awarded in Wales
+            return (EwcWalesMatchStatus.OneMatch);
         }
         else if (qtsStatus != null && (qtsStatus.Equals("68", StringComparison.InvariantCultureIgnoreCase)))
         {
-            var status = results.Single(x => x.dfeta_Value == qtsStatus); //68 - Qualified Teacher: Teachers trained/registered in Scotland
-            return (EwcWalesMatchStatus.OneMatch, status.Id);
+            //68 - Qualified Teacher: Teachers trained/registered in Scotland
+            return (EwcWalesMatchStatus.OneMatch);
         }
         else if (qtsStatus != null && (qtsStatus.Equals("69", StringComparison.InvariantCultureIgnoreCase)))
         {
-            var status = results.Single(x => x.dfeta_Value == qtsStatus); //69 - Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
-            return (EwcWalesMatchStatus.OneMatch, status.Id);
+            //69 - Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
+            return (EwcWalesMatchStatus.OneMatch);
         }
 
         else
         {
-            return (EwcWalesMatchStatus.NoMatch, null);
+            return (EwcWalesMatchStatus.NoMatch);
         }
     }
 
@@ -440,7 +433,6 @@ public class QtsImporter
     {
         public required Person? Person { get; set; }
         public required EwcWalesMatchStatus? PersonMatchStatus { get; set; }
-        public required Guid? TeacherStatusId { get; set; }
         public required EwcWalesMatchStatus? TeacherStatusMatchStatus { get; set; }
         public required bool HasActiveAlerts { get; set; }
     }

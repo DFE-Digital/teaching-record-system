@@ -5,26 +5,21 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class InductionImporter
 {
     private const string DATE_FORMAT = "dd/MM/yyyy";
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly IClock _clock;
-    private readonly ReferenceDataCache _cache;
 
-    public InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock)
+    public InductionImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, IClock clock)
     {
-        _crmQueryDispatcher = crmQueryDispatcher;
         _dbContext = dbContext;
         _logger = logger;
         _clock = clock;
-        _cache = cache;
     }
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -67,7 +62,6 @@ public class InductionImporter
                 Guid? personId = null;
                 Guid itrId = Guid.NewGuid();
                 var itrFailureMessage = new StringBuilder();
-                using var rowTransaction = _crmQueryDispatcher.CreateTransactionRequestBuilder();
 
                 try
                 {
