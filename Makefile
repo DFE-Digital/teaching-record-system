@@ -11,7 +11,7 @@ SERVICE_NAME=teaching-record-system
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	## environments:
-	## - AKS: dev, test, pre-production, production
+	## - AKS: dev, pre-production, production
 
 .PHONY: dv_review
 dv_review: dev-cluster
@@ -27,10 +27,6 @@ dv_review: dev-cluster
 .PHONY: dev
 dev: test-cluster
 	$(eval include global_config/dev.sh)
-
-.PHONY: test
-test: test-cluster
-	$(eval include global_config/test.sh)
 
 .PHONY: pre-production
 pre-production: test-cluster
