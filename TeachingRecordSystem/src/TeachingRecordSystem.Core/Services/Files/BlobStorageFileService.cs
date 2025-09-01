@@ -27,6 +27,13 @@ public class BlobStorageFileService : IFileService
         return fileId;
     }
 
+    public async Task<bool> UploadFileAsync(string fileName, Stream stream, string? contentType)
+    {
+        var blobClient = await GetBlobClientAsync(fileName);
+        var response = await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null);
+        return response.GetRawResponse().Status == 201;
+    }
+
     public async Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
     {
         var blobClient = await GetBlobClientAsync(fileId);
@@ -57,10 +64,15 @@ public class BlobStorageFileService : IFileService
         return deleted;
     }
 
-    private async Task<BlobClient> GetBlobClientAsync(Guid fileId)
+    private Task<BlobClient> GetBlobClientAsync(Guid fileId)
+    {
+        return GetBlobClientAsync(fileId.ToString());
+    }
+
+    private async Task<BlobClient> GetBlobClientAsync(string fileName)
     {
         await EnsureBlobContainerClientAsync();
-        return _blobContainerClient!.GetBlobClient(fileId.ToString());
+        return _blobContainerClient!.GetBlobClient(fileName);
     }
 
     private async Task EnsureBlobContainerClientAsync()

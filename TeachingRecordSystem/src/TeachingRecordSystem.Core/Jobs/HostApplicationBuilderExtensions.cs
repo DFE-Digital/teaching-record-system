@@ -258,6 +258,16 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportAmendJob.JobSchedule);
 
+                recurringJobManager.AddOrUpdate<ResetIncorrectHasEypsOnPersonsJob>(
+                    $"{nameof(ResetIncorrectHasEypsOnPersonsJob)} (dry-run)",
+                    job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<ResetIncorrectHasEypsOnPersonsJob>(
+                    nameof(ResetIncorrectHasEypsOnPersonsJob),
+                    job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
