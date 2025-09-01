@@ -65,10 +65,6 @@ variable "run_dqt_reporting_service" {
   type = bool
 }
 
-variable "run_recurring_jobs" {
-  type = bool
-}
-
 variable "api_replicas" {
   type    = number
   default = 1
@@ -159,6 +155,7 @@ variable "enable_dfe_analytics_federated_auth" {
   description = "Create the resources in Google cloud for federated authentication and enable in application"
   default     = false
 }
+
 locals {
   app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
 

@@ -148,7 +148,7 @@ public abstract class TestBase : IDisposable
         var principal = new ClaimsPrincipal(identity);
 
         var properties = new AuthenticationProperties();
-        properties.SetVectorOfTrust(vtr);
+        properties.SetVectorsOfTrust([vtr]);
         properties.StoreTokens([new AuthenticationToken() { Name = OpenIdConnectParameterNames.IdToken, Value = "dummy" }]);
 
         return new AuthenticationTicket(principal, properties, authenticationScheme: "OneLogin");

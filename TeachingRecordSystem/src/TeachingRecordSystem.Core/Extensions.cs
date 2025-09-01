@@ -15,9 +15,19 @@ namespace TeachingRecordSystem.Core;
 
 public static class Extensions
 {
+    public static IConfigurationBuilder AddAksConfiguration(this IConfigurationBuilder builder)
+    {
+        var deployedEnvironmentName = Environment.GetEnvironmentVariable("ENVIRONMENT_NAME")
+            ?? throw new InvalidOperationException("ENVIRONMENT_NAME environment variable is not set.");
+
+        return builder
+            .AddJsonFile($"appsettings.aks_{deployedEnvironmentName}.json")
+            .AddJsonFile($"appsettings.aks_{deployedEnvironmentName}_shared.json");
+    }
+
     public static IHostApplicationBuilder AddBackgroundWorkScheduler(this IHostApplicationBuilder builder)
     {
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
         }
@@ -63,7 +73,7 @@ public static class Extensions
             prepareSchemaIfNecessary = false;
         }
 
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddHangfire((sp, configuration) => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)

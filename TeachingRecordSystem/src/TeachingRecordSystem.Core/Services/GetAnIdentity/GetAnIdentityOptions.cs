@@ -15,7 +15,4 @@ public class GetAnIdentityOptions
 
     [Required]
     public required string BaseAddress { get; set; }
-
-    [Required]
-    public required string WebHookClientSecret { get; set; }
 }

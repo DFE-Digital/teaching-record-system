@@ -32,11 +32,11 @@
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "Direct",
-        "requested": "[0.3.1, )",
-        "resolved": "0.3.1",
-        "contentHash": "vwqK13c6mDsrw/Yb3MpBXZJuQ3Kr6PeDudgAKqaQzE3QYpNNVARyWvaX4vY6vAITbXrry/z6183F9pRX9Ox3tA==",
+        "requested": "[0.4.0, )",
+        "resolved": "0.4.0",
+        "contentHash": "xmddqVvAp7m9B47sk9mczdGk/IjKca5dbnClcJCAOf/D4/sGbKbjavR2szu1uXWEIHU5v+TgegEia48LFed0IA==",
         "dependencies": {
-          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.3"
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "8.0.16"
         }
       },
       "Humanizer.Core": {
@@ -2754,8 +2754,8 @@
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
         "type": "CentralTransitive",
         "requested": "[9.0.8, )",
-        "resolved": "8.0.3",
-        "contentHash": "23d/HjzJQN2CJrBpCDqSjbZQMBPpHEhTFXAN5Xoo3CODsJVcAZBqluobUjVoRtlGcn3/C9vRzAfqN53ATRd1UA==",
+        "resolved": "8.0.16",
+        "contentHash": "dc/PwmCpdIbU74Wnf6WSLbr8gfxCGCSAl5AAO6edBbUdo1nnqCYTyVVjtzffs7LGiDpKjT1myeWHiI2LsPssjw==",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "7.1.2"
         }

@@ -8,7 +8,7 @@ public static class HostApplicationBuilderExtensions
 {
     public static IHostApplicationBuilder AddPublishApi(this IHostApplicationBuilder builder)
     {
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddOptions<PublishApiOptions>()
                 .Bind(builder.Configuration.GetSection("PublishApi"))

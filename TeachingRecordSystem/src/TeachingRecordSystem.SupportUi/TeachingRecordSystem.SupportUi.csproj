@@ -4,6 +4,7 @@
     <RestoreGovUkFrontendNpmPackage>true</RestoreGovUkFrontendNpmPackage>
     <GovUkFrontendNpmPackageLocation>wwwroot/lib/govuk-frontend</GovUkFrontendNpmPackageLocation>
     <EnableDefaultSassItems>false</EnableDefaultSassItems>
+    <RequiresSharedAppsettings>true</RequiresSharedAppsettings>
   </PropertyGroup>
 
   <Target Name="CopyGovUkJavaScriptToWwwroot" BeforeTargets="Build">

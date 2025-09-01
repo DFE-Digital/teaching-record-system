@@ -9,7 +9,7 @@ module "migrations_job_configuration" {
   secret_key_vault_short = "inf"
 
   config_variables = {
-    DUMMY = ""
+    ENVIRONMENT_NAME = var.environment_name
   }
   secret_variables = {
     CONNECTION_STRING = module.postgres.dotnet_connection_string
@@ -43,21 +43,9 @@ module "api_application_configuration" {
   config_short           = var.environment_short_name
   secret_key_vault_short = "api"
 
-  config_variables = {
-    DataProtectionKeysContainerName = azurerm_storage_container.keys.name
-    DistributedLockContainerName    = azurerm_storage_container.locks.name
-    RecurringJobs__Enabled          = var.run_recurring_jobs
-    SENTRY_ENVIRONMENT              = local.app_name_suffix
-  }
+  config_variables = local.shared_config
 
-  secret_variables = {
-    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
-    ConnectionStrings__Redis             = module.redis.connection_string
-    DATABASE_URL                         = module.postgres.url
-    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
-    Sentry__Dsn                          = module.infrastructure_secrets.map.SENTRY-DSN
-    SharedConfig                         = module.infrastructure_secrets.map.SharedConfig
-  }
+  secret_variables = local.shared_secrets
 }
 
 module "api_application" {
@@ -97,20 +85,9 @@ module "authz_application_configuration" {
   config_short           = var.environment_short_name
   secret_key_vault_short = "authz"
 
-  config_variables = merge({
-    DataProtectionKeysContainerName = azurerm_storage_container.keys.name
-    SENTRY_ENVIRONMENT              = local.app_name_suffix
-    DUMMY                           = "Dummy variable to force new Kubernetes config map to be created"
-  }, local.federated_auth_configmap)
+  config_variables = merge(local.shared_config, local.federated_auth_configmap, { App = "AuthorizeAccess" })
 
-  secret_variables = merge({
-    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
-    ConnectionStrings__Redis             = "${module.redis.connection_string},defaultDatabase=1"
-    DATABASE_URL                         = module.postgres.url
-    Sentry__Dsn                          = module.infrastructure_secrets.map.SENTRY-DSN
-    SharedConfig                         = module.infrastructure_secrets.map.SharedConfig
-    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
-  }, local.federated_auth_secrets)
+  secret_variables = merge(local.shared_secrets, local.federated_auth_secrets)
 }
 
 module "authz_application" {
@@ -150,19 +127,9 @@ module "ui_application_configuration" {
   config_short           = var.environment_short_name
   secret_key_vault_short = "ui"
 
-  config_variables = {
-    DataProtectionKeysContainerName = azurerm_storage_container.keys.name
-    SENTRY_ENVIRONMENT              = local.app_name_suffix
-  }
+  config_variables = merge(local.shared_config, { app = "SupportUi" })
 
-  secret_variables = {
-    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
-    ConnectionStrings__Redis             = "${module.redis.connection_string},defaultDatabase=1"
-    DATABASE_URL                         = module.postgres.url
-    Sentry__Dsn                          = module.infrastructure_secrets.map.SENTRY-DSN
-    SharedConfig                         = module.infrastructure_secrets.map.SharedConfig
-    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
-  }
+  secret_variables = local.shared_secrets
 }
 
 module "ui_application" {
@@ -202,20 +169,11 @@ module "worker_application_configuration" {
   config_short           = var.environment_short_name
   secret_key_vault_short = "worker"
 
-  config_variables = {
-    DistributedLockContainerName = azurerm_storage_container.locks.name
-    DqtReporting__RunService     = var.run_dqt_reporting_service
-    SENTRY_ENVIRONMENT           = local.app_name_suffix
-  }
+  config_variables = merge(local.shared_config, { app = "Worker" })
 
-  secret_variables = {
-    ConnectionStrings__DefaultConnection      = module.postgres.dotnet_connection_string
+  secret_variables = merge(local.shared_secrets, {
     DqtReporting__ReportingDbConnectionString = local.reporting_db_connection_string
-    DATABASE_URL                              = module.postgres.url
-    Sentry__Dsn                               = module.infrastructure_secrets.map.SENTRY-DSN
-    StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
-    SharedConfig                              = module.infrastructure_secrets.map.SharedConfig
-  }
+  })
 }
 
 module "worker_application" {
@@ -242,4 +200,21 @@ module "worker_application" {
   enable_logit                 = var.enable_logit
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
   enable_gcp_wif               = true
+}
+
+locals {
+  shared_config = {
+    DataProtectionKeysContainerName = azurerm_storage_container.keys.name
+    DistributedLockContainerName    = azurerm_storage_container.locks.name
+    ENVIRONMENT_NAME                = var.environment_name
+    SENTRY_ENVIRONMENT              = local.app_name_suffix
+  }
+
+  shared_secrets = merge({
+    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
+    ConnectionStrings__Redis             = "${module.redis.connection_string},defaultDatabase=1"
+    DATABASE_URL                         = module.postgres.url
+    Sentry__Dsn                          = module.infrastructure_secrets.map.SENTRY-DSN
+    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+  }, { for k, v in module.infrastructure_secrets.map : replace(k, "--", "__") => v })
 }

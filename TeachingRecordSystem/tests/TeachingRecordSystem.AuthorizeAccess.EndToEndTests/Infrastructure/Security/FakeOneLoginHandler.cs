@@ -25,12 +25,12 @@ public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider
         _ = _context ?? throw new InvalidOperationException("Not initialized.");
         var user = currentUserProvider.CurrentUser ?? throw new InvalidOperationException("No current user set.");
 
-        if (properties is null || !properties.TryGetVectorOfTrust(out var vtr))
+        if (properties is null || !properties.TryGetVectorsOfTrust(out var vtr))
         {
             throw new InvalidOperationException("No vtr set.");
         }
 
-        if (vtr == SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr && user.CoreIdentityVc is null)
+        if (vtr.SequenceEqual([SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr]) && user.CoreIdentityVc is null)
         {
             // Simulate an 'access_denied' error for failing ID verification
 

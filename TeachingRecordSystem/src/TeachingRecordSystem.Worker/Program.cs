@@ -5,7 +5,6 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
-using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
@@ -24,9 +23,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration
-        .AddJsonEnvironmentVariable("AppConfig")
-        .AddJsonEnvironmentVariable("SharedConfig");
+    builder.Configuration.AddAksConfiguration();
 }
 
 builder.ConfigureLogging();

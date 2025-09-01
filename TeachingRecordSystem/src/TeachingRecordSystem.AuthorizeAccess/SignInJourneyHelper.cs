@@ -24,8 +24,8 @@ public class SignInJourneyHelper(
     IUserInstanceStateProvider userInstanceStateProvider,
     IClock clock)
 {
-    public const string AuthenticationOnlyVtr = @"[""Cl.Cm""]";
-    public const string AuthenticationAndIdentityVerificationVtr = @"[""Cl.Cm.P2""]";
+    public const string AuthenticationOnlyVtr = "Cl.Cm";
+    public const string AuthenticationAndIdentityVerificationVtr = "Cl.Cm.P2";
 
     // ID's database has a user_id column to indicate that a TRN token has been used already.
     // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
@@ -45,18 +45,18 @@ public class SignInJourneyHelper(
 
     public async Task<IResult> OnOneLoginCallbackAsync(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
     {
-        if (!ticket.Properties.TryGetVectorOfTrust(out var vtr))
+        if (!ticket.Properties.TryGetVectorsOfTrust(out var vtr))
         {
             throw new InvalidOperationException("No vtr.");
         }
 
-        if (vtr == AuthenticationOnlyVtr)
+        if (vtr.SequenceEqual([AuthenticationOnlyVtr]))
         {
             await OnUserAuthenticatedAsync(journeyInstance, ticket);
         }
         else
         {
-            Debug.Assert(vtr == AuthenticationAndIdentityVerificationVtr);
+            Debug.Assert(vtr.SequenceEqual([AuthenticationAndIdentityVerificationVtr]));
             Debug.Assert(journeyInstance.State.OneLoginAuthenticationTicket is not null);
             await OnUserVerifiedAsync(journeyInstance, ticket);
         }
@@ -420,7 +420,7 @@ public class SignInJourneyHelper(
     private IResult OneLoginChallenge(JourneyInstance<SignInJourneyState> journeyInstance, string vtr)
     {
         var delegatedProperties = new AuthenticationProperties();
-        delegatedProperties.SetVectorOfTrust(vtr);
+        delegatedProperties.SetVectorsOfTrust([vtr]);
         delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
         return Results.Challenge(delegatedProperties, authenticationSchemes: [journeyInstance.State.OneLoginAuthenticationScheme]);
     }

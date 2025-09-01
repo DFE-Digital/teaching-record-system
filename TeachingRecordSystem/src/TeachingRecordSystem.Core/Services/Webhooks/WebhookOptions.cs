@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.IdentityModel.Tokens;
 
@@ -37,6 +38,8 @@ public class WebhookOptions
                 .Aggregate((l, r) => l + r);
 
             jsonWebKey.X5c.Add(certChain);
+
+            Debug.Assert(!jsonWebKey.HasPrivateKey);
 
             keySet.Keys.Add(jsonWebKey);
         }

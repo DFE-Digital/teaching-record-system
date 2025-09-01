@@ -20,7 +20,7 @@ public static partial class ServiceCollectionExtensions
         IConfiguration configuration,
         IHostEnvironment environment)
     {
-        if (!environment.IsUnitTests() && !environment.IsEndToEndTests())
+        if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
             services.AddOptions<AccessYourTeachingQualificationsOptions>()
                 .Bind(configuration.GetSection("AccessYourTeachingQualifications"))
