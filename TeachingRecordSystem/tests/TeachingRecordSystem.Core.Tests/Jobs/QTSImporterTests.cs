@@ -415,13 +415,13 @@ public class QtsImporterTests : IAsyncLifetime
         var lookups = await Importer.GetLookupDataAsync(row);
 
         // Assert
-        Assert.NotNull(lookups.TeacherStatusId);
+        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.TeacherStatusMatchStatus);
     }
 
     [Theory]
     [InlineData("63")]
     [InlineData("")]
-    public async Task GetLookupData_TeacherStatusIsNullForUnrecognizedStatus(string qtsStatus)
+    public async Task GetLookupData_TeacherStatusIsNotMatchForUnrecognizedStatus(string qtsStatus)
     {
         // Arrange
         var accountNumber = "1357";
@@ -444,7 +444,7 @@ public class QtsImporterTests : IAsyncLifetime
         var lookups = await Importer.GetLookupDataAsync(row);
 
         // Assert
-        Assert.Null(lookups.TeacherStatusId);
+        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.TeacherStatusMatchStatus);
     }
 
     [Fact]
@@ -535,7 +535,7 @@ public class QtsImporterTests : IAsyncLifetime
         // Assert
         Assert.NotNull(lookups.Person);
         Assert.Equal(EwcWalesMatchStatus.TeacherHasQts, lookups.PersonMatchStatus);
-        Assert.NotNull(lookups.TeacherStatusId);
+        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.TeacherStatusMatchStatus);
     }
 
     private EwcWalesQtsFileImportData GetDefaultRow(Func<EwcWalesQtsFileImportData, EwcWalesQtsFileImportData>? configurator = null)
