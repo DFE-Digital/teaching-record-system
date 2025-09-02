@@ -6,6 +6,54 @@ namespace TeachingRecordSystem.Core.Tests.Services.PersonMatching;
 
 public partial class PersonMatchingServiceTests
 {
+    [Fact]
+    public Task MatchFromTrnRequestAsync_WithOutOfOrderNames_ReturnsMatch() =>
+        DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            // Arrange
+            var applicationUser = await TestData.CreateApplicationUserAsync();
+            var firstName = TestData.GenerateFirstName();
+            var middleName = TestData.GenerateMiddleName();
+            var lastName = TestData.GenerateLastName();
+            var dateOfBirth = TestData.GenerateDateOfBirth();
+            var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+            var emailAddress = TestData.GenerateUniqueEmail();
+
+            var person = await TestData.CreatePersonAsync(p => p
+                .WithNationalInsuranceNumber(nationalInsuranceNumber)
+                .WithFirstName(firstName)
+                .WithMiddleName(middleName)
+                .WithLastName(lastName)
+                .WithDateOfBirth(dateOfBirth)
+                .WithEmail(emailAddress));
+
+            var requestData = new TrnRequestMetadata()
+            {
+                ApplicationUserId = applicationUser.UserId,
+                RequestId = Guid.NewGuid().ToString(),
+                CreatedOn = Clock.UtcNow,
+                IdentityVerified = null,
+                EmailAddress = null,
+                OneLoginUserSubject = null,
+                FirstName = lastName,
+                MiddleName = middleName,
+                LastName = firstName,
+                PreviousFirstName = null,
+                PreviousLastName = null,
+                Name = [lastName, firstName, middleName],
+                DateOfBirth = TestData.GenerateChangedDateOfBirth(dateOfBirth),
+                NationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber)
+            };
+
+            var service = new PersonMatchingService(dbContext);
+
+            // Act
+            var result = await service.MatchFromTrnRequestAsync(requestData);
+
+            // Assert
+            Assert.Contains(person.PersonId, result.PotentialMatchesPersonIds);
+        });
+
     [Theory]
     [MemberData(nameof(GetMatchFromTrnRequestData))]
     public Task MatchFromTrnRequestAsync_ReturnsExpectedResult(
