@@ -152,6 +152,9 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob");
                 recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob (dry-run)");
 
+                recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob (dry-run)");
+                recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob");
+
                 recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
                     nameof(CpdInductionImporterJob),
                     job => job.ExecuteAsync(CancellationToken.None),
@@ -258,13 +261,13 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportAmendJob.JobSchedule);
 
-                recurringJobManager.AddOrUpdate<ResetIncorrectHasEypsOnPersonsJob>(
-                    $"{nameof(ResetIncorrectHasEypsOnPersonsJob)} (dry-run)",
+                recurringJobManager.AddOrUpdate<SetMissingHasEypsOnPersonsJob>(
+                    $"{nameof(SetMissingHasEypsOnPersonsJob)} (dry-run)",
                     job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<ResetIncorrectHasEypsOnPersonsJob>(
-                    nameof(ResetIncorrectHasEypsOnPersonsJob),
+                recurringJobManager.AddOrUpdate<SetMissingHasEypsOnPersonsJob>(
+                    nameof(SetMissingHasEypsOnPersonsJob),
                     job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 
