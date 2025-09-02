@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
@@ -67,6 +68,33 @@ public static partial class ServiceCollectionExtensions
         Func<IServiceProvider, IOrganizationServiceAsync2> getServiceClient)
     {
         return AddServiceClient(services, name, lifetime, getServiceClient);
+    }
+
+    public static IServiceCollection AddCrmEntityChangesService(
+        this IServiceCollection services,
+        string name)
+    {
+        // Since ICrmEntityChangesService is registered as a singleton, the corresponding ServiceClient should be too
+        var orgServiceRegistration = services.SingleOrDefault(sd => sd.ServiceKey as string == name && sd.ServiceType == typeof(IOrganizationServiceAsync));
+        if (orgServiceRegistration is null)
+        {
+            throw new InvalidOperationException($"No ServiceClient has been registered for name: '{name}'.");
+        }
+        if (orgServiceRegistration.Lifetime != ServiceLifetime.Singleton)
+        {
+            throw new InvalidOperationException(
+                $"The ServiceClient used for {nameof(CrmEntityChangesService)} should be registered with {nameof(ServiceLifetime.Singleton)} lifetime.");
+        }
+
+        services.AddKeyedSingleton<ICrmEntityChangesService>(
+            name,
+            (IServiceProvider serviceProvider, object? key) =>
+            {
+                var namedOrgService = serviceProvider.GetRequiredKeyedService<IOrganizationServiceAsync>(name);
+                return ActivatorUtilities.CreateInstance<CrmEntityChangesService>(serviceProvider, namedOrgService);
+            });
+
+        return services;
     }
 
     private static IServiceCollection AddServiceClient(
