@@ -128,7 +128,7 @@ builder.Services.AddRedis(builder.Environment, builder.Configuration);
 
 if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
-    builder.Services.AddTrnGeneration(builder.Configuration);
+    builder.Services.AddTrnGeneration();
 
     var crmConnectionString = $"""
         AuthType=ClientSecret;

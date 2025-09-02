@@ -209,7 +209,7 @@ public class Program
         if (!env.IsTests())
         {
             var crmServiceClient = GetCrmServiceClient();
-            services.AddTrnGeneration(configuration);
+            services.AddTrnGeneration();
             services.AddPooledDefaultServiceClient(crmServiceClient, size: 200);
 
             services.AddHealthChecks()
