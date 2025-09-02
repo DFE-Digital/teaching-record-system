@@ -22,7 +22,7 @@ public class Person
     public PersonStatus Status { get; set; }
     public Guid? MergedWithPersonId { get; set; }
     public Person? MergedWithPerson { get; }
-    public required string? Trn { get; set; }
+    public string? Trn { get; }
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
     public required string LastName { get; set; }
@@ -72,7 +72,6 @@ public class Person
     public DateOnly? DateOfDeath { get; set; }
 
     public static CreatePersonResult Create(
-        string trn,
         string firstName,
         string middleName,
         string lastName,
@@ -87,7 +86,6 @@ public class Person
         var person = new Person
         {
             PersonId = Guid.NewGuid(),
-            Trn = trn,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
