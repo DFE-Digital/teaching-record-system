@@ -57,6 +57,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             .WithMiddleName(TestData.GenerateMiddleName())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
             .WithEmailAddress(TestData.GenerateUniqueEmail())
+            .WithGender(TestData.GenerateGender())
             .ExecuteAsync(TestData);
 
         var requestMetadata = supportTask.TrnRequestMetadata;
@@ -94,6 +95,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             Assert.Equal(person.DateOfBirth, requestMetadata.DateOfBirth);
             Assert.Equal(person.EmailAddress, requestMetadata.EmailAddress);
             Assert.Equal(person.NationalInsuranceNumber, requestMetadata.NationalInsuranceNumber);
+            Assert.Equal(person.Gender, requestMetadata.Gender);
         });
 
         // support task is updated
@@ -169,6 +171,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Equal(personAttributes.DateOfBirth, expectedPersonAttributes.DateOfBirth);
         Assert.Equal(personAttributes.EmailAddress, expectedPersonAttributes.EmailAddress);
         Assert.Equal(personAttributes.NationalInsuranceNumber, expectedPersonAttributes.NationalInsuranceNumber);
+        Assert.Equal(personAttributes.Gender, expectedPersonAttributes.Gender);
     }
 
     private void AssertTrnRequestMetadataMatches(EventModels.TrnRequestMetadata expected, EventModels.TrnRequestMetadata actual)

@@ -351,29 +351,49 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects()
+    [Theory]
+    [InlineData(PersonMatchedAttribute.EmailAddress)]
+    [InlineData(PersonMatchedAttribute.DateOfBirth)]
+    [InlineData(PersonMatchedAttribute.NationalInsuranceNumber)]
+    [InlineData(PersonMatchedAttribute.Gender)]
+    public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects(PersonMatchedAttribute attribute)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
             applicationUser.UserId,
-            PersonMatchedAttribute.EmailAddress);
+            attribute);
         var requestData = supportTask.TrnRequestMetadata!;
 
         Clock.Advance();
 
         var comments = Faker.Lorem.Paragraph();
-        var journeyInstance = await CreateJourneyInstance(
-            supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
-            {
-                PersonId = matchedPerson.PersonId,
-                PersonAttributeSourcesSet = true,
-                EmailAddressSource = PersonAttributeSource.TrnRequest,
-                Comments = comments
-            });
+        var state = new ResolveNpqTrnRequestState()
+        {
+            PersonId = matchedPerson.PersonId,
+            PersonAttributeSourcesSet = true,
+            Comments = comments
+        };
+
+        if (attribute == PersonMatchedAttribute.DateOfBirth)
+        {
+            state.DateOfBirthSource = PersonAttributeSource.TrnRequest;
+        }
+        if (attribute == PersonMatchedAttribute.EmailAddress)
+        {
+            state.EmailAddressSource = PersonAttributeSource.TrnRequest;
+        }
+        if (attribute == PersonMatchedAttribute.NationalInsuranceNumber)
+        {
+            state.NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest;
+        }
+        if (attribute == PersonMatchedAttribute.Gender)
+        {
+            state.GenderSource = PersonAttributeSource.TrnRequest;
+        }
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
 
         EventPublisher.Clear();
 
@@ -395,7 +415,23 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         {
             var updatedPersonRecord = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == matchedPerson.PersonId);
-            Assert.Equal(requestData.EmailAddress, updatedPersonRecord.EmailAddress);
+
+            if (attribute == PersonMatchedAttribute.DateOfBirth)
+            {
+                Assert.Equal(requestData.DateOfBirth, updatedPersonRecord.DateOfBirth);
+            }
+            if (attribute == PersonMatchedAttribute.EmailAddress)
+            {
+                Assert.Equal(requestData.EmailAddress, updatedPersonRecord.EmailAddress);
+            }
+            if (attribute == PersonMatchedAttribute.NationalInsuranceNumber)
+            {
+                Assert.Equal(requestData.NationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
+            }
+            if (attribute == PersonMatchedAttribute.Gender)
+            {
+                Assert.Equal(requestData.Gender, updatedPersonRecord.Gender);
+            }
         });
 
         // support task is updated
@@ -411,15 +447,21 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
             Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
+
+            var dateOfBirth = attribute == PersonMatchedAttribute.DateOfBirth ? requestData.DateOfBirth : matchedPerson.DateOfBirth;
+            var emailAddress = attribute == PersonMatchedAttribute.EmailAddress ? requestData.EmailAddress : matchedPerson.Email;
+            var nationalInsuranceNumber = attribute == PersonMatchedAttribute.NationalInsuranceNumber ? requestData.NationalInsuranceNumber : matchedPerson.NationalInsuranceNumber;
+            var gender = attribute == PersonMatchedAttribute.Gender ? requestData.Gender : matchedPerson.Gender;
+
             AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
             {
                 FirstName = matchedPerson.FirstName,
                 MiddleName = matchedPerson.MiddleName,
                 LastName = matchedPerson.LastName,
-                DateOfBirth = matchedPerson.DateOfBirth,
-                EmailAddress = requestData.EmailAddress,
-                NationalInsuranceNumber = matchedPerson.NationalInsuranceNumber,
-                Gender = matchedPerson.Gender
+                DateOfBirth = dateOfBirth,
+                EmailAddress = emailAddress,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+                Gender = gender
             });
         });
 
@@ -557,6 +599,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             s.WithMiddleName(TestData.GenerateMiddleName());
             s.WithEmailAddress(TestData.GenerateUniqueEmail());
             s.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
+            s.WithGender(TestData.GenerateGender());
         });
         var requestMetadata = supportTask.TrnRequestMetadata;
         Assert.NotNull(requestMetadata);
@@ -601,6 +644,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             Assert.Equal(person.DateOfBirth, requestMetadata.DateOfBirth);
             Assert.Equal(person.EmailAddress, requestMetadata.EmailAddress);
             Assert.Equal(person.NationalInsuranceNumber, requestMetadata.NationalInsuranceNumber);
+            Assert.Equal(person.Gender, requestMetadata.Gender);
         });
 
         // support task is updated

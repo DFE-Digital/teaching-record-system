@@ -181,6 +181,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
                 DateOfBirthSource = PersonAttributeSource.TrnRequest,
                 EmailAddressSource = PersonAttributeSource.TrnRequest,
                 NationalInsuranceNumberSource = PersonAttributeSource.TrnRequest,
+                GenderSource = PersonAttributeSource.TrnRequest,
                 Comments = null
             });
 
@@ -216,6 +217,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
                 DateOfBirthSource = PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = PersonAttributeSource.ExistingRecord,
+                GenderSource = PersonAttributeSource.ExistingRecord,
                 Comments = null
             });
 
@@ -393,6 +395,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
+        var genderSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -403,6 +406,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
                 { "DateOfBirthSource", dateOfBirthSelection },
                 { "EmailAddressSource", emailAddressSelection },
                 { "NationalInsuranceNumberSource", nationalInsuranceNumberSelection },
+                { "GenderSource", genderSelection },
             }
         };
 
@@ -419,6 +423,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.Equal(dateOfBirthSelection, journeyInstance.State.DateOfBirthSource);
         Assert.Equal(emailAddressSelection, journeyInstance.State.EmailAddressSource);
         Assert.Equal(nationalInsuranceNumberSelection, journeyInstance.State.NationalInsuranceNumberSource);
+        Assert.Equal(genderSelection, journeyInstance.State.GenderSource);
     }
 
 
@@ -437,7 +442,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-
+        var genderSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -465,7 +470,8 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
     {
         { PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource" },
         { PersonMatchedAttribute.EmailAddress, "EmailAddressSource" },
-        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource" }
+        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource" },
+        { PersonMatchedAttribute.Gender, "GenderSource" }
     };
 
     private Task<JourneyInstance<ResolveNpqTrnRequestState>> CreateJourneyInstance(

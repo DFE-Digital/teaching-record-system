@@ -47,7 +47,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithMiddleName(TestData.GenerateMiddleName())
-            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
+            .WithGender(TestData.GenerateGender()));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -79,7 +80,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithMiddleName(TestData.GenerateMiddleName())
-            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
+            .WithGender(TestData.GenerateGender()));
 
         var firstMatch = await WithDbContext(
             dbContext => dbContext.Persons.SingleAsync(
@@ -251,6 +253,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithEmail(null)
             .WithNationalInsuranceNumber(false)
+            .WithGender(false)
             .WithMiddleName(""));
 
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
@@ -258,6 +261,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             configure.WithMiddleName(null);
             configure.WithEmailAddress(null);
             configure.WithNationalInsuranceNumber(null);
+            configure.WithGender(null);
             configure.WithMatchedPersons(matchedPerson.PersonId);
         });
 
@@ -277,9 +281,11 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Email"));
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight("Middle name", false);
         AssertMatchRowHasExpectedHighlight("National Insurance number", false);
+        AssertMatchRowHasExpectedHighlight("Gender", false);
         AssertMatchRowHasExpectedHighlight("Email", false);
 
         void AssertMatchRowHasExpectedHighlight(string summaryListKey, bool expectHighlight)

@@ -85,7 +85,8 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, s => s
             .WithMiddleName(TestData.GenerateMiddleName())
-            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
+            .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
+            .WithGender(TestData.GenerateGender()));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -106,6 +107,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueForKey("Date of birth"));
         Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueForKey("Email"));
         Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueForKey("Gender"));
         Assert.Equal($"{supportTask.TrnRequestMetadata!.NpqEvidenceFileName} (opens in a new tab)", requestDetails.GetSummaryListValueForKey("Evidence"));
     }
 
@@ -116,7 +118,8 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithEmail(TestData.GenerateUniqueEmail())
-            .WithNationalInsuranceNumber());
+            .WithNationalInsuranceNumber()
+            .WithGender(TestData.GenerateGender()));
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure => configure.WithMatchedPersons(matchedPerson.PersonId));
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
@@ -138,6 +141,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueForKey("Date of birth"));
         Assert.Equal(matchedPerson.Email, firstMatchDetails.GetSummaryListValueForKey("Email"));
         Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(matchedPerson.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
     }
 
     [Fact]
@@ -148,12 +152,14 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber(false)
+            .WithGender(false)
             .WithMiddleName(""));
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
             configure.WithMiddleName("John");
             configure.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
+            configure.WithGender(TestData.GenerateGender());
             configure.WithEmailAddress(TestData.GenerateUniqueEmail());
             configure.WithMatchedPersons(matchedPerson.PersonId);
         });
@@ -175,9 +181,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", true);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "National Insurance number", true);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", true);
     }
 
     [Fact]
@@ -189,12 +197,14 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber(false)
+            .WithGender(false)
             .WithMiddleName(""));
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
             configure.WithMiddleName(null);
             configure.WithNationalInsuranceNumber(null);
+            configure.WithGender(null);
             configure.WithMatchedPersons(matchedPerson.PersonId);
         });
 
@@ -215,9 +225,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
         Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "National Insurance number", false);
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", false);
     }
 
     [Fact]
@@ -397,7 +409,8 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         new[] { PersonMatchedAttribute.LastName },
         new[] { PersonMatchedAttribute.DateOfBirth },
         new[] { PersonMatchedAttribute.EmailAddress },
-        new[] { PersonMatchedAttribute.NationalInsuranceNumber }
+        new[] { PersonMatchedAttribute.NationalInsuranceNumber },
+        new[] { PersonMatchedAttribute.Gender }
     };
 
     [Theory]
@@ -435,7 +448,12 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .WithNationalInsuranceNumber(
                     matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
                         ? matchedPerson.NationalInsuranceNumber
-                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
+                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
+                .WithGender(
+                    matchedAttributes.Contains(PersonMatchedAttribute.Gender)
+                        ? matchedPerson.Gender
+                        : TestData.GenerateChangedGender(matchedPerson.Gender!)));
+
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
 
@@ -456,6 +474,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Email", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "National Insurance number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+        AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
     [Fact]
@@ -613,6 +632,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                GenderSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 
@@ -631,6 +651,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Null(journeyInstance.State.DateOfBirthSource);
         Assert.Null(journeyInstance.State.EmailAddressSource);
         Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
+        Assert.Null(journeyInstance.State.GenderSource);
         Assert.False(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
@@ -651,6 +672,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                GenderSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 
@@ -669,6 +691,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.NotNull(journeyInstance.State.DateOfBirthSource);
         Assert.NotNull(journeyInstance.State.EmailAddressSource);
         Assert.NotNull(journeyInstance.State.NationalInsuranceNumberSource);
+        Assert.NotNull(journeyInstance.State.GenderSource);
         Assert.True(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
@@ -689,6 +712,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 DateOfBirthSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 NationalInsuranceNumberSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
+                GenderSource = ResolveNpqTrnRequestState.PersonAttributeSource.ExistingRecord,
                 PersonAttributeSourcesSet = true
             });
 
