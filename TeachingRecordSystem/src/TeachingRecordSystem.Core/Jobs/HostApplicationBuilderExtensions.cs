@@ -155,6 +155,9 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob (dry-run)");
                 recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob");
 
+                recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob (dry-run)");
+                recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob");
+
                 recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
                     nameof(CpdInductionImporterJob),
                     job => job.ExecuteAsync(CancellationToken.None),
@@ -261,13 +264,13 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportAmendJob.JobSchedule);
 
-                recurringJobManager.AddOrUpdate<SetMissingHasEypsOnPersonsJob>(
-                    $"{nameof(SetMissingHasEypsOnPersonsJob)} (dry-run)",
+                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEyps>(
+                    $"{nameof(AllocateTrnsToPersonsWithEyps)} (dry-run)",
                     job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<SetMissingHasEypsOnPersonsJob>(
-                    nameof(SetMissingHasEypsOnPersonsJob),
+                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEyps>(
+                    nameof(AllocateTrnsToPersonsWithEyps),
                     job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 
