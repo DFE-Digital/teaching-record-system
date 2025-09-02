@@ -29,7 +29,7 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
         }
 
         var journeyDescriptor = journeyInstanceProvider.ResolveJourneyDescriptor(context, throwIfNotFound: true)!;
-        var state = Activator.CreateInstance(journeyDescriptor.StateType)!;
+        var state = await CreateStateAsync();
         var newInstance = await journeyInstanceProvider.CreateInstanceAsync(context, state);
 
         if (journeyDescriptor.AppendUniqueKey)
@@ -44,5 +44,35 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
         }
 
         await next();
+
+        async Task<object> CreateStateAsync()
+        {
+            var journeyStateFactoryType = typeof(IJourneyStateFactory<>).MakeGenericType(journeyDescriptor.StateType);
+            if (context.HttpContext.RequestServices.GetService(journeyStateFactoryType) is { } journeyStateFactory)
+            {
+                var wrapperInstance = (FactoryWrapper)Activator.CreateInstance(
+                    typeof(FactoryWrapper<>).MakeGenericType(journeyDescriptor.StateType),
+                    journeyStateFactory)!;
+
+                var createStateContext = new CreateJourneyStateContext(journeyDescriptor, context.HttpContext);
+                return await wrapperInstance.CreateAsync(createStateContext);
+            }
+
+            return Activator.CreateInstance(journeyDescriptor.StateType)!;
+        }
+    }
+
+    private abstract class FactoryWrapper
+    {
+        public abstract Task<object> CreateAsync(CreateJourneyStateContext context);
+    }
+
+    private class FactoryWrapper<T>(IJourneyStateFactory<T> factory)
+    {
+        public async Task<object> CreateAsync(CreateJourneyStateContext context)
+        {
+            var state = await factory.CreateAsync(context);
+            return state!;
+        }
     }
 }
