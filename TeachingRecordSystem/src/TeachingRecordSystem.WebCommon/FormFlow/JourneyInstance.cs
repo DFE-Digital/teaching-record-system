@@ -17,7 +17,7 @@ public class JourneyInstance
         _stateProvider = stateProvider;
         StateType = stateType;
         InstanceId = instanceId;
-        Properties = properties ?? PropertiesBuilder.CreateEmpty();
+        Properties = properties;
         State = state;
         Completed = completed;
     }

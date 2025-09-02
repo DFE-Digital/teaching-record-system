@@ -46,6 +46,10 @@ public static class ServiceCollectionExtensions
             options.Conventions.Add(new BindJourneyInstancePropertiesConvention());
         });
 
+        services.Scan(s => s
+            .FromAssemblies(typeof(IJourneyStateFactory<>).Assembly)
+            .AddClasses(t => t.AssignableTo(typeof(IJourneyStateFactory<>))).AsImplementedInterfaces());
+
         return services;
     }
 
