@@ -150,18 +150,11 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_ValidCountry_ReturnsErrorMessage()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
             x.DateOfBirth = person.DateOfBirth.ToString()!;
-            x.IttEstabCode = account.AccountNumber;
             return x;
         });
         var lookups = await Importer.GetLookupDataAsync(row);
@@ -178,12 +171,6 @@ public class QtsImporterTests : IAsyncLifetime
     {
         // Arrange
         var holdsDate = Clock.Today.AddDays(-10);
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithRouteToProfessionalStatus(s => s
@@ -195,7 +182,6 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = account.AccountNumber;
             x.QtsDate = holdsDate.ToString("dd/MM/yyyy");
             return x;
         });
@@ -213,12 +199,6 @@ public class QtsImporterTests : IAsyncLifetime
     {
         // Arrange
         var holdsDate = Clock.Today.AddDays(-10);
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithRouteToProfessionalStatus(s => s
@@ -230,7 +210,6 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = account.AccountNumber;
             x.QtsDate = holdsDate.AddDays(1).ToString("dd/MM/yyyy");
             x.QtsStatus = "71";
             return x;
@@ -249,12 +228,6 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_QualifiedTeacherEcDirectiveStatusAfterRegsChangeDate_ReturnErrorMessage()
     {
         // Arrange
-        var accountNumber = "13571";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
@@ -278,18 +251,11 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_QtsDateInTheFuture_ReturnErrorMessage()
     {
         // Arrange
-        var accountNumber = "13571";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqEstabCode = "InvalidOrg";
             x.QtsStatus = "67";
             x.QtsDate = Clock.UtcNow.AddDays(1).ToString("dd/MM/yyyy");
             return x;
@@ -307,12 +273,6 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_QualifiedTeacherEcDirectiveStatusBeforeRegsChangeDate_DoesNotReturnErrorMessage()
     {
         // Arrange
-        var accountNumber = "13571";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
@@ -333,50 +293,14 @@ public class QtsImporterTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Validate_ValidPqEstabCode_DoesNotReturnErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync();
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = account.AccountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqEstabCode = account.AccountNumber;
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.DoesNotContain(failures, item => item.Contains($"Organisation with PQ Establishment Code {row.PqEstabCode} was not found."));
-    }
-
-    [Fact]
     public async Task GetLookupData_TrnDoesNotExist_ReturnsNoMatch()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = "InvalidTrn";
-            x.IttEstabCode = account.AccountNumber;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqEstabCode = account.AccountNumber;
             return x;
         });
 
@@ -395,17 +319,10 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task GetLookupData_TeacherStatusIsNotNullForRecognizedStatus(string qtsStatus)
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsStatus = qtsStatus;
             return x;
@@ -424,17 +341,10 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task GetLookupData_TeacherStatusIsNotMatchForUnrecognizedStatus(string qtsStatus)
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsStatus = qtsStatus;
             return x;
@@ -451,18 +361,10 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task GetLookupData_ConvertToCSVString_ReturnsExpectedCSV()
     {
         // Arrange
-        var accountNumber = "135711";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x => x.WithQts(new DateOnly(2024, 01, 01)));
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.PqEstabCode = account.AccountNumber;
-            x.IttEstabCode = account.AccountNumber;
             return x;
         });
         var expectedJson = $"{row.QtsRefNo},{row.Forename},{row.Surname},{row.DateOfBirth},{row.QtsStatus},{row.QtsDate},{row.IttStartMonth},{row.IttStartYear},{row.IttEndDate},{row.ITTCourseLength},{row.IttEstabLeaCode},{row.IttEstabCode},{row.IttQualCode},{row.IttClassCode},{row.IttSubjectCode1},{row.IttSubjectCode2},{row.IttMinAgeRange},{row.IttMaxAgeRange},{row.IttMinSpAgeRange},{row.IttMaxSpAgeRange},{row.PqCourseLength},{row.PqYearOfAward},{row.Country},{row.PqEstabCode},{row.PqQualCode},{row.Honours},{row.PqClassCode},{row.PqSubjectCode1},{row.PqSubjectCode2},{row.PqSubjectCode3}\r\n";
@@ -478,12 +380,6 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task GetLookupData_WithActiveAlert_ReturnsExpected()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithAlert();
@@ -491,7 +387,6 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             return x;
         });
@@ -507,13 +402,7 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task GetLookupData_ValidRow_PopulatesLookupDate()
     {
         // Arrange
-        var accountNumber = "1357111";
         var awardDate = new DateOnly(2011, 01, 1);
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(s => s
@@ -523,8 +412,6 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.PqEstabCode = account.AccountNumber;
-            x.IttEstabCode = account.AccountNumber;
             x.QtsStatus = "67";
             return x;
         });

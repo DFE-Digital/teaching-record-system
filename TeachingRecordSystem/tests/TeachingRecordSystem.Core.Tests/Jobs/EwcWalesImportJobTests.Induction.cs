@@ -161,12 +161,6 @@ public partial class EwcWalesImportJobTests
     public async Task EwcWalesImportJobInduction_DateOfBirthDoesNotMatch_FailsAndReturnsExpectedCounts()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var expectedTotalRowCount = 1;
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
@@ -176,7 +170,7 @@ public partial class EwcWalesImportJobTests
         var inductionStartDate = new DateOnly(2024, 05, 01);
         var inductionPassDate = new DateOnly(2024, 10, 07);
         var dob = "01/09/1977";
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{person.Trn!},Keri Louise Lyddon,Nicholas,{dob},{inductionStartDate.ToString()},{inductionPassDate.ToString()},,Pembrokeshire Local Authority,{account},Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{person.Trn!},Keri Louise Lyddon,Nicholas,{dob},{inductionStartDate.ToString()},{inductionPassDate.ToString()},,Pembrokeshire Local Authority,,Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -213,16 +207,10 @@ public partial class EwcWalesImportJobTests
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 1;
-        var accountNumber = "54321";
         var inductionStartDate = new DateOnly(1999, 09, 17);
         var inductionPassDate = new DateOnly(1999, 09, 28);
         var holdsFrom = new DateOnly(2000, 11, 04);
         var qtsDate = new DateOnly(2000, 10, 05);
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithQts(qtsDate);
@@ -230,7 +218,7 @@ public partial class EwcWalesImportJobTests
         });
         var expectedValueMessage = $"Induction passed date cannot be before Qts Date.";
         var trn = person.Trn;
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{inductionStartDate.ToString("dd/MM/yyyy")},{inductionPassDate.ToString("dd/MM/yyyy")},,{account.Name},{accountNumber},Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{inductionStartDate.ToString("dd/MM/yyyy")},{inductionPassDate.ToString("dd/MM/yyyy")},,,,Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -265,12 +253,6 @@ public partial class EwcWalesImportJobTests
     public async Task EwcWalesImportJobInduction_WithInvalidTRN_ReturnsExpectedCounts()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var expectedTotalRowCount = 1;
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
@@ -279,7 +261,7 @@ public partial class EwcWalesImportJobTests
         var inductionPassDate = new DateTime(2024, 10, 07);
         var invalidTRN = "invalid";
         var expectedFailureMessage = $"Teacher with TRN {invalidTRN} was not found.";
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{invalidTRN},Keri Louise Lyddon,Nicholas,01/01/2024,{inductionStartDate.ToString()},{inductionPassDate.ToString()},,{account.AccountNumber},12345,Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{invalidTRN},Keri Louise Lyddon,Nicholas,01/01/2024,{inductionStartDate.ToString()},{inductionPassDate.ToString()},,,,Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -312,12 +294,6 @@ public partial class EwcWalesImportJobTests
     public async Task EwcWalesImportJobInduction_WithRequiredToCompleteInductionStatus_UpdatesInductionStatus()
     {
         // Arrange
-        var accountNumber = "678910";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var expectedTotalRowCount = 1;
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
@@ -332,7 +308,7 @@ public partial class EwcWalesImportJobTests
         var trn = person.Trn;
         var updatedStartDate = DateTime.ParseExact("17/09/2019", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         var updatedPassDate = DateTime.ParseExact("28/09/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{updatedStartDate.ToString("dd/MM/yyyy")},{updatedPassDate.ToString("dd/MM/yyyy")},,,{accountNumber},Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{updatedStartDate.ToString("dd/MM/yyyy")},{updatedPassDate.ToString("dd/MM/yyyy")},,,,Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);

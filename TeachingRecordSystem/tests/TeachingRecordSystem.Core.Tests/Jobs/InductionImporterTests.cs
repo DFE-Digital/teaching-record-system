@@ -132,13 +132,7 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task Validate_PassedDateBeforeQtsDate_ReturnsError()
     {
         // Arrange
-        var accountNumber = "1357111";
         var awardDate = new DateOnly(2011, 01, 1);
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var person = await TestData.CreatePersonAsync(x =>
         {
@@ -169,13 +163,7 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task Validate_StartDateBeforeQtsDate_ReturnsError()
     {
         // Arrange
-        var accountNumber = "1357111";
         var awardDate = new DateOnly(2011, 01, 1);
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person1AwardedDate = Clock.Today.AddDays(-100);
         var qtsDate = Clock.Today.AddDays(-110);
         var person = await TestData.CreatePersonAsync(x =>
@@ -283,12 +271,6 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task Validate_WithCompletedInduction_ReturnsError(InductionStatus inductionStatus)
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithInductionStatus(builder => builder.WithStatus(inductionStatus));
@@ -316,11 +298,6 @@ public class InductionImporterTests : IAsyncLifetime
         // Arrange
         var inductionPeriodStartDate = new DateOnly(2019, 01, 01);
         var inductionStartDate = new DateOnly(2019, 01, 01);
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithRouteToProfessionalStatus(s => s
@@ -349,12 +326,6 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task GetLookupData_TrnDoesNotExist_ReturnsNoMatch()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
@@ -374,12 +345,6 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task GetLookupData_WithActiveAlert_ReturnsExpected()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithQts();
@@ -403,12 +368,6 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task GetLookupData_ValidTrnWithoutQTS_ReturnsNoAssociatedQTS()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync();
         var row = GetDefaultRow(x =>
         {
@@ -430,12 +389,6 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task GetLookupData_ValidTrnWithQTS_ReturnsTeacherHasQTS()
     {
         // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithQts();
@@ -460,13 +413,7 @@ public class InductionImporterTests : IAsyncLifetime
     public async Task Validate_WithQtlsDate_DoesNotReturnError()
     {
         // Arrange
-        var accountNumber = "1357111";
         var awardDate = new DateOnly(2011, 01, 1);
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId).First();
         var person = await TestData.CreatePersonAsync(p => p
