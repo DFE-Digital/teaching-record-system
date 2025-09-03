@@ -72,7 +72,7 @@ public class WebhookDeliveryService(
         var startedAt = clock.UtcNow;
 
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
 
         // Get the first batch of messages that are due to be sent.
         // Constrain the batch to `batchSize`, but return one more record so we know if there are more that need to be processed.

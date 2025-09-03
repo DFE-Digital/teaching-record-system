@@ -250,7 +250,7 @@ public class TpsCsvExtractProcessor(
         do
         {
             hasRecordsToUpdate = false;
-            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
             await foreach (var item in dbContext.Database.SqlQuery<NewTpsEmployment>(querySql).AsAsyncEnumerable())
             {
@@ -422,7 +422,7 @@ public class TpsCsvExtractProcessor(
         do
         {
             hasRecordsToUpdate = false;
-            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
             await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmployment>(querySql).AsAsyncEnumerable())
             {
@@ -600,7 +600,7 @@ public class TpsCsvExtractProcessor(
         do
         {
             hasRecordsToUpdate = false;
-            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
             await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentEstablishment>(querySql).AsAsyncEnumerable())
             {
@@ -714,7 +714,7 @@ public class TpsCsvExtractProcessor(
         do
         {
             hasRecordsToUpdate = false;
-            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
             await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentEndDate>(querySql).AsAsyncEnumerable())
             {
@@ -830,7 +830,7 @@ public class TpsCsvExtractProcessor(
         do
         {
             hasRecordsToUpdate = false;
-            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
             await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentEmployerEmailAddress>(querySql).AsAsyncEnumerable())
             {

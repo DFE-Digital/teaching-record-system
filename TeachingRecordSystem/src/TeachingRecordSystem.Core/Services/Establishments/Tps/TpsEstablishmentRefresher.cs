@@ -18,7 +18,7 @@ public class TpsEstablishmentRefresher(
         using var dbContext = dbContextFactory.CreateDbContext();
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
-        using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         var truncateSql = "TRUNCATE TABLE tps_establishments";
         await using var command = new NpgsqlCommand(truncateSql, connection, transaction);

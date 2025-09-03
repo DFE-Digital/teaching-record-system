@@ -12,7 +12,7 @@ public class AllocateTrnsToPersonsWithEypsJob(
 {
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
-        using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // Get all persons where HasEyps has been set to true but there is no TRN
         var personsWithHasEypsAndNoTrn = await dbContext.Persons
