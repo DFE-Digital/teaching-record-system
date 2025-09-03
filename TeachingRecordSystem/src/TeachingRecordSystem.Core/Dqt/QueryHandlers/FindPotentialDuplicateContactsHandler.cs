@@ -151,7 +151,7 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                 (f.Value is string stringValue && string.IsNullOrEmpty(stringValue)) ||
                 (f.Value is IEnumerable<string> stringEnumerable && !stringEnumerable.Any()));
 
-            var combinations = fields.GetCombinations(length: 3).ToArray();
+            var combinations = fields.Permutations(length: 3).ToArray();
 
             if (combinations.Length == 0)
             {

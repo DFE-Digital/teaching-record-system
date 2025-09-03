@@ -22,7 +22,7 @@
                         (Model.HasQts, "QTS"),
                         (Model.HasEyts, "EYTS")
                     };
-                    var flagsDescription = recordFlagsText.Where(t => t.HasFlag).Select(t => t.Text).ToCommaSeparatedString();
+                    var flagsDescription = recordFlagsText.Where(t => t.HasFlag).Select(t => t.Text).ToCommaDelimitedString();
                 }
                 This request matches a record with <span data-testid="flags-description">@flagsDescription</span>.
                 Make sure you’ve completed any checks outside this service before continuing.
