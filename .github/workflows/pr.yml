@@ -2,7 +2,11 @@ name: Pull request build
 
 on:
   pull_request:
+    branches:
+      - main
   merge_group:
+    branches:
+      - main
 
 permissions:
   checks: write
@@ -107,11 +111,27 @@ jobs:
       - name: Install tools
         run: just install-tools
 
-      - name: Run Incrementalist
+      - name: Get test projects
         id: get_test_projects
         run: |
-          dotnet incrementalist run --file ${{ runner.temp }}/test_projects.txt --branch main --dir ../ --target-glob "**/*Tests.csproj"
-          echo "project_short_names=$(cat ${{ runner.temp }}/test_projects.txt | xargs -n 1 dirname | xargs -n 1 basename | sed 's/^TeachingRecordSystem\.//g' | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
+          TARGET_BRANCH=main
+          TEST_PROJECTS_LIST=${{ runner.temp }}/test_projects.txt
+
+          dotnet incrementalist run --file $TEST_PROJECTS_LIST --branch $TARGET_BRANCH --dir ../ --target-glob "**/*Tests.csproj"
+
+          # Check projects with Razor views individually as incrementalist doesn't currently know about them
+          git fetch origin $TARGET_BRANCH --quiet --depth=1
+          CHANGED_FILES=$(git diff --name-only origin/$TARGET_BRANCH $GITHUB_SHA)
+          if [[ $(echo "$CHANGED_FILES" | grep -El "TeachingRecordSystem.SupportUi") ]]; then
+            echo $(realpath "tests/TeachingRecordSystem.SupportUi.Tests/TeachingRecordSystem.SupportUi.Tests.csproj") >> $TEST_PROJECTS_LIST
+            echo $(realpath "tests/TeachingRecordSystem.SupportUi.EndToEndTests/TeachingRecordSystem.SupportUi.EndToEndTests.csproj") >> $TEST_PROJECTS_LIST
+          fi
+          if [[ $(echo "$CHANGED_FILES" | grep -El "TeachingRecordSystem.AuthorizeAccess") ]]; then
+            echo $(realpath "tests/TeachingRecordSystem.AuthorizeAccess.Tests/TeachingRecordSystem.AuthorizeAccess.Tests.csproj") >> $TEST_PROJECTS_LIST
+            echo $(realpath "tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests.csproj") >> $TEST_PROJECTS_LIST
+          fi
+
+          echo "project_short_names=$(cat $TEST_PROJECTS_LIST | uniq | xargs -n 1 dirname | xargs -n 1 basename | sed 's/^TeachingRecordSystem\.//g' | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
         working-directory: TeachingRecordSystem
 
   tests:
