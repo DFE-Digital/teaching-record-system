@@ -2,7 +2,7 @@ using TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class SetRouteToProfessionalStatusTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
+public class SetRouteToProfessionalStatusTests : OperationTestBase
 {
     //HandleAsync_PersonDoesNotExist_ReturnsError
     //HandleAsync_RouteTypeIsNotPermitted_ReturnsError

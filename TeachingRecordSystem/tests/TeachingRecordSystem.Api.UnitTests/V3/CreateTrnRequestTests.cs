@@ -3,20 +3,32 @@ using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 
 #pragma warning disable TRS0001
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-[Collection(nameof(DisableParallelization))]
-public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
+[NotInParallel]
+public class CreateTrnRequestTests : OperationTestBase
 {
-    public CreateTrnRequestTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
+    [Before(Test)]
+    public void ConfigureMocks()
     {
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
     }
 
-    [Fact]
+    [Before(Test)]
+    public Task ClearDb() => DbHelper.DeleteAllPersonsAsync();
+
+    [Test]
     public Task HandleAsync_RequestForSameUserAndIdAlreadyExists_ReturnsError() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -38,7 +50,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             AssertError(result, 10029);  // Cannot resubmit request
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_WithNino_NormalizesNino() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -55,14 +67,14 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             var result = await handler.HandleAsync(command);
 
             // Assert
-            var metadata = await DbFixture.WithDbContextAsync(dbContext =>
+            var metadata = await WithDbContextAsync(dbContext =>
                 dbContext.TrnRequestMetadata
                     .SingleAsync(m =>
                         m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId));
             Assert.Equal(expectedNormalizedInsuranceNumber, metadata.NationalInsuranceNumber);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_WithNoEmail_Succeeds() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -79,7 +91,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             AssertSuccess(result);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_WithNoNino_Succeeds() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -96,8 +108,8 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             AssertSuccess(result);
         });
 
-    [Theory]
-    [MemberData(nameof(GetPotentialMatchCombinationsData))]
+    [Test]
+    [MethodDataSource(nameof(GetPotentialMatchCombinationsData))]
     public Task HandleAsync_MatchingExistingPersonOnTwoNamesAndDateOfBirth_ReturnsPendingStatusAndCreatesSupportTask(MatchedField[] matchedFields) =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -154,7 +166,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.Null(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
-            var persons = await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+            var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
             Assert.Empty(persons);
 
             await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
@@ -162,7 +174,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_MatchingExistingPersonOnTrsNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePersonOrSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -192,7 +204,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.NotNull(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
-            var persons = await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+            var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
             Assert.Empty(persons);
 
             await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
@@ -200,7 +212,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_MatchingExistingPersonOnTrsNinoOnly_CreatesSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -230,7 +242,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.Null(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
-            var persons = await DbFixture.WithDbContextAsync(dbContext =>
+            var persons = await WithDbContextAsync(dbContext =>
                 dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
             Assert.Empty(persons);
 
@@ -239,7 +251,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_MatchingExistingPersonOnEmailOnly_CreatesSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -265,7 +277,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.Null(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
-            var persons = await DbFixture.WithDbContextAsync(dbContext =>
+            var persons = await WithDbContextAsync(dbContext =>
                 dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
             Assert.Empty(persons);
 
@@ -274,7 +286,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_MatchingMultipleExistingPersonsOnTrsNinoAndDob_CreatesSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -308,7 +320,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.Null(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
-            var persons = await DbFixture.WithDbContextAsync(dbContext =>
+            var persons = await WithDbContextAsync(dbContext =>
                 dbContext.Persons.Where(p => p.PersonId != matchedPerson1.PersonId && p.PersonId != matchedPerson2.PersonId).ToArrayAsync());
             Assert.Empty(persons);
 
@@ -317,7 +329,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_MatchingExistingPersonOnWorkforceNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePerson() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -357,7 +369,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.NotNull(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
-            var persons = await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+            var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
             Assert.Empty(persons);
 
             await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
@@ -365,7 +377,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_DefiniteMatchWithPersonDoesNotRequireFurthersChecks_ReturnsTrn() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -399,7 +411,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.NotNull(success.Trn);
             Assert.NotNull(success.AccessYourTeachingQualificationsLink);
 
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 var metadata = await dbContext.TrnRequestMetadata
                     .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
@@ -416,7 +428,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             });
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_DefiniteMatchWithPersonDoesRequireFurthersChecks_CreatesSupportTaskAndDoesNotReturnTrn() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -450,7 +462,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.Null(success.Trn);
             Assert.Null(success.AccessYourTeachingQualificationsLink);
 
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 var metadata = await dbContext.TrnRequestMetadata
                     .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
@@ -467,7 +479,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             });
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_NoMatches_CreatesPersonWithTrnButNoSupportTask() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
@@ -486,7 +498,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
             Assert.NotNull(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
-            var person = await DbFixture.WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync());
+            var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync());
             Assert.NotNull(person);
             Assert.NotNull(person.Trn);
             AssertPersonMatchesCommand(command, person, expectTrn: true);
@@ -543,7 +555,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
     }
 
     private Task AssertMetadataMatchesCommandAsync(CreateTrnRequestCommand command, bool expectedPotentialDuplicate) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             var applicationUserId = CurrentUserProvider.GetCurrentApplicationUser().UserId;
 
@@ -585,7 +597,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
         });
 
     private Task AssertSupportTaskCreatedAsync(Guid applicationUserId, string requestId) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             var supportTask = await dbContext.SupportTasks
                 .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
@@ -597,7 +609,7 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
         });
 
     private Task AssertNoSupportTaskCreatedAsync(Guid applicationUserId, string requestId) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             var supportTask = await dbContext.SupportTasks
                 .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
@@ -606,24 +618,6 @@ public class CreateTrnRequestTests : OperationTestBase, IAsyncLifetime
 
             Assert.Null(supportTask);
         });
-
-    public async Task InitializeAsync()
-    {
-        // Any existing Contacts will affect our duplicate matching; clear them all out before every test
-        await OperationTestFixture.DbFixture.DbHelper.DeleteAllPersonsAsync();
-
-        GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 
     public enum MatchedField
     {
