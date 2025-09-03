@@ -72,6 +72,32 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.RemoveIfExists("BatchSendQtsAwardedEmailsJob");
                 recurringJobManager.RemoveIfExists("BatchSendInternationalQtsAwardedEmailsJob");
                 recurringJobManager.RemoveIfExists("BatchSendEytsAwardedEmailsJob");
+                recurringJobManager.RemoveIfExists("DeleteOldAttachmentsJob");
+
+                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob");
+                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
+                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob & migrate");
+
+                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob");
+                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & (dry-run)");
+                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & migrate");
+
+                recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob");
+                recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob (dry-run)");
+
+                recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob (dry-run)");
+                recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob");
+
+                recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob (dry-run)");
+                recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob");
+
+                recurringJobManager.RemoveIfExists("AllocateTrnsToPersonsWithEyps (dry-run)");
+                recurringJobManager.RemoveIfExists("AllocateTrnsToPersonsWithEyps");
+
+                recurringJobManager.RemoveIfExists("BackfillDqtReportingAlertTypes");
+                recurringJobManager.RemoveIfExists("BackfillDqtReportingPersons");
+                recurringJobManager.RemoveIfExists("BackfillDqtReportingQualifications");
+                recurringJobManager.RemoveIfExists("BackfillDqtReportingWorkforceData");
 
                 recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
                     nameof(SyncAllPersonsFromCrmJob),
@@ -109,20 +135,18 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.RemoveIfExists("DeleteOldAttachmentsJob");
-
-                recurringJobManager.AddOrUpdate<BackfillDqtReportingQualifications>(
-                    nameof(BackfillDqtReportingQualifications),
+                recurringJobManager.AddOrUpdate<BackfillDqtReportingQualificationsJob>(
+                    nameof(BackfillDqtReportingQualificationsJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<BackfillDqtReportingWorkforceData>(
-                    nameof(BackfillDqtReportingWorkforceData),
+                recurringJobManager.AddOrUpdate<BackfillDqtReportingWorkforceDataJob>(
+                    nameof(BackfillDqtReportingWorkforceDataJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<BackfillDqtReportingPersons>(
-                    nameof(BackfillDqtReportingPersons),
+                recurringJobManager.AddOrUpdate<BackfillDqtReportingPersonsJob>(
+                    nameof(BackfillDqtReportingPersonsJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
@@ -141,23 +165,6 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob");
-                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
-                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob & migrate");
-
-                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob");
-                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & (dry-run)");
-                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & migrate");
-
-                recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob");
-                recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob (dry-run)");
-
-                recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob (dry-run)");
-                recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob");
-
-                recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob (dry-run)");
-                recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob");
-
                 recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
                     nameof(CpdInductionImporterJob),
                     job => job.ExecuteAsync(CancellationToken.None),
@@ -168,8 +175,8 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypes>(
-                    nameof(BackfillDqtReportingAlertTypes),
+                recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypesJob>(
+                    nameof(BackfillDqtReportingAlertTypesJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
@@ -264,13 +271,13 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportAmendJob.JobSchedule);
 
-                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEyps>(
-                    $"{nameof(AllocateTrnsToPersonsWithEyps)} (dry-run)",
+                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEypsJob>(
+                    $"{nameof(AllocateTrnsToPersonsWithEypsJob)} (dry-run)",
                     job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEyps>(
-                    nameof(AllocateTrnsToPersonsWithEyps),
+                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEypsJob>(
+                    nameof(AllocateTrnsToPersonsWithEypsJob),
                     job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 

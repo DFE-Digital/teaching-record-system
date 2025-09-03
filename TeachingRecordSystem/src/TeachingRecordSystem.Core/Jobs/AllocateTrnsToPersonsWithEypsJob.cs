@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class AllocateTrnsToPersonsWithEyps(
+public class AllocateTrnsToPersonsWithEypsJob(
     TrsDbContext dbContext,
     ITrnGenerator trnGenerator,
     IFileService fileService,

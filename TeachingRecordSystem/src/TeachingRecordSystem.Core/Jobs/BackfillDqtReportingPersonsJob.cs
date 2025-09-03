@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.Jobs;
 
 [AutomaticRetry(Attempts = 0)]
-public class BackfillDqtReportingPersons(IConfiguration configuration, TrsDbContext dbContext, IClock clock)
+public class BackfillDqtReportingPersonsJob(IConfiguration configuration, TrsDbContext dbContext, IClock clock)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
