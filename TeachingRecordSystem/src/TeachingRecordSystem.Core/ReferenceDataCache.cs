@@ -1,28 +1,19 @@
-using System.ServiceModel;
-using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core;
 
-public class ReferenceDataCache(
-    ICrmQueryDispatcher crmQueryDispatcher,
-    IDbContextFactory<TrsDbContext> dbContextFactory) : IStartupTask
+public class ReferenceDataCache(IDbContextFactory<TrsDbContext> dbContextFactory) : IStartupTask
 {
+    private object _alertCategoriesSyncObj = new();
+    private object _alertTypesSyncObj = new();
+    private object _inductionExemptionReasonsSyncObj = new();
     private object _routeTypesSyncObj = new();
+    private object _trainingSubjectsSyncObj = new();
+    private object _countriesSyncObj = new();
+    private object _trainingProvidersSyncObj = new();
+    private object _degreeTypesSyncObj = new();
 
-    // CRM
-    private Task<Subject[]>? _getSubjectsTask;
-    private Task<dfeta_hequalification[]>? _getHeQualificationsTask;
-    private Task<dfeta_hesubject[]>? _getHeSubjectsTask;
-    private Task<dfeta_country[]>? _getCountriesTask;
-    private Task<dfeta_ittsubject[]>? _getIttSubjectsTask;
-    private Task<dfeta_ittqualification[]>? _getIttQualificationsTask;
-    private Task<Account[]>? _getIttProvidersTask;
-
-    // TRS
     private Task<AlertCategory[]>? _alertCategoriesTask;
     private Task<AlertType[]>? _alertTypesTask;
     private Task<InductionExemptionReason[]>? _inductionExemptionReasonsTask;
@@ -32,50 +23,22 @@ public class ReferenceDataCache(
     private Task<TrainingProvider[]>? _trainingProvidersTask;
     private Task<DegreeType[]>? _degreeTypesTask;
 
-    protected IDbContextFactory<TrsDbContext> DbContextFactory => dbContextFactory;
-
-    public async Task<Subject> GetSubjectByTitleAsync(string title)
+    public void Clear()
     {
-        var subjects = await EnsureSubjectsAsync();
-        return subjects.Single(s => s.Title == title, $"Could not find subject with title: '{title}'.");
-    }
-
-    public async Task<dfeta_hequalification[]> GetHeQualificationsAsync()
-    {
-        var heQualifications = await EnsureHeQualificationsAsync();
-        return heQualifications.ToArray();
-    }
-
-    public async Task<dfeta_hequalification> GetHeQualificationByValueAsync(string value)
-    {
-        var heQualifications = await EnsureHeQualificationsAsync();
-        // build environment has some duplicate HE Qualifications, which prevent us using Single() here
-        return heQualifications.First(s => s.dfeta_Value == value, $"Could not find HE qualification with value: '{value}'.");
-    }
-
-    public async Task<dfeta_hesubject[]> GetHeSubjectsAsync()
-    {
-        var heSubjects = await EnsureHeSubjectsAsync();
-        return heSubjects.ToArray();
-    }
-
-    public async Task<dfeta_hesubject> GetHeSubjectByValueAsync(string value)
-    {
-        var heSubjects = await EnsureHeSubjectsAsync();
-        // build environment has some duplicate HE Subjects, which prevent us using Single() here
-        return heSubjects.First(s => s.dfeta_Value == value, $"Could not find HE subject with value: '{value}'.");
+        _alertCategoriesTask = null;
+        _alertTypesTask = null;
+        _inductionExemptionReasonsTask = null;
+        _routesTypesTask = null;
+        _trainingSubjectsTask = null;
+        _countriesTask = null;
+        _trainingProvidersTask = null;
+        _degreeTypesTask = null;
     }
 
     public async Task<AlertCategory[]> GetAlertCategoriesAsync()
     {
         var alertCategories = await EnsureAlertCategoriesAsync();
         return alertCategories;
-    }
-
-    public async Task<AlertCategory> GetAlertCategoryByIdAsync(Guid alertCategoryId)
-    {
-        var alertCategories = await EnsureAlertCategoriesAsync();
-        return alertCategories.Single(ac => ac.AlertCategoryId == alertCategoryId, $"Could not find alert category with ID: '{alertCategoryId}'.");
     }
 
     public async Task<AlertType[]> GetAlertTypesAsync(bool activeOnly = false)
@@ -94,75 +57,6 @@ public class ReferenceDataCache(
     {
         var alertTypes = await EnsureAlertTypesAsync();
         return alertTypes.Single(at => at.DqtSanctionCode == dqtSanctionCode, $"Could not find alert type with DQT sanction code: '{dqtSanctionCode}'.");
-    }
-
-    public async Task<AlertType?> GetAlertTypeByDqtSanctionCodeIfExistsAsync(string dqtSanctionCode)
-    {
-        var alertTypes = await EnsureAlertTypesAsync();
-        return alertTypes.SingleOrDefault(at => at.DqtSanctionCode == dqtSanctionCode);
-    }
-
-    public async Task<dfeta_country?> GetCountryByCountryCodeAsync(string countryCode)
-    {
-        var countries = await EnsureCountriesAsync();
-        // build environment has duplicate Countries, which prevent us using Single() here
-        return countries.FirstOrDefault(at => at.dfeta_Value == countryCode);
-    }
-
-    public async Task<dfeta_country> GetCountryByIdAsync(Guid countryId)
-    {
-        var countries = await EnsureCountriesAsync();
-        return countries.Single(c => c.Id == countryId, $"Could not find country with ID: '{countryId}'.");
-    }
-
-    public async Task<dfeta_ittsubject?> GetIttSubjectBySubjectCodeAsync(string subjectCode)
-    {
-        var ittSubjects = await EnsureIttSubjectsAsync();
-        // build environment has duplicate ITT Subjects, which prevent us using Single() here
-        return ittSubjects.FirstOrDefault(at => at.dfeta_Value == subjectCode);
-    }
-
-    public async Task<dfeta_ittsubject> GetIttSubjectBySubjectIdAsync(Guid subjectId)
-    {
-        var ittSubjects = await EnsureIttSubjectsAsync();
-        return ittSubjects.Single(s => s.Id == subjectId, $"Could not find ITT subject with ID: '{subjectId}'.");
-    }
-
-    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync(bool activeOnly = true)
-    {
-        var ittQualifications = await EnsureIttQualificationsAsync();
-        return ittQualifications.Where(q => !activeOnly || q.StateCode == dfeta_ittqualificationState.Active).ToArray();
-    }
-
-    public async Task<dfeta_ittqualification> GetIttQualificationByValueAsync(string value)
-    {
-        var ittQualifications = await EnsureIttQualificationsAsync();
-        // build environment has some duplicate ITT Qualifications, which prevent us using Single() here
-        return ittQualifications.First(s => s.dfeta_Value == value, $"Could not find ITT qualification with value: '{value}'.");
-    }
-
-    public async Task<dfeta_ittqualification> GetIttQualificationByIdAsync(Guid ittQualificationId)
-    {
-        var ittQualifications = await EnsureIttQualificationsAsync();
-        return ittQualifications.Single(q => q.Id == ittQualificationId, $"Could not find ITT qualification with ID: '{ittQualificationId}'.");
-    }
-
-    public async Task<Account?> GetIttProviderByUkPrnAsync(string ukPrn)
-    {
-        var ittProviders = await EnsureIttProvidersAsync();
-        return ittProviders.SingleOrDefault(p => p.dfeta_UKPRN == ukPrn);
-    }
-
-    public async Task<Account?> GetIttProviderByNameAsync(string name)
-    {
-        var ittProviders = await EnsureIttProvidersAsync();
-        return ittProviders.SingleOrDefault(p => p.Name == name);
-    }
-
-    public async Task<Account?> GetIttProviderByIdAsync(Guid providerId)
-    {
-        var ittProviders = await EnsureIttProvidersAsync();
-        return ittProviders.Single(p => p.AccountId == providerId, $"Could not find ITT provider with ID: '{providerId}'.");
     }
 
     public async Task<InductionExemptionReason[]> GetPersonLevelInductionExemptionReasonsAsync(bool activeOnly = false)
@@ -253,24 +147,10 @@ public class ReferenceDataCache(
         return trainingProviders.SingleOrDefault(tp => tp.Ukprn == ukprn);
     }
 
-    private Task<Subject[]> EnsureSubjectsAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getSubjectsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllSubjectsQuery()));
-
-    private Task<dfeta_hequalification[]> EnsureHeQualificationsAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getHeQualificationsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveHeQualificationsQuery()));
-
-    private Task<dfeta_hesubject[]> EnsureHeSubjectsAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getHeSubjectsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveHeSubjectsQuery()));
-
     private Task<AlertCategory[]> EnsureAlertCategoriesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _alertCategoriesTask,
+            ref _alertCategoriesSyncObj,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
@@ -280,71 +160,17 @@ public class ReferenceDataCache(
     private Task<AlertType[]> EnsureAlertTypesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _alertTypesTask,
+            ref _alertTypesSyncObj,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
                 return await dbContext.AlertTypes.AsNoTracking().Include(t => t.AlertCategory).IgnoreAutoIncludes().ToArrayAsync();
             });
 
-    private Task<dfeta_country[]> EnsureCountriesAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getCountriesTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllCountriesQuery()));
-
-    private Task<dfeta_ittsubject[]> EnsureIttSubjectsAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getIttSubjectsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttSubjectsQuery()));
-
-    private Task<dfeta_ittqualification[]> EnsureIttQualificationsAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getIttQualificationsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttQualificationsQuery()));
-
-    private Task<Account[]> EnsureIttProvidersAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getIttProvidersTask,
-            async () =>
-            {
-                var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(PageNumber: 1, Pagesize: 1000);
-                var ittProviders = new List<Account>();
-
-                while (true)
-                {
-                    PagedProviderResults result;
-                    try
-                    {
-                        result = await crmQueryDispatcher.ExecuteQueryAsync(crmQuery);
-                    }
-                    catch (FaultException<OrganizationServiceFault> e) when (e.IsCrmRateLimitException(out var retryAfter))
-                    {
-                        await Task.Delay(retryAfter);
-                        continue;
-                    }
-
-                    ittProviders.AddRange(result.Providers);
-
-                    if (result.MoreRecords)
-                    {
-                        crmQuery = crmQuery with { PageNumber = crmQuery.PageNumber + 1, PagingCookie = result.PagingCookie };
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                // Also get any active ITT providers (some of which may not have an ITT record in DQT)
-                var activeIttProviders = await crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttProvidersQuery());
-                var ittProviderIds = ittProviders.Select(p => p.AccountId).ToHashSet();
-                ittProviders.AddRange(activeIttProviders.Where(a => !ittProviderIds.Contains(a.Id)));
-
-                return ittProviders.ToArray();
-            });
-
     private Task<InductionExemptionReason[]> EnsureInductionExemptionReasonsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _inductionExemptionReasonsTask,
+            ref _inductionExemptionReasonsSyncObj,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
@@ -355,17 +181,16 @@ public class ReferenceDataCache(
         LazyInitializer.EnsureInitialized(
             ref _routesTypesTask,
             ref _routeTypesSyncObj,
-            InitializeRouteToProfessionalStatusTypesAsync);
-
-    protected async virtual Task<RouteToProfessionalStatusType[]> InitializeRouteToProfessionalStatusTypesAsync()
-    {
-        using var dbContext = dbContextFactory.CreateDbContext();
-        return await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
-    }
+            async () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
+            });
 
     private Task<Country[]> EnsureTrainingCountriesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _countriesTask,
+            ref _countriesSyncObj,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
@@ -375,6 +200,7 @@ public class ReferenceDataCache(
     private Task<TrainingSubject[]> EnsureTrainingSubjectsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _trainingSubjectsTask,
+            ref _trainingSubjectsSyncObj,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
@@ -384,6 +210,7 @@ public class ReferenceDataCache(
     private Task<TrainingProvider[]> EnsureTrainingProvidersAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _trainingProvidersTask,
+            ref _trainingProvidersSyncObj,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
@@ -393,30 +220,21 @@ public class ReferenceDataCache(
     private Task<DegreeType[]> EnsureDegreeTypesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _degreeTypesTask,
+            ref _degreeTypesSyncObj,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
                 return await dbContext.DegreeTypes.AsNoTracking().ToArrayAsync();
             });
 
-    async Task IStartupTask.ExecuteAsync()
-    {
-        // CRM
-        await EnsureSubjectsAsync();
-        await EnsureHeQualificationsAsync();
-        await EnsureHeSubjectsAsync();
-        await EnsureCountriesAsync();
-        await EnsureIttSubjectsAsync();
-        await EnsureIttQualificationsAsync();
-        await EnsureIttProvidersAsync();
-
-        // TRS
-        await EnsureAlertCategoriesAsync();
-        await EnsureAlertTypesAsync();
-        await EnsureInductionExemptionReasonsAsync();
-        await EnsureRouteToProfessionalStatusTypesAsync();
-        await EnsureTrainingCountriesAsync();
-        await EnsureTrainingSubjectsAsync();
-        await EnsureTrainingProvidersAsync();
-    }
+    Task IStartupTask.ExecuteAsync() => Task.WhenAll(
+        EnsureAlertCategoriesAsync(),
+        EnsureAlertTypesAsync(),
+        EnsureInductionExemptionReasonsAsync(),
+        EnsureRouteToProfessionalStatusTypesAsync(),
+        EnsureTrainingSubjectsAsync(),
+        EnsureTrainingCountriesAsync(),
+        EnsureTrainingProvidersAsync(),
+        EnsureDegreeTypesAsync()
+    );
 }

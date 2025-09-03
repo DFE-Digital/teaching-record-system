@@ -9,11 +9,8 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
-using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -129,27 +126,6 @@ builder.Services.AddRedis(builder.Environment, builder.Configuration);
 if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
     builder.Services.AddTrnGeneration();
-
-    var crmConnectionString = $"""
-        AuthType=ClientSecret;
-        Url={builder.Configuration.GetRequiredValue("CrmUrl")};
-        ClientId={builder.Configuration.GetRequiredValue("AzureAd:ClientId")};
-        ClientSecret={builder.Configuration.GetRequiredValue("AzureAd:ClientSecret")};
-        RequireNewInstance=true
-        """;
-
-    var serviceClient = new ServiceClient(crmConnectionString)
-    {
-        DisableCrossThreadSafeties = true,
-        EnableAffinityCookie = true,
-        MaxRetryCount = 2,
-        RetryPauseTime = TimeSpan.FromSeconds(1)
-    };
-
-    builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => serviceClient.Clone());
-
-    builder.Services.AddHealthChecks()
-        .AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 
     if (!builder.Environment.IsDevelopment())
     {

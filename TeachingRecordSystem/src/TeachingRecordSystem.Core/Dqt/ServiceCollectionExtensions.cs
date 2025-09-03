@@ -56,8 +56,6 @@ public static partial class ServiceCollectionExtensions
     {
         services.AddServiceClient(name: null, lifetime, getServiceClient);
 
-        services.AddSingleton<ReferenceDataCache>();
-
         return services;
     }
 

@@ -109,9 +109,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_NoCategoriesSpecifiedAndFiltersApplied_ReturnsNoResults()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var dobChangeRequest = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId));
-        Clock.Advance();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var connectOneLoginUser = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 

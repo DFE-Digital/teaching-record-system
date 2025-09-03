@@ -683,16 +683,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var eytsDate = awardDate.AddDays(1);
         var pqtsDate = awardDate.AddDays(2);
         var qtlsDate = awardDate.AddDays(3);
-        var ittQualification = await ReferenceDataCache.GetIttQualificationByValueAsync("008");
-        var ittProvider = await ReferenceDataCache.GetIttProviderByUkPrnAsync("10007799");
-        var ittSubject1 = await ReferenceDataCache.GetIttSubjectBySubjectCodeAsync("100078");
-        var ittSubject2 = await ReferenceDataCache.GetIttSubjectBySubjectCodeAsync("100079");
-        var ittSubject3 = await ReferenceDataCache.GetIttSubjectBySubjectCodeAsync("100343");
+        var ittQualification = new { dfeta_Value = "008", dfeta_name = "Qualification" };
+        var ittProvider = new { dfeta_UKPRN = "10007799", Name = "ITT Provider", Id = Guid.NewGuid() };
+        var ittSubject1 = new { dfeta_Value = "100078", dfeta_name = "Subject 1" };
+        var ittSubject2 = new { dfeta_Value = "100079", dfeta_name = "Subject 2" };
+        var ittSubject3 = new { dfeta_Value = "100343", dfeta_name = "Subject 3" };
         var dqtAgeRangeFrom = dfeta_AgeRange._10;
         var dqtAgeRangeTo = dfeta_AgeRange._16;
         var programmeType = dfeta_ITTProgrammeType.AssessmentOnlyRoute;
         var ittResult = dfeta_ITTResult.Pass;
-        var dqtCountry = await ReferenceDataCache.GetCountryByCountryCodeAsync("XK");
+        var dqtCountry = new { dfeta_Value = "XK", dfeta_name = "United Kingdom" };
 
         // Use populateOptional to deliberately populate OR not populate ALL optional fields to test rendering.
         // (even though in reality not all combinations of these fields would happen).
@@ -745,16 +745,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 Result = ittResult.ToString(),
                 QualificationName = ittQualification.dfeta_name,
                 QualificationValue = ittQualification.dfeta_Value,
-                ProviderId = ittProvider!.Id,
+                ProviderId = ittProvider.Id,
                 ProviderName = ittProvider.Name,
                 ProviderUkprn = ittProvider.dfeta_UKPRN,
-                CountryName = dqtCountry!.dfeta_name,
+                CountryName = dqtCountry.dfeta_name,
                 CountryValue = dqtCountry.dfeta_Value,
-                Subject1Name = ittSubject1!.dfeta_name,
+                Subject1Name = ittSubject1.dfeta_name,
                 Subject1Value = ittSubject1.dfeta_Value,
-                Subject2Name = ittSubject2!.dfeta_name,
+                Subject2Name = ittSubject2.dfeta_name,
                 Subject2Value = ittSubject2.dfeta_Value,
-                Subject3Name = ittSubject3!.dfeta_name,
+                Subject3Name = ittSubject3.dfeta_name,
                 Subject3Value = ittSubject3.dfeta_Value,
                 AgeRangeFrom = dqtAgeRangeFrom.ToString(),
                 AgeRangeTo = dqtAgeRangeTo.ToString()
