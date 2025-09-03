@@ -17,7 +17,7 @@
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Search for a record</h3>
                 </govuk-input-label>
                 <govuk-input-hint class="moj-search__hint">
-                    For example TRN, name or date of birth
+                    Enter a name, date of birth or teacher reference number (TRN)
                 </govuk-input-hint>
             </govuk-input>
             <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
@@ -43,7 +43,7 @@
                 </a>
                 <a href="@LinkGenerator.ApiTrnRequests()" class="trs-tile">
                     <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ApiTrnRequest)</span>
-                    <span class="trs-tile__title">Duplicates via API</span>
+                    <span class="trs-tile__title">Potential duplicates via API</span>
                 </a>
                 <a href="@LinkGenerator.TrnRequestManualChecksNeeded()" class="trs-tile">
                     <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TrnRequestManualChecksNeeded)</span>

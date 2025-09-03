@@ -66,7 +66,7 @@
                                 </a>
                             </th>
                             <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
-                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</td>
                             <td class="govuk-table__cell" data-testid="potential-duplicate"><colored-tag class="@tagClass">@tagValue</colored-tag></td>
                         </tr>
                     }
