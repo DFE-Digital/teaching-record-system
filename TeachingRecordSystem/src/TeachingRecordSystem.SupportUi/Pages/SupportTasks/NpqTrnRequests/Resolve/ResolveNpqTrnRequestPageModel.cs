@@ -102,16 +102,22 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
             {
                 yield return PersonMatchedAttribute.NationalInsuranceNumber;
             }
+
+            if (state.GenderSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.Gender;
+            }
         }
     }
 
     protected IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeMatches(
-    string firstName,
-    string? middleName,
-    string lastName,
-    DateOnly? dateOfBirth,
-    string? emailAddress,
-    string? nationalInsuranceNumber)
+        string firstName,
+        string? middleName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        string? emailAddress,
+        string? nationalInsuranceNumber,
+        Gender? gender)
     {
         return Impl().AsReadOnly();
 
@@ -147,6 +153,11 @@ public abstract class ResolveNpqTrnRequestPageModel(TrsDbContext dbContext) : Pa
             if (nationalInsuranceNumber == requestData.NationalInsuranceNumber)
             {
                 yield return PersonMatchedAttribute.NationalInsuranceNumber;
+            }
+
+            if (gender == requestData.Gender)
+            {
+                yield return PersonMatchedAttribute.Gender;
             }
         }
     }
