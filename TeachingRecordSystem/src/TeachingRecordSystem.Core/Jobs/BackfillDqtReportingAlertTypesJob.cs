@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class BackfillDqtReportingAlertTypes(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, IClock clock)
+public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, IClock clock)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
