@@ -25,6 +25,7 @@ public partial class TestData
         private Option<string> _lastName;
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
+        private Option<Gender?> _gender;
         private Option<TrnRequestMatchedPerson[]> _matchedPersons;
         private Option<string> _npqApplicationId;
         private Option<bool> _npqIsInEducationalSetting;
@@ -114,6 +115,12 @@ public partial class TestData
             return this;
         }
 
+        public CreateNpqTrnRequestSupportTaskBuilder WithGender(Gender? gender)
+        {
+            _gender = Option.Some(gender);
+            return this;
+        }
+
         public CreateNpqTrnRequestSupportTaskBuilder WithMatchedPersons(params Guid[] personIds)
         {
             if (_withMatches is false)
@@ -147,6 +154,7 @@ public partial class TestData
             var lastName = _lastName.ValueOr(testData.GenerateLastName);
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOrDefault();
+            var gender = _gender.ValueOrDefault();
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
             var npqApplicationId = _npqApplicationId.ValueOr(testData.GenerateNpqApplicationId());
             var npqIsInEducationalSetting = _npqIsInEducationalSetting.ValueOr(Faker.Boolean.Random);
@@ -178,6 +186,11 @@ public partial class TestData
                             {
                                 p.WithNationalInsuranceNumber(nationalInsuranceNumber);
                             }
+
+                            if (gender is not null)
+                            {
+                                p.WithGender(gender.Value);
+                            }
                         });
 
                         return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
@@ -206,7 +219,7 @@ public partial class TestData
                 DateOfBirth = dateOfBirth,
                 PotentialDuplicate = potentialDuplicate,
                 NationalInsuranceNumber = nationalInsuranceNumber,
-                Gender = null,
+                Gender = gender,
                 AddressLine1 = null,
                 AddressLine2 = null,
                 AddressLine3 = null,

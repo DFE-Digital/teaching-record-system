@@ -78,6 +78,14 @@
                     Model.NationalInsuranceNumber!.TrnRequestValue,
                     Model.NationalInsuranceNumber!.ExistingRecordValue,
                     Model.NationalInsuranceNumberSource);
+
+                await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.GenderSource),
+                    Model.Gender!.Different,
+                    Html.NameFor(m => m.GenderSource),
+                    Model.Gender!.TrnRequestValue?.GetDisplayName(),
+                    Model.Gender!.ExistingRecordValue?.GetDisplayName(),
+                    Model.GenderSource);
             }
         </tbody>
     </table>

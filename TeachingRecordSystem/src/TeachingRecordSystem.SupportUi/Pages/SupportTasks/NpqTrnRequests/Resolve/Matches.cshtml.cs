@@ -55,6 +55,7 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
                 state.DateOfBirthSource = null;
                 state.EmailAddressSource = null;
                 state.NationalInsuranceNumberSource = null;
+                state.GenderSource = null;
                 state.PersonAttributeSourcesSet = false;
             }
         });
@@ -116,7 +117,8 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
                     r.LastName,
                     r.DateOfBirth,
                     r.EmailAddress,
-                    r.NationalInsuranceNumber)
+                    r.NationalInsuranceNumber,
+                    r.Gender)
             })
             .ToArray();
 

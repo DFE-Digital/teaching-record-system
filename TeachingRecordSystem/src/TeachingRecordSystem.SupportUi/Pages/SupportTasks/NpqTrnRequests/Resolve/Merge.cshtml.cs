@@ -19,6 +19,8 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
     public PersonAttribute<string?>? NationalInsuranceNumber { get; set; }
 
+    public PersonAttribute<Gender?>? Gender { get; set; }
+
     [BindProperty]
     [Display(Name = "Date of birth")]
     public PersonAttributeSource? DateOfBirthSource { get; set; }
@@ -32,6 +34,10 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
 
     [BindProperty]
+    [Display(Name = "Gender")]
+    public PersonAttributeSource? GenderSource { get; set; }
+
+    [BindProperty]
     [Display(Name = "Add comments (optional)")]
     public string? Comments { get; set; }
 
@@ -41,6 +47,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
         DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
         EmailAddressSource = JourneyInstance!.State.EmailAddressSource;
         NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
+        GenderSource = JourneyInstance!.State.GenderSource;
         Comments = JourneyInstance!.State.Comments;
     }
 
@@ -61,6 +68,11 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             ModelState.AddModelError(nameof(NationalInsuranceNumberSource), "Select a National Insurance number");
         }
 
+        if (Gender!.Different && GenderSource is null)
+        {
+            ModelState.AddModelError(nameof(GenderSource), "Select a gender");
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -71,6 +83,7 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             state.DateOfBirthSource = DateOfBirthSource;
             state.EmailAddressSource = EmailAddressSource;
             state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+            state.GenderSource = GenderSource;
             state.PersonAttributeSourcesSet = true;
             state.Comments = Comments;
         });
@@ -108,7 +121,8 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             personAttributes.LastName,
             personAttributes.DateOfBirth,
             personAttributes.EmailAddress,
-            personAttributes.NationalInsuranceNumber);
+            personAttributes.NationalInsuranceNumber,
+            personAttributes.Gender);
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
             personAttributes.DateOfBirth,
@@ -124,6 +138,11 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+
+        Gender = new PersonAttribute<Gender?>(
+            personAttributes.Gender,
+            requestData.Gender,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
 
         PersonName = StringHelper.JoinNonEmpty(' ', new string?[] { personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName });
 
