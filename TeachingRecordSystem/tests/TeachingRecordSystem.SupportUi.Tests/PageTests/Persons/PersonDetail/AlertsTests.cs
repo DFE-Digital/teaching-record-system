@@ -260,7 +260,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
@@ -285,7 +285,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
@@ -394,7 +394,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
@@ -418,7 +418,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 

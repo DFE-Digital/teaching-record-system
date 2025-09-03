@@ -272,7 +272,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_WithExemptionReasonsSelected_ShowsExpected()
     {
         var selectedExemptionReasonIds = ExemptionReasonCategories.ExemptionReasonIds
-            .RandomSelection(2)
+            .TakeRandom(2)
             .ToArray();
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -322,7 +322,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var exemptionReasonIds = ExemptionReasonCategories.ExemptionReasonIds
-            .RandomSelection(2)
+            .TakeRandom(2)
             .ToArray();
 
         var journeyInstance = await CreateJourneyInstanceAsync(

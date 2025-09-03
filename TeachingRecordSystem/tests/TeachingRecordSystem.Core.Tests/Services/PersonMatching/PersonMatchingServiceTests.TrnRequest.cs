@@ -307,7 +307,7 @@ public partial class PersonMatchingServiceTests
             return attrNames;
         }
 
-        foreach (var matchedAttrs in matchableAttributes.GetCombinations())
+        foreach (var matchedAttrs in matchableAttributes.Permutations())
         {
             if (GetDistinctAttributeTypes(matchedAttrs).Count < 3)
             {
@@ -339,7 +339,7 @@ public partial class PersonMatchingServiceTests
 
         // Match on 2 or fewer attributes
 
-        foreach (var matchedAttrs in matchableAttributes.GetCombinations())
+        foreach (var matchedAttrs in matchableAttributes.Permutations())
         {
             if (GetDistinctAttributeTypes(matchedAttrs).Count >= 3)
             {

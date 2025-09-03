@@ -407,10 +407,10 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstance(supportTask, personId: matchedPerson.PersonId);
 
-        var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var genderSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
+        var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var genderSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -452,10 +452,10 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstance(supportTask, personId: matchedPerson.PersonId);
 
-        var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var genderSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
+        var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var genderSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

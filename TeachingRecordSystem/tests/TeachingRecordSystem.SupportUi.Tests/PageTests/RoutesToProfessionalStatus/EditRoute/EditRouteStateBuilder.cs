@@ -36,7 +36,7 @@ public class EditRouteStateBuilder()
                 && s.TrainingProviderRequired != FieldRequirement.NotApplicable
                 && s.TrainingStartDateRequired != FieldRequirement.NotApplicable
                 && s.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         return this;
     }

@@ -16,10 +16,10 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var endDate = startDate.AddMonths(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var setProviderName = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync(true))
-            .RandomOne()
+            .SingleRandom()
             .Name;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne()
+            .SingleRandom()
             .Name;
 
         var person = await TestData.CreatePersonAsync();
@@ -118,10 +118,10 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var endDate = startDate.AddMonths(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var setProviderName = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync(true))
-            .RandomOne()
+            .SingleRandom()
             .Name;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne()
+            .SingleRandom()
             .Name;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -189,7 +189,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
             .Single(r => r.Name == "Postgraduate Teaching Apprenticeship");
         var status = RouteToProfessionalStatusStatus.Deferred;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne()
+            .SingleRandom()
             .Name;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -250,11 +250,11 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
                 && r.TrainingProviderRequired == FieldRequirement.NotApplicable
                 && r.DegreeTypeRequired == FieldRequirement.NotApplicable
                 && r.TrainingCountryRequired == FieldRequirement.Mandatory)
-            .RandomOne();
+            .SingleRandom();
         var status = RouteToProfessionalStatusStatus.Holds;
         var holdsFrom = new DateOnly(2021, 1, 1);
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne()
+            .SingleRandom()
             .Name;
 
         var person = await TestData.CreatePersonAsync();
@@ -320,11 +320,11 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
                 && r.TrainingProviderRequired == FieldRequirement.NotApplicable
                 && r.DegreeTypeRequired == FieldRequirement.NotApplicable
                 && r.TrainingCountryRequired == FieldRequirement.Mandatory)
-            .RandomOne();
+            .SingleRandom();
         var status = RouteToProfessionalStatusStatus.Holds;
         var holdsFrom = new DateOnly(2021, 1, 1);
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne()
+            .SingleRandom()
             .Name;
 
         var person = await TestData.CreatePersonAsync();
@@ -414,10 +414,10 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var endDate = startDate.AddMonths(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var setProviderName = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync(true))
-            .RandomOne()
+            .SingleRandom()
             .Name;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne()
+            .SingleRandom()
             .Name;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -484,7 +484,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var editCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("XQZ");
         var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
         var editTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
-            .RandomOne();
+            .SingleRandom();
 
         await page.ClickLinkForElementWithTestIdAsync("add-start-date-link");
         await page.AssertOnRouteAddStartAndEndDatePageAsync();

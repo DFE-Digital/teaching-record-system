@@ -506,7 +506,7 @@ public class CreateTrnRequestTests : OperationTestBase
         NationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber(),
         IdentityVerified = null,
         OneLoginUserSubject = null,
-        Gender = Enum.GetValues<Gender>().RandomOne()
+        Gender = Enum.GetValues<Gender>().SingleRandom()
     };
 
     private void AssertResultPersonMatchesCommand(CreateTrnRequestCommand command, TrnRequestInfoPerson person)
@@ -636,7 +636,7 @@ public class CreateTrnRequestTests : OperationTestBase
             // Can't do potential matching against workforce data until this query is done wholly against the TRS DB
             // plus we don't have a great way to set up previous names yet
             .Except([MatchedField.WorkforceNationalInsuranceNumber, MatchedField.PreviousLastName])
-            .GetCombinations()
+            .Permutations()
             // Only consider combinations that include 3 distinct fields
             .Where(c => c.Select(field => fieldGroups.Single(g => g.Value.Contains(field))).Distinct().Count() >= 3)
             // DateOfBirth and Nino are considered a direct match rather than potential match

@@ -364,13 +364,13 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             supportTask,
             matchedPerson.PersonId);
 
-        var firstNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var middleNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var lastNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
-        var genderSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
+        var firstNameSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var middleNameSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var lastNameSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
+        var genderSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,

@@ -19,7 +19,7 @@ public static class TestDataHelper
                 && r.TrainingEndDateRequired != FieldRequirement.NotApplicable
                 && r.HoldsFromRequired != FieldRequirement.NotApplicable)
             .Where(r => professionalStatusType is null || professionalStatusType == r.ProfessionalStatusType)
-            .RandomOne();
+            .SingleRandom();
     }
 
     public static async Task<RouteToProfessionalStatusType> GetRouteWhereAllFieldsHaveFieldRequirementAsync(this ReferenceDataCache referenceDataCache, FieldRequirement fieldRequirement)
@@ -33,7 +33,7 @@ public static class TestDataHelper
                 && r.InductionExemptionRequired == fieldRequirement
                 && r.TrainingStartDateRequired == fieldRequirement
                 && r.TrainingEndDateRequired == fieldRequirement)
-            .RandomOne();
+            .SingleRandom();
     }
 
     public static RouteToProfessionalStatusStatus GetRouteStatusWhereAllFieldsApply()
@@ -48,7 +48,7 @@ public static class TestDataHelper
                 && s.TrainingProviderRequired != FieldRequirement.NotApplicable
                 && s.TrainingStartDateRequired != FieldRequirement.NotApplicable
                 && s.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
     }
 
