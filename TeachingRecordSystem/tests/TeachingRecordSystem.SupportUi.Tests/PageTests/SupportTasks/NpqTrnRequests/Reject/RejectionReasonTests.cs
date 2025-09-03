@@ -23,9 +23,9 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
             RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
         };
         var journeyInstance = await CreateJourneyInstance(
-                JourneyNames.RejectNpqTrnRequest,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+            JourneyNames.RejectNpqTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/details";
 
@@ -56,9 +56,9 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
             RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
         };
         var journeyInstance = await CreateJourneyInstance(
-                JourneyNames.RejectNpqTrnRequest,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+            JourneyNames.RejectNpqTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
 
@@ -89,9 +89,9 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
             RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
         };
         var journeyInstance = await CreateJourneyInstance(
-                JourneyNames.RejectNpqTrnRequest,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+            JourneyNames.RejectNpqTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -122,9 +122,9 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
 
         var state = new RejectNpqTrnRequestState();
         var journeyInstance = await CreateJourneyInstance(
-                JourneyNames.RejectNpqTrnRequest,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+            JourneyNames.RejectNpqTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -149,9 +149,9 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
 
         var state = new RejectNpqTrnRequestState();
         var journeyInstance = await CreateJourneyInstance(
-                JourneyNames.RejectNpqTrnRequest,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+            JourneyNames.RejectNpqTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,

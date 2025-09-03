@@ -24,9 +24,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
         };
         var journeyInstance = await CreateJourneyInstance(
-                JourneyNames.RejectNpqTrnRequest,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+            JourneyNames.RejectNpqTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
@@ -57,9 +57,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
         };
         var journeyInstance = await CreateJourneyInstance(
-                JourneyNames.RejectNpqTrnRequest,
-                state,
-                new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
+            JourneyNames.RejectNpqTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTask.SupportTaskReference));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -176,6 +176,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(expected.LastName, actual.LastName);
         Assert.Equal(expected.EmailAddress, actual.EmailAddress);
         Assert.Equal(expected.NationalInsuranceNumber, actual.NationalInsuranceNumber);
+        Assert.Equal(expected.Gender, actual.Gender);
         Assert.Equal(expected.DateOfBirth, actual.DateOfBirth);
         Assert.Equal(expected.ResolvedPersonId, actual.ResolvedPersonId);
         Assert.Equivalent(expected.Matches, actual.Matches);

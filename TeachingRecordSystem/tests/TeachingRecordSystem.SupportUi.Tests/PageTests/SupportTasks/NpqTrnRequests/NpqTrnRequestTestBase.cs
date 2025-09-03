@@ -6,7 +6,9 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
 {
     protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithNationalInsuranceNumber()
+            .WithGender());
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUserId,
@@ -14,7 +16,8 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
                 .WithMatchedPersons(matchedPerson.PersonId)
                 .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
-                .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
+                .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
+                .WithGender(TestData.GenerateChangedGender(matchedPerson.Gender!)));
 
         return (supportTask, matchedPerson);
     }
@@ -25,7 +28,8 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber()
-            .WithEmail(TestData.GenerateUniqueEmail()));
+            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithGender());
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
             applicationUserId,
@@ -42,7 +46,12 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
                 .WithNationalInsuranceNumber(
                     differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber
                         ? matchedPerson.NationalInsuranceNumber
-                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
+                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
+                .WithGender(
+                    differentAttribute != PersonMatchedAttribute.Gender
+                        ? matchedPerson.Gender
+                        : TestData.GenerateChangedGender(matchedPerson.Gender!)));
+
 
         return (supportTask, matchedPerson);
     }
