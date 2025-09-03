@@ -23,7 +23,7 @@ public class CpdInductionImporterJob(BlobServiceClient blobServiceClient, IDbCon
             using var dbContext = dbContextFactory.CreateDbContext();
             var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
             await connection.OpenAsync(cancellationToken);
-            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
             //create temp table
             using (var command = new NpgsqlCommand(

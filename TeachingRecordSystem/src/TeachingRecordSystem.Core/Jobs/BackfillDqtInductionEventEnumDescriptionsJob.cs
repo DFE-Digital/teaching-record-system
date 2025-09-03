@@ -191,7 +191,7 @@ public class BackfillDqtInductionEventEnumDescriptionsJob(NpgsqlDataSource trsDb
 
         do
         {
-            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             using (var updateCommand = transaction.Connection!.CreateCommand())
             {
                 updateCommand.CommandText = updateSql;

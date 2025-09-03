@@ -17,7 +17,7 @@ public class ResetIncorrectHasEypsOnPersonsJob(
         var eypsRouteTypes = allRouteTypes.Where(r => r.ProfessionalStatusType == ProfessionalStatusType.EarlyYearsProfessionalStatus).Select(r => r.RouteToProfessionalStatusTypeId);
         var eytsRouteTypes = allRouteTypes.Where(r => r.ProfessionalStatusType == ProfessionalStatusType.EarlyYearsTeacherStatus).Select(r => r.RouteToProfessionalStatusTypeId);
 
-        using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // Get all persons where HasEyps has been set to true
         var personsWithHasEyps = await dbContext.Persons

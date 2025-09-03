@@ -14,7 +14,7 @@ public class SetMissingHasEypsOnPersonsJob(
         var allRouteTypes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         var eypsRouteTypes = allRouteTypes.Where(r => r.ProfessionalStatusType == ProfessionalStatusType.EarlyYearsProfessionalStatus).Select(r => r.RouteToProfessionalStatusTypeId);
 
-        using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // Get all EYPS routes
         var eypsRoutes = await dbContext.RouteToProfessionalStatuses

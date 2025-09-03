@@ -852,7 +852,7 @@ public class TrsDataSyncHelper(
         var modelTypeSyncInfo = GetModelTypeSyncInfo<PersonInfo>(ModelTypes.Person);
 
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using (var createTempTableCommand = connection.CreateCommand())
         {
@@ -1030,7 +1030,7 @@ public class TrsDataSyncHelper(
             }
         }
 
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using (var createTempTableCommand = connection.CreateCommand())
         {
@@ -1111,7 +1111,7 @@ public class TrsDataSyncHelper(
 
         do
         {
-            using var txn = await connection.BeginTransactionAsync(cancellationToken);
+            await using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
             using (var createTempTableCommand = connection.CreateCommand())
             {
@@ -1259,7 +1259,7 @@ public class TrsDataSyncHelper(
         }
 
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await using var txn = await connection.BeginTransactionAsync(cancellationToken);
         await txn.SaveEventsAsync(events, "events_induction_migration", clock, cancellationToken);
 
         if (!dryRun)
@@ -1318,7 +1318,7 @@ public class TrsDataSyncHelper(
         var mapped = contactIds.SelectMany(id => MapPreviousNames(contacts[id], previousNamesByContactId[id])).ToArray();
 
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using (var createTempTableCommand = connection.CreateCommand())
         {
@@ -1439,7 +1439,7 @@ public class TrsDataSyncHelper(
         var modelTypeSyncInfo = GetModelTypeSyncInfo<RouteToProfessionalStatus>(ModelTypes.Route);
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using var dbContext = TrsDbContext.Create(connection);
         dbContext.Database.UseTransaction(txn);
@@ -3130,7 +3130,7 @@ public class TrsDataSyncHelper(
         CancellationToken cancellationToken)
     {
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await using var txn = await connection.BeginTransactionAsync(cancellationToken);
         await txn.SaveEventsAsync(events, tempTableSuffix, clock, cancellationToken, timeoutSeconds: 120);
         if (!dryRun)
         {
