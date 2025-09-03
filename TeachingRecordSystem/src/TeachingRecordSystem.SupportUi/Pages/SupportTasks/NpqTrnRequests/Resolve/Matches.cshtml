@@ -55,7 +55,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.Gender</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.Gender?.GetDisplayName()</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
@@ -161,7 +161,7 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback highlight="@(!match.MatchedAttributes.Contains(PersonMatchedAttribute.Gender))">
-                                @match.Gender
+                                @match.Gender?.GetDisplayName()
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>

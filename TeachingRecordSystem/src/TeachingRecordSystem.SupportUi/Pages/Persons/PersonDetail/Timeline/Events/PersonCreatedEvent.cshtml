@@ -53,7 +53,7 @@
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@details.Gender</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback>@details.Gender?.GetDisplayName()</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
             </govuk-summary-list>
