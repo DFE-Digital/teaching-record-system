@@ -25,7 +25,7 @@ public abstract class DbUserInstanceStateProviderBase(IClock clock, IOptions<Jso
 
     protected async Task CompleteInstanceAsync(JourneyInstanceId instanceId, Type stateType, string userId, TrsDbContext dbContext)
     {
-        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
+        var instance = await GetInstanceAsync(instanceId, userId, dbContext) ??
             throw new ArgumentException("Instance does not exist.");
 
         if (instance.Completed is not null)
@@ -67,7 +67,7 @@ public abstract class DbUserInstanceStateProviderBase(IClock clock, IOptions<Jso
 
     protected async Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType, string userId, TrsDbContext dbContext)
     {
-        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
+        var instance = await GetInstanceAsync(instanceId, userId, dbContext) ??
             throw new ArgumentException("Instance does not exist.");
 
         dbContext.JourneyStates.Remove(instance);
@@ -76,7 +76,7 @@ public abstract class DbUserInstanceStateProviderBase(IClock clock, IOptions<Jso
 
     protected async Task<JourneyInstance?> GetInstanceAsync(JourneyInstanceId instanceId, Type stateType, string userId, TrsDbContext dbContext)
     {
-        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId);
+        var instance = await GetInstanceAsync(instanceId, userId, dbContext);
 
         if (instance is null)
         {
@@ -90,13 +90,26 @@ public abstract class DbUserInstanceStateProviderBase(IClock clock, IOptions<Jso
 
     protected async Task UpdateInstanceStateAsync(JourneyInstanceId instanceId, Type stateType, object state, string userId, TrsDbContext dbContext)
     {
-        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
+        var instance = await GetInstanceAsync(instanceId, userId, dbContext) ??
             throw new ArgumentException("Instance does not exist.");
 
         var serializedState = SerializeState(stateType, state);
         instance.State = serializedState;
         instance.Updated = Clock.UtcNow;
         await dbContext.SaveChangesAsync();
+    }
+
+    private async Task<JourneyState?> GetInstanceAsync(JourneyInstanceId instanceId, string userId, TrsDbContext dbContext)
+    {
+        return await dbContext.JourneyStates
+            .FromSql(
+                $"""
+                 SELECT *
+                 FROM journey_states
+                 WHERE instance_id = {instanceId.ToString()} AND user_id = {userId}
+                 FOR UPDATE
+                 """)
+            .SingleOrDefaultAsync();
     }
 
     private string SerializeState(Type stateType, object state) =>
