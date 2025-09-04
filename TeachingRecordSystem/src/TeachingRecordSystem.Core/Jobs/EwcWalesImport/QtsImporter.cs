@@ -203,8 +203,6 @@ public class QtsImporter
         using (var writer = new StringWriter())
         using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
-            csv.WriteHeader<EwcWalesQtsFileImportData>();
-            csv.NextRecord();
             csv.WriteRecord(row);
             csv.NextRecord();
             return writer.ToString();
