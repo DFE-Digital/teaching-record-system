@@ -18,7 +18,7 @@ public class DbWithHttpContextTransactionUserInstanceStateProvider(
 
     public override async Task CompleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
-        using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        var dbContext = await EnsureDbContextAsync();
         var userId = currentUserIdProvider.GetCurrentUserId();
         await CompleteInstanceAsync(instanceId, stateType, userId, dbContext);
     }
