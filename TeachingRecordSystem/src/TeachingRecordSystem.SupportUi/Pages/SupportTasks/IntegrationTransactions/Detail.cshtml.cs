@@ -112,43 +112,14 @@ public class DetailModel(TrsDbContext context) : PageModel
             .Where(x => x.Status == IntegrationTransactionRecordStatus.Failure)
             .OrderBy(x => x.IntegrationTransactionId);
 
-        //first row in rowdata is the header
-        var header = records.FirstOrDefault();
-        if (header != null)
-        {
-            using var stringReader = new StringReader(header.RowData!);
-            var headerStr = stringReader.ReadLine();
 
-            if (headerStr != null)
-            {
-                var headers = headerStr.Split(',');
-                foreach (var h in headers)
-                {
-                    csv.WriteField(h);
-                }
-                csv.NextRecord();
-            }
-        }
-
-        //write rows
+        // Some files contain a header but other files do not.
+        // also, some files are command delimited, others are semicolon
         foreach (var record in records)
         {
-            using var stringReader = new StringReader(record.RowData!);
-
-            // Skip header
-            var _ = stringReader.ReadLine();
-            var dataLine = stringReader.ReadLine();
-
-            if (!string.IsNullOrWhiteSpace(dataLine))
-            {
-                var rowFields = dataLine.Split(',');
-                foreach (var field in rowFields)
-                {
-                    csv.WriteField(field.Trim());
-                }
-                csv.WriteField(record.FailureMessage); // add failure message column
-                csv.NextRecord();
-            }
+            csv.WriteField(record.RowData);
+            csv.WriteField(record.FailureMessage);
+            csv.NextRecord();
         }
 
         var csvContent = writer.ToString();
