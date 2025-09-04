@@ -298,16 +298,6 @@ public class InductionImporter
             errors.Add("Induction start date cannot be before qts date");
         }
 
-        var welshrRoutes = lookups.Person?.Qualifications?
-            .OfType<RouteToProfessionalStatus>()
-            .Where(p => p.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId && p.Status == RouteToProfessionalStatusStatus.Holds)
-            .ToArray();
-
-        if (lookups.Person != null && welshrRoutes?.Count() == 0)
-        {
-            errors.Add("Person does not hold welshr route!");
-        }
-
         switch (lookups.InductionStatus)
         {
             case InductionStatus.Passed:
