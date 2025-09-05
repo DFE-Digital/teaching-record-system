@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -15,8 +14,10 @@ public class CommitDbTransactionMiddleware(RequestDelegate next)
         if (context.Items.ContainsKey(typeof(DbTransactionCreatedMarker)))
         {
             var dbContext = context.RequestServices.GetRequiredService<TrsDbContext>();
-            Debug.Assert(dbContext.Database.CurrentTransaction is not null);
-            await dbContext.Database.CurrentTransaction.CommitAsync();
+            if (dbContext.Database.CurrentTransaction is not null)
+            {
+                await dbContext.Database.CurrentTransaction.CommitAsync();
+            }
         }
     }
 }
