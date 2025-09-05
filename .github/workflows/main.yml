@@ -43,7 +43,7 @@ jobs:
     outputs:
       deploy_preprod: ${{ steps.check_preprod_deployment.outputs.deploy_preprod }}
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         id: check_preprod_deployment
         with:
           script: |
