@@ -44,6 +44,7 @@ public class ApplicationUser : UserBase
     public const string OneLoginAuthenticationSchemeNameUniqueIndexName = "ix_users_one_login_authentication_scheme_name";
 
     public static Guid NpqApplicationUserGuid { get; } = new("0F18F1EC-A102-4023-843F-1CADEF3E6E14");
+    public static Guid CapitaTpsImportGuid { get; } = new("14e1fa20-b364-446d-805d-699525671111");
 
     public string[]? ApiRoles { get; set; }
     public ICollection<ApiKey>? ApiKeys { get; }
@@ -128,6 +129,13 @@ public class ApplicationUser : UserBase
     {
         UserId = ApplicationUser.NpqApplicationUserGuid,
         Name = "NPQ",
+        Active = true
+    };
+
+    public static ApplicationUser CapitaTpsImportUser { get; } = new()
+    {
+        UserId = ApplicationUser.CapitaTpsImportGuid,
+        Name = "CapitaTpsImport",
         Active = true
     };
 }

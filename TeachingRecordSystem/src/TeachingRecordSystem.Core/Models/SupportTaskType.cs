@@ -15,7 +15,9 @@ public enum SupportTaskType
     [SupportTaskTypeInfo("TRN request from NPQ", SupportTaskCategory.TrnRequests)]
     NpqTrnRequest = 5,
     [SupportTaskTypeInfo("Manual checks needed", SupportTaskCategory.TrnRequests)]
-    TrnRequestManualChecksNeeded = 6
+    TrnRequestManualChecksNeeded = 6,
+    [SupportTaskTypeInfo("Capita import potential duplicate", SupportTaskCategory.CapitaImport)]
+    CapitaImportPotentialDuplicate = 7
 }
 
 public static class SupportTaskTypeRegistry

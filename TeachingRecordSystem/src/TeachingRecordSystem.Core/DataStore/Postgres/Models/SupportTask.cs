@@ -133,6 +133,7 @@ public class SupportTask
         SupportTaskType.ApiTrnRequest => typeof(ApiTrnRequestData),
         SupportTaskType.NpqTrnRequest => typeof(NpqTrnRequestData),
         SupportTaskType.TrnRequestManualChecksNeeded => typeof(TrnRequestManualChecksNeededData),
+        SupportTaskType.CapitaImportPotentialDuplicate => typeof(CapitaPotentialDuplicateData),
         _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
     };
 

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text;
 using Azure.Storage.Blobs;
@@ -325,6 +326,7 @@ public enum CapitaAmendExportType
 
 public class CapitaTpsUserOption
 {
+    [Required]
     public required Guid CapitaTpsUserId { get; set; }
 }
 
