@@ -3,9 +3,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
+public class SetQtlsTests : OperationTestBase
 {
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonDoesNotExist_ReturnsError() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
@@ -19,7 +19,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_NullQtsDateAndNoExistingRoute_DoesNotCreateEvent() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
@@ -36,7 +36,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             EventObserver.AssertNoEventsSaved();
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_NullQtsDateAndExistingQtlsRoute_DeletesRouteAndSetsQtlsStatusToExpired() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
@@ -69,7 +69,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             });
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_NonNullQtsDateAndNoExistingRoute_CreatesRouteAndSetsQtlsStatusToActive() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
@@ -105,7 +105,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             });
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_NonNullQtsDateAndExistingRouteHoldsFromMatches_DoesNotCreateEvent() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
@@ -126,7 +126,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             EventObserver.AssertNoEventsSaved();
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_NonNullQtsDateAndExistingRouteHoldFromDoesNotMatch_UpdatesRoute() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
@@ -162,14 +162,14 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         });
 
     private Task<RouteToProfessionalStatus?> GetQtlsRoute(Guid personId) =>
-        DbFixture.WithDbContextAsync(dbContext =>
+        WithDbContextAsync(dbContext =>
             dbContext.Qualifications
                 .OfType<RouteToProfessionalStatus>()
                 .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(q => q.PersonId == personId && q.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
     private Task<QtlsStatus> GetQtlsStatus(Guid personId) =>
-        DbFixture.WithDbContextAsync(dbContext =>
+        WithDbContextAsync(dbContext =>
             dbContext.Persons
                 .Where(p => p.PersonId == personId)
                 .Select(p => p.QtlsStatus)

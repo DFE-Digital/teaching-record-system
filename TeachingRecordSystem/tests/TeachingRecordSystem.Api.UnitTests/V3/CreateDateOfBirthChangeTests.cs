@@ -3,14 +3,9 @@ using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-[Collection(nameof(DisableParallelization))]
 public class CreateDateOfBirthChangeTests : OperationTestBase
 {
-    public CreateDateOfBirthChangeTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
-    {
-    }
-
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonDoesNotExist_ReturnsError() =>
         WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
         {
@@ -24,7 +19,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_EvidenceFileDoesNotExist_ReturnsError() =>
         WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
         {
@@ -32,7 +27,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             var createPersonResult = await TestData.CreatePersonAsync();
             var command = await CreateCommand() with
             {
-                Trn = createPersonResult!.Trn!,
+                Trn = createPersonResult.Trn!,
                 EvidenceFileUrl = "https://nonexistenturl.com"
             };
 
@@ -43,7 +38,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             AssertError(result, ApiError.ErrorCodes.SpecifiedResourceUrlDoesNotExist);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber() =>
         WithHandler<CreateDateOfBirthChangeRequestHandler>(async handler =>
         {
@@ -51,7 +46,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             var createPersonResult = await TestData.CreatePersonAsync();
             var command = await CreateCommand() with
             {
-                Trn = createPersonResult!.Trn!
+                Trn = createPersonResult.Trn!
             };
 
             // Act
@@ -61,7 +56,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             var success = AssertSuccess(result);
             Assert.NotEmpty(success.CaseNumber);
 
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
                 Assert.NotNull(supportTask);
@@ -86,6 +81,6 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             DateOfBirth = TestData.GenerateDateOfBirth(),
             EmailAddress = TestData.GenerateUniqueEmail(),
             EvidenceFileName = "evidence.txt",
-            EvidenceFileUrl = Startup.EvidenceFileUrl
+            EvidenceFileUrl = EvidenceFilesHttpClientHelper.EvidenceFileUrl
         };
 }

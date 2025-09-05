@@ -3,9 +3,9 @@ using TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
+public class GetTrnTests : OperationTestBase
 {
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonDoesNotExist_ReturnsError() =>
         WithHandler<GetTrnHandler>(async handler =>
         {
@@ -20,14 +20,14 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonExistsButIsNotActive_ReturnsError() =>
         WithHandler<GetTrnHandler>(async handler =>
         {
             // Arrange
             var person = await TestData.CreatePersonAsync();
 
-            await DbFixture.WithDbContextAsync(dbContext =>
+            await WithDbContextAsync(dbContext =>
                 dbContext.Persons
                     .Where(p => p.PersonId == person.PersonId)
                     .ExecuteUpdateAsync(u => u.SetProperty(p => p.Status, _ => PersonStatus.Deactivated)));
@@ -41,7 +41,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
             AssertError(result, ApiError.ErrorCodes.RecordIsNotActive);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonIsMerged_ReturnsError() =>
         WithHandler<GetTrnHandler>(async handler =>
         {
@@ -49,7 +49,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
             var person = await TestData.CreatePersonAsync();
             var anotherPerson = await TestData.CreatePersonAsync();
 
-            await DbFixture.WithDbContextAsync(dbContext =>
+            await WithDbContextAsync(dbContext =>
                 dbContext.Persons
                     .Where(p => p.PersonId == person.PersonId)
                     .ExecuteUpdateAsync(u => u
@@ -72,7 +72,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
                 });
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonExistsAndIsActive_ReturnsSuccess() =>
         WithHandler<GetTrnHandler>(async handler =>
         {

@@ -1,6 +1,7 @@
-using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -10,48 +11,40 @@ namespace TeachingRecordSystem.Api.UnitTests;
 
 public abstract class OperationTestBase
 {
-    private readonly TestScopedServices _testServices;
+    [SharedDependenciesDataSource]
+    public required IServiceProvider Services { get; init; }
 
-    protected OperationTestBase(OperationTestFixture operationTestFixture)
+    protected TestableClock Clock => (TestableClock)Services.GetRequiredService<IClock>();
+
+    protected ICurrentUserProvider CurrentUserProvider => Services.GetRequiredService<ICurrentUserProvider>();
+
+    protected DbFixture DbFixture => Services.GetRequiredService<DbFixture>();
+
+    protected DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+
+    protected TestData TestData => Services.GetRequiredService<TestData>();
+
+    protected Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => Mock.Get(Services.GetRequiredService<IGetAnIdentityApiClient>());
+
+    protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
+
+    protected TestableFeatureProvider FeatureProvider => (TestableFeatureProvider)Services.GetRequiredService<IFeatureProvider>();
+
+    protected TrnRequestOptions TrnRequestOptions => Services.GetRequiredService<IOptions<TrnRequestOptions>>().Value;
+
+    protected IFileService FileService => Services.GetRequiredService<IFileService>();
+
+    protected T AssertSuccess<T>(ApiResult<T> result) where T : notnull
     {
-        OperationTestFixture = operationTestFixture;
+        if (result.IsError)
+        {
+            Assert.False(result.IsError, $"Result is not in a Success state (got error: {result.GetError().ErrorCode})");
+        }
 
-        _testServices = TestScopedServices.Reset(operationTestFixture.Services);
-        OperationTestFixture.EnsureApplicationUser();
-        EventObserver.Clear();
-    }
-
-    public OperationTestFixture OperationTestFixture { get; }
-
-    public DbFixture DbFixture => OperationTestFixture.DbFixture;
-
-    public TestableClock Clock => _testServices.Clock;
-
-    public ICurrentUserProvider CurrentUserProvider => OperationTestFixture.Services.GetRequiredService<ICurrentUserProvider>();
-
-    public TestData TestData => OperationTestFixture.TestData;
-
-    public CrmQueryDispatcherSpy CrmQueryDispatcherSpy => _testServices.CrmQueryDispatcherSpy;
-
-    public IXrmFakedContext XrmFakedContext => OperationTestFixture.Services.GetRequiredService<IXrmFakedContext>();
-
-    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => Mock.Get(OperationTestFixture.Services.GetRequiredService<IGetAnIdentityApiClient>());
-
-    public CaptureEventObserver EventObserver => _testServices.EventObserver;
-
-    public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
-
-    public TrnRequestOptions TrnRequestOptions => _testServices.TrnRequestOptions;
-
-    public IFileService FileService => _testServices.BlobStorageFileService.Object;
-
-    public T AssertSuccess<T>(ApiResult<T> result) where T : notnull
-    {
-        Assert.False(result.IsError, "Result is not in a Success state.");
         return result.GetSuccess();
     }
 
-    public ApiError AssertError<T>(ApiResult<T> result, int expectedErrorCode) where T : notnull
+    protected ApiError AssertError<T>(ApiResult<T> result, int expectedErrorCode) where T : notnull
     {
         Assert.True(result.IsError, "Result is not in a Error state.");
         var error = result.GetError();
@@ -59,9 +52,13 @@ public abstract class OperationTestBase
         return error;
     }
 
-    public async Task WithHandler<THandler>(Func<THandler, Task> action, params object[] parameters) where THandler : notnull
+    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) => DbFixture.WithDbContextAsync(action);
+
+    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) => DbFixture.WithDbContextAsync(action);
+
+    protected virtual async Task WithHandler<THandler>(Func<THandler, Task> action, params object[] parameters) where THandler : notnull
     {
-        var serviceScopeFactory = OperationTestFixture.Services.GetRequiredService<IServiceScopeFactory>();
+        var serviceScopeFactory = Services.GetRequiredService<IServiceScopeFactory>();
         using var scope = serviceScopeFactory.CreateScope();
         var handler = ActivatorUtilities.CreateInstance<THandler>(scope.ServiceProvider, parameters);
         await action(handler);

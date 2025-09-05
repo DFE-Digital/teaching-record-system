@@ -3,9 +3,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public partial class GetQtlsTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
+public class GetQtlsTests : OperationTestBase
 {
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonDoesNotExist_ReturnsNotFoundError() =>
         WithHandler<GetQtlsHandler>(async handler =>
         {
@@ -19,7 +19,7 @@ public partial class GetQtlsTests(OperationTestFixture operationTestFixture) : O
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonDoesNotHaveQtlsRoute_ReturnsNullQtsDate() =>
         WithHandler<GetQtlsHandler>(async handler =>
         {
@@ -37,7 +37,7 @@ public partial class GetQtlsTests(OperationTestFixture operationTestFixture) : O
             Assert.Null(success.QtsDate);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonHasQtlsRoute_ReturnsAwardedDate() =>
         WithHandler<GetQtlsHandler>(async handler =>
         {

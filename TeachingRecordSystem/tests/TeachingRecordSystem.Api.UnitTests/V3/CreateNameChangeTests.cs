@@ -3,14 +3,9 @@ using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-[Collection(nameof(DisableParallelization))]
 public class CreateNameChangeTests : OperationTestBase
 {
-    public CreateNameChangeTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
-    {
-    }
-
-    [Fact]
+    [Test]
     public Task HandleAsync_PersonDoesNotExist_ReturnsError() =>
         WithHandler<CreateNameChangeRequestHandler>(async handler =>
         {
@@ -24,7 +19,7 @@ public class CreateNameChangeTests : OperationTestBase
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_EvidenceFileDoesNotExist_ReturnsError() =>
         WithHandler<CreateNameChangeRequestHandler>(async handler =>
         {
@@ -32,7 +27,7 @@ public class CreateNameChangeTests : OperationTestBase
             var createPersonResult = await TestData.CreatePersonAsync();
             var command = await CreateCommand() with
             {
-                Trn = createPersonResult!.Trn!,
+                Trn = createPersonResult.Trn!,
                 EvidenceFileUrl = "https://nonexistenturl.com"
             };
 
@@ -43,7 +38,7 @@ public class CreateNameChangeTests : OperationTestBase
             AssertError(result, ApiError.ErrorCodes.SpecifiedResourceUrlDoesNotExist);
         });
 
-    [Fact]
+    [Test]
     public Task HandleAsync_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber() =>
         WithHandler<CreateNameChangeRequestHandler>(async handler =>
         {
@@ -51,7 +46,7 @@ public class CreateNameChangeTests : OperationTestBase
             var createPersonResult = await TestData.CreatePersonAsync();
             var command = await CreateCommand() with
             {
-                Trn = createPersonResult!.Trn!
+                Trn = createPersonResult.Trn!
             };
             // Act
             var result = await handler.HandleAsync(command);
@@ -60,7 +55,7 @@ public class CreateNameChangeTests : OperationTestBase
             var success = AssertSuccess(result);
             Assert.NotEmpty(success.CaseNumber);
 
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
                 Assert.NotNull(supportTask);
@@ -89,6 +84,6 @@ public class CreateNameChangeTests : OperationTestBase
             LastName = TestData.GenerateLastName(),
             EmailAddress = TestData.GenerateUniqueEmail(),
             EvidenceFileName = "evidence.jpg",
-            EvidenceFileUrl = Startup.EvidenceFileUrl
+            EvidenceFileUrl = EvidenceFilesHttpClientHelper.EvidenceFileUrl
         };
 }

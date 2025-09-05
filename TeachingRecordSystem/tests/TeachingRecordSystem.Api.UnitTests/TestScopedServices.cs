@@ -13,7 +13,6 @@ public class TestScopedServices
 
     public TestScopedServices(IServiceProvider serviceProvider)
     {
-        CrmQueryDispatcherSpy = new();
         Clock = new();
         GetAnIdentityApiClient = new();
         EventObserver = new();
@@ -46,8 +45,6 @@ public class TestScopedServices
         current = default;
         return false;
     }
-
-    public CrmQueryDispatcherSpy CrmQueryDispatcherSpy { get; }
 
     public TestableClock Clock { get; }
 
