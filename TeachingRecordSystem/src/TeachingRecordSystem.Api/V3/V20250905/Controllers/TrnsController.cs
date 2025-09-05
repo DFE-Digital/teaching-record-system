@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20250905.Controllers;
 
 [Route("trns")]
 public class TrnsController : ControllerBase

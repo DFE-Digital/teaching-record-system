@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.VNext;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250905;
 
 public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
