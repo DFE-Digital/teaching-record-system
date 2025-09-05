@@ -30,9 +30,7 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
 
         await JourneyInstance!.UpdateStateAsync(state => state.HaveRegisteredForAnNpq = HaveRegisteredForAnNpq);
 
-        return HaveRegisteredForAnNpq == true ?
-            Redirect(linkGenerator.RequestTrnNpqApplication(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnNpqName(JourneyInstance.InstanceId));
+        return Redirect(linkGenerator.RequestTrnNpqName(JourneyInstance.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

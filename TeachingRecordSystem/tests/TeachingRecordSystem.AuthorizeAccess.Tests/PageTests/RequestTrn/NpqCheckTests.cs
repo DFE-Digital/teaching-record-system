@@ -35,7 +35,7 @@ public class NpqCheckTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_Yes_RedirectsToNotNotEligible()
+    public async Task Post_Yes_RedirectsToNpqName()
     {
         // Arrange
         var state = CreateNewState();
@@ -54,7 +54,7 @@ public class NpqCheckTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/npq-application?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/request-trn/npq-name?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
