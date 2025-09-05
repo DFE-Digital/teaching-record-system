@@ -1,3 +1,6 @@
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
 public class SchoolOrEducationalSettingTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -16,6 +19,58 @@ public class SchoolOrEducationalSettingTests(HostFixture hostFixture) : TestBase
 
         // Assert
         await AssertEx.HtmlResponseAsync(response);
+    }
+
+    [Fact]
+    public async Task Get_PreviousValueStoredInState_RendersExpectedContent()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.WorkEmail = TestData.GenerateUniqueEmail();
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/school-or-educational-setting?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var document = await AssertEx.HtmlResponseAsync(response);
+
+        var selectedRadio = document
+            .QuerySelectorAll<IHtmlInputElement>("input[type=radio][name=IsWorkingInSchoolOrEducationalSetting]")
+            .Single(i => i.IsChecked == true).Value;
+
+        Assert.Equal("True", selectedRadio);
+    }
+
+    [Fact]
+    public async Task Post_PreviousYesChangedToNo_SetsWorkEmailToNull()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.WorkEmail = TestData.GenerateUniqueEmail();
+
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/school-or-educational-setting?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["IsWorkingInSchoolOrEducationalSetting"] = "false"
+            })
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var document = await response.GetDocumentAsync();
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance.State.WorkEmail);
     }
 
     [Fact]

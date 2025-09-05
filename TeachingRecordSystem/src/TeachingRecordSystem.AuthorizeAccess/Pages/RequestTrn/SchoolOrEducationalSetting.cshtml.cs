@@ -15,6 +15,11 @@ public class SchoolOrEducationalSettingModel(AuthorizeAccessLinkGenerator linkGe
     [Required(ErrorMessage = "Select yes if you’re currently working in a school or other educational setting")]
     public bool? IsWorkingInSchoolOrEducationalSetting { get; set; }
 
+    public void OnGet()
+    {
+        IsWorkingInSchoolOrEducationalSetting = JourneyInstance!.State.WorkingInSchoolOrEducationalSetting;
+    }
+
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
@@ -22,7 +27,11 @@ public class SchoolOrEducationalSettingModel(AuthorizeAccessLinkGenerator linkGe
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.WorkingInSchoolOrEducationalSetting = IsWorkingInSchoolOrEducationalSetting);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.WorkingInSchoolOrEducationalSetting = IsWorkingInSchoolOrEducationalSetting;
+            state.WorkEmail = IsWorkingInSchoolOrEducationalSetting!.Value ? state.WorkEmail : null;
+        });
 
         return IsWorkingInSchoolOrEducationalSetting == false ?
             Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance!.InstanceId)) :
