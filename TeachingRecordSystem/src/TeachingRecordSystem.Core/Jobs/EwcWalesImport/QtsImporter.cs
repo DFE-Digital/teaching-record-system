@@ -87,8 +87,8 @@ public class QtsImporter
                 {
                     foreach (var error in validationFailures.Errors)
                     {
-                        failureMessage.AppendLine(error);
-                        itrFailureMessage.AppendLine(error);
+                        failureMessage.AppendLine($"{error};");
+                        itrFailureMessage.AppendLine($"{error};");
                     }
                 }
                 else
@@ -142,8 +142,8 @@ public class QtsImporter
                     //soft validation errors can be appended to the IntegrationTransactionRecord Failure message
                     foreach (var validationMessage in validationFailures.ValidationFailures)
                     {
-                        itrFailureMessage.AppendLine(validationMessage);
-                        failureMessage.AppendLine(validationMessage);
+                        itrFailureMessage.AppendLine($"{validationMessage};");
+                        failureMessage.AppendLine($"{validationMessage}");
                     }
                 }
 
@@ -204,7 +204,7 @@ public class QtsImporter
         using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
             csv.WriteRecord(row);
-            csv.NextRecord();
+            csv.Flush();
             return writer.ToString();
         }
     }

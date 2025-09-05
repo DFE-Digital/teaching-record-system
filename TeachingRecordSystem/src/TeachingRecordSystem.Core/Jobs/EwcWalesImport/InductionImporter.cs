@@ -93,8 +93,8 @@ public class InductionImporter
 
                         foreach (var validationMessage in validationFailures.ValidationFailures)
                         {
-                            itrFailureMessage.AppendLine(validationMessage);
-                            failureMessage.AppendLine(validationMessage);
+                            itrFailureMessage.AppendLine($"{validationMessage};");
+                            failureMessage.AppendLine($"{validationMessage};");
                         }
                     }
                     else
@@ -118,8 +118,8 @@ public class InductionImporter
                         //soft validation errors can be appended to the IntegrationTransactionRecord Failure message
                         foreach (var validationMessage in validationFailures.ValidationFailures)
                         {
-                            itrFailureMessage.AppendLine(validationMessage);
-                            failureMessage.AppendLine(validationMessage);
+                            itrFailureMessage.AppendLine($"{validationMessage};");
+                            failureMessage.AppendLine($"{validationMessage};");
                         }
 
                         //increase failurecount if row is processable or if there are validation failures
@@ -181,7 +181,7 @@ public class InductionImporter
         using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
             csv.WriteRecord(row);
-            csv.NextRecord();
+            csv.Flush();
             return writer.ToString();
         }
     }
