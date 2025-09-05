@@ -10,9 +10,9 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
 
@@ -41,9 +41,9 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => !r.IsActive)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
 
@@ -71,7 +71,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteState();
@@ -100,10 +100,10 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
-            .RandomOne();
+            .SingleRandom();
         var archivedRoute = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => !r.IsActive)
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteState();
@@ -133,7 +133,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteState();
@@ -163,7 +163,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteState();
@@ -193,7 +193,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteState();
@@ -226,7 +226,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
         await WithDbContext(async dbContext =>

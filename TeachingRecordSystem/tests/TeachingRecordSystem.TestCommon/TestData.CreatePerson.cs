@@ -146,7 +146,7 @@ public partial class TestData
         {
             var routeType = _referenceData.RouteTypes
                 .Where(r => r.ProfessionalStatusType == professionalStatusType)
-                .RandomOne();
+                .SingleRandom();
 
             return WithHoldsRouteToProfessionalStatus(routeType.RouteToProfessionalStatusTypeId, holdsFrom);
         }
@@ -174,7 +174,7 @@ public partial class TestData
 
                 ConfigureUnlessNotApplicable(
                     routeType.TrainingSubjectsRequired,
-                    () => b.WithTrainingSubjectIds([_referenceData.TrainingSubjects.RandomOne().TrainingSubjectId]));
+                    () => b.WithTrainingSubjectIds([_referenceData.TrainingSubjects.SingleRandom().TrainingSubjectId]));
 
                 ConfigureUnlessNotApplicable(
                     routeType.TrainingAgeSpecialismTypeRequired,
@@ -182,15 +182,15 @@ public partial class TestData
 
                 ConfigureUnlessNotApplicable(
                     routeType.TrainingCountryRequired,
-                    () => b.WithTrainingCountryId(_referenceData.Countries.RandomOne().CountryId));
+                    () => b.WithTrainingCountryId(_referenceData.Countries.SingleRandom().CountryId));
 
                 ConfigureUnlessNotApplicable(
                     routeType.TrainingProviderRequired,
-                    () => b.WithTrainingProviderId(_referenceData.TrainingProviders.RandomOne().TrainingProviderId));
+                    () => b.WithTrainingProviderId(_referenceData.TrainingProviders.SingleRandom().TrainingProviderId));
 
                 ConfigureUnlessNotApplicable(
                     routeType.DegreeTypeRequired,
-                    () => b.WithDegreeTypeId(_referenceData.DegreeTypes.RandomOne().DegreeTypeId));
+                    () => b.WithDegreeTypeId(_referenceData.DegreeTypes.SingleRandom().DegreeTypeId));
 
                 ConfigureUnlessNotApplicable(
                     routeType.InductionExemptionRequired,
@@ -761,7 +761,7 @@ public partial class TestData
         {
             var personId = createPersonBuilder.PersonId;
 
-            var alertTypeId = _alertTypeId.ValueOr((await testData.ReferenceDataCache.GetAlertTypesAsync()).RandomOne().AlertTypeId);
+            var alertTypeId = _alertTypeId.ValueOr((await testData.ReferenceDataCache.GetAlertTypesAsync()).SingleRandom().AlertTypeId);
             var details = _details.ValueOr(testData.GenerateLoremIpsum());
             var externalLink = _externalLink.ValueOr((string?)null);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
@@ -903,9 +903,9 @@ public partial class TestData
         {
             var personId = createPersonBuilder.PersonId;
 
-            var providerId = _mandatoryQualificationProviderId.ValueOr(MandatoryQualificationProvider.All.RandomOne().MandatoryQualificationProviderId);
-            var specialism = _specialism.ValueOr(MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).RandomOne().Value);
-            var status = _status.ValueOr(_endDate.ValueOrDefault() is DateOnly ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatusRegistry.All.RandomOne().Value);
+            var providerId = _mandatoryQualificationProviderId.ValueOr(MandatoryQualificationProvider.All.SingleRandom().MandatoryQualificationProviderId);
+            var specialism = _specialism.ValueOr(MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).SingleRandom().Value);
+            var status = _status.ValueOr(_endDate.ValueOrDefault() is DateOnly ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatusRegistry.All.SingleRandom().Value);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);

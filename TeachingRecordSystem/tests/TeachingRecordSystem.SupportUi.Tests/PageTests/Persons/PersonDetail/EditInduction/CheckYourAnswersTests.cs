@@ -66,7 +66,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
             ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-                .RandomSelection(1)
+                .TakeRandom(1)
                 .Select(r => r.InductionExemptionReasonId)
                 .ToArray()
             : [];
@@ -135,7 +135,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
             ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
+            .TakeRandom(1)
             .Select(r => r.InductionExemptionReasonId)
             .ToArray()
             : [];
@@ -210,7 +210,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
             ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
+            .TakeRandom(1)
             .Select(r => r.InductionExemptionReasonId)
             .ToArray()
             : [];
@@ -463,7 +463,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var completedDate = Clock.Today;
         var exemptionReasonIds = (await TestData.ReferenceDataCache
             .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
+            .TakeRandom(1)
             .Select(r => r.InductionExemptionReasonId)
             .ToArray();
         var person = await TestData.CreatePersonAsync(

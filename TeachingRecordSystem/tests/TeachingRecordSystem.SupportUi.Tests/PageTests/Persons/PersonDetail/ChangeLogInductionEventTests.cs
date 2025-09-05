@@ -16,7 +16,7 @@ public class ChangeLogInductionEventTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.UtcNow = nows.RandomOne();
+        Clock.UtcNow = nows.SingleRandom();
     }
 
     [Theory]

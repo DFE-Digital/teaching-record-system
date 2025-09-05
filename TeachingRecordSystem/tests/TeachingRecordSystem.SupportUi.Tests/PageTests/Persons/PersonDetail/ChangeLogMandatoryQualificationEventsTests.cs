@@ -16,7 +16,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.UtcNow = nows.RandomOne();
+        Clock.UtcNow = nows.SingleRandom();
     }
 
     [Fact]
@@ -568,7 +568,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         await UpdateMq(
             mq.QualificationId,
-            q => q.Specialism = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false).RandomOneExcept(s => s.Value == mq.Specialism).Value,
+            q => q.Specialism = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false).SingleRandom(s => s.Value == mq.Specialism).Value,
             MandatoryQualificationUpdatedEventChanges.Specialism,
             updatedByUser.UserId,
             changeReason,
@@ -606,7 +606,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         await UpdateMq(
             mq.QualificationId,
-            q => q.Specialism = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false).RandomOneExcept(s => s.Value == mq.Specialism).Value,
+            q => q.Specialism = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false).SingleRandom(s => s.Value == mq.Specialism).Value,
             MandatoryQualificationUpdatedEventChanges.Specialism,
             updatedByUser.UserId);
 
@@ -640,7 +640,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         await UpdateMq(
             mq.QualificationId,
-            q => q.ProviderId = MandatoryQualificationProvider.All.RandomOneExcept(p => p.MandatoryQualificationProviderId == oldProviderId).MandatoryQualificationProviderId,
+            q => q.ProviderId = MandatoryQualificationProvider.All.SingleRandom(p => p.MandatoryQualificationProviderId == oldProviderId).MandatoryQualificationProviderId,
             MandatoryQualificationUpdatedEventChanges.Provider,
             updatedByUser.UserId);
 
@@ -695,7 +695,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         await UpdateMq(
             mq.QualificationId,
-            q => q.Specialism = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false).RandomOneExcept(s => s.Value == oldSpecialism).Value,
+            q => q.Specialism = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false).SingleRandom(s => s.Value == oldSpecialism).Value,
             MandatoryQualificationUpdatedEventChanges.Specialism,
             updatedByUser.UserId);
 
@@ -947,7 +947,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
     private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification, dfeta_mqestablishment MqEstablishment)> CreateMqWithLegacyProvider()
     {
-        var legacyProvider = (await TestData.ReferenceDataCache.GetMqEstablishmentsAsync()).RandomOne();
+        var legacyProvider = (await TestData.ReferenceDataCache.GetMqEstablishmentsAsync()).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
