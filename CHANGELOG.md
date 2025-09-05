@@ -2,10 +2,15 @@
 
 ## vNext
 
-An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record with the given TRN exists and is active.
-
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
+
+## 20250905
+
+An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record with the given TRN exists and is active.
+If the TRN exists and is active, a 204 response is returned with no body.
+If the TRN exists but is deactivated (and not merged), a 400 response is returned.
+If the TRN exists but has been merged into another record, a 308 response is returned with the retained TRN in the `Location` header e.g. `Location: /v3/trns/<retained TRN>`.
 
 ## 20250804
 - Webhook messages have been added to notify when an alert is created, updated, or deleted.
