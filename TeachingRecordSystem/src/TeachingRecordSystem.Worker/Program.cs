@@ -1,8 +1,8 @@
 using Hangfire;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Jobs;
@@ -48,14 +48,17 @@ builder
     .AddTrnRequestService()
     .AddTrsSyncHelper();
 
-var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
+if (builder.Configuration.GetValue<string>("ConnectionStrings:Crm") is string crmConnectionString)
 {
-    DisableCrossThreadSafeties = true,
-    EnableAffinityCookie = true,
-    MaxRetryCount = 2,
-    RetryPauseTime = TimeSpan.FromSeconds(1)
-};
-builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+    var crmServiceClient = new ServiceClient(crmConnectionString)
+    {
+        DisableCrossThreadSafeties = true,
+        EnableAffinityCookie = true,
+        MaxRetryCount = 2,
+        RetryPauseTime = TimeSpan.FromSeconds(1)
+    };
+    builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+}
 
 builder.Services.AddHangfireServer();
 
