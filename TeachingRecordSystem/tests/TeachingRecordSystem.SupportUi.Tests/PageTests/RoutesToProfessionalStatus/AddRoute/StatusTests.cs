@@ -11,7 +11,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync();
 
@@ -103,7 +103,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
@@ -139,7 +139,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
         var person = await TestData.CreatePersonAsync();
         await WithDbContext(async dbContext =>
         {

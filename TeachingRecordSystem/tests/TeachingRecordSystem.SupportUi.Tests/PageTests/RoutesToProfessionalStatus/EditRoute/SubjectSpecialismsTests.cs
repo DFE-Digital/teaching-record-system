@@ -23,9 +23,9 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -100,9 +100,9 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -159,13 +159,13 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(3).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -199,13 +199,13 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenSubjectsAreEntered_SavesDataAndRedirectsToDetail()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(3).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -246,13 +246,13 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Post_SubjectIsOptional_WhenNoSubjectsAreEntered_RedirectsToDetail()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(3).Select(s => s.TrainingSubjectId).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).Select(s => s.TrainingSubjectId).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -288,10 +288,10 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -335,10 +335,10 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r

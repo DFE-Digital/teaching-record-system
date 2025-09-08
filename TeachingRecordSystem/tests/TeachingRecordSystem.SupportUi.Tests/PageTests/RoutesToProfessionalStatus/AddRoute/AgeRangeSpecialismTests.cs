@@ -87,10 +87,10 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         var ageTo = 8;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
@@ -127,10 +127,10 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
@@ -164,10 +164,10 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
@@ -204,10 +204,10 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         await WithDbContext(async dbContext =>

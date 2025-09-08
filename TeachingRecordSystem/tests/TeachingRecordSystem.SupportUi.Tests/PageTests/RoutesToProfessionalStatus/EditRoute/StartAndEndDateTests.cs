@@ -24,9 +24,9 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -102,9 +102,9 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -166,12 +166,12 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = startDate.AddMonths(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Optional && r.TrainingEndDateRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingStartDateRequired == FieldRequirement.Optional
                 && s.TrainingEndDateRequired == FieldRequirement.Optional
                 && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -211,10 +211,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Optional && r.TrainingEndDateRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingStartDateRequired == FieldRequirement.Optional && s.TrainingEndDateRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -265,10 +265,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = startDate.AddDays(daysAfter);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Optional && r.TrainingEndDateRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingStartDateRequired == FieldRequirement.Optional && s.TrainingEndDateRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -315,11 +315,11 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingEndDateRequired == FieldRequirement.Optional
                 && s.Value != RouteToProfessionalStatusStatus.Holds)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -370,7 +370,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -422,10 +422,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Optional && r.TrainingEndDateRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingStartDateRequired == FieldRequirement.Optional && s.TrainingEndDateRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -472,10 +472,10 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Optional && r.TrainingEndDateRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingStartDateRequired == FieldRequirement.Optional && s.TrainingEndDateRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r

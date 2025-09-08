@@ -10,7 +10,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -52,7 +52,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Continue_LinksToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -92,8 +92,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
 
         var person = await TestData.CreatePersonAsync(p => p
@@ -155,7 +155,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsHaveFieldRequirementAsync(FieldRequirement.Optional);
-        var status = ProfessionalStatusStatusRegistry.All.Where(s => s.Value == RouteToProfessionalStatusStatus.InTraining).RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All.Where(s => s.Value == RouteToProfessionalStatusStatus.InTraining).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -198,11 +198,11 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicableRoutes = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(TestDataHelper.PropertyHasFieldRequirement<RouteToProfessionalStatusType>(propertySelector, FieldRequirement.NotApplicable));
-        var route = applicableRoutes.Any() ? applicableRoutes.RandomOne() : (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
+        var route = applicableRoutes.Any() ? applicableRoutes.SingleRandom() : (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).SingleRandom();
 
         var status = ProfessionalStatusStatusRegistry.All
             .Where(TestDataHelper.PropertyHasFieldRequirement<ProfessionalStatusStatusInfo>(propertySelector, FieldRequirement.NotApplicable))
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -241,7 +241,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition")
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -285,10 +285,10 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
+            .SingleRandom()
             .Value;
 
         var person = await TestData.CreatePersonAsync(p => p
@@ -329,7 +329,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
