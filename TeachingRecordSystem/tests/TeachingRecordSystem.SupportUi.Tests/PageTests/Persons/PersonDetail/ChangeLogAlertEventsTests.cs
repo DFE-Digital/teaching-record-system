@@ -1089,15 +1089,14 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId!.Value);
-        var dqtSanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeByValueAsync(alertType.DqtSanctionCode!);
+        var dqtSanctionCode = LegacyDataCache.Instance.GetSanctionCodeByValue(alertType.DqtSanctionCode!);
         var oldAlert = alert with
         {
             AlertId = Guid.NewGuid(),
             DqtSanctionCode = populateOptional ? new AlertDqtSanctionCode
             {
-                SanctionCodeId = dqtSanctionCode!.Id,
-                Name = dqtSanctionCode.dfeta_name,
-                Value = dqtSanctionCode.dfeta_Value
+                Name = dqtSanctionCode.Name,
+                Value = dqtSanctionCode.Value
             }
             : null,
             DqtSpent = populateOptional ? true : (bool?)null,
@@ -1183,14 +1182,13 @@ public class ChangeLogAlertEventsTests : TestBase
         var migratedSanctionCodes = (await TestData.ReferenceDataCache.GetAlertTypesAsync())
             .Where(t => t.DqtSanctionCode is not null)
             .Select(c => c.DqtSanctionCode);
-        var dqtSanctionCode = (await TestData.ReferenceDataCache.GetSanctionCodesAsync(activeOnly: false))
-            .Where(s => migratedSanctionCodes.Contains(s.dfeta_Value) && (isDbsAlertType ? s.dfeta_Value == dbsAlertType.DqtSanctionCode : s.dfeta_Value != dbsAlertType.DqtSanctionCode))
+        var dqtSanctionCode = LegacyDataCache.Instance.GetAllSanctionCodes(activeOnly: false)
+            .Where(s => migratedSanctionCodes.Contains(s.Value) && (isDbsAlertType ? s.Value == dbsAlertType.DqtSanctionCode : s.Value != dbsAlertType.DqtSanctionCode))
             .RandomOne();
         var alertDqtSanctionCode = new AlertDqtSanctionCode
         {
-            SanctionCodeId = dqtSanctionCode!.Id,
-            Name = dqtSanctionCode.dfeta_name,
-            Value = dqtSanctionCode.dfeta_Value
+            Name = dqtSanctionCode.Name,
+            Value = dqtSanctionCode.Value
         };
 
         var dqtSpent = populateOptional ? true : (bool?)null;
