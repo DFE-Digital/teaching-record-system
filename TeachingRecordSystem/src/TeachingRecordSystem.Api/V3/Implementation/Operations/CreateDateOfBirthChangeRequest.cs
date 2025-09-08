@@ -71,7 +71,10 @@ public class CreateDateOfBirthChangeRequestHandler(
         var getAnIdentityApplicationUserId = configuration.GetValue<Guid>("GetAnIdentityApplicationUserId");
 
         // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        using var transaction = new TransactionScope(
+            TransactionScopeOption.RequiresNew,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
 
         var supportTask = PostgresModels.SupportTask.Create(
             SupportTaskType.ChangeDateOfBirthRequest,
