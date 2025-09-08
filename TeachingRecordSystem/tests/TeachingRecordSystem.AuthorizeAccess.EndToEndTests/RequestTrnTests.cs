@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
 public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Theory(Skip = "not finding first page")]
+    [Theory]
     [InlineData("yes")]
     [InlineData("no")]
     public async Task RequestTrn_AlwaysAsksForNameAndProvider(string hasRegisteredForNpq)
@@ -42,7 +42,7 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForUrlPathAsync("/request-trn/taking-npq");
     }
 
-    [Theory(Skip = "not finding first page")]
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task RequestTrn_HasNationalInsuranceNumber_YesNo_FollowsExpectedNextPages(bool hasNationalInsuranceNumber)
@@ -167,7 +167,7 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Theory(Skip = "not finding first page")]
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task RequestTrn_WorkingInEducationalSetting_YesNo_FollowsExpectedNextPages(bool isWorkingInSchoolOrEducationalSetting)

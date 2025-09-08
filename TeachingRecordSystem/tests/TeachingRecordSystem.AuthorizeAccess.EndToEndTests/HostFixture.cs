@@ -28,7 +28,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
     private IPlaywright? _playwright;
     private IBrowser? _browser;
 
-    public IConfiguration Configuration => configuration;
+    public IConfiguration Configuration => Services.GetRequiredService<IConfiguration>();
 
     public IBrowser Browser
     {
