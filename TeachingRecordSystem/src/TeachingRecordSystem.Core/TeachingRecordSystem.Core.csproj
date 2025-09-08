@@ -239,6 +239,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0081_TrsPersonTrnRequestLink.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0082_TrsPersonDateOfDeath.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0083_MqReferenceValues.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0084_MqDqtSpecialismValue.sql" />
   </ItemGroup>
 
   <ItemGroup>
