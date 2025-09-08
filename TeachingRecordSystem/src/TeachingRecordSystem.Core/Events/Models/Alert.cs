@@ -25,7 +25,6 @@ public record Alert
 
 public record AlertDqtSanctionCode
 {
-    public required Guid SanctionCodeId { get; init; }
     public required string Name { get; init; }
     public required string Value { get; init; }
 }

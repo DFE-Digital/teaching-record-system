@@ -15,7 +15,6 @@ public class ReferenceDataCache(
 
     // CRM
     private Task<dfeta_mqestablishment[]>? _mqEstablishmentsTask;
-    private Task<dfeta_sanctioncode[]>? _getSanctionCodesTask;
     private Task<Subject[]>? _getSubjectsTask;
     private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
     private Task<dfeta_earlyyearsstatus[]>? _getEarlyYearsStatusesTask;
@@ -38,25 +37,6 @@ public class ReferenceDataCache(
     private Task<DegreeType[]>? _degreeTypesTask;
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => dbContextFactory;
-
-    public async Task<dfeta_sanctioncode> GetSanctionCodeByValueAsync(string value)
-    {
-        var sanctionCodes = await EnsureSanctionCodesAsync();
-        // build environment has some duplicate sanction codes, which prevent us using Single() here
-        return sanctionCodes.First(s => s.dfeta_Value == value, $"Could not find sanction code with value: '{value}'.");
-    }
-
-    public async Task<dfeta_sanctioncode> GetSanctionCodeByIdAsync(Guid sanctionCodeId)
-    {
-        var sanctionCodes = await EnsureSanctionCodesAsync();
-        return sanctionCodes.Single(s => s.dfeta_sanctioncodeId == sanctionCodeId, $"Could not find sanction code with ID: '{sanctionCodeId}'.");
-    }
-
-    public async Task<dfeta_sanctioncode[]> GetSanctionCodesAsync(bool activeOnly = true)
-    {
-        var sanctionCodes = await EnsureSanctionCodesAsync();
-        return sanctionCodes.Where(s => s.StateCode == dfeta_sanctioncodeState.Active || !activeOnly).ToArray();
-    }
 
     public async Task<Subject> GetSubjectByTitleAsync(string title)
     {
@@ -351,11 +331,6 @@ public class ReferenceDataCache(
         return trainingProviders.SingleOrDefault(tp => tp.Ukprn == ukprn);
     }
 
-    private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getSanctionCodesTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllSanctionCodesQuery(ActiveOnly: false)));
-
     private Task<Subject[]> EnsureSubjectsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSubjectsTask,
@@ -525,7 +500,6 @@ public class ReferenceDataCache(
     async Task IStartupTask.ExecuteAsync()
     {
         // CRM
-        await EnsureSanctionCodesAsync();
         await EnsureSubjectsAsync();
         await EnsureTeacherStatusesAsync();
         await EnsureEarlyYearsStatusesAsync();
