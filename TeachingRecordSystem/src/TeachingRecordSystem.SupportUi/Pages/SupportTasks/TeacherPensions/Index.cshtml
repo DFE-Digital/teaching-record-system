@@ -1,13 +1,66 @@
 @page "/support-tasks/teacher-pensions"
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
-@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions.DetailModel
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.IndexModel
 @{
-    ViewBag.Title = "Potential duplicates via Teachers' Pensions";
+    ViewBag.Title = "Potential duplicates via Teachers&rsquo; Pensions";
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-full">
         <span class="govuk-caption-l">Support tasks</span>
-        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Potential duplicates via Teachers' Pensions</h1>
+        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Potential duplicates via Teachers&rsquo; Pensions</h1>
+    </div>
+
+    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                        sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.Name ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.Name, direction))">
+                        Name
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.CreatedOn ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.CreatedOn, direction))">
+                        Date created
+                    </th>
+                    <th scope="col" class="govuk-table__header trs-!-width-150"
+                        sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.Filename ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.Filename, direction))">
+                        File name
+                    </th>
+                    <th scope="col" class="govuk-table__header trs-!-width-150"
+                        sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.InterfaceId ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.InterfaceId, direction))">
+                        Interface ID
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if (Model.Results!.Count == 0)
+                {
+                    <tr class="govuk-table__row" data-testid="no-tasks-message">
+                        <td class="govuk-table__cell" colspan="4">No potential duplicates</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var result in Model.Results)
+                    {
+                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                            <td scope="row" class="govuk-table__cell" data-testid="name">
+                                <a href="@LinkGenerator.TeacherPensionsMatches(result.SupportTaskReference) class="govuk-link">
+                                    @result.Name
+                                </a>
+                            </td>
+                            <td class="govuk-table__cell" data-testid="created-on">@result.CreatedOn.ToString("dd MMM yyyy")</td>
+                            <td class="govuk-table__cell" data-testid="filename">@result.Filename</td>
+                            <td class="govuk-table__cell" data-testid="integration-transaction-id">@result.IntergrationTransactionId</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 </div>

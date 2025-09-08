@@ -37,17 +37,17 @@
         <div class="trs-tile-section">
             <h2 class="govuk-heading-m">TRN requests</h2>
             <div class="trs-tile-row">
-                <a href="@LinkGenerator.NpqTrnRequests()" class="trs-tile">
+                <a href="@LinkGenerator.NpqTrnRequests()" class="trs-tile trs-tile--branded">
                     <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.NpqTrnRequest)</span>
                     <span class="trs-tile__title">NPQ TRN requests</span>
                 </a>
-                <a href="@LinkGenerator.ApiTrnRequests()" class="trs-tile">
+                <a href="@LinkGenerator.ApiTrnRequests()" class="trs-tile trs-tile--branded">
                     <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ApiTrnRequest)</span>
                     <span class="trs-tile__title">Potential duplicates via API</span>
                 </a>
-                <a href="@LinkGenerator.TrnRequestManualChecksNeeded()" class="trs-tile">
+                <a href="@LinkGenerator.TrnRequestManualChecksNeeded()" class="trs-tile trs-tile--branded">
                     <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.TrnRequestManualChecksNeeded)</span>
-                    <span class="trs-tile__title">Matched records:<br/>manual checks needed</span>
+                    <span class="trs-tile__title">Matched records:<br />manual checks needed</span>
                 </a>
             </div>
         </div>
@@ -58,7 +58,7 @@
         <div class="trs-tile-section">
             <h2 class="govuk-heading-m">Change requests</h2>
             <div class="trs-tile-row">
-                <a href="@LinkGenerator.SupportTasks(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true)" class="trs-tile">
+                <a href="@LinkGenerator.SupportTasks(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true)" class="trs-tile trs-tile--branded">
                     <span class="trs-tile__count">@(Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeNameRequest) + Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.ChangeDateOfBirthRequest))</span>
                     <span class="trs-tile__title">Name and date of birth change requests</span>
                 </a>
@@ -71,6 +71,10 @@
         <div class="trs-tile-row">
             <a href="@LinkGenerator.IntegrationTransactions()" class="trs-tile">
                 <span class="trs-tile__title">Integration transaction records (ITRs)</span>
+            </a>
+            <a href="@LinkGenerator.TeacherPensions()" class="trs-tile">
+                <span class="trs-tile__count">@Model.SupportTaskCounts!.GetValueOrDefault(SupportTaskType.CapitaImportPotentialDuplicate)</span>
+                <span class="trs-tile__title">Potential duplicates via Teachers&rsquo; Pensions</span>
             </a>
         </div>
     </div>
