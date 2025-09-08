@@ -294,7 +294,7 @@
   padding: 20px;
   height: 80px;
 
-  &:has(.trs-tile__count) {
+  &--branded {
     background-color: $govuk-brand-colour;
     color: govuk-colour("white");
   }

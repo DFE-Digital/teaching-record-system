@@ -1,5 +1,6 @@
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded;
 
 namespace TeachingRecordSystem.SupportUi;
@@ -26,9 +27,6 @@ public partial class TrsLinkGenerator
 
     public string ApiTrnRequests(string? search = null, ApiTrnRequestsSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search, sortBy, sortDirection, pageNumber });
-
-    public string TeacherPensionsMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string ApiTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
@@ -113,4 +111,11 @@ public partial class TrsLinkGenerator
 
     public string ResolveTrnRequestManualChecksNeededConfirm(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/TrnRequestManualChecksNeeded/Resolve/Confirm", routeValues: new { supportTaskReference });
+
+    public string TeacherPensionsMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+     GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string TeacherPensions(TeacherPensionsSortOptions? sortBy = null, SortDirection? sortDirection = null) =>
+        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Index", routeValues: new { sortBy, sortDirection });
+
 }
