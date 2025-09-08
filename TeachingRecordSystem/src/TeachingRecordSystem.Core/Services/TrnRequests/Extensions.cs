@@ -9,8 +9,12 @@ public static class Extensions
     public static IServiceCollection AddTrnRequestService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<TrnRequestService>();
-        services.AddOptions<TrnRequestOptions>().Configure(options =>
-            options.AllowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<Guid[]>() ?? []);
+
+        services.AddOptions<TrnRequestOptions>()
+            .Bind(configuration.GetSection("TrnRequests"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         return services;
     }
 
