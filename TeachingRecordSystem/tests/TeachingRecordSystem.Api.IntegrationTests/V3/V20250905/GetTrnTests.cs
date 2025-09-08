@@ -36,7 +36,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.RecordIsNotActive, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.RecordIsNotActive, StatusCodes.Status410Gone);
     }
 
     [Fact]
