@@ -15,5 +15,7 @@ public class MandatoryQualificationMapping : IEntityTypeConfiguration<MandatoryQ
         builder.Property(q => q.StartDate).HasColumnName("start_date");
         builder.Property(q => q.EndDate).HasColumnName("end_date");
         builder.HasIndex(q => q.DqtQualificationId).HasFilter("dqt_qualification_id is not null").IsUnique();
+        builder.Property(q => q.DqtMqEstablishmentValue).HasMaxLength(3);
+        builder.Property(q => q.DqtSpecialismValue).HasMaxLength(3);
     }
 }

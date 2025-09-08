@@ -16,7 +16,9 @@ public class MandatoryQualification : Qualification
 
     public Guid? DqtQualificationId { get; set; }
     public Guid? DqtMqEstablishmentId { get; set; }
+    public string? DqtMqEstablishmentValue { get; set; }
     public Guid? DqtSpecialismId { get; set; }
+    public string? DqtSpecialismValue { get; set; }
 
     public static MandatoryQualification Create(
         Guid personId,
