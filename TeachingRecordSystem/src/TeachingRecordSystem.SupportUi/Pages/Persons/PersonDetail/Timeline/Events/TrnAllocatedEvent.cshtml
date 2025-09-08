@@ -1,0 +1,27 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@model TimelineItem<TimelineEvent<TrnAllocatedEvent>>
+@{
+    var trnAllocatedEvent = Model.ItemModel.Event;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-trn-allocated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">TRN allocated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <div data-testid="details">
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Trn</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@trnAllocatedEvent.Trn</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+        </div>
+    </div>
+</div>
+
