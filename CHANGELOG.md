@@ -9,7 +9,7 @@ The following new endpoints have been added:
 
 An endpoint has been added at `GET /v3/trns/<trn>` to check whether a record with the given TRN exists and is active.
 If the TRN exists and is active, a 204 response is returned with no body.
-If the TRN exists but is deactivated (and not merged), a 400 response is returned.
+If the TRN exists but is deactivated (and not merged), a 410 response is returned.
 If the TRN exists but has been merged into another record, a 308 response is returned with the retained TRN in the `Location` header e.g. `Location: /v3/trns/<retained TRN>`.
 
 ## 20250804
