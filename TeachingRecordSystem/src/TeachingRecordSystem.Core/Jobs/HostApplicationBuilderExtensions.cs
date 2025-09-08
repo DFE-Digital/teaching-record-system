@@ -160,10 +160,7 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     InductionStatusUpdatedSupportJob.JobSchedule);
 
-                recurringJobManager.AddOrUpdate<BackfillDqtNotesJob>(
-                    nameof(BackfillDqtNotesJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    Cron.Never);
+                recurringJobManager.RemoveIfExists("BackfillDqtNotesJob");
 
                 recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
                     nameof(CpdInductionImporterJob),
@@ -236,20 +233,9 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<BackfillDqtIttQtsBusinessEventAuditsJob>(
-                    $"{nameof(BackfillDqtIttQtsBusinessEventAuditsJob)} (dry-run)",
-                    job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<BackfillDqtIttQtsBusinessEventAuditsJob>(
-                    nameof(BackfillDqtIttQtsBusinessEventAuditsJob),
-                    job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<SyncAllPreviousNamesFromCrmJob>(
-                    nameof(SyncAllPreviousNamesFromCrmJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    Cron.Never);
+                recurringJobManager.RemoveIfExists("BackfillDqtIttQtsBusinessEventAuditsJob (dry-run)");
+                recurringJobManager.RemoveIfExists("BackfillDqtIttQtsBusinessEventAuditsJob");
+                recurringJobManager.RemoveIfExists("SyncAllPreviousNamesFromCrmJob");
 
                 recurringJobManager.AddOrUpdate<BackfillPersonCreatedByTpsJob>(
                     nameof(BackfillPersonCreatedByTpsJob),
