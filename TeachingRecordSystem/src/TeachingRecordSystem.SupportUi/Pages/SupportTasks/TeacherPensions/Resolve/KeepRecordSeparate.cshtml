@@ -1,0 +1,40 @@
+@page "/support-tasks/teacher-pensions/{supportTaskReference}/resolve/keep-record-separate/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate
+@{
+    ViewBag.Title = "Why are you keeping the records separate?";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.TeacherPensionsCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator.TeacherPensions())" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.TeacherPensionsKeepRecordSeparate(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-radios asp-for="KeepSeparateReason">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
+                        @ViewBag.Title
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@KeepingRecordSeparateReason.RecordDoesNotMatch">
+                        The records do not match
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@KeepingRecordSeparateReason.AnotherReason">
+                        Another reason
+                        <govuk-radios-item-conditional>
+                            <govuk-input asp-for="Reason" />
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.TeacherPensionsCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, true)" class="govuk-button--secondary">Cancel</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
+
+

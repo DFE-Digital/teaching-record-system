@@ -20,7 +20,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
         var currentSupportTaskQuery = dbContext.SupportTasks
             .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update");  // https://github.com/dotnet/efcore/issues/26042
 
-        if (supportTaskTypes.Contains(SupportTaskType.ApiTrnRequest) || supportTaskTypes.Contains(SupportTaskType.TrnRequestManualChecksNeeded) || supportTaskTypes.Contains(SupportTaskType.NpqTrnRequest))
+        if (supportTaskTypes.Contains(SupportTaskType.ApiTrnRequest) || supportTaskTypes.Contains(SupportTaskType.TrnRequestManualChecksNeeded) || supportTaskTypes.Contains(SupportTaskType.NpqTrnRequest) || supportTaskTypes.Contains(SupportTaskType.TeacherPensionsPotentialDuplicate))
         {
             currentSupportTaskQuery = currentSupportTaskQuery
                 .Include(t => t.TrnRequestMetadata)

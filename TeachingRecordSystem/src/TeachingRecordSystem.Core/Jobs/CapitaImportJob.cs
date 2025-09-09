@@ -193,18 +193,18 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
 
                             potentialDuplicate = true;
                             var supportTask = DataStore.Postgres.Models.SupportTask.Create(
-                                SupportTaskType.CapitaImportPotentialDuplicate,
-                                new Models.SupportTaskData.CapitaPotentialDuplicateData()
+                                SupportTaskType.TeacherPensionsPotentialDuplicate,
+                                new Models.SupportTaskData.TeacherPensionsPotentialDuplicateData()
                                 {
                                     FileName = fileName,
                                     IntegrationTransactionId = integrationJob.IntegrationTransactionId
                                 },
                                 personId: personId.Value,
-                                null,
-                                null,
-                                trnRequestMetadata.RequestId,
-                                capitaUser.Value.CapitaTpsUserId,
-                                clock.UtcNow,
+                                oneLoginUserSubject: null,
+                                trnRequestApplicationUserId: capitaUser.Value.CapitaTpsUserId,
+                                trnRequestId: trnRequestMetadata.RequestId,
+                                createdBy: capitaUser.Value.CapitaTpsUserId,
+                                now: clock.UtcNow,
                                 out var supportTaskCreatedEvent);
 
                             dbContext.SupportTasks.Add(supportTask);

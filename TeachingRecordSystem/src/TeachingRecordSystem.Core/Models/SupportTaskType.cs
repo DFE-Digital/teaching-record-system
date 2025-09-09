@@ -16,8 +16,8 @@ public enum SupportTaskType
     NpqTrnRequest = 5,
     [SupportTaskTypeInfo("Manual checks needed", SupportTaskCategory.TrnRequests, "80adb2e0-199c-4629-b494-4d052230a248")]
     TrnRequestManualChecksNeeded = 6,
-    [SupportTaskTypeInfo("Capita import potential duplicate", SupportTaskCategory.CapitaImport, "fdee6a10-6338-463a-b6df-e34a2b95a854")]
-    CapitaImportPotentialDuplicate = 7
+    [SupportTaskTypeInfo("Teacher pensions potential duplicate", SupportTaskCategory.TeacherPensions, "fdee6a10-6338-463a-b6df-e34a2b95a854")]
+    TeacherPensionsPotentialDuplicate = 7
 }
 
 public static class SupportTaskTypeRegistry

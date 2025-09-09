@@ -29,6 +29,7 @@ public partial class TestData
         private Option<TrnRequestMatchedPerson[]> _matchedPersons;
         private string? _fileName;
         private long _integrationTransactionId;
+        private Option<SupportTaskStatus> _status;
 
         public CreateTeacherPensionsPotentialDuplicateTaskBuilder WithFirstName(string firstName)
         {
@@ -75,6 +76,12 @@ public partial class TestData
         public CreateTeacherPensionsPotentialDuplicateTaskBuilder WithMatchedPersons(params Guid[] personIds)
         {
             _matchedPersons = Option.Some(personIds.Select(id => new TrnRequestMatchedPerson() { PersonId = id }).ToArray());
+            return this;
+        }
+
+        public CreateTeacherPensionsPotentialDuplicateTaskBuilder WithStatus(SupportTaskStatus status)
+        {
+            _status = Option.Some(status);
             return this;
         }
 
@@ -129,19 +136,21 @@ public partial class TestData
                 }
             };
             var supportTask = Core.DataStore.Postgres.Models.SupportTask.Create(
-                SupportTaskType.CapitaImportPotentialDuplicate,
-                new Core.Models.SupportTaskData.CapitaPotentialDuplicateData()
+                SupportTaskType.TeacherPensionsPotentialDuplicate,
+                new Core.Models.SupportTaskData.TeacherPensionsPotentialDuplicateData()
                 {
                     FileName = fileName,
                     IntegrationTransactionId = integrationTransactionId
                 },
                 personId: personId,
                 null,
-                null,
-                trnRequestMetadata.RequestId,
-                userId,
-                createdOn!.Value,
+                trnRequestApplicationUserId: userId,
+                trnRequestId: trnRequestMetadata.RequestId,
+                createdBy: userId,
+                now: createdOn!.Value,
                 out var supportTaskCreatedEvent);
+
+            supportTask.Status = _status.ValueOr(SupportTaskStatus.Open);
 
             return await testData.WithDbContextAsync(async dbContext =>
             {

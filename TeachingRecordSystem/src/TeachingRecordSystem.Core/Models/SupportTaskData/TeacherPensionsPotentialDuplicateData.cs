@@ -1,14 +1,14 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
-public record CapitaPotentialDuplicateData
+public record TeacherPensionsPotentialDuplicateData
 {
-    public CapitaPotentialDuplicateAttributes? SelectedPersonAttributes { get; init; }
-    public CapitaPotentialDuplicateAttributes? ResolvedAttributes { get; init; }
+    public TeacherPensionsPotentialDuplicateAttributes? SelectedPersonAttributes { get; init; }
+    public TeacherPensionsPotentialDuplicateAttributes? ResolvedAttributes { get; init; }
     public required string FileName { get; set; }
     public required long IntegrationTransactionId { get; set; }
 }
 
-public record CapitaPotentialDuplicateAttributes
+public record TeacherPensionsPotentialDuplicateAttributes
 {
     public required string FirstName { get; init; }
     public required string MiddleName { get; init; }
@@ -16,4 +16,5 @@ public record CapitaPotentialDuplicateAttributes
     public required DateOnly? DateOfBirth { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
     public required Gender? Gender { get; init; }
+    public required string Trn { get; init; }
 }
