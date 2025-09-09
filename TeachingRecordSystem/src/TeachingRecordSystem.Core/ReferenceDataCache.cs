@@ -14,11 +14,9 @@ public class ReferenceDataCache(
     private object _routeTypesSyncObj = new();
 
     // CRM
-    private Task<dfeta_mqestablishment[]>? _mqEstablishmentsTask;
     private Task<Subject[]>? _getSubjectsTask;
     private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
     private Task<dfeta_earlyyearsstatus[]>? _getEarlyYearsStatusesTask;
-    private Task<dfeta_specialism[]>? _getSpecialismsTask;
     private Task<dfeta_hequalification[]>? _getHeQualificationsTask;
     private Task<dfeta_hesubject[]>? _getHeSubjectsTask;
     private Task<dfeta_country[]>? _getCountriesTask;
@@ -78,44 +76,6 @@ public class ReferenceDataCache(
     {
         var earlyYearsStatuses = await EnsureEarlyYearsStatusesAsync();
         return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value, $"Could not find early years teacher status with value: '{value}'.");
-    }
-
-    public async Task<dfeta_specialism[]> GetMqSpecialismsAsync()
-    {
-        var specialisms = await EnsureSpecialismsAsync();
-        return specialisms.ToArray();
-    }
-
-    public async Task<dfeta_specialism> GetMqSpecialismByValueAsync(string value)
-    {
-        var specialisms = await EnsureSpecialismsAsync();
-        // build environment has some duplicate Specialisms, which prevent us using Single() here
-        return specialisms.First(s => s.dfeta_Value == value, $"Could not find MQ specialism with value: '{value}'.");
-    }
-
-    public async Task<dfeta_specialism> GetMqSpecialismByIdAsync(Guid specialismId)
-    {
-        var specialisms = await EnsureSpecialismsAsync();
-        return specialisms.Single(s => s.dfeta_specialismId == specialismId, $"Could not find MQ specialism with ID: '{specialismId}'.");
-    }
-
-    public async Task<dfeta_mqestablishment[]> GetMqEstablishmentsAsync()
-    {
-        var mqEstablishments = await EnsureMqEstablishmentsAsync();
-        return mqEstablishments.ToArray();
-    }
-
-    public async Task<dfeta_mqestablishment> GetMqEstablishmentByValueAsync(string value)
-    {
-        var mqEstablishments = await EnsureMqEstablishmentsAsync();
-        // build environment has some duplicate MQ Establishments, which prevent us using Single() here
-        return mqEstablishments.First(s => s.dfeta_Value == value, $"Could not find MQ establishment with value: '{value}'.");
-    }
-
-    public async Task<dfeta_mqestablishment> GetMqEstablishmentByIdAsync(Guid mqEstablishmentId)
-    {
-        var mqEstablishments = await EnsureMqEstablishmentsAsync();
-        return mqEstablishments.Single(s => s.dfeta_mqestablishmentId == mqEstablishmentId, $"Could not find MQ establishment with ID: '{mqEstablishmentId}'.");
     }
 
     public async Task<dfeta_hequalification[]> GetHeQualificationsAsync()
@@ -346,16 +306,6 @@ public class ReferenceDataCache(
             ref _getEarlyYearsStatusesTask,
             () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveEarlyYearsStatusesQuery()));
 
-    private Task<dfeta_specialism[]> EnsureSpecialismsAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getSpecialismsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllSpecialismsQuery()));
-
-    private Task<dfeta_mqestablishment[]> EnsureMqEstablishmentsAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _mqEstablishmentsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllMqEstablishmentsQuery()));
-
     private Task<dfeta_hequalification[]> EnsureHeQualificationsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeQualificationsTask,
@@ -503,8 +453,6 @@ public class ReferenceDataCache(
         await EnsureSubjectsAsync();
         await EnsureTeacherStatusesAsync();
         await EnsureEarlyYearsStatusesAsync();
-        await EnsureSpecialismsAsync();
-        await EnsureMqEstablishmentsAsync();
         await EnsureHeQualificationsAsync();
         await EnsureHeSubjectsAsync();
         await EnsureCountriesAsync();

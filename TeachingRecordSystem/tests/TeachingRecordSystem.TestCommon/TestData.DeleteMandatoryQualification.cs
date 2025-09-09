@@ -21,8 +21,8 @@ public partial class TestData
 
             qualification.DeletedOn = now;
 
-            var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-                await ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
+            var mqEstablishment = qualification.DqtMqEstablishmentValue is string mqEstablishmentValue ?
+                LegacyDataCache.Instance.GetMqEstablishmentByValue(mqEstablishmentValue) :
                 null;
 
             var deletedEvent = new MandatoryQualificationDeletedEvent()
@@ -41,8 +41,8 @@ public partial class TestData
                             Name = qualification.ProviderId is not null ?
                                 qualification.Provider?.Name ?? throw new InvalidOperationException($"Missing {nameof(qualification.Provider)}.") :
                                 null,
-                            DqtMqEstablishmentId = mqEstablishment?.Id,
-                            DqtMqEstablishmentName = mqEstablishment?.dfeta_name
+                            DqtMqEstablishmentName = mqEstablishment?.Name,
+                            DqtMqEstablishmentValue = mqEstablishment?.Value
                         } :
                         null,
                     Specialism = qualification.Specialism,
@@ -52,11 +52,11 @@ public partial class TestData
                 },
                 DeletionReason = deletionReason ?? "Added in error",
                 DeletionReasonDetail = deletionReasonDetail,
-                EvidenceFile = evidenceFile is (Guid FileId, string Name) e ?
+                EvidenceFile = evidenceFile is (Guid FileId, string Name) ?
                     new EventModels.File()
                     {
-                        FileId = e.FileId,
-                        Name = e.Name
+                        FileId = FileId,
+                        Name = Name
                     } :
                     null
             };

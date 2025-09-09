@@ -30,6 +30,6 @@ public record MandatoryQualificationProvider
 {
     public required Guid? MandatoryQualificationProviderId { get; init; }
     public required string? Name { get; init; }
-    public Guid? DqtMqEstablishmentId { get; init; }
+    public string? DqtMqEstablishmentValue { get; init; }
     public string? DqtMqEstablishmentName { get; init; }
 }

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
@@ -171,7 +170,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
-            item => Assert.Equal(legacyProvider.dfeta_name, item.GetElementByTestId("provider")?.TrimmedText()));
+            item => Assert.Equal(legacyProvider.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -245,7 +244,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event"),
-            item => Assert.Equal(legacyProvider.dfeta_name, item.GetElementByTestId("provider")?.TrimmedText()));
+            item => Assert.Equal(legacyProvider.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -312,8 +311,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             var qualification = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleAsync(q => q.QualificationId == mq.QualificationId);
             qualification.DeletedOn = null;
 
-            var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-                await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
+            var mqEstablishment = qualification.DqtMqEstablishmentValue is string mqEstablishmentValue ?
+                LegacyDataCache.Instance.GetMqEstablishmentByValue(mqEstablishmentValue) :
                 null;
 
             var reactivatedEvent = new MandatoryQualificationDqtReactivatedEvent()
@@ -332,8 +331,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                             Name = qualification.ProviderId is not null ?
                                 qualification.Provider?.Name ?? throw new InvalidOperationException($"Missing {nameof(qualification.Provider)}.") :
                                 null,
-                            DqtMqEstablishmentId = mqEstablishment?.Id,
-                            DqtMqEstablishmentName = mqEstablishment?.dfeta_name
+                            DqtMqEstablishmentName = mqEstablishment?.Name,
+                            DqtMqEstablishmentValue = mqEstablishment?.Value
                         } :
                         null,
                     Specialism = qualification.Specialism,
@@ -453,10 +452,10 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     public async Task Person_WithMandatoryQualificationMigratedEventWithChangedProvider_RendersProviderRowInPreviousDataSummaryList()
     {
         // Arrange
-        var establishmentWithProviderMapping = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("150");  // Postgraduate Diploma in Deaf Education, University of Manchester, School of Psychological Sciences
+        var establishmentWithProviderMapping = LegacyDataCache.Instance.GetMqEstablishmentByValue("150");
         var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
-                .WithDqtMqEstablishment(establishmentWithProviderMapping)));
+                .WithDqtMqEstablishment(establishmentWithProviderMapping.Value)));
         Clock.Advance();
 
         var migratedProvider = await WithDbContext(async dbContext =>
@@ -465,7 +464,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishmentWithProviderMapping, out var migratedProvider);
+            MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(establishmentWithProviderMapping.Value, out var migratedProvider);
             Debug.Assert(migratedProvider is not null);
             mq.ProviderId = migratedProvider.MandatoryQualificationProviderId;
             await dbContext.SaveChangesAsync();
@@ -505,11 +504,11 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var specialism = MandatoryQualificationSpecialism.DeafEducation;
-        var establishmentWithSpecialismMapping = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("961");  // University of Manchester
+        var establishmentWithSpecialismMapping = LegacyDataCache.Instance.GetMqEstablishmentByValue("961");  // University of Manchester
         var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithSpecialism(specialism)
-                .WithDqtMqEstablishment(establishmentWithSpecialismMapping)));
+                .WithDqtMqEstablishment(establishmentWithSpecialismMapping.Value)));
         Clock.Advance();
 
         var migratedSpecialism = await WithDbContext(async dbContext =>
@@ -518,8 +517,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
-            MandatoryQualificationSpecialismRegistry.TryMapFromDqtMqEstablishment(
-                establishmentWithSpecialismMapping.dfeta_Value,
+            MandatoryQualificationSpecialismRegistry.TryMapFromDqtSpecialism(
+                establishmentWithSpecialismMapping.Value,
                 specialism.GetDqtValue(),
                 out var migratedSpecialism);
             Debug.Assert(migratedSpecialism is not null);
@@ -945,18 +944,18 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         return (person.PersonId, mq);
     }
 
-    private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification, dfeta_mqestablishment MqEstablishment)> CreateMqWithLegacyProvider()
+    private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification, LegacyDataCache.MqEstablishment MqEstablishment)> CreateMqWithLegacyProvider()
     {
-        var legacyProvider = (await TestData.ReferenceDataCache.GetMqEstablishmentsAsync()).RandomOne();
+        var legacyProvider = LegacyDataCache.Instance.GetAllMqEstablishments().RandomOne();
 
         var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
-                .WithDqtMqEstablishment(legacyProvider, mandatoryQualificationProviderId: null)));
+                .WithDqtMqEstablishment(legacyProvider.Value, mandatoryQualificationProviderId: null)));
 
         var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
-        Debug.Assert(mq.DqtMqEstablishmentId.HasValue);
+        Debug.Assert(mq.DqtMqEstablishmentValue is not null);
         Debug.Assert(!mq.ProviderId.HasValue);
 
         return (person.PersonId, mq, legacyProvider);
@@ -976,8 +975,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         qualification.DeletedOn = now;
 
-        var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-            await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
+        var mqEstablishment = qualification.DqtMqEstablishmentValue is string mqEstablishmentValue ?
+            LegacyDataCache.Instance.GetMqEstablishmentByValue(mqEstablishmentValue) :
             null;
 
         var deletedEvent = new MandatoryQualificationDqtDeactivatedEvent()
@@ -996,8 +995,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                         Name = qualification.ProviderId is not null ?
                             qualification.Provider?.Name ?? throw new InvalidOperationException($"Missing {nameof(qualification.Provider)}.") :
                             null,
-                        DqtMqEstablishmentId = mqEstablishment?.Id,
-                        DqtMqEstablishmentName = mqEstablishment?.dfeta_name
+                        DqtMqEstablishmentName = mqEstablishment?.Name,
+                        DqtMqEstablishmentValue = mqEstablishment?.Value
                     } :
                     null,
                 Specialism = qualification.Specialism,
@@ -1027,8 +1026,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             var qualification = await dbContext.MandatoryQualifications
                 .SingleAsync(q => q.QualificationId == qualificationId);
 
-            var oldMqEstablishment = qualification.DqtMqEstablishmentId is Guid oldMqEstablishmentId ?
-                await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(oldMqEstablishmentId) :
+            var oldMqEstablishment = qualification.DqtMqEstablishmentValue is string oldMqEstablishmentValue ?
+                LegacyDataCache.Instance.GetMqSpecialismByValue(oldMqEstablishmentValue) :
                 null;
 
             var oldMq = new EventModels.MandatoryQualification()
@@ -1041,8 +1040,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                         Name = qualification.ProviderId is not null ?
                             qualification.Provider?.Name ?? throw new InvalidOperationException($"Missing {nameof(qualification.Provider)}.") :
                             null,
-                        DqtMqEstablishmentId = oldMqEstablishment?.Id,
-                        DqtMqEstablishmentName = oldMqEstablishment?.dfeta_name
+                        DqtMqEstablishmentName = oldMqEstablishment?.Name,
+                        DqtMqEstablishmentValue = oldMqEstablishment?.Value
                     } :
                     null,
                 Specialism = qualification.Specialism,
@@ -1054,8 +1053,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             update(qualification);
             qualification.UpdatedOn = now;
 
-            var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-                await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
+            var mqEstablishment = qualification.DqtMqEstablishmentValue is string mqEstablishmentValue ?
+                LegacyDataCache.Instance.GetMqSpecialismByValue(mqEstablishmentValue) :
                 null;
 
             var updatedEvent = new MandatoryQualificationUpdatedEvent()
@@ -1074,8 +1073,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                             Name = qualification.ProviderId is not null ?
                                 qualification.Provider?.Name ?? throw new InvalidOperationException($"Missing {nameof(qualification.Provider)}.") :
                                 null,
-                            DqtMqEstablishmentId = mqEstablishment?.Id,
-                            DqtMqEstablishmentName = mqEstablishment?.dfeta_name
+                            DqtMqEstablishmentName = mqEstablishment?.Name,
+                            DqtMqEstablishmentValue = mqEstablishment?.Value
                         } :
                         null,
                     Specialism = qualification.Specialism,
@@ -1089,8 +1088,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 EvidenceFile = evidenceFile is not null ?
                     new EventModels.File()
                     {
-                        FileId = evidenceFile!.Value.FileId,
-                        Name = evidenceFile!.Value.Name
+                        FileId = evidenceFile.Value.FileId,
+                        Name = evidenceFile.Value.Name
                     } :
                     null,
                 Changes = changes

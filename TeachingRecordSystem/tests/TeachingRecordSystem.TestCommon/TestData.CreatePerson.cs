@@ -795,9 +795,9 @@ public partial class TestData
     public class CreatePersonMandatoryQualificationBuilder
     {
         private Option<Guid?> _mandatoryQualificationProviderId;
-        private Option<Guid?> _mqEstablishmentId;
+        private Option<string?> _mqEstablishmentValue;
         private Option<MandatoryQualificationSpecialism?> _specialism;
-        private Option<Guid?> _dqtSpecialismId;
+        private Option<string?> _dqtSpecialismValue;
         private Option<MandatoryQualificationStatus?> _status;
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
@@ -810,34 +810,34 @@ public partial class TestData
         public CreatePersonMandatoryQualificationBuilder WithProvider(Guid? mandatoryQualificationProviderId)
         {
             _mandatoryQualificationProviderId = Option.Some(mandatoryQualificationProviderId);
-            _mqEstablishmentId = default;
+            _mqEstablishmentValue = default;
             return this;
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishment(dfeta_mqestablishment? mqEstablishment)
+        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishment(string? mqEstablishmentValue)
         {
             Guid? mandatoryQualificationProviderId = null;
 
-            if (mqEstablishment is not null)
+            if (mqEstablishmentValue is not null)
             {
-                MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
+                MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(mqEstablishmentValue, out var provider);
                 mandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId;
             }
 
-            return WithDqtMqEstablishment(mqEstablishment, mandatoryQualificationProviderId);
+            return WithDqtMqEstablishment(mqEstablishmentValue, mandatoryQualificationProviderId);
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishment(dfeta_mqestablishment? mqEstablishment, Guid? mandatoryQualificationProviderId)
+        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishment(string? mqEstablishmentValue, Guid? mandatoryQualificationProviderId)
         {
-            _mqEstablishmentId = Option.Some(mqEstablishment?.Id);
+            _mqEstablishmentValue = Option.Some(mqEstablishmentValue);
             _mandatoryQualificationProviderId = Option.Some(mandatoryQualificationProviderId);
             return this;
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithSpecialism(MandatoryQualificationSpecialism? specialism, Guid? dqtSpecialismId = null)
+        public CreatePersonMandatoryQualificationBuilder WithSpecialism(MandatoryQualificationSpecialism? specialism, string? dqtSpecialismValue = null)
         {
             _specialism = Option.Some(specialism);
-            _dqtSpecialismId = Option.Some(dqtSpecialismId);
+            _dqtSpecialismValue = Option.Some(dqtSpecialismValue);
             return this;
         }
 
@@ -925,8 +925,8 @@ public partial class TestData
                 Specialism = specialism,
                 StartDate = startDate,
                 EndDate = endDate,
-                DqtSpecialismId = _dqtSpecialismId.ValueOr((Guid?)null),
-                DqtMqEstablishmentId = _mqEstablishmentId.ValueOr((Guid?)null)
+                DqtSpecialismValue = _dqtSpecialismValue.ValueOr((string?)null),
+                DqtMqEstablishmentValue = _mqEstablishmentValue.ValueOr((string?)null)
             };
 
             dbContext.MandatoryQualifications.Add(mq);

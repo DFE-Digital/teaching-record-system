@@ -6,6 +6,60 @@ public class LegacyDataCache
 
     public static LegacyDataCache Instance { get; } = new();
 
+    public IReadOnlyCollection<MqEstablishment> MqEstablishments =
+    [
+        new("Liverpool John Moores University", "964",  true),
+        new("Plymouth University",  "965",  true),
+        new("Diploma in Professional Studies in Education for Teachers of Visually Handicapped Children - Moray House College of Education, Edinburgh", "10", false),
+        new("Diploma for Teachers of the Deaf - University College, Dublin", "100", false),
+        new("Diploma in Education of Deaf and Partially Hearing Children - Moray House College of Education, Edinburgh", "110", false),
+        new("Postgraduate Diploma in Education (Special Education: Hearing Impairment), University of Birmingham, School of Education", "120", false),
+        new("Diploma in Special Education (Hearing Impaired) - University of Swansea",  "130", false),
+        new("Postgraduate Diploma (Education of Deaf Children), University of Hertfordshire", "140", false),
+        new("Postgraduate Diploma in Deaf Education, University of Manchester, School of Psychological Sciences", "150", false),
+        new("BPhil in Education (Special Education: Hearing Impairment), University of Birmingham, School of Education", "160", false),
+        new("Diploma in Special Educational Needs: Hearing Impaired - Gwent College", "170", false),
+        new("BPhil in Multi-Sensory Impairment and Deafblindness, University of Birmingham, School of Education", "180", false),
+        new("Diploma in the Education and Psychology of Children with Special Needs - Multi-Sensory Impairment (Deaf - Blind) - University of London, Institute of Education in conjunction with Whitfield School, Walthamstow", "190", false),
+        new("BPhil for Teachers of Children with a Visual Impairment, University of Birmingham, School of Education", "20", false),
+        new("Diploma in the Education and Psychology of Children with Special Needs - Multi", "200", false),
+        new("Postgraduate Diploma in Multi-Sensory Impairment and Deafblindness, University of Birmingham, School of Education", "210", false),
+        new("MA in Deaf Education (Teacher of the Deaf Qualification), University of Leeds, School of Education", "220", false),
+        new("Postgraduate Diploma in Education Studies (Hearing Impairment), Oxford Brookes University, Westminster Institute of Education, in partnership with Mary Hare School",  "230", false),
+        new("Postgraduate Diploma (Teachers Working with Children with Multi-Sensory Impairment), Kingston University, School of Education, in partnership with Whitefield Schools and Centre", "240", false),
+        new("Postgraduate Diploma for Teachers of Children with Visual Impairment, University of Birmingham, School of Education", "30", false),
+        new("Diploma in the Education of Children with Disabilities of Sight - Cambridge Institute of Education", "40", false),
+        new("Graduate Diploma in Special and Inclusive Education: Disabilities of Sight, University of London Institute of Education", "50", false),
+        new("Diploma in Professional Practice in Education (SEN) in Visual Impairment - Manchester Metropolitan University", "60", false),
+        new("Diploma in Special Education (Visually Impaired) - University of Swansea", "70", false),
+        new("Diploma in Special Educational Needs: Visually Impaired - Gwent College", "80", false),
+        new("Masters Level: Mandatory Qualification for Teachers of Children with Visual Impairment, University of Plymouth, Faculty of Education, in partnership with the Sensory Consortium", "90", false),
+        new("Special courses of advanced study and courses leading to higher degrees and degrees in education other than BEd degrees", "950", false),
+        new("Bristol Polytechnic", "951", false),
+        new("Courses for teaching handicapped children other than the blind, deaf and partially hearing", "952", false),
+        new("One-year courses (originally known as Supplementary Courses)", "953", false),
+        new("University College, Swansea", "954", true),
+        new("University of Birmingham", "955", true),
+        new("University of Cambridge", "956", true),
+        new("University of Edinburgh", "957", true),
+        new("University of Hertfordshire", "958", true),
+        new("University of Leeds", "959", true),
+        new("University of London", "960", true),
+        new("University of Manchester", "961", true),
+        new("University of Newcastle-upon-Tyne", "962", true),
+        new("University of Oxford/Oxford Polytechnic", "963", true)
+    ];
+
+    public IReadOnlyCollection<MqSpecialism> MqSpecialisms =
+    [
+        new("Deaf education", "Deaf education", true),
+        new("N/A", "N/A", true),
+        new("Auditory Impairment", "Auditory", false),
+        new("Hearing", "Hearing", true),
+        new("Multi_Sensory Impairment", "Multi-Sensory", true),
+        new("Visual Impairment", "Visual", true)
+    ];
+
     public IReadOnlyCollection<SanctionCode> SanctionCodes =
     [
         new("FOR INTERNAL INFORMATION ONLY - known duplicate record", "T10", true),
@@ -76,11 +130,27 @@ public class LegacyDataCache
         new("Council Member  -  do not register", "Z2", false)
     ];
 
+    public IReadOnlyCollection<MqEstablishment> GetAllMqEstablishments(bool activeOnly = true) =>
+        MqEstablishments.Where(m => !activeOnly || m.Active).AsReadOnly();
+
+    public MqEstablishment GetMqEstablishmentByValue(string value) =>
+        MqEstablishments.Single(m => m.Value == value);
+
+    public IReadOnlyCollection<MqSpecialism> GetAllMqSpecialisms(bool activeOnly = true) =>
+        MqSpecialisms.Where(s => !activeOnly || s.Active).AsReadOnly();
+
+    public MqSpecialism GetMqSpecialismByValue(string value) =>
+        MqSpecialisms.Single(s => s.Value == value);
+
     public IReadOnlyCollection<SanctionCode> GetAllSanctionCodes(bool activeOnly = true) =>
         SanctionCodes.Where(s => !activeOnly || s.Active).AsReadOnly();
 
     public SanctionCode GetSanctionCodeByValue(string value) =>
         SanctionCodes.Single(s => s.Value == value);
+
+    public record MqEstablishment(string Name, string Value, bool Active);
+
+    public record MqSpecialism(string Name, string Value, bool Active);
 
     public record SanctionCode(string Name, string Value, bool Active);
 }

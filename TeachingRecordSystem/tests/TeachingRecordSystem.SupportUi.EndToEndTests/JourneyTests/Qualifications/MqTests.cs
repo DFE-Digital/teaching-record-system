@@ -14,8 +14,8 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task AddMq()
     {
         var person = await TestData.CreatePersonAsync();
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValueAsync("Hearing");
+        var mqEstablishment = LegacyDataCache.Instance.GetMqEstablishmentByValue("959"); // University of Leeds
+        var specialism = LegacyDataCache.Instance.GetMqSpecialismByValue("Hearing");
         var startDate = new DateOnly(2021, 3, 1);
         var result = dfeta_qualification_dfeta_MQ_Status.Passed;
         var endDate = new DateOnly(2021, 11, 5);
@@ -32,14 +32,14 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddMqProviderPageAsync();
 
-        await page.FillAsync($"label:text-is('Training provider')", mqEstablishment.dfeta_name);
+        await page.FillAsync($"label:text-is('Training provider')", mqEstablishment.Name);
 
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddMqSpecialismPageAsync();
 
-        await page.CheckAsync($"label{TextIsSelector(specialism.dfeta_name)}");
+        await page.CheckAsync($"label{TextIsSelector(specialism.Name)}");
 
         await page.ClickContinueButtonAsync();
 
@@ -69,8 +69,8 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Test]
     public async Task EditMqProvider()
     {
-        var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("959"); // University of Leeds
-        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("961"); // University of Manchester
+        var oldMqEstablishment = LegacyDataCache.Instance.GetMqEstablishmentByValue("959"); // University of Leeds
+        var newMqEstablishment = LegacyDataCache.Instance.GetMqEstablishmentByValue("961"); // University of Manchester
         var changeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider;
         var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
@@ -88,7 +88,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqProviderPageAsync(qualificationId);
 
-        await page.FillAsync($"label:text-is('Training provider')", newMqEstablishment.dfeta_name);
+        await page.FillAsync($"label:text-is('Training provider')", newMqEstablishment.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 

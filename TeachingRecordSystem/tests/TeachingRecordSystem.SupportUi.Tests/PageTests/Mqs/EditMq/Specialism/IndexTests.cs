@@ -80,8 +80,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var specialism = MandatoryQualificationSpecialism.DeafEducation;
         Debug.Assert(MandatoryQualificationSpecialismRegistry.IsLegacy(specialism));
-        var dqtSpecialism = await TestData.ReferenceDataCache.GetMqSpecialismByValueAsync(specialism.GetDqtValue());
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism, dqtSpecialism.dfeta_specialismId)));
+        var dqtSpecialism = LegacyDataCache.Instance.GetMqSpecialismByValue(specialism.GetDqtValue());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism, dqtSpecialism.Value)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(

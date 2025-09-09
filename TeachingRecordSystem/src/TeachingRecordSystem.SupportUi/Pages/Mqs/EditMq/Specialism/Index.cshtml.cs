@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 [Journey(JourneyNames.EditMqSpecialism), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
 
@@ -62,8 +62,8 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
 
-        var migratedFromDqtWithLegacySpecialism = qualificationInfo.MandatoryQualification.DqtSpecialismId is Guid dqtSpecialismId &&
-            MandatoryQualificationSpecialismRegistry.GetByDqtValue((await referenceDataCache.GetMqSpecialismByIdAsync(dqtSpecialismId)).dfeta_Value).IsLegacy();
+        var migratedFromDqtWithLegacySpecialism = qualificationInfo.MandatoryQualification.DqtSpecialismValue is string dqtSpecialismValue &&
+            MandatoryQualificationSpecialismRegistry.GetByDqtValue(dqtSpecialismValue).IsLegacy();
 
         Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: migratedFromDqtWithLegacySpecialism);
 
