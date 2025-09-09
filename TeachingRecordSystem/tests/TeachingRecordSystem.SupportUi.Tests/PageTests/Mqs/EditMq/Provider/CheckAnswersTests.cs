@@ -168,8 +168,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     {
                         MandatoryQualificationProviderId = newProvider.MandatoryQualificationProviderId,
                         Name = newProvider.Name,
-                        DqtMqEstablishmentId = null,
-                        DqtMqEstablishmentName = null
+                        DqtMqEstablishmentName = null,
+                        DqtMqEstablishmentValue = null
                     },
                     Specialism = qualification.Specialism,
                     Status = qualification.Status,
@@ -183,8 +183,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     {
                         MandatoryQualificationProviderId = oldProvider.MandatoryQualificationProviderId,
                         Name = oldProvider.Name,
-                        DqtMqEstablishmentId = null,
-                        DqtMqEstablishmentName = null
+                        DqtMqEstablishmentName = null,
+                        DqtMqEstablishmentValue = null
                     },
                     Specialism = qualification.Specialism,
                     Status = qualification.Status,
