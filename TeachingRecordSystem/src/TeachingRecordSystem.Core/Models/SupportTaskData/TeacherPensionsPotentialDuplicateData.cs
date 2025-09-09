@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
-public record CapitaPotentialDuplicateData
+public record TeacherPensionsPotentialDuplicateData
 {
     public CapitaPotentialDuplicateAttributes? SelectedPersonAttributes { get; init; }
     public CapitaPotentialDuplicateAttributes? ResolvedAttributes { get; init; }
