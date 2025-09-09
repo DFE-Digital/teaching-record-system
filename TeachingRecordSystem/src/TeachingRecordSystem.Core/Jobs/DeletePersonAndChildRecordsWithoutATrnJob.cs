@@ -16,7 +16,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
-        dbContext.Database.SetCommandTimeout(300);
+        dbContext.Database.SetCommandTimeout(30);
 
         var personIdsWithNoTrn = await dbContext.Persons
             .Where(p => p.Trn == null)
@@ -52,23 +52,26 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
 
             var deletedPersonIdsInBatch = await ExecuteSqlAsync<Guid>(
             $"""
-                -- Delete support tasks referencing person (and accompanying requests/metadata)
+                -- Delete support tasks referencing person via person_id (and accompanying requests/metadata)
 
-                DELETE FROM trn_request_metadata AS m
-                USING support_tasks AS s
-                WHERE s.trn_request_application_user_id = m.application_user_id AND s.trn_request_id = m.request_id
-                AND s.person_id = ANY ({personIds});
-
-                DELETE FROM trn_requests AS r
-                USING support_tasks AS s, trn_request_metadata AS m
-                WHERE r.request_id = m.request_id
-                AND s.trn_request_application_user_id = m.application_user_id AND s.trn_request_id = m.request_id
-                AND s.person_id = ANY ({personIds});
+                CREATE TEMP TABLE support_task_trn_request_ids AS
+                SELECT trn_request_id FROM support_tasks
+                WHERE person_id = ANY ({personIds});
 
                 DELETE FROM support_tasks
                 WHERE person_id = ANY ({personIds});
+            
+                DELETE FROM trn_request_metadata
+                WHERE request_id IN (SELECT trn_request_id FROM support_task_trn_request_ids);
 
-                -- Delete requests/metadata referencing person (and accompanying support tasks)
+                DELETE FROM trn_requests AS r
+                USING trn_request_metadata AS m
+                WHERE r.request_id = m.request_id
+                AND r.request_id IN (SELECT trn_request_id FROM support_task_trn_request_ids);
+
+                DROP TABLE support_task_trn_request_ids;
+
+                -- Delete requests/metadata referencing person via resolved_person_id (and accompanying support tasks)
 
                 DELETE FROM support_tasks AS s
                 USING trn_request_metadata AS m
@@ -76,9 +79,8 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
                 AND m.resolved_person_id = ANY ({personIds});
 
                 DELETE FROM trn_requests AS r
-                USING support_tasks AS s, trn_request_metadata AS m
+                USING trn_request_metadata AS m
                 WHERE r.request_id = m.request_id
-                AND s.trn_request_application_user_id = m.application_user_id AND s.trn_request_id = m.request_id
                 AND m.resolved_person_id = ANY ({personIds});
 
                 DELETE FROM trn_request_metadata
@@ -123,7 +125,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
         await writer.FlushAsync();
         stream.Position = 0;
 
-        await fileService.UploadFileAsync($"allocatetrntopersonswitheyps{clock.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv");
+        await fileService.UploadFileAsync($"deletepersonandchildrecordswithoutatrn{clock.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv");
 
         if (!dryRun)
         {

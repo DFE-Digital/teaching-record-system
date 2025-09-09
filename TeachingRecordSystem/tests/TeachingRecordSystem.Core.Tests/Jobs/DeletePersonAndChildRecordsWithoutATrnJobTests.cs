@@ -4,8 +4,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.Files;
 using Xunit.Abstractions;
 using static TeachingRecordSystem.TestCommon.TestData;
@@ -37,8 +37,8 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public async Task Execute_WithDryRunTrue_DoesNotDeleteAnyPersons()
     {
         // Arrange
-        var personsWithNoTrn = await CreatePersonsWithoutTrnAsync(3);
-        var personsWithTrn = await CreatePersonsWithTrnAsync(3);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -57,8 +57,8 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public async Task Execute_WithDryRunFalse_OnlyDeletesPersonsWithNullTrn()
     {
         // Arrange
-        var personsWithNoTrn = await CreatePersonsWithoutTrnAsync(3);
-        var personsWithTrn = await CreatePersonsWithTrnAsync(3);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -77,8 +77,8 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public async Task Execute_WithDryRunTrue_UploadsFileWithPersonIdsThatWouldHaveBeenDeleted()
     {
         // Arrange
-        var personsWithNoTrn = await CreatePersonsWithoutTrnAsync(3);
-        var personsWithTrn = await CreatePersonsWithTrnAsync(3);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 2);
 
@@ -89,6 +89,8 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var file = fixture.GetLastUploadedFile();
         Assert.NotNull(file);
 
+        Assert.StartsWith("deletepersonandchildrecordswithoutatrn", file.FileName);
+
         var deleted = ReadAsCsvRows(file.Contents);
         Assert.Equivalent(personsWithNoTrn.Select(p => new CsvRow(p)), deleted);
     }
@@ -97,8 +99,8 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public async Task Execute_WithDryRunFalse_UploadsFileWithPersonIdsThatWereDeleted()
     {
         // Arrange
-        var personsWithNoTrn = await CreatePersonsWithoutTrnAsync(3);
-        var personsWithTrn = await CreatePersonsWithTrnAsync(3);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 2);
 
@@ -109,19 +111,24 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var file = fixture.GetLastUploadedFile();
         Assert.NotNull(file);
 
+        Assert.StartsWith("deletepersonandchildrecordswithoutatrn", file.FileName);
+
         var deleted = ReadAsCsvRows(file.Contents);
         Assert.Equivalent(personsWithNoTrn.Select(p => new CsvRow(p)), deleted);
     }
 
     [Fact]
-    public async Task Execute_WhenPersonsDirectlyReferencedBySupportTask_DeletesSupportTasksForPersonsWithNoTrn()
+    public async Task Execute_WhenPersonsReferencedBySupportTaskViaPersonId_DeletesSupportTasksForPersonsWithNoTrn()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
-        var supportTasksForPersonWithNoTrn = await CreateSupportTasksReferencingPersonViaPersonIdAsync(personWithNoTrn);
-        var supportTasksForPersonWithTrn = await CreateSupportTasksReferencingPersonViaPersonIdAsync(personWithTrn);
+        var supportTasksForPersonsWithNoTrn = await CreateSupportTasksReferencingPersonViaPersonIdAsync(personsWithNoTrn);
+        var supportTasksForPersonsWithTrn = await CreateSupportTasksReferencingPersonViaPersonIdAsync(personsWithTrn);
+
+        Assert.Empty(await GetTrnRequestsAsync());
+        Assert.Empty(await GetTrnRequestMetadataAsync());
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -132,24 +139,27 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var personsAfterDelete = await GetPersonsAsync();
         var supportTasksAfterDelete = await GetSupportTasksAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        AssertEx.DoesNotContainAny(supportTasksForPersonWithNoTrn, supportTasksAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(supportTasksForPersonsWithNoTrn, supportTasksAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        AssertEx.ContainsAll(supportTasksForPersonWithTrn, supportTasksAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonsWithTrn, supportTasksAfterDelete);
     }
 
     [Fact]
     public async Task Execute_WhenPersonsReferencedByTrnRequestMetadataViaResolvedPersonId_DeletesSupportTasksRequestsAndRequestMetadataForPersonsWithNoTrn()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var (supportTasksForPersonWithNoTrn, requestIdsForPersonWithNoTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(personWithNoTrn, applicationUser.UserId);
-        var (supportTasksForPersonWithTrn, requestIdsForPersonWithTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(personWithTrn, applicationUser.UserId);
+        var (supportTasksForPersonsWithNoTrn, requestIdsForPersonsWithNoTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(personsWithNoTrn, applicationUser.UserId);
+        var (supportTasksForPersonsWithTrn, requestIdsForPersonsWithTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(personsWithTrn, applicationUser.UserId);
+
+        Assert.NotEmpty(await GetTrnRequestsAsync());
+        Assert.NotEmpty(await GetTrnRequestMetadataAsync());
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -162,15 +172,60 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var trnRequestsAfterDelete = await GetTrnRequestsAsync();
         var trnRequestMetaDataAfterDelete = await GetTrnRequestMetadataAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        AssertEx.DoesNotContainAny(supportTasksForPersonWithNoTrn, supportTasksAfterDelete);
-        AssertEx.DoesNotContainAny(requestIdsForPersonWithNoTrn, trnRequestsAfterDelete);
-        AssertEx.DoesNotContainAny(requestIdsForPersonWithNoTrn, trnRequestMetaDataAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(supportTasksForPersonsWithNoTrn, supportTasksAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestsAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestMetaDataAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        AssertEx.ContainsAll(supportTasksForPersonWithTrn, supportTasksAfterDelete);
-        AssertEx.ContainsAll(requestIdsForPersonWithTrn, trnRequestsAfterDelete);
-        AssertEx.ContainsAll(requestIdsForPersonWithTrn, trnRequestMetaDataAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonsWithTrn, supportTasksAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestsAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestMetaDataAfterDelete);
+
+        Assert.Contains(applicationUser.UserId, await GetApplicationUsersAsync());
+    }
+
+    [Fact]
+    public async Task Execute_WhenPersonsReferencedByTrnRequestMetadataViaResolvedPersonIdAndPersonId_DeletesSupportTasksRequestsAndRequestMetadataForPersonsWithNoTrn()
+    {
+        // Arrange
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var olusForPersonsWithNoTrn = await CreateOneLoginUsersAsync(personsWithNoTrn, applicationUser.UserId);
+        var olusForPersonsWithTrn = await CreateOneLoginUsersAsync(personsWithTrn, applicationUser.UserId);
+
+        var (supportTasksForPersonsWithNoTrn, requestIdsForPersonsWithNoTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAndPersonIdAsync(personsWithNoTrn.Zip(olusForPersonsWithNoTrn), applicationUser.UserId);
+        var (supportTasksForPersonsWithTrn, requestIdsForPersonsWithTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAndPersonIdAsync(personsWithTrn.Zip(olusForPersonsWithTrn), applicationUser.UserId);
+
+        Assert.NotEmpty(await GetTrnRequestsAsync());
+        Assert.NotEmpty(await GetTrnRequestMetadataAsync());
+
+        var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
+
+        // Act
+        await job.ExecuteAsync(false, CancellationToken.None);
+
+        // Assert
+        var personsAfterDelete = await GetPersonsAsync();
+        var supportTasksAfterDelete = await GetSupportTasksAsync();
+        var trnRequestsAfterDelete = await GetTrnRequestsAsync();
+        var trnRequestMetaDataAfterDelete = await GetTrnRequestMetadataAsync();
+        var olusAfterDelete = await GetOneLoginUsersAsync();
+
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(supportTasksForPersonsWithNoTrn, supportTasksAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestsAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestMetaDataAfterDelete);
+        AssertEx.ContainsAll(olusForPersonsWithNoTrn, olusAfterDelete);
+
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonsWithTrn, supportTasksAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestsAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestMetaDataAfterDelete);
+        AssertEx.ContainsAll(olusForPersonsWithTrn, olusAfterDelete);
 
         Assert.Contains(applicationUser.UserId, await GetApplicationUsersAsync());
     }
@@ -179,13 +234,13 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public async Task Execute_WhenPersonsReferencedByTrnRequestMetadataViaMatchedPersons_DoesNotDeleteSupportTaskOrMetadataForPersonsWithNoTrn()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var (supportTasksForPersonWithNoTrn, requestIdsForPersonWithNoTrn) = await CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(personWithNoTrn, applicationUser.UserId);
-        var (supportTasksForPersonWithTrn, requestIdsForPersonWithTrn) = await CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(personWithTrn, applicationUser.UserId);
+        var (supportTasksForPersonsWithNoTrn, requestIdsForPersonWithNoTrn) = await CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(personsWithNoTrn, applicationUser.UserId);
+        var (supportTasksForPersonWithTrn, requestIdsForPersonWithTrn) = await CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(personsWithTrn, applicationUser.UserId);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -198,12 +253,12 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var trnRequestsAfterDelete = await GetTrnRequestsAsync();
         var trnRequestMetaDataAfterDelete = await GetTrnRequestMetadataAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        AssertEx.ContainsAll(supportTasksForPersonWithNoTrn, supportTasksAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonsWithNoTrn, supportTasksAfterDelete);
         AssertEx.ContainsAll(requestIdsForPersonWithNoTrn, trnRequestsAfterDelete);
         AssertEx.ContainsAll(requestIdsForPersonWithNoTrn, trnRequestMetaDataAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
         AssertEx.ContainsAll(supportTasksForPersonWithTrn, supportTasksAfterDelete);
         AssertEx.ContainsAll(requestIdsForPersonWithTrn, trnRequestsAfterDelete);
         AssertEx.ContainsAll(requestIdsForPersonWithTrn, trnRequestMetaDataAfterDelete);
@@ -215,9 +270,9 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public async Task Execute_WhenPersonsMergedWithOtherPersonsWithTrn_DoesNotDeleteOtherPersonsWithTrn()
     {
         // Arrange
-        var (otherPersonWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync(mergedWithPersonId: otherPersonWithTrn);
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync(mergedWithPersonId: otherPersonWithTrn);
+        var (otherPersonsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(1);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3, mergedWithPersonId: otherPersonsWithTrn.Single());
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3, mergedWithPersonId: otherPersonsWithTrn.Single());
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -227,18 +282,18 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         // Assert
         var personsAfterDelete = await GetPersonsAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
 
-        AssertEx.ContainsAll([personWithTrn, otherPersonWithTrn], personsAfterDelete);
+        AssertEx.ContainsAll([.. personsWithTrn, .. otherPersonsWithTrn], personsAfterDelete);
     }
 
     [Fact]
     public async Task Execute_WhenPersonsMergedWithOtherPersonsWithNoTrn_DoesNotDeleteOtherPersonsWithTrn()
     {
         // Arrange
-        var (otherPersonWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync(mergedWithPersonId: otherPersonWithNoTrn);
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync(mergedWithPersonId: otherPersonWithNoTrn);
+        var (otherPersonWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(1);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3, mergedWithPersonId: otherPersonWithNoTrn.Single());
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3, mergedWithPersonId: otherPersonWithNoTrn.Single());
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -248,19 +303,19 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         // Assert
         var personsAfterDelete = await GetPersonsAsync();
 
-        AssertEx.DoesNotContainAny([personWithNoTrn, otherPersonWithNoTrn], personsAfterDelete);
+        AssertEx.DoesNotContainAny([.. personsWithNoTrn, .. otherPersonWithNoTrn], personsAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
     }
 
     [Fact]
     public async Task Execute_WhenOtherPersonsWithTrnMergedWithPersonsWithTrn_DoesNotDeleteOtherPersonsWithTrn()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
-        var (otherPersonWithTrn1, _, _, _) = await CreatePersonWithTrnAsync(mergedWithPersonId: personWithNoTrn);
-        var (otherPersonWithTrn2, _, _, _) = await CreatePersonWithTrnAsync(mergedWithPersonId: personWithTrn);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(1);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(1);
+        var (otherPersonsWithTrn1, _, _, _) = await CreatePersonsWithTrnAsync(3, mergedWithPersonId: personsWithNoTrn.Single());
+        var (otherPersonsWithTrn2, _, _, _) = await CreatePersonsWithTrnAsync(3, mergedWithPersonId: personsWithTrn.Single());
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -270,19 +325,19 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         // Assert
         var personsAfterDelete = await GetPersonsAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
 
-        AssertEx.ContainsAll([personWithTrn, otherPersonWithTrn1, otherPersonWithTrn2], personsAfterDelete);
+        AssertEx.ContainsAll([.. personsWithTrn, .. otherPersonsWithTrn1, .. otherPersonsWithTrn2], personsAfterDelete);
     }
 
     [Fact]
     public async Task Execute_WhenOtherPersonsWithNoTrnMergedWithPersonsWithTrn_DoesNotDeleteOtherPersonsWithTrn()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
-        var (otherPersonWithNoTrn1, _, _, _) = await CreatePersonWithNoTrnAsync(mergedWithPersonId: personWithNoTrn);
-        var (otherPersonWithNoTrn2, _, _, _) = await CreatePersonWithNoTrnAsync(mergedWithPersonId: personWithTrn);
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(1);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(1);
+        var (otherPersonsWithNoTrn1, _, _, _) = await CreatePersonsWithNoTrnAsync(3, mergedWithPersonId: personsWithNoTrn.Single());
+        var (otherPersonsWithNoTrn2, _, _, _) = await CreatePersonsWithNoTrnAsync(3, mergedWithPersonId: personsWithTrn.Single());
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -292,20 +347,20 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         // Assert
         var personsAfterDelete = await GetPersonsAsync();
 
-        AssertEx.DoesNotContainAny([personWithNoTrn, otherPersonWithNoTrn1, otherPersonWithNoTrn2], personsAfterDelete);
+        AssertEx.DoesNotContainAny([.. personsWithNoTrn, .. otherPersonsWithNoTrn1, .. otherPersonsWithNoTrn2], personsAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
     }
 
     [Fact]
     public async Task Execute_WhenPersonsReferencedByIntegrationTransactionRecord_DeletesIntegrationTransactionRecordsForPersonsWithNoTrn()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
-        var itrForPersonWithNoTrn = await CreateIntegrationTransactionRecordAsync(personWithNoTrn);
-        var itrForPersonWithTrn = await CreateIntegrationTransactionRecordAsync(personWithTrn);
+        var itrsForPersonsWithNoTrn = await CreateIntegrationTransactionRecordsAsync(personsWithNoTrn);
+        var itrsForPersonsWithTrn = await CreateIntegrationTransactionRecordsAsync(personsWithTrn);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -316,24 +371,24 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var personsAfterDelete = await GetPersonsAsync();
         var itrsAfterDelete = await GetIntegrationTransactionRecordsAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        Assert.DoesNotContain(itrForPersonWithNoTrn, itrsAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(itrsForPersonsWithNoTrn, itrsAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        Assert.Contains(itrForPersonWithTrn, itrsAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(itrsForPersonsWithTrn, itrsAfterDelete);
     }
 
     [Fact]
     public async Task Execute_WhenPersonsReferencedByOneLoginUsers_DoesNotDeleteOneLoginUsers()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var oluForPersonWithNoTrn = await CreateOneLoginUserAsync(personWithNoTrn, applicationUser.UserId);
-        var oluForPersonWithTrn = await CreateOneLoginUserAsync(personWithTrn, applicationUser.UserId);
+        var olusForPersonsWithNoTrn = await CreateOneLoginUsersAsync(personsWithNoTrn, applicationUser.UserId);
+        var olusForPersonsWithTrn = await CreateOneLoginUsersAsync(personsWithTrn, applicationUser.UserId);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -344,11 +399,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var personsAfterDelete = await GetPersonsAsync();
         var olusAfterDelete = await GetOneLoginUsersAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        Assert.Contains(oluForPersonWithNoTrn, olusAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.ContainsAll(olusForPersonsWithNoTrn, olusAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        Assert.Contains(oluForPersonWithTrn, olusAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(olusForPersonsWithTrn, olusAfterDelete);
 
         Assert.Contains(applicationUser.UserId, await GetApplicationUsersAsync());
     }
@@ -359,19 +414,19 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         // Arrange
         var user = await TestData.CreateUserAsync();
 
-        var (personWithNoTrn, alertsForPersonsWithNoTrn, _, _) = await CreatePersonWithNoTrnAsync(p => p
+        var (personsWithNoTrn, alertsForPersonsWithNoTrn, _, _) = await CreatePersonsWithNoTrnAsync(3, p => p
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.DbsAlertTypeId)
                 .WithCreatedByUser(user.UserId)
                 .WithStartDate(DateOnly.Parse("1 Jan 2000"))));
 
-        var (personWithTrn, alertsForPersonsWithTrn, _, _) = await CreatePersonWithTrnAsync(p => p
+        var (personsWithTrn, alertsForPersonsWithTrn, _, _) = await CreatePersonsWithTrnAsync(3, p => p
             .WithAlert(a => a
                 .WithAlertTypeId(AlertType.DbsAlertTypeId)
                 .WithCreatedByUser(user.UserId)
                 .WithStartDate(DateOnly.Parse("1 Jan 2000"))));
 
-        var allPersons = new[] { personWithNoTrn };
+        var allPersons = new[] { personsWithNoTrn };
         var allAlertTypes = await GetAlertTypesAsync();
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
@@ -383,10 +438,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var personsAfterDelete = await GetPersonsAsync();
         var alertsAfterDelete = await GetAlertsAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
         AssertEx.DoesNotContainAny(alertsForPersonsWithNoTrn, alertsAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
         AssertEx.ContainsAll(alertsForPersonsWithTrn, alertsAfterDelete);
 
         Assert.Equivalent(allAlertTypes, await GetAlertTypesAsync());
@@ -398,13 +453,13 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public async Task Execute_WhenPersonsHaveNotes_DeletesNotesForPersonsWithNoTrn()
     {
         // Arrange
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var user = await TestData.CreateUserAsync();
 
-        var noteForPersonWithNoTrn = await CreateNoteAsync(personWithNoTrn, user.UserId);
-        var noteForPersonWithTrn = await CreateNoteAsync(personWithTrn, user.UserId);
+        var notesForPersonsWithNoTrn = await CreateNotesAsync(personsWithNoTrn, user.UserId);
+        var notesForPersonsWithTrn = await CreateNotesAsync(personsWithTrn, user.UserId);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -415,11 +470,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var personsAfterDelete = await GetPersonsAsync();
         var notesAfterDelete = await GetNotesAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        Assert.DoesNotContain(noteForPersonWithNoTrn, notesAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(notesForPersonsWithNoTrn, notesAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        Assert.Contains(noteForPersonWithTrn, notesAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(notesForPersonsWithTrn, notesAfterDelete);
 
         Assert.Contains(user.UserId, await GetUsersAsync());
     }
@@ -429,9 +484,9 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     {
         var date = DateTime.Parse("1 Jan 2000").ToUniversalTime();
         // Arrange
-        var (personWithNoTrn, _, previousNamesForPersonWithNoTrn, _) = await CreatePersonWithNoTrnAsync(p => p
+        var (personsWithNoTrn, _, previousNamesForPersonsWithNoTrn, _) = await CreatePersonsWithNoTrnAsync(3, p => p
             .WithPreviousNames([("Joan", "Of", "Arc", date), ("Winnie", "The", "Pooh", date)]));
-        var (personWithTrn, _, previousNamesForPersonWithTrn, _) = await CreatePersonWithTrnAsync(p => p
+        var (personsWithTrn, _, previousNamesForPersonsWithTrn, _) = await CreatePersonsWithTrnAsync(3, p => p
             .WithPreviousNames([("Joan", "Of", "Arc", date), ("Winnie", "The", "Pooh", date)]));
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
@@ -443,11 +498,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var personsAfterDelete = await GetPersonsAsync();
         var previousNamesAfterDelete = await GetPreviousNamesAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        AssertEx.DoesNotContainAny(previousNamesForPersonWithNoTrn, previousNamesAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(previousNamesForPersonsWithNoTrn, previousNamesAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        AssertEx.ContainsAll(previousNamesForPersonWithTrn, previousNamesAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(previousNamesForPersonsWithTrn, previousNamesAfterDelete);
     }
 
     [Fact]
@@ -456,12 +511,12 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         // Arrange
         var user = await TestData.CreateUserAsync();
 
-        var (personWithNoTrn, _, _, qualificationsForPersonWithNoTrn) = await CreatePersonWithNoTrnAsync(p => p
+        var (personsWithNoTrn, _, _, qualificationsForPersonsWithNoTrn) = await CreatePersonsWithNoTrnAsync(3, p => p
             .WithMandatoryQualification(mq => mq
-                .WithCreatedByUser(RaisedByUserInfo.FromUserId(user.UserId))));
-        var (personWithTrn, _, _, qualificationsForPersonWithTrn) = await CreatePersonWithTrnAsync(p => p
+                .WithCreatedByUser(Events.Models.RaisedByUserInfo.FromUserId(user.UserId))));
+        var (personsWithTrn, _, _, qualificationsForPersonsWithTrn) = await CreatePersonsWithTrnAsync(3, p => p
             .WithMandatoryQualification(mq => mq
-                .WithCreatedByUser(RaisedByUserInfo.FromUserId(user.UserId))));
+                .WithCreatedByUser(Events.Models.RaisedByUserInfo.FromUserId(user.UserId))));
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -472,11 +527,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var personsAfterDelete = await GetPersonsAsync();
         var qualificationsAfterDelete = await GetQualificationsAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        AssertEx.DoesNotContainAny(qualificationsForPersonWithNoTrn, qualificationsAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(qualificationsForPersonsWithNoTrn, qualificationsAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        AssertEx.ContainsAll(qualificationsForPersonWithTrn, qualificationsAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(qualificationsForPersonsWithTrn, qualificationsAfterDelete);
     }
 
     [Fact]
@@ -485,13 +540,13 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         // Arrange
         var user = await TestData.CreateUserAsync();
 
-        var (personWithNoTrn, _, _, _) = await CreatePersonWithNoTrnAsync();
-        var (personWithTrn, _, _, _) = await CreatePersonWithTrnAsync();
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
 
         var establishment = await TestData.CreateEstablishmentAsync("001");
 
-        var employmentForPersonWithNoTrn = await CreateEmploymentAsync(establishment.EstablishmentId, personWithNoTrn);
-        var employmentForPersonWithTrn = await CreateEmploymentAsync(establishment.EstablishmentId, personWithTrn);
+        var employmentsForPersonsWithNoTrn = await CreateEmploymentsAsync(establishment.EstablishmentId, personsWithNoTrn);
+        var employmentsForPersonsWithTrn = await CreateEmploymentsAsync(establishment.EstablishmentId, personsWithTrn);
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -503,11 +558,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var employmentsAfterDelete = await GetTpsEmploymentsAsync();
         var establishmentsAfterDelete = await GetEstablishmentsAsync();
 
-        Assert.DoesNotContain(personWithNoTrn, personsAfterDelete);
-        Assert.DoesNotContain(employmentForPersonWithNoTrn, employmentsAfterDelete);
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(employmentsForPersonsWithNoTrn, employmentsAfterDelete);
 
-        Assert.Contains(personWithTrn, personsAfterDelete);
-        Assert.Contains(employmentForPersonWithTrn, employmentsAfterDelete);
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(employmentsForPersonsWithTrn, employmentsAfterDelete);
 
         Assert.Contains(establishment.EstablishmentId, establishmentsAfterDelete);
     }
@@ -536,20 +591,39 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         return csv.GetRecords<CsvRow>().ToList();
     }
 
-    private async Task<IEnumerable<Guid>> CreatePersonsWithTrnAsync(int count)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
     {
-        List<Guid> personIds = [];
+        List<Person> persons = [];
 
         for (var i = 0; i < count; i++)
         {
             var person = await TestData.CreatePersonAsync();
-            personIds.Add(person.PersonId);
+            persons.Add(person.Person);
         }
 
-        return personIds;
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            foreach (var p in persons)
+            {
+                dbContext.Attach(p);
+                if (mergedWithPersonId is Guid id)
+                {
+                    p.MergedWithPersonId = id;
+                }
+            }
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        return (
+            persons.Select(p => p.PersonId),
+            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []),
+            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []),
+            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? [])
+        );
     }
 
-    private async Task<IEnumerable<Guid>> CreatePersonsWithoutTrnAsync(int count)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
     {
         List<Person> persons = [];
 
@@ -565,190 +639,397 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             {
                 dbContext.Attach(p);
                 p.Trn = null;
+
+                if (mergedWithPersonId is Guid id)
+                {
+                    p.MergedWithPersonId = id;
+                }
             }
 
             await dbContext.SaveChangesAsync();
-
-            return persons;
         });
 
-        return persons.Select(p => p.PersonId);
+        return (
+            persons.Select(p => p.PersonId),
+            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []),
+            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []),
+            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? [])
+        );
     }
 
-    private async Task<(Guid, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonWithTrnAsync(Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
+    private async Task<IEnumerable<string>> CreateSupportTasksReferencingPersonViaPersonIdAsync(IEnumerable<Guid> personIds)
     {
-        var person = await TestData.CreatePersonAsync(configure);
+        List<SupportTask> supportTasks = [];
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        foreach (var personId in personIds)
         {
-            dbContext.Attach(person.Person);
+            var supportTask1 = await TestData.CreateChangeNameRequestSupportTaskAsync(
+                personId,
+                b => b.WithFirstName("XXX"));
 
-            if (mergedWithPersonId is Guid id)
-            {
-                person.Person.MergedWithPersonId = id;
-            }
+            var supportTask2 = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+                personId,
+                b => b.WithDateOfBirth(DateOnly.Parse("1 Jan 1900")));
 
-            await dbContext.SaveChangesAsync();
-        });
+            supportTasks.AddRange(supportTask1, supportTask2);
+        }
 
-        return (person.PersonId, person.Alerts.Select(a => a.AlertId), person.PreviousNames.Select(p => p.PreviousNameId), person.MandatoryQualifications.Select(q => q.QualificationId));
+        return supportTasks.Select(st => st.SupportTaskReference);
     }
 
-    private async Task<(Guid, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonWithNoTrnAsync(Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
+    private async Task<(IEnumerable<string>, IEnumerable<string?>)> CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(IEnumerable<Guid> personIds, Guid applicationUserId)
     {
-        var person = await TestData.CreatePersonAsync(configure);
+        List<SupportTask> supportTasks = [];
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        foreach (var personId in personIds)
         {
-            dbContext.Attach(person.Person);
-            person.Person.Trn = null;
-
-            if (mergedWithPersonId is Guid id)
-            {
-                person.Person.MergedWithPersonId = id;
-            }
-
-            await dbContext.SaveChangesAsync();
-        });
-
-        return (person.PersonId, person.Alerts.Select(a => a.AlertId), person.PreviousNames.Select(p => p.PreviousNameId), person.MandatoryQualifications.Select(q => q.QualificationId));
-    }
-
-    private async Task<IEnumerable<string>> CreateSupportTasksReferencingPersonViaPersonIdAsync(Guid personId)
-    {
-        return new[] {
-            await TestData.CreateChangeNameRequestSupportTaskAsync(
-                personId,
-                b => b.WithFirstName("XXX")),
-            await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                personId,
-                b => b.WithDateOfBirth(DateOnly.Parse("1 Jan 1900")))
-        }.Select(st => st.SupportTaskReference);
-    }
-
-    private async Task<(IEnumerable<string>, IEnumerable<string?>)> CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(Guid personId, Guid applicationUserId)
-    {
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
+            var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
                 .WithCreatedOn(DateTime.Parse("1 Jan 2000"))
                 .WithResolvedPersonId(personId));
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
+
+            var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
                 .WithCreatedOn(DateTime.Parse("1 Jan 2000")));
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            dbContext.Attach(supportTask2);
+            await DbFixture.WithDbContextAsync(async dbContext =>
+            {
+                dbContext.Attach(supportTask2);
 
-            supportTask2.TrnRequestMetadata!.SetResolvedPerson(personId, TrnRequestStatus.Completed);
-            await dbContext.SaveChangesAsync();
-        });
+                supportTask2.TrnRequestMetadata!.SetResolvedPerson(personId, TrnRequestStatus.Completed);
+                await dbContext.SaveChangesAsync();
+            });
 
-        return ([supportTask1.SupportTaskReference, supportTask2.SupportTaskReference], [supportTask1.TrnRequestId, supportTask2.TrnRequestId]);
+            supportTasks.AddRange(supportTask1, supportTask2);
+        }
+
+        return (supportTasks.Select(s => s.SupportTaskReference), supportTasks.Select(s => s.TrnRequestId));
     }
 
-    private async Task<(IEnumerable<string>, IEnumerable<string?>)> CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(Guid personId, Guid applicationUserId)
+    private async Task<(IEnumerable<string>, IEnumerable<string?>)> CreateSupportTasksReferencingPersonViaResolvedPersonIdAndPersonIdAsync(IEnumerable<(Guid, string)> personIdWithOneLoginUserSubject, Guid applicationUserId)
     {
-        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
+        List<SupportTask> supportTasks = [];
+
+        foreach (var (personId, oneLoginUserSubject) in personIdWithOneLoginUserSubject)
+        {
+            var trnRequest1Id = Guid.NewGuid().ToString();
+            var trnRequest2Id = Guid.NewGuid().ToString();
+            var emailAddress = TestData.GenerateUniqueEmail();
+            var firstName = TestData.GenerateFirstName();
+            var middleName = "";
+            var lastName = TestData.GenerateLastName();
+            var dateOfBirth = TestData.GenerateDateOfBirth();
+            var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+            var gender = TestData.GenerateGender();
+            var createdOn = TestData.Clock.UtcNow;
+
+            var request1 = new TrnRequest
+            {
+                ClientId = "TEST",
+                RequestId = trnRequest1Id,
+                TeacherId = Guid.NewGuid()
+            };
+
+            var request2 = new TrnRequest
+            {
+                ClientId = "TEST",
+                RequestId = trnRequest2Id,
+                TeacherId = Guid.NewGuid()
+            };
+
+            var metadata1 = new TrnRequestMetadata
+            {
+                ApplicationUserId = applicationUserId,
+                RequestId = trnRequest1Id,
+                CreatedOn = createdOn,
+                IdentityVerified = false,
+                EmailAddress = emailAddress,
+                OneLoginUserSubject = oneLoginUserSubject,
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                PreviousFirstName = null,
+                PreviousLastName = null,
+                Name = (new List<string?> { firstName, middleName, lastName }).OfType<string>().ToArray(),
+                DateOfBirth = dateOfBirth,
+                PotentialDuplicate = false,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+                Gender = gender,
+                AddressLine1 = null,
+                AddressLine2 = null,
+                AddressLine3 = null,
+                City = null,
+                Postcode = null,
+                Country = null,
+                TrnToken = null,
+                Matches = new TrnRequestMatches() { MatchedPersons = [] }
+            };
+
+            var metadata2 = new TrnRequestMetadata
+            {
+                ApplicationUserId = applicationUserId,
+                RequestId = trnRequest2Id,
+                CreatedOn = createdOn,
+                IdentityVerified = false,
+                EmailAddress = emailAddress,
+                OneLoginUserSubject = oneLoginUserSubject,
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                PreviousFirstName = null,
+                PreviousLastName = null,
+                Name = (new List<string?> { firstName, middleName, lastName }).OfType<string>().ToArray(),
+                DateOfBirth = dateOfBirth,
+                PotentialDuplicate = false,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+                Gender = gender,
+                AddressLine1 = null,
+                AddressLine2 = null,
+                AddressLine3 = null,
+                City = null,
+                Postcode = null,
+                Country = null,
+                TrnToken = null,
+                Matches = new TrnRequestMatches() { MatchedPersons = [] }
+            };
+
+            metadata1.SetResolvedPerson(personId, TrnRequestStatus.Completed);
+            metadata2.SetResolvedPerson(personId, TrnRequestStatus.Completed);
+
+            var data = new ChangeNameRequestData
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                EvidenceFileId = Guid.NewGuid(),
+                EvidenceFileName = "filename.jpg",
+                EmailAddress = emailAddress,
+                ChangeRequestOutcome = null
+            };
+
+            var supportTask1 = SupportTask.Create(
+                SupportTaskType.ChangeNameRequest,
+                data,
+                personId: personId,
+                oneLoginUserSubject: oneLoginUserSubject,
+                trnRequestApplicationUserId: applicationUserId,
+                trnRequestId: trnRequest1Id,
+                createdBy: SystemUser.SystemUserId,
+                createdOn,
+                out var _);
+
+            var supportTask2 = SupportTask.Create(
+                SupportTaskType.ChangeNameRequest,
+                data,
+                personId: personId,
+                oneLoginUserSubject: oneLoginUserSubject,
+                trnRequestApplicationUserId: applicationUserId,
+                trnRequestId: trnRequest2Id,
+                createdBy: SystemUser.SystemUserId,
+                createdOn,
+                out var _);
+
+            await DbFixture.WithDbContextAsync(async dbContext =>
+            {
+                dbContext.TrnRequests.AddRange(request1, request2);
+                dbContext.TrnRequestMetadata.AddRange(metadata1, metadata2);
+                dbContext.SupportTasks.AddRange(supportTask1, supportTask2);
+
+                await dbContext.SaveChangesAsync();
+            });
+
+            supportTasks.AddRange(supportTask1, supportTask2);
+        }
+
+        return (supportTasks.Select(s => s.SupportTaskReference), supportTasks.Select(s => s.TrnRequestId));
+    }
+
+    private async Task<(IEnumerable<string>, IEnumerable<string?>)> CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(IEnumerable<Guid> personIds, Guid applicationUserId)
+    {
+        List<SupportTask> supportTasks = [];
+
+        foreach (var personId in personIds)
+        {
+            var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserId, t => t
                .WithMatchedPersons(personId));
-        var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
+
+            var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
                 .WithMatchedPersons(personId));
 
-        return ([supportTask1.SupportTaskReference, supportTask2.SupportTaskReference], [supportTask1.TrnRequestId, supportTask2.TrnRequestId]);
+            supportTasks.Add(supportTask1);
+            supportTasks.Add(supportTask2);
+        }
+
+        return (supportTasks.Select(s => s.SupportTaskReference), supportTasks.Select(s => s.TrnRequestId));
     }
 
-    private async Task<long> CreateIntegrationTransactionRecordAsync(Guid personId)
+    private async Task<IEnumerable<long>> CreateIntegrationTransactionRecordsAsync(IEnumerable<Guid> personIds)
     {
-        return await DbFixture.WithDbContextAsync(async dbContext =>
+        List<long> ids = [];
+
+        foreach (var personId in personIds)
         {
-            var itr = new IntegrationTransactionRecord
+            await DbFixture.WithDbContextAsync(async dbContext =>
             {
-                IntegrationTransactionRecordId = Faker.RandomNumber.Next(1, long.MaxValue),
-                CreatedDate = Clock.UtcNow,
-                Duplicate = false,
-                FailureMessage = "TEST",
-                HasActiveAlert = false,
-                PersonId = personId,
-                RowData = "XXX",
-                Status = IntegrationTransactionRecordStatus.Failure
-            };
+                var itr1 = new IntegrationTransactionRecord
+                {
+                    IntegrationTransactionRecordId = Faker.RandomNumber.Next(1, long.MaxValue),
+                    CreatedDate = Clock.UtcNow,
+                    Duplicate = false,
+                    FailureMessage = "TEST",
+                    HasActiveAlert = false,
+                    PersonId = personId,
+                    RowData = "XXX",
+                    Status = IntegrationTransactionRecordStatus.Failure
+                };
 
-            dbContext.IntegrationTransactionRecords.Add(itr);
+                var itr2 = new IntegrationTransactionRecord
+                {
+                    IntegrationTransactionRecordId = Faker.RandomNumber.Next(1, long.MaxValue),
+                    CreatedDate = Clock.UtcNow,
+                    Duplicate = false,
+                    FailureMessage = "TEST",
+                    HasActiveAlert = false,
+                    PersonId = personId,
+                    RowData = "XXX",
+                    Status = IntegrationTransactionRecordStatus.Failure
+                };
 
-            await dbContext.SaveChangesAsync();
+                dbContext.IntegrationTransactionRecords.AddRange(itr1, itr2);
 
-            return itr.IntegrationTransactionRecordId;
-        });
+                await dbContext.SaveChangesAsync();
+
+                ids.AddRange(itr1.IntegrationTransactionRecordId, itr2.IntegrationTransactionRecordId);
+            });
+        }
+
+        return ids;
     }
 
-    private async Task<string> CreateOneLoginUserAsync(Guid personId, Guid applicationUserId)
+    private async Task<IEnumerable<string>> CreateOneLoginUsersAsync(IEnumerable<Guid> personIds, Guid applicationUserId)
     {
-        return await DbFixture.WithDbContextAsync(async dbContext =>
+        List<string> subjects = [];
+
+        foreach (var personId in personIds)
         {
-            var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId, verifiedInfo: (["XXX"], DateOnly.Parse("1 Jan 2000")));
-
-            dbContext.Attach(oneLoginUser);
-            oneLoginUser.SetVerified(Clock.UtcNow, OneLoginUserVerificationRoute.External, applicationUserId, null, null);
-
-            await dbContext.SaveChangesAsync();
-
-            return oneLoginUser.Subject;
-        });
-    }
-
-    private async Task<Guid> CreateNoteAsync(Guid personId, Guid userId)
-    {
-        return await DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            var note = new Core.DataStore.Postgres.Models.Note
+            var subject = await DbFixture.WithDbContextAsync(async dbContext =>
             {
-                NoteId = Guid.NewGuid(),
-                PersonId = personId,
-                Content = "TEST",
-                FileId = null,
-                OriginalFileName = null,
-                CreatedByUserId = userId,
-                CreatedOn = Clock.UtcNow,
-                UpdatedOn = Clock.UtcNow
-            };
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId, verifiedInfo: (["XXX"], DateOnly.Parse("1 Jan 2000")));
 
-            dbContext.Notes.Add(note);
+                dbContext.Attach(oneLoginUser);
+                oneLoginUser.SetVerified(Clock.UtcNow, OneLoginUserVerificationRoute.External, applicationUserId, null, null);
 
-            await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
-            return note.NoteId;
-        });
+                return oneLoginUser.Subject;
+            });
+
+            subjects.Add(subject);
+        }
+
+        return subjects;
     }
 
-    private async Task<Guid> CreateEmploymentAsync(Guid establishmentId, Guid personId)
+    private async Task<IEnumerable<Guid>> CreateNotesAsync(IEnumerable<Guid> personIds, Guid userId)
     {
-        return await DbFixture.WithDbContextAsync(async dbContext =>
+        List<Guid> ids = [];
+
+        foreach (var personId in personIds)
         {
-            var employment = new Core.DataStore.Postgres.Models.TpsEmployment()
+            await DbFixture.WithDbContextAsync(async dbContext =>
             {
-                CreatedOn = Clock.UtcNow,
-                EmployerEmailAddress = null,
-                EmployerPostcode = null,
-                EmploymentType = EmploymentType.FullTime,
-                EndDate = null,
-                EstablishmentId = establishmentId,
-                Key = "TEST",
-                LastExtractDate = DateOnly.Parse("1 Jan 2000"),
-                LastKnownTpsEmployedDate = DateOnly.Parse("1 Jan 2000"),
-                NationalInsuranceNumber = null,
-                PersonEmailAddress = null,
-                PersonId = personId,
-                PersonPostcode = null,
-                StartDate = DateOnly.Parse("1 Jan 2000"),
-                TpsEmploymentId = Guid.NewGuid(),
-                UpdatedOn = Clock.UtcNow,
-                WithdrawalConfirmed = false
-            };
+                var note1 = new Note
+                {
+                    NoteId = Guid.NewGuid(),
+                    PersonId = personId,
+                    Content = "TEST",
+                    FileId = null,
+                    OriginalFileName = null,
+                    CreatedByUserId = userId,
+                    CreatedOn = Clock.UtcNow,
+                    UpdatedOn = Clock.UtcNow
+                };
 
-            dbContext.TpsEmployments.Add(employment);
+                var note2 = new Note
+                {
+                    NoteId = Guid.NewGuid(),
+                    PersonId = personId,
+                    Content = "TEST",
+                    FileId = null,
+                    OriginalFileName = null,
+                    CreatedByUserId = userId,
+                    CreatedOn = Clock.UtcNow,
+                    UpdatedOn = Clock.UtcNow
+                };
 
-            await dbContext.SaveChangesAsync();
+                dbContext.Notes.AddRange(note1, note2);
 
-            return employment.TpsEmploymentId;
-        });
+                await dbContext.SaveChangesAsync();
+
+                ids.AddRange(note1.NoteId, note2.NoteId);
+            });
+        }
+
+        return ids;
+    }
+
+    private async Task<IEnumerable<Guid>> CreateEmploymentsAsync(Guid establishmentId, IEnumerable<Guid> personIds)
+    {
+        List<Guid> ids = [];
+
+        foreach (var personId in personIds)
+        {
+            await DbFixture.WithDbContextAsync(async dbContext =>
+            {
+                var employment1 = new TpsEmployment()
+                {
+                    CreatedOn = Clock.UtcNow,
+                    EmployerEmailAddress = null,
+                    EmployerPostcode = null,
+                    EmploymentType = EmploymentType.FullTime,
+                    EndDate = null,
+                    EstablishmentId = establishmentId,
+                    Key = "TEST",
+                    LastExtractDate = DateOnly.Parse("1 Jan 2000"),
+                    LastKnownTpsEmployedDate = DateOnly.Parse("1 Jan 2000"),
+                    NationalInsuranceNumber = null,
+                    PersonEmailAddress = null,
+                    PersonId = personId,
+                    PersonPostcode = null,
+                    StartDate = DateOnly.Parse("1 Jan 2000"),
+                    TpsEmploymentId = Guid.NewGuid(),
+                    UpdatedOn = Clock.UtcNow,
+                    WithdrawalConfirmed = false
+                };
+
+                var employment2 = new TpsEmployment()
+                {
+                    CreatedOn = Clock.UtcNow,
+                    EmployerEmailAddress = null,
+                    EmployerPostcode = null,
+                    EmploymentType = EmploymentType.FullTime,
+                    EndDate = null,
+                    EstablishmentId = establishmentId,
+                    Key = "TEST",
+                    LastExtractDate = DateOnly.Parse("1 Jan 2000"),
+                    LastKnownTpsEmployedDate = DateOnly.Parse("1 Jan 2000"),
+                    NationalInsuranceNumber = null,
+                    PersonEmailAddress = null,
+                    PersonId = personId,
+                    PersonPostcode = null,
+                    StartDate = DateOnly.Parse("1 Jan 2000"),
+                    TpsEmploymentId = Guid.NewGuid(),
+                    UpdatedOn = Clock.UtcNow,
+                    WithdrawalConfirmed = false
+                };
+
+                dbContext.TpsEmployments.AddRange(employment1, employment2);
+
+                await dbContext.SaveChangesAsync();
+
+                ids.AddRange(employment1.TpsEmploymentId, employment2.TpsEmploymentId);
+            });
+        }
+
+        return ids;
     }
 
     private async Task<IEnumerable<Guid>> GetPersonsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
