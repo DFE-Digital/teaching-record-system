@@ -130,6 +130,101 @@ public class LegacyDataCache
         new("Council Member  -  do not register", "Z2", false)
     ];
 
+    public IReadOnlyCollection<TeacherStatus> TeacherStatuses =
+    [
+        new("Early Years Teacher Status", "221", false),
+        new("Early Years Trainee", "220", false),
+        new("Early Years Professional Status", "222", false),
+        new("Qualified Teacher (by virtue of European teaching qualifications)", "223", true),
+        new("Qualified teacher: by virtue of achieving international qualified teacher status", "90", true),
+        new("Qualified Teacher (by virtue of non-UK teaching qualifications)", "104", true),
+        new("Partial qualified teacher status: qualified to teach in SEN establishments", "214", true),
+        new("Teacher, other than an uncertificated or supplementary teacher, employed under Regulation 16(3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959", "10", false),
+        new("Qualified Teacher: Assessment Only Route", "100", true),
+        new("Qualified Teacher: Teach First Programme (TNP)", "101", false),
+        new("Qualified Teacher: Troops to Teach Programme", "102", false),
+        new("Qualified Teacher: By virtue of overseas qualifications", "103", true),
+        new("Certified teacher under the Code in force before 1 April 1945", "20", false),
+        new("Trainee on HEI/SCITT", "200", false),
+        new("Trainee on Teach First Programme", "201", false),
+        new("Trainee on OTT programme", "202", false),
+        new("Trainee on OTT programme (Exempt)", "203", false),
+        new("Instructor", "204", false),
+        new("OTT: Working under 4 year regulations", "205", false),
+        new("Qualified Teacher: Under temporary provision 2005/36/EC", "206", true),
+        new("Unknown", "207", false),
+        new("Trainee on the Teach First Programme (TNP)", "208", false),
+        new("Trainee on the Troops to Teach Programme", "209", false),
+        new("Trainee Teacher: HESA", "210", false),
+        new("Trainee Teacher", "211", true),
+        new("AOR Candidate", "212", true),
+        new("Qualified teacher: following at least 1 terms service as a licensed teacher (in respect of 3 yrs OTT), further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils", "23", false),
+        new("Qualified Teacher: following at least 1 school yrs service as a licensed teacher (in respect of those with 2 years or more experience in an independent school), further qualified to teach the deaf or partially hearing impaired under Re", "24", false),
+        new("Qualified Teacher: Teacher trained/registered in Scotland, further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959.", "28", true),
+        new("Teacher employed as an uncertificated teacher under Regulation 16 (3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959", "30", false),
+        new("Qualified teacher: following at least one terms service as a licensed teacher (in respect of 3 years overseas trained teachers), further qualified to teach the blind or visually impaired under Regulation 15(2) of the Special Schools and", "33", false),
+        new("Qualified Teacher: following at least one school years service as a licensed teacher (in respect of those with 2 years or more experience in an independent school), further qualified to teach the blind or visually impaired under Regul", "34", false),
+        new("Qualified Teacher: Teachers trained/registered in Scotland, further qualified to teach the blind or visually impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959.", "38", false),
+        new("Supplementary teacher employed under Regulation 16(3)(a) of the Schools Regulations 1959 or under Regulation 15(3)(a) of the Handicapped Pupils and Special Schools Regulations 1959", "40", false),
+        new("Person who has completed a course of instruction in the care of young children and whose appointment to the assistant staff of a nursery school or to the staff of a nursery class is approved under Regulation 16(3)(c) of the Schools Regulati", "44", false),
+        new("Qualified teacher: Following at least one school year's service on the Teach First Programme", "45", false),
+        new("Trainee on Registered Teacher Programme", "46", false),
+        new("Qualified teacher: Following at least one year's service on the Registered Teacher Programme", "47", true),
+        new("Trainee on Graduate Teacher Programme", "48", false),
+        new("Qualified teacher: Following at least one term's service on the Graduate Teacher Programme", "49", true),
+        new("Person not qualified for employment as a regular teacher whose employment as an Instructor is allowed under Regulation 18 of the Schools Regulations 1959", "50", true),
+        new("Qualified Teacher (Overseas Trained Teacher needing to complete induction)", "51", false),
+        new("Qualified Teacher (Overseas Trained Teacher exempt from induction)", "52", false),
+        new("Qualified Teacher (Further Education)", "53", false),
+        new("Registered Teacher", "54", false),
+        new("Person whose employment is authorised under Regulation 153c of The Handicapped Pupils and Special Schools Regulations 1959 as holder of the Diploma in the Teaching on Mentally Handicapped Children awarded by the Training Council for Teacher", "55", false),
+        new("Person whose employment is authorised under Regulation 15(3)(c) of The Handicapped Pupils and Special Schools Regulations 1959 as holder of the Declaration of Recognition of Experience awarded by the Training Council for Teachers of the Men", "56", false),
+        new("Person whose employment is authorised under Regulation 16A of the Handicapped Pupils and Special Schools Regulations 1959", "57", false),
+        new("Qualified teacher: TCMH  3 year,s experience.", "58", false),
+        new("Licenced teacher who has withdrawn and licence is cancelled", "59", false),
+        new("Student teacher whose employment is approved under Regulation 17 (1) of the Schools Regulations 1959", "60", false),
+        new("Licensed Teacher", "61", false),
+        new("Qualified Teacher: following at least 2 year's service as a licensed teacher", "62", false),
+        new("Qualified Teacher: following at least one term's service as a licensed teacher (in respect of 3 year's overseas trained teachers)", "63", false),
+        new("Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in an independent school)", "64", false),
+        new("Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in further education)", "65", false),
+        new("Qualified Teacher: following at least one schoolyear's service as a licensed teacher (in respect of those with 2 year's or more experience in the educational services of the Armed Forces)", "66", false),
+        new("Qualified Teacher: Under the EC Directive", "67", true),
+        new("Qualified Teacher: Teachers trained/registered in Scotland", "68", true),
+        new("Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)", "69", true),
+        new("FAILED Licensed Teacher", "70", false),
+        new("Qualified teacher (trained)", "71", true),
+        new("Qualified teacher (graduate non-trained)", "72", false),
+        new("Qualified teacher (by virtue of long service)", "73", false),
+        new("Qualified teacher following at least one years employment as a licensed teacher with at least two years previous experience as an instructor in a maintained school (from 1 September 1991)", "74", false),
+        new("Authorised teacher (from 1 September 1991)", "75", false),
+        new("Qualified teacher following at least one terms employment as an authorized teacher with at least one years teaching experience (from 1 september 1991)", "76", false),
+        new("Qualified teacher following a school centred Initial Teacher Training course (SCITT)", "77", false),
+        new("Qualified teacher following successful completion of a period of Registration in a CTC or CCTA", "78", false),
+        new("Qualified teacher (by virtue of other qualifications)", "79", false),
+        new("Qualified Teacher (under the Flexible Post-graduate route)", "80", false),
+        new("Qualified teacher (trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "81", false),
+        new("Qualified teacher (graduate non-trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "82", false),
+        new("Qualified teacher (by virtue of long service) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "83", false),
+        new("Qualified teacher of children with Multi-sensory Impairments (from 1 June 1991)", "85", false),
+        new("Qualified teacher (under the EC Directive) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "87", true),
+        new("Qualified teacher (by virtue of other qualifications) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations", "89", false),
+        new("Qualified teacher (trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "91", false),
+        new("Qualified teacher (graduate non-trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "92", false),
+        new("Qualified teacher (by virtue of long service) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "93", false),
+        new("Qualified teacher (under the EC Directive) further qualifed to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "97", false),
+        new("Qualified teacher (by virtue of other qualifications) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959 a maintained school.", "99", false),
+        new("QTS Awarded in error", "999", false),
+        new("Qualified Teacher: QTS awarded in Wales", "213", true),
+    ];
+
+    public IReadOnlyCollection<EarlyYearsStatus> EarlyYearsStatuses =
+    [
+        new("Early Years Trainee", "220", true),
+        new("Early Years Teacher Status", "221", true),
+        new("Early Years Professional Status", "222", true)
+    ];
+
     public IReadOnlyCollection<MqEstablishment> GetAllMqEstablishments(bool activeOnly = true) =>
         MqEstablishments.Where(m => !activeOnly || m.Active).AsReadOnly();
 
@@ -148,9 +243,25 @@ public class LegacyDataCache
     public SanctionCode GetSanctionCodeByValue(string value) =>
         SanctionCodes.Single(s => s.Value == value);
 
+    public IReadOnlyCollection<TeacherStatus> GetAllTeacherStatuses(bool activeOnly = true) =>
+        TeacherStatuses.Where(s => !activeOnly || s.Active).AsReadOnly();
+
+    public TeacherStatus GetTeacherStatusByValue(string value) =>
+        TeacherStatuses.Single(s => s.Value == value);
+
+    public IReadOnlyCollection<EarlyYearsStatus> GetAllEarlyYearsStatuses(bool activeOnly = true) =>
+        EarlyYearsStatuses.Where(s => !activeOnly || s.Active).AsReadOnly();
+
+    public EarlyYearsStatus GetEarlyYearsStatusByValue(string value) =>
+        EarlyYearsStatuses.Single(s => s.Value == value);
+
     public record MqEstablishment(string Name, string Value, bool Active);
 
     public record MqSpecialism(string Name, string Value, bool Active);
 
     public record SanctionCode(string Name, string Value, bool Active);
+
+    public record TeacherStatus(string Name, string Value, bool Active);
+
+    public record EarlyYearsStatus(string Name, string Value, bool Active);
 }
