@@ -1,8 +1,5 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema;
@@ -30,15 +27,12 @@ public class EventMapperFixture
     public EventMapperFixture(
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
-        ICrmQueryDispatcher crmQueryDispatcher,
         FakeTrnGenerator trnGenerator,
-        IServiceProvider serviceProvider,
-        ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        IServiceProvider serviceProvider)
     {
         Clock = new TestableClock();
         DbFixture = dbFixture;
-        ReferenceDataCache = new ReferenceDataCache(crmQueryDispatcher, dbFixture.GetDbContextFactory());
+        ReferenceDataCache = new ReferenceDataCache(dbFixture.GetDbContextFactory());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

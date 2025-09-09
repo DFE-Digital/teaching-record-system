@@ -1,13 +1,11 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFactory<TrsDbContext> dbContextFactory)
-    : ReferenceDataCache(crmQueryDispatcher, dbContextFactory)
+public class AddTestRouteTypesStartupTask(IDbContextFactory<TrsDbContext> dbContextFactory, ReferenceDataCache referenceDataCache) : IStartupTask
 {
-    private RouteToProfessionalStatusType[] _testRoutes = [
+    private readonly RouteToProfessionalStatusType[] _testRoutes = [
         new()
         {
             RouteToProfessionalStatusTypeId = Guid.NewGuid(),
@@ -44,9 +42,11 @@ public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbC
         }
     ];
 
-    protected override async Task<RouteToProfessionalStatusType[]> InitializeRouteToProfessionalStatusTypesAsync()
+    public async Task ExecuteAsync()
     {
-        using var dbContext = DbContextFactory.CreateDbContext();
+        referenceDataCache.Clear();
+
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
         var existingTestRoutes = await dbContext.RouteToProfessionalStatusTypes
             .Where(r => _testRoutes.Select(tr => tr.Name).Contains(r.Name))
@@ -78,7 +78,5 @@ public class TestReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher, IDbC
         }
 
         await dbContext.SaveChangesAsync();
-
-        return await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
     }
 }

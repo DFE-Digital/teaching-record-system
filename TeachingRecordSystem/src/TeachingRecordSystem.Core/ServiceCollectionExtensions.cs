@@ -12,7 +12,8 @@ public static partial class ServiceCollectionExtensions
         return services
             .AddSingleton<IClock, Clock>()
             .AddCrmQueries()
-            .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>();
+            .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
+            .AddSingleton<ReferenceDataCache>();
     }
 
     public static IServiceCollection AddAccessYourTeachingQualificationsOptions(

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
@@ -71,8 +70,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);
-            services.RemoveAll<ReferenceDataCache>();
-            services.AddSingleton<ReferenceDataCache, TestReferenceDataCache>();
+            services.AddStartupTask<AddTestRouteTypesStartupTask>();
             services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
             services.Decorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>();
             services.AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions));
