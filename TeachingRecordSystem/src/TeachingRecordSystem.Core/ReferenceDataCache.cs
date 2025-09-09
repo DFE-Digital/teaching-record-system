@@ -15,8 +15,6 @@ public class ReferenceDataCache(
 
     // CRM
     private Task<Subject[]>? _getSubjectsTask;
-    private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
-    private Task<dfeta_earlyyearsstatus[]>? _getEarlyYearsStatusesTask;
     private Task<dfeta_hequalification[]>? _getHeQualificationsTask;
     private Task<dfeta_hesubject[]>? _getHeSubjectsTask;
     private Task<dfeta_country[]>? _getCountriesTask;
@@ -40,42 +38,6 @@ public class ReferenceDataCache(
     {
         var subjects = await EnsureSubjectsAsync();
         return subjects.Single(s => s.Title == title, $"Could not find subject with title: '{title}'.");
-    }
-
-    public async Task<dfeta_teacherstatus> GetTeacherStatusByIdAsync(Guid id)
-    {
-        var teacherStatuses = await EnsureTeacherStatusesAsync();
-        return teacherStatuses.Single(ts => ts.Id == id, $"Could not find teacher status with ID: '{id}'.");
-    }
-
-    public async Task<dfeta_teacherstatus> GetTeacherStatusByValueAsync(string value)
-    {
-        var teacherStatuses = await EnsureTeacherStatusesAsync();
-        return teacherStatuses.Single(ts => ts.dfeta_Value == value, $"Could not find teacher status with value: '{value}'.");
-    }
-
-    public async Task<dfeta_teacherstatus[]> GetTeacherStatusesAsync()
-    {
-        var teacherStatuses = await EnsureTeacherStatusesAsync();
-        return teacherStatuses;
-    }
-
-    public async Task<dfeta_earlyyearsstatus[]> GetEytsStatusesAsync()
-    {
-        var earlyyearStatuses = await EnsureEarlyYearsStatusesAsync();
-        return earlyyearStatuses;
-    }
-
-    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByIdAsync(Guid id)
-    {
-        var earlyYearsStatuses = await EnsureEarlyYearsStatusesAsync();
-        return earlyYearsStatuses.Single(ey => ey.Id == id, $"Could not find early years teacher status with ID: '{id}'.");
-    }
-
-    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValueAsync(string value)
-    {
-        var earlyYearsStatuses = await EnsureEarlyYearsStatusesAsync();
-        return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value, $"Could not find early years teacher status with value: '{value}'.");
     }
 
     public async Task<dfeta_hequalification[]> GetHeQualificationsAsync()
@@ -296,16 +258,6 @@ public class ReferenceDataCache(
             ref _getSubjectsTask,
             () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllSubjectsQuery()));
 
-    private Task<dfeta_teacherstatus[]> EnsureTeacherStatusesAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getTeacherStatusesTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllTeacherStatusesQuery()));
-
-    private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatusesAsync() =>
-        LazyInitializer.EnsureInitialized(
-            ref _getEarlyYearsStatusesTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveEarlyYearsStatusesQuery()));
-
     private Task<dfeta_hequalification[]> EnsureHeQualificationsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeQualificationsTask,
@@ -451,8 +403,6 @@ public class ReferenceDataCache(
     {
         // CRM
         await EnsureSubjectsAsync();
-        await EnsureTeacherStatusesAsync();
-        await EnsureEarlyYearsStatusesAsync();
         await EnsureHeQualificationsAsync();
         await EnsureHeSubjectsAsync();
         await EnsureCountriesAsync();

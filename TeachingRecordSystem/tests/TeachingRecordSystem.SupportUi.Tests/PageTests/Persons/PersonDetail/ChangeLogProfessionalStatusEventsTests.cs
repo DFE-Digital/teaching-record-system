@@ -677,8 +677,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var createdByUser = await TestData.CreateUserAsync();
         var sourceApplicationUserId = Guid.NewGuid();
         var sourceApplicationReference = "source-application-reference";
-        var qualifiedTeacherStatus = await ReferenceDataCache.GetTeacherStatusByValueAsync("71");
-        var earlyYearsTeacherStatus = await ReferenceDataCache.GetEarlyYearsStatusByValueAsync("221");
+        var qualifiedTeacherStatus = LegacyDataCache.Instance.GetTeacherStatusByValue("71");
+        var earlyYearsTeacherStatus = LegacyDataCache.Instance.GetEarlyYearsStatusByValue("221");
         var qtsDate = awardDate;
         var eytsDate = awardDate.AddDays(1);
         var pqtsDate = awardDate.AddDays(2);
@@ -726,10 +726,10 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             dqtQtsRegistration = new EventModels.DqtQtsRegistration()
             {
                 QtsRegistrationId = Guid.NewGuid(),
-                TeacherStatusName = qualifiedTeacherStatus.dfeta_name,
-                TeacherStatusValue = qualifiedTeacherStatus.dfeta_Value,
-                EarlyYearsStatusName = earlyYearsTeacherStatus.dfeta_name,
-                EarlyYearsStatusValue = earlyYearsTeacherStatus.dfeta_Value,
+                TeacherStatusName = qualifiedTeacherStatus.Name,
+                TeacherStatusValue = qualifiedTeacherStatus.Value,
+                EarlyYearsStatusName = earlyYearsTeacherStatus.Name,
+                EarlyYearsStatusValue = earlyYearsTeacherStatus.Value,
                 QtsDate = qtsDate,
                 EytsDate = eytsDate,
                 PartialRecognitionDate = pqtsDate
