@@ -33,6 +33,7 @@ public class Startup
                 services.AddSingleton<FakeTrnGenerator>();
                 services.AddCrmQueries();
                 services.AddFakeXrm();
+                services.AddSingleton<ReferenceDataCache>();
                 services.AddSingleton<WebhookReceiver>();
                 services.AddSingleton<PersonInfoCache>();
                 services.AddSingleton<EventMapperFixture>();
