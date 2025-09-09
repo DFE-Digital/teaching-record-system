@@ -27,4 +27,5 @@ public static class JourneyNames
     public const string ResolveNpqTrnRequest = nameof(ResolveNpqTrnRequest);
     public const string RejectNpqTrnRequest = nameof(RejectNpqTrnRequest);
     public const string SetStatus = nameof(SetStatus);
+    public const string ResolveTpsPotentialDuplicate = nameof(ResolveTpsPotentialDuplicate);
 }

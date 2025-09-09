@@ -1,0 +1,70 @@
+@page "/support-tasks/teacher-pensions/{supportTaskReference}/resolve/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.CheckAnswersModel
+@{
+    ViewBag.Title = "Check details before merging records";
+    var changeLink = LinkGenerator.TeacherPensionsMatches(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true);
+    var confirmButtonLabel = "Confirm and merge records";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.TeacherPensionsMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" />
+}
+
+<form action="@LinkGenerator.TeacherPensionsCheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <span class="govuk-caption-l">Support tasks</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <govuk-summary-card data-testid="request">
+                <govuk-summary-card-title>
+                    Details of the merged record
+                </govuk-summary-card-title>
+                <govuk-summary-card-actions>
+                    <govuk-summary-card-action href="@changeLink" data-testid="change-link">Change</govuk-summary-card-action>
+                </govuk-summary-card-actions>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.FirstName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.LastName</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Trn</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NI number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    @if (Model.EvidenceFileId is not null)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>
+                                <p class="govuk-body">
+                                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
+                                </p>
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                </govuk-summary-list>
+            </govuk-summary-card>
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="submit">@confirmButtonLabel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.TeacherPensionsCheckAnswersCancel(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, false)" class="govuk-button--secondary">Cancel</govuk-button>
+            </div>
+        </div>
+    </div>
+</form>
