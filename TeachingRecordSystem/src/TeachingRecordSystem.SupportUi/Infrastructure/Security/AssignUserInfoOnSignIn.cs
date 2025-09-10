@@ -1,10 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
-using Microsoft.PowerPlatform.Dataverse.Client;
-using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -34,7 +31,7 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
             if (user is null)
             {
                 // We couldn't find a user by principal, but we may find them via email
-                // (the CLI commmand to add a user creates a record *without* the AD subject).
+                // (the CLI command to add a user creates a record *without* the AD subject).
 
                 user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email != null && u.Email.ToLower() == email.ToLower() && u.Active == true && u.AzureAdUserId == null);
 
@@ -61,24 +58,6 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
 
             ctx.Principal = new ClaimsPrincipal(identityWithRoles);
 
-            async Task<Guid?> GetDqtUserIdAsync()
-            {
-                var organizationService = ctx.HttpContext.RequestServices.GetRequiredService<IOrganizationServiceAsync>();
-
-                var request = new QueryByAttribute(SystemUser.EntityLogicalName);
-                request.AddAttributeValue(SystemUser.Fields.AzureActiveDirectoryObjectId, new Guid(aadUserId));
-                request.AddAttributeValue(SystemUser.Fields.IsDisabled, false);
-
-                var response = await organizationService.RetrieveMultipleAsync(request);
-
-                if (response.Entities.Count == 0)
-                {
-                    return null;
-                }
-
-                return response.Entities.Single().Id;
-            }
-
             async Task SyncUserInfoAsync()
             {
                 // The GraphServiceClient used within AadUserService needs HttpContext.User assigned so it can retrieve the access token;
@@ -93,7 +72,6 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                     var azureAdUser = (await aadUserService.GetUserByIdAsync(aadUserId))!;
                     user.Email = azureAdUser.Email;
                     user.Name = azureAdUser.Name;
-                    user.DqtUserId ??= await GetDqtUserIdAsync();
                     await dbContext.SaveChangesAsync();
                 }
                 finally
