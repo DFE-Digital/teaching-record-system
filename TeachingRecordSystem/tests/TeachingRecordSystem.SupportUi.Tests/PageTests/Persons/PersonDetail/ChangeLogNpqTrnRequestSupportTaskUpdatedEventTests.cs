@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
@@ -319,7 +320,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         {
             PersonId = personId,
             SupportTaskReference = "TEST-ST-1",
-            SupportTaskType = SupportTaskType.ApiTrnRequest,
+            SupportTaskTypeId = SupportTaskType.ApiTrnRequest.SupportTaskTypeId,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Closed,
         };
@@ -328,7 +329,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         {
             PersonId = personId,
             SupportTaskReference = "TEST-ST-1",
-            SupportTaskType = SupportTaskType.ApiTrnRequest,
+            SupportTaskTypeId = SupportTaskType.ApiTrnRequest.SupportTaskTypeId,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Open,
         };

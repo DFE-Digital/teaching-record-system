@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks;
 
@@ -34,11 +35,11 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
 
         var allSupportTasks = await dbContext.SupportTasks
             .Where(t => t.Status == SupportTaskStatus.Open)
-            .Select(t => new SupportTaskInfo(t.SupportTaskReference, t.SupportTaskType, t.SupportTaskType.GetTitle(), t.CreatedOn.ToGmt()))
+            .Select(t => new SupportTaskInfo(t.SupportTaskReference, t.SupportTaskType, t.SupportTaskType.Title, t.CreatedOn.ToGmt()))
             .ToArrayAsync();
 
         SupportTaskCategories = allSupportTasks
-            .GroupBy(t => t.Type.GetCategory())
+            .GroupBy(t => t.Type.Category)
             .Select(g => (g.Key, g.Key.GetTitle(), g.Count()))
             .ToArray();
 
@@ -49,7 +50,7 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
             results.RemoveAll(t => t.Reference != Reference);
         }
 
-        results.RemoveAll(t => !Categories.Contains(t.Type.GetCategory()));
+        results.RemoveAll(t => !Categories.Contains(t.Type.Category));
 
         Results = results
             .OrderBy(r => SortBy == SortByOption.Type ? (object)r.TypeTitle : r.RequestedOn)

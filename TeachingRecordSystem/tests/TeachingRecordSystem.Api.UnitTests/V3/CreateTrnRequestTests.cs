@@ -408,7 +408,7 @@ public class CreateTrnRequestTests : OperationTestBase
             Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
 
             var supportTasks = await dbContext.SupportTasks
-                .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
+                    .Where(t => t.SupportTaskTypeId == SupportTaskType.TrnRequestManualChecksNeeded.SupportTaskTypeId &&
                     t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
                     t.TrnRequestMetadata!.RequestId == command.RequestId)
                 .ToArrayAsync();
@@ -458,7 +458,7 @@ public class CreateTrnRequestTests : OperationTestBase
             Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
 
             var supportTasks = await dbContext.SupportTasks
-                .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
+                    .Where(t => t.SupportTaskTypeId == SupportTaskType.TrnRequestManualChecksNeeded.SupportTaskTypeId &&
                     t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
                     t.TrnRequestMetadata!.RequestId == command.RequestId)
                 .ToArrayAsync();
@@ -587,7 +587,7 @@ public class CreateTrnRequestTests : OperationTestBase
         WithDbContextAsync(async dbContext =>
         {
             var supportTask = await dbContext.SupportTasks
-                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
+                .SingleOrDefaultAsync(t => t.SupportTaskTypeId == SupportTaskType.ApiTrnRequest.SupportTaskTypeId &&
                     t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
                     t.TrnRequestMetadata!.RequestId == requestId);
 
@@ -599,7 +599,7 @@ public class CreateTrnRequestTests : OperationTestBase
         WithDbContextAsync(async dbContext =>
         {
             var supportTask = await dbContext.SupportTasks
-                .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest &&
+                .SingleOrDefaultAsync(t => t.SupportTaskTypeId == SupportTaskType.ApiTrnRequest.SupportTaskTypeId &&
                     t.TrnRequestMetadata!.ApplicationUserId == applicationUserId &&
                     t.TrnRequestMetadata!.RequestId == requestId);
 

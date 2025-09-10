@@ -39,7 +39,7 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
             SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
             CreatedOn = clock.UtcNow,
             UpdatedOn = clock.UtcNow,
-            SupportTaskType = SupportTaskType.ConnectOneLoginUser,
+            SupportTaskTypeId = SupportTaskType.ConnectOneLoginUser.SupportTaskTypeId,
             Status = SupportTaskStatus.Open,
             Data = new ConnectOneLoginUserData()
             {

@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
@@ -12,18 +13,40 @@ public partial class TrsLinkGenerator
     public string SupportTasks(SupportTaskCategory[]? categories = null, Pages.SupportTasks.IndexModel.SortByOption? sortBy = null, string? reference = null, bool? filtersApplied = null) =>
         GetRequiredPathByPage("/SupportTasks/Index", routeValues: new { category = categories, sortBy, reference, _f = filtersApplied == true ? "1" : null });
 
-    public string SupportTaskDetail(string supportTaskReference, SupportTaskType supportTaskType) =>
-        supportTaskType switch
+    public string SupportTaskDetail(string supportTaskReference, SupportTaskType supportTaskType)
+    {
+        if (supportTaskType == SupportTaskType.ConnectOneLoginUser)
         {
-            SupportTaskType.ConnectOneLoginUser => ConnectOneLoginUserSupportTask(supportTaskReference),
-            SupportTaskType.ApiTrnRequest => ApiTrnRequestMatches(supportTaskReference),
-            SupportTaskType.TrnRequestManualChecksNeeded => ResolveTrnRequestManualChecksNeeded(supportTaskReference),
-            SupportTaskType.NpqTrnRequest => NpqTrnRequestDetailsPage(supportTaskReference),
-            SupportTaskType.ChangeDateOfBirthRequest => EditChangeRequest(supportTaskReference),
-            SupportTaskType.ChangeNameRequest => EditChangeRequest(supportTaskReference),
-            SupportTaskType.CapitaImportPotentialDuplicate => TeacherPensionsMatches(supportTaskReference),
-            _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
-        };
+            return ConnectOneLoginUserSupportTask(supportTaskReference);
+        }
+
+        if (supportTaskType == SupportTaskType.ApiTrnRequest)
+        {
+            return ApiTrnRequestMatches(supportTaskReference);
+        }
+
+        if (supportTaskType == SupportTaskType.TrnRequestManualChecksNeeded)
+        {
+            return ResolveTrnRequestManualChecksNeeded(supportTaskReference);
+        }
+
+        if (supportTaskType == SupportTaskType.NpqTrnRequest)
+        {
+            return NpqTrnRequestDetailsPage(supportTaskReference);
+        }
+
+        if (supportTaskType == SupportTaskType.ChangeDateOfBirthRequest || supportTaskType == SupportTaskType.ChangeNameRequest)
+        {
+            return EditChangeRequest(supportTaskReference);
+        }
+
+        if (supportTaskType == SupportTaskType.CapitaImportPotentialDuplicate)
+        {
+            return TeacherPensionsMatches(supportTaskReference);
+        }
+
+        throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType));
+    }
 
     public string ApiTrnRequests(string? search = null, ApiTrnRequestsSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search, sortBy, sortDirection, pageNumber });

@@ -1,4 +1,5 @@
 @page "/change-requests/{supportTaskReference}/reject"
+@using TeachingRecordSystem.Core.DataStore.Postgres.Models
 @using static TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel;
 @model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel
 @{
@@ -13,7 +14,7 @@
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">        
+    <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RejectChangeRequest(Model.SupportTaskReference)" method="post">
             <govuk-radios asp-for="RejectionReasonChoice">
                 <govuk-radios-fieldset>

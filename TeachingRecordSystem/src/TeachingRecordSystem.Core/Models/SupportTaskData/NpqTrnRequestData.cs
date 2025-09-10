@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
+[SupportTaskData("3ca684d4-15de-4f12-b0fb-c5386360b171")]
 public record NpqTrnRequestData
 {
     public NpqTrnRequestDataPersonAttributes? SelectedPersonAttributes { get; init; }

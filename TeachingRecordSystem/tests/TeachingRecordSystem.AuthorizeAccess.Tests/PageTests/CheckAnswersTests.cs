@@ -311,7 +311,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
             Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
             Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
-            Assert.Equal(SupportTaskType.ConnectOneLoginUser, supportTaskCreatedEvent.SupportTask.SupportTaskType);
+            Assert.Equal(SupportTaskType.ConnectOneLoginUser.SupportTaskTypeId, supportTaskCreatedEvent.SupportTask.SupportTaskTypeId);
             Assert.Equal(SupportTaskStatus.Open, supportTaskCreatedEvent.SupportTask.Status);
             Assert.Equal(oneLoginUser.Subject, supportTaskCreatedEvent.SupportTask.OneLoginUserSubject);
             var eventData = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);

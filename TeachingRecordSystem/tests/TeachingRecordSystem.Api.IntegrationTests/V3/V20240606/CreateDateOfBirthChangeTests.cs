@@ -1,5 +1,6 @@
 using System.Text;
 using JustEat.HttpClientInterception;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;

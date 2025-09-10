@@ -26,12 +26,6 @@ public static class SupportTaskCategoryRegistry
 
     public static string GetTitle(this SupportTaskCategory supportTaskCategory) => _info[supportTaskCategory].Title;
 
-    public static SupportTaskCategory GetSupportTaskCategoryForType(SupportTaskType supportTaskType) =>
-        SupportTaskTypeRegistry.GetCategory(supportTaskType);
-
-    public static IReadOnlyCollection<SupportTaskType> GetSupportTaskTypesByCategory(SupportTaskCategory supportTaskCategory) =>
-        SupportTaskTypeRegistry.GetAll().Where(v => v.SupportTaskCategory == supportTaskCategory).Select(i => i.Value).AsReadOnly();
-
     private static SupportTaskCategoryInfo GetInfo(SupportTaskCategory supportTaskCategory)
     {
         var attr = supportTaskCategory.GetType()
