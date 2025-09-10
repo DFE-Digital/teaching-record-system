@@ -13,7 +13,6 @@ public class SendInductionCompletedEmailJob(
     IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions,
     IClock clock)
 {
-    private const string InductionCompletedEmailConfirmationTemplateId = "8029faa8-8409-4423-a717-c142dfd2ba86";
     private const string LinkToAccessYourQualificationsServicePersonalisationKey = "link to access your teaching qualifications service";
 
     private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
@@ -34,7 +33,7 @@ public class SendInductionCompletedEmailJob(
             item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
         }
 
-        await notificationSender.SendEmailAsync(InductionCompletedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
+        await notificationSender.SendEmailAsync(EmailTemplateIds.InductionCompletedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
         dbContext.AddEventWithoutBroadcast(new InductionCompletedEmailSentEvent

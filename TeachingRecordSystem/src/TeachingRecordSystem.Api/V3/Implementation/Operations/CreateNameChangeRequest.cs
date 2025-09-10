@@ -95,7 +95,7 @@ public class CreateNameChangeRequestHandler(
             var email = new Email
             {
                 EmailId = Guid.NewGuid(),
-                TemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfNameSubmittedEmailConfirmationTemplateId,
+                TemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameSubmittedEmailConfirmationTemplateId,
                 EmailAddress = emailAddress!,
                 Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, person.FirstName } }
             };

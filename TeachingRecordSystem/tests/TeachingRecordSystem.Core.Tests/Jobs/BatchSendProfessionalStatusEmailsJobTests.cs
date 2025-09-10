@@ -35,7 +35,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
         Assert.Equal(person.Email, email.EmailAddress);
-        Assert.Equal(BatchSendProfessionalStatusEmailsJob.TemplateIds.QtsAwardedEmailConfirmationTemplateId, email.TemplateId);
+        Assert.Equal(EmailTemplateIds.QtsAwardedEmailConfirmationTemplateId, email.TemplateId);
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
@@ -73,7 +73,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
         Assert.Equal(person.Email, email.EmailAddress);
-        Assert.Equal(BatchSendProfessionalStatusEmailsJob.TemplateIds.InternationalQtsAwardedEmailConfirmationTemplateId, email.TemplateId);
+        Assert.Equal(EmailTemplateIds.InternationalQtsAwardedEmailConfirmationTemplateId, email.TemplateId);
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
@@ -111,7 +111,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
         Assert.Equal(person.Email, email.EmailAddress);
-        Assert.Equal(BatchSendProfessionalStatusEmailsJob.TemplateIds.EytsAwardedEmailConfirmationTemplateId, email.TemplateId);
+        Assert.Equal(EmailTemplateIds.EytsAwardedEmailConfirmationTemplateId, email.TemplateId);
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
@@ -165,7 +165,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
         Assert.Equal(person.Email, email.EmailAddress);
-        Assert.Equal(BatchSendProfessionalStatusEmailsJob.TemplateIds.QtlsLapsedTemplateId, email.TemplateId);
+        Assert.Equal(EmailTemplateIds.QtlsLapsedTemplateId, email.TemplateId);
 
         backgroundJobScheduler
             .Verify(

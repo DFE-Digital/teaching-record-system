@@ -120,7 +120,7 @@ public class RejectModel(
                 };
 
                 emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
-                emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfNameRejectedEmailConfirmationTemplateId;
+                emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmationTemplateId;
             }
             else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
             {
@@ -142,7 +142,7 @@ public class RejectModel(
                 };
 
                 emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
-                emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmationTemplateId;
+                emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmationTemplateId;
             }
 
             await dbContext.AddEventAndBroadcastAsync(rejectedEvent);
