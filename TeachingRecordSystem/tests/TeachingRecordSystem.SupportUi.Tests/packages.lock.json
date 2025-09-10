@@ -2413,10 +2413,10 @@
           "Microsoft.Extensions.Configuration.Binder": "[9.0.9, )",
           "Microsoft.Extensions.Configuration.Json": "[9.0.9, )",
           "Microsoft.Extensions.Configuration.UserSecrets": "[9.0.9, )",
-          "Microsoft.Extensions.Hosting": "[9.0.8, )",
-          "Microsoft.Extensions.Http": "[9.0.8, )",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "[9.0.8, )",
-          "Microsoft.Extensions.Options.DataAnnotations": "[9.0.8, )",
+          "Microsoft.Extensions.Hosting": "[9.0.9, )",
+          "Microsoft.Extensions.Http": "[9.0.9, )",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "[9.0.9, )",
+          "Microsoft.Extensions.Options.DataAnnotations": "[9.0.9, )",
           "Microsoft.PowerPlatform.Dataverse.Client": "[1.1.27, )",
           "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "[1.1.27, )",
           "NSign.Client": "[1.1.0, )",
@@ -2436,7 +2436,7 @@
           "Serilog.Sinks.ApplicationInsights": "[4.0.0, )",
           "Serilog.Sinks.Console": "[6.0.0, )",
           "SerilogTimings": "[3.1.0, )",
-          "System.Net.Http.Json": "[9.0.8, )",
+          "System.Net.Http.Json": "[9.0.9, )",
           "System.Reactive": "[6.0.1, )",
           "dbup-sqlserver": "[5.0.37, )",
           "morelinq": "[4.4.0, )"
@@ -2885,7 +2885,7 @@
       },
       "Microsoft.Extensions.Hosting": {
         "type": "CentralTransitive",
-        "requested": "[9.0.8, )",
+        "requested": "[9.0.9, )",
         "resolved": "9.0.9",
         "contentHash": "DmRsWH3g8yZGho/pLQ79hxhM2ctE1eDTZ/HbAnrD/uw8m+P2pRRJOoBVxlrhbhMP3/y3oAJoy0yITasfmilbTg==",
         "dependencies": {
@@ -2915,21 +2915,21 @@
       },
       "Microsoft.Extensions.Http": {
         "type": "CentralTransitive",
-        "requested": "[9.0.8, )",
-        "resolved": "9.0.8",
-        "contentHash": "jDj+4aDByk47oESlDDTtk6LWzlXlmoCsjCn6ihd+i9OntN885aPLszUII5+w0B/7wYSZcS3KdjqLAIhKLSiBXQ==",
+        "requested": "[9.0.9, )",
+        "resolved": "9.0.9",
+        "contentHash": "dTmh5Rj4/WpirsN1PDs8YhyaodgtzxWqPKaT+B3Zn72uHKLJOuxIt06HTea126eEDWHYSLNN61I4snw7PuerFg==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.8",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.8",
-          "Microsoft.Extensions.Diagnostics": "9.0.8",
-          "Microsoft.Extensions.Logging": "9.0.8",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.8",
-          "Microsoft.Extensions.Options": "9.0.8"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Diagnostics": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9"
         }
       },
       "Microsoft.Extensions.Options.ConfigurationExtensions": {
         "type": "CentralTransitive",
-        "requested": "[9.0.8, )",
+        "requested": "[9.0.9, )",
         "resolved": "9.0.9",
         "contentHash": "n4DCdnn2qs6V5U06Sx62FySEAZsJiJJgOzrPHDh9hPK7c2W8hEabC76F3Re3tGPjpiKa02RvB6FxZyxo8iICzg==",
         "dependencies": {
@@ -2942,12 +2942,12 @@
       },
       "Microsoft.Extensions.Options.DataAnnotations": {
         "type": "CentralTransitive",
-        "requested": "[9.0.8, )",
-        "resolved": "9.0.8",
-        "contentHash": "WSKyfcZV4+yTk4ZhpnxSqi5JdEItgB5whhPIi+3+tZgb3IvPtCwpoIbLsyoAucodAFnkzEIPsGrBkcx3AjQc/A==",
+        "requested": "[9.0.9, )",
+        "resolved": "9.0.9",
+        "contentHash": "Al+1FXnKKFygTXz0Zsa1+jYEPvsx5dKavlJxMXjRbrL6lmBhQZsVMhjuNB5lWvdRhdoxt5y/Q3v5kbLZLsXWdA==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.8",
-          "Microsoft.Extensions.Options": "9.0.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9"
         }
       },
       "Microsoft.Identity.Web": {
@@ -3296,9 +3296,9 @@
       },
       "System.Net.Http.Json": {
         "type": "CentralTransitive",
-        "requested": "[9.0.8, )",
-        "resolved": "9.0.8",
-        "contentHash": "6w0yedKNkPN5+7SYuO8YLTbUfwendQBGlyxKCvExEvADX5/oOK8lTVO5cF1vedLuoOH6DKpbPdcQzTXpAbUn2Q=="
+        "requested": "[9.0.9, )",
+        "resolved": "9.0.9",
+        "contentHash": "Plss2+D6djmOMTkx/TbJ6vuz1bHjrhMXSj5DsjeWgK0PMRFPuc1Jo0TlFtgzbP3tMlG5U6Q+xB6ZwtMKRe1Ppw=="
       },
       "System.Reactive": {
         "type": "CentralTransitive",
