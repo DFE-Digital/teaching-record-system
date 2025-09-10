@@ -57,6 +57,11 @@ public static class HostApplicationBuilderExtensions
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+            builder.Services.AddOptions<DeletePersonAndChildRecordsWithoutATrnOptions>()
+                .BindConfiguration("RecurringJobs:DeletePersonAndChildRecordsWithoutATrn")
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
 
             builder.Services.AddTransient<QtsImporter>();
@@ -271,6 +276,16 @@ public static class HostApplicationBuilderExtensions
                     nameof(CapitaImportJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaImportJob.JobSchedule);
+
+                recurringJobManager.AddOrUpdate<DeletePersonAndChildRecordsWithoutATrnJob>(
+                    $"{nameof(DeletePersonAndChildRecordsWithoutATrnJob)} (dry-run)",
+                    job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<DeletePersonAndChildRecordsWithoutATrnJob>(
+                    nameof(DeletePersonAndChildRecordsWithoutATrnJob),
+                    job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                    Cron.Never);
 
                 return Task.CompletedTask;
             });
