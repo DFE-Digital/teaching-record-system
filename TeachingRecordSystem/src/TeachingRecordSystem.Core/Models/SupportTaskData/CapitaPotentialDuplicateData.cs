@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
+[SupportTaskData("fdee6a10-6338-463a-b6df-e34a2b95a854")]
 public record CapitaPotentialDuplicateData
 {
     public CapitaPotentialDuplicateAttributes? SelectedPersonAttributes { get; init; }

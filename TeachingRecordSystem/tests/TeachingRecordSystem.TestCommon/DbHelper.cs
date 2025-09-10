@@ -133,7 +133,8 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "countries",
                     "training_subjects",
                     "degree_types",
-                    "training_providers"
+                    "training_providers",
+                    "support_task_types"
                 ]
             });
 }

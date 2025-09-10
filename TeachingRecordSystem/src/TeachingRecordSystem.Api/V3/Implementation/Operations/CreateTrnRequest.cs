@@ -86,7 +86,7 @@ public class CreateTrnRequestHandler(
             if (furtherChecksNeeded)
             {
                 var furtherChecksSupportTask = PostgresModels.SupportTask.Create(
-                    SupportTaskType.TrnRequestManualChecksNeeded,
+                    PostgresModels.SupportTaskType.TrnRequestManualChecksNeeded,
                     new TrnRequestManualChecksNeededData(),
                     matchResult.PersonId,
                     command.OneLoginUserSubject,
@@ -103,7 +103,7 @@ public class CreateTrnRequestHandler(
         else if (matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches)
         {
             var supportTask = PostgresModels.SupportTask.Create(
-                SupportTaskType.ApiTrnRequest,
+                PostgresModels.SupportTaskType.ApiTrnRequest,
                 new ApiTrnRequestData(),
                 personId: null,
                 command.OneLoginUserSubject,

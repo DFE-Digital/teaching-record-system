@@ -729,7 +729,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
     {
         var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
         var supportTask = await dbContext.SupportTasks
-            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
+            .SingleOrDefaultAsync(t => t.SupportTaskTypeId == PostgresModels.SupportTaskType.NpqTrnRequest.SupportTaskTypeId &&
                 t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
 
         Assert.NotNull(supportTask);
@@ -741,7 +741,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
     {
         var applicationUserId = PostgresModels.ApplicationUser.NpqApplicationUserGuid;
         var supportTask = await dbContext.SupportTasks
-            .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
+            .SingleOrDefaultAsync(t => t.SupportTaskType == PostgresModels.SupportTaskType.NpqTrnRequest &&
                 t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
         var events = await dbContext.Events
             .Where(e => e.EventName == nameof(SupportTaskCreatedEvent))

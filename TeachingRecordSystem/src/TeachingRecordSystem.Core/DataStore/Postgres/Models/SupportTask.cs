@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -15,8 +14,8 @@ public class SupportTask
     public required string SupportTaskReference { get; set; }
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
-    public required SupportTaskType SupportTaskType { get; init; }
-    public Guid? SupportTaskTypeId { get; init; }
+    public required Guid SupportTaskTypeId { get; init; }
+    public SupportTaskType SupportTaskType => SupportTaskType.FromSupportTaskTypeId(SupportTaskTypeId);
     public required SupportTaskStatus Status { get; set; }
     public string? OneLoginUserSubject { get; init; }
     public Guid? PersonId { get; init; }
@@ -27,8 +26,8 @@ public class SupportTask
 
     public required object Data
     {
-        get => JsonSerializer.Deserialize(_data, GetDataType(), SerializerOptions)!;
-        init => _data = JsonSerializer.SerializeToDocument(value, GetDataType(), SerializerOptions);
+        get => JsonSerializer.Deserialize(_data, SupportTaskType.DataType, SerializerOptions)!;
+        init => _data = JsonSerializer.SerializeToDocument(value, SupportTaskType.DataType, SerializerOptions);
     }
 
     public static SupportTask Create(
@@ -47,8 +46,7 @@ public class SupportTask
             SupportTaskReference = GenerateSupportTaskReference(),
             CreatedOn = now,
             UpdatedOn = now,
-            SupportTaskType = supportTaskType,
-            SupportTaskTypeId = supportTaskType.GetSupportTaskTypeId(),
+            SupportTaskTypeId = supportTaskType.SupportTaskTypeId,
             Status = SupportTaskStatus.Open,
             Data = data,
             PersonId = personId,
@@ -123,21 +121,7 @@ public class SupportTask
     {
         var currentValue = GetData<T>();
         var newValue = update(currentValue);
-        _data = JsonSerializer.SerializeToDocument(newValue, GetDataType(), SerializerOptions);
+        _data = JsonSerializer.SerializeToDocument(newValue, SupportTaskType.DataType, SerializerOptions);
         return newValue;
     }
-
-    internal static Type GetDataType(SupportTaskType supportTaskType) => supportTaskType switch
-    {
-        SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
-        SupportTaskType.ChangeDateOfBirthRequest => typeof(ChangeDateOfBirthRequestData),
-        SupportTaskType.ChangeNameRequest => typeof(ChangeNameRequestData),
-        SupportTaskType.ApiTrnRequest => typeof(ApiTrnRequestData),
-        SupportTaskType.NpqTrnRequest => typeof(NpqTrnRequestData),
-        SupportTaskType.TrnRequestManualChecksNeeded => typeof(TrnRequestManualChecksNeededData),
-        SupportTaskType.CapitaImportPotentialDuplicate => typeof(CapitaPotentialDuplicateData),
-        _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
-    };
-
-    private Type GetDataType() => GetDataType(SupportTaskType);
 }
