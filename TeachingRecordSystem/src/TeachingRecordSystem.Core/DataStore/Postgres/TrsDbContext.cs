@@ -137,7 +137,9 @@ public class TrsDbContext : DbContext
 
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
-        Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
+        Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o
+            .CommandTimeout(commandTimeout)
+            .EnableRetryOnFailure();
 
         if (connectionString != null)
         {
