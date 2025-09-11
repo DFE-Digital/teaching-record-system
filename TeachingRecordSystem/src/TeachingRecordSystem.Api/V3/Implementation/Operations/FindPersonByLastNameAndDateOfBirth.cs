@@ -15,13 +15,13 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
         var matchedPersons = await DbContext.Database.SqlQueryRaw<Result>(
                 """
                 SELECT person_id FROM person_search_attributes
-                WHERE (attribute_type = 'LastName' AND attribute_value = (:last_name COLLATE "case_insensitive")) OR
+                WHERE (attribute_type = 'LastName' AND attribute_value IN (:last_names COLLATE "case_insensitive")) OR
                       (attribute_type = 'DateOfBirth' AND attribute_value = (:date_of_birth COLLATE "case_insensitive"))
                 GROUP BY person_id
                 HAVING COUNT(DISTINCT attribute_type) = 2
                 """,
                 parameters: [
-                    new NpgsqlParameter("last_name", command.LastName),
+                    new NpgsqlParameter("last_names", PersonSearchAttribute.SplitNames(command.LastName)),
                     new NpgsqlParameter("date_of_birth", command.DateOfBirth.ToString("yyyy-MM-dd"))
                 ]
             ).ToArrayAsync();
