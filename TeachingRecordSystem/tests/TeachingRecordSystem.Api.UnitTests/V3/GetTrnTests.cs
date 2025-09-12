@@ -14,7 +14,7 @@ public class GetTrnTests : OperationTestBase
             var command = new GetTrnCommand(trn);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
@@ -35,7 +35,7 @@ public class GetTrnTests : OperationTestBase
             var command = new GetTrnCommand(person.Trn!);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.RecordIsNotActive);
@@ -59,7 +59,7 @@ public class GetTrnTests : OperationTestBase
             var command = new GetTrnCommand(person.Trn!);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var error = AssertError(result, ApiError.ErrorCodes.RecordIsMerged);
@@ -82,7 +82,7 @@ public class GetTrnTests : OperationTestBase
             var command = new GetTrnCommand(person.Trn!);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);

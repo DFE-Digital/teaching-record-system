@@ -11,7 +11,7 @@ using TeachingRecordSystem.Api.V3.V20250627.Responses;
 namespace TeachingRecordSystem.Api.V3.V20250627.Controllers;
 
 [Route("person")]
-public class PersonController(IMapper mapper) : ControllerBase
+public class PersonController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [HttpGet]
@@ -22,8 +22,7 @@ public class PersonController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAsync(
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
-        [FromServices] GetPersonHandler handler)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include)
     {
         var command = new GetPersonCommand(
             Trn: User.FindFirstValue("trn")!,
@@ -31,7 +30,7 @@ public class PersonController(IMapper mapper) : ControllerBase
             DateOfBirth: null,
             NationalInsuranceNumber: null);
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);

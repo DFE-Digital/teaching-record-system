@@ -13,7 +13,7 @@ public class SetQtlsTests : OperationTestBase
             var command = new SetQtlsCommand("0000000", QtsDate: null);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
@@ -29,7 +29,7 @@ public class SetQtlsTests : OperationTestBase
             var command = new SetQtlsCommand(person.Trn!, QtsDate: null);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);
@@ -49,7 +49,7 @@ public class SetQtlsTests : OperationTestBase
             EventObserver.Clear();
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);
@@ -82,7 +82,7 @@ public class SetQtlsTests : OperationTestBase
             EventObserver.Clear();
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);
@@ -118,7 +118,7 @@ public class SetQtlsTests : OperationTestBase
             EventObserver.Clear();
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);
@@ -140,7 +140,7 @@ public class SetQtlsTests : OperationTestBase
             EventObserver.Clear();
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);

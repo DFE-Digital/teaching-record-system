@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240606.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 
 [Route("persons")]
-public class PersonsController(IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -24,8 +24,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
-        [FromServices] GetPersonHandler handler)
+        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth)
     {
         var command = new GetPersonCommand(
             trn,
@@ -37,7 +36,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
                 ApplyLegacyAlertsBehavior = true
             });
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
@@ -51,12 +50,10 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync(
-        FindPersonRequest request,
-        [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
+    public async Task<IActionResult> FindPersonsAsync(FindPersonRequest request)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r =>
             Ok(new FindPersonResponse()

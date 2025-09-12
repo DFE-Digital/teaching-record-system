@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240416.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240416.Controllers;
 
 [Route("teachers")]
-public class TeachersController(IMapper mapper) : ControllerBase
+public class TeachersController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -24,8 +24,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
-        [FromServices] GetPersonHandler handler)
+        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth)
     {
         var command = new GetPersonCommand(
             trn,
@@ -37,7 +36,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
                 ApplyLegacyAlertsBehavior = true
             });
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);

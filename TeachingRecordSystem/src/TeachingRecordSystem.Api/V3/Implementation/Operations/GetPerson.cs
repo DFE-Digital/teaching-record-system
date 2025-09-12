@@ -19,7 +19,8 @@ public record GetPersonCommand(
     GetPersonCommandIncludes Include,
     DateOnly? DateOfBirth,
     string? NationalInsuranceNumber,
-    GetPersonCommandOptions? Options = null);
+    GetPersonCommandOptions? Options = null) :
+    ICommand<GetPersonResult>;
 
 public record GetPersonCommandOptions
 {
@@ -173,9 +174,10 @@ public record GetPersonResultRouteToProfessionalStatusInductionExemption
     public required IReadOnlyCollection<PostgresModels.InductionExemptionReason> ExemptionReasons { get; init; }
 }
 
-public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referenceDataCache)
+public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referenceDataCache) :
+    ICommandHandler<GetPersonCommand, GetPersonResult>
 {
-    public async Task<ApiResult<GetPersonResult>> HandleAsync(GetPersonCommand command)
+    public async Task<ApiResult<GetPersonResult>> ExecuteAsync(GetPersonCommand command)
     {
         var options = command.Options ?? new GetPersonCommandOptions();
 

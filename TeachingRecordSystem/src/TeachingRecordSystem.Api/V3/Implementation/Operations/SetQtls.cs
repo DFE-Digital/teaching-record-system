@@ -4,15 +4,16 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record SetQtlsCommand(string Trn, DateOnly? QtsDate);
+public record SetQtlsCommand(string Trn, DateOnly? QtsDate) : ICommand<QtlsResult>;
 
 public class SetQtlsHandler(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     ICurrentUserProvider currentUserProvider,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<SetQtlsCommand, QtlsResult>
 {
-    public async Task<ApiResult<QtlsResult>> HandleAsync(SetQtlsCommand command)
+    public async Task<ApiResult<QtlsResult>> ExecuteAsync(SetQtlsCommand command)
     {
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)

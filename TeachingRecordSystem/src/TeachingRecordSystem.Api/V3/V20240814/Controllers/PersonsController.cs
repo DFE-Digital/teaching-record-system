@@ -9,7 +9,7 @@ using TeachingRecordSystem.Api.V3.V20240814.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240814.Controllers;
 
 [Route("persons")]
-public class PersonsController(IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPost("find")]
     [SwaggerOperation(
@@ -19,12 +19,10 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync(
-        [FromBody] FindPersonsRequest request,
-        [FromServices] FindPersonsByTrnAndDateOfBirthHandler handler)
+    public async Task<IActionResult> FindPersonsAsync([FromBody] FindPersonsRequest request)
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
         return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
     }
 
@@ -36,12 +34,10 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync(
-        FindPersonRequest request,
-        [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
+    public async Task<IActionResult> FindPersonsAsync(FindPersonRequest request)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r =>
             Ok(new FindPersonResponse()

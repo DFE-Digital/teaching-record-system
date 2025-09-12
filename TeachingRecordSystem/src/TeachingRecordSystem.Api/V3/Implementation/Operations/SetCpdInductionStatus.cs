@@ -8,13 +8,15 @@ public record SetCpdInductionStatusCommand(
     InductionStatus Status,
     DateOnly? StartDate,
     DateOnly? CompletedDate,
-    DateTime CpdModifiedOn);
+    DateTime CpdModifiedOn) :
+    ICommand<SetCpdInductionStatusResult>;
 
 public record SetCpdInductionStatusResult;
 
-public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserProvider currentUserProvider, IClock clock)
+public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserProvider currentUserProvider, IClock clock) :
+    ICommandHandler<SetCpdInductionStatusCommand, SetCpdInductionStatusResult>
 {
-    public async Task<ApiResult<SetCpdInductionStatusResult>> HandleAsync(SetCpdInductionStatusCommand command)
+    public async Task<ApiResult<SetCpdInductionStatusResult>> ExecuteAsync(SetCpdInductionStatusCommand command)
     {
         if (command.Status is not InductionStatus.RequiredToComplete and not InductionStatus.InProgress
             and not InductionStatus.Passed and not InductionStatus.Failed)

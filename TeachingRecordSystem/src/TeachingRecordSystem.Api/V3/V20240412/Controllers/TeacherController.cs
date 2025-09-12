@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240412.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240412.Controllers;
 
 [Route("teacher")]
-public class TeacherController(IMapper mapper) : ControllerBase
+public class TeacherController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPost("name-changes")]
     [SwaggerOperation(
@@ -20,9 +20,7 @@ public class TeacherController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-    public async Task<IActionResult> CreateNameChangeAsync(
-        [FromBody] CreateNameChangeRequestRequest request,
-        [FromServices] CreateNameChangeRequestHandler handler)
+    public async Task<IActionResult> CreateNameChangeAsync([FromBody] CreateNameChangeRequestRequest request)
     {
         var command = new CreateNameChangeRequestCommand()
         {
@@ -35,7 +33,7 @@ public class TeacherController(IMapper mapper) : ControllerBase
             EmailAddress = request.Email
         };
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<CreateNameChangeResponse>(r)));
     }
@@ -48,9 +46,7 @@ public class TeacherController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-    public async Task<IActionResult> CreateDateOfBirthChangeAsync(
-        [FromBody] CreateDateOfBirthChangeRequestRequest request,
-        [FromServices] CreateDateOfBirthChangeRequestHandler handler)
+    public async Task<IActionResult> CreateDateOfBirthChangeAsync([FromBody] CreateDateOfBirthChangeRequestRequest request)
     {
         var command = new CreateDateOfBirthChangeRequestCommand()
         {
@@ -61,7 +57,7 @@ public class TeacherController(IMapper mapper) : ControllerBase
             EmailAddress = request.Email
         };
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<CreateDateOfBirthChangeResponse>(r)));
     }

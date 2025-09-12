@@ -46,7 +46,7 @@ public class CreateTrnRequestTests : OperationTestBase
                 .WithTrnRequest(applicationUserId, command.RequestId));
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
             AssertError(result, 10029);  // Cannot resubmit request
         });
 
@@ -64,7 +64,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var metadata = await WithDbContextAsync(dbContext =>
@@ -85,7 +85,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);
@@ -102,7 +102,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertSuccess(result);
@@ -155,7 +155,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -193,7 +193,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -231,7 +231,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -266,7 +266,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -309,7 +309,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -358,7 +358,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -401,7 +401,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -452,7 +452,7 @@ public class CreateTrnRequestTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -487,7 +487,7 @@ public class CreateTrnRequestTests : OperationTestBase
             var command = CreateCommand();
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);

@@ -17,7 +17,8 @@ public record SetRouteToProfessionalStatusCommand(
     string? TrainingCountryReference,
     string? TrainingProviderUkprn,
     Guid? DegreeTypeId,
-    bool? IsExemptFromInduction);
+    bool? IsExemptFromInduction) :
+    ICommand<SetRouteToProfessionalStatusResult>;
 
 public record SetRouteToProfessionalStatusCommandTrainingAgeSpecialism(
     TrainingAgeSpecialismType Type,
@@ -30,7 +31,8 @@ public class SetRouteToProfessionalStatusHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
     ReferenceDataCache referenceDataCache,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<SetRouteToProfessionalStatusCommand, SetRouteToProfessionalStatusResult>
 {
     private static readonly IReadOnlyCollection<Guid> _permittedRouteTypeIds =
     [
@@ -67,7 +69,7 @@ public class SetRouteToProfessionalStatusHandler(
         new("20F67E38-F117-4B42-BBFC-5812AA717B94")
     ];
 
-    public async Task<ApiResult<SetRouteToProfessionalStatusResult>> HandleAsync(SetRouteToProfessionalStatusCommand command)
+    public async Task<ApiResult<SetRouteToProfessionalStatusResult>> ExecuteAsync(SetRouteToProfessionalStatusCommand command)
     {
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)

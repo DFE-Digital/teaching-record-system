@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20250327.Responses;
 namespace TeachingRecordSystem.Api.V3.V20250327.Controllers;
 
 [Route("persons")]
-public class PersonsController(IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -25,8 +25,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
         [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified nationalInsuranceNumber, if provided.")] string? nationalInsuranceNumber,
-        [FromServices] GetPersonHandler handler)
+        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified nationalInsuranceNumber, if provided.")] string? nationalInsuranceNumber)
     {
         include ??= GetPersonRequestIncludes.None;
 
@@ -46,7 +45,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
                 ApplyAppropriateBodyUserRestrictions = User.IsInRole(ApiRoles.AppropriateBody)
             });
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result
             .ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
@@ -62,12 +61,10 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync(
-        [FromBody] FindPersonsRequest request,
-        [FromServices] FindPersonsByTrnAndDateOfBirthHandler handler)
+    public async Task<IActionResult> FindPersonsAsync([FromBody] FindPersonsRequest request)
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
         return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
     }
 
@@ -79,12 +76,10 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync(
-        FindPersonRequest request,
-        [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
+    public async Task<IActionResult> FindPersonsAsync(FindPersonRequest request)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r =>
             Ok(new FindPersonResponse()

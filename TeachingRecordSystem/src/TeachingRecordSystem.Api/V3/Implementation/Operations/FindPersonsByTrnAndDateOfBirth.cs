@@ -2,14 +2,15 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record FindPersonsByTrnAndDateOfBirthCommand(IEnumerable<(string Trn, DateOnly DateOfBirth)> Persons);
+public record FindPersonsByTrnAndDateOfBirthCommand(IEnumerable<(string Trn, DateOnly DateOfBirth)> Persons) : ICommand<FindPersonsResult>;
 
 public class FindPersonsByTrnAndDateOfBirthHandler(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache) :
-    FindPersonsHandlerBase(dbContext, referenceDataCache)
+    FindPersonsHandlerBase(dbContext, referenceDataCache),
+    ICommandHandler<FindPersonsByTrnAndDateOfBirthCommand, FindPersonsResult>
 {
-    public async Task<ApiResult<FindPersonsResult>> HandleAsync(FindPersonsByTrnAndDateOfBirthCommand command)
+    public async Task<ApiResult<FindPersonsResult>> ExecuteAsync(FindPersonsByTrnAndDateOfBirthCommand command)
     {
         var trns = command.Persons
             .Where(t => !string.IsNullOrEmpty(t.Trn))

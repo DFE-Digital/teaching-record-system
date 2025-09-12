@@ -8,7 +8,7 @@ using TeachingRecordSystem.Api.V3.VNext.Requests;
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
 [Route("persons")]
-public class PersonsController : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/welsh-induction")]
     [SwaggerOperation(
@@ -21,8 +21,7 @@ public class PersonsController : ControllerBase
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetWelshInduction)]
     public async Task<IActionResult> SetWelshInductionStatusAsync(
         [FromRoute] string trn,
-        [FromBody] SetWelshInductionStatusRequest request,
-        [FromServices] SetWelshInductionStatusHandler handler)
+        [FromBody] SetWelshInductionStatusRequest request)
     {
         var command = new SetWelshInductionStatusCommand(
             trn,
@@ -30,7 +29,7 @@ public class PersonsController : ControllerBase
             request.StartDate,
             request.CompletedDate);
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);

@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
-public class TrnRequestsController(IMapper mapper) : ControllerBase
+public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPost("")]
     [SwaggerOperation(
@@ -24,9 +24,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateTrnRequestAsync(
-        [FromBody] CreateTrnRequestRequest request,
-        [FromServices] CreateTrnRequestHandler handler)
+    public async Task<IActionResult> CreateTrnRequestAsync([FromBody] CreateTrnRequestRequest request)
     {
         var command = new CreateTrnRequestCommand()
         {
@@ -41,7 +39,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             OneLoginUserSubject = null,
             Gender = null
         };
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestAlreadyCreated, StatusCodes.Status409Conflict);
@@ -57,12 +55,10 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
         """)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTrnRequestAsync(
-        [FromQuery] string requestId,
-        [FromServices] GetTrnRequestHandler handler)
+    public async Task<IActionResult> GetTrnRequestAsync([FromQuery] string requestId)
     {
         var command = new GetTrnRequestCommand(requestId);
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);

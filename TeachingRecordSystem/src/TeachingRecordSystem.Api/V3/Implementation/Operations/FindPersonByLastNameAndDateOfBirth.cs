@@ -3,14 +3,15 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record FindPersonByLastNameAndDateOfBirthCommand(string LastName, DateOnly DateOfBirth);
+public record FindPersonByLastNameAndDateOfBirthCommand(string LastName, DateOnly DateOfBirth) : ICommand<FindPersonsResult>;
 
 public class FindPersonByLastNameAndDateOfBirthHandler(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache) :
-    FindPersonsHandlerBase(dbContext, referenceDataCache)
+    FindPersonsHandlerBase(dbContext, referenceDataCache),
+    ICommandHandler<FindPersonByLastNameAndDateOfBirthCommand, FindPersonsResult>
 {
-    public async Task<ApiResult<FindPersonsResult>> HandleAsync(FindPersonByLastNameAndDateOfBirthCommand command)
+    public async Task<ApiResult<FindPersonsResult>> ExecuteAsync(FindPersonByLastNameAndDateOfBirthCommand command)
     {
         var matchedPersons = await DbContext.Database.SqlQueryRaw<Result>(
                 """

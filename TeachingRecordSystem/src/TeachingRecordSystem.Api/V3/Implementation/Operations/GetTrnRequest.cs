@@ -5,11 +5,12 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record GetTrnRequestCommand(string RequestId);
+public record GetTrnRequestCommand(string RequestId) : ICommand<TrnRequestInfo>;
 
-public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider)
+public class GetTrnRequestHandler(TrsDbContext dbContext, TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider) :
+    ICommandHandler<GetTrnRequestCommand, TrnRequestInfo>
 {
-    public async Task<ApiResult<TrnRequestInfo>> HandleAsync(GetTrnRequestCommand command)
+    public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(GetTrnRequestCommand command)
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 

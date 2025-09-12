@@ -3,14 +3,17 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record SetDeceasedCommand(string Trn, DateOnly DateOfDeath);
+public record SetDeceasedCommand(string Trn, DateOnly DateOfDeath) : ICommand<SetDeceasedResult>;
+
+public record SetDeceasedResult;
 
 public class SetDeceasedHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<SetDeceasedCommand, SetDeceasedResult>
 {
-    public async Task<ApiResult<Unit>> HandleAsync(SetDeceasedCommand command)
+    public async Task<ApiResult<SetDeceasedResult>> ExecuteAsync(SetDeceasedCommand command)
     {
         var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
 
@@ -41,6 +44,6 @@ public class SetDeceasedHandler(
 
         await dbContext.SaveChangesAsync();
 
-        return Unit.Instance;
+        return new SetDeceasedResult();
     }
 }
