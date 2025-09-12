@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Transactions;
 using Hangfire;
 using Hangfire.States;
 using Npgsql;
@@ -9,12 +10,16 @@ public class HangfireBackgroundJobScheduler(IBackgroundJobClient jobClient, Npgs
 {
     public Task<string> EnqueueAsync<T>(Expression<Func<T, Task>> expression) where T : notnull
     {
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
+
         var jobId = jobClient.Enqueue(expression);
         return Task.FromResult(jobId);
     }
 
     public Task<string> ContinueJobWithAsync<T>(string parentId, Expression<Func<T, Task>> expression) where T : notnull
     {
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
+
         var jobId = jobClient.ContinueJobWith(parentId, expression);
         return Task.FromResult(jobId);
     }

@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
@@ -60,7 +61,16 @@ public abstract class OperationTestBase
     {
         var serviceScopeFactory = Services.GetRequiredService<IServiceScopeFactory>();
         using var scope = serviceScopeFactory.CreateScope();
+
+        using var txn = new TransactionScope(
+            TransactionScopeOption.RequiresNew,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+
         var handler = ActivatorUtilities.CreateInstance<THandler>(scope.ServiceProvider, parameters);
+
         await action(handler);
+
+        txn.Complete();
     }
 }

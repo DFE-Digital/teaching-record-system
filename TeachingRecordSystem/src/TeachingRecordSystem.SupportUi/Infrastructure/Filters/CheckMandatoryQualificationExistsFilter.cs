@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -24,7 +25,7 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
             return;
         }
 
-        await context.HttpContext.EnsureDbTransactionAsync();
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
 
         var query = dbContext.MandatoryQualifications
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update")  // https://github.com/dotnet/efcore/issues/26042
