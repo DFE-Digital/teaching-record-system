@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
-using TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -24,12 +23,7 @@ public static class AlertsAuthorization
         builder.Services
             .AddSingleton<IAuthorizationHandler, AlertsViewAuthorizationHandler>()
             .AddSingleton<IAuthorizationHandler, AlertsEditAuthorizationHandler>()
-            .AddSingleton<IAuthorizationHandler, AlertTypeAuthorizationHandler>()
-
-            // AuthorizationHandlers for Legacy user roles, delete when existing users have been migrated to new user roles.
-            .AddSingleton<IAuthorizationHandler, LegacyAlertsViewAuthorizationHandler>()
-            .AddSingleton<IAuthorizationHandler, LegacyAlertsEditAuthorizationHandler>()
-            .AddSingleton<IAuthorizationHandler, LegacyAlertTypeAuthorizationHandler>();
+            .AddSingleton<IAuthorizationHandler, AlertTypeAuthorizationHandler>();
 
         return builder;
     }

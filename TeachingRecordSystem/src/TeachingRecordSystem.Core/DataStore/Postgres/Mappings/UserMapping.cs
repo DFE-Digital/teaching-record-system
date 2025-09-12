@@ -24,7 +24,6 @@ public class UserMapping : IEntityTypeConfiguration<User>
     {
         builder.Property(e => e.Email).HasMaxLength(User.EmailMaxLength);
         builder.Property(e => e.AzureAdUserId).HasMaxLength(User.AzureAdUserIdMaxLength);
-        builder.Property(e => e.Roles).HasColumnType("varchar[]");
         builder.Property(e => e.Role).HasMaxLength(User.RoleMaxLength);
         builder.HasIndex(e => e.AzureAdUserId).IsUnique();
     }

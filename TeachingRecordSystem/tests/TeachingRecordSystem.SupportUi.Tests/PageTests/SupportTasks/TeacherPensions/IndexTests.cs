@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 [Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
-        await WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
+        return WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

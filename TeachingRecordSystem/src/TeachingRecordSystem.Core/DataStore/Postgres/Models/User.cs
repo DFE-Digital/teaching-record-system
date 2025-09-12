@@ -23,10 +23,7 @@ public class User : UserBase
 
     public required string? Email { get; set; }
     public string? AzureAdUserId { get; set; }
-    // Column containing Legacy user roles, delete when existing users have been migrated to new user roles.
-    public string[]? Roles { get; set; } = [];
-    // Make required when existing users have been migrated to new user roles.
-    public string? Role { get; set; }
+    public required string? Role { get; set; }
     public Guid? DqtUserId { get; set; }
 }
 

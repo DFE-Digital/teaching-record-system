@@ -56,14 +56,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -112,14 +106,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -225,14 +213,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -337,14 +319,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -462,14 +438,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -541,14 +511,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -622,14 +586,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -704,14 +662,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
                 .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-            var user = new User()
-            {
-                UserId = Guid.NewGuid(),
-                Name = Faker.Name.First(),
-                Email = Faker.Internet.Email()
-            };
-            dbContext.Users.Add(user);
-            await dbContext.SaveChangesAsync();
+            var user = await TestData.CreateUserAsync();
+
             var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
             var jobOption = Options.Create(option);
             var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -787,14 +739,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
@@ -835,14 +781,8 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = new User()
-        {
-            UserId = Guid.NewGuid(),
-            Name = Faker.Name.First(),
-            Email = Faker.Internet.Email()
-        };
-        dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        var user = await TestData.CreateUserAsync();
+
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
         var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);

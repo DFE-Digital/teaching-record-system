@@ -222,7 +222,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(hasReadWriteAccess
             ? TestUsers.GetUser(UserRoles.RecordManager)
-            : TestUsers.GetUser(role: null));
+            : TestUsers.GetUser(UserRoles.Viewer));
 
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
@@ -367,7 +367,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     [Theory]
     [InlineData(UserRoles.RecordManager, true)]
-    [InlineData(null, false)]
+    [InlineData(UserRoles.Viewer, false)]
     public async Task Get_InductionExemption_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange
@@ -412,7 +412,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     [Theory]
     [InlineData(UserRoles.RecordManager, true)]
-    [InlineData(null, false)]
+    [InlineData(UserRoles.Viewer, false)]
     public async Task Get_InductionStartAndEndDate_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange

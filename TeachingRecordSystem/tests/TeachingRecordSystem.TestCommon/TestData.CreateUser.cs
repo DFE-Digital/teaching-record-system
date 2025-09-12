@@ -2,7 +2,6 @@ using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Legacy;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -105,40 +104,6 @@ public partial class TestData
         });
 
         return users;
-    }
-
-    public async Task<User> CreateUserWithLegacyRolesAsync(
-        bool? active = null,
-        string? name = null,
-        string? email = null,
-        string[]? roles = null,
-        Guid? azureAdUserId = null)
-    {
-        var user = await WithDbContextAsync(async dbContext =>
-        {
-            active ??= true;
-            name ??= GenerateName();
-            email ??= GenerateUniqueEmail();
-            roles ??= [LegacyUserRoles.Helpdesk];
-
-            var user = new User()
-            {
-                Active = active.Value,
-                Name = name,
-                Email = email,
-                Roles = roles,
-                UserId = Guid.NewGuid(),
-                AzureAdUserId = azureAdUserId?.ToString(),
-            };
-
-            dbContext.Users.Add(user);
-
-            await dbContext.SaveChangesAsync();
-
-            return user;
-        });
-
-        return user;
     }
 
     public async Task CreateCrmUserAsync(
