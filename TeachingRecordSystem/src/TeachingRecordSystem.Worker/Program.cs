@@ -23,6 +23,12 @@ using TeachingRecordSystem.Worker.Infrastructure.Logging;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+builder.ConfigureContainer(new DefaultServiceProviderFactory(new ServiceProviderOptions()
+{
+    ValidateOnBuild = true,
+    ValidateScopes = true
+}));
+
 if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddAksConfiguration();

@@ -35,6 +35,12 @@ using TeachingRecordSystem.WebCommon.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseDefaultServiceProvider(options =>
+{
+    options.ValidateOnBuild = true;
+    options.ValidateScopes = true;
+});
+
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.AddServiceDefaults(dataProtectionBlobName: "SupportUi");
