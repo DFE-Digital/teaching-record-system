@@ -7,7 +7,7 @@ using TeachingRecordSystem.Api.V3.Implementation.Operations;
 namespace TeachingRecordSystem.Api.V3.V20250905.Controllers;
 
 [Route("trns")]
-public class TrnsController : ControllerBase
+public class TrnsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
     [ActionName("GetTrn")]
@@ -21,10 +21,9 @@ public class TrnsController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey)]
     public async Task<IActionResult> GetTrnAsync(
-        [FromRoute] string trn,
-        [FromServices] GetTrnHandler handler)
+        [FromRoute] string trn)
     {
-        var result = await handler.HandleAsync(new GetTrnCommand(trn));
+        var result = await commandDispatcher.DispatchAsync(new GetTrnCommand(trn));
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)

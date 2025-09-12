@@ -13,7 +13,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             var command = await CreateCommand();
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
@@ -32,7 +32,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.SpecifiedResourceUrlDoesNotExist);
@@ -50,7 +50,7 @@ public class CreateDateOfBirthChangeTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);

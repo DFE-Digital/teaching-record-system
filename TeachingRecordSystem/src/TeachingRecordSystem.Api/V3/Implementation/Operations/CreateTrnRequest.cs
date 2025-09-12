@@ -10,7 +10,7 @@ using Gender = TeachingRecordSystem.Core.Models.Gender;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record CreateTrnRequestCommand
+public record CreateTrnRequestCommand : ICommand<TrnRequestInfo>
 {
     public required string RequestId { get; init; }
     public required string FirstName { get; init; }
@@ -30,9 +30,10 @@ public class CreateTrnRequestHandler(
     TrnRequestService trnRequestService,
     ICurrentUserProvider currentUserProvider,
     ITrnGenerator trnGenerator,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<CreateTrnRequestCommand, TrnRequestInfo>
 {
-    public async Task<ApiResult<TrnRequestInfo>> HandleAsync(CreateTrnRequestCommand command)
+    public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(CreateTrnRequestCommand command)
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 

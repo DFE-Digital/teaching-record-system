@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.ApiSchema.V3.V20240912.Dtos;
 namespace TeachingRecordSystem.Api.V3.V20240912.Controllers;
 
 [Route("persons")]
-public class PersonsController(IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPut("{trn}/qtls")]
     [SwaggerOperation(
@@ -21,11 +21,10 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
     public async Task<IActionResult> PutQtlsAsync(
         [FromRoute] string trn,
-        [FromBody] SetQtlsRequest request,
-        [FromServices] SetQtlsHandler handler)
+        [FromBody] SetQtlsRequest request)
     {
         var command = new SetQtlsCommand(trn, request.QtsDate);
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<QtlsResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
@@ -39,12 +38,10 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
-    public async Task<IActionResult> GetQtlsAsync(
-        [FromRoute] string trn,
-        [FromServices] GetQtlsHandler handler)
+    public async Task<IActionResult> GetQtlsAsync([FromRoute] string trn)
     {
         var command = new GetQtlsCommand(trn);
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
         return result.ToActionResult(r => Ok(mapper.Map<QtlsResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }

@@ -161,11 +161,6 @@ services
 services.Scan(scan =>
 {
     scan.FromAssemblyOf<Program>()
-        .AddClasses(filter => filter.InNamespaces("TeachingRecordSystem.Api.V3.Implementation.Operations").Where(type => type.Name.EndsWith("Handler")))
-            .AsSelf()
-            .WithTransientLifetime();
-
-    scan.FromAssemblyOf<Program>()
         .AddClasses(filter => filter.AssignableTo(typeof(ITypeConverter<,>)))
             .AsSelf()
             .WithTransientLifetime();
@@ -204,7 +199,8 @@ services
     .AddAccessYourTeachingQualificationsOptions(configuration, env)
     .AddFileService()
     .AddTransient<GetPersonHelper>()
-    .AddPersonMatching();
+    .AddPersonMatching()
+    .AddApiCommands();
 
 if (env.IsDevelopment() || env.IsProduction())
 {

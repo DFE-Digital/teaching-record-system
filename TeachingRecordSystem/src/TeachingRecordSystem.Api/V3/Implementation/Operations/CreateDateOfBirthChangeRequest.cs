@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record CreateDateOfBirthChangeRequestCommand
+public record CreateDateOfBirthChangeRequestCommand : ICommand<CreateDateOfBirthChangeRequestResult>
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }
@@ -26,11 +26,12 @@ public class CreateDateOfBirthChangeRequestHandler(
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
     IFileService fileService,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<CreateDateOfBirthChangeRequestCommand, CreateDateOfBirthChangeRequestResult>
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task<ApiResult<CreateDateOfBirthChangeRequestResult>> HandleAsync(CreateDateOfBirthChangeRequestCommand command)
+    public async Task<ApiResult<CreateDateOfBirthChangeRequestResult>> ExecuteAsync(CreateDateOfBirthChangeRequestCommand command)
     {
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)
@@ -76,7 +77,7 @@ public class CreateDateOfBirthChangeRequestHandler(
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
 
-        var supportTask = PostgresModels.SupportTask.Create(
+        var supportTask = SupportTask.Create(
             SupportTaskType.ChangeDateOfBirthRequest,
             changeRequestData,
             person.PersonId,

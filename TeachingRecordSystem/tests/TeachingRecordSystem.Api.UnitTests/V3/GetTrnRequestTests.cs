@@ -29,7 +29,7 @@ public class GetTrnRequestTests : OperationTestBase
             var command = new GetTrnRequestCommand(requestId);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.TrnRequestDoesNotExist);
@@ -50,7 +50,7 @@ public class GetTrnRequestTests : OperationTestBase
             var command = new GetTrnRequestCommand(requestId);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = result.GetSuccess();
@@ -74,7 +74,7 @@ public class GetTrnRequestTests : OperationTestBase
             var command = new GetTrnRequestCommand(requestId);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = result.GetSuccess();

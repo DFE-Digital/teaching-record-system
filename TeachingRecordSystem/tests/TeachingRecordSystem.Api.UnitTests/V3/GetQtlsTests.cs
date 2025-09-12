@@ -13,7 +13,7 @@ public class GetQtlsTests : OperationTestBase
             var command = new GetQtlsCommand("0000000");
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
@@ -29,7 +29,7 @@ public class GetQtlsTests : OperationTestBase
             var command = new GetQtlsCommand(person.Trn!);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);
@@ -53,7 +53,7 @@ public class GetQtlsTests : OperationTestBase
             var command = new GetQtlsCommand(person.Trn!);
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);

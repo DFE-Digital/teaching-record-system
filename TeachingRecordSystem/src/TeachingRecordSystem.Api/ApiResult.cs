@@ -72,10 +72,3 @@ public class ApiResultActionResultBuilder<TResult>(ApiResult<TResult> result, Fu
         return this;
     }
 }
-
-public sealed class Unit
-{
-    private Unit() { }
-
-    public static Unit Instance { get; } = new();
-}

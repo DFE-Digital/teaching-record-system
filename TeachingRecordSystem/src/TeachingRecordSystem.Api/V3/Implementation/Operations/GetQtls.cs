@@ -4,11 +4,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record GetQtlsCommand(string Trn);
+public record GetQtlsCommand(string Trn) : ICommand<QtlsResult>;
 
-public class GetQtlsHandler(TrsDbContext dbContext)
+public class GetQtlsHandler(TrsDbContext dbContext) : ICommandHandler<GetQtlsCommand, QtlsResult>
 {
-    public async Task<ApiResult<QtlsResult>> HandleAsync(GetQtlsCommand command)
+    public async Task<ApiResult<QtlsResult>> ExecuteAsync(GetQtlsCommand command)
     {
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)

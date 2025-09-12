@@ -11,7 +11,7 @@ using Gender = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.Gender;
 namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 
 [Route("persons")]
-public class PersonsController(IMapper mapper) : ControllerBase
+public class PersonsController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpPut("{trn}/professional-statuses/{reference}")]
     [SwaggerOperation(
@@ -24,8 +24,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     public async Task<IActionResult> SetProfessionalStatusAsync(
         [FromRoute] string trn,
         [FromRoute(Name = "reference")] string sourceApplicationReference,
-        [FromBody] SetProfessionalStatusRequest request,
-        [FromServices] SetRouteToProfessionalStatusHandler handler)
+        [FromBody] SetProfessionalStatusRequest request)
     {
         var command = new SetRouteToProfessionalStatusCommand(
             trn,
@@ -47,7 +46,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
             request.DegreeTypeId,
             request.IsExemptFromInduction);
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
@@ -63,8 +62,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> SetPiiAsync(
         [FromRoute] string trn,
-        [FromBody] SetPiiRequest request,
-        [FromServices] SetPiiHandler handler)
+        [FromBody] SetPiiRequest request)
     {
         var command = new SetPiiCommand()
         {
@@ -78,7 +76,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
             Gender = request.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null,
         };
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);

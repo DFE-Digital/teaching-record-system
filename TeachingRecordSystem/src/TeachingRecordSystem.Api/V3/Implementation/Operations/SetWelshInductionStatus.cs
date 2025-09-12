@@ -3,16 +3,17 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record SetWelshInductionStatusCommand(string Trn, bool Passed, DateOnly StartDate, DateOnly CompletedDate);
+public record SetWelshInductionStatusCommand(string Trn, bool Passed, DateOnly StartDate, DateOnly CompletedDate) : ICommand<SetWelshInductionStatusResult>;
 
 public record SetWelshInductionStatusResult;
 
 public class SetWelshInductionStatusHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<SetWelshInductionStatusCommand, SetWelshInductionStatusResult>
 {
-    public async Task<ApiResult<SetWelshInductionStatusResult>> HandleAsync(SetWelshInductionStatusCommand command)
+    public async Task<ApiResult<SetWelshInductionStatusResult>> ExecuteAsync(SetWelshInductionStatusCommand command)
     {
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)

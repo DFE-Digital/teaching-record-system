@@ -13,7 +13,7 @@ public class CreateNameChangeTests : OperationTestBase
             var command = await CreateCommand();
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.PersonNotFound);
@@ -32,7 +32,7 @@ public class CreateNameChangeTests : OperationTestBase
             };
 
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             AssertError(result, ApiError.ErrorCodes.SpecifiedResourceUrlDoesNotExist);
@@ -49,7 +49,7 @@ public class CreateNameChangeTests : OperationTestBase
                 Trn = createPersonResult.Trn!
             };
             // Act
-            var result = await handler.HandleAsync(command);
+            var result = await handler.ExecuteAsync(command);
 
             // Assert
             var success = AssertSuccess(result);

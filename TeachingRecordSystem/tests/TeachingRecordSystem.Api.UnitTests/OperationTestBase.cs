@@ -56,7 +56,7 @@ public abstract class OperationTestBase
 
     protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) => DbFixture.WithDbContextAsync(action);
 
-    protected virtual async Task WithHandler<THandler>(Func<THandler, Task> action, params object[] parameters) where THandler : notnull
+    protected virtual async Task WithHandler<THandler>(Func<THandler, Task> action, params object[] parameters)
     {
         var serviceScopeFactory = Services.GetRequiredService<IServiceScopeFactory>();
         using var scope = serviceScopeFactory.CreateScope();

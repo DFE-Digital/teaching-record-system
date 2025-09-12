@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record SetPiiCommand
+public record SetPiiCommand : ICommand<SetPiiResult>
 {
     public required string Trn { get; init; }
     public required string FirstName { get; init; }
@@ -15,12 +15,15 @@ public record SetPiiCommand
     public required Gender? Gender { get; init; }
 }
 
+public record SetPiiResult;
+
 public class SetPiiHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<SetPiiCommand, SetPiiResult>
 {
-    public async Task<ApiResult<Unit>> HandleAsync(SetPiiCommand command)
+    public async Task<ApiResult<SetPiiResult>> ExecuteAsync(SetPiiCommand command)
     {
         var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
 
@@ -77,6 +80,6 @@ public class SetPiiHandler(
 
         await dbContext.SaveChangesAsync();
 
-        return Unit.Instance;
+        return new SetPiiResult();
     }
 }

@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record CreateNameChangeRequestCommand
+public record CreateNameChangeRequestCommand : ICommand<CreateNameChangeRequestResult>
 {
     public required string Trn { get; init; }
     public required string FirstName { get; init; }
@@ -28,11 +28,12 @@ public class CreateNameChangeRequestHandler(
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
     IFileService fileService,
-    IClock clock)
+    IClock clock) :
+    ICommandHandler<CreateNameChangeRequestCommand, CreateNameChangeRequestResult>
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task<ApiResult<CreateNameChangeRequestResult>> HandleAsync(CreateNameChangeRequestCommand command)
+    public async Task<ApiResult<CreateNameChangeRequestResult>> ExecuteAsync(CreateNameChangeRequestCommand command)
     {
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)

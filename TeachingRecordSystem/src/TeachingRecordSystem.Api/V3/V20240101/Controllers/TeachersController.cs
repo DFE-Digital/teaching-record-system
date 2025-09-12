@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240101.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [Route("teachers")]
-public class TeachersController(IMapper mapper) : ControllerBase
+public class TeachersController(ICommandDispatcher commandDispatcher, IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -23,8 +23,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
-        [FromServices] GetPersonHandler handler)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
     {
         var command = new GetPersonCommand(
             trn,
@@ -36,7 +35,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
                 ApplyLegacyAlertsBehavior = true
             });
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
@@ -51,8 +50,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateNameChangeAsync(
-        [FromBody] CreateNameChangeRequestRequest request,
-        [FromServices] CreateNameChangeRequestHandler handler)
+        [FromBody] CreateNameChangeRequestRequest request)
     {
         var command = new CreateNameChangeRequestCommand()
         {
@@ -65,7 +63,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             EmailAddress = null
         };
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(_ => NoContent());
     }
@@ -79,8 +77,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateDateOfBirthChangeAsync(
-        [FromBody] CreateDateOfBirthChangeRequestRequest request,
-        [FromServices] CreateDateOfBirthChangeRequestHandler handler)
+        [FromBody] CreateDateOfBirthChangeRequestRequest request)
     {
         var command = new CreateDateOfBirthChangeRequestCommand()
         {
@@ -91,7 +88,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             EmailAddress = null
         };
 
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(_ => NoContent());
     }
@@ -104,12 +101,10 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindTeachersAsync(
-        FindTeachersRequest request,
-        [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
+    public async Task<IActionResult> FindTeachersAsync(FindTeachersRequest request)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await handler.HandleAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command);
 
         return result.ToActionResult(r =>
             Ok(new FindTeachersResponse()
