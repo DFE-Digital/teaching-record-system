@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -14,7 +13,6 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
-[TransactionScope]
 public class RejectModel(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,

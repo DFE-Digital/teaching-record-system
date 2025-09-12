@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -29,7 +30,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
             return;
         }
 
-        await context.HttpContext.EnsureDbTransactionAsync();
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
 
         var query = dbContext.Alerts
             .FromSql($"select * from alerts where alert_id = {alertId} for update")  // https://github.com/dotnet/efcore/issues/26042

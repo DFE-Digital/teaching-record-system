@@ -6,8 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Prometheus;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.WebCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
 
@@ -29,7 +27,6 @@ public static class Extensions
         builder.Services.AddHealthChecks().AddNpgSql(sp => sp.GetRequiredService<NpgsqlDataSource>());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         builder.Services.AddSingleton<UrlRedactor>();
-        builder.Services.TryDecorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>();
 
         if (builder.Environment.IsProduction())
         {
@@ -92,7 +89,6 @@ public static class Extensions
     public static IApplicationBuilder UseTransactions(this IApplicationBuilder app)
     {
         app.UseMiddleware<TransactionScopeMiddleware>();
-        app.UseMiddleware<CommitDbTransactionMiddleware>();
 
         return app;
     }
