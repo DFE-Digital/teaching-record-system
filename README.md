@@ -43,12 +43,11 @@ See the [changelog](CHANGELOG.md) for the details of what has changed between ve
 
 ## Environments
 
-| Name           | API URL |
-| --- | --- |
-| Production     | https://teacher-qualifications-api.education.gov.uk |
+| Name           | API URL                                                     |
+|----------------|-------------------------------------------------------------|
+| Production     | https://teacher-qualifications-api.education.gov.uk         |
 | Pre-production | https://preprod.teacher-qualifications-api.education.gov.uk |
-| Test           | https://test.teacher-qualifications-api.education.gov.uk/ |
-| Development    | https://dev.teacher-qualifications-api.education.gov.uk/ |
+| Development    | https://dev.teacher-qualifications-api.education.gov.uk/    |
 
 
 ## Developer setup
@@ -122,10 +121,11 @@ just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=pos
 just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
-To set up the initial trs database schema run:
+To set up the initial TRS database schema run:
 ```shell
 just build
 just cli migrate-db
+just cli add-trn-range --from 1000000 --to 9999999
 ```
 
 The trs_tests database will be created automatically when running the tests.
