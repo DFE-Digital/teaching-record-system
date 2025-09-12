@@ -35,7 +35,7 @@ public partial class TestData
             var supportTask = new SupportTask()
             {
                 CreatedOn = Clock.UtcNow,
-                SupportTaskType = SupportTaskType.ConnectOneLoginUser,
+                SupportTaskTypeId = SupportTaskType.ConnectOneLoginUser.SupportTaskTypeId,
                 Data = data,
                 OneLoginUserSubject = oneLoginUserSubject,
                 Status = SupportTaskStatus.Open,

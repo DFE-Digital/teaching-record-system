@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
+[SupportTaskData("b621cc79-b116-461e-be8d-593d6efd53cd")]
 public record ChangeDateOfBirthRequestData
 {
     public required DateOnly DateOfBirth { get; init; }

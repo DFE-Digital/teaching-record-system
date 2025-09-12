@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
+[SupportTaskData("4b76f9b8-c60e-4076-ac4b-d173f395dc71")]
 public record ConnectOneLoginUserData
 {
     public required bool Verified { get; init; }

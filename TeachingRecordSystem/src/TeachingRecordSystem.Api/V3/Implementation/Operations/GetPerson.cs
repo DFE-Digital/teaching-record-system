@@ -205,13 +205,13 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
             var openTaskTypes = await dbContext.SupportTasks
                 .Where(t => t.Person!.Trn == command.Trn &&
                     t.Status == SupportTaskStatus.Open &&
-                    (t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest || t.SupportTaskType == SupportTaskType.ChangeNameRequest))
+                    (t.SupportTaskType == PostgresModels.SupportTaskType.ChangeDateOfBirthRequest || t.SupportTaskType == PostgresModels.SupportTaskType.ChangeNameRequest))
                 .Select(t => t.SupportTaskType)
                 .Distinct()
                 .ToArrayAsync();
 
-            return (openTaskTypes.Any(t => t == SupportTaskType.ChangeNameRequest),
-                    openTaskTypes.Any(t => t == SupportTaskType.ChangeDateOfBirthRequest));
+            return (openTaskTypes.Any(t => t == PostgresModels.SupportTaskType.ChangeNameRequest),
+                    openTaskTypes.Any(t => t == PostgresModels.SupportTaskType.ChangeDateOfBirthRequest));
         }
 
         (bool PendingNameRequest, bool PendingDateOfBirthRequest)? pendingDetailChanges = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ?
