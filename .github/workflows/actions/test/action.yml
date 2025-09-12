@@ -28,7 +28,7 @@ runs:
         cd $PROJECT_PATH
 
         case "$(basename $PWD)" in
-          "TeachingRecordSystem.Api.UnitTests" | "TeachingRecordSystem.SupportUi.EndToEndTests")
+          "TeachingRecordSystem.Api.UnitTests" | "TeachingRecordSystem.Cli.Tests" | "TeachingRecordSystem.SupportUi.EndToEndTests")
             dotnet test --configuration Release ${{ inputs.dotnet_test_args }} -- --report-trx
             ;;
           *)
