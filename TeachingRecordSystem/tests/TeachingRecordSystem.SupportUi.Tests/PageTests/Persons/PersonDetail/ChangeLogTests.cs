@@ -99,6 +99,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.DoesNotContain(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "next");
     }
 
+    // Random comment
+
     [Fact]
     public async Task Get_PageIsNotFirstPage_ShowsPreviousPageLink()
     {
