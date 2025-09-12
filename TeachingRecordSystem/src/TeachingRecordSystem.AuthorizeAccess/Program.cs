@@ -37,6 +37,12 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseDefaultServiceProvider(options =>
+{
+    options.ValidateOnBuild = true;
+    options.ValidateScopes = true;
+});
+
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.AddServiceDefaults(dataProtectionBlobName: "AuthorizeAccess");

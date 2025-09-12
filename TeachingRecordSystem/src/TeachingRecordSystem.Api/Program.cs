@@ -41,6 +41,12 @@ using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseDefaultServiceProvider(options =>
+{
+    options.ValidateOnBuild = true;
+    options.ValidateScopes = true;
+});
+
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.AddServiceDefaults(dataProtectionBlobName: "Api");
@@ -200,7 +206,7 @@ services
     .AddTransient<GetPersonHelper>()
     .AddPersonMatching();
 
-if (env.IsProduction())
+if (env.IsDevelopment() || env.IsProduction())
 {
     services.AddTrnGeneration();
 }
