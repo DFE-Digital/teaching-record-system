@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -26,7 +27,7 @@ public class CheckPersonExistsFilter(TrsDbContext dbContext) : IAsyncResourceFil
             return;
         }
 
-        await context.HttpContext.EnsureDbTransactionAsync();
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
 
         var person = await GetPersonAsync();
 

@@ -1,4 +1,3 @@
-using System.Transactions;
 using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -71,12 +70,6 @@ public class CreateDateOfBirthChangeRequestHandler(
 
         var getAnIdentityApplicationUserId = configuration.GetValue<Guid>("GetAnIdentityApplicationUserId");
 
-        // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
-        using var transaction = new TransactionScope(
-            TransactionScopeOption.RequiresNew,
-            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
-            TransactionScopeAsyncFlowOption.Enabled);
-
         var supportTask = SupportTask.Create(
             SupportTaskType.ChangeDateOfBirthRequest,
             changeRequestData,
@@ -108,7 +101,6 @@ public class CreateDateOfBirthChangeRequestHandler(
         }
 
         await dbContext.SaveChangesAsync();
-        transaction.Complete();
 
         return new CreateDateOfBirthChangeRequestResult(supportTask.SupportTaskReference);
     }

@@ -29,7 +29,6 @@ using TeachingRecordSystem.SupportUi.Pages;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.WebCommon.Filters;
-using TeachingRecordSystem.WebCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
 
@@ -100,10 +99,7 @@ builder.Services.AddAuthorizationBuilder()
     .AddPersonDataPolicies();
 
 builder.Services
-    .AddRazorPages(options =>
-    {
-        options.Conventions.Add(new TransactionScopeEndpointConventions());
-    })
+    .AddRazorPages()
     .AddMvcOptions(options =>
     {
         var policy = new AuthorizationPolicyBuilder()

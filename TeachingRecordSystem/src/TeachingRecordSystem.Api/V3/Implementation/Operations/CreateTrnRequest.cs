@@ -70,8 +70,6 @@ public class CreateTrnRequestHandler(
 
         var matchResult = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
 
-        await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
-
         string? trn = null;
 
         if (matchResult.Outcome is TrnRequestMatchResultOutcome.DefiniteMatch)
@@ -167,7 +165,6 @@ public class CreateTrnRequestHandler(
         await trnRequestService.TryEnsureTrnTokenAsync(trnRequestMetadata, trn);
 
         await dbContext.SaveChangesAsync();
-        await txn.CommitAsync();
 
         var status = trnRequestMetadata.Status!.Value;
 

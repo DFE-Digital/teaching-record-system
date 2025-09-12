@@ -223,6 +223,7 @@ app.MapDefaultEndpoints();
 app.UseMiddleware<AssignRequestedVersionMiddleware>();
 
 app.UseRouting();
+app.UseTransactions();
 
 app.UseAuthentication();
 app.UseAuthorization();

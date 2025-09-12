@@ -22,9 +22,9 @@ public class ExecuteOnCommitBackgroundJobScheduler(IServiceProvider serviceProvi
         var jobId = Guid.NewGuid().ToString();
         var transactionCompleted = new TaskCompletionSource();
 
-        async Task ScheduleAsync()
+        async Task ScheduleAsync(CancellationToken cancellationToken)
         {
-            await transactionCompleted.Task;
+            await transactionCompleted.Task.WaitAsync(cancellationToken);
 
             using var scope = serviceProvider.CreateScope();
             var service = ActivatorUtilities.CreateInstance<T>(scope.ServiceProvider);
@@ -32,19 +32,23 @@ public class ExecuteOnCommitBackgroundJobScheduler(IServiceProvider serviceProvi
             await task;
         }
 
-        var jobTask = ScheduleAsync();
+        var cts = new CancellationTokenSource();
+        var jobTask = ScheduleAsync(cts.Token);
 
         _jobsById.TryAdd(jobId, jobTask);
 
         transaction.TransactionCompleted += (_, t) =>
         {
+            using var __ = cts;
             if (t.Transaction?.TransactionInformation.Status == TransactionStatus.Committed)
             {
                 transactionCompleted.SetResult();
             }
             else
             {
-                transactionCompleted.SetException(new Exception("Transaction failed."));
+                cts.Cancel();
+                jobTask.Dispose();
+                return;
             }
 
             jobTask.Wait();
