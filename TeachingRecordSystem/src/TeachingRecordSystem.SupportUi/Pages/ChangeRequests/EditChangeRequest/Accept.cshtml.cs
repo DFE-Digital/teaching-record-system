@@ -93,7 +93,7 @@ public class AcceptModel(
             }
 
             emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
-            emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfNameApprovedEmailConfirmationTemplateId;
+            emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmationTemplateId;
 
             await dbContext.AddEventAndBroadcastAsync(approvedEvent);
         }
@@ -119,7 +119,7 @@ public class AcceptModel(
             };
 
             emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
-            emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmationTemplateId;
+            emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmationTemplateId;
 
             await dbContext.AddEventAndBroadcastAsync(approvedEvent);
         }
