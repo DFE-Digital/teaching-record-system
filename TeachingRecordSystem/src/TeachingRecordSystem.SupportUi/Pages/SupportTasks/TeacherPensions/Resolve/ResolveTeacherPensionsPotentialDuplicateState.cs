@@ -19,6 +19,7 @@ public class ResolveTeacherPensionsPotentialDuplicateState : IRegisterJourney
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
     public PersonAttributeSource? GenderSource { get; set; }
     public string? Comments { get; set; }
+    public PersonAttributeSource? TRNSource { get; set; }
 
     public enum PersonAttributeSource
     {

@@ -59,6 +59,29 @@
         <table class="govuk-table">
             <tbody class="govuk-table__body">
                 @{
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.FirstNameSource),
+                    Model.FirstName!.Different,
+                    Html.NameFor(m => m.FirstNameSource),
+                    Model.FirstName!.TrnRequestValue,
+                    Model.FirstName!.ExistingRecordValue,
+                    Model.FirstNameSource);
+
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.LastNameSource),
+                    Model.LastName!.Different,
+                    Html.NameFor(m => m.LastNameSource),
+                    Model.LastName!.TrnRequestValue,
+                    Model.LastName!.ExistingRecordValue,
+                    Model.LastNameSource);
+
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.TRNSource),
+                    Model.Trn!.Different,
+                    Html.NameFor(m => m.TRNSource),
+                    Model.Trn!.TrnRequestValue,
+                    Model.Trn!.ExistingRecordValue,
+                    Model.TRNSource);
 
                     await RenderChoosePersonAttribute(
                     Html.DisplayNameFor(m => m.DateOfBirthSource),
@@ -67,14 +90,6 @@
                     Model.DateOfBirth!.TrnRequestValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
                     Model.DateOfBirth!.ExistingRecordValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
                     Model.DateOfBirthSource);
-
-                    await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.EmailAddressSource),
-                    Model.EmailAddress!.Different,
-                    Html.NameFor(m => m.EmailAddressSource),
-                    Model.EmailAddress!.TrnRequestValue,
-                    Model.EmailAddress!.ExistingRecordValue,
-                    Model.EmailAddressSource);
 
                     await RenderChoosePersonAttribute(
                     Html.DisplayNameFor(m => m.NationalInsuranceNumberSource),

@@ -117,7 +117,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
         }
     }
 
-    protected CapitaPotentialDuplicateAttributes GetPersonAttributes(Person person) =>
+    protected TeacherPensionsPotentialDuplicateAttributes GetPersonAttributes(Person person) =>
         new()
         {
             FirstName = person.FirstName,
@@ -128,7 +128,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
             Gender = person.Gender
         };
 
-    protected async Task<CapitaPotentialDuplicateAttributes> GetPersonAttributesAsync(Guid personId)
+    protected async Task<TeacherPensionsPotentialDuplicateAttributes> GetPersonAttributesAsync(Guid personId)
     {
         var personAttributes = await dbContext.Persons
             .Where(p => p.PersonId == personId)
@@ -144,7 +144,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
             })
             .SingleAsync();
 
-        return new CapitaPotentialDuplicateAttributes()
+        return new TeacherPensionsPotentialDuplicateAttributes()
         {
             FirstName = personAttributes.FirstName,
             MiddleName = personAttributes.MiddleName,
@@ -155,11 +155,11 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
         };
     }
 
-    protected CapitaPotentialDuplicateAttributes GetPersonAttributesFromRequestData()
+    protected TeacherPensionsPotentialDuplicateAttributes GetPersonAttributesFromRequestData()
     {
         var requestData = GetRequestData();
 
-        return new CapitaPotentialDuplicateAttributes()
+        return new TeacherPensionsPotentialDuplicateAttributes()
         {
             FirstName = requestData.FirstName!,
             MiddleName = requestData.MiddleName ?? string.Empty,
@@ -170,8 +170,8 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
         };
     }
 
-    protected CapitaPotentialDuplicateAttributes GetResolvedPersonAttributes(
-        CapitaPotentialDuplicateAttributes? selectedPersonAttributes)
+    protected TeacherPensionsPotentialDuplicateAttributes GetResolvedPersonAttributes(
+        TeacherPensionsPotentialDuplicateAttributes? selectedPersonAttributes)
     {
         var state = JourneyInstance!.State;
         var trnRequestPersonAttributes = GetPersonAttributesFromRequestData();
@@ -185,7 +185,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
         {
             Debug.Assert(selectedPersonAttributes is not null);
 
-            return new CapitaPotentialDuplicateAttributes()
+            return new TeacherPensionsPotentialDuplicateAttributes()
             {
                 FirstName = state.FirstNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.FirstName : trnRequestPersonAttributes.FirstName,
                 MiddleName = state.MiddleNameSource is PersonAttributeSource.ExistingRecord ? selectedPersonAttributes.MiddleName : trnRequestPersonAttributes.MiddleName,

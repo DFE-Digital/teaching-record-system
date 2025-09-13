@@ -6,6 +6,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.R
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? PersonName { get; set; }
@@ -15,6 +16,12 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
     public PersonAttribute<DateOnly?>? DateOfBirth { get; set; }
 
     public PersonAttribute<string?>? EmailAddress { get; set; }
+
+    public PersonAttribute<string?>? Trn { get; set; }
+
+    public PersonAttribute<string?>? FirstName { get; set; }
+
+    public PersonAttribute<string?>? LastName { get; set; }
 
     public PersonAttribute<string?>? NationalInsuranceNumber { get; set; }
 
@@ -37,14 +44,29 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
     public PersonAttributeSource? GenderSource { get; set; }
 
     [BindProperty]
+    [Display(Name = "First name")]
+    public PersonAttributeSource? FirstNameSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Last name")]
+    public PersonAttributeSource? LastNameSource { get; set; }
+
+    [Display(Name = "TRN")]
+    public PersonAttributeSource? TRNSource { get; set; }
+
+    [BindProperty]
     [Display(Name = "Add comments (optional)")]
     public string? Comments { get; set; }
+
     public void OnGet()
     {
         DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
         NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
         GenderSource = JourneyInstance!.State.GenderSource;
         Comments = JourneyInstance!.State.Comments;
+        FirstNameSource = JourneyInstance!.State.FirstNameSource;
+        LastNameSource = JourneyInstance!.State.LastNameSource;
+        TRNSource = JourneyInstance!.State.TRNSource;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -54,14 +76,24 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
             ModelState.AddModelError(nameof(DateOfBirthSource), "Select a date of birth");
         }
 
-        if (EmailAddress!.Different && EmailAddressSource is null)
-        {
-            ModelState.AddModelError(nameof(EmailAddressSource), "Select an email");
-        }
-
         if (NationalInsuranceNumber!.Different && NationalInsuranceNumberSource is null)
         {
             ModelState.AddModelError(nameof(NationalInsuranceNumberSource), "Select a National Insurance number");
+        }
+
+        if (Trn!.Different && TRNSource is null)
+        {
+            ModelState.AddModelError(nameof(TRNSource), "Select a TRN");
+        }
+
+        if (FirstName!.Different && FirstNameSource is null)
+        {
+            ModelState.AddModelError(nameof(FirstNameSource), "Select a First name");
+        }
+
+        if (LastName!.Different && LastNameSource is null)
+        {
+            ModelState.AddModelError(nameof(LastNameSource), "Select a Last name");
         }
 
         if (Gender!.Different && GenderSource is null)
@@ -81,6 +113,9 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
             state.GenderSource = GenderSource;
             state.PersonAttributeSourcesSet = true;
             state.Comments = Comments;
+            state.TRNSource = TRNSource;
+            state.FirstNameSource = FirstNameSource;
+            state.LastNameSource = LastNameSource;
         });
 
         return Redirect(linkGenerator.TeacherPensionsCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
