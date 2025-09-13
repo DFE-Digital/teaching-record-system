@@ -1,0 +1,131 @@
+@page "/support-tasks/teacher-pensions/{supportTaskReference}/merge/{handler?}"
+@using TeachingRecordSystem.SupportUi.Pages.Shared
+@using static ResolveTeacherPensionsPotentialDuplicateState
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.Merge
+@{
+    ViewBag.Title = "Potential duplicates via Teachers&rsquo; Pensions";
+}
+
+
+
+
+@functions {
+#pragma warning disable CS1998
+    private async Task RenderChoosePersonAttribute(
+        string label,
+        bool different,
+        string name,
+        string? leftLabel,
+        string? rightLabel,
+        PersonAttributeSource? selectedValue)
+    {
+        var chooseAttributeModel = new ChoosePersonAttributeViewModel()
+        {
+            Label = label,
+            Different = different,
+            Name = name,
+            LeftValue = PersonAttributeSource.TrnRequest,
+            LeftLabel = leftLabel,
+            RightValue = PersonAttributeSource.ExistingRecord,
+            RightLabel = rightLabel,
+            SelectedValue = selectedValue
+        };
+        <partial name="Shared/_ChoosePersonAttribute" model="@chooseAttributeModel" />
+    }
+#pragma warning restore CS1998
+}
+
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <span class="govuk-caption-l">Support tasks</span>
+        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Select the details to keep in merged record</h1>
+    </div>
+
+
+    <form action="@LinkGenerator.TeacherPensionsMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+        <span class="govuk-caption-l">Support tasks</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <div style="display: flex">
+            <div class="govuk-heading-m govuk-!-width-one-half">
+                Teachers&rsquo; Pensions
+            </div>
+            <div class="govuk-heading-m govuk-!-width-one-half">
+                Existing record
+            </div>
+        </div>
+
+        <table class="govuk-table">
+            <tbody class="govuk-table__body">
+                @{
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.FirstNameSource),
+                    Model.FirstName!.Different,
+                    Html.NameFor(m => m.FirstNameSource),
+                    Model.FirstName!.TrnRequestValue,
+                    Model.FirstName!.ExistingRecordValue,
+                    Model.FirstNameSource);
+
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.LastNameSource),
+                    Model.LastName!.Different,
+                    Html.NameFor(m => m.LastNameSource),
+                    Model.LastName!.TrnRequestValue,
+                    Model.LastName!.ExistingRecordValue,
+                    Model.LastNameSource);
+
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.TRNSource),
+                    Model.Trn!.Different,
+                    Html.NameFor(m => m.TRNSource),
+                    Model.Trn!.TrnRequestValue,
+                    Model.Trn!.ExistingRecordValue,
+                    Model.TRNSource);
+
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.DateOfBirthSource),
+                    Model.DateOfBirth!.Different,
+                    Html.NameFor(m => m.DateOfBirthSource),
+                    Model.DateOfBirth!.TrnRequestValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
+                    Model.DateOfBirth!.ExistingRecordValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
+                    Model.DateOfBirthSource);
+
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.NationalInsuranceNumberSource),
+                    Model.NationalInsuranceNumber!.Different,
+                    Html.NameFor(m => m.NationalInsuranceNumberSource),
+                    Model.NationalInsuranceNumber!.TrnRequestValue,
+                    Model.NationalInsuranceNumber!.ExistingRecordValue,
+                    Model.NationalInsuranceNumberSource);
+
+                    await RenderChoosePersonAttribute(
+                    Html.DisplayNameFor(m => m.GenderSource),
+                    Model.Gender!.Different,
+                    Html.NameFor(m => m.GenderSource),
+                    Model.Gender!.TrnRequestValue?.GetDisplayName(),
+                    Model.Gender!.ExistingRecordValue?.GetDisplayName(),
+                    Model.GenderSource);
+                }
+            </tbody>
+        </table>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds-from-desktop">
+                <govuk-textarea asp-for="Comments" label-class="govuk-label--s" />
+
+                <p class="govuk-body govuk-!-font-size-24 govuk-!-font-weight-bold">Do you want to use these details in the primary record?</p>
+
+                <govuk-warning-text>
+                    The TRN request will be marked as complete after the record has been updated.
+                </govuk-warning-text>
+
+                <div class="govuk-button-group">
+                    <govuk-button type="submit">Continue</govuk-button>
+                    <govuk-button type="submit" formaction="@LinkGenerator.TeacherPensionsMergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
