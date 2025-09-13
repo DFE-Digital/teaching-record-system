@@ -78,17 +78,17 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
     {
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.ApiTrnRequests());
+        return Redirect(linkGenerator.TeacherPensions());
     }
 
     protected IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeMatches(
-    string firstName,
-    string middleName,
-    string lastName,
-    DateOnly? dateOfBirth,
-    string? emailAddress,
-    string? nationalInsuranceNumber,
-    Gender? gender)
+        string firstName,
+        string middleName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        string? emailAddress,
+        string? nationalInsuranceNumber,
+        Gender? gender)
     {
         return Impl().AsReadOnly();
 

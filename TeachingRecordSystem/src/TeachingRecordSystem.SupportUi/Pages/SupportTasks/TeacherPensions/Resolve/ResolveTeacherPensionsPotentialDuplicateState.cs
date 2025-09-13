@@ -21,6 +21,7 @@ public class ResolveTeacherPensionsPotentialDuplicateState : IRegisterJourney
     public string? Comments { get; set; }
     public PersonAttributeSource? TRNSource { get; set; }
 
+
     public enum PersonAttributeSource
     {
         ExistingRecord = 0,

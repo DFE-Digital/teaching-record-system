@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
-using TeachingRecordSystem.Core.Services.TrnRequests;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
@@ -195,13 +193,13 @@ public class CheckAnswersModel(
 
         if (state.PersonId is not Guid personId)
         {
-            context.Result = Redirect(linkGenerator.NpqTrnRequestMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.TeacherPensionsMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 
         if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
         {
-            context.Result = Redirect(linkGenerator.NpqTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.TeacherPensionsMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 

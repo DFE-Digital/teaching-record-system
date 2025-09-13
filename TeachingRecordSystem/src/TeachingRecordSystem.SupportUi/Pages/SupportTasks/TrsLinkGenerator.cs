@@ -121,15 +121,21 @@ public partial class TrsLinkGenerator
     public string TeacherPensionsMerge(string supportTaskReference, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Merge", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string TeacherPensionsCheckAnswers(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+    public string TeacherPensionsCheckAnswers(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool keepRecordSeparate = false) =>
+        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/CheckAnswers", routeValues: new { supportTaskReference, keepRecordSeparate }, journeyInstanceId: journeyInstanceId);
 
-    public string TeacherPensionsCheckAnswersCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+    public string TeacherPensionsCheckAnswersCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool keepRecordSeparate = false) =>
+        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/CheckAnswers", routeValues: new { supportTaskReference, keepRecordSeparate }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
     public string TeacherPensionsMatchesCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
     public string TeacherPensionsMergeCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
+    public string TeacherPensionsKeepRecordSeparate(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/KeepRecordSeparate", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string TeacherPensionsKeepRecordSeparateCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
+        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/KeepRecordSeparate", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 }

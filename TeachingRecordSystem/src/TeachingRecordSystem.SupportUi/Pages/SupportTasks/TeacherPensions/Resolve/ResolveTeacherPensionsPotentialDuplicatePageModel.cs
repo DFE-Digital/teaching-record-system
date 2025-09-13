@@ -16,6 +16,9 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
 
+    [FromQuery]
+    public bool KeepRecordSeparate { get; set; }
+
     public JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext => dbContext;
