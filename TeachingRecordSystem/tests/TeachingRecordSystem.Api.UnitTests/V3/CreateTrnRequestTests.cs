@@ -29,318 +29,105 @@ public class CreateTrnRequestTests : OperationTestBase
     public Task ClearDb() => DbHelper.DeleteAllPersonsAsync();
 
     [Test]
-    public Task HandleAsync_RequestForSameUserAndIdAlreadyExists_ReturnsError() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var command = CreateCommand();
-            var applicationUserId = CurrentUserProvider.GetCurrentApplicationUser().UserId;
+    public async Task HandleAsync_RequestForSameUserAndIdAlreadyExists_ReturnsError()
+    {
+        // Arrange
+        var command = CreateCommand();
+        var applicationUserId = CurrentUserProvider.GetCurrentApplicationUser().UserId;
 
-            await TestData.CreatePersonAsync(p => p
-                .WithFirstName(command.FirstName)
-                .WithMiddleName(command.MiddleName)
-                .WithLastName(command.LastName)
-                .WithDateOfBirth(command.DateOfBirth)
-                .WithNationalInsuranceNumber(command.NationalInsuranceNumber!)
-                .WithEmail(command.EmailAddresses.First())
-                .WithTrnRequest(applicationUserId, command.RequestId));
+        await TestData.CreatePersonAsync(p => p
+            .WithFirstName(command.FirstName)
+            .WithMiddleName(command.MiddleName)
+            .WithLastName(command.LastName)
+            .WithDateOfBirth(command.DateOfBirth)
+            .WithNationalInsuranceNumber(command.NationalInsuranceNumber!)
+            .WithEmail(command.EmailAddresses.First())
+            .WithTrnRequest(applicationUserId, command.RequestId));
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
-            AssertError(result, 10029);  // Cannot resubmit request
-        });
-
-    [Test]
-    public Task HandleAsync_WithNino_NormalizesNino() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var nationalInsuranceNumber = "WC 34 87 05 C";
-            var expectedNormalizedInsuranceNumber = "WC348705C";
-
-            var command = CreateCommand() with
-            {
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
-
-            // Act
-            var result = await handler.ExecuteAsync(command);
-
-            // Assert
-            var metadata = await WithDbContextAsync(dbContext =>
-                dbContext.TrnRequestMetadata
-                    .SingleAsync(m =>
-                        m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId));
-            Assert.Equal(expectedNormalizedInsuranceNumber, metadata.NationalInsuranceNumber);
-        });
+        // Act
+        var result = await ExecuteCommandAsync(command);
+        AssertError(result, 10029);  // Cannot resubmit request
+    }
 
     [Test]
-    public Task HandleAsync_WithNoEmail_Succeeds() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
+    public async Task HandleAsync_WithNino_NormalizesNino()
+    {
+        // Arrange
+        var nationalInsuranceNumber = "WC 34 87 05 C";
+        var expectedNormalizedInsuranceNumber = "WC348705C";
+
+        var command = CreateCommand() with
         {
-            // Arrange
-            var command = CreateCommand() with
-            {
-                EmailAddresses = []
-            };
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            // Assert
-            AssertSuccess(result);
-        });
+        // Assert
+        var metadata = await WithDbContextAsync(dbContext =>
+            dbContext.TrnRequestMetadata
+                .SingleAsync(m =>
+                    m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId));
+        Assert.Equal(expectedNormalizedInsuranceNumber, metadata.NationalInsuranceNumber);
+    }
 
     [Test]
-    public Task HandleAsync_WithNoNino_Succeeds() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
+    public async Task HandleAsync_WithNoEmail_Succeeds()
+    {
+        // Arrange
+        var command = CreateCommand() with
         {
-            // Arrange
-            var command = CreateCommand() with
-            {
-                NationalInsuranceNumber = null
-            };
+            EmailAddresses = []
+        };
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            // Assert
-            AssertSuccess(result);
-        });
+        // Assert
+        AssertSuccess(result);
+    }
+
+    [Test]
+    public async Task HandleAsync_WithNoNino_Succeeds()
+    {
+        // Arrange
+        var command = CreateCommand() with
+        {
+            NationalInsuranceNumber = null
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        AssertSuccess(result);
+    }
 
     [Test]
     [MethodDataSource(nameof(GetPotentialMatchCombinationsData))]
-    public Task HandleAsync_MatchingExistingPersonOnTwoNamesAndDateOfBirth_ReturnsPendingStatusAndCreatesSupportTask(MatchedField[] matchedFields) =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
+    public async Task HandleAsync_MatchingExistingPersonOnTwoNamesAndDateOfBirth_ReturnsPendingStatusAndCreatesSupportTask(MatchedField[] matchedFields)
+    {
+        // Arrange
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var nino = TestData.GenerateNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(matchedFields.Contains(MatchedField.FirstName) ? firstName : TestData.GenerateChangedFirstName(firstName))
+            .WithMiddleName(matchedFields.Contains(MatchedField.MiddleName) ? middleName : TestData.GenerateChangedMiddleName(middleName))
+            .WithLastName(matchedFields.Contains(MatchedField.LastName) ? lastName : TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(matchedFields.Contains(MatchedField.DateOfBirth) ? dateOfBirth : TestData.GenerateChangedDateOfBirth(dateOfBirth))
+            .WithEmail(matchedFields.Contains(MatchedField.EmailAddress) ? emailAddress : TestData.GenerateUniqueEmail())
+            .WithNationalInsuranceNumber(matchedFields.Contains(MatchedField.TrsNationalInsuranceNumber)
+                ? nino
+                : TestData.GenerateChangedNationalInsuranceNumber(nino)));
+
+        if (matchedFields.Contains(MatchedField.WorkforceNationalInsuranceNumber))
         {
-            // Arrange
-            var firstName = TestData.GenerateFirstName();
-            var middleName = TestData.GenerateMiddleName();
-            var lastName = TestData.GenerateLastName();
-            var dateOfBirth = TestData.GenerateDateOfBirth();
-            var emailAddress = TestData.GenerateUniqueEmail();
-            var nino = TestData.GenerateNationalInsuranceNumber();
-
-            var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithFirstName(matchedFields.Contains(MatchedField.FirstName) ? firstName : TestData.GenerateChangedFirstName(firstName))
-                .WithMiddleName(matchedFields.Contains(MatchedField.MiddleName) ? middleName : TestData.GenerateChangedMiddleName(middleName))
-                .WithLastName(matchedFields.Contains(MatchedField.LastName) ? lastName : TestData.GenerateChangedLastName(lastName))
-                .WithDateOfBirth(matchedFields.Contains(MatchedField.DateOfBirth) ? dateOfBirth : TestData.GenerateChangedDateOfBirth(dateOfBirth))
-                .WithEmail(matchedFields.Contains(MatchedField.EmailAddress) ? emailAddress : TestData.GenerateUniqueEmail())
-                .WithNationalInsuranceNumber(matchedFields.Contains(MatchedField.TrsNationalInsuranceNumber)
-                    ? nino
-                    : TestData.GenerateChangedNationalInsuranceNumber(nino)));
-
-            if (matchedFields.Contains(MatchedField.WorkforceNationalInsuranceNumber))
-            {
-                var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
-                await TestData.CreateTpsEmploymentAsync(
-                    matchedPerson,
-                    establishment,
-                    startDate: new DateOnly(2024, 1, 1),
-                    lastKnownEmployedDate: new DateOnly(2024, 10, 1),
-                    EmploymentType.FullTime,
-                    lastExtractDate: new DateOnly(2024, 10, 1),
-                    nationalInsuranceNumber: nino);
-            }
-
-            var command = CreateCommand() with
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                EmailAddresses = [emailAddress],
-                NationalInsuranceNumber = nino
-            };
-
-            // Act
-            var result = await handler.ExecuteAsync(command);
-
-            // Assert
-            var success = AssertSuccess(result);
-
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Pending, success.Status);
-            Assert.Null(success.Trn);
-            Assert.Null(success.AccessYourTeachingQualificationsLink);
-            AssertResultPersonMatchesCommand(command, success.Person);
-
-            var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
-            Assert.Empty(persons);
-
-            await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
-
-            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
-        });
-
-    [Test]
-    public Task HandleAsync_MatchingExistingPersonOnTrsNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePersonOrSupportTask() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var dateOfBirth = new DateOnly(1990, 01, 01);
-            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-            var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithDateOfBirth(dateOfBirth)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber));
-
-            var command = CreateCommand() with
-            {
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
-
-            // Act
-            var result = await handler.ExecuteAsync(command);
-
-            // Assert
-            var success = AssertSuccess(result);
-
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Completed, success.Status);
-            Assert.NotNull(success.Trn);
-            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
-            AssertResultPersonMatchesCommand(command, success.Person);
-
-            var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
-            Assert.Empty(persons);
-
-            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
-
-            await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
-        });
-
-    [Test]
-    public Task HandleAsync_MatchingExistingPersonOnTrsNinoOnly_CreatesSupportTask() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var dateOfBirth = new DateOnly(1990, 01, 01);
-            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-            var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
-                .WithNationalInsuranceNumber(nationalInsuranceNumber));
-
-            var command = CreateCommand() with
-            {
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
-
-            // Act
-            var result = await handler.ExecuteAsync(command);
-
-            // Assert
-            var success = AssertSuccess(result);
-
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Pending, success.Status);
-            Assert.Null(success.Trn);
-            Assert.Null(success.AccessYourTeachingQualificationsLink);
-            AssertResultPersonMatchesCommand(command, success.Person);
-
-            var persons = await WithDbContextAsync(dbContext =>
-                dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
-            Assert.Empty(persons);
-
-            await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
-
-            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
-        });
-
-    [Test]
-    public Task HandleAsync_MatchingExistingPersonOnEmailOnly_CreatesSupportTask() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var emailAddress = TestData.GenerateUniqueEmail();
-
-            var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmail(emailAddress));
-
-            var command = CreateCommand() with
-            {
-                EmailAddresses = [emailAddress]
-            };
-
-            // Act
-            var result = await handler.ExecuteAsync(command);
-
-            // Assert
-            var success = AssertSuccess(result);
-
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Pending, success.Status);
-            Assert.Null(success.Trn);
-            Assert.Null(success.AccessYourTeachingQualificationsLink);
-            AssertResultPersonMatchesCommand(command, success.Person);
-
-            var persons = await WithDbContextAsync(dbContext =>
-                dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
-            Assert.Empty(persons);
-
-            await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
-
-            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
-        });
-
-    [Test]
-    public Task HandleAsync_MatchingMultipleExistingPersonsOnTrsNinoAndDob_CreatesSupportTask() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var dateOfBirth = new DateOnly(1990, 01, 01);
-            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-            var matchedPerson1 = await TestData.CreatePersonAsync(p => p
-                .WithDateOfBirth(dateOfBirth)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber));
-
-            var matchedPerson2 = await TestData.CreatePersonAsync(p => p
-                .WithDateOfBirth(dateOfBirth)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber));
-
-            var command = CreateCommand() with
-            {
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
-
-            // Act
-            var result = await handler.ExecuteAsync(command);
-
-            // Assert
-            var success = AssertSuccess(result);
-
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Pending, success.Status);
-            Assert.Null(success.Trn);
-            Assert.Null(success.AccessYourTeachingQualificationsLink);
-            AssertResultPersonMatchesCommand(command, success.Person);
-
-            var persons = await WithDbContextAsync(dbContext =>
-                dbContext.Persons.Where(p => p.PersonId != matchedPerson1.PersonId && p.PersonId != matchedPerson2.PersonId).ToArrayAsync());
-            Assert.Empty(persons);
-
-            await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
-
-            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
-        });
-
-    [Test]
-    public Task HandleAsync_MatchingExistingPersonOnWorkforceNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePerson() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var dateOfBirth = new DateOnly(1990, 01, 01);
-            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-            var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithDateOfBirth(dateOfBirth));
-            Debug.Assert(matchedPerson.NationalInsuranceNumber is null);
-
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
             await TestData.CreateTpsEmploymentAsync(
                 matchedPerson,
@@ -349,164 +136,364 @@ public class CreateTrnRequestTests : OperationTestBase
                 lastKnownEmployedDate: new DateOnly(2024, 10, 1),
                 EmploymentType.FullTime,
                 lastExtractDate: new DateOnly(2024, 10, 1),
-                nationalInsuranceNumber: nationalInsuranceNumber);
+                nationalInsuranceNumber: nino);
+        }
 
-            var command = CreateCommand() with
-            {
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
+        var command = CreateCommand() with
+        {
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            EmailAddresses = [emailAddress],
+            NationalInsuranceNumber = nino
+        };
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            // Assert
-            var success = AssertSuccess(result);
+        // Assert
+        var success = AssertSuccess(result);
 
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Completed, success.Status);
-            Assert.NotNull(success.Trn);
-            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
-            AssertResultPersonMatchesCommand(command, success.Person);
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Pending, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
 
-            var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
-            Assert.Empty(persons);
+        var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+        Assert.Empty(persons);
 
-            await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
-            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
-        });
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+    }
 
     [Test]
-    public Task HandleAsync_DefiniteMatchWithPersonDoesNotRequireFurthersChecks_ReturnsTrn() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
+    public async Task HandleAsync_MatchingExistingPersonOnTrsNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePersonOrSupportTask()
+    {
+        // Arrange
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var command = CreateCommand() with
         {
-            // Arrange
-            TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
-                CurrentUserProvider.GetCurrentApplicationUser().UserId
-            ];
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
 
-            var dateOfBirth = new DateOnly(1990, 01, 01);
-            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithDateOfBirth(dateOfBirth)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber));
-            Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+        // Assert
+        var success = AssertSuccess(result);
 
-            var command = CreateCommand() with
-            {
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Completed, success.Status);
+        Assert.NotNull(success.Trn);
+        Assert.NotNull(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+        Assert.Empty(persons);
 
-            // Assert
-            var success = AssertSuccess(result);
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
 
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Completed, success.Status);
-            Assert.NotNull(success.Trn);
-            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
-
-            await WithDbContextAsync(async dbContext =>
-            {
-                var metadata = await dbContext.TrnRequestMetadata
-                    .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
-                Assert.Equal(TrnRequestStatus.Completed, metadata.Status);
-                Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
-
-                var supportTasks = await dbContext.SupportTasks
-                    .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
-                        t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
-                        t.TrnRequestMetadata!.RequestId == command.RequestId)
-                    .ToArrayAsync();
-
-                Assert.Empty(supportTasks);
-            });
-        });
+        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+    }
 
     [Test]
-    public Task HandleAsync_DefiniteMatchWithPersonDoesRequireFurthersChecks_CreatesSupportTaskAndDoesNotReturnTrn() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
+    public async Task HandleAsync_MatchingExistingPersonOnTrsNinoOnly_CreatesSupportTask()
+    {
+        // Arrange
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var command = CreateCommand() with
         {
-            // Arrange
-            TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
-                CurrentUserProvider.GetCurrentApplicationUser().UserId
-            ];
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
 
-            var dateOfBirth = new DateOnly(1990, 01, 01);
-            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            var matchedPerson = await TestData.CreatePersonAsync(p => p
-                .WithDateOfBirth(dateOfBirth)
-                .WithNationalInsuranceNumber(nationalInsuranceNumber)
-                .WithAlert());
+        // Assert
+        var success = AssertSuccess(result);
 
-            var command = CreateCommand() with
-            {
-                DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
-            };
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Pending, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        var persons = await WithDbContextAsync(dbContext =>
+            dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+        Assert.Empty(persons);
 
-            // Assert
-            var success = AssertSuccess(result);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Pending, success.Status);
-            Assert.Null(success.Trn);
-            Assert.Null(success.AccessYourTeachingQualificationsLink);
-
-            await WithDbContextAsync(async dbContext =>
-            {
-                var metadata = await dbContext.TrnRequestMetadata
-                    .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
-                Assert.Equal(TrnRequestStatus.Pending, metadata.Status);
-                Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
-
-                var supportTasks = await dbContext.SupportTasks
-                    .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
-                        t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
-                        t.TrnRequestMetadata!.RequestId == command.RequestId)
-                    .ToArrayAsync();
-
-                Assert.NotEmpty(supportTasks);
-            });
-        });
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+    }
 
     [Test]
-    public Task HandleAsync_NoMatches_CreatesPersonWithTrnButNoSupportTask() =>
-        WithHandler<CreateTrnRequestHandler>(async handler =>
+    public async Task HandleAsync_MatchingExistingPersonOnEmailOnly_CreatesSupportTask()
+    {
+        // Arrange
+        var emailAddress = TestData.GenerateUniqueEmail();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmail(emailAddress));
+
+        var command = CreateCommand() with
         {
-            // Arrange
-            var command = CreateCommand();
+            EmailAddresses = [emailAddress]
+        };
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            // Assert
-            var success = AssertSuccess(result);
+        // Assert
+        var success = AssertSuccess(result);
 
-            Assert.Equal(command.RequestId, success.RequestId);
-            Assert.Equal(TrnRequestStatus.Completed, success.Status);
-            Assert.NotNull(success.Trn);
-            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
-            AssertResultPersonMatchesCommand(command, success.Person);
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Pending, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
 
-            var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync());
-            Assert.NotNull(person);
-            Assert.NotNull(person.Trn);
-            AssertPersonMatchesCommand(command, person, expectTrn: true);
+        var persons = await WithDbContextAsync(dbContext =>
+            dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+        Assert.Empty(persons);
 
-            await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
-            await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+    }
+
+    [Test]
+    public async Task HandleAsync_MatchingMultipleExistingPersonsOnTrsNinoAndDob_CreatesSupportTask()
+    {
+        // Arrange
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var matchedPerson1 = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var matchedPerson2 = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var command = CreateCommand() with
+        {
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Pending, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
+
+        var persons = await WithDbContextAsync(dbContext =>
+            dbContext.Persons.Where(p => p.PersonId != matchedPerson1.PersonId && p.PersonId != matchedPerson2.PersonId).ToArrayAsync());
+        Assert.Empty(persons);
+
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+    }
+
+    [Test]
+    public async Task HandleAsync_MatchingExistingPersonOnWorkforceNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePerson()
+    {
+        // Arrange
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(dateOfBirth));
+        Debug.Assert(matchedPerson.NationalInsuranceNumber is null);
+
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
+        await TestData.CreateTpsEmploymentAsync(
+            matchedPerson,
+            establishment,
+            startDate: new DateOnly(2024, 1, 1),
+            lastKnownEmployedDate: new DateOnly(2024, 10, 1),
+            EmploymentType.FullTime,
+            lastExtractDate: new DateOnly(2024, 10, 1),
+            nationalInsuranceNumber: nationalInsuranceNumber);
+
+        var command = CreateCommand() with
+        {
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Completed, success.Status);
+        Assert.NotNull(success.Trn);
+        Assert.NotNull(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
+
+        var persons = await WithDbContextAsync(dbContext => dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+        Assert.Empty(persons);
+
+        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
+    }
+
+    [Test]
+    public async Task HandleAsync_DefiniteMatchWithPersonDoesNotRequireFurthersChecks_ReturnsTrn()
+    {
+        // Arrange
+        TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
+            CurrentUserProvider.GetCurrentApplicationUser().UserId
+        ];
+
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+        Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+
+        var command = CreateCommand() with
+        {
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Completed, success.Status);
+        Assert.NotNull(success.Trn);
+        Assert.NotNull(success.AccessYourTeachingQualificationsLink);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var metadata = await dbContext.TrnRequestMetadata
+                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+            Assert.Equal(TrnRequestStatus.Completed, metadata.Status);
+            Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
+
+            var supportTasks = await dbContext.SupportTasks
+                .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
+                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                    t.TrnRequestMetadata!.RequestId == command.RequestId)
+                .ToArrayAsync();
+
+            Assert.Empty(supportTasks);
         });
+    }
+
+    [Test]
+    public async Task HandleAsync_DefiniteMatchWithPersonDoesRequireFurthersChecks_CreatesSupportTaskAndDoesNotReturnTrn()
+    {
+        // Arrange
+        TrnRequestOptions.FlagFurtherChecksRequiredFromUserIds = [
+            CurrentUserProvider.GetCurrentApplicationUser().UserId
+        ];
+
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber)
+            .WithAlert());
+
+        var command = CreateCommand() with
+        {
+            DateOfBirth = dateOfBirth,
+            NationalInsuranceNumber = nationalInsuranceNumber
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Pending, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var metadata = await dbContext.TrnRequestMetadata
+                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+            Assert.Equal(TrnRequestStatus.Pending, metadata.Status);
+            Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
+
+            var supportTasks = await dbContext.SupportTasks
+                .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
+                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                    t.TrnRequestMetadata!.RequestId == command.RequestId)
+                .ToArrayAsync();
+
+            Assert.NotEmpty(supportTasks);
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_NoMatches_CreatesPersonWithTrnButNoSupportTask()
+    {
+        // Arrange
+        var command = CreateCommand();
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Completed, success.Status);
+        Assert.NotNull(success.Trn);
+        Assert.NotNull(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
+
+        var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync());
+        Assert.NotNull(person);
+        Assert.NotNull(person.Trn);
+        AssertPersonMatchesCommand(command, person, expectTrn: true);
+
+        await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
+    }
 
     private CreateTrnRequestCommand CreateCommand() => new CreateTrnRequestCommand
     {
