@@ -33,7 +33,11 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState() { PersonId = null });
+            new ResolveNpqTrnRequestState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                PersonId = null
+            });
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -61,6 +65,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = false
             });
@@ -93,6 +98,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState()
         {
+            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -157,6 +163,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -184,6 +191,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true
             });
@@ -214,6 +222,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true,
                 Comments = comments
@@ -243,6 +252,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true
             });
@@ -275,6 +285,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel,
                 PersonAttributeSourcesSet = true,
             });
@@ -305,7 +316,11 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState() { PersonId = null });
+            new ResolveNpqTrnRequestState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                PersonId = null
+            });
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -333,6 +348,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = false
             });
@@ -371,6 +387,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var state = new ResolveNpqTrnRequestState()
         {
+            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true,
             Comments = comments
@@ -504,6 +521,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState()
         {
+            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -546,6 +564,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var state = new ResolveNpqTrnRequestState()
         {
+            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -608,6 +627,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveNpqTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel,
                 PersonAttributeSourcesSet = true,
                 Comments = comments

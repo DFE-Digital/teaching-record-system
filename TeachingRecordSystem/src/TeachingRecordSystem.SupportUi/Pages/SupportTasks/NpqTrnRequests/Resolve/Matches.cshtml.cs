@@ -77,14 +77,7 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
     {
         RequestData = GetRequestData();
 
-        if (RequestData.PotentialDuplicate != true ||
-            RequestData.Matches is not { MatchedPersons.Count: >= 1 })
-        {
-            context.Result = BadRequest();
-            return;
-        }
-
-        var matchedPersonIds = RequestData.Matches.MatchedPersons.Select(m => m.PersonId).ToArray();
+        var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
 
         PotentialDuplicates = (await DbContext.Persons
             .Where(p => matchedPersonIds.Contains(p.PersonId))

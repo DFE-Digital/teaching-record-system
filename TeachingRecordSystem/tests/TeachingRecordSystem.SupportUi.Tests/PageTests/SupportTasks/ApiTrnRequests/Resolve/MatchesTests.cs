@@ -50,7 +50,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
             .WithGender(TestData.GenerateGender()));
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -87,7 +87,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             dbContext => dbContext.Persons.SingleAsync(
                 p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId));
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -115,11 +115,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert());
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithMatchedPersons(matchedPerson.PersonId));
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -142,11 +140,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithQts());
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithMatchedPersons(matchedPerson.PersonId));
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -169,11 +165,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts(Clock.Today.AddDays(-1)));
-        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
-            applicationUser.UserId,
-            t => t.WithMatchedPersons(matchedPerson.PersonId));
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -201,7 +195,11 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState() { PersonId = firstMatchId });
+            new ResolveApiTrnRequestState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                PersonId = firstMatchId
+            });
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -227,7 +225,11 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState() { PersonId = ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel });
+            new ResolveApiTrnRequestState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                PersonId = ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel
+            });
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -265,7 +267,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             configure.WithMatchedPersons(matchedPerson.PersonId);
         });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask, useFactory: false);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -303,6 +305,44 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
                 Assert.True(highlightElement == null, $"{summaryListKey} should not be highlighted");
             }
         }
+    }
+
+    [Fact]
+    public async Task Get_ShowsRefreshedMatchedPersons()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var initialMatchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId, t => t
+                .WithFirstName(initialMatchedPerson.FirstName)
+                .WithLastName(initialMatchedPerson.LastName)
+                .WithDateOfBirth(initialMatchedPerson.DateOfBirth)
+                .WithNationalInsuranceNumber(initialMatchedPerson.NationalInsuranceNumber)
+                .WithMatchedPersons(initialMatchedPerson.PersonId));
+
+        var subsequentMatchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithFirstName(initialMatchedPerson.FirstName)
+            .WithLastName(initialMatchedPerson.LastName)
+            .WithDateOfBirth(initialMatchedPerson.DateOfBirth)
+            .WithNationalInsuranceNumber(initialMatchedPerson.NationalInsuranceNumber!));
+
+        var journeyInstance = await CreateJourneyInstance(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var shownMatchedPersonIds = doc.GetAllElementsByTestId("match").Select(e => e.GetAttribute("data-personid")!).Select(Guid.Parse).ToList();
+        Assert.Contains(initialMatchedPerson.PersonId, shownMatchedPersonIds);
+        Assert.Contains(subsequentMatchedPerson.PersonId, shownMatchedPersonIds);
     }
 
     public static TheoryData<PersonMatchedAttribute[]> HighlightedDifferencesData { get; } = new()
@@ -358,7 +398,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
                         ? matchedPerson.Gender
                         : TestData.GenerateChangedGender(matchedPerson.Gender!)));
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask, useFactory: false);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -407,7 +447,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -433,7 +473,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var unmatchedPerson = await TestData.CreatePersonAsync();
         var personId = unmatchedPerson.PersonId;
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -456,7 +496,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -481,7 +521,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var personId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId;
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -512,7 +552,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var personId = ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel;
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -547,6 +587,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 FirstNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
                 MiddleNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
@@ -593,6 +634,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = selectedPersonId,
                 FirstNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
                 MiddleNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
@@ -626,11 +668,23 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.True(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
+    private async Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(SupportTask supportTask, bool useFactory = true)
+    {
+        var state = useFactory
+            ? await CreateJourneyStateWithFactory<ResolveApiTrnRequestStateFactory, ResolveApiTrnRequestState>(factory => factory.CreateAsync(supportTask))
+            : new ResolveApiTrnRequestState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly()
+            };
+
+        return await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+    }
+
     private Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(
             string supportTaskReference,
-            ResolveApiTrnRequestState? state = null) =>
+            ResolveApiTrnRequestState state) =>
         CreateJourneyInstance(
             JourneyNames.ResolveApiTrnRequest,
-            state ?? new(),
+            state,
             new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 }

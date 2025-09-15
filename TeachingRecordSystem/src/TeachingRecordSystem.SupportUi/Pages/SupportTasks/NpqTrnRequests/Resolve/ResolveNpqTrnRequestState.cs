@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.PersonMatching;
+
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
 public class ResolveNpqTrnRequestState : IRegisterJourney
@@ -10,6 +14,7 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
         ["supportTaskReference"],
         appendUniqueKey: true);
 
+    public required IReadOnlyCollection<Guid> MatchedPersonIds { get; init; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? DateOfBirthSource { get; set; }
@@ -24,3 +29,33 @@ public class ResolveNpqTrnRequestState : IRegisterJourney
         TrnRequest = 1
     }
 }
+
+public class ResolveNpqTrnRequestStateFactory(IPersonMatchingService personMatchingService) : IJourneyStateFactory<ResolveNpqTrnRequestState>
+{
+    public Task<ResolveNpqTrnRequestState> CreateAsync(CreateJourneyStateContext context)
+    {
+        var supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+        return CreateAsync(supportTask);
+    }
+
+    public async Task<ResolveNpqTrnRequestState> CreateAsync(SupportTask supportTask)
+    {
+        Debug.Assert(supportTask.SupportTaskType is SupportTaskType.NpqTrnRequest);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        var matchResult = await personMatchingService.MatchFromTrnRequestAsync(requestData);
+
+        var state = new ResolveNpqTrnRequestState
+        {
+            MatchedPersonIds = matchResult.Outcome switch
+            {
+                TrnRequestMatchResultOutcome.DefiniteMatch => [matchResult.PersonId],
+                TrnRequestMatchResultOutcome.PotentialMatches => matchResult.PotentialMatchesPersonIds,
+                _ => []
+            }
+        };
+
+        return state;
+    }
+}
+

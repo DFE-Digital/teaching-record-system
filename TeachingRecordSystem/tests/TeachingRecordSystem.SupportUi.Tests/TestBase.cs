@@ -95,6 +95,14 @@ public abstract class TestBase : IDisposable
         return (JourneyInstance<TState>)instance;
     }
 
+    public async Task<TState> CreateJourneyStateWithFactory<TFactory, TState>(Func<TFactory, Task<TState>> createState)
+        where TFactory : IJourneyStateFactory<TState>
+    {
+        await using var scope = HostFixture.Services.CreateAsyncScope();
+        var factory = ActivatorUtilities.CreateInstance<TFactory>(scope.ServiceProvider);
+        return await createState(factory);
+    }
+
     public async Task<JourneyInstance<TState>> ReloadJourneyInstance<TState>(JourneyInstance<TState> journeyInstance)
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();

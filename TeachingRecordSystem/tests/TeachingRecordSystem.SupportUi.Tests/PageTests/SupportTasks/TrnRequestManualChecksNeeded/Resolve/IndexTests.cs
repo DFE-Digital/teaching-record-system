@@ -155,7 +155,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var apiSupportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var apiSupportTask = await TestData.CreateResolvedApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             matchedPerson.Person,
             t => t.WithTrnRequestStatus(TrnRequestStatus.Pending));
