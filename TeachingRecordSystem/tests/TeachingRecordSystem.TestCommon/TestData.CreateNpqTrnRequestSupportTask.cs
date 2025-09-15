@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -14,6 +15,32 @@ public partial class TestData
         var builder = new CreateNpqTrnRequestSupportTaskBuilder(applicationUserId);
         configure?.Invoke(builder);
         return builder.ExecuteAsync(this);
+    }
+
+    public Task<SupportTask> CreateNpqTrnRequestSupportTaskAsync(
+        Guid applicationUserId,
+        Person matchedPerson,
+        Action<CreateNpqTrnRequestSupportTaskBuilder>? configure = null)
+    {
+        Debug.Assert(matchedPerson.EmailAddress is not null);
+
+        return CreateNpqTrnRequestSupportTaskAsync(
+            applicationUserId,
+            t =>
+            {
+                // NINO is not set here to avoid a definite match
+
+                t
+                    .WithFirstName(matchedPerson.FirstName)
+                    .WithMiddleName(matchedPerson.MiddleName)
+                    .WithLastName(matchedPerson.LastName)
+                    .WithDateOfBirth(matchedPerson.DateOfBirth!.Value)
+                    .WithEmailAddress(matchedPerson.EmailAddress!)
+                    .WithGender(matchedPerson.Gender)
+                    .WithMatchedPersons(matchedPerson.PersonId);
+
+                configure?.Invoke(t);
+            });
     }
 
     public class CreateNpqTrnRequestSupportTaskBuilder(Guid applicationUserId)

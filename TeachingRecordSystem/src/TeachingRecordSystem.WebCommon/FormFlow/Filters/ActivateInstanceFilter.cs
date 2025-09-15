@@ -67,9 +67,9 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
         public abstract Task<object> CreateAsync(CreateJourneyStateContext context);
     }
 
-    private class FactoryWrapper<T>(IJourneyStateFactory<T> factory)
+    private class FactoryWrapper<T>(IJourneyStateFactory<T> factory) : FactoryWrapper
     {
-        public async Task<object> CreateAsync(CreateJourneyStateContext context)
+        public override async Task<object> CreateAsync(CreateJourneyStateContext context)
         {
             var state = await factory.CreateAsync(context);
             return state!;

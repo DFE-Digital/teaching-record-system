@@ -441,7 +441,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             applicationUserId = applicationUser.UserId;
         }
 
-        var apiSupportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+        var apiSupportTask = await TestData.CreateResolvedApiTrnRequestSupportTaskAsync(
             applicationUserId.Value,
             matchedPerson.Person,
             t =>

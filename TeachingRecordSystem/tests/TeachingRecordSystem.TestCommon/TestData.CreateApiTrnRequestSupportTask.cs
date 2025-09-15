@@ -25,6 +25,30 @@ public partial class TestData
             applicationUserId,
             t =>
             {
+                // NINO is not set here to avoid a definite match
+
+                t
+                    .WithFirstName(matchedPerson.FirstName)
+                    .WithMiddleName(matchedPerson.MiddleName)
+                    .WithLastName(matchedPerson.LastName)
+                    .WithDateOfBirth(matchedPerson.DateOfBirth!.Value)
+                    .WithEmailAddress(matchedPerson.EmailAddress)
+                    .WithGender(matchedPerson.Gender)
+                    .WithMatchedPersons(matchedPerson.PersonId);
+
+                configure?.Invoke(t);
+            });
+    }
+
+    public Task<SupportTask> CreateResolvedApiTrnRequestSupportTaskAsync(
+        Guid applicationUserId,
+        Person matchedPerson,
+        Action<CreateApiTrnRequestSupportTaskBuilder>? configure = null)
+    {
+        return CreateApiTrnRequestSupportTaskAsync(
+            applicationUserId,
+            t =>
+            {
                 t
                     .WithFirstName(matchedPerson.FirstName)
                     .WithMiddleName(matchedPerson.MiddleName)

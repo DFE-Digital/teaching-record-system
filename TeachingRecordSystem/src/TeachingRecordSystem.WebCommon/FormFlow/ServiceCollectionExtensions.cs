@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
         });
 
         services.Scan(s => s
-            .FromAssemblies(typeof(IJourneyStateFactory<>).Assembly)
+            .FromApplicationDependencies()
             .AddClasses(t => t.AssignableTo(typeof(IJourneyStateFactory<>))).AsImplementedInterfaces());
 
         return services;

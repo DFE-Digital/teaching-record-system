@@ -32,7 +32,11 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState() { PersonId = null });
+            new ResolveApiTrnRequestState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                PersonId = null
+            });
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -60,6 +64,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = false
             });
@@ -92,6 +97,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var state = new ResolveApiTrnRequestState()
         {
+            MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
             PersonAttributeSourcesSet = true
         };
@@ -156,6 +162,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -183,6 +190,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true
             });
@@ -213,6 +221,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true,
                 Comments = comments
@@ -242,6 +251,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
             });
 
@@ -273,6 +283,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = true
             });
@@ -303,7 +314,11 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState() { PersonId = null });
+            new ResolveApiTrnRequestState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
+                PersonId = null
+            });
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -331,6 +346,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
                 PersonAttributeSourcesSet = false
             });
@@ -367,6 +383,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel,
                 Comments = comments
             });
@@ -436,6 +453,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
@@ -503,6 +521,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,
@@ -547,6 +566,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = matchedPerson.PersonId,
                 PersonAttributeSourcesSet = true,
                 MiddleNameSource = PersonAttributeSource.TrnRequest,

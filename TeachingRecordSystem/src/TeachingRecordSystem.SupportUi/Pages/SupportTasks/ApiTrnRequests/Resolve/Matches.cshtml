@@ -68,7 +68,7 @@
         @foreach (var match in Model.PotentialDuplicates!)
         {
             <div class="govuk-grid-column-one-half-from-desktop">
-                <govuk-summary-card data-testid="match">
+                <govuk-summary-card data-testid="match" data-personid="@match.PersonId">
                     <govuk-summary-card-title>
                         Record @match.Identifier
                     </govuk-summary-card-title>
