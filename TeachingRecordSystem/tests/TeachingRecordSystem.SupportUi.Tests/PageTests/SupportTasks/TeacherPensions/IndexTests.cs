@@ -220,6 +220,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                            s.WithCreatedOn(Clock.UtcNow);
                        });
 
+        Clock.Advance();
+
         var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
                        person1.PersonId,
                        user.UserId,
