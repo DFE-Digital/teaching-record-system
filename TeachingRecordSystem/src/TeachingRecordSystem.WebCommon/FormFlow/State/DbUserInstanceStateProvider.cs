@@ -1,104 +1,118 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Transactions;
-using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 
 namespace TeachingRecordSystem.WebCommon.FormFlow.State;
 
-public class DbWithHttpContextTransactionUserInstanceStateProvider(
-    IHttpContextAccessor httpContextAccessor,
-    IDbContextFactory<TrsDbContext> dbContextFactory,
+public class DbUserInstanceStateProvider(
+    TrsDbContext dbContext,
     ICurrentUserIdProvider currentUserIdProvider,
     IClock clock,
-    IOptions<JsonOptions> jsonOptionsAccessor) : DbUserInstanceStateProviderBase(clock, jsonOptionsAccessor)
+    IOptions<JsonOptions> jsonOptionsAccessor) :
+    IUserInstanceStateProvider
 {
-    private const string HttpContextItemsDbContextKey = "_FormFlowDbContext";
-
-    public override async Task CompleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
+    public async Task CompleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
-        var dbContext = await EnsureDbContextAsync();
         var userId = currentUserIdProvider.GetCurrentUserId();
-        await CompleteInstanceAsync(instanceId, stateType, userId, dbContext);
-    }
 
-    public async Task CommitChangesAsync()
-    {
-        var httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HttpContext.");
+        var instance = await GetInstanceAsync(instanceId, userId) ??
+            throw new ArgumentException("Instance does not exist.");
 
-        if (TryGetDbContext(httpContext, out var dbContext))
+        if (instance.Completed is not null)
         {
-            if (dbContext.Database.CurrentTransaction is not null)
-            {
-                await dbContext.Database.CurrentTransaction.CommitAsync();
-            }
-
-            await dbContext.DisposeAsync();
+            throw new InvalidOperationException("Instance is already completed.");
         }
+
+        instance.Completed = clock.UtcNow;
+        await dbContext.SaveChangesAsync();
     }
 
-    public override async Task<JourneyInstance> CreateInstanceAsync(
+    public async Task<JourneyInstance> CreateInstanceAsync(
         JourneyInstanceId instanceId,
         Type stateType,
         object state,
         IReadOnlyDictionary<object, object>? properties)
     {
-        var dbContext = await EnsureDbContextAsync();
         var userId = currentUserIdProvider.GetCurrentUserId();
-        return await CreateInstanceAsync(instanceId, stateType, state, properties, userId, dbContext);
-    }
 
-    public override async Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
-    {
-        var dbContext = await EnsureDbContextAsync();
-        var userId = currentUserIdProvider.GetCurrentUserId();
-        await DeleteInstanceAsync(instanceId, stateType, userId, dbContext);
-    }
-
-    public override async Task<JourneyInstance?> GetInstanceAsync(JourneyInstanceId instanceId, Type stateType)
-    {
-        var dbContext = await EnsureDbContextAsync();
-        var userId = currentUserIdProvider.GetCurrentUserId();
-        return await GetInstanceAsync(instanceId, stateType, userId, dbContext);
-    }
-
-    public override async Task UpdateInstanceStateAsync(JourneyInstanceId instanceId, Type stateType, object state)
-    {
-        var dbContext = await EnsureDbContextAsync();
-        var userId = currentUserIdProvider.GetCurrentUserId();
-        await UpdateInstanceStateAsync(instanceId, stateType, state, userId, dbContext);
-    }
-
-    private async Task<TrsDbContext> EnsureDbContextAsync()
-    {
-        var httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HttpContext.");
-
-        if (TryGetDbContext(httpContext, out var dbContext))
+        if (properties is { Count: > 0 })
         {
-            return dbContext;
+            throw new NotSupportedException("Specifying properties is not supported.");
         }
 
-        dbContext = await dbContextFactory.CreateDbContextAsync();
-        httpContext.Items.Add(HttpContextItemsDbContextKey, dbContext);
-
-        if (Transaction.Current is null)
+        var serializedState = SerializeState(stateType, state);
+        var instance = new JourneyState()
         {
-            await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
-        }
+            InstanceId = instanceId,
+            UserId = userId,
+            State = serializedState,
+            Created = clock.UtcNow,
+            Updated = clock.UtcNow
+        };
+        dbContext.JourneyStates.Add(instance);
+        await dbContext.SaveChangesAsync();
 
-        return dbContext;
+        return JourneyInstance.Create(this, instanceId, stateType, state, PropertiesBuilder.CreateEmpty(), completed: false);
     }
 
-    private bool TryGetDbContext(HttpContext httpContext, [NotNullWhen(true)] out TrsDbContext? dbContext)
+    public async Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
-        if (httpContext.Items.TryGetValue(HttpContextItemsDbContextKey, out var dbContextObj) && dbContextObj is TrsDbContext dbc)
+        var userId = currentUserIdProvider.GetCurrentUserId();
+
+        var instance = await GetInstanceAsync(instanceId, userId) ??
+            throw new ArgumentException("Instance does not exist.");
+
+        dbContext.JourneyStates.Remove(instance);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<JourneyInstance?> GetInstanceAsync(JourneyInstanceId instanceId, Type stateType)
+    {
+        var userId = currentUserIdProvider.GetCurrentUserId();
+
+        var instance = await GetInstanceAsync(instanceId, userId);
+
+        if (instance is null)
         {
-            dbContext = dbc;
-            return true;
+            return null;
         }
 
-        dbContext = default;
-        return false;
+        var state = DeserializeState(stateType, instance.State);
+
+        return JourneyInstance.Create(this, instanceId, stateType, state, PropertiesBuilder.CreateEmpty(), completed: instance.Completed.HasValue);
     }
+
+    public async Task UpdateInstanceStateAsync(JourneyInstanceId instanceId, Type stateType, object state)
+    {
+        var userId = currentUserIdProvider.GetCurrentUserId();
+
+        var instance = await GetInstanceAsync(instanceId, userId) ??
+            throw new ArgumentException("Instance does not exist.");
+
+        var serializedState = SerializeState(stateType, state);
+        instance.State = serializedState;
+        instance.Updated = clock.UtcNow;
+        await dbContext.SaveChangesAsync();
+    }
+
+    private async Task<JourneyState?> GetInstanceAsync(JourneyInstanceId instanceId, string userId)
+    {
+        return await dbContext.JourneyStates
+            .FromSql(
+                $"""
+                 SELECT *
+                 FROM journey_states
+                 WHERE instance_id = {instanceId.ToString()} AND user_id = {userId}
+                 FOR UPDATE
+                 """)
+            .SingleOrDefaultAsync();
+    }
+
+    private string SerializeState(Type stateType, object state) =>
+        JsonSerializer.Serialize(state, stateType, jsonOptionsAccessor.Value.JsonSerializerOptions);
+
+    private object DeserializeState(Type stateType, string serialized) =>
+        JsonSerializer.Deserialize(serialized, stateType, jsonOptionsAccessor.Value.JsonSerializerOptions)!;
 }

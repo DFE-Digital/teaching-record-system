@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Transactions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -7,10 +9,7 @@ public class DbTrnGenerator(TrsDbContext dbContext) : ITrnGenerator
 {
     public async Task<string> GenerateTrnAsync()
     {
-        if (dbContext.Database.CurrentTransaction is null)
-        {
-            throw new InvalidOperationException("A database transaction is required to generate a TRN.");
-        }
+        Debug.Assert(Transaction.Current is not null);
 
         var nextTrn = await dbContext
             .Database

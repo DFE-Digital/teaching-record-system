@@ -1,5 +1,4 @@
 using System.Reflection;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -19,13 +18,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFormFlow(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-        services.AddSingleton<JourneyInstanceProvider>();
+        services.AddTransient<JourneyInstanceProvider>();
         services.TryAddSingleton<IStateSerializer, JsonStateSerializer>();
-        services.TryAddSingleton<IUserInstanceStateProvider, DbWithHttpContextTransactionUserInstanceStateProvider>();
+        services.TryAddTransient<IUserInstanceStateProvider, DbUserInstanceStateProvider>();
         services.AddOptions<State.JsonOptions>();
-        services.AddScoped<MissingInstanceFilter>();
-        services.AddScoped<ActivateInstanceFilter>();
-        services.AddSingleton<IStartupFilter, CommitStateChangesStartupFilter>();
+        services.AddTransient<MissingInstanceFilter>();
+        services.AddTransient<ActivateInstanceFilter>();
 
         var conventions = new FormFlowConventions();
 
@@ -68,14 +66,5 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConfigureOptions<FormFlowOptions>>(new DiscoverJourneyDescriptors(assembly));
 
         return services;
-    }
-
-    private class CommitStateChangesStartupFilter : IStartupFilter
-    {
-        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
-        {
-            app.UseMiddleware<CommitStateChangesMiddleware>();
-            next(app);
-        };
     }
 }
