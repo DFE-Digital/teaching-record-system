@@ -53,12 +53,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]
@@ -122,12 +122,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]
@@ -195,12 +195,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]
@@ -270,12 +270,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]
@@ -339,12 +339,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]
@@ -408,12 +408,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]
@@ -477,12 +477,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]
@@ -849,12 +849,12 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(false, null, true)]
+    [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, UserRoles.RecordManager, true)]
     [InlineData(false, UserRoles.AlertsManagerTra, true)]
     [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(false, UserRoles.Administrator, true)]
-    [InlineData(true, null, false)]
+    [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.RecordManager, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
     [InlineData(true, UserRoles.AlertsManagerTra, true)]

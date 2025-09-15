@@ -173,7 +173,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_NonDbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(TestUsers.GetUser(role: UserRoles.Viewer));
 
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(b => b

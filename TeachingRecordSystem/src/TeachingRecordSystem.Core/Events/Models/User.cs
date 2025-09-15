@@ -17,7 +17,6 @@ public record User
         Name = user.Name,
         Email = user.Email,
         AzureAdUserId = user.AzureAdUserId,
-        Roles = user.Roles,
-        Role = user.Role,
+        Role = user.Role
     };
 }
