@@ -20,66 +20,63 @@ public class GetTrnRequestTests : OperationTestBase
     }
 
     [Test]
-    public Task HandleAsync_RequestDoesNotExist_ReturnsError() =>
-        WithHandler<GetTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var requestId = Guid.NewGuid().ToString();
+    public async Task HandleAsync_RequestDoesNotExist_ReturnsError()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
 
-            var command = new GetTrnRequestCommand(requestId);
+        var command = new GetTrnRequestCommand(requestId);
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            // Assert
-            AssertError(result, ApiError.ErrorCodes.TrnRequestDoesNotExist);
-        });
-
-    [Test]
-    public Task HandleAsync_RequestIsPending_ReturnsPendingStatus() =>
-        WithHandler<GetTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var requestId = Guid.NewGuid().ToString();
-            var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
-
-            await TestData.CreateApiTrnRequestSupportTaskAsync(
-                applicationUserId,
-                c => c.WithRequestId(requestId).WithStatus(SupportTaskStatus.Open));
-
-            var command = new GetTrnRequestCommand(requestId);
-
-            // Act
-            var result = await handler.ExecuteAsync(command);
-
-            // Assert
-            var success = result.GetSuccess();
-            Assert.Equal(TrnRequestStatus.Pending, success.Status);
-            Assert.Null(success.Trn);
-            Assert.Null(success.AccessYourTeachingQualificationsLink);
-        });
+        // Assert
+        AssertError(result, ApiError.ErrorCodes.TrnRequestDoesNotExist);
+    }
 
     [Test]
-    public Task HandleAsync_RequestIsCompleted_ReturnsTrnAndCompletedStatus() =>
-        WithHandler<GetTrnRequestHandler>(async handler =>
-        {
-            // Arrange
-            var requestId = Guid.NewGuid().ToString();
-            var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+    public async Task HandleAsync_RequestIsPending_ReturnsPendingStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
 
-            var person = await TestData.CreatePersonAsync(p => p
-                .WithTrnRequest(applicationUserId, requestId)
-                .WithEmail(TestData.GenerateUniqueEmail()));
+        await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUserId,
+            c => c.WithRequestId(requestId).WithStatus(SupportTaskStatus.Open));
 
-            var command = new GetTrnRequestCommand(requestId);
+        var command = new GetTrnRequestCommand(requestId);
 
-            // Act
-            var result = await handler.ExecuteAsync(command);
+        // Act
+        var result = await ExecuteCommandAsync(command);
 
-            // Assert
-            var success = result.GetSuccess();
-            Assert.Equal(TrnRequestStatus.Completed, success.Status);
-            Assert.Equal(person.Trn, success.Trn);
-            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
-        });
+        // Assert
+        var success = result.GetSuccess();
+        Assert.Equal(TrnRequestStatus.Pending, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+    }
+
+    [Test]
+    public async Task HandleAsync_RequestIsCompleted_ReturnsTrnAndCompletedStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrnRequest(applicationUserId, requestId)
+            .WithEmail(TestData.GenerateUniqueEmail()));
+
+        var command = new GetTrnRequestCommand(requestId);
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = result.GetSuccess();
+        Assert.Equal(TrnRequestStatus.Completed, success.Status);
+        Assert.Equal(person.Trn, success.Trn);
+        Assert.NotNull(success.AccessYourTeachingQualificationsLink);
+    }
 }

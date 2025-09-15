@@ -56,11 +56,12 @@ public abstract class OperationTestBase
 
     protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) => DbFixture.WithDbContextAsync(action);
 
-    protected virtual async Task WithHandler<THandler>(Func<THandler, Task> action, params object[] parameters)
+    protected async Task<ApiResult<TResult>> ExecuteCommandAsync<TResult>(ICommand<TResult> command)
+        where TResult : notnull
     {
         var serviceScopeFactory = Services.GetRequiredService<IServiceScopeFactory>();
         using var scope = serviceScopeFactory.CreateScope();
-        var handler = ActivatorUtilities.CreateInstance<THandler>(scope.ServiceProvider, parameters);
-        await action(handler);
+        var dispatcher = scope.ServiceProvider.GetRequiredService<ICommandDispatcher>();
+        return await dispatcher.DispatchAsync(command);
     }
 }

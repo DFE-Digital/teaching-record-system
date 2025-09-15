@@ -68,6 +68,7 @@ public static class Setup
                     (IClock)new ForwardToTestScopedClock(),
                     TestDataPersonDataSource.CrmAndTrs))
             .AddTrsBaseServices()
+            .AddApiCommands()
             .AddTestScoped<IClock>(tss => tss.Clock)
             .AddSingleton<FakeTrnGenerator>()
             .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
