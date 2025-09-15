@@ -16,7 +16,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
-using TeachingRecordSystem.WebCommon.Infrastructure;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
@@ -92,8 +92,7 @@ public class HostFixture : WebApplicationFactory<Program>
                 inner => new CrmQueryDispatcherDecorator(
                     inner,
                     TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()));
-            services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
-            services.Decorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>();
+            services.AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
 
             services.Configure<GetAnIdentityOptions>(options =>
             {

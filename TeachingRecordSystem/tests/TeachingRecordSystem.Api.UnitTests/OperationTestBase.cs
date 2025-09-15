@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
@@ -62,6 +63,24 @@ public abstract class OperationTestBase
         var serviceScopeFactory = Services.GetRequiredService<IServiceScopeFactory>();
         using var scope = serviceScopeFactory.CreateScope();
         var dispatcher = scope.ServiceProvider.GetRequiredService<ICommandDispatcher>();
-        return await dispatcher.DispatchAsync(command);
+        var transactionScopeDispatcher = new TransactionScopeCommandDispatcher(dispatcher);
+        return await transactionScopeDispatcher.DispatchAsync(command);
+    }
+
+    private class TransactionScopeCommandDispatcher(ICommandDispatcher innerDispatcher) : ICommandDispatcher
+    {
+        public async Task<ApiResult<TResult>> DispatchAsync<TResult>(ICommand<TResult> command) where TResult : notnull
+        {
+            using var txn = new TransactionScope(
+                TransactionScopeOption.RequiresNew,
+                new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+                TransactionScopeAsyncFlowOption.Enabled);
+
+            var result = await innerDispatcher.DispatchAsync(command);
+
+            txn.Complete();
+
+            return result;
+        }
     }
 }

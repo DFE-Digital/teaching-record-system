@@ -50,8 +50,6 @@ public class CheckAnswersModel(
     {
         var now = clock.UtcNow;
 
-        await using var txn = await DbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
-
         var trn = await trnGenerator.GenerateTrnAsync();
 
         var (person, personAttributes) = Person.Create(
@@ -87,7 +85,6 @@ public class CheckAnswersModel(
         DbContext.Add(person);
         await DbContext.AddEventAndBroadcastAsync(createdEvent);
         await DbContext.SaveChangesAsync();
-        await txn.CommitAsync();
 
         await JourneyInstance!.CompleteAsync();
 

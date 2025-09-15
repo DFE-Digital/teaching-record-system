@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -14,7 +15,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
             return;
         }
 
-        await context.HttpContext.EnsureDbTransactionAsync();
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
 
         var currentSupportTaskQuery = dbContext.SupportTasks
             .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update");  // https://github.com/dotnet/efcore/issues/26042

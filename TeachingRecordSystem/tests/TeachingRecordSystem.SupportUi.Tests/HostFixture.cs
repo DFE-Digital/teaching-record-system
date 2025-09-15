@@ -15,7 +15,6 @@ using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
-using TeachingRecordSystem.WebCommon.Infrastructure;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
@@ -71,8 +70,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);
             services.AddStartupTask<AddTestRouteTypesStartupTask>();
-            services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
-            services.Decorate<IBackgroundJobScheduler, RequireTransactionScopeBackgroundJobScheduler>();
+            services.AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
             services.AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions));
             services.AddSingleton<INotificationSender, NoopNotificationSender>();
         });
