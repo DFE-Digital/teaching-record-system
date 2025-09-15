@@ -5,9 +5,9 @@ using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
 
-public class AddAnalyticsDataMiddleware(IUserInstanceStateProvider userInstanceStateProvider, RequestDelegate next)
+public class AddAnalyticsDataMiddleware(RequestDelegate next)
 {
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, IUserInstanceStateProvider userInstanceStateProvider)
     {
         var journeyInstance = await userInstanceStateProvider.GetSignInJourneyInstanceAsync(context);
         if (journeyInstance is not null && context.GetWebRequestEvent() is Event webRequestEvent)
