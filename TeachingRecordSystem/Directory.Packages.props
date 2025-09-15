@@ -76,8 +76,8 @@
     <PackageVersion Include="NSign.Client" Version="1.1.0" />
     <PackageVersion Include="NSign.SignatureProviders" Version="1.1.0" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.0.0" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.0.0" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.1.0" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.1.0" />
     <PackageVersion Include="Optional" Version="4.0.0" />
     <PackageVersion Include="Parquet.Net" Version="4.24.0" />
     <PackageVersion Include="Polly.Core" Version="8.2.1" />
