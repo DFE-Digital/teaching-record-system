@@ -10,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Rejec
 [Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrsLinkGenerator linkGenerator,
     IClock clock) : PageModel
 {
@@ -53,9 +54,9 @@ public class CheckAnswersModel(
             RaisedBy = User.GetUserId()
         };
 
-        await dbContext.AddEventAndBroadcastAsync(@event);
-
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(@event);
 
         TempData.SetFlashSuccess(
             $"TRN request for {PersonName} rejected");

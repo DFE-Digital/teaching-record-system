@@ -329,7 +329,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
     }

@@ -10,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ReferenceDataCache referenceDataCache,
     IClock clock,
     IFileService fileService)
@@ -96,8 +97,9 @@ public class CheckYourAnswersModel(
 
         if (updatedEvent is not null)
         {
-            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
             await DbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(updatedEvent);
         }
 
         await JourneyInstance!.CompleteAsync();

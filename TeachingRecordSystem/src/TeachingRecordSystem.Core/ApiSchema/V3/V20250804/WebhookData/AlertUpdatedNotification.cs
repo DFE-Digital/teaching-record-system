@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
+using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 

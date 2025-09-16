@@ -142,7 +142,6 @@ builder
     .AddTrnRequestService();
 
 builder.Services
-    .AddTrsBaseServices()
     .AddPersonMatching()
     .AddSupportUiServices(builder.Configuration, builder.Environment)
     .AddFormFlow()

@@ -189,13 +189,12 @@ builder
     .AddDistributedLocks()
     .AddIdentityApi()
     .AddNameSynonyms()
-    .AddWebhookOptions()
     .AddTrsSyncHelper()
     .AddTrnRequestService()
-    .AddEmail();
+    .AddEmail()
+    .AddWebhookOptions();
 
 services
-    .AddTrsBaseServices()
     .AddAccessYourTeachingQualificationsOptions(configuration, env)
     .AddFileService()
     .AddTransient<GetPersonHelper>()

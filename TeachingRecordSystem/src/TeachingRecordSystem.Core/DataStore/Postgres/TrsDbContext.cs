@@ -1,13 +1,13 @@
+using System.Data;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using OpenIddict.EntityFrameworkCore.Models;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Infrastructure.EntityFramework;
-using TeachingRecordSystem.Core.Services.Webhooks;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
@@ -15,15 +15,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public class TrsDbContext : DbContext
 {
-    private readonly IServiceProvider? _serviceProvider;
-
-    public TrsDbContext(DbContextOptions<TrsDbContext> options, IServiceProvider serviceProvider)
-        : base(options)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
-    private TrsDbContext(DbContextOptions<TrsDbContext> options)
+    public TrsDbContext(DbContextOptions<TrsDbContext> options)
         : base(options)
     {
     }
@@ -161,19 +153,22 @@ public class TrsDbContext : DbContext
             });
     }
 
-    public async Task AddEventAndBroadcastAsync(EventBase @event)
+    public void AddEvent(EventBase @event)
     {
         Events.Add(Event.FromEventBase(@event, inserted: null));
-
-        _ = _serviceProvider ?? throw new InvalidOperationException("No ServiceProvider on DbContext.");
-        var webhookMessageFactory = _serviceProvider.GetRequiredService<WebhookMessageFactory>();
-        var messages = await webhookMessageFactory.CreateMessagesAsync(this, @event, _serviceProvider);
-        WebhookMessages.AddRange(messages);
     }
 
-    public void AddEventWithoutBroadcast(EventBase @event)
+    public Task<IDbContextTransaction> CreateTransactionAsync() =>
+        Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+    public async Task<IDbContextTransaction> EnsureTransactionAsync()
     {
-        Events.Add(Event.FromEventBase(@event, inserted: null));
+        if (Database.CurrentTransaction is null)
+        {
+            await CreateTransactionAsync();
+        }
+
+        return Database.CurrentTransaction!;
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

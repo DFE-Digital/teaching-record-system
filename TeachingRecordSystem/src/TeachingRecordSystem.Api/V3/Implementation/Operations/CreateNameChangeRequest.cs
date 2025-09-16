@@ -26,6 +26,7 @@ public class CreateNameChangeRequestHandler(
     IBackgroundJobScheduler backgroundJobScheduler,
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IFileService fileService,
     IClock clock) :
     ICommandHandler<CreateNameChangeRequestCommand, CreateNameChangeRequestResult>
@@ -86,7 +87,6 @@ public class CreateNameChangeRequestHandler(
             out var supportTaskCreatedEvent);
 
         dbContext.SupportTasks.Add(supportTask);
-        await dbContext.AddEventAndBroadcastAsync(supportTaskCreatedEvent);
 
         var emailAddress = string.IsNullOrEmpty(command.EmailAddress) ? person.EmailAddress : command.EmailAddress;
 
@@ -105,6 +105,8 @@ public class CreateNameChangeRequestHandler(
         }
 
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(supportTaskCreatedEvent);
 
         return new CreateNameChangeRequestResult(supportTask.SupportTaskReference);
     }

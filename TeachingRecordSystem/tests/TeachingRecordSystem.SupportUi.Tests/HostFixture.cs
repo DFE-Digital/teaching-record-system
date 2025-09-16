@@ -47,9 +47,6 @@ public class HostFixture : WebApplicationFactory<Program>
             // (we want to be able to POST directly from a test without having to set antiforgery cookies etc.)
             services.AddSingleton<IPageApplicationModelProvider, RemoveAutoValidateAntiforgeryPageApplicationModelProvider>();
 
-            // Publish events synchronously
-            PublishEventsDbCommandInterceptor.ConfigureServices(services);
-
             services.AddSingleton<CurrentUserProvider>();
             services.AddSingleton<TestUsers>();
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
@@ -73,6 +70,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
             services.AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions));
             services.AddSingleton<INotificationSender, NoopNotificationSender>();
+            services.AddEventObserver();
         });
     }
 

@@ -9,6 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 [Journey(JourneyNames.EditAlertDetails), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
     IClock clock) : PageModel
@@ -60,8 +61,9 @@ public class CheckAnswersModel(
 
         if (updatedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
             await dbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(updatedEvent);
         }
 
         await JourneyInstance!.CompleteAsync();

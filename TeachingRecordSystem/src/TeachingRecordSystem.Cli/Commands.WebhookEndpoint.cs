@@ -95,7 +95,7 @@ public partial class Commands
 
                     dbContext.WebhookEndpoints.Add(endpoint);
 
-                    dbContext.AddEventWithoutBroadcast(new WebhookEndpointCreatedEvent
+                    dbContext.AddEvent(new WebhookEndpointCreatedEvent
                     {
                         WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint),
                         EventId = Guid.NewGuid(),
@@ -152,7 +152,7 @@ public partial class Commands
                     var now = DateTime.UtcNow;
                     endpoint.DeletedOn = now;
 
-                    dbContext.AddEventWithoutBroadcast(new WebhookEndpointDeletedEvent
+                    dbContext.AddEvent(new WebhookEndpointDeletedEvent
                     {
                         WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint),
                         EventId = Guid.NewGuid(),
@@ -309,7 +309,7 @@ public partial class Commands
                         var now = DateTime.UtcNow;
                         endpoint.UpdatedOn = now;
 
-                        dbContext.AddEventWithoutBroadcast(new WebhookEndpointUpdatedEvent
+                        dbContext.AddEvent(new WebhookEndpointUpdatedEvent
                         {
                             EventId = Guid.NewGuid(),
                             CreatedUtc = now,

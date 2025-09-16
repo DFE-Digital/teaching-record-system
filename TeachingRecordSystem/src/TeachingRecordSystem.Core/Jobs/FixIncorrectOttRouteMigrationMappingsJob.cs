@@ -38,7 +38,7 @@ public class FixIncorrectOttRouteMigrationMappingsJob(
 
             if (updatedEvent is not null)
             {
-                await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+                dbContext.AddEvent(updatedEvent);
                 await dbContext.SaveChangesAsync();
             }
         }

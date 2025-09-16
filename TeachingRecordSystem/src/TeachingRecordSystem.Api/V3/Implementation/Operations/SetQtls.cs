@@ -8,6 +8,7 @@ public record SetQtlsCommand(string Trn, DateOnly? QtsDate) : ICommand<QtlsResul
 
 public class SetQtlsHandler(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ReferenceDataCache referenceDataCache,
     ICurrentUserProvider currentUserProvider,
     IClock clock) :
@@ -68,7 +69,10 @@ public class SetQtlsHandler(
                     @event: out var @event);
 
                 dbContext.Qualifications.Add(professionalStatus);
-                await dbContext.AddEventAndBroadcastAsync(@event);
+
+                await dbContext.SaveChangesAsync();
+
+                await eventPublisher.PublishEventAsync(@event);
             }
             else
             {
@@ -82,9 +86,11 @@ public class SetQtlsHandler(
                     now: clock.UtcNow,
                     out var @event);
 
+                await dbContext.SaveChangesAsync();
+
                 if (@event is not null)
                 {
-                    await dbContext.AddEventAndBroadcastAsync(@event);
+                    await eventPublisher.PublishEventAsync(@event);
                 }
             }
         }
@@ -99,10 +105,10 @@ public class SetQtlsHandler(
                 now: clock.UtcNow,
                 out var @event);
 
-            await dbContext.AddEventAndBroadcastAsync(@event);
-        }
+            await dbContext.SaveChangesAsync();
 
-        await dbContext.SaveChangesAsync();
+            await eventPublisher.PublishEventAsync(@event);
+        }
 
         return new QtlsResult()
         {

@@ -184,7 +184,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEvent(@nameChangeEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -373,7 +373,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEvent(@nameChangeEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -419,7 +419,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEvent(@nameChangeEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -464,7 +464,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEvent(@nameChangeEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -513,7 +513,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
+        dbContext.AddEvent(@nameChangeEvent1!);
 
         // second marriage
         var updateresult2 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName2, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow.AddYears(-1));
@@ -532,7 +532,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult2.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent2!);
+        dbContext.AddEvent(@nameChangeEvent2!);
 
         // third marriage
         var updateresult3 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName3, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow.AddYears(-1));
@@ -551,7 +551,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult3.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent3!);
+        dbContext.AddEvent(@nameChangeEvent3!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -718,7 +718,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
+        dbContext.AddEvent(@nameChangeEvent1!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -840,8 +840,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult2.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent2!);
+        dbContext.AddEvent(@nameChangeEvent1!);
+        dbContext.AddEvent(@nameChangeEvent2!);
         await dbContext.SaveChangesAsync();
 
         // Act

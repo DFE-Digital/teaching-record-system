@@ -14,6 +14,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 public class CheckAnswersModel(
     AuthorizeAccessLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IPersonMatchingService matchingService,
     IFileService fileService,
     IClock clock) : PageModel
@@ -160,8 +161,10 @@ public class CheckAnswersModel(
             out var createdEvent
             );
         dbContext.SupportTasks.Add(supportTask);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
-        dbContext.SaveChanges();
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(createdEvent);
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 

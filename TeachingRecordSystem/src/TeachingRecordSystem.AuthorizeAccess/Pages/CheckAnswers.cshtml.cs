@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
@@ -11,7 +10,7 @@ using TeachingRecordSystem.WebCommon.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContext, IClock clock) : PageModel
+public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContext, IEventPublisher eventPublisher, IClock clock) : PageModel
 {
     public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
 
@@ -34,11 +33,13 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
         var subject = JourneyInstance!.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = JourneyInstance!.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
 
+        var now = clock.UtcNow;
+
         var supportTask = new SupportTask()
         {
             SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
-            CreatedOn = clock.UtcNow,
-            UpdatedOn = clock.UtcNow,
+            CreatedOn = now,
+            UpdatedOn = now,
             SupportTaskType = SupportTaskType.ConnectOneLoginUser,
             Status = SupportTaskStatus.Open,
             Data = new ConnectOneLoginUserData()
@@ -57,27 +58,15 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
         };
         dbContext.SupportTasks.Add(supportTask);
 
-        await dbContext.AddEventAndBroadcastAsync(new SupportTaskCreatedEvent()
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(new SupportTaskCreatedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = now,
             RaisedBy = SystemUser.SystemUserId,
             SupportTask = EventModels.SupportTask.FromModel(supportTask)
         });
-
-        while (true)
-        {
-            try
-            {
-                await dbContext.SaveChangesAsync();
-                break;
-            }
-            catch (Exception ex) when (ex.InnerException is PostgresException postgresException && postgresException.SqlState == PostgresErrorCodes.UniqueViolation)
-            {
-                supportTask.SupportTaskReference = SupportTask.GenerateSupportTaskReference();
-                continue;
-            }
-        }
 
         await JourneyInstance.UpdateStateAsync(state => state.HasPendingSupportRequest = true);
 

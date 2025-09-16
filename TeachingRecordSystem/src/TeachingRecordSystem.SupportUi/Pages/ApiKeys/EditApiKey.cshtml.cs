@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class EditApiKeyModel(TrsDbContext dbContext, IEventPublisher eventPublisher, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     private ApiKey? _apiKey;
 
@@ -35,22 +35,24 @@ public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenera
             return BadRequest();
         }
 
+        var now = clock.UtcNow;
+
         var oldApiKey = Core.Events.Models.ApiKey.FromModel(_apiKey!);
 
-        _apiKey!.Expires = clock.UtcNow;
+        _apiKey!.Expires = now;
+
+        await dbContext.SaveChangesAsync();
 
         var @event = new ApiKeyUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = now,
             RaisedBy = User.GetUserId(),
             ApiKey = Core.Events.Models.ApiKey.FromModel(_apiKey),
             OldApiKey = oldApiKey,
             Changes = ApiKeyUpdatedEventChanges.Expires
         };
-        await dbContext.AddEventAndBroadcastAsync(@event);
-
-        await dbContext.SaveChangesAsync();
+        await eventPublisher.PublishEventAsync(@event);
 
         TempData.SetFlashSuccess("API key expired");
         return Redirect(linkGenerator.EditApplicationUser(ApplicationUserId));

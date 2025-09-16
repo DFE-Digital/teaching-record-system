@@ -37,7 +37,7 @@ public class SendInductionCompletedEmailJob(
         await notificationSender.SendEmailAsync(InductionCompletedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
-        dbContext.AddEventWithoutBroadcast(new InductionCompletedEmailSentEvent
+        dbContext.AddEvent(new InductionCompletedEmailSentEvent
         {
             EventId = Guid.NewGuid(),
             InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,

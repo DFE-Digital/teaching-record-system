@@ -10,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ReferenceDataCache referenceDataCache,
     IFileService fileService,
     IClock clock)
@@ -70,8 +71,9 @@ public class CheckYourAnswersModel(
                 null, @event: out var @event);
 
         dbContext.Qualifications.Add(professionalStatus);
-        await dbContext.AddEventAndBroadcastAsync(@event);
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(@event);
 
         await JourneyInstance!.CompleteAsync();
 

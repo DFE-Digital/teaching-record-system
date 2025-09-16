@@ -15,6 +15,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class AcceptModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IBackgroundJobScheduler backgroundJobScheduler,
     TrsLinkGenerator linkGenerator,
     IClock clock) : PageModel
@@ -37,6 +38,7 @@ public class AcceptModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var now = clock.UtcNow;
+        var events = new List<EventBase>();
         var changeNameRequestData = ChangeType == SupportTaskType.ChangeNameRequest ? EventModels.ChangeNameRequestData.FromModel((ChangeNameRequestData)SupportTask!.Data) : null;
         var changeDateOfBirthRequestData = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? EventModels.ChangeDateOfBirthRequestData.FromModel((ChangeDateOfBirthRequestData)SupportTask!.Data) : null;
         var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
@@ -93,7 +95,7 @@ public class AcceptModel(
             emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
             emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfNameApprovedEmailConfirmationTemplateId;
 
-            await dbContext.AddEventAndBroadcastAsync(approvedEvent);
+            events.Add(approvedEvent);
         }
         else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
         {
@@ -119,7 +121,7 @@ public class AcceptModel(
             emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
             emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmationTemplateId;
 
-            await dbContext.AddEventAndBroadcastAsync(approvedEvent);
+            events.Add(approvedEvent);
         }
 
         if (!string.IsNullOrEmpty(emailAddress))
@@ -137,6 +139,8 @@ public class AcceptModel(
         }
 
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventsAsync(events);
 
         TempData.SetFlashSuccess(
             $"The request has been accepted",

@@ -11,7 +11,12 @@ using TeachingRecordSystem.Core.Infrastructure.Json;
 
 namespace TeachingRecordSystem.Core.Services.Webhooks;
 
-public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClock clock, IMemoryCache memoryCache)
+public class WebhookMessageFactory(
+    TrsDbContext dbContext,
+    EventMapperRegistry eventMapperRegistry,
+    IServiceProvider serviceProvider,
+    IClock clock,
+    IMemoryCache memoryCache)
 {
     private static readonly TimeSpan _webhookEndpointsCacheDuration = TimeSpan.FromMinutes(1);
 
@@ -27,10 +32,7 @@ public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClo
             }
         };
 
-    public async Task<IEnumerable<WebhookMessage>> CreateMessagesAsync(
-        TrsDbContext dbContext,
-        EventBase @event,
-        IServiceProvider serviceProvider)
+    public async Task<IEnumerable<WebhookMessage>> CreateMessagesAsync(EventBase @event)
     {
         var endpoints = await memoryCache.GetOrCreateAsync(
             CacheKeys.EnabledWebhookEndpoints(),

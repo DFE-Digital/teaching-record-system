@@ -7,7 +7,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class CheckAnswersModel(
+    TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
+    TrsLinkGenerator linkGenerator,
+    IClock clock) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -42,8 +46,9 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
             out var createdEvent);
 
         dbContext.MandatoryQualifications.Add(qualification);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(createdEvent);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification added");

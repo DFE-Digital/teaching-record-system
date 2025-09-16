@@ -54,7 +54,7 @@ public class ChangeLogSetStatusEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(statusUpdatedEvent);
+            dbContext.AddEvent(statusUpdatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -112,7 +112,7 @@ public class ChangeLogSetStatusEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(statusUpdatedEvent);
+            dbContext.AddEvent(statusUpdatedEvent);
             await dbContext.SaveChangesAsync();
         });
 

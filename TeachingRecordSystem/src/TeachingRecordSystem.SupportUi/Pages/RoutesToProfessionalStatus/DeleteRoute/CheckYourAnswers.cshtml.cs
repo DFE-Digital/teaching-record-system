@@ -11,6 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.Delete
 public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ReferenceDataCache referenceDataCache,
     IFileService fileService,
     IClock clock) : PageModel
@@ -62,11 +63,10 @@ public class CheckYourAnswersModel(
             User.GetUserId(),
             clock.UtcNow,
             out var deletedEvent);
-        if (deletedEvent is not null)
-        {
-            await dbContext.AddEventAndBroadcastAsync(deletedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(deletedEvent);
 
         await JourneyInstance!.CompleteAsync();
 

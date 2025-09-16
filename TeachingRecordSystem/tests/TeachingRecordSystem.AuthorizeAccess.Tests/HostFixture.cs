@@ -50,9 +50,6 @@ public class HostFixture : WebApplicationFactory<Program>
             // (we want to be able to POST directly from a test without having to set antiforgery cookies etc.)
             services.AddSingleton<IPageApplicationModelProvider, RemoveAutoValidateAntiforgeryPageApplicationModelProvider>();
 
-            // Publish events synchronously
-            PublishEventsDbCommandInterceptor.ConfigureServices(services);
-
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddSingleton<TestData>(
@@ -68,6 +65,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton(GetMockFileService());
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object);
+            services.AddEventObserver();
 
             IFileService GetMockFileService()
             {

@@ -9,6 +9,7 @@ public record SetDeceasedResult;
 
 public class SetDeceasedHandler(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ICurrentUserProvider currentUserProvider,
     IClock clock) :
     ICommandHandler<SetDeceasedCommand, SetDeceasedResult>
@@ -40,9 +41,10 @@ public class SetDeceasedHandler(
             EvidenceFile = null,
             DateOfDeath = command.DateOfDeath
         };
-        await dbContext.AddEventAndBroadcastAsync(@event);
 
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(@event);
 
         return new SetDeceasedResult();
     }

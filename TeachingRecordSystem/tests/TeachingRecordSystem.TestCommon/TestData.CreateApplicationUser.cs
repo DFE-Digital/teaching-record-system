@@ -66,7 +66,7 @@ public partial class TestData
                 CreatedUtc = Clock.UtcNow,
                 ApplicationUser = EventModels.ApplicationUser.FromModel(user)
             };
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
 

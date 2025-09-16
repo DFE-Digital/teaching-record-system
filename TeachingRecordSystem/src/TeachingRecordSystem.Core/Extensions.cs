@@ -2,12 +2,13 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
 using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events.EventHandlers;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
@@ -15,6 +16,22 @@ namespace TeachingRecordSystem.Core;
 
 public static class Extensions
 {
+    public static IServiceCollection AddAccessYourTeachingQualificationsOptions(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IHostEnvironment environment)
+    {
+        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        {
+            services.AddOptions<AccessYourTeachingQualificationsOptions>()
+                .Bind(configuration.GetSection("AccessYourTeachingQualifications"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+        }
+
+        return services;
+    }
+
     public static IConfigurationBuilder AddAksConfiguration(this IConfigurationBuilder builder)
     {
         var deployedEnvironmentName = Environment.GetEnvironmentVariable("ENVIRONMENT_NAME")
@@ -58,6 +75,39 @@ public static class Extensions
         return services;
     }
 
+    public static IHostApplicationBuilder AddEventHandlers(this IHostApplicationBuilder builder)
+    {
+        AddEventHandlers(builder.Services, builder.Configuration);
+
+        return builder;
+    }
+
+    public static IServiceCollection AddEventHandlers(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddWebhookMessageEventHandlerDependencies(configuration);
+
+        // Add non-generic event handlers explicitly
+        // (SaveEventToDbEventHandler is added by AddEventPublisher)
+        services.AddTransient<IEventHandler, CreateWebhookMessagesEventHandler>();
+
+        services.Scan(s => s
+            .FromAssembliesOf(typeof(Extensions))
+            .AddClasses(c => c.AssignableTo(typeof(IEventHandler<>))).AsImplementedInterfaces().WithTransientLifetime());
+
+        return services;
+    }
+
+    public static IServiceCollection AddEventPublisher(this IServiceCollection services)
+    {
+        services.AddTransient<IEventPublisher, EventPublisher>();
+
+        // We always want the event to be persisted to the DB so we add that EventHandler explicitly here;
+        // (we might not always want all other handlers e.g. in tests)
+        services.AddTransient<IEventHandler, SaveEventToDbEventHandler>();
+
+        return services;
+    }
+
     public static IHostApplicationBuilder AddHangfire(this IHostApplicationBuilder builder)
     {
         var prepareSchemaIfNecessary = true;
@@ -96,13 +146,23 @@ public static class Extensions
         return builder;
     }
 
-    public static IHostApplicationBuilder AddWebhookMessageFactory(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddTrsBaseServices(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<WebhookMessageFactory>();
-        builder.Services.AddSingleton<EventMapperRegistry>();
-        builder.Services.TryAddSingleton<PersonInfoCache>();
+        AddTrsBaseServices(builder.Services, builder.Configuration);
 
         return builder;
+    }
+
+    public static IServiceCollection AddTrsBaseServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddSingleton<IClock, Clock>()
+            .AddCrmQueries()
+            .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
+            .AddSingleton<ReferenceDataCache>()
+            .AddEventPublisher();
+
+        return services;
     }
 
     public static void ConfigureSerilog(

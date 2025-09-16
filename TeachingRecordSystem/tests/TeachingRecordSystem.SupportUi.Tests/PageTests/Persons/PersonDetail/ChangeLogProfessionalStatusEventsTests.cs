@@ -219,7 +219,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
             Debug.Assert(@event is not null);
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -313,7 +313,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 out var @event);
             Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -396,7 +396,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 out var @event);
             Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -464,7 +464,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 Clock.UtcNow,
                 out var @event);
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -519,7 +519,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 Clock.UtcNow,
                 out var @event);
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -558,7 +558,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 Clock.UtcNow,
                 out var @event);
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -597,7 +597,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 Clock.UtcNow,
                 out var @event);
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -636,7 +636,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 Clock.UtcNow,
                 out var @event);
 
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });
@@ -801,7 +801,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
+            dbContext.AddEvent(migratedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -877,7 +877,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(createdEvent);
+            dbContext.AddEvent(createdEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -923,7 +923,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -974,7 +974,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(createdEvent);
+            dbContext.AddEvent(createdEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -1070,7 +1070,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
 

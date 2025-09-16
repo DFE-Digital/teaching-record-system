@@ -10,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
     IClock clock) : PageModel
@@ -71,8 +72,9 @@ public class CheckAnswersModel(
             out var createdEvent);
 
         dbContext.Alerts.Add(alert);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(createdEvent);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert added");

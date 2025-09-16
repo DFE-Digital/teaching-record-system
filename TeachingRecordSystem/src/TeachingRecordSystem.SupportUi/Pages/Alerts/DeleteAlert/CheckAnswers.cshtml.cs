@@ -9,6 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 [Journey(JourneyNames.DeleteAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
     IClock clock) : PageModel
@@ -59,8 +60,9 @@ public class CheckAnswersModel(
             clock.UtcNow,
             out var deletedEvent);
 
-        await dbContext.AddEventAndBroadcastAsync(deletedEvent);
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(deletedEvent);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert deleted");

@@ -10,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 [Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
     IClock clock)
@@ -162,8 +163,9 @@ public class CheckAnswersModel(
             RaisedBy = User.GetUserId()
         };
 
-        await DbContext.AddEventAndBroadcastAsync(@event);
         await DbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(@event);
 
         TempData.SetFlashSuccess(
             $"Records merged successfully for {FirstName} {MiddleName} {LastName}",

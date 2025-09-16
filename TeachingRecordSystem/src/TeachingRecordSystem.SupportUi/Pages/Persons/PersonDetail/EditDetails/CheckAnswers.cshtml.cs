@@ -11,6 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IClock clock,
     IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
@@ -118,8 +119,9 @@ public class CheckAnswersModel(
 
         if (updatedEvent is not null)
         {
-            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
             await DbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(updatedEvent);
         }
 
         await JourneyInstance!.CompleteAsync();
