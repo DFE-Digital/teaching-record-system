@@ -125,7 +125,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
 

@@ -281,7 +281,7 @@ public partial class TestData
             {
                 dbContext.TrnRequestMetadata.Add(metadata);
                 dbContext.SupportTasks.Add(task);
-                dbContext.AddEventWithoutBroadcast(createdEvent);
+                dbContext.AddEvent(createdEvent);
                 await dbContext.SaveChangesAsync();
 
                 // Re-query what we've just added so we return a SupportTask with TrnRequestMetadata populated

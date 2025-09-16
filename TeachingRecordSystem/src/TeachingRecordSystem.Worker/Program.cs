@@ -37,6 +37,7 @@ if (builder.Environment.IsProduction())
 builder.ConfigureLogging();
 
 builder
+    .AddTrsBaseServices()
     .AddDatabase()
     .AddBlobStorage()
     .AddDistributedLocks()
@@ -49,7 +50,6 @@ builder
     .AddIdentityApi()
     .AddNameSynonyms()
     .AddWebhookDeliveryService()
-    .AddWebhookMessageFactory()
     .AddPublishApi()
     .AddTrnRequestService()
     .AddTrsSyncHelper();
@@ -69,7 +69,6 @@ if (builder.Configuration.GetValue<string>("ConnectionStrings:Crm") is string cr
 builder.Services.AddHangfireServer();
 
 builder.Services
-    .AddTrsBaseServices()
     .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
     .AddWorkforceData()
     .AddMemoryCache()

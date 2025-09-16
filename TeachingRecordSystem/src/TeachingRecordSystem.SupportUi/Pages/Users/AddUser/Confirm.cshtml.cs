@@ -12,6 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class ConfirmModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IAadUserService userService,
     IClock clock,
     TrsLinkGenerator linkGenerator) : PageModel
@@ -77,15 +78,15 @@ public class ConfirmModel(
 
         dbContext.Users.Add(newUser);
 
-        await dbContext.AddEventAndBroadcastAsync(new UserAddedEvent()
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(new UserAddedEvent()
         {
             EventId = Guid.NewGuid(),
             User = Core.Events.Models.User.FromModel(newUser),
             RaisedBy = User.GetUserId(),
             CreatedUtc = clock.UtcNow
         });
-
-        await dbContext.SaveChangesAsync();
 
         var roleText = UserRoles.GetDisplayNameForRole(Role!)
             .ToLowerInvariantFirstLetter()

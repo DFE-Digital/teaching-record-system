@@ -12,6 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IClock clock,
     IFileService fileService,
     ITrnGenerator trnGenerator)
@@ -83,8 +84,9 @@ public class CheckAnswersModel(
         };
 
         DbContext.Add(person);
-        await DbContext.AddEventAndBroadcastAsync(createdEvent);
         await DbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(createdEvent);
 
         await JourneyInstance!.CompleteAsync();
 

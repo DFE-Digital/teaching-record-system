@@ -48,7 +48,7 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
                 out var @event);
 
             Debug.Assert(@event is not null);
-            dbContext.AddEventWithoutBroadcast(@event);
+            dbContext.AddEvent(@event);
 
             await dbContext.SaveChangesAsync();
         });

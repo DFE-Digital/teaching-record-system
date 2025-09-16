@@ -15,7 +15,7 @@ using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
+public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IEventPublisher eventPublisher, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 0 31 2 *";
     public const string StorageContainer = "dqt-integrations";
@@ -117,6 +117,9 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         {
             try
             {
+                var now = clock.UtcNow;
+                var events = new List<EventBase>();
+
                 var (errors, warnings) = ValidateRow(row);
                 var personId = default(Guid?);
                 var recordStatus = IntegrationTransactionRecordStatus.Success;
@@ -138,11 +141,11 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     if (person is null)
                     {
                         //create person if incoming record is not known in trs
-                        var (newPerson, personAttributes) = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddleName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow, createdByTps: true);
+                        var (newPerson, personAttributes) = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddleName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, now, createdByTps: true);
                         var createdEvent = new PersonCreatedEvent
                         {
                             EventId = Guid.NewGuid(),
-                            CreatedUtc = clock.UtcNow,
+                            CreatedUtc = now,
                             RaisedBy = capitaUser.Value.CapitaTpsUserId,
                             PersonId = newPerson.PersonId,
                             PersonAttributes = personAttributes,
@@ -151,18 +154,17 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                             EvidenceFile = null,
                             TrnRequestMetadata = null
                         };
+                        events.Add(createdEvent);
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
-                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, now, out var @event);
                             if (@event is not null)
                             {
-                                await dbContext.AddEventAndBroadcastAsync(@event);
-                                await dbContext.SaveChangesAsync();
+                                events.Add(@event);
                             }
                         }
                         dbContext.Persons.Add(newPerson);
-                        await dbContext.AddEventAndBroadcastAsync(createdEvent);
                         personId = newPerson.PersonId;
 
                         //create task
@@ -172,7 +174,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                             {
                                 ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
                                 RequestId = Guid.NewGuid().ToString(),
-                                CreatedOn = clock.UtcNow,
+                                CreatedOn = now,
                                 IdentityVerified = null,
                                 OneLoginUserSubject = null,
                                 Name = GetNonEmptyValues(
@@ -204,18 +206,17 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 null,
                                 trnRequestMetadata.RequestId,
                                 capitaUser.Value.CapitaTpsUserId,
-                                clock.UtcNow,
+                                now,
                                 out var supportTaskCreatedEvent);
 
                             dbContext.SupportTasks.Add(supportTask);
-                            await dbContext.AddEventAndBroadcastAsync(supportTaskCreatedEvent);
+                            events.Add(supportTaskCreatedEvent);
                             duplicateRowCount++;
                         }
                         else
                         {
                             successCount++;
                         }
-
                     }
                     else if (person is not null)
                     {
@@ -225,11 +226,10 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
                             person.DateOfDeath = dateOfDeath;
-                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, now, out var @event);
                             if (@event is not null)
                             {
-                                await dbContext.AddEventAndBroadcastAsync(@event);
-                                await dbContext.SaveChangesAsync();
+                                events.Add(@event);
                             }
                         }
 
@@ -262,7 +262,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                 integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                 {
                     IntegrationTransactionRecordId = 0,
-                    CreatedDate = clock.UtcNow,
+                    CreatedDate = now,
                     RowData = row.ToString(),
                     Status = recordStatus,
                     PersonId = personId,
@@ -271,6 +271,10 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     HasActiveAlert = null
                 });
                 totalRowCount++;
+
+                await dbContext.SaveChangesAsync();
+
+                await eventPublisher.PublishEventsAsync(events);
 
             }
             catch (Exception ex)

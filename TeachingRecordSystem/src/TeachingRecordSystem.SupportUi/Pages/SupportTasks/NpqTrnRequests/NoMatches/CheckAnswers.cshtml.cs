@@ -11,6 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NoMat
 
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
     IClock clock) : PageModel
@@ -101,8 +102,9 @@ public class CheckAnswersModel(
             RaisedBy = User.GetUserId()
         };
 
-        await dbContext.AddEventAndBroadcastAsync(@event);
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(@event);
 
         TempData.SetFlashSuccess(
             $"{SourceApplicationUserName} request completed",

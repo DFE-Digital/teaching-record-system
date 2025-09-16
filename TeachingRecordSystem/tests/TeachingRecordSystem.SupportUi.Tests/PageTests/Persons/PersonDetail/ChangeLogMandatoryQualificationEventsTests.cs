@@ -341,7 +341,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                     EndDate = qualification.EndDate
                 }
             };
-            dbContext.AddEventWithoutBroadcast(reactivatedEvent);
+            dbContext.AddEvent(reactivatedEvent);
 
             await dbContext.SaveChangesAsync();
         });
@@ -386,7 +386,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 MandatoryQualification = EventModels.MandatoryQualification.FromModel(mq),
                 Changes = MandatoryQualificationMigratedEventChanges.None
             };
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
+            dbContext.AddEvent(migratedEvent);
 
             await dbContext.SaveChangesAsync();
         });
@@ -431,7 +431,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 MandatoryQualification = EventModels.MandatoryQualification.FromModel(mq),
                 Changes = MandatoryQualificationMigratedEventChanges.None
             };
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
+            dbContext.AddEvent(migratedEvent);
 
             await dbContext.SaveChangesAsync();
         });
@@ -479,7 +479,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 MandatoryQualification = EventModels.MandatoryQualification.FromModel(mq),
                 Changes = MandatoryQualificationMigratedEventChanges.Provider
             };
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
+            dbContext.AddEvent(migratedEvent);
 
             await dbContext.SaveChangesAsync();
 
@@ -534,7 +534,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 MandatoryQualification = EventModels.MandatoryQualification.FromModel(mq),
                 Changes = MandatoryQualificationMigratedEventChanges.Specialism
             };
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
+            dbContext.AddEvent(migratedEvent);
 
             await dbContext.SaveChangesAsync();
 
@@ -1005,7 +1005,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 EndDate = qualification.EndDate
             }
         };
-        dbContext.AddEventWithoutBroadcast(deletedEvent);
+        dbContext.AddEvent(deletedEvent);
 
         await dbContext.SaveChangesAsync();
     });
@@ -1094,7 +1094,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                     null,
                 Changes = changes
             };
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
 
             await dbContext.SaveChangesAsync();
         });

@@ -33,7 +33,6 @@ using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 
@@ -189,13 +188,11 @@ builder
     .AddDistributedLocks()
     .AddIdentityApi()
     .AddNameSynonyms()
-    .AddWebhookOptions()
     .AddTrsSyncHelper()
     .AddTrnRequestService()
     .AddEmail();
 
 services
-    .AddTrsBaseServices()
     .AddAccessYourTeachingQualificationsOptions(configuration, env)
     .AddFileService()
     .AddTransient<GetPersonHelper>()

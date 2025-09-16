@@ -22,7 +22,7 @@ public class ChangeLogTrnAllocatedEventTests(HostFixture hostFixture) : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(trnAllocatedEvent);
+            dbContext.AddEvent(trnAllocatedEvent);
             await dbContext.SaveChangesAsync();
         });
 

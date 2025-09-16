@@ -11,6 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class IndexModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IClock clock,
     TrsLinkGenerator linkGenerator) : PageModel
 {
@@ -74,7 +75,9 @@ public class IndexModel(
             _user.Role = Role;
             _user.Name = Name!;
 
-            await dbContext.AddEventAndBroadcastAsync(new UserUpdatedEvent
+            await dbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(new UserUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
                 User = EventModels.User.FromModel(_user),
@@ -82,8 +85,6 @@ public class IndexModel(
                 CreatedUtc = clock.UtcNow,
                 Changes = changes
             });
-
-            await dbContext.SaveChangesAsync();
         }
 
         if ((changes & UserUpdatedEventChanges.Roles) != UserUpdatedEventChanges.None)
@@ -117,7 +118,9 @@ public class IndexModel(
 
         _user.Active = true;
 
-        await dbContext.AddEventAndBroadcastAsync(new UserActivatedEvent
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(new UserActivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(_user),
@@ -125,7 +128,6 @@ public class IndexModel(
             CreatedUtc = clock.UtcNow
         });
 
-        await dbContext.SaveChangesAsync();
         TempData.SetFlashSuccess(messageText: $"{_user.Name}\u2019s account has been reactivated.");
 
         return Redirect(linkGenerator.Users());

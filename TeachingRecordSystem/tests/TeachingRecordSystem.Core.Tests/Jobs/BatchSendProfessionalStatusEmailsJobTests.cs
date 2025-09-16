@@ -146,7 +146,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
                 deletedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
                 out var deletedEvent);
-            dbContext.AddEventWithoutBroadcast(deletedEvent);
+            dbContext.AddEvent(deletedEvent);
             await dbContext.SaveChangesAsync();
         });
 

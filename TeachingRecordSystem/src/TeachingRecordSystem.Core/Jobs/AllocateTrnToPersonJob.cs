@@ -18,7 +18,7 @@ public class AllocateTrnToPersonJob(
 
         var newTrn = await trnGenerator.GenerateTrnAsync();
         person.Trn = newTrn;
-        dbContext.AddEventWithoutBroadcast(new TrnAllocatedEvent()
+        dbContext.AddEvent(new TrnAllocatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,

@@ -19,6 +19,7 @@ public record SetPiiResult;
 
 public class SetPiiHandler(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ICurrentUserProvider currentUserProvider,
     IClock clock) :
     ICommandHandler<SetPiiCommand, SetPiiResult>
@@ -76,9 +77,10 @@ public class SetPiiHandler(
             DetailsChangeEvidenceFile = null,
             Changes = PersonDetailsUpdatedEventChanges.None
         };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent);
 
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(personUpdatedEvent);
 
         return new SetPiiResult();
     }

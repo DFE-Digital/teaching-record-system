@@ -14,12 +14,14 @@ public class InductionImporter
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly IClock _clock;
+    private readonly IEventPublisher _eventPublisher;
 
-    public InductionImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, IClock clock)
+    public InductionImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, IClock clock, IEventPublisher eventPublisher)
     {
         _dbContext = dbContext;
         _logger = logger;
         _clock = clock;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -111,7 +113,7 @@ public class InductionImporter
 
                             if (updatedEvent is not null)
                             {
-                                await _dbContext.AddEventAndBroadcastAsync(updatedEvent);
+                                await _eventPublisher.PublishEventAsync(updatedEvent);
                             }
                         }
 
