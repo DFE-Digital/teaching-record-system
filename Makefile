@@ -37,7 +37,7 @@ tps-sandbox: production-cluster
 	$(eval include global_config/tps-sandbox.sh)
 
 .PHONY: pentest
-pentest: production-cluster
+pentest: platform-test-cluster
 	$(eval include global_config/pentest.sh)
 
 .PHONY: production
@@ -142,6 +142,10 @@ get-cluster-credentials: set-azure-account
 dev-cluster:
 	$(eval CLUSTER_RESOURCE_GROUP_NAME=s189d01-tsc-dv-rg)
 	$(eval CLUSTER_NAME=s189d01-tsc-${CLUSTER}-aks)
+
+platform-test-cluster:
+	$(eval CLUSTER_RESOURCE_GROUP_NAME=s189t01-tsc-pt-rg)
+	$(eval CLUSTER_NAME=s189t01-tsc-platform-test-aks)
 
 action-group: set-azure-account # make production action-group ACTION_GROUP_EMAIL=notificationemail@domain.com . Must be run before setting enable_monitoring=true. Use any non-prod environment to create in the test subscription.
 	$(if $(ACTION_GROUP_EMAIL), , $(error Please specify a notification email for the action group))
