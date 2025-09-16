@@ -37,7 +37,7 @@ tps-sandbox: production-cluster
 	$(eval include global_config/tps-sandbox.sh)
 
 .PHONY: pentest
-tps-sandbox: production-cluster
+pentest: production-cluster
 	$(eval include global_config/pentest.sh)
 
 .PHONY: production
