@@ -61,8 +61,12 @@ public class TrnRequestService(
             requestData.MiddleName ?? string.Empty,
             requestData.LastName!,
             requestData.DateOfBirth,
-            requestData.EmailAddress is string emailAddress ? EmailAddress.Parse(emailAddress) : null,
-            requestData.NationalInsuranceNumber is string nationalInsuranceNumber ? NationalInsuranceNumber.Parse(nationalInsuranceNumber) : null,
+            requestData.EmailAddress is string emailAddress && !string.IsNullOrEmpty(emailAddress)
+                ? EmailAddress.Parse(emailAddress)
+                : null,
+            requestData.NationalInsuranceNumber is string nationalInsuranceNumber && !string.IsNullOrEmpty(nationalInsuranceNumber)
+                ? NationalInsuranceNumber.Parse(nationalInsuranceNumber)
+                : null,
             requestData.Gender,
             now,
             (requestData.ApplicationUserId, requestData.RequestId));
