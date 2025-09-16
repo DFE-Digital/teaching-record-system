@@ -287,6 +287,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<RemoveStaleJourneyStatesJob>(
+                    nameof(RemoveStaleJourneyStatesJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    RemoveStaleJourneyStatesJob.JobSchedule);
+
                 return Task.CompletedTask;
             });
         }
