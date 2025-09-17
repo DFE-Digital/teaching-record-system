@@ -42,6 +42,8 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
 
     public string? PersonName { get; set; }
 
+    public string PageCaption => $"Add a route - {PersonName}";
+
     protected Task<IActionResult> ContinueAsync()
     {
         IActionResult nextPage = Redirect((currentPage, FromCheckAnswers) switch

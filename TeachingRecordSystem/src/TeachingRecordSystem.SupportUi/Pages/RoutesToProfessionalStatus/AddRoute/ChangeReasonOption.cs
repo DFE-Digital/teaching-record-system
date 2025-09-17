@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 public enum ChangeReasonOption
 {
-    [Display(Name = "New Information Received")]
+    [Display(Name = "New information was received")]
     NewInformationReceived,
     [Display(Name = "Manually added for Register")]
     AddedForRegister,

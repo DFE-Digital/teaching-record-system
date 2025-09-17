@@ -12,7 +12,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
     public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())
         == FieldRequirement.Mandatory;
 
-    public string PageHeading => "Add age range specialism"
+    public string PageHeading => "Select an age range specialism"
        + (AgeRangeSpecialismRequired ? "" : " (optional)");
 
     public void OnGet()
