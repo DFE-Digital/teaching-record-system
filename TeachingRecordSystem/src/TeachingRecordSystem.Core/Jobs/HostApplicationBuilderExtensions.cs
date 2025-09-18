@@ -262,13 +262,13 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     CapitaExportAmendJob.JobSchedule);
 
-                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEypsJob>(
-                    $"{nameof(AllocateTrnsToPersonsWithEypsJob)} (dry-run)",
+                recurringJobManager.AddOrUpdate<AllocateTrnToPersonJob>(
+                    $"{nameof(AllocateTrnToPersonJob)} (dry-run)",
                     job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<AllocateTrnsToPersonsWithEypsJob>(
-                    nameof(AllocateTrnsToPersonsWithEypsJob),
+                recurringJobManager.AddOrUpdate<AllocateTrnToPersonJob>(
+                    nameof(AllocateTrnToPersonJob),
                     job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 
