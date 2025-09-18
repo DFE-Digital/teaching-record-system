@@ -27,7 +27,6 @@ module "migrations" {
   arguments       = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
   job_name        = "migrations"
   enable_logit    = var.enable_logit
-  run_as_non_root = var.run_as_non_root
 
   config_map_ref = module.migrations_job_configuration.kubernetes_config_map_name
   secret_ref     = module.migrations_job_configuration.kubernetes_secret_name
