@@ -19,14 +19,14 @@ module "migrations_job_configuration" {
 module "migrations" {
   source = "./vendor/modules/aks//aks/job_configuration"
 
-  namespace       = var.namespace
-  environment     = local.app_name_suffix
-  service_name    = var.service_name
-  docker_image    = var.docker_image
-  commands        = ["trscli"]
-  arguments       = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
-  job_name        = "migrations"
-  enable_logit    = var.enable_logit
+  namespace    = var.namespace
+  environment  = local.app_name_suffix
+  service_name = var.service_name
+  docker_image = var.docker_image
+  commands     = ["trscli"]
+  arguments    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+  job_name     = "migrations"
+  enable_logit = var.enable_logit
 
   config_map_ref = module.migrations_job_configuration.kubernetes_config_map_name
   secret_ref     = module.migrations_job_configuration.kubernetes_secret_name
