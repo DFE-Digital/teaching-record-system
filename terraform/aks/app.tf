@@ -19,14 +19,15 @@ module "migrations_job_configuration" {
 module "migrations" {
   source = "./vendor/modules/aks//aks/job_configuration"
 
-  namespace    = var.namespace
-  environment  = local.app_name_suffix
-  service_name = var.service_name
-  docker_image = var.docker_image
-  commands     = ["trscli"]
-  arguments    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
-  job_name     = "migrations"
-  enable_logit = var.enable_logit
+  namespace        = var.namespace
+  environment     = local.app_name_suffix
+  service_name    = var.service_name
+  docker_image    = var.docker_image
+  commands        = ["trscli"]
+  arguments       = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+  job_name        = "migrations"
+  enable_logit    = var.enable_logit
+  run_as_non_root = var.run_as_non_root
 
   config_map_ref = module.migrations_job_configuration.kubernetes_config_map_name
   secret_ref     = module.migrations_job_configuration.kubernetes_secret_name
@@ -65,14 +66,15 @@ module "api_application" {
   kubernetes_config_map_name = module.api_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.api_application_configuration.kubernetes_secret_name
 
-  docker_image   = var.docker_image
-  command        = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
-  web_port       = 3000
-  probe_path     = "/health"
-  replicas       = var.api_replicas
-  max_memory     = var.api_max_memory
-  enable_logit   = var.enable_logit
-  enable_gcp_wif = true
+  docker_image    = var.docker_image
+  command         = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
+  web_port        = 3000
+  probe_path      = "/health"
+  replicas        = var.api_replicas
+  max_memory      = var.api_max_memory
+  enable_logit    = var.enable_logit
+  run_as_non_root = var.run_as_non_root
+  enable_gcp_wif  = true
 }
 
 module "authz_application_configuration" {
@@ -107,14 +109,15 @@ module "authz_application" {
   kubernetes_config_map_name = module.authz_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.authz_application_configuration.kubernetes_secret_name
 
-  docker_image   = var.docker_image
-  command        = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
-  web_port       = 3000
-  probe_path     = "/health"
-  replicas       = var.authz_replicas
-  max_memory     = var.authz_max_memory
-  enable_logit   = var.enable_logit
-  enable_gcp_wif = true
+  docker_image    = var.docker_image
+  command         = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
+  web_port        = 3000
+  probe_path      = "/health"
+  replicas        = var.authz_replicas
+  max_memory      = var.authz_max_memory
+  enable_logit    = var.enable_logit
+  run_as_non_root = var.run_as_non_root
+  enable_gcp_wif  = true
 }
 
 module "ui_application_configuration" {
@@ -155,6 +158,7 @@ module "ui_application" {
   probe_path                   = "/health"
   replicas                     = var.ui_replicas
   enable_logit                 = var.enable_logit
+  run_as_non_root              = var.run_as_non_root
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
   enable_gcp_wif               = true
 }
@@ -198,6 +202,7 @@ module "worker_application" {
   replicas                     = var.worker_replicas
   max_memory                   = var.worker_max_memory
   enable_logit                 = var.enable_logit
+  run_as_non_root              = var.run_as_non_root
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
   enable_gcp_wif               = true
 }
