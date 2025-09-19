@@ -9,6 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 [Journey(JourneyNames.CloseAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
     IClock clock) : PageModel
@@ -77,9 +78,9 @@ public class CheckAnswersModel(
             Changes = AlertUpdatedEventChanges.EndDate
         };
 
-        await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(updatedEvent);
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert closed");

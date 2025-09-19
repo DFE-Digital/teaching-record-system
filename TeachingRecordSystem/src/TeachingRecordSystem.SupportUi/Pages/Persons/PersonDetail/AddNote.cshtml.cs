@@ -11,7 +11,12 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(Policy = AuthorizationPolicies.PersonDataEdit)]
-public class AddNote(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFileService fileService, IClock clock) : PageModel
+public class AddNote(
+    TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
+    TrsLinkGenerator linkGenerator,
+    IFileService fileService,
+    IClock clock) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -58,19 +63,16 @@ public class AddNote(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFi
             FileId = fileId,
             OriginalFileName = File?.FileName
         };
+        dbContext.Notes.Add(note);
+        await dbContext.SaveChangesAsync();
 
-        var noteCreatedEvent = new NoteCreatedEvent
+        await eventPublisher.PublishEventAsync(new NoteCreatedEvent
         {
             Note = EventModels.Note.FromModel(note),
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
             RaisedBy = User.GetUserId()
-        };
-
-        dbContext.Notes.Add(note);
-        await dbContext.AddEventAndBroadcastAsync(noteCreatedEvent);
-
-        await dbContext.SaveChangesAsync();
+        });
 
         return Redirect(linkGenerator.PersonNotes(PersonId));
     }

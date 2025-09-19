@@ -16,13 +16,15 @@ public class QtsImporter
     private readonly ReferenceDataCache _cache;
     public DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate => new DateOnly(2023, 02, 01);
     private readonly IClock _clock;
+    private readonly IEventPublisher _eventPublisher;
 
-    public QtsImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock)
+    public QtsImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock, IEventPublisher eventPublisher)
     {
         _dbContext = dbContext;
         _logger = logger;
         _cache = cache;
         _clock = clock;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<QtsImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -134,7 +136,7 @@ public class QtsImporter
                            evidenceFile: null,
                            out var routeevent);
 
-                        await _dbContext.AddEventAndBroadcastAsync(routeevent);
+                        await _eventPublisher.PublishEventAsync(routeevent);
 
                         _dbContext.RouteToProfessionalStatuses.Add(route);
                     }

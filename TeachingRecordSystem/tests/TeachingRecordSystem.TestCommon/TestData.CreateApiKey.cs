@@ -28,7 +28,7 @@ public partial class TestData
             RaisedBy = SystemUser.SystemUserId,
             ApiKey = Core.Events.Models.ApiKey.FromModel(apiKey)
         };
-        dbContext.AddEventWithoutBroadcast(@event);
+        dbContext.AddEvent(@event);
 
         await dbContext.SaveChangesAsync();
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events.EventHandlers;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -53,20 +54,17 @@ public static class Setup
         var pgConnectionString = configuration.GetRequiredConnectionString("DefaultConnection");
         DbHelper.ConfigureDbServices(services, pgConnectionString);
 
-        // Publish events synchronously
-        PublishEventsDbCommandInterceptor.ConfigureServices(services);
-
         EvidenceFilesHttpClientHelper.ConfigureServices(services);
 
         services
             .AddSingleton<IConfiguration>(configuration)
+            .AddTrsBaseServices(configuration)
             .AddSingleton<DbFixture>()
             .AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
                     (IClock)new ForwardToTestScopedClock(),
                     TestDataPersonDataSource.CrmAndTrs))
-            .AddTrsBaseServices()
             .AddApiCommands()
             .AddTestScoped<IClock>(tss => tss.Clock)
             .AddSingleton<FakeTrnGenerator>()
@@ -78,9 +76,10 @@ public static class Setup
             .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped<IFileService>(tss => tss.BlobStorageFileService.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
+            .AddSingleton<IEventHandler, EventObserverEventHandler>()
             .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
             .AddTestScoped<CaptureEventObserver>(tss => tss.EventObserver)
-            .AddSingleton<WebhookMessageFactory>()
+            .AddTransient<WebhookMessageFactory>()
             .AddSingleton<EventMapperRegistry>()
             .AddMemoryCache()
             .AddTransient<GetPersonHelper>()

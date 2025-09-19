@@ -24,6 +24,7 @@ public class CreateDateOfBirthChangeRequestHandler(
     IBackgroundJobScheduler backgroundJobScheduler,
     IHttpClientFactory httpClientFactory,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IFileService fileService,
     IClock clock) :
     ICommandHandler<CreateDateOfBirthChangeRequestCommand, CreateDateOfBirthChangeRequestResult>
@@ -82,7 +83,6 @@ public class CreateDateOfBirthChangeRequestHandler(
             out var supportTaskCreatedEvent);
 
         dbContext.SupportTasks.Add(supportTask);
-        await dbContext.AddEventAndBroadcastAsync(supportTaskCreatedEvent);
 
         var emailAddress = string.IsNullOrEmpty(command.EmailAddress) ? person.EmailAddress : command.EmailAddress;
 
@@ -101,6 +101,8 @@ public class CreateDateOfBirthChangeRequestHandler(
         }
 
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(supportTaskCreatedEvent);
 
         return new CreateDateOfBirthChangeRequestResult(supportTask.SupportTaskReference);
     }

@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class AddApplicationUserModel(TrsDbContext dbContext, IEventPublisher eventPublisher, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     [BindProperty]
     [Display(Name = "Name")]
@@ -43,14 +43,6 @@ public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator li
 
         dbContext.ApplicationUsers.Add(newUser);
 
-        await dbContext.AddEventAndBroadcastAsync(new ApplicationUserCreatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            ApplicationUser = Core.Events.Models.ApplicationUser.FromModel(newUser),
-            RaisedBy = User.GetUserId(),
-            CreatedUtc = clock.UtcNow
-        });
-
         try
         {
             await dbContext.SaveChangesAsync();
@@ -60,6 +52,14 @@ public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator li
             ModelState.AddModelError(nameof(Name), "Name must be unique.");
             return this.PageWithErrors();
         }
+
+        await eventPublisher.PublishEventAsync(new ApplicationUserCreatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            ApplicationUser = Core.Events.Models.ApplicationUser.FromModel(newUser),
+            RaisedBy = User.GetUserId(),
+            CreatedUtc = clock.UtcNow
+        });
 
         TempData.SetFlashSuccess("Application user added");
         return Redirect(linkGenerator.EditApplicationUser(newUser.UserId));

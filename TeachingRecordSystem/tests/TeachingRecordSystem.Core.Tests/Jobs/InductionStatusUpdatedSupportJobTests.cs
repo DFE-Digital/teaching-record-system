@@ -93,7 +93,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out var event1);
-        context.AddEventWithoutBroadcast(event1!);
+        context.AddEvent(event1!);
         trsPerson.SetInductionStatus(
             toInductionStatus,
             startDate: null,
@@ -105,7 +105,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(1),
             out var event2);
-        context.AddEventWithoutBroadcast(event2!);
+        context.AddEvent(event2!);
         await context.SaveChangesAsync();
 
         // Act
@@ -145,7 +145,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out var event1);
-        context.AddEventWithoutBroadcast(event1!);
+        context.AddEvent(event1!);
 
         trsPerson.SetInductionStatus(
             toInductionStatus,
@@ -158,7 +158,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(1),
             out var event2);
-        context.AddEventWithoutBroadcast(event2!);
+        context.AddEvent(event2!);
         await context.SaveChangesAsync();
 
         // Act
@@ -198,7 +198,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(-2),
             out var event1);
-        context.AddEventWithoutBroadcast(event1!);
+        context.AddEvent(event1!);
 
         trsPerson.SetInductionStatus(
             toInductionStatus,
@@ -211,7 +211,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(-2),
             out var event2);
-        context.AddEventWithoutBroadcast(event2!);
+        context.AddEvent(event2!);
         await context.SaveChangesAsync();
 
         // Act

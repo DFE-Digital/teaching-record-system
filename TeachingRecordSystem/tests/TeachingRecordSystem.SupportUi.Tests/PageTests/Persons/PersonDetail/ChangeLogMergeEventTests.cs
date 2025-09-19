@@ -351,7 +351,7 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(mergedEvent);
+            dbContext.AddEvent(mergedEvent);
             await dbContext.SaveChangesAsync();
         });
     }

@@ -386,7 +386,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
 
         return WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
     }

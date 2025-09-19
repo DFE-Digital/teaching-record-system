@@ -65,7 +65,7 @@ public class ChangeLogCreateEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(createdEvent);
+            dbContext.AddEvent(createdEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -133,7 +133,7 @@ public class ChangeLogCreateEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(createdEvent);
+            dbContext.AddEvent(createdEvent);
             await dbContext.SaveChangesAsync();
         });
 

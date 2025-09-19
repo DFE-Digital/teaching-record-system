@@ -12,6 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ReferenceDataCache referenceDataCache,
     IFileService fileService,
     IClock clock) : PageModel
@@ -79,8 +80,9 @@ public class CheckYourAnswersModel(
 
         if (updatedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
             await dbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(updatedEvent);
         }
 
         await JourneyInstance!.CompleteAsync();

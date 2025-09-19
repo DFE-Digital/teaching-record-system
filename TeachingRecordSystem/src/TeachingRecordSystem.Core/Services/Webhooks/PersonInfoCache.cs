@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
-namespace TeachingRecordSystem.Core;
+namespace TeachingRecordSystem.Core.Services.Webhooks;
 
 public class PersonInfoCache(IDbContextFactory<TrsDbContext> dbContextFactory, IMemoryCache memoryCache)
 {
