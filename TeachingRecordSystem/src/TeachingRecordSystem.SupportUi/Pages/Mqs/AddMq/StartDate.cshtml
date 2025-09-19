@@ -1,7 +1,7 @@
 @page "/mqs/add/start-date"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.StartDateModel
 @{
-    ViewBag.Title = "Start date";
+    ViewBag.Title = "Enter the start date";
 }
 
 @section BeforeContent {
@@ -16,6 +16,7 @@
             <govuk-date-input asp-for="StartDate">
                 <govuk-date-input-fieldset>
                     <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
                 </govuk-date-input-fieldset>
             </govuk-date-input>
 
