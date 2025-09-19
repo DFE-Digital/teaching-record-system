@@ -24,12 +24,12 @@ public class ImportTpsCsvExtractFileJob(
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
         var importJobId = await backgroundJobScheduler.EnqueueAsync<TpsCsvExtractFileImporter>(j => j.ImportFileAsync(tpsCsvExtractId, pendingImportFileNames[0], cancellationToken));
-        txn.Complete();
         var archiveJobId = await backgroundJobScheduler.ContinueJobWithAsync<ITpsExtractStorageService>(importJobId, j => j.ArchiveFileAsync(pendingImportFileNames[0], cancellationToken));
         var copyJobId = await backgroundJobScheduler.ContinueJobWithAsync<TpsCsvExtractFileImporter>(archiveJobId, j => j.CopyValidFormatDataToStagingAsync(tpsCsvExtractId, cancellationToken));
         var processInvalidTrnsJobId = await backgroundJobScheduler.ContinueJobWithAsync<TpsCsvExtractProcessor>(copyJobId, j => j.ProcessNonMatchingTrnsAsync(tpsCsvExtractId, cancellationToken));
         var processInvalidEstablishmentsJobId = await backgroundJobScheduler.ContinueJobWithAsync<TpsCsvExtractProcessor>(processInvalidTrnsJobId, j => j.ProcessNonMatchingEstablishmentsAsync(tpsCsvExtractId, cancellationToken));
         var processNewEmploymentHistoryJobId = await backgroundJobScheduler.ContinueJobWithAsync<TpsCsvExtractProcessor>(processInvalidEstablishmentsJobId, j => j.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, cancellationToken));
         var processUpdatedEmploymentHistoryJobId = await backgroundJobScheduler.ContinueJobWithAsync<TpsCsvExtractProcessor>(processNewEmploymentHistoryJobId, j => j.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, cancellationToken));
+        txn.Complete();
     }
 }
