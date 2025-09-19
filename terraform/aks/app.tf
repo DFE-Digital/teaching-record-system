@@ -19,14 +19,15 @@ module "migrations_job_configuration" {
 module "migrations" {
   source = "./vendor/modules/aks//aks/job_configuration"
 
-  namespace    = var.namespace
-  environment  = local.app_name_suffix
-  service_name = var.service_name
-  docker_image = var.docker_image
-  commands     = ["trscli"]
-  arguments    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
-  job_name     = "migrations"
-  enable_logit = var.enable_logit
+  namespace       = var.namespace
+  environment     = local.app_name_suffix
+  service_name    = var.service_name
+  docker_image    = var.docker_image
+  commands        = ["trscli"]
+  arguments       = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+  job_name        = "migrations"
+  enable_logit    = var.enable_logit
+  run_as_non_root = var.run_as_non_root
 
   config_map_ref = module.migrations_job_configuration.kubernetes_config_map_name
   secret_ref     = module.migrations_job_configuration.kubernetes_secret_name
@@ -170,6 +171,7 @@ module "worker_application_configuration" {
   azure_resource_prefix  = var.azure_resource_prefix
   service_short          = var.service_short_name
   config_short           = var.environment_short_name
+  run_as_non_root        = var.run_as_non_root
   secret_key_vault_short = "worker"
 
   config_variables = merge(local.shared_config, { app = "Worker" })
