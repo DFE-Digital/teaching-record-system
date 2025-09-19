@@ -22,7 +22,7 @@
                     <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                                                       visually-hidden-text="reason">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -30,7 +30,7 @@
                     <govuk-summary-list-row-value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                                                       visually-hidden-text="change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -47,7 +47,7 @@
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                                                       visually-hidden-text="change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
 
                 </govuk-summary-list-row>

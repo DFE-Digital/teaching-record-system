@@ -135,7 +135,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Status", status.GetTitle());
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Professional status date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
         doc.AssertRowContentMatches("Country of training", country.Name);
@@ -174,8 +174,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Reason for change", deleteRouteState.ChangeReason!.GetDisplayName()!);
-        doc.AssertRowContentMatches("Additional information", deleteRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
+        doc.AssertRowContentMatches("Reason", deleteRouteState.ChangeReason!.GetDisplayName()!);
+        doc.AssertRowContentMatches("More details", deleteRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
         doc.AssertRowContentMatches("Evidence", "Not provided");
     }
 

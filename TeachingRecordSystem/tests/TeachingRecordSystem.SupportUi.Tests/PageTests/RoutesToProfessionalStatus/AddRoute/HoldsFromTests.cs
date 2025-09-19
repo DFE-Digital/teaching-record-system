@@ -78,7 +78,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter a professional status date");
+            await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the date they first held this professional status");
         }
     }
 
@@ -281,7 +281,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter a professional status date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the date they first held this professional status");
     }
 
     [Fact]
@@ -322,7 +322,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Professional status date must not be in the future");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "The date they first held this professional status must not be in the future");
     }
 
     [Fact]
