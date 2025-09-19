@@ -11,7 +11,7 @@ SERVICE_NAME=teaching-record-system
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	## environments:
-	## - AKS: dev, pre-production, tps-sandbox, production
+	## - AKS: dev, pre-production, tps-sandbox, pentest, production
 
 .PHONY: dv_review
 dv_review: dev-cluster
@@ -35,6 +35,10 @@ pre-production: test-cluster
 .PHONY: tps-sandbox
 tps-sandbox: production-cluster
 	$(eval include global_config/tps-sandbox.sh)
+
+.PHONY: pentest
+pentest: platform-test-cluster
+	$(eval include global_config/pentest.sh)
 
 .PHONY: production
 production: production-cluster
@@ -138,6 +142,10 @@ get-cluster-credentials: set-azure-account
 dev-cluster:
 	$(eval CLUSTER_RESOURCE_GROUP_NAME=s189d01-tsc-dv-rg)
 	$(eval CLUSTER_NAME=s189d01-tsc-${CLUSTER}-aks)
+
+platform-test-cluster:
+	$(eval CLUSTER_RESOURCE_GROUP_NAME=s189t01-tsc-pt-rg)
+	$(eval CLUSTER_NAME=s189t01-tsc-platform-test-aks)
 
 action-group: set-azure-account # make production action-group ACTION_GROUP_EMAIL=notificationemail@domain.com . Must be run before setting enable_monitoring=true. Use any non-prod environment to create in the test subscription.
 	$(if $(ACTION_GROUP_EMAIL), , $(error Please specify a notification email for the action group))
