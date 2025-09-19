@@ -62,7 +62,8 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsD
     {
         var openTasks = await dbContext.SupportTasks
             .Where(s => s.Status == SupportTaskStatus.Open && s.SupportTaskType == SupportTaskType.NpqTrnRequest)
-            .Where(s => s.TrnRequestMetadata!.EmailAddress == emailAddress)
+                .Where(s => s.TrnRequestMetadata!.EmailAddress != null &&
+                        s.TrnRequestMetadata.EmailAddress.ToLower() == emailAddress.ToLower())
             .AnyAsync();
         return openTasks;
     }
