@@ -13,11 +13,19 @@ public class AgeRangeFromValidationAttribute(string errorMessage) : ValidationAt
             throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be applied to {nameof(AgeRange)} types.");
         }
 
-        if (ageRange.AgeRangeType == TrainingAgeSpecialismType.Range && ageRange.AgeRangeFrom == null)
+        if (ageRange.AgeRangeType == TrainingAgeSpecialismType.Range)
         {
-            return new ValidationResult("Enter a 'from' age", new List<string> { nameof(ageRange.AgeRangeFrom) });
+            if (ageRange.AgeRangeFrom == null)
+            {
+                return new ValidationResult("Enter a 'from' age", new List<string> { nameof(ageRange.AgeRangeFrom) });
+            }
+            else if (ageRange.AgeRangeFrom < 0 || ageRange.AgeRangeFrom > 20)
+            {
+                return new ValidationResult($"Age must be within the range 0 to 20", new List<string> { nameof(ageRange.AgeRangeFrom) });
+            }
         }
 
         return ValidationResult.Success;
+
     }
 }
