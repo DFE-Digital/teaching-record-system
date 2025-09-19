@@ -72,7 +72,6 @@ module "api_application" {
   replicas        = var.api_replicas
   max_memory      = var.api_max_memory
   enable_logit    = var.enable_logit
-  run_as_non_root = var.run_as_non_root
   enable_gcp_wif  = true
 }
 
@@ -115,7 +114,6 @@ module "authz_application" {
   replicas        = var.authz_replicas
   max_memory      = var.authz_max_memory
   enable_logit    = var.enable_logit
-  run_as_non_root = var.run_as_non_root
   enable_gcp_wif  = true
 }
 
