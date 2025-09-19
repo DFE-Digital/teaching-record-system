@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;

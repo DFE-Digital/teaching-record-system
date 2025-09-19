@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Core.Models.SupportTaskData;
 
+[SupportTaskData("6bc82e72-7592-4b05-a4ae-822fb52cad8d")]
 public record ChangeNameRequestData
 {
     public required string FirstName { get; init; }
