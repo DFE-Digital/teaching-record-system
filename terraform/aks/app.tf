@@ -155,7 +155,6 @@ module "ui_application" {
   probe_path                   = "/health"
   replicas                     = var.ui_replicas
   enable_logit                 = var.enable_logit
-  run_as_non_root              = var.run_as_non_root
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
   enable_gcp_wif               = true
 }
@@ -199,7 +198,6 @@ module "worker_application" {
   replicas                     = var.worker_replicas
   max_memory                   = var.worker_max_memory
   enable_logit                 = var.enable_logit
-  run_as_non_root              = var.run_as_non_root
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
   enable_gcp_wif               = true
 }
