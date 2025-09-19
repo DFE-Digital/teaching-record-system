@@ -242,6 +242,106 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
+    [Theory]
+    [InlineData(TrainingAgeSpecialismType.Range, null, null)]
+    [InlineData(TrainingAgeSpecialismType.Range, 1, null)]
+    [InlineData(TrainingAgeSpecialismType.Range, null, 5)]
+    [InlineData(TrainingAgeSpecialismType.Range, 1, 33)]
+    public async Task Post_WhenInputInvalid_ShowsError(TrainingAgeSpecialismType radioChoice, int? ageFrom, int? ageTo)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(status)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
+
+        var contentBuilder = new FormUrlEncodedContentBuilder()
+            .Add(nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), radioChoice);
+        if (ageFrom is not null)
+        {
+            contentBuilder.Add(nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom);
+        }
+        if (ageTo is not null)
+        {
+            contentBuilder.Add(nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeTo), ageTo);
+        }
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = contentBuilder
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response, StatusCodes.Status400BadRequest);
+    }
+
+    [Theory]
+    [InlineData(TrainingAgeSpecialismType.KeyStage4, 1, null)]
+    [InlineData(TrainingAgeSpecialismType.KeyStage4, 1, 5)]
+    [InlineData(TrainingAgeSpecialismType.KeyStage4, 1, 33)]
+    public async Task Post_WhenTrainingAgeSpecialismTypeEntered_AndAgeRangeTextEntered_ClearsAgeRangeTextAndPersistsTrainingAgeSpecialismType(TrainingAgeSpecialismType radioChoice, int? ageFrom, int? ageTo)
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(status)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
+
+        var contentBuilder = new FormUrlEncodedContentBuilder()
+            .Add(nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), radioChoice);
+        if (ageFrom is not null)
+        {
+            contentBuilder.Add(nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom);
+        }
+        if (ageTo is not null)
+        {
+            contentBuilder.Add(nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeTo), ageTo);
+        }
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = contentBuilder
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance.State.TrainingAgeSpecialismRangeFrom);
+        Assert.Null(journeyInstance.State.TrainingAgeSpecialismRangeTo);
+    }
+
     [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
