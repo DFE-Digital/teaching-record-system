@@ -22,24 +22,26 @@ public class PersonalEmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Post_RequestForEmailWithOpenTasks_RedirectsToEmailInUse()
+    [Theory]
+    [InlineData("test@example.com", "test@example.com")]
+    [InlineData("test@example.com", "Test@example.com")]
+    [InlineData("test@example.com", "test@Example.com")]
+    public async Task Post_RequestForEmailWithOpenTasks_RedirectsToEmailInUse(string openTaskEmail, string requestEmail)
     {
         // Arrange
-        var email = Faker.Internet.Email();
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
         var person = await TestData.CreatePersonAsync();
 
         await TestData.CreateNpqTrnRequestSupportTaskAsync(ApplicationUser.NpqApplicationUserGuid, configure => configure
-            .WithEmailAddress(email)
+            .WithEmailAddress(openTaskEmail)
             .WithStatus(SupportTaskStatus.Open));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/personal-email?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                { "PersonalEmail", email }
+                { "PersonalEmail", requestEmail }
             })
         };
 
