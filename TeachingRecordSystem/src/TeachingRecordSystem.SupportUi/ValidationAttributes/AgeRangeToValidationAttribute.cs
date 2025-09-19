@@ -13,9 +13,16 @@ public class AgeRangeToValidationAttribute(string errorMessage) : ValidationAttr
             throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be applied to {nameof(AgeRange)} types.");
         }
 
-        if (ageRange.AgeRangeType == TrainingAgeSpecialismType.Range && ageRange.AgeRangeTo == null)
+        if (ageRange.AgeRangeType == TrainingAgeSpecialismType.Range)
         {
-            return new ValidationResult("Enter a 'to' age", new List<string> { nameof(ageRange.AgeRangeTo) });
+            if (ageRange.AgeRangeTo == null)
+            {
+                return new ValidationResult("Enter a 'to' age", new List<string> { nameof(ageRange.AgeRangeTo) });
+            }
+            else if (ageRange.AgeRangeTo < 0 || ageRange.AgeRangeTo > 20)
+            {
+                return new ValidationResult($"Age must be within the range 0 to 20", new List<string> { nameof(ageRange.AgeRangeTo) });
+            }
         }
 
         return ValidationResult.Success;

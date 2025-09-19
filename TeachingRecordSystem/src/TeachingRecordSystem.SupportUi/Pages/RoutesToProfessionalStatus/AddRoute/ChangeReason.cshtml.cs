@@ -22,7 +22,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCach
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add more information")]
+    [Display(Name = "Enter details")]
     [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 

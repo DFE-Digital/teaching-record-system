@@ -28,6 +28,8 @@ public abstract class EditRouteCommonPageModel(TrsLinkGenerator linkGenerator, R
 
     public RouteToProfessionalStatusStatus Status { get; set; }
 
+    public string PageCaption => $"Edit route - {PersonName}";
+
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();

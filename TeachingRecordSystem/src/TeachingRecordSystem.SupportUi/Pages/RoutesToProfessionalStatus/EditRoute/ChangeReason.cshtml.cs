@@ -34,7 +34,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add more information")]
+    [Display(Name = "Enter details about this change")]
     [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
@@ -61,6 +61,8 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     public string BackLink => FromCheckAnswers == true
         ? linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
         : linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+
+    public string PageCaption => $"Edit route - {PersonName}";
 
     public async Task OnGetAsync()
     {

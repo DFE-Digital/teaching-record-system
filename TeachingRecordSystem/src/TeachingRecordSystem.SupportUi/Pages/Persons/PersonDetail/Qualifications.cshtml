@@ -70,7 +70,7 @@ else
                     @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.HoldsFromRequired, professionalStatus.Status.GetHoldsFromDateRequirement()) != FieldRequirement.NotApplicable)
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Professional status date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }

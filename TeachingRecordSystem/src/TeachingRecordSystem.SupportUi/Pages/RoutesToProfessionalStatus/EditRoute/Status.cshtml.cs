@@ -31,6 +31,8 @@ public class StatusModel(
 
     public string PageHeading => "Select the route status";
 
+    public string PageCaption => $"Edit route - {PersonName}";
+
     public void OnGet()
     {
         Status = JourneyInstance!.State.EditStatusState is null ? JourneyInstance!.State.Status : JourneyInstance!.State.EditStatusState.Status;

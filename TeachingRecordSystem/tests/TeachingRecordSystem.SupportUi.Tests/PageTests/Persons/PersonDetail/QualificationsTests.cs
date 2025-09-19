@@ -178,7 +178,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Professional status date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Training provider", trainingProvider.Name);
         doc.AssertRowContentContains($"professionalstatus-{qualificationid}", "Degree type", degreeType.Name);
@@ -219,7 +219,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Professional status date");
+        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Held since");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Training provider", "Not provided");
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Degree type", "Not provided");
@@ -256,7 +256,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Start date");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "End date");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Professional status date");
+        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Held since");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Training provider");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Degree type");
@@ -296,7 +296,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Start date");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "End date");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Professional status date", holdsFromDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFromDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Induction exemption", "Yes");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Training provider");
         doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Degree type");

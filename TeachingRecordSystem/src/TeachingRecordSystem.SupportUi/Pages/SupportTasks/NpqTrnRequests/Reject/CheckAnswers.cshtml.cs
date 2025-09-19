@@ -82,6 +82,6 @@ public class CheckAnswersModel(
             Redirect(linkGenerator.NpqTrnRequestRejectionReason(supportTask.SupportTaskReference, JourneyInstance!.InstanceId));
         }
 
-        return base.OnPageHandlerExecutionAsync(context, next);
+        return next();
     }
 }
