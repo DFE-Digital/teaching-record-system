@@ -81,7 +81,8 @@ public class ChangeHistoryModel(
             nameof(DqtQtsRegistrationUpdatedEvent),
             nameof(PersonStatusUpdatedEvent),
             nameof(PersonsMergedEvent),
-            nameof(TrnAllocatedEvent)
+            nameof(TrnAllocatedEvent),
+            nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)
         };
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();
