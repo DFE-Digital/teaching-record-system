@@ -42,11 +42,12 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteEditTrainingCountry(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select asp-for="TrainingCountryId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
                     @Model.PageHeading
                 </govuk-select-label>
+                <govuk-select-hint>Start typing the name of the country</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var country in Model.TrainingCountries)
                 {

@@ -6,7 +6,7 @@ public enum ChangeReasonOption
 {
     [Display(Name = "It was created in error")]
     CreatedInError,
-    [Display(Name = "The teacher no longer has QTLS status")]
+    [Display(Name = "No longer holds QTLS status")]
     RemovedQtlsStatus,
     [Display(Name = "Another reason")]
     AnotherReason

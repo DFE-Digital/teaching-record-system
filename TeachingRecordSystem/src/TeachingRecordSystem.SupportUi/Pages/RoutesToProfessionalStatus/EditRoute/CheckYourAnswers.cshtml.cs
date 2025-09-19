@@ -32,6 +32,8 @@ public class CheckYourAnswersModel(
     [FromRoute]
     public Guid QualificationId { get; set; }
 
+    public string PageCaption => $"Edit route - {PersonName}";
+
     public async Task OnGetAsync()
     {
         RouteDetail.IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;

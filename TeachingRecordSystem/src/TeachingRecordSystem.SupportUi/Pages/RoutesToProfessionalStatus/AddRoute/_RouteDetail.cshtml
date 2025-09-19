@@ -44,7 +44,7 @@
             <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-holds-from-link" href="@LinkGenerator.RouteAddHoldsFrom(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="professional status date">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-holds-from-link" href="@LinkGenerator.RouteAddHoldsFrom(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="held since">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }

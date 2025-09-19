@@ -80,7 +80,7 @@
                 <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Professional Status date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
                 <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
@@ -114,12 +114,15 @@
                 <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>
                 <govuk-summary-list-row-value data-testid="subjects" use-empty-fallback><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
             </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testId="source-application-reference" use-empty-fallback>
-                    @professionalStatus.SourceApplicationReference
-                </govuk-summary-list-row-value>
-            </govuk-summary-list-row>
+            @if (professionalStatus.SourceApplicationReference is not null)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Source application reference</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testId="source-application-reference" use-empty-fallback>
+                        @professionalStatus.SourceApplicationReference
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
         </govuk-summary-list>
         <govuk-details class="govuk-!-margin-bottom-2">
             <govuk-details-summary>Reason for change</govuk-details-summary>
