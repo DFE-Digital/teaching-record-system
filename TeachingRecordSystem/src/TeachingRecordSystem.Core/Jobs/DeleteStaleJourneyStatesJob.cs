@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class RemoveStaleJourneyStatesJob(TrsDbContext dbContext, IClock clock)
+public class DeleteStaleJourneyStatesJob(TrsDbContext dbContext, IClock clock)
 {
     public const string JobSchedule = "0 3 * * *";  //3AM every day
     public const string LastRunDateKey = "LastRunDate";

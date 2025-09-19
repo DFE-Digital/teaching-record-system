@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class RemoveStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifetime
+public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifetime
 {
     private TrsDbContext _trsContext = null!;
 
@@ -18,7 +18,7 @@ public class RemoveStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
     }
 
     [Fact]
-    public async Task RemoveStaleJourneyStatesJob_RemovesJourneyStatesOlderThanOneDay_UpdatesMetadataLastRunDate()
+    public async Task DeleteStaleJourneyStatesJob_RemovesJourneyStatesOlderThanOneDay_UpdatesMetadataLastRunDate()
     {
         // Arrange
         var journeyState1 = new Core.DataStore.Postgres.Models.JourneyState
@@ -51,7 +51,7 @@ public class RemoveStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
         _trsContext.JourneyStates.Add(journeyState3);
         await _trsContext.SaveChangesAsync();
 
-        var job = new RemoveStaleJourneyStatesJob(_trsContext, Clock);
+        var job = new DeleteStaleJourneyStatesJob(_trsContext, Clock);
 
         // Act
         await job.ExecuteAsync(CancellationToken.None);
@@ -64,7 +64,7 @@ public class RemoveStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
 
         var metaData = await _trsContext.JobMetadata.ToListAsync();
         Assert.Single(metaData);
-        Assert.Equal("RemoveStaleJourneyStatesJob", metaData[0].JobName);
+        Assert.Equal("DeleteStaleJourneyStatesJob", metaData[0].JobName);
         Assert.Equal(Clock.UtcNow.ToString("s"), metaData[0].Metadata["LastRunDate"]);
     }
 }
