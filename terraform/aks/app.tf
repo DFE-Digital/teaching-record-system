@@ -65,14 +65,14 @@ module "api_application" {
   kubernetes_config_map_name = module.api_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.api_application_configuration.kubernetes_secret_name
 
-  docker_image    = var.docker_image
-  command         = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
-  web_port        = 3000
-  probe_path      = "/health"
-  replicas        = var.api_replicas
-  max_memory      = var.api_max_memory
-  enable_logit    = var.enable_logit
-  enable_gcp_wif  = true
+  docker_image   = var.docker_image
+  command        = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
+  web_port       = 3000
+  probe_path     = "/health"
+  replicas       = var.api_replicas
+  max_memory     = var.api_max_memory
+  enable_logit   = var.enable_logit
+  enable_gcp_wif = true
 }
 
 module "authz_application_configuration" {
@@ -107,14 +107,14 @@ module "authz_application" {
   kubernetes_config_map_name = module.authz_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.authz_application_configuration.kubernetes_secret_name
 
-  docker_image    = var.docker_image
-  command         = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
-  web_port        = 3000
-  probe_path      = "/health"
-  replicas        = var.authz_replicas
-  max_memory      = var.authz_max_memory
-  enable_logit    = var.enable_logit
-  enable_gcp_wif  = true
+  docker_image   = var.docker_image
+  command        = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
+  web_port       = 3000
+  probe_path     = "/health"
+  replicas       = var.authz_replicas
+  max_memory     = var.authz_max_memory
+  enable_logit   = var.enable_logit
+  enable_gcp_wif = true
 }
 
 module "ui_application_configuration" {
