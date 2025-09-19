@@ -14,7 +14,7 @@ public class RefreshEstablishmentsJob(IBackgroundJobScheduler backgroundJobSched
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
         var refreshJobId = await backgroundJobScheduler.EnqueueAsync<EstablishmentRefresher>(j => j.RefreshEstablishmentsAsync(cancellationToken));
-        txn.Complete();
         await backgroundJobScheduler.ContinueJobWithAsync<TpsCsvExtractProcessor>(refreshJobId, j => j.UpdateLatestEstablishmentVersionsAsync(cancellationToken));
+        txn.Complete();
     }
 }
