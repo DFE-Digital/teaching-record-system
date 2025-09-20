@@ -2,7 +2,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.ProviderModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
-    ViewBag.Title = "Training provider";
+    ViewBag.Title = Html.DisplayNameFor(m => m.ProviderId);
 }
 
 @section Styles {
@@ -32,6 +32,7 @@
 
             <govuk-select asp-for="ProviderId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true" />
+                <govuk-select-hint>Start typing the name of the training provider</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var provider in Model.Providers!)
                 {

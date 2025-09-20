@@ -19,7 +19,7 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Specialism")]
+    [Display(Name = "Select a specialism")]
     [Required(ErrorMessage = "Select a specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 

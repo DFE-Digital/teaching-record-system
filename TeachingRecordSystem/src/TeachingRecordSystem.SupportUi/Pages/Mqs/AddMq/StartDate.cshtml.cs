@@ -20,7 +20,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Enter a start date")]
-    [Display(Name = "Start date")]
+    [Display(Name = "Enter the start date")]
     public DateOnly? StartDate { get; set; }
 
     public void OnGet()

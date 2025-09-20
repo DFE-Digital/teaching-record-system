@@ -21,7 +21,7 @@ public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Select a training provider")]
-    [Display(Name = "Training provider")]
+    [Display(Name = "Enter a training provider")]
     public Guid? ProviderId { get; set; }
 
     public ProviderInfo[]? Providers { get; set; }
