@@ -74,9 +74,6 @@ public partial class TrsLinkGenerator
     public string MqEditStartDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/StartDate/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
-    public string MqEditEndDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
-        GetRequiredPathByPage("/Mqs/EditMq/EndDate/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-
     public string MqEditStartDateCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/StartDate/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 

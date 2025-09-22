@@ -222,7 +222,7 @@ else
                     <govuk-summary-list-row-actions>
                         @if (Model.CanEdit)
                         {
-                            <govuk-summary-list-row-action href="@LinkGenerator.MqEditEndDate(mq.QualificationId, null)" visually-hidden-text="change end date" data-testid="end-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.MqEditStatus(mq.QualificationId, null)" visually-hidden-text="change end date" data-testid="end-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                         }
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
