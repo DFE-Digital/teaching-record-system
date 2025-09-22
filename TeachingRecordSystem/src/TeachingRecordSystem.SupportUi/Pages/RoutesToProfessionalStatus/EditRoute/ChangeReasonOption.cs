@@ -4,11 +4,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 public enum ChangeReasonOption
 {
-    [Display(Name = "Data loss or incomplete information")]
+    [Display(Name = "Information was missing or incorrect")]
     IncompleteDetails,
-    [Display(Name = "New information received")]
+    [Display(Name = "New information was received")]
     NewInformation,
-    [Display(Name = "No longer exempt from induction")]
+    [Display(Name = "Induction exemption no longer applies")]
     NoLongerExemptFromInduction,
     [Display(Name = "Another reason")]
     AnotherReason

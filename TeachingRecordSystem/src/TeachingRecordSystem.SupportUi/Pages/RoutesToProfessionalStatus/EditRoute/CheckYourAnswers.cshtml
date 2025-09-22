@@ -1,7 +1,7 @@
 @page "/route/{qualificationId}/edit/check-answers/{handler?}"
 @model CheckYourAnswersModel
 @{
-    ViewBag.Title = "Check details and edit route";
+    ViewBag.Title = "Check details before editing route";
 }
 
 @section BeforeContent {
@@ -11,26 +11,26 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteEditCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <partial name="_RouteDetail" model="@Model.RouteDetail" />
 
             <h2 class="govuk-heading-l">Why are you editing this route?</h2>
             <govuk-summary-list>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RouteEditChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                        visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                                                        visually-hidden-text="change reason">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RouteEditChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                                                       visually-hidden-text="change more details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -47,7 +47,7 @@
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RouteEditChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                                                       visually-hidden-text="change evidence">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
 
                 </govuk-summary-list-row>

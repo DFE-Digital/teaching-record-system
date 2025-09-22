@@ -10,7 +10,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios asp-for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
@@ -24,10 +24,10 @@
                     <govuk-radios-item value="@TrainingAgeSpecialismType.FurtherEducation">@TrainingAgeSpecialismType.FurtherEducation.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-divider>or</govuk-radios-divider>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.Range">
-                        I want to provide an age range
+                        Enter an age range
                         <govuk-radios-item-conditional>
-                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeFrom"/>
-                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeTo"/>
+                            <govuk-input class="govuk-input--width-2" asp-for="TrainingAgeSpecialism.AgeRangeFrom" />
+                            <govuk-input class="govuk-input--width-2" asp-for="TrainingAgeSpecialism.AgeRangeTo" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
