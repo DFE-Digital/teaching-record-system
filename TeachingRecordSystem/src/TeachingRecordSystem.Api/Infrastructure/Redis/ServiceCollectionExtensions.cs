@@ -4,20 +4,21 @@ namespace TeachingRecordSystem.Api.Infrastructure.Redis;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRedis(
-        this IServiceCollection services,
-        IWebHostEnvironment environment,
-        IConfiguration configuration)
+    public static IHostApplicationBuilder AddRedis(this IHostApplicationBuilder builder)
     {
-        if (environment.IsProduction())
-        {
-            var connectionString = configuration.GetRequiredConnectionString("Redis");
+        builder.Services.AddRedis(builder.Configuration);
 
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
-            services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
+        return builder;
+    }
 
-            services.AddHealthChecks().AddRedis(connectionString);
-        }
+    public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetRequiredConnectionString("Redis");
+
+        services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
+        services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
+
+        services.AddHealthChecks().AddRedis(connectionString);
 
         return services;
     }

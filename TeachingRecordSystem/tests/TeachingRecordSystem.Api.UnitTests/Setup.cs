@@ -1,15 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting.Internal;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
-using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
-using TeachingRecordSystem.Core.Services.TrnRequests;
-using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
@@ -47,8 +42,9 @@ public static class Setup
             .AddEnvironmentVariables()
             .Build();
 
-        var pgConnectionString = configuration.GetRequiredConnectionString("DefaultConnection");
-        DbHelper.ConfigureDbServices(services, pgConnectionString);
+        var environment = new HostingEnvironment { EnvironmentName = "Tests" };
+
+        DbHelper.ConfigureDbServices(services, configuration.GetPostgresConnectionString());
 
         // Publish events synchronously
         PublishEventsDbCommandInterceptor.ConfigureServices(services);
@@ -57,34 +53,23 @@ public static class Setup
 
         services
             .AddSingleton<IConfiguration>(configuration)
+            .AddCoreServices(configuration, environment)
+            .AddApiServices(configuration, environment)
             .AddSingleton<DbFixture>()
+            .AddFakeXrm()
             .AddSingleton(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
                     new ForwardToTestScopedClock(),
                     TestDataPersonDataSource.CrmAndTrs))
-            .AddTrsBaseServices()
-            .AddApiCommands()
-            .AddTestScoped<IClock>(tss => tss.Clock)
             .AddSingleton<FakeTrnGenerator>()
             .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
-            .AddFakeXrm()
             .AddSingleton(Mock.Of<ICurrentUserProvider>())
-            .AddNameSynonyms()
-            .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
-            .AddTestScoped(tss => tss.BlobStorageFileService.Object)
-            .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
-            .AddTestScoped(tss => tss.EventObserver)
-            .AddSingleton<WebhookMessageFactory>()
-            .AddSingleton<EventMapperRegistry>()
-            .AddMemoryCache()
-            .AddTransient<GetPersonHelper>()
-            .AddPersonMatching()
-            .AddTrnRequestService(configuration)
             .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>()
-            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
             .AddSingleton<INotificationSender, NoopNotificationSender>();
+
+        TestScopedServices.ConfigureServices(services);
 
         return services.BuildServiceProvider();
     }
@@ -125,14 +110,5 @@ public static class Setup
     private class ForwardToTestScopedEventObserver : IEventObserver
     {
         public void OnEventCreated(EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventCreated(@event);
-    }
-}
-
-file static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
-        where T : class
-    {
-        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
     }
 }

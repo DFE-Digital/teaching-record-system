@@ -68,3 +68,5 @@ WHERE TRIM(COALESCE(attribute_value, '')) != '';
 
 END;
 $BODY$;
+
+

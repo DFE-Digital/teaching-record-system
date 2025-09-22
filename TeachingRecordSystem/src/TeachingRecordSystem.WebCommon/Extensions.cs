@@ -19,11 +19,6 @@ public static class Extensions
     {
         builder.Services.AddHealthChecks();
 
-        builder.AddDatabase();
-        builder.AddHangfire();
-        builder.AddBackgroundWorkScheduler();
-        builder.AddWebhookMessageFactory();
-
         builder.Services.AddHealthChecks().AddNpgSql(sp => sp.GetRequiredService<NpgsqlDataSource>());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         builder.Services.AddSingleton<UrlRedactor>();

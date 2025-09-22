@@ -6,8 +6,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddTrnGeneration(this IServiceCollection services)
     {
-        services
-            .AddScoped<ITrnGenerator, DbTrnGenerator>();
+        services.AddScoped<ITrnGenerator, DbTrnGenerator>();
 
         return services;
     }
