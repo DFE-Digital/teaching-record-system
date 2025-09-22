@@ -88,7 +88,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqProviderPageAsync(qualificationId);
 
-        await page.FillAsync($"label:text-is('Enter a training provider')", newMqEstablishment.Name);
+        await page.FillAsync($"label:text-is('Training provider')", newMqEstablishment.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
