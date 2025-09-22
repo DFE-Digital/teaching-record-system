@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerator linkGenerator) : PageModel
+public class AddApiKeyModel(TrsDbContext dbContext, IEventPublisher eventPublisher, IClock clock, TrsLinkGenerator linkGenerator) : PageModel
 {
     [FromQuery]
     public Guid ApplicationUserId { get; set; }
@@ -54,7 +54,6 @@ public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerat
             RaisedBy = User.GetUserId(),
             ApiKey = Core.Events.Models.ApiKey.FromModel(apiKey)
         };
-        await dbContext.AddEventAndBroadcastAsync(@event);
 
         try
         {
@@ -65,6 +64,8 @@ public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerat
             ModelState.AddModelError(nameof(Key), "Key is already in use");
             return this.PageWithErrors();
         }
+
+        await eventPublisher.PublishEventAsync(@event);
 
         TempData.SetFlashSuccess("API key added");
         return Redirect(linkGenerator.EditApplicationUser(ApplicationUserId));

@@ -60,7 +60,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(createdEvent);
+            dbContext.AddEvent(createdEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -142,7 +142,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(importedEvent);
+            dbContext.AddEvent(importedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -191,7 +191,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(deactivatedEvent);
+            dbContext.AddEvent(deactivatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -240,7 +240,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(reactivatedEvent);
+            dbContext.AddEvent(reactivatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -332,7 +332,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -442,7 +442,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
+            dbContext.AddEvent(migratedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -512,7 +512,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(statusChangedEvent);
+            dbContext.AddEvent(statusChangedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -623,7 +623,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -788,7 +788,7 @@ public class ChangeLogInductionEventTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         });
 

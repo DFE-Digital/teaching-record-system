@@ -38,7 +38,7 @@ public class ResetIncorrectHasEypsOnPersonsJob(
 
             person.HasEyps = false;
 
-            dbContext.AddEventWithoutBroadcast(new RouteToProfessionalStatusUpdatedEvent()
+            dbContext.AddEvent(new RouteToProfessionalStatusUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = clock.UtcNow,

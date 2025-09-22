@@ -15,7 +15,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 [BindProperties]
-public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class EditApplicationUserModel(TrsDbContext dbContext, IEventPublisher eventPublisher, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     // From PathString
     private static readonly SearchValues<char> _validPathChars =
@@ -228,6 +228,8 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
                 _user.OneLoginPostLogoutRedirectUriPath = OneLoginPostLogoutRedirectUriPath;
             }
 
+            await dbContext.SaveChangesAsync();
+
             var @event = new ApplicationUserUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
@@ -237,9 +239,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
                 OldApplicationUser = oldApplicationUser,
                 Changes = changes
             };
-            await dbContext.AddEventAndBroadcastAsync(@event);
-
-            await dbContext.SaveChangesAsync();
+            await eventPublisher.PublishEventAsync(@event);
         }
 
         TempData.SetFlashSuccess("Application user updated", messageText: flashMessage);

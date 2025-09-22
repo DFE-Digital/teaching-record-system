@@ -53,20 +53,17 @@ public static class Setup
         var pgConnectionString = configuration.GetRequiredConnectionString("DefaultConnection");
         DbHelper.ConfigureDbServices(services, pgConnectionString);
 
-        // Publish events synchronously
-        PublishEventsDbCommandInterceptor.ConfigureServices(services);
-
         EvidenceFilesHttpClientHelper.ConfigureServices(services);
 
         services
             .AddSingleton<IConfiguration>(configuration)
+            .AddTrsBaseServices(configuration)
             .AddSingleton<DbFixture>()
             .AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
                     (IClock)new ForwardToTestScopedClock(),
                     TestDataPersonDataSource.CrmAndTrs))
-            .AddTrsBaseServices()
             .AddApiCommands()
             .AddTestScoped<IClock>(tss => tss.Clock)
             .AddSingleton<FakeTrnGenerator>()
@@ -78,9 +75,10 @@ public static class Setup
             .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped<IFileService>(tss => tss.BlobStorageFileService.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
+            .AddEventObserver()
             .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
             .AddTestScoped<CaptureEventObserver>(tss => tss.EventObserver)
-            .AddSingleton<WebhookMessageFactory>()
+            .AddTransient<WebhookMessageFactory>()
             .AddSingleton<EventMapperRegistry>()
             .AddMemoryCache()
             .AddTransient<GetPersonHelper>()

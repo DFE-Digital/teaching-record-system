@@ -153,7 +153,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)dobChangedEvent.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent!);
+        dbContext.AddEvent(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -260,7 +260,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)changeEvent.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent!);
+        dbContext.AddEvent(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -367,7 +367,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)changeEvent.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent!);
+        dbContext.AddEvent(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act

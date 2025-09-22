@@ -9,6 +9,7 @@ public record SetWelshInductionStatusResult;
 
 public class SetWelshInductionStatusHandler(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ICurrentUserProvider currentUserProvider,
     IClock clock) :
     ICommandHandler<SetWelshInductionStatusCommand, SetWelshInductionStatusResult>
@@ -39,12 +40,12 @@ public class SetWelshInductionStatusHandler(
             clock.UtcNow,
             out var updatedEvent);
 
+        await dbContext.SaveChangesAsync();
+
         if (updatedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await eventPublisher.PublishEventAsync(updatedEvent);
         }
-
-        await dbContext.SaveChangesAsync();
 
         return new SetWelshInductionStatusResult();
     }

@@ -181,7 +181,7 @@ public partial class TestData
                 @event: out var createdEvent);
 
             dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
-            dbContext.AddEventWithoutBroadcast(createdEvent);
+            dbContext.AddEvent(createdEvent);
 
             return (professionalStatus.QualificationId, [createdEvent]);
         }

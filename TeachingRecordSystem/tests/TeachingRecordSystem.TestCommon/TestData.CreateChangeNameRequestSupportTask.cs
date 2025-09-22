@@ -111,7 +111,7 @@ public partial class TestData
             return await testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.SupportTasks.Add(supportTask);
-                dbContext.AddEventWithoutBroadcast(createdEvent);
+                dbContext.AddEvent(createdEvent);
                 await dbContext.SaveChangesAsync();
 
                 return supportTask;

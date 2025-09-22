@@ -13,6 +13,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resol
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
@@ -96,9 +97,9 @@ public class CheckAnswersModel(
                 RaisedBy = User.GetUserId()
             };
 
-            await DbContext.AddEventAndBroadcastAsync(@event);
-
             await DbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(@event);
         }
         else // updating
         {
@@ -165,10 +166,11 @@ public class CheckAnswersModel(
                 CreatedUtc = now,
                 RaisedBy = User.GetUserId()
             };
-            await DbContext.AddEventAndBroadcastAsync(@event);
-        }
 
-        await DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(@event);
+        }
 
         TempData.SetFlashSuccess(
             $"{SourceApplicationUserName} request completed",

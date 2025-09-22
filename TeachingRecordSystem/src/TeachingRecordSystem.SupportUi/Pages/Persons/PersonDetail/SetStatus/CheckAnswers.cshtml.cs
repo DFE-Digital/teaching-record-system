@@ -10,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IClock clock,
     IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
@@ -79,11 +80,9 @@ public class CheckAnswersModel(
             now,
             out var @event);
 
-        if (@event is not null)
-        {
-            await DbContext.AddEventAndBroadcastAsync(@event);
-            await DbContext.SaveChangesAsync();
-        }
+        await DbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(@event);
 
         await JourneyInstance!.CompleteAsync();
 

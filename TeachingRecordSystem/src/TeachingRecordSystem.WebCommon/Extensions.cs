@@ -19,10 +19,11 @@ public static class Extensions
     {
         builder.Services.AddHealthChecks();
 
+        builder.AddTrsBaseServices();
+        builder.AddEventHandlers();
         builder.AddDatabase();
         builder.AddHangfire();
         builder.AddBackgroundWorkScheduler();
-        builder.AddWebhookMessageFactory();
 
         builder.Services.AddHealthChecks().AddNpgSql(sp => sp.GetRequiredService<NpgsqlDataSource>());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();

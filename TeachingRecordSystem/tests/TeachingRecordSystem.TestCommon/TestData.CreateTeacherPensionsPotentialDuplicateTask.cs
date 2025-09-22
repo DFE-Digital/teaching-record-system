@@ -156,7 +156,7 @@ public partial class TestData
             {
                 dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
                 dbContext.SupportTasks.Add(supportTask);
-                dbContext.AddEventWithoutBroadcast(supportTaskCreatedEvent);
+                dbContext.AddEvent(supportTaskCreatedEvent);
                 await dbContext.SaveChangesAsync();
 
                 return supportTask;

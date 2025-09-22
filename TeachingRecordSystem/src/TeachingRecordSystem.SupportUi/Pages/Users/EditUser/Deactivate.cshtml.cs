@@ -14,6 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class DeactivateModel(
     TrsLinkGenerator linkGenerator,
+    IEventPublisher eventPublisher,
     IFileService fileService,
     TrsDbContext dbContext,
     IClock clock) : PageModel
@@ -126,7 +127,9 @@ public class DeactivateModel(
 
         _user.Active = false;
 
-        await dbContext.AddEventAndBroadcastAsync(new UserDeactivatedEvent
+        await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventAsync(new UserDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = EventModels.User.FromModel(_user),
@@ -136,8 +139,6 @@ public class DeactivateModel(
             DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
             EvidenceFileId = EvidenceFileId,
         });
-
-        await dbContext.SaveChangesAsync();
         TempData.SetFlashSuccess(messageText: $"{_user.Name}\u2019s account has been deactivated.");
 
         return Redirect(linkGenerator.Users());

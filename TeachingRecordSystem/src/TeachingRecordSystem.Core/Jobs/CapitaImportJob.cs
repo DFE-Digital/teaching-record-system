@@ -158,12 +158,12 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                             newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
                             if (@event is not null)
                             {
-                                await dbContext.AddEventAndBroadcastAsync(@event);
+                                dbContext.AddEvent(@event);
                                 await dbContext.SaveChangesAsync();
                             }
                         }
                         dbContext.Persons.Add(newPerson);
-                        await dbContext.AddEventAndBroadcastAsync(createdEvent);
+                        dbContext.AddEvent(createdEvent);
                         personId = newPerson.PersonId;
 
                         //create task
@@ -209,7 +209,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 out var supportTaskCreatedEvent);
 
                             dbContext.SupportTasks.Add(supportTask);
-                            await dbContext.AddEventAndBroadcastAsync(supportTaskCreatedEvent);
+                            dbContext.AddEvent(supportTaskCreatedEvent);
                             duplicateRowCount++;
                         }
                         else
@@ -229,7 +229,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                             person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
                             if (@event is not null)
                             {
-                                await dbContext.AddEventAndBroadcastAsync(@event);
+                                dbContext.AddEvent(@event);
                                 await dbContext.SaveChangesAsync();
                             }
                         }

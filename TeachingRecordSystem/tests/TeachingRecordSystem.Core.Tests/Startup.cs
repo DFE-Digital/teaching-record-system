@@ -39,9 +39,8 @@ public class Startup
                 services.AddSingleton<EventMapperFixture>();
                 services.AddSingleton<NightlyEmailJobFixture>();
                 services.AddSingleton<IClock, TestableClock>();
-                services.AddSingleton<WebhookMessageFactory>();
+                services.AddTransient<WebhookMessageFactory>();
                 services.AddSingleton<EventMapperRegistry>();
+                services.AddEventPublisher();
             });
-
-
 }

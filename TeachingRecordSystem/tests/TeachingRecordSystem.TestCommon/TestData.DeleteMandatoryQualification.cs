@@ -60,7 +60,7 @@ public partial class TestData
                     } :
                     null
             };
-            dbContext.AddEventWithoutBroadcast(deletedEvent);
+            dbContext.AddEvent(deletedEvent);
 
             await dbContext.SaveChangesAsync();
         });

@@ -32,7 +32,7 @@ public class SendEmailJob(TrsDbContext dbContext, INotificationSender notificati
 
         email.SentOn = clock.UtcNow;
 
-        dbContext.AddEventWithoutBroadcast(new EmailSentEvent
+        dbContext.AddEvent(new EmailSentEvent
         {
             EventId = Guid.NewGuid(),
             Email = EventModels.Email.FromModel(email),

@@ -26,6 +26,7 @@ public record CreateTrnRequestCommand : ICommand<TrnRequestInfo>
 
 public class CreateTrnRequestHandler(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IPersonMatchingService personMatchingService,
     TrnRequestService trnRequestService,
     ICurrentUserProvider currentUserProvider,
@@ -47,6 +48,7 @@ public class CreateTrnRequestHandler(
         var emailAddress = command.EmailAddresses.FirstOrDefault();
 
         var now = clock.UtcNow;
+        var events = new List<EventBase>();
 
         var trnRequestMetadata = new PostgresModels.TrnRequestMetadata()
         {
@@ -96,7 +98,7 @@ public class CreateTrnRequestHandler(
                     out var furtherChecksSupportTaskCreatedEvent);
 
                 dbContext.SupportTasks.Add(furtherChecksSupportTask);
-                await dbContext.AddEventAndBroadcastAsync(furtherChecksSupportTaskCreatedEvent);
+                events.Add(furtherChecksSupportTaskCreatedEvent);
             }
         }
         else if (matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches)
@@ -113,7 +115,7 @@ public class CreateTrnRequestHandler(
                 out var createdEvent);
 
             dbContext.SupportTasks.Add(supportTask);
-            await dbContext.AddEventAndBroadcastAsync(createdEvent);
+            events.Add(createdEvent);
         }
         else
         {
@@ -136,7 +138,7 @@ public class CreateTrnRequestHandler(
                 EvidenceFile = null,
                 TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata)
             };
-            await dbContext.AddEventAndBroadcastAsync(personCreatedEvent);
+            events.Add(personCreatedEvent);
 
             trnRequestMetadata.SetResolvedPerson(createPersonResult.Person.PersonId);
         }
@@ -165,6 +167,8 @@ public class CreateTrnRequestHandler(
         await trnRequestService.TryEnsureTrnTokenAsync(trnRequestMetadata, trn);
 
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventsAsync(events);
 
         var status = trnRequestMetadata.Status!.Value;
 

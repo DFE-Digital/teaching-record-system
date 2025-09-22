@@ -34,7 +34,7 @@ public class SetMissingHasEypsOnPersonsJob(
 
             person.HasEyps = true;
 
-            dbContext.AddEventWithoutBroadcast(new RouteToProfessionalStatusUpdatedEvent()
+            dbContext.AddEvent(new RouteToProfessionalStatusUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = clock.UtcNow,

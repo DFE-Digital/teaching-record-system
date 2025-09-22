@@ -14,6 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
 public class CheckAnswers(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
@@ -60,6 +61,7 @@ public class CheckAnswers(
         EventModels.PersonAttributes? oldPersonAttributes;
 
         var now = clock.UtcNow;
+        var events = new List<EventBase>();
 
         async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
         {
@@ -110,7 +112,7 @@ public class CheckAnswers(
                     out var furtherChecksSupportTaskCreatedEvent);
 
                 DbContext.SupportTasks.Add(furtherChecksSupportTask);
-                await DbContext.AddEventAndBroadcastAsync(furtherChecksSupportTaskCreatedEvent);
+                events.Add(furtherChecksSupportTaskCreatedEvent);
             }
 
             Debug.Assert(Trn is not null);
@@ -173,9 +175,11 @@ public class CheckAnswers(
             CreatedUtc = now,
             RaisedBy = User.GetUserId()
         };
-        await DbContext.AddEventAndBroadcastAsync(@event);
+        events.Add(@event);
 
         await DbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventsAsync(events);
 
         TempData.SetFlashSuccess(
             $"{(CreatingNewRecord ? "Record created" : "Records merged successfully")} for {FirstName} {MiddleName} {LastName}",

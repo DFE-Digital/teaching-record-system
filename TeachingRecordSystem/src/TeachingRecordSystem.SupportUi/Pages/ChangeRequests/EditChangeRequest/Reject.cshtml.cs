@@ -15,6 +15,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class RejectModel(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IBackgroundJobScheduler backgroundJobScheduler,
     TrsLinkGenerator linkGenerator,
     IClock clock) : PageModel
@@ -45,11 +46,13 @@ public class RejectModel(
         var requestStatus = "rejected";
         var flashMessage = "The user’s record has not been changed and they have been notified.";
 
+        var events = new List<EventBase>();
+        var now = clock.UtcNow;
         var changeNameRequestData = ChangeType == SupportTaskType.ChangeNameRequest ? EventModels.ChangeNameRequestData.FromModel((ChangeNameRequestData)SupportTask!.Data) : null;
         var changeDateOfBirthRequestData = ChangeType == SupportTaskType.ChangeDateOfBirthRequest ? EventModels.ChangeDateOfBirthRequestData.FromModel((ChangeDateOfBirthRequestData)SupportTask!.Data) : null;
         var oldSupportTask = EventModels.SupportTask.FromModel(SupportTask!);
         SupportTask!.Status = SupportTaskStatus.Closed;
-        SupportTask.UpdatedOn = clock.UtcNow;
+        SupportTask.UpdatedOn = now;
 
         if (RejectionReasonChoice!.Value == CaseRejectionReasonOption.ChangeNoLongerRequired)
         {
@@ -71,7 +74,7 @@ public class RejectModel(
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = clock.UtcNow,
+                    CreatedUtc = now,
                     RaisedBy = User.GetUserId()
                 };
             }
@@ -89,12 +92,12 @@ public class RejectModel(
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = clock.UtcNow,
+                    CreatedUtc = now,
                     RaisedBy = User.GetUserId()
                 };
             }
 
-            await dbContext.AddEventAndBroadcastAsync(cancelledEvent);
+            events.Add(cancelledEvent);
         }
         else
         {
@@ -115,7 +118,7 @@ public class RejectModel(
                     OldSupportTask = oldSupportTask,
                     RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = clock.UtcNow,
+                    CreatedUtc = now,
                     RaisedBy = User.GetUserId()
                 };
 
@@ -137,7 +140,7 @@ public class RejectModel(
                     OldSupportTask = oldSupportTask,
                     RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = clock.UtcNow,
+                    CreatedUtc = now,
                     RaisedBy = User.GetUserId()
                 };
 
@@ -145,7 +148,7 @@ public class RejectModel(
                 emailTemplateId = ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmationTemplateId;
             }
 
-            await dbContext.AddEventAndBroadcastAsync(rejectedEvent);
+            events.Add(rejectedEvent);
 
             if (!string.IsNullOrEmpty(emailAddress))
             {
@@ -163,6 +166,8 @@ public class RejectModel(
         }
 
         await dbContext.SaveChangesAsync();
+
+        await eventPublisher.PublishEventsAsync(events);
 
         TempData.SetFlashSuccess(
             $"The request has been {requestStatus}",

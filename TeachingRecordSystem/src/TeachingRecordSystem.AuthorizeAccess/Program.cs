@@ -180,7 +180,6 @@ builder
     .AddTrnRequestService();
 
 builder.Services
-    .AddTrsBaseServices()
     .AddTransient<AuthorizeAccessLinkGenerator, RoutingAuthorizeAccessLinkGenerator>()
     .AddTransient<FormFlowJourneySignInHandler>()
     .AddTransient<MatchToTeachingRecordAuthenticationHandler>()

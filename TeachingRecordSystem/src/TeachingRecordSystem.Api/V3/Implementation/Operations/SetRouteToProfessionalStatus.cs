@@ -29,6 +29,7 @@ public record SetRouteToProfessionalStatusResult;
 
 public class SetRouteToProfessionalStatusHandler(
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     ICurrentUserProvider currentUserProvider,
     ReferenceDataCache referenceDataCache,
     IClock clock) :
@@ -212,9 +213,11 @@ public class SetRouteToProfessionalStatusHandler(
                 clock.UtcNow,
                 out var @event);
 
+            await dbContext.SaveChangesAsync();
+
             if (@event is not null)
             {
-                await dbContext.AddEventAndBroadcastAsync(@event);
+                await eventPublisher.PublishEventAsync(@event);
             }
         }
         else
@@ -245,10 +248,11 @@ public class SetRouteToProfessionalStatusHandler(
                 @event: out var @event);
 
             dbContext.RouteToProfessionalStatuses.Add(route);
-            await dbContext.AddEventAndBroadcastAsync(@event);
-        }
 
-        await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
+
+            await eventPublisher.PublishEventAsync(@event);
+        }
 
         return new SetRouteToProfessionalStatusResult();
     }
