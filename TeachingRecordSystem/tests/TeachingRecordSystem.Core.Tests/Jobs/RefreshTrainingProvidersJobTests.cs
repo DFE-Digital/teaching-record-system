@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.Services.PublishApi;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
+[Collection(nameof(DisableParallelization))]
 public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
 {
     [Fact]
@@ -42,7 +43,7 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
 
         var job = new RefreshTrainingProvidersJob(publishApiClient.Object, dbContextFactory);
 
-        // Act        
+        // Act
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert

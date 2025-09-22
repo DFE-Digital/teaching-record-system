@@ -223,10 +223,7 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<AppendTrainingProvidersFromCrmJob>(
-                    nameof(AppendTrainingProvidersFromCrmJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    Cron.Never);
+                recurringJobManager.RemoveIfExists("AppendTrainingProvidersFromCrmJob");
 
                 recurringJobManager.AddOrUpdate<ResyncAllPersonsJob>(
                     nameof(ResyncAllPersonsJob),
