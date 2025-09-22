@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
@@ -34,7 +33,7 @@ public class HostFixture : WebApplicationFactory<Program>
 
         builder.ConfigureServices((context, services) =>
         {
-            DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
+            DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
 
             services.AddAuthentication()
                 .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
@@ -46,29 +45,25 @@ public class HostFixture : WebApplicationFactory<Program>
             // Publish events synchronously
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
-            services.AddSingleton<CurrentUserProvider>();
-            services.AddSingleton<TestUsers>();
-            services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
-            services.AddTestScoped<IClock>(tss => tss.Clock);
-            services.AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object);
-            services.AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
-            services.AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
-            services.AddSingleton(
-                sp => ActivatorUtilities.CreateInstance<TestData>(
+            services
+                .AddSingleton<CurrentUserProvider>()
+                .AddSingleton<TestUsers>()
+                .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
+                .AddFakeXrm()
+                .AddSingleton(sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
                     new ForwardToTestScopedClock(),
-                    TestDataPersonDataSource.Trs));
-            services.AddFakeXrm();
-            services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
-            services.AddSingleton<FakeTrnGenerator>();
-            services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
-            services.AddSingleton<TrsDataSyncHelper>();
-            services.AddSingleton<IAuditRepository, TestableAuditRepository>();
-            services.AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object);
-            services.AddStartupTask<AddTestRouteTypesStartupTask>();
-            services.AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
-            services.AddTestScoped(tss => Options.Create(tss.TrnRequestOptions));
-            services.AddSingleton<INotificationSender, NoopNotificationSender>();
+                    TestDataPersonDataSource.Trs))
+                .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
+                .AddSingleton<FakeTrnGenerator>()
+                .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
+                .AddSingleton<TrsDataSyncHelper>()
+                .AddSingleton<IAuditRepository, TestableAuditRepository>()
+                .AddStartupTask<AddTestRouteTypesStartupTask>()
+                .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>()
+                .AddSingleton<INotificationSender, NoopNotificationSender>();
+
+            TestScopedServices.ConfigureServices(services);
         });
     }
 
@@ -110,14 +105,5 @@ public class HostFixture : WebApplicationFactory<Program>
     private class ForwardToTestScopedClock : IClock
     {
         public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
-    }
-}
-
-file static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
-        where T : class
-    {
-        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
     }
 }

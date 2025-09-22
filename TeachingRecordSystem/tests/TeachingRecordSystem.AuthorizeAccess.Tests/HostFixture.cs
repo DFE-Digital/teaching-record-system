@@ -52,21 +52,21 @@ public class HostFixture : WebApplicationFactory<Program>
             // Publish events synchronously
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
-            services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
-            services.AddTestScoped<IClock>(tss => tss.Clock);
-            services.AddSingleton(
-                sp => ActivatorUtilities.CreateInstance<TestData>(
+            services
+                .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
+                .AddFakeXrm()
+                .AddSingleton(sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
                     new ForwardToTestScopedClock(),
-                    TestDataPersonDataSource.CrmAndTrs));
-            services.AddFakeXrm();
-            services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
-            services.AddSingleton<FakeTrnGenerator>();
-            services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
-            services.AddSingleton<IAuditRepository, TestableAuditRepository>();
-            services.AddSingleton<TrsDataSyncHelper>();
-            services.AddSingleton(GetMockFileService());
-            services.AddTestScoped(tss => tss.GetAnIdentityApiClient.Object);
+                    TestDataPersonDataSource.Trs))
+                .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
+                .AddSingleton<FakeTrnGenerator>()
+                .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
+                .AddSingleton<TrsDataSyncHelper>()
+                .AddSingleton<IAuditRepository, TestableAuditRepository>()
+                .AddSingleton(GetMockFileService());
+
+            TestScopedServices.ConfigureServices(services);
 
             IFileService GetMockFileService()
             {
@@ -123,14 +123,5 @@ public class HostFixture : WebApplicationFactory<Program>
     private class ForwardToTestScopedClock : IClock
     {
         public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
-    }
-}
-
-file static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
-        where T : class
-    {
-        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
     }
 }

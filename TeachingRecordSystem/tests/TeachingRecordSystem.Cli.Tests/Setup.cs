@@ -22,8 +22,7 @@ public static class Setup
             .AddEnvironmentVariables()
             .Build();
 
-        var pgConnectionString = configuration.GetRequiredConnectionString("DefaultConnection");
-        DbHelper.ConfigureDbServices(services, pgConnectionString);
+        DbHelper.ConfigureDbServices(services, configuration.GetPostgresConnectionString());
 
         services
             .AddSingleton<IConfiguration>(configuration)
