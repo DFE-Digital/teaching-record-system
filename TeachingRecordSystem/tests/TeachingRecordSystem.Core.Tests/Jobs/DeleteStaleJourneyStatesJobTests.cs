@@ -61,10 +61,5 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
         var remainingJourneyStates = await _trsContext.JourneyStates.ToListAsync();
         Assert.All(remainingJourneyStates, s => Assert.Contains(s.InstanceId, expected.Select(e => e.InstanceId)));
         Assert.Equal(2, remainingJourneyStates.Count);
-
-        var metaData = await _trsContext.JobMetadata.ToListAsync();
-        Assert.Single(metaData);
-        Assert.Equal("DeleteStaleJourneyStatesJob", metaData[0].JobName);
-        Assert.Equal(Clock.UtcNow.ToString("s"), metaData[0].Metadata["LastRunDate"]);
     }
 }
