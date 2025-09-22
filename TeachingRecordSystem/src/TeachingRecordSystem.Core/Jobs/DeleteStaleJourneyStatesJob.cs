@@ -11,7 +11,7 @@ public class DeleteStaleJourneyStatesJob(TrsDbContext dbContext, IClock clock)
     {
         var cutoffDate = clock.Today.AddDays(-1).ToDateTime();
         var staleJourneyStates = await dbContext.JourneyStates
-           .Where(e => e.Created < clock.Today.AddDays(-1).ToDateTime())
+           .Where(e => e.Created < cutoffDate)
            .ExecuteDeleteAsync();
 
         await dbContext.SaveChangesAsync();

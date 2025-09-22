@@ -40,10 +40,10 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
         var journeyState3 = new Core.DataStore.Postgres.Models.JourneyState
         {
             InstanceId = Guid.NewGuid().ToString(),
-            Created = Clock.UtcNow.AddMinutes(Random.Shared.Next(0, 60)),
+            Created = Clock.UtcNow.AddMinutes(Random.Shared.Next(-60, 0)),
             State = "State3",
             UserId = Guid.NewGuid().ToString(),
-            Updated = Clock.UtcNow.AddMinutes(Random.Shared.Next(0, 60))
+            Updated = Clock.UtcNow.AddMinutes(Random.Shared.Next(-60, 0))
         };
 
         _trsContext.JourneyStates.Add(journeyState1);
