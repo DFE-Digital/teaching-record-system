@@ -3,6 +3,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.Logging;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 

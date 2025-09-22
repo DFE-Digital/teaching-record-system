@@ -48,24 +48,6 @@ public static class InductionStatusRegistry
     public static bool IsHigherPriorityThan(this InductionStatus status, InductionStatus otherStatus) =>
         status.GetPriority() < otherStatus.GetPriority();
 
-    public static InductionStatus ToInductionStatus(this dfeta_InductionStatus status) =>
-        ToInductionStatus((dfeta_InductionStatus?)status);
-
-    public static InductionStatus ToInductionStatus(this dfeta_InductionStatus? status) => status switch
-    {
-        null => InductionStatus.None,
-        dfeta_InductionStatus.RequiredtoComplete => InductionStatus.RequiredToComplete,
-        dfeta_InductionStatus.NotYetCompleted => InductionStatus.InProgress,
-        dfeta_InductionStatus.InProgress => InductionStatus.InProgress,
-        dfeta_InductionStatus.InductionExtended => InductionStatus.InProgress,
-        dfeta_InductionStatus.Pass => InductionStatus.Passed,
-        dfeta_InductionStatus.Fail => InductionStatus.Failed,
-        dfeta_InductionStatus.Exempt => InductionStatus.Exempt,
-        dfeta_InductionStatus.PassedinWales => InductionStatus.Exempt,
-        dfeta_InductionStatus.FailedinWales => InductionStatus.FailedInWales,
-        _ => throw new ArgumentException($"Failed mapping '{status}' to {nameof(InductionStatus)}.", nameof(status))
-    };
-
     public static string? ToDqtInductionStatus(this InductionStatus status, out string? statusDescription)
     {
         switch (status)

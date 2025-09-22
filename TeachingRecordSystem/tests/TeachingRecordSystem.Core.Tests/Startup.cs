@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Tests.ApiSchema;
 using TeachingRecordSystem.Core.Tests.Jobs;
@@ -31,7 +30,6 @@ public class Startup
 
                 services.AddSingleton<DbFixture>();
                 services.AddSingleton<FakeTrnGenerator>();
-                services.AddCrmQueries();
                 services.AddFakeXrm();
                 services.AddSingleton<ReferenceDataCache>();
                 services.AddSingleton<WebhookReceiver>();

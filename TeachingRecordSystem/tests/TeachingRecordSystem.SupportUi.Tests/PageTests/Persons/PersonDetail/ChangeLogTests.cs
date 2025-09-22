@@ -39,7 +39,6 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        await TestData.CreateCrmTaskAsync(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
 

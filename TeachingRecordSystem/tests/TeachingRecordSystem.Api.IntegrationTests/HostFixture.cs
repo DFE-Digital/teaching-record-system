@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -88,10 +87,6 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddSingleton<ITrnGenerator, FakeTrnGenerationApiClient>();
-            services.Decorate<ICrmQueryDispatcher>(
-                inner => new CrmQueryDispatcherDecorator(
-                    inner,
-                    TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()));
             services.AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
 
             services.Configure<GetAnIdentityOptions>(options =>

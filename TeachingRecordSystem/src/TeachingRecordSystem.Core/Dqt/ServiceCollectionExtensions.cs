@@ -5,50 +5,8 @@ using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
-public static partial class ServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddCrmQueries(this IServiceCollection services)
-    {
-        services.Scan(scan => scan
-            .FromAssembliesOf(typeof(ICrmQuery<>))
-            .AddClasses(classes => classes.AssignableTo(typeof(ICrmQueryHandler<,>)))
-                .AsImplementedInterfaces()
-                .WithTransientLifetime()
-            .AddClasses(classes => classes.AssignableTo(typeof(IEnumerableCrmQueryHandler<,>)))
-                .AsImplementedInterfaces()
-                .WithTransientLifetime()
-            .AddClasses(classes => classes.AssignableTo(typeof(ICrmTransactionalQueryHandler<,>)))
-                .AsImplementedInterfaces()
-                .WithTransientLifetime());
-
-        return services;
-    }
-
-    public static IServiceCollection AddPooledDefaultServiceClient(
-        this IServiceCollection services,
-        ServiceClient baseServiceClient,
-        int size)
-    {
-        services.AddKeyedSingleton(serviceKey: null, PooledOrganizationService.Create(baseServiceClient, size));
-
-        services.AddDefaultServiceClient(ServiceLifetime.Singleton, sp => sp.GetRequiredKeyedService<PooledOrganizationService>(serviceKey: null));
-
-        return services;
-    }
-
-    public static IServiceCollection AddPooledNamedServiceClient(
-        this IServiceCollection services,
-        string name,
-        ServiceClient baseServiceClient,
-        int size)
-    {
-        services.AddKeyedSingleton(name, PooledOrganizationService.Create(baseServiceClient, size));
-
-        services.AddNamedServiceClient(name, ServiceLifetime.Singleton, sp => sp.GetRequiredKeyedService<PooledOrganizationService>(name));
-
-        return services;
-    }
-
     public static IServiceCollection AddDefaultServiceClient(
         this IServiceCollection services,
         ServiceLifetime lifetime,
@@ -114,11 +72,6 @@ public static partial class ServiceCollectionExtensions
             name,
             implementationFactory: (IServiceProvider serviceProvider, object? key) => serviceProvider.GetRequiredKeyedService<IOrganizationServiceAsync2>(key),
             lifetime));
-
-        // Can't use KeyedService.AnyKey because of https://github.com/dotnet/runtime/issues/93438
-        services.AddKeyedTransient<ICrmQueryDispatcher>(
-            name,
-            (IServiceProvider serviceProvider, object? key) => new CrmQueryDispatcher(serviceProvider, name));
 
         return services;
     }

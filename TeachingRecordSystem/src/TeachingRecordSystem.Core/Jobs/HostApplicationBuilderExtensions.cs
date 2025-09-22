@@ -160,10 +160,7 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<InductionStatusUpdatedSupportJob>(
-                    nameof(InductionStatusUpdatedSupportJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    InductionStatusUpdatedSupportJob.JobSchedule);
+                recurringJobManager.RemoveIfExists("InductionStatusUpdatedSupportJob");
 
                 recurringJobManager.RemoveIfExists("BackfillDqtNotesJob");
 

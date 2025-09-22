@@ -155,7 +155,6 @@ builder.Services
     .AddTransient<RequireClosedAlertFilter>()
     .AddTransient<RequireOpenAlertFilter>()
     .AddSingleton<ReferenceDataCache>()
-    .AddSingleton<SanctionTextLookup>()
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
     .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>();
 

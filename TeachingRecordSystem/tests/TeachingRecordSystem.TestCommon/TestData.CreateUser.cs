@@ -1,7 +1,4 @@
-using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -104,52 +101,6 @@ public partial class TestData
         });
 
         return users;
-    }
-
-    public async Task CreateCrmUserAsync(
-        Guid azureAdUserId,
-        bool hasDisabledCrmAccount = false,
-        string[]? dqtRoles = null)
-    {
-        var txnRequestBuilder = RequestBuilder.CreateTransaction(this.OrganizationService);
-
-        var systemUserId = Guid.NewGuid();
-        txnRequestBuilder.AddRequest(new CreateRequest()
-        {
-            Target = new Core.Dqt.Models.SystemUser()
-            {
-                Id = systemUserId,
-                AzureActiveDirectoryObjectId = azureAdUserId,
-                IsDisabled = hasDisabledCrmAccount
-            }
-        });
-
-        if (dqtRoles is not null)
-        {
-            foreach (var dqtRole in dqtRoles)
-            {
-                var roleId = Guid.NewGuid();
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = new Role()
-                    {
-                        RoleId = roleId,
-                        Name = dqtRole
-                    }
-                });
-
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = new SystemUserRoles()
-                    {
-                        SystemUserId = systemUserId,
-                        RoleId = roleId
-                    }
-                });
-            }
-        }
-
-        await txnRequestBuilder.ExecuteAsync();
     }
 
     public class CreateUserSpec

@@ -29,11 +29,6 @@ public class EmailInUseTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.PersonalEmail = email;
         var journeyInstance = await CreateJourneyInstance(state);
         var person = await TestData.CreatePersonAsync();
-        await TestData.CreateCrmTaskAsync(x =>
-        {
-            x.WithPersonId(person.ContactId);
-            x.WithEmailAddress(email);
-        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/emailinuse?{journeyInstance.GetUniqueIdQueryParameter()}");
 

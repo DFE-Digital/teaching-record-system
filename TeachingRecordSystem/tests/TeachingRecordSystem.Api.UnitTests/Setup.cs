@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -71,7 +70,6 @@ public static class Setup
             .AddTestScoped<IClock>(tss => tss.Clock)
             .AddSingleton<FakeTrnGenerator>()
             .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
-            .AddCrmQueries()
             .AddFakeXrm()
             .AddSingleton<ICurrentUserProvider>(Mock.Of<ICurrentUserProvider>())
             .AddNameSynonyms()
