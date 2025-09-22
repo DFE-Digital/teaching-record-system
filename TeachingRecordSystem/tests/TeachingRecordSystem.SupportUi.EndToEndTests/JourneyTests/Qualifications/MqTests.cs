@@ -32,7 +32,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddMqProviderPageAsync();
 
-        await page.FillAsync($"label:text-is('Training provider')", mqEstablishment.Name);
+        await page.FillAsync($"label:text-is('Enter a training provider')", mqEstablishment.Name);
 
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -59,7 +59,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddMqCheckAnswersPageAsync();
 
-        await page.ClickButtonAsync("Confirm mandatory qualification");
+        await page.ClickButtonAsync("Confirm and add mandatory qualification");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
 

@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core.Dqt.Models;
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.StatusModel
 @{
-    ViewBag.Title = "Status";
+    ViewBag.Title = Html.DisplayNameFor(m => m.Status);
 }
 
 @section BeforeContent {
@@ -34,7 +34,7 @@
                         <govuk-radios-item-conditional>
                             <govuk-date-input asp-for="EndDate">
                                 <govuk-date-input-fieldset>
-                                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend" />
                                 </govuk-date-input-fieldset>
                             </govuk-date-input>
                         </govuk-radios-item-conditional>

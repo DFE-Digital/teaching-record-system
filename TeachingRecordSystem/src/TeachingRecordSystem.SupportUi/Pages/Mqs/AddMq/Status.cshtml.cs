@@ -20,6 +20,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Select a status")]
+    [Display(Name = "Select the status")]
     public MandatoryQualificationStatus? Status { get; set; }
 
     [BindProperty]
