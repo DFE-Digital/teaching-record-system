@@ -9,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using Npgsql;
@@ -19,7 +21,7 @@ using Npgsql.Replication.PgOutput.Messages;
 using NpgsqlTypes;
 using Polly;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 namespace TeachingRecordSystem.Core.Services.DqtReporting;
@@ -47,7 +49,7 @@ public partial class DqtReportingService : BackgroundService
 
     private readonly DqtReportingOptions _options;
     private readonly ICrmEntityChangesService _crmEntityChangesService;
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
+    private readonly IOrganizationServiceAsync2 _organizationService;
     private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IClock _clock;
     private readonly IConfiguration _configuration;
@@ -57,7 +59,7 @@ public partial class DqtReportingService : BackgroundService
     public DqtReportingService(
         IOptions<DqtReportingOptions> optionsAccessor,
         [FromKeyedServices(CrmClientName)] ICrmEntityChangesService crmEntityChangesService,
-        [FromKeyedServices(CrmClientName)] ICrmQueryDispatcher crmQueryDispatcher,
+        [FromKeyedServices(CrmClientName)] IOrganizationServiceAsync2 organizationService,
         IDistributedLockProvider distributedLockProvider,
         IClock clock,
         IConfiguration configuration,
@@ -65,7 +67,7 @@ public partial class DqtReportingService : BackgroundService
     {
         _options = optionsAccessor.Value;
         _crmEntityChangesService = crmEntityChangesService;
-        _crmQueryDispatcher = crmQueryDispatcher;
+        _organizationService = organizationService;
         _distributedLockProvider = distributedLockProvider;
         _clock = clock;
         _configuration = configuration;
@@ -135,8 +137,13 @@ public partial class DqtReportingService : BackgroundService
 
                 try
                 {
-                    var entityMetadata = await _crmQueryDispatcher.ExecuteQueryAsync(
-                        new GetEntityMetadataQuery(entity, EntityFilters.Default | EntityFilters.Attributes));
+                    var entityResponse = (RetrieveEntityResponse)await _organizationService.ExecuteAsync(new RetrieveEntityRequest()
+                    {
+                        LogicalName = entity,
+                        EntityFilters = EntityFilters.Default | EntityFilters.Attributes
+                    });
+
+                    var entityMetadata = entityResponse.EntityMetadata;
 
                     if (entityMetadata.ChangeTrackingEnabled != true)
                     {

@@ -1,7 +1,6 @@
 using FluentValidation;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V3.V20250203.Requests;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.V20250203.Validators;
 
@@ -17,14 +16,14 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
 
         RuleFor(r => r.Person.FirstName)
             .NotEmpty()
-            .MaximumLength(AttributeConstraints.Contact.FirstNameMaxLength);
+            .MaximumLength(PostgresModels.Person.FirstNameMaxLength);
 
         RuleFor(r => r.Person.MiddleName)
-            .MaximumLength(AttributeConstraints.Contact.MiddleNameMaxLength);
+            .MaximumLength(PostgresModels.Person.MiddleNameMaxLength);
 
         RuleFor(r => r.Person.LastName)
             .NotEmpty()
-            .MaximumLength(AttributeConstraints.Contact.LastNameMaxLength);
+            .MaximumLength(PostgresModels.Person.LastNameMaxLength);
 
         RuleFor(r => r.Person.DateOfBirth)
             .NotEmpty()
@@ -40,7 +39,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             .NotNull()
             .WithMessage("Email address cannot be null.")
             .EmailAddress()
-            .MaximumLength(AttributeConstraints.Contact.EMailAddress1MaxLength);
+            .MaximumLength(PostgresModels.Person.EmailAddressMaxLength);
 
         RuleFor(r => r.Person.NationalInsuranceNumber)
             .Custom((value, ctx) =>

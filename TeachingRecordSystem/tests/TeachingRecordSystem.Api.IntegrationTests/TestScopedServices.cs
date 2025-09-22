@@ -14,7 +14,6 @@ public class TestScopedServices
     {
         Clock = new();
         GetAnIdentityApiClientMock = new();
-        CrmQueryDispatcherSpy = new();
         BlobStorageFileServiceMock = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
 
@@ -54,8 +53,6 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public IOptions<AccessYourTeachingQualificationsOptions> AccessYourTeachingQualificationsOptions { get; }
-
-    public CrmQueryDispatcherSpy CrmQueryDispatcherSpy { get; }
 
     public Mock<IFileService> BlobStorageFileServiceMock { get; }
 

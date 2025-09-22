@@ -48,8 +48,6 @@ public abstract class TestBase : IAsyncLifetime
 
     public Guid ApplicationUserId { get; } = HostFixture.DefaultApplicationUserId;
 
-    public CrmQueryDispatcherSpy CrmQueryDispatcherSpy => _testServices.CrmQueryDispatcherSpy;
-
     public TestableClock Clock => _testServices.Clock;
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;

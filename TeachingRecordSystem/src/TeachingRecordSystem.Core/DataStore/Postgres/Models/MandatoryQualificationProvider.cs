@@ -7,19 +7,6 @@ public class MandatoryQualificationProvider
     public required Guid MandatoryQualificationProviderId { get; init; }
     public required string Name { get; set; }
 
-    public static bool TryMapFromDqtMqEstablishment(
-        dfeta_mqestablishment? mqestablishment,
-        [NotNullWhen(true)] out MandatoryQualificationProvider? provider)
-    {
-        if (mqestablishment is null)
-        {
-            provider = null;
-            return false;
-        }
-
-        return TryMapFromDqtMqEstablishmentValue(mqestablishment.dfeta_Value, out provider);
-    }
-
     public static bool TryMapFromDqtMqEstablishmentValue(
         string mqestablishmentValue,
         [NotNullWhen(true)] out MandatoryQualificationProvider? provider)

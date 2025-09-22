@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Core.Models;
 
