@@ -1,0 +1,104 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService;
+@model TimelineItem<TimelineEvent<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>>
+@{
+    var mergedEvent = Model.ItemModel.Event;
+
+    var title = Model.PersonId == mergedEvent.PersonId ? $"Record merged with TRN {mergedEvent.SecondaryPersonTrn}" : "";
+
+    var evidenceFileUrl = mergedEvent.EvidenceFileId is not null
+        ? await FileService.GetFileUrlAsync(mergedEvent.EvidenceFileId.Value, TimeSpan.FromMinutes(15))
+        : null;
+
+    var details = mergedEvent.PersonAttributes;
+    var oldDetails = mergedEvent.OldPersonAttributes!;
+    var name = StringHelper.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
+    var oldName = StringHelper.JoinNonEmpty(' ', oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName);
+    var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
+        ? parsedEmail.ToDisplayString()
+        : details.EmailAddress;
+    var oldEmail = EmailAddress.TryParse(oldDetails.EmailAddress, out var oldParsedEmail)
+        ? oldParsedEmail.ToDisplayString()
+        : oldDetails.EmailAddress;
+    var nino = NationalInsuranceNumber.TryParse(details.NationalInsuranceNumber, out var parsedNino)
+        ? parsedNino.ToDisplayString()
+        : details.NationalInsuranceNumber;
+    var oldNino = NationalInsuranceNumber.TryParse(oldDetails.NationalInsuranceNumber, out var oldParsedNino)
+        ? oldParsedNino.ToDisplayString()
+        : oldDetails.NationalInsuranceNumber;
+}
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-persons-merged-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">@title</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        @if (Model.PersonId == mergedEvent.PersonId)
+        {
+            <div data-testid="details">
+                <govuk-summary-list>
+                    @if (mergedEvent.Changes.HasAnyFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNameChange))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (mergedEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonDateOfBirth))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@details.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (mergedEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@nino</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (mergedEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonGender))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@details.Gender?.GetDisplayName()</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                </govuk-summary-list>
+            </div>
+        }
+
+        @if (mergedEvent.Comments is not null || mergedEvent.EvidenceFileId is not null)
+        {
+            <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+                <govuk-details-summary>Reason for change</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@mergedEvent.Comments</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @if (evidenceFileUrl is not null)
+                                {
+                                    <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{mergedEvent.EvidenceFileName!} (opens in new tab)")</a>
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
+        }
+    </div>
+</div>

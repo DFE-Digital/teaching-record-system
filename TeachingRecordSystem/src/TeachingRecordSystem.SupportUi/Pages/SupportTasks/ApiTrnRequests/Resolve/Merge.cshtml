@@ -8,19 +8,19 @@
 
 @section BeforeContent {
     <govuk-back-link href="@(Model.FromCheckAnswers ?
-        LinkGenerator.ApiTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId))"/>
+                         LinkGenerator.ApiTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+                         LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId))" />
 }
 
 @functions {
 #pragma warning disable CS1998
     private async Task RenderChoosePersonAttribute(
-        string label,
-        bool different,
-        string name,
-        string? leftLabel,
-        string? rightLabel,
-        PersonAttributeSource? selectedValue)
+            string label,
+            bool different,
+            string name,
+            string? leftLabel,
+            string? rightLabel,
+            PersonAttributeSource? selectedValue)
     {
         var chooseAttributeModel = new ChoosePersonAttributeViewModel()
         {
@@ -78,8 +78,7 @@
                     Model.LastName!.ExistingRecordValue,
                     Model.LastNameSource);
 
-                await RenderChoosePersonAttribute(
-                    Html.DisplayNameFor(m => m.DateOfBirthSource),
+                await RenderChoosePersonAttribute(Html.DisplayNameFor(m => m.DateOfBirthSource),
                     Model.DateOfBirth!.Different,
                     Html.NameFor(m => m.DateOfBirthSource),
                     Model.DateOfBirth!.TrnRequestValue?.ToString(UiDefaults.DateOnlyDisplayFormat),
@@ -122,8 +121,8 @@
             </govuk-warning-text>
 
             <div class="govuk-button-group">
-               <govuk-button type="submit">Continue</govuk-button>
-               <govuk-button type="submit" formaction="@LinkGenerator.ApiTrnRequestMergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.ApiTrnRequestMergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

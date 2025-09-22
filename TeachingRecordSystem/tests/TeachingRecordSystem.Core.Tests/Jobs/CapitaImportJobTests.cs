@@ -98,7 +98,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.NotNull(item1.FailureMessage);
                     Assert.Empty(item1.FailureMessage);
                 });
-        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
+        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.NotNull(task);
         var trnRequest = dbContext.TrnRequestMetadata.Single(x => x.RequestId == task.TrnRequestId);
         Assert.NotNull(trnRequest);
@@ -181,7 +181,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.NotNull(item1.FailureMessage);
                     Assert.Empty(item1.FailureMessage);
                 });
-        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
+        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.NotNull(task);
         var trnRequest = dbContext.TrnRequestMetadata.Single(x => x.RequestId == task.TrnRequestId);
         Assert.NotNull(trnRequest);
@@ -261,7 +261,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.NotNull(item1.FailureMessage);
                     Assert.Contains($"Warning: Attempted to update lastname from {person.LastName} to {expectedLastName}", item1.FailureMessage);
                 });
-        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
+        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.Null(task);
     }
 
@@ -336,7 +336,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.NotNull(item1.FailureMessage);
                     Assert.Empty(item1.FailureMessage);
                 });
-        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
+        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.Null(task);
     }
 
@@ -410,7 +410,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.NotNull(item1.FailureMessage);
                     Assert.Contains($"Warning: Attempted to update gender from {person.Gender} to {expectedGender}", item1.FailureMessage);
                 });
-        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
+        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.Null(task);
     }
 
@@ -485,7 +485,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.NotNull(item1.FailureMessage);
                     Assert.Contains($"Warning: Attempted to update NationalInsuranceNumber from {person.NationalInsuranceNumber} to {expectedNI}", item1.FailureMessage);
                 });
-        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
+        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.Null(task);
     }
 
@@ -557,7 +557,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                     Assert.NotNull(item1.FailureMessage);
                     Assert.Empty(item1.FailureMessage);
                 });
-        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && x.PersonId == person.PersonId);
+        var task = dbContext.SupportTasks.SingleOrDefault(x => x.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && x.PersonId == person.PersonId);
         Assert.NotNull(task);
         var trnRequest = dbContext.TrnRequestMetadata.Single(x => x.RequestId == task.TrnRequestId);
         Assert.NotNull(trnRequest);

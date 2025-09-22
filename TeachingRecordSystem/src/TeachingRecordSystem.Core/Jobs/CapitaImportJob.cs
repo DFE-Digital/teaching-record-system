@@ -112,6 +112,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         dbContext.IntegrationTransactions.Add(integrationJob);
         await dbContext.SaveChangesAsync();
         var integrationId = integrationJob.IntegrationTransactionId;
+        var now = clock.UtcNow;
 
         foreach (var row in records)
         {
@@ -142,7 +143,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         var createdEvent = new PersonCreatedEvent
                         {
                             EventId = Guid.NewGuid(),
-                            CreatedUtc = clock.UtcNow,
+                            CreatedUtc = now,
                             RaisedBy = capitaUser.Value.CapitaTpsUserId,
                             PersonId = newPerson.PersonId,
                             PersonAttributes = personAttributes,
@@ -172,7 +173,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                             {
                                 ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
                                 RequestId = Guid.NewGuid().ToString(),
-                                CreatedOn = clock.UtcNow,
+                                CreatedOn = now,
                                 IdentityVerified = null,
                                 OneLoginUserSubject = null,
                                 Name = GetNonEmptyValues(
@@ -193,18 +194,18 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
 
                             potentialDuplicate = true;
                             var supportTask = DataStore.Postgres.Models.SupportTask.Create(
-                                SupportTaskType.CapitaImportPotentialDuplicate,
-                                new Models.SupportTaskData.CapitaPotentialDuplicateData()
+                                SupportTaskType.TeacherPensionsPotentialDuplicate,
+                                new Models.SupportTaskData.TeacherPensionsPotentialDuplicateData()
                                 {
                                     FileName = fileName,
                                     IntegrationTransactionId = integrationJob.IntegrationTransactionId
                                 },
                                 personId: personId.Value,
-                                null,
-                                null,
-                                trnRequestMetadata.RequestId,
-                                capitaUser.Value.CapitaTpsUserId,
-                                clock.UtcNow,
+                                oneLoginUserSubject: null,
+                                trnRequestApplicationUserId: capitaUser.Value.CapitaTpsUserId,
+                                trnRequestId: trnRequestMetadata.RequestId,
+                                createdBy: capitaUser.Value.CapitaTpsUserId,
+                                now: now,
                                 out var supportTaskCreatedEvent);
 
                             dbContext.SupportTasks.Add(supportTask);

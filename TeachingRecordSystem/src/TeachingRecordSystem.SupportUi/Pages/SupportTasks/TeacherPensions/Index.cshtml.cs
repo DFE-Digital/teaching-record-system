@@ -34,12 +34,12 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
             .Include(t => t.Person)
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
-            .Where(t => t.SupportTaskType == SupportTaskType.CapitaImportPotentialDuplicate && t.Status == SupportTaskStatus.Open)
+            .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.Status == SupportTaskStatus.Open)
             .ToListAsync();
 
         var unorderedResults = tasks.Select(t =>
         {
-            var data = t.Data as CapitaPotentialDuplicateData;
+            var data = t.Data as TeacherPensionsPotentialDuplicateData;
             return new Result
             (
                 t.SupportTaskReference,

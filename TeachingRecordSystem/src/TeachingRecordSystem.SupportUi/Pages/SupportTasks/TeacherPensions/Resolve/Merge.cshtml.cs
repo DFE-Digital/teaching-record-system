@@ -1,0 +1,257 @@
+using System.ComponentModel.DataAnnotations;
+using Humanizer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
+using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
+
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
+
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
+public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFileService fileService) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+{
+    public string? PersonName { get; set; }
+
+    public string? SourceApplicationUserName { get; set; }
+
+    public PersonAttribute<DateOnly?>? DateOfBirth { get; set; }
+
+    public PersonAttribute<string?>? EmailAddress { get; set; }
+
+    public PersonAttribute<string?>? Trn { get; set; }
+
+    public PersonAttribute<string?>? FirstName { get; set; }
+
+    public PersonAttribute<string?>? LastName { get; set; }
+
+    public PersonAttribute<string?>? NationalInsuranceNumber { get; set; }
+
+    public PersonAttribute<Gender?>? Gender { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Upload evidence")]
+    public bool? UploadEvidence { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Date of birth")]
+    public PersonAttributeSource? DateOfBirthSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Email")]
+    public PersonAttributeSource? EmailAddressSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "National Insurance number")]
+    public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Gender")]
+    public PersonAttributeSource? GenderSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "First name")]
+    public PersonAttributeSource? FirstNameSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Last name")]
+    public PersonAttributeSource? LastNameSource { get; set; }
+
+    [Display(Name = "TRN")]
+    public PersonAttributeSource? TRNSource { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Add comments (optional)")]
+    public string? MergeComments { get; set; }
+
+    [BindProperty]
+    [EvidenceFile]
+    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    public IFormFile? EvidenceFile { get; set; }
+
+    public Guid? EvidenceFileId { get; set; }
+
+    public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
+        NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
+        GenderSource = JourneyInstance!.State.GenderSource;
+        MergeComments = JourneyInstance!.State.MergeComments;
+        FirstNameSource = JourneyInstance!.State.FirstNameSource;
+        LastNameSource = JourneyInstance!.State.LastNameSource;
+        TRNSource = JourneyInstance!.State.TRNSource;
+        UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
+        UploadEvidence = JourneyInstance?.State.UploadEvidence;
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (UploadEvidence is null)
+        {
+            ModelState.AddModelError(nameof(UploadEvidence), "Select upload evidence");
+        }
+
+        if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
+        {
+            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
+        }
+
+        if (DateOfBirth!.Different && DateOfBirthSource is null)
+        {
+            ModelState.AddModelError(nameof(DateOfBirthSource), "Select a date of birth");
+        }
+
+        if (NationalInsuranceNumber!.Different && NationalInsuranceNumberSource is null)
+        {
+            ModelState.AddModelError(nameof(NationalInsuranceNumberSource), "Select a National Insurance number");
+        }
+
+        if (FirstName!.Different && FirstNameSource is null)
+        {
+            ModelState.AddModelError(nameof(FirstNameSource), "Select a First name");
+        }
+
+        if (LastName!.Different && LastNameSource is null)
+        {
+            ModelState.AddModelError(nameof(LastNameSource), "Select a Last name");
+        }
+
+        if (Gender!.Different && GenderSource is null)
+        {
+            ModelState.AddModelError(nameof(GenderSource), "Select a gender");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
+        if (UploadEvidence == true)
+        {
+            if (EvidenceFile is not null)
+            {
+                if (EvidenceFileId is not null)
+                {
+                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
+                }
+
+                using var stream = EvidenceFile.OpenReadStream();
+                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
+                await JourneyInstance!.UpdateStateAsync(state =>
+                {
+                    state.EvidenceFileId = evidenceFileId;
+                    state.EvidenceFileName = EvidenceFile.FileName;
+                    state.EvidenceFileSizeDescription = EvidenceFile.Length.Bytes().Humanize();
+                });
+            }
+        }
+        else if (EvidenceFileId is not null)
+        {
+            await fileService.DeleteFileAsync(EvidenceFileId.Value);
+            await JourneyInstance!.UpdateStateAsync(state =>
+            {
+                state.EvidenceFileId = null;
+                state.EvidenceFileName = null;
+                state.EvidenceFileSizeDescription = null;
+            });
+        }
+
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.DateOfBirthSource = DateOfBirthSource;
+            state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+            state.GenderSource = GenderSource;
+            state.PersonAttributeSourcesSet = true;
+            state.MergeComments = MergeComments;
+            state.FirstNameSource = FirstNameSource;
+            state.LastNameSource = LastNameSource;
+            state.UploadEvidence = UploadEvidence;
+        });
+
+        return Redirect(linkGenerator.TeacherPensionsCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+    }
+
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.TeacherPensions());
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var supportTask = GetSupportTask();
+        var requestData = supportTask.TrnRequestMetadata!;
+        var state = JourneyInstance!.State;
+        var person = DbContext!.Persons.Single(x => x.PersonId == supportTask.PersonId);
+
+        if (state.PersonId is not Guid personId)
+        {
+            context.Result = Redirect(linkGenerator.TeacherPensionsMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            return;
+        }
+
+        if (state.PersonId == CreateNewRecordPersonIdSentinel)
+        {
+            context.Result = Redirect(linkGenerator.TeacherPensionsCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+            return;
+        }
+        var personAttributes = await GetPersonAttributesAsync(personId);
+
+        var attributeMatches = GetPersonAttributeMatches(
+            personAttributes.FirstName,
+            personAttributes.MiddleName,
+            personAttributes.LastName,
+            personAttributes.DateOfBirth,
+            personAttributes.NationalInsuranceNumber,
+            personAttributes.Gender);
+
+        DateOfBirth = new PersonAttribute<DateOnly?>(
+            personAttributes.DateOfBirth,
+            requestData.DateOfBirth,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
+
+        NationalInsuranceNumber = new PersonAttribute<string?>(
+            personAttributes.NationalInsuranceNumber,
+            requestData.NationalInsuranceNumber,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+
+        Gender = new PersonAttribute<Gender?>(
+            personAttributes.Gender,
+            requestData.Gender,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
+
+        LastName = new PersonAttribute<string?>(
+            personAttributes.LastName,
+            requestData.LastName,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
+
+        FirstName = new PersonAttribute<string?>(
+            personAttributes.FirstName,
+            requestData.FirstName,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
+
+        Trn = new PersonAttribute<string?>(
+            personAttributes.Trn,
+            person.Trn,
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
+
+        PersonName = StringHelper.JoinNonEmpty(' ', new string?[] { personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName });
+
+        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
+    }
+}
+
+public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
