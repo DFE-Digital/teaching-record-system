@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250923092825_PersonSearchableAttributes")]
+    partial class PersonSearchableAttributes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4163,17 +4166,26 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("updated_on");
 
                     b.PrimitiveCollection<string[]>("last_names")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("varchar[]")
+                        .HasDefaultValue(new string[0])
                         .HasColumnName("last_names")
                         .UseCollation("case_insensitive");
 
                     b.PrimitiveCollection<string[]>("names")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("varchar[]")
+                        .HasDefaultValue(new string[0])
                         .HasColumnName("names")
                         .UseCollation("case_insensitive");
 
                     b.PrimitiveCollection<string[]>("national_insurance_numbers")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("varchar[]")
+                        .HasDefaultValue(new string[0])
                         .HasColumnName("national_insurance_numbers")
                         .UseCollation("case_insensitive");
 
