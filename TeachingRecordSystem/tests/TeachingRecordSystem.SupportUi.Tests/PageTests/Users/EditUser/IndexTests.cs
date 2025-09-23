@@ -273,8 +273,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
     [Theory]
     [InlineData(true, false, true, UserUpdatedEventChanges.Name, "has been updated.")]
-    [InlineData(false, true, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions).")]
-    [InlineData(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions).")]
+    [InlineData(false, true, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
+    [InlineData(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
     [InlineData(false, false, false, UserUpdatedEventChanges.None, "has been updated.")]
     public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage(
         bool changeName,
