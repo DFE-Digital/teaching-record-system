@@ -41,17 +41,17 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
             var supportTask = GetSupportTask();
             var requestData = supportTask.TrnRequestMetadata!;
 
-            if (firstName == requestData.FirstName)
+            if (firstName.Equals(requestData.FirstName, StringComparison.OrdinalIgnoreCase))
             {
                 yield return PersonMatchedAttribute.FirstName;
             }
 
-            if (middleName == requestData.MiddleName || (string.IsNullOrWhiteSpace(requestData.MiddleName) && string.IsNullOrWhiteSpace(middleName)))
+            if (middleName.Equals(requestData.MiddleName, StringComparison.OrdinalIgnoreCase) || (string.IsNullOrWhiteSpace(requestData.MiddleName) && string.IsNullOrWhiteSpace(middleName)))
             {
                 yield return PersonMatchedAttribute.MiddleName;
             }
 
-            if (lastName == requestData.LastName)
+            if (lastName.Equals(requestData.LastName, StringComparison.OrdinalIgnoreCase))
             {
                 yield return PersonMatchedAttribute.LastName;
             }
