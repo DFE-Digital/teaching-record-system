@@ -17,4 +17,3 @@ Include any dependencies that are required for this change.
 -   [ ] Rebased master
 -   [ ] Cleaned commit history
 -   [ ] Tested by running locally
--   [ ] Run DQT integration tests locally (if appropriate)
