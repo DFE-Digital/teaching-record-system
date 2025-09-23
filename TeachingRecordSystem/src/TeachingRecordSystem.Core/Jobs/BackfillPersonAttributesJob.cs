@@ -24,13 +24,17 @@ public class BackfillPersonAttributesJob(TrsDbContext dbContext)
             		union all
             		select person_id, null, null, null, national_insurance_number from tps_employments
             	)
-            	where person_id in (select person_id from persons where names is null or national_insurance_numbers is null limit 10000)
+            	where person_id in (
+            	    select person_id from persons
+                    where (names is null or national_insurance_numbers is null) and
+                    (first_name is not null or last_name is not null or national_insurance_number is not null) limit 10000
+                )
             	group by person_id
             )
             update persons set
             	names = fn_split_names(ARRAY[merged_data.first_names, merged_data.middle_names, merged_data.last_names]::varchar[] COLLATE "default"),
             	last_names = fn_split_names(ARRAY[merged_data.last_names]::varchar[] COLLATE "default"),
-            	national_insurance_numbers = merged_data.national_insurance_numbers
+            	national_insurance_numbers = array_remove(merged_data.national_insurance_numbers, NULL)
             from merged_data
             where merged_data.person_id = persons.person_id
             """;
