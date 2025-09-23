@@ -30,5 +30,8 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.HasOne(p => p.MergedWithPerson).WithMany().HasForeignKey(p => p.MergedWithPersonId);
         builder.HasOne<TrnRequestMetadata>().WithMany().HasForeignKey(p => new { p.SourceApplicationUserId, p.SourceTrnRequestId });
         builder.Property(p => p.DateOfDeath);
+        builder.Property<string[]>("names").HasColumnType("varchar[]").UseCollation("case_insensitive");
+        builder.Property<string[]>("last_names").HasColumnType("varchar[]").UseCollation("case_insensitive");
+        builder.Property<string[]>("national_insurance_numbers").HasColumnType("varchar[]").UseCollation("case_insensitive");
     }
 }
