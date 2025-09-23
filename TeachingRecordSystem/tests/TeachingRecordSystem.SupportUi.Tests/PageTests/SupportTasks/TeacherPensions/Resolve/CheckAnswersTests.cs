@@ -9,7 +9,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arranges
         var taskReference = "1234567";
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = [] };
         var journeyInstance = await CreateJourneyInstance(taskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -47,7 +47,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.TeachersPensionPersonId = person.PersonId;
         state.FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
         state.MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
@@ -114,7 +114,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.TeachersPensionPersonId = person.PersonId;
         state.DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
         state.FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
@@ -165,7 +165,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.TeachersPensionPersonId = person.PersonId;
         state.FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
         state.MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
@@ -229,9 +229,9 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
 
     private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
         string supportTaskReference,
-        ResolveTeacherPensionsPotentialDuplicateState? state = null) =>
-            CreateJourneyInstance(
-                JourneyNames.ResolveTpsPotentialDuplicate,
-                state ?? new(),
-                new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
+        ResolveTeacherPensionsPotentialDuplicateState state) =>
+        CreateJourneyInstance(
+            JourneyNames.ResolveTpsPotentialDuplicate,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 }

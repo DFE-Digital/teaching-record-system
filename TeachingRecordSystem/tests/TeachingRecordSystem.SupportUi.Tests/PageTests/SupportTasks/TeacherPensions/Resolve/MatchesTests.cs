@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions.Resolve;
@@ -79,7 +80,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -122,7 +123,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -164,7 +165,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -204,7 +205,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Closed);
             });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -244,7 +245,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
         var unmatchedPerson = await TestData.CreatePersonAsync();
         var personId = unmatchedPerson.PersonId;
 
@@ -285,7 +286,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -330,7 +331,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithCreatedOn(Clock.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
             });
-        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+        var journeyInstance = await CreateJourneyInstance(supportTask);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -352,11 +353,23 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(Guid.Empty, journeyInstance.State.PersonId);
     }
 
+    private async Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(SupportTask supportTask, bool useFactory = true)
+    {
+        var state = useFactory
+            ? await CreateJourneyStateWithFactory<ResolveTeacherPensionsPotentialDuplicateStateFactory, ResolveTeacherPensionsPotentialDuplicateState>(factory => factory.CreateAsync(supportTask))
+            : new ResolveTeacherPensionsPotentialDuplicateState
+            {
+                MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly()
+            };
+
+        return await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+    }
+
     private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
-        string supportTaskReference,
-        ResolveTeacherPensionsPotentialDuplicateState? state = null) =>
-    CreateJourneyInstance(
-        JourneyNames.ResolveTpsPotentialDuplicate,
-        state ?? new(),
-        new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
+            string supportTaskReference,
+            ResolveTeacherPensionsPotentialDuplicateState state) =>
+        CreateJourneyInstance(
+            JourneyNames.ResolveTpsPotentialDuplicate,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 }
