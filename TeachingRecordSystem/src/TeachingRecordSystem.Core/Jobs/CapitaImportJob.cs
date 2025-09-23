@@ -118,7 +118,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         {
             try
             {
-                var (errors, warnings) = ValidateRow(row);
+                var (errors, warnings, person) = await ValidateRowAsync(row);
                 var personId = default(Guid?);
                 var recordStatus = IntegrationTransactionRecordStatus.Success;
                 var potentialDuplicate = false;
@@ -133,7 +133,6 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                 }
                 else
                 {
-                    var person = await dbContext.Persons.FirstOrDefaultAsync(x => x.Trn == row.TRN);
                     NationalInsuranceNumber.TryParse(row.NINumber, out var ni);
                     var potentialMatches = await GetPotentialMatchingPersonsAsync(row);
                     if (person is null)
@@ -293,7 +292,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         return integrationId;
     }
 
-    public (List<string> Errors, List<string> Warnings) ValidateRow(CapitaImportRecord record)
+    public async Task<(List<string> Errors, List<string> Warnings, Person? person)> ValidateRowAsync(CapitaImportRecord record)
     {
         //hard errors
         var errors = new List<string>();
@@ -306,19 +305,31 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         if (string.IsNullOrEmpty(record.TRN))
         {
             errors.Add("Missing required field: TRN");
-            return (errors, warnings);
+            return (errors, warnings, null);
         }
         else if (!trnRegex.IsMatch(record.TRN))
         {
             errors.Add("Validation failed on field: TRN");
-            return (errors, warnings);
+            return (errors, warnings, null);
+        }
+
+        // if a potential match is not found and the result of the import of this row would be to create a person
+        // make sure that first name and last name are both present.
+        var person = await dbContext.Persons.FirstOrDefaultAsync(x => x.Trn == record.TRN);
+        if (person is null && string.IsNullOrEmpty(record.GetFirstName()))
+        {
+            errors.Add("Unable to create a new record without a firstname");
+        }
+        if (person is null && string.IsNullOrEmpty(record.LastName))
+        {
+            errors.Add("Unable to create a new record without a lastname");
         }
 
         //dob
         if (string.IsNullOrEmpty(record.DateOfBirth))
         {
             errors.Add("Missing required field: Date of birth");
-            return (errors, warnings);
+            return (errors, warnings, person);
         }
         else
         {
@@ -348,7 +359,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         if (!record.Gender.HasValue)
         {
             errors.Add("Missing required field: Gender");
-            return (errors, warnings);
+            return (errors, warnings, person);
         }
         else
         {
@@ -365,7 +376,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             warnings.Add("Invalid National Insurance number");
         }
 
-        return (errors, warnings);
+        return (errors, warnings, person);
     }
 
     public async Task<TrnRequestMatchResult> GetPotentialMatchingPersonsAsync(CapitaImportRecord row)
@@ -451,7 +462,7 @@ public class CapitaImportRecord
         var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts?.Length > 0)
             return parts[0];
-        return null;
+        return string.Empty;
     }
 
     public string? GetMiddleName()
@@ -459,7 +470,7 @@ public class CapitaImportRecord
         var parts = FirstNameOrMiddleName?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts?.Length > 0)
             return string.Join(" ", parts, 1, parts.Length - 1);
-        return null;
+        return string.Empty;
     }
 
     public DateOnly? GetDateOfBirth()

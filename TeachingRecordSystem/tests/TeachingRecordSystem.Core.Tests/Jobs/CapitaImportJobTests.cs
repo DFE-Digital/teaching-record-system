@@ -706,6 +706,152 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                 });
     }
 
+    [Fact]
+    public async Task Import_WithoutMiddleName_ReturnsExpectedRecords()
+    {
+        // Arrange
+        var fileName = "SingleFile.txt";
+        var gender = Gender.Male;
+        var expectedTotalRowCount = 1;
+        var expectedSuccessCount = 1;
+        var expectedDuplicateRowCount = 0;
+        var expectedFailureRowCount = 0;
+        var expectedTrn = "9988776";
+        var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
+        var expectedDob = new DateOnly(1981, 08, 20);
+        var expectedGender = gender;
+        var expectedLastName = Faker.Name.Last();
+        var expectedFirstName = Faker.Name.First();
+        var expectedMiddleName = Faker.Name.Middle();
+        var expectedStatus = IntegrationTransactionImportStatus.Success;
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};{expectedFirstName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+        var expectedRow = $"{expectedTrn};" +
+                          $"{(int)gender};" +
+                          $"{expectedLastName};" +
+                          $"{expectedFirstName};" +
+                          $";" +
+                          $"{expectedDob.ToString("yyyyMMdd")};" +
+                          $"{expectedNI};" +
+                          $";" +
+                          $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync(reader, fileName);
+
+        // Assert
+        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
+        var person = dbContext.Persons.FirstOrDefault(x => x.Trn == expectedTrn);
+        Assert.NotNull(person);
+        Assert.Equal(expectedTrn, person.Trn);
+        Assert.Equal(expectedDob, person.DateOfBirth);
+        Assert.Equal(expectedGender, person.Gender);
+        Assert.Equal(expectedNI, person.NationalInsuranceNumber);
+        Assert.Equal(expectedFirstName, person.FirstName);
+        Assert.Empty(person.MiddleName);
+        Assert.Equal(expectedLastName, person.LastName);
+        Assert.True(person.CreatedByTps);
+
+        Assert.NotNull(integrationTransaction);
+        Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+        Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
+        Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+        Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
+        Assert.Equal(fileName, integrationTransaction.FileName);
+        Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
+        Assert.NotEmpty(integrationTransaction.IntegrationTransactionRecords);
+        Assert.Collection(integrationTransaction.IntegrationTransactionRecords!,
+                item1 =>
+                {
+                    Assert.NotNull(item1.PersonId);
+                    Assert.Equal(person.PersonId, item1.PersonId);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Null(item1.HasActiveAlert);
+                    Assert.False(item1.Duplicate);
+                    Assert.NotNull(item1.RowData);
+                    Assert.Equal(expectedRow, item1.RowData);
+                    Assert.NotNull(item1.FailureMessage);
+                    Assert.Empty(item1.FailureMessage);
+                });
+    }
+
+    [Fact]
+    public async Task Import_WithFirstAndMiddleNameCombined_ReturnsExpectedRecords()
+    {
+        // Arrange
+        var fileName = "SingleFile.txt";
+        var gender = Gender.Male;
+        var expectedTotalRowCount = 1;
+        var expectedSuccessCount = 1;
+        var expectedDuplicateRowCount = 0;
+        var expectedFailureRowCount = 0;
+        var expectedTrn = "9988776";
+        var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
+        var expectedDob = new DateOnly(1981, 08, 20);
+        var expectedGender = gender;
+        var expectedLastName = Faker.Name.Last();
+        var expectedFirstName = Faker.Name.First();
+        var expectedMiddleName = Faker.Name.Middle();
+        var expectedStatus = IntegrationTransactionImportStatus.Success;
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var csvContent = $"{expectedTrn};{(int)expectedGender};{expectedLastName};{expectedFirstName} {expectedMiddleName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+        var expectedRow = $"{expectedTrn};" +
+                          $"{(int)gender};" +
+                          $"{expectedLastName};" +
+                          $"{expectedFirstName} {expectedMiddleName};" +
+                          $";" +
+                          $"{expectedDob.ToString("yyyyMMdd")};" +
+                          $"{expectedNI};" +
+                          $";" +
+                          $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync(reader, fileName);
+
+        // Assert
+        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
+        var person = dbContext.Persons.FirstOrDefault(x => x.Trn == expectedTrn);
+        Assert.NotNull(person);
+        Assert.Equal(expectedTrn, person.Trn);
+        Assert.Equal(expectedDob, person.DateOfBirth);
+        Assert.Equal(expectedGender, person.Gender);
+        Assert.Equal(expectedNI, person.NationalInsuranceNumber);
+        Assert.Equal(expectedFirstName, person.FirstName);
+        Assert.Equal(expectedMiddleName, person.MiddleName);
+        Assert.Equal(expectedLastName, person.LastName);
+        Assert.True(person.CreatedByTps);
+
+        Assert.NotNull(integrationTransaction);
+        Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+        Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
+        Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+        Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
+        Assert.Equal(fileName, integrationTransaction.FileName);
+        Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
+        Assert.NotEmpty(integrationTransaction.IntegrationTransactionRecords);
+        Assert.Collection(integrationTransaction.IntegrationTransactionRecords!,
+                item1 =>
+                {
+                    Assert.NotNull(item1.PersonId);
+                    Assert.Equal(person.PersonId, item1.PersonId);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Null(item1.HasActiveAlert);
+                    Assert.False(item1.Duplicate);
+                    Assert.NotNull(item1.RowData);
+                    Assert.Equal(expectedRow, item1.RowData);
+                    Assert.NotNull(item1.FailureMessage);
+                    Assert.Empty(item1.FailureMessage);
+                });
+    }
+
     [Theory]
     [InlineData(Gender.Male)]
     [InlineData(Gender.Female)]
@@ -882,7 +1028,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     }
 
     [Fact]
-    public void Validate_MissingTrn_ReturnsValidationError()
+    public async Task Validate_MissingTrn_ReturnsValidationError()
     {
         // Arrange
         var record = new CapitaImportRecord()
@@ -898,7 +1044,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains("Missing required field: TRN", errors);
@@ -908,7 +1054,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     [InlineData("1")]
     [InlineData("111111111")]
     [InlineData("111111a")]
-    public void Validate_InvalidTrn_ReturnsValidationError(string trn)
+    public async Task Validate_InvalidTrn_ReturnsValidationError(string trn)
     {
         // Arrange
         var record = new CapitaImportRecord()
@@ -924,14 +1070,14 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains("Validation failed on field: TRN", errors);
     }
 
     [Fact]
-    public void Validate_MissingGender_ReturnsValidationError()
+    public async Task Validate_MissingGender_ReturnsValidationError()
     {
         // Arrange
         var record = new CapitaImportRecord()
@@ -947,7 +1093,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains("Missing required field: Date of birth", errors);
@@ -957,7 +1103,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     [InlineData(3)]
     [InlineData(0)]
     [InlineData(-13)]
-    public void Validate_InvalidGender_ReturnsValidationError(int gender)
+    public async Task Validate_InvalidGender_ReturnsValidationError(int gender)
     {
         // Arrange
         var record = new CapitaImportRecord()
@@ -973,7 +1119,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains($"Invalid Gender: {record.Gender.Value}", errors);
@@ -982,7 +1128,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     [Theory]
     [InlineData("08011972")] //invalid month
     [InlineData("19900231")] //invalid day
-    public void Validate_DateOfBirthIncorrectFormat_ReturnsValidationError(string dateOfBirth)
+    public async Task Validate_DateOfBirthIncorrectFormat_ReturnsValidationError(string dateOfBirth)
     {
         // Arrange
         var record = new CapitaImportRecord()
@@ -998,14 +1144,14 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains($"Validation Failed: Invalid Date of Birth", errors);
     }
 
     [Fact]
-    public void Validate_DateOfBirthMissing_ReturnsValidationError()
+    public async Task Validate_DateOfBirthMissing_ReturnsValidationError()
     {
         // Arrange
         var record = new CapitaImportRecord()
@@ -1021,14 +1167,40 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains("Missing required field: Date of birth", errors);
     }
 
     [Fact]
-    public void Validate_DateOfBirthInFuture_ReturnsValidationError()
+    public async Task Validate_CreateNewRecordWithoutFirstAndLastName_ReturnsValidationError()
+    {
+        // Arrange
+        var dateOfBirth = Clock.UtcNow.AddDays(25);
+        var person = await TestData.CreatePersonAsync();
+        var record = new CapitaImportRecord()
+        {
+            TRN = "1234567",
+            Gender = (int)Gender.Male,
+            LastName = null,
+            FirstNameOrMiddleName = null,
+            PreviousLastName = null,
+            DateOfBirth = dateOfBirth.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("yyyyMMdd"),
+            NINumber = null,
+            DateOfDeath = null
+        };
+
+        // Act
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
+
+        // Assert
+        Assert.Contains($"Unable to create a new record without a firstname", errors);
+        Assert.Contains($"Unable to create a new record without a lastname", errors);
+    }
+
+    [Fact]
+    public async Task Validate_DateOfBirthInFuture_ReturnsValidationError()
     {
         // Arrange
         var dateOfBirth = Clock.UtcNow.AddDays(25);
@@ -1045,14 +1217,14 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains($"Validation Failed: Date of Birth cannot be in the future", errors);
     }
 
     [Fact]
-    public void Validate_DateOfDeathInFuture_ReturnsValidationError()
+    public async Task Validate_DateOfDeathInFuture_ReturnsValidationError()
     {
         // Arrange
         var dateOfBirth = Clock.UtcNow.AddYears(-25);
@@ -1070,7 +1242,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains($"Validation Failed: Date of death cannot be in the future", errors);
@@ -1079,7 +1251,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     [Theory]
     [InlineData("01022025")] //invalid month
     [InlineData("19900931")] //invalid day
-    public void Validate_DateOfDeathInvalid_ReturnsValidationError(string dateOfDeath)
+    public async Task Validate_DateOfDeathInvalid_ReturnsValidationError(string dateOfDeath)
     {
         // Arrange
         var dateOfBirth = Clock.UtcNow.AddYears(-25);
@@ -1096,7 +1268,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         };
 
         // Act
-        var (errors, warnings) = Job.ValidateRow(record);
+        var (errors, warnings, _) = await Job.ValidateRowAsync(record);
 
         // Assert
         Assert.Contains($"Validation Failed: Invalid Date of death", errors);
