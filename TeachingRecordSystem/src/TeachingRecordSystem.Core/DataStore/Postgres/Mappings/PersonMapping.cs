@@ -33,5 +33,9 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.Property<string[]>("names").HasColumnType("varchar[]").UseCollation("case_insensitive");
         builder.Property<string[]>("last_names").HasColumnType("varchar[]").UseCollation("case_insensitive");
         builder.Property<string[]>("national_insurance_numbers").HasColumnType("varchar[]").UseCollation("case_insensitive");
+        builder.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers")
+            .HasMethod("GIN")
+            .UseCollation("case_insensitive")
+            .IsCreatedConcurrently();
     }
 }
