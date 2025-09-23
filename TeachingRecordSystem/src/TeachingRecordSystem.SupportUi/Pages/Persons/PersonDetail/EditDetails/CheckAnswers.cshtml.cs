@@ -124,7 +124,7 @@ public class CheckAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess(messageText: "Personal details have been updated successfully.");
+        TempData.SetFlashSuccess(heading: "Personal details have been updated");
 
         return Redirect(LinkGenerator.PersonDetail(PersonId));
     }

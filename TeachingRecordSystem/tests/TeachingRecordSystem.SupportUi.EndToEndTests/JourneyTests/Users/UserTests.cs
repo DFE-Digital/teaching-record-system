@@ -61,7 +61,7 @@ public class UserTests : TestBase
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name} has been changed to a record manager.");
+        await page.AssertFlashMessageAsync(expectedHeader: $"{user.Name} has been changed to a record manager");
     }
 
     [Test]

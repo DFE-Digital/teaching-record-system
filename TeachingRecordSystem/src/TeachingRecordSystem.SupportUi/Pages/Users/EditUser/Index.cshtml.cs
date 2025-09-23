@@ -92,7 +92,7 @@ public class IndexModel(
                 .ToLowerInvariantFirstLetter()
                 .WithIndefiniteArticle();
 
-            TempData.SetFlashSuccess(messageText: $"{Name} has been changed to {roleText}.");
+            TempData.SetFlashSuccess(heading: $"{Name} has been changed to {roleText}");
         }
         else
         {
