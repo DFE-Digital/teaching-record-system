@@ -128,6 +128,7 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_tps_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v2.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v3.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_employments_person_search_attributes_v2.sql" />
