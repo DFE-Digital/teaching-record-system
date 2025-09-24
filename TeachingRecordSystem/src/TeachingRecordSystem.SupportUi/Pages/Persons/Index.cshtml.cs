@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons;
@@ -43,45 +44,37 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         var sortBy = SortBy ??= PersonSearchSortByOption.LastNameAscending;
 
-        var query = dbContext.Persons.IgnoreQueryFilters();
+        IQueryable<Person> query;
 
         if (SearchTextIsDate(out var dateOfBirth))
         {
-            query = query.Where(p => p.DateOfBirth == dateOfBirth);
+            query = dbContext.Persons.Where(p => p.DateOfBirth == dateOfBirth);
         }
         else if (SearchTextIsTrn())
         {
-            query = query.Where(p => p.Trn == Search);
+            query = dbContext.Persons.Where(p => p.Trn == Search);
+        }
+        else if (!string.IsNullOrWhiteSpace(Search))
+        {
+            query = dbContext.Persons.FromSqlRaw(
+                    """
+                    SELECT * FROM persons
+                    WHERE fn_split_names(ARRAY[:names]::varchar[]) COLLATE "case_insensitive" <@ names
+                    """,
+                    parameters:
+                    [
+                        // ReSharper disable once FormatStringProblem
+                        new NpgsqlParameter("names", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = Search }
+                    ])
+                .IgnoreQueryFilters();
         }
         else
         {
-            var nameParts = Search.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-            if (nameParts.Length > 0)
-            {
-                query = dbContext.Database.SqlQueryRaw<NameSearchQueryResult>(
-                        """
-                        select a.person_id from (
-                            select unnest(:names) collate "case_insensitive" as name
-                        ) x, person_search_attributes a
-                        where a.attribute_value = x.name
-                        and a.attribute_type in ('FirstName', 'MiddleName', 'LastName')
-                        group by a.person_id
-                        having count(distinct x.name) = array_length(:names, 1)
-                        """,
-                        parameters:
-                        // ReSharper disable once FormatStringProblem
-                        [
-                            new NpgsqlParameter("names", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Varchar)
-                            {
-                                Value = nameParts
-                            }
-                        ])
-                    .Join(query, r => r.person_id, p => p.PersonId, (_, p) => p);
-            }
+            query = dbContext.Persons;
         }
 
         var groupedByStatus = await query
+            .IgnoreQueryFilters()
             .Select(p => p.Status)
             .GroupBy(p => p)
             .Select(g => new { Status = g.Key, Count = g.Count() })
