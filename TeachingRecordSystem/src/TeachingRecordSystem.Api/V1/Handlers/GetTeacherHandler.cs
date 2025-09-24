@@ -20,17 +20,15 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
         var birthDate = request.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value.ToString("yyyy-MM-dd");
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
-        var matched = await dbContext.Database.SqlQuery<PersonIdResult>(
+        var matched = await dbContext.Persons.FromSql(
                 $"""
-                SELECT person_id FROM person_search_attributes
-                WHERE (attribute_type = 'DateOfBirth' AND attribute_value = ({birthDate} COLLATE "case_insensitive"))
-                OR (attribute_type = 'Trn' AND attribute_value = ({request.Trn} COLLATE "case_insensitive"))
-                OR (attribute_type = 'NationalInsuranceNumber' AND attribute_value = ({nationalInsuranceNumber} COLLATE "case_insensitive"))
-                GROUP BY person_id
-                HAVING 'DateOfBirth' = ANY(array_agg(attribute_type)) AND
-                ARRAY['Trn', 'NationalInsuranceNumber']::varchar[] && array_agg(attribute_type)
+                SELECT * FROM persons
+                WHERE status = 0 AND trn IS NOT NULL AND
+                date_of_birth = {birthDate}::date AND (
+                    trn = {request.Trn} OR
+                    (national_insurance_numbers && array_remove(ARRAY[{nationalInsuranceNumber}]::varchar[], null) COLLATE "case_insensitive")
+                )
                 """)
-            .Join(dbContext.Persons, id => id.person_id, p => p.PersonId, (id, p) => p)
             .Select(p => new
             {
                 p.Trn,
