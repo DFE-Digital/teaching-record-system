@@ -4,6 +4,7 @@ using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -108,6 +109,7 @@ builder.Services
 
         options.Filters.Add(new AuthorizeFilter(policy));
         options.Filters.Add(new CheckUserExistsFilter());
+        options.Filters.Add(new ServiceFilterAttribute<RedirectWithPersonIdFilter> { Order = RedirectWithPersonIdFilter.Order });
         options.Filters.Add(new NoCachePageFilter());
         options.Filters.Add(new RequireActivePersonFilter());
 
@@ -151,6 +153,7 @@ builder.Services
     .AddTransient<TrsLinkGenerator>()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
+    .AddTransient<RedirectWithPersonIdFilter>()
     .AddTransient<CheckUserExistsFilter>()
     .AddTransient<RequireClosedAlertFilter>()
     .AddTransient<RequireOpenAlertFilter>()
