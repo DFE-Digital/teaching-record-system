@@ -61,96 +61,244 @@ We need to load this into TRS each month.
 
 - Connect to the TRS Postgres database and start a **psql** session:
   - Run `./db.sh`.
-- Get the **tps_csv_extract_id** values from the **tps_csv_extract** table associated with the import where *YYYYMMDD* is the year, month and day of the extract date.
+- Get details of the latest 2 imported file for a given extract from the **tps_csv_extract** table where *YYYYMMDD* is the year, month and day of the extract date.
   - Execute the query
     ```
     SELECT
-      *
+        *
     FROM
-      tps_csv_extracts
+        tps_csv_extracts
     WHERE
-      filename like '%YYYYMMDD%';
+        filename LIKE '%YYYYMMDD%'
+    ORDER BY
+        created_on DESC
+    LIMIT
+        2;
     ```
-- Get the counts of records with valid / invalid format fields from the initial import from the CSV files into the **tps_csv_extract_load_items** table:
+- Get the counts of records with valid / invalid format fields from the initial import from the CSV files into the **tps_csv_extract_load_items** table where *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
     ```
-    SELECT 
-      errors, 
-      count(1) 
-    FROM 
-      tps_csv_extract_load_items 
-    WHERE 
-      tps_csv_extract_id in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>');
-    GROUP BY 
-      errors;
+    WITH
+        latest_extracts AS (
+            SELECT
+                *
+            FROM
+                tps_csv_extracts
+            WHERE
+                filename LIKE '%YYYYMMDD%'
+            ORDER BY
+                created_on DESC
+            LIMIT
+                2
+        )
+    SELECT
+        errors,
+        COUNT(1)
+    FROM
+        tps_csv_extract_load_items x
+    WHERE
+        EXISTS (
+            SELECT
+                1
+            FROM
+                latest_extracts le
+            WHERE
+                le.tps_csv_extract_id = x.tps_csv_extract_id
+        )
+    GROUP BY
+        errors;
     ```
-- Drill into the detail of any records with errors (the errors field is an flag enum which can indicate multiple errors):
+- Drill into the detail of any records with errors (the `errors` field in the `tps_csv_extract_load_items` table is a flag enum which can contain details of multiple format errors for a given row in the import file) where *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query  
     ```
-    SELECT 
+    WITH
+      latest_extracts AS (
+          SELECT
+              *
+          FROM
+              tps_csv_extracts
+          WHERE
+              filename LIKE '%YYYYMMDD%'
+          ORDER BY
+              created_on DESC
+          LIMIT
+              2
+      )
+    SELECT
+        *
+    FROM
+        tps_csv_extract_load_items x
+    WHERE
+        EXISTS (
+            SELECT
+                1
+            FROM
+                latest_extracts le
+            WHERE
+                le.tps_csv_extract_id = x.tps_csv_extract_id
+        )
+        AND errors != 0;
+    ```  
+- Table of possible formatting errors where the `error_number` is the 0 based bit number representing the error in the `errors` flag
+
+| error_number  | `errors` value (if no other errors) | Field with format error     |
+|---------------|-------------------------------------|-----------------------------|
+| 0             | 1                                   | TRN                         |
+| 1             | 2                                   | National Insurance Number   |
+| 2             | 4                                   | Date Of Birth               |
+| 3             | 8                                   | Date Of Death               |
+| 4             | 16                                  | Member Postcode             |
+| 5             | 32                                  | Member Email Address        |
+| 6             | 64                                  | Local Authority Code        |
+| 7             | 128                                 | Establishment Number        |
+| 8             | 256                                 | Establishment Postcode      |
+| 9             | 512                                 | Member Id                   |
+| 10            | 1024                                | Employment Start Date       |
+| 11            | 2048                                | Employment End Date         |
+| 12            | 4096                                | Full Or Part Time Indicator |
+| 13            | 8192                                | Withdrawl Indicator         |
+| 14            | 16384                               | Extract Date                |
+| 15            | 32768                               | Gender                      |
+| 15            | 65536                               | Establishment Email Address |
+
+- Drill into the detail of any records with specific formatting errors and *YYYYMMDD* is the year, month and day of the extract date:
+  - Execute the query
+  ```
+  WITH
+    latest_extracts AS (
+        SELECT
+            *
+        FROM
+            tps_csv_extracts
+        WHERE
+            filename LIKE '%YYYYMMDD%'
+        ORDER BY
+            created_on DESC
+        LIMIT
+            2
+    )
+  SELECT 
       *
-    FROM 
-      tps_csv_extract_load_items 
-    WHERE 
-      tps_csv_extract_id in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>')
-      AND errors != 0;
-    ```
-  - Make a note of the specific errors in order to feedback to TPS.
-- Get the counts of valid / invalid records after trying to match to a TRN and Establishment and create or update a `person_employments` record:
+  FROM
+      tps_csv_extract_load_items x
+  WHERE
+      EXISTS (
+          SELECT
+              1
+          FROM
+              latest_extracts le
+          WHERE
+              le.tps_csv_extract_id = x.tps_csv_extract_id
+      )
+      AND (errors >> error_number) & 1 = 1;
+  ```
+  - Make a note of any fields with incorrect formats in order to feedback to TPS.
+  - The most common fields which may have formatting issues are the `National Insurance Number`, `Member Email Address` and `Establishment Email Address`.
+  
+- Get the counts of valid / invalid records after trying to match to a TRN and Establishment and create or update a `person_employments` record where *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
     ```
+    WITH
+        latest_extracts AS (
+            SELECT
+                *
+            FROM
+                tps_csv_extracts
+            WHERE
+                filename LIKE '%YYYYMMDD%'
+            ORDER BY
+                created_on DESC
+            LIMIT
+                2
+        )
     SELECT
-      result,
-      CASE 
-        WHEN result = 1 THEN 'person_employments record added'
-        WHEN result = 2 THEN 'person_employments record updated'
-        WHEN result = 3 THEN 'no persons record found in TRS with the given TRN'
-        WHEN result = 4 THEN 'no establishments record found in TRS with the given Local Authority Code and Establishment Number'
-      END as description,
-      COUNT(1) 
-    FROM 
-      tps_csv_extract_items 
-    WHERE 
-      tps_csv_extract_id in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>')
-    GROUP BY 
-      result;
+        result,
+        CASE
+            WHEN result = 1 THEN 'person_employments record added'
+            WHEN result = 2 THEN 'person_employments record updated'
+            WHEN result = 3 THEN 'no persons record found in TRS with the given TRN'
+            WHEN result = 4 THEN 'no establishments record found in TRS with the given Local Authority Code and Establishment Number'
+        END AS description,
+        COUNT(1)
+    FROM
+        tps_csv_extract_items x
+    WHERE
+        EXISTS(
+            SELECT
+                1
+            FROM
+                latest_extracts le
+            WHERE
+                le.tps_csv_extract_id = x.tps_csv_extract_id
+        )
+    GROUP BY
+        result;
     ```
-- Drill into records where no `persons` record could be found which match the TRN provided:
+- Drill into records where no `persons` record could be found which match the TRN provided where *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
     ```
-    SELECT
-      trn
-    FROM 
-      tps_csv_extract_items x1
-    WHERE 
-      tps_csv_extract_id in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>')
-      AND result = 3
-      AND NOT EXISTS (SELECT
-                        1
-                      FROM
-                        tps_csv_extract_items x2
-                      WHERE
-                        x2.trn = x1.trn
-                        AND x2.tps_csv_extract_id not in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>'))
+    WITH
+        latest_extracts AS (
+            SELECT
+                *
+            FROM
+                tps_csv_extracts
+            WHERE
+                filename LIKE '%YYYYMMDD%'
+            ORDER BY
+                created_on DESC
+            LIMIT
+                2
+        )
+    SELECT DISTINCT
+        trn
+    FROM
+        tps_csv_extract_items x
+    WHERE
+        EXISTS (
+            SELECT
+                1
+            FROM
+                latest_extracts le
+            WHERE
+                le.tps_csv_extract_id = x.tps_csv_extract_id
+        )
+        AND result = 3
     ORDER BY
-      trn;  
+        trn;
     ```  
   - Make a note of the TRNs in order to feedback to TPS.
-- Drill into records where no `establishments` record could be found which match the Local Authority Code and Establishment Number provided:
+- Drill into records where no `establishments` record could be found which match the Local Authority Code and Establishment Number provided where *YYYYMMDD* is the year, month and day of the extract date:
   - Execute the query
     ```
-    SELECT
-      local_authority_code,
-      establishment_number, 
-      COUNT(1)
-    FROM 
-      tps_csv_extract_items 
-    WHERE 
-      tps_csv_extract_id in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>')
-      AND result = 4
-    GROUP BY
-      local_authority_code,
-      establishment_number;  
+    WITH
+        latest_extracts AS (
+            SELECT
+                *
+            FROM
+                tps_csv_extracts
+            WHERE
+                filename LIKE '%YYYYMMDD%'
+            ORDER BY
+                created_on DESC
+            LIMIT
+                2
+        )
+    SELECT DISTINCT
+        local_authority_code,
+        establishment_number
+    FROM
+        tps_csv_extract_items x
+    WHERE
+        EXISTS (
+            SELECT
+                1
+            FROM
+                latest_extracts le
+            WHERE
+                le.tps_csv_extract_id = x.tps_csv_extract_id
+        )
+        AND result = 4;
     ```
   - Make a note of the LA Code / Establishment Numbers in order to feedback to TPS.
 - If there are any issues with the data in the extract:
