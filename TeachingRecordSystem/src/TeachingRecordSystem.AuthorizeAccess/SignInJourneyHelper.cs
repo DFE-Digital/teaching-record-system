@@ -313,13 +313,6 @@ public class SignInJourneyHelper(
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
-            // It's possible we match on a record that doesn't have a TRN; we don't want to proceed in that case;
-            // downstream consumers can't do anything without a TRN
-            if (matchedTrn is null)
-            {
-                return false;
-            }
-
             var subject = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
             var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == subject);
