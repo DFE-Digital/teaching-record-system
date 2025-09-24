@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Npgsql;
+using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -43,11 +44,11 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     new NpgsqlParameter("first_names", firstNames),
                     new NpgsqlParameter("last_names", lastNames),
                     new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
-                    new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    new NpgsqlParameter("ni_number", NpgsqlDbType.Varchar)
                     {
                         Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
                     },
-                    new NpgsqlParameter("trn", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    new NpgsqlParameter("trn", NpgsqlDbType.Varchar)
                     {
                         Value = trn is not null ? trn : DBNull.Value
                     }
@@ -105,7 +106,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     new NpgsqlParameter("last_names", lastNames),
                     new NpgsqlParameter("first_names", firstNames),
                     new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
-                    new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    new NpgsqlParameter("ni_number", NpgsqlDbType.Varchar)
                     {
                         Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
                     },
@@ -171,7 +172,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     new NpgsqlParameter("last_names", lastNames),
                     new NpgsqlParameter("first_names", firstNames),
                     new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
-                    new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    new NpgsqlParameter("ni_number", NpgsqlDbType.Varchar)
                     {
                         Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
                     },
@@ -193,11 +194,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         return results switch
         {
 #pragma warning disable format
-            [var singleMatch]
-                when singleMatch.matched_attr_keys
-                    .Select(Enum.Parse<PersonMatchedAttribute>)
-                    .ToHashSet()
-                    .IsSupersetOf([PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber]) =>
+            [{ date_of_birth_matches: true, national_insurance_number_matches: true } singleMatch] =>
                 TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
 #pragma warning restore format
             [] => TrnRequestMatchResult.NoMatches(),
@@ -212,13 +209,12 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         return results
             .Select(r =>
             {
-                var score = r.matched_attr_keys.Sum(
-                    m => m switch
-                    {
-                        "NationalInsuranceNumber" => 10,
-                        "EmailAddress" => 5,
-                        _ => 1
-                    });
+                var score = (r.date_of_birth_matches ? 1 : 0) +
+                    (r.first_name_matches ? 1 : 0) +
+                    (r.middle_name_matches ? 1 : 0) +
+                    (r.last_name_matches ? 1 : 0) +
+                    (r.email_address_matches ? 5 : 0) +
+                    (r.national_insurance_number_matches ? 10 : 0);
 
                 return (Result: r, Score: score);
             })
@@ -237,63 +233,71 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .AsReadOnly();
     }
 
-    private Task<SuggestionsQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
+    private async Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request)
     {
         // Find all Active records with a TRN that match on:
-        // - at least three of first name, middle name, last name, DOB, email address, NINO *OR*
+        // - at least three of first name, middle name, last name, DOB *OR*
         // - NINO *OR*
         // - email address.
 
-        var names = new[] { request.FirstName, request.PreviousFirstName, request.MiddleName, request.LastName, request.PreviousLastName }
-            .ExceptEmpty()
-            .SelectMany(PersonSearchAttribute.SplitName);
+        var firstNames = new[] { request.FirstName, request.PreviousFirstName };
+        var middleNames = new[] { request.MiddleName, request.PreviousMiddleName };
+        var lastNames = new[] { request.LastName, request.PreviousLastName };
 
         var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
-        return dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
+        return await dbContext.Database.SqlQueryRaw<TrnRequestMatchQueryResult>(
                 """
-                WITH matches AS (
+                WITH vars AS (
                     SELECT
-                        a.person_id,
-                        array_agg(DISTINCT a.attribute_type) matched_attr_keys,
-                        json_agg(json_build_object('attribute_type', a.attribute_type, 'attribute_value', a.attribute_value)) matched_attrs
-                    FROM person_search_attributes a
-                    WHERE
-                        (a.attribute_type IN ('FirstName', 'MiddleName', 'LastName') AND a.attribute_value = ANY((:names COLLATE "case_insensitive")))
-                        OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY((:dates_of_birth COLLATE "case_insensitive")))
-                        OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = ANY((:ni_numbers COLLATE "case_insensitive")))
-                        OR (a.attribute_type = 'EmailAddress' AND a.attribute_value = ANY((:email_addresses COLLATE "case_insensitive")))
-                    GROUP BY a.person_id
+                        (fn_split_names(:first_names, include_synonyms => true) collate "case_insensitive") first_names,
+                        (fn_split_names(:middle_names, include_synonyms => true) collate "case_insensitive") middle_names,
+                        (fn_split_names(:last_names, include_synonyms => false) collate "case_insensitive") last_names,
+                        :date_of_birth date_of_birth,
+                        (:email_address COLLATE "case_insensitive") email_address,
+                        array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers
                 )
                 SELECT
-                    m.matched_attr_keys,
                     p.person_id,
                     p.trn,
-                    p.email_address,
                     p.first_name,
                     p.middle_name,
                     p.last_name,
                     p.date_of_birth,
-                    p.national_insurance_number
-                FROM matches m
-                JOIN persons p ON m.person_id = p.person_id
-                WHERE (
-                    ARRAY['NationalInsuranceNumber', 'EmailAddress']::varchar[] && m.matched_attr_keys
-                    OR array_length(m.matched_attr_keys, 1) >= 3)
-                AND p.status = 0 AND p.trn IS NOT NULL
+                    p.email_address,
+                    p.national_insurance_number,
+                    CASE WHEN p.names && vars.first_names THEN true ELSE false END first_name_matches,
+                    CASE WHEN p.names && vars.middle_names THEN true ELSE false END middle_name_matches,
+                    CASE WHEN p.names && vars.last_names THEN true ELSE false END last_name_matches,
+                    CASE WHEN p.date_of_birth = vars.date_of_birth THEN true ELSE false END date_of_birth_matches,
+                    CASE WHEN vars.email_address IS NOT NULL AND p.email_address = vars.email_address THEN true ELSE false END email_address_matches,
+                    array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers national_insurance_number_matches
+                FROM persons p, vars
+                WHERE
+                    p.status = 0 and p.trn IS NOT NULL AND (
+                        (p.names && vars.first_names AND p.names && vars.middle_names AND p.names && vars.last_names) OR
+                        (p.names && vars.first_names AND p.names && vars.middle_names AND p.date_of_birth = vars.date_of_birth) OR
+                        (p.names && vars.middle_names AND p.names && vars.last_names AND p.date_of_birth = vars.date_of_birth) OR
+                        (p.names && vars.first_names AND p.names && vars.last_names AND p.date_of_birth = vars.date_of_birth) OR
+                        (vars.email_address IS NOT NULL AND p.email_address = vars.email_address) OR
+                        (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers)
+                    )
                 """,
                 parameters:
-                // ReSharper disable once FormatStringProblem
+                // ReSharper disable FormatStringProblem
                 [
-                    CreateArrayParameter("names", names),
-                    CreateArrayParameter("dates_of_birth", request.DateOfBirth.ToSingleItemCollectionIfNotEmpty().Select(d => d.ToString("yyyy-MM-dd"))),
-                    CreateArrayParameter("ni_numbers", nationalInsuranceNumber.ToSingleItemCollectionIfNotEmpty()),
-                    CreateArrayParameter("email_addresses", request.EmailAddress.ToSingleItemCollectionIfNotEmpty())
+                    CreateArrayParameter("first_names", firstNames),
+                    CreateArrayParameter("middle_names", middleNames),
+                    CreateArrayParameter("last_names", lastNames),
+                    new NpgsqlParameter("date_of_birth", NpgsqlDbType.Date) { Value = (object?)request.DateOfBirth ?? DBNull.Value },
+                    new NpgsqlParameter("national_insurance_number", NpgsqlDbType.Varchar) { Value = (object?)nationalInsuranceNumber ?? DBNull.Value },
+                    new NpgsqlParameter("email_address", NpgsqlDbType.Varchar) { Value = (object?)request.EmailAddress ?? DBNull.Value }
                 ]
+                // ReSharper restore FormatStringProblem
             ).ToArrayAsync();
 
-        static NpgsqlParameter CreateArrayParameter(string name, IEnumerable<string> values) =>
-            new(name, NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Varchar) { Value = values.ToArray() };
+        static NpgsqlParameter CreateArrayParameter(string name, IEnumerable<string?> values) =>
+            new(name, NpgsqlDbType.Array | NpgsqlDbType.Varchar) { Value = values.ToArray() };
     }
 
     private static IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>> MapMatchedAttrs(JsonDocument doc) =>
@@ -327,7 +331,18 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
     private record TrnRequestMatchQueryResult(
         Guid person_id,
         string trn,
-        string[] matched_attr_keys);
+        string first_name,
+        string? middle_name,
+        string last_name,
+        DateOnly? date_of_birth,
+        string? email_address,
+        string? national_insurance_number,
+        bool first_name_matches,
+        bool middle_name_matches,
+        bool last_name_matches,
+        bool date_of_birth_matches,
+        bool email_address_matches,
+        bool national_insurance_number_matches);
 #pragma warning restore IDE1006 // Naming Styles
 }
 
