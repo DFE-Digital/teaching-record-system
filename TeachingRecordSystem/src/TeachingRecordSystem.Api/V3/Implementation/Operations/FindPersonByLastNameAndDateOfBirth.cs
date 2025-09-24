@@ -15,16 +15,16 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
     {
         var matchedPersons = await DbContext.Database.SqlQueryRaw<Result>(
                 """
-                SELECT person_id FROM person_search_attributes
-                WHERE (attribute_type = 'LastName' AND attribute_value = ANY(:last_names COLLATE "case_insensitive")) OR
-                      (attribute_type = 'DateOfBirth' AND attribute_value = (:date_of_birth COLLATE "case_insensitive"))
-                GROUP BY person_id
-                HAVING COUNT(DISTINCT attribute_type) = 2
+                SELECT person_id FROM persons
+                WHERE last_names && fn_split_names(ARRAY[:last_names]::varchar[]) COLLATE "case_insensitive" AND
+                date_of_birth = :date_of_birth
                 """,
+                // ReSharper disable FormatStringProblem
                 parameters: [
-                    new NpgsqlParameter("last_names", PostgresModels.PersonSearchAttribute.SplitName(command.LastName)),
-                    new NpgsqlParameter("date_of_birth", command.DateOfBirth.ToString("yyyy-MM-dd"))
+                    new NpgsqlParameter("last_names", command.LastName),
+                    new NpgsqlParameter("date_of_birth", command.DateOfBirth)
                 ]
+                // ReSharper restore FormatStringProblem
             ).ToArrayAsync();
 
         return await CreateResultAsync(matchedPersons.Select(r => r.person_id).Distinct().AsReadOnly());
