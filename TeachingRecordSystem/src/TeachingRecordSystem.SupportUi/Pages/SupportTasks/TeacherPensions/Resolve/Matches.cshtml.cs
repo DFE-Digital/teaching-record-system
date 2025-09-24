@@ -89,7 +89,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
             return;
         }
 
-        var matchedPersonIds = RequestData.Matches.MatchedPersons.Select(m => m.PersonId).ToArray();
+        var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
 
         PotentialDuplicates = (await DbContext.Persons
             .Where(p => matchedPersonIds.Contains(p.PersonId))

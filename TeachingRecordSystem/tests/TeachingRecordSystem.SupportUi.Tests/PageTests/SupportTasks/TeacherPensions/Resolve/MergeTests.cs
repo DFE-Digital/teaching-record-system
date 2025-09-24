@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
 
@@ -12,7 +13,26 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var taskReference = "1234567";
-        var journeyInstance = await CreateJourneyInstance(taskReference);
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Female));
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber(Faker.Identification.UkNationalInsuranceNumber()!).WithGender(Gender.Male));
+        var user = await TestData.CreateUserAsync();
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            user.UserId,
+            s =>
+            {
+                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithLastName(person.LastName);
+                s.WithFirstName(person.FirstName);
+                s.WithMiddleName(person.MiddleName);
+                s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
+                s.WithGender(person.Gender);
+                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithSupportTaskData("fileName.csv", 1);
+                s.WithCreatedOn(Clock.UtcNow);
+                s.WithStatus(SupportTaskStatus.Open);
+            });
+        var journeyInstance = await CreateJourneyInstance(supportTask, null);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -48,7 +68,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.PersonId = duplicatePerson1.PersonId;
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
 
@@ -139,7 +159,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.PersonId = duplicatePerson1.PersonId;
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -181,7 +201,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.PersonId = duplicatePerson1.PersonId;
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -220,7 +240,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.PersonId = duplicatePerson1.PersonId;
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -264,7 +284,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.PersonId = duplicatePerson1.PersonId;
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -326,7 +346,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState();
+        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
         state.PersonId = duplicatePerson1.PersonId;
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -411,13 +431,21 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         return builder;
     }
 
+    private async Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(SupportTask supportTask, Guid? personId)
+    {
+        var state = await CreateJourneyStateWithFactory<ResolveTeacherPensionsPotentialDuplicateStateFactory, ResolveTeacherPensionsPotentialDuplicateState>(
+            factory => factory.CreateAsync(supportTask));
+        state.PersonId = personId;
+
+        return await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+    }
+
     private Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(
             string supportTaskReference,
-            ResolveTeacherPensionsPotentialDuplicateState? state = null) =>
-                CreateJourneyInstance(
-                    JourneyNames.ResolveTpsPotentialDuplicate,
-                    state ?? new(),
-                    new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
-
+            ResolveTeacherPensionsPotentialDuplicateState state) =>
+        CreateJourneyInstance(
+            JourneyNames.ResolveTpsPotentialDuplicate,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 
 }
