@@ -28,6 +28,11 @@ public partial class PersonMatchingServiceTests
                     Name = firstName,
                     Synonyms = [alias]
                 });
+                dbContext.NameSynonyms.Add(new NameSynonyms()
+                {
+                    Name = alias,
+                    Synonyms = [firstName]
+                });
                 await dbContext.SaveChangesAsync();
             }
 

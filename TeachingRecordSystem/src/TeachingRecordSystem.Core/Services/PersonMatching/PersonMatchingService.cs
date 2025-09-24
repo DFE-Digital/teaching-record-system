@@ -18,47 +18,65 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
         var results = await dbContext.Database.SqlQueryRaw<OneLoginUserMatchQueryResult>(
                 """
-                WITH matches AS (
-                	SELECT
-                        a.person_id,
-                        array_agg(a.attribute_type) matched_attr_keys,
-                        json_agg(json_build_object('attribute_type', a.attribute_type, 'attribute_value', a.attribute_value)) matched_attrs
-                    FROM person_search_attributes a
-                	WHERE (a.attribute_type = 'FirstName' AND a.attribute_value = ANY(:first_names))
-                	OR (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
-                	OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
-                	OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
-                	OR (a.attribute_type = 'Trn' AND a.attribute_value = :trn)
-                	GROUP BY a.person_id
+                WITH vars AS (
+                    SELECT
+                        (fn_split_names(:first_names, include_synonyms => true) collate "case_insensitive") first_names,
+                        (fn_split_names(:last_names, include_synonyms => false) collate "case_insensitive") last_names,
+                        :dobs dates_of_birth,
+                        array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers,
+                        :trn trn
                 )
-                SELECT p.person_id, p.trn, m.matched_attrs
-                FROM matches m
-                JOIN persons p ON m.person_id = p.person_id
-                WHERE ARRAY['DateOfBirth', 'FirstName', 'LastName']::varchar[] <@ m.matched_attr_keys
-                AND ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attr_keys
-                AND p.status = 0
+                SELECT
+                    p.person_id,
+                    p.trn,
+                    p.first_name,
+                    p.last_name,
+                    p.date_of_birth,
+                    :national_insurance_number national_insurance_number,
+                    CASE WHEN p.trn = vars.trn THEN true ELSE false END trn_matches,
+                    CASE WHEN p.names && vars.first_names THEN true ELSE false END first_name_matches,
+                    CASE WHEN p.names && vars.last_names THEN true ELSE false END last_name_matches,
+                    CASE WHEN p.date_of_birth = ANY(vars.dates_of_birth) THEN true ELSE false END date_of_birth_matches,
+                    array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers national_insurance_number_matches
+                FROM persons p, vars
+                WHERE p.status = 0 AND p.trn IS NOT NULL AND (
+                    p.names && vars.first_names AND
+                    p.names && vars.last_names AND
+                    p.date_of_birth = ANY(vars.dates_of_birth) AND (
+                        (array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers) OR
+                        (vars.trn IS NOT NULL AND p.trn = vars.trn)
+                    )
+                )
                 """,
                 parameters:
-                // ReSharper disable once FormatStringProblem
+                // ReSharper disable FormatStringProblem
                 [
                     new NpgsqlParameter("first_names", firstNames),
                     new NpgsqlParameter("last_names", lastNames),
-                    new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
-                    new NpgsqlParameter("ni_number", NpgsqlDbType.Varchar)
-                    {
-                        Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
-                    },
-                    new NpgsqlParameter("trn", NpgsqlDbType.Varchar)
-                    {
-                        Value = trn is not null ? trn : DBNull.Value
-                    }
+                    new NpgsqlParameter("dobs", request.DatesOfBirth.ToArray()),
+                    new NpgsqlParameter("national_insurance_number", NpgsqlDbType.Varchar) { Value = (object?)nationalInsuranceNumber ?? DBNull.Value },
+                    new NpgsqlParameter("trn", NpgsqlDbType.Varchar) { Value = (object?)trn ?? DBNull.Value }
                 ]
+                // ReSharper disable FormatStringProblem
             ).ToArrayAsync();
 
         return results switch
         {
 #pragma warning disable format
-            [OneLoginUserMatchQueryResult r] => new OneLoginUserMatchResult(r.person_id, r.trn, MapMatchedAttrs(r.matched_attrs)),
+            [OneLoginUserMatchQueryResult r] => new OneLoginUserMatchResult(
+                r.person_id,
+                r.trn,
+                new (bool Matches, string? Value, PersonMatchedAttribute Attribute)[]
+                {
+                    (r.trn_matches, r.trn, PersonMatchedAttribute.Trn),
+                    (r.first_name_matches, r.first_name, PersonMatchedAttribute.FirstName),
+                    (r.last_name_matches, r.last_name, PersonMatchedAttribute.LastName),
+                    (r.date_of_birth_matches, r.date_of_birth.ToString("yyyy-MM-dd"), PersonMatchedAttribute.DateOfBirth),
+                    (r.national_insurance_number_matches, r.national_insurance_number, PersonMatchedAttribute.NationalInsuranceNumber)
+                }
+                .Where(t => t.Matches)
+                .Select(t => KeyValuePair.Create(t.Attribute, t.Value!))
+                .AsReadOnly()),
 #pragma warning restore format
             _ => null
         };
@@ -101,6 +119,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 OR ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attr_keys))
                 AND p.status = 0
                 """,
+                // ReSharper disable FormatStringProblem
                 parameters:
                 [
                     new NpgsqlParameter("last_names", lastNames),
@@ -112,6 +131,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     },
                     new NpgsqlParameter("trns", trns)
                 ]
+                // ReSharper restore FormatStringProblem
             ).ToArrayAsync();
 
         return results
@@ -166,7 +186,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 AND a.person_id = :person_id
                 """,
                 parameters:
-                // ReSharper disable once FormatStringProblem
+                // ReSharper disable FormatStringProblem
                 [
                     new NpgsqlParameter("person_id", personId),
                     new NpgsqlParameter("last_names", lastNames),
@@ -178,6 +198,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     },
                     new NpgsqlParameter("trns", trns)
                 ]
+                // ReSharper restore FormatStringProblem
             ).ToArrayAsync();
 
         return results
@@ -311,7 +332,18 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
 
 #pragma warning disable IDE1006 // Naming Styles
-    private record OneLoginUserMatchQueryResult(Guid person_id, string trn, JsonDocument matched_attrs);
+    private record OneLoginUserMatchQueryResult(
+        Guid person_id,
+        string trn,
+        string first_name,
+        string last_name,
+        DateOnly date_of_birth,
+        string? national_insurance_number,
+        bool trn_matches,
+        bool first_name_matches,
+        bool last_name_matches,
+        bool date_of_birth_matches,
+        bool national_insurance_number_matches);
 
     private record MatchedAttribute(string attribute_type, string attribute_value);
 
