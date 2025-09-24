@@ -82,13 +82,6 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
             Trn = person.Trn!;
         }
 
-        if (RequestData.PotentialDuplicate != true ||
-            RequestData.Matches is not { MatchedPersons.Count: >= 1 })
-        {
-            context.Result = BadRequest();
-            return;
-        }
-
         var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
 
         PotentialDuplicates = (await DbContext.Persons
