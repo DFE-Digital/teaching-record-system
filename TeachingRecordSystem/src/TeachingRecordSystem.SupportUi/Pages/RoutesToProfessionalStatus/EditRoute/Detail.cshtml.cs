@@ -24,6 +24,8 @@ public class DetailModel(
     [FromQuery]
     public bool FromInductions { get; set; }
 
+    public string PageCaption => $"Edit route - {PersonName}";
+
     public async Task OnGetAsync()
     {
         RouteDetail.IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
