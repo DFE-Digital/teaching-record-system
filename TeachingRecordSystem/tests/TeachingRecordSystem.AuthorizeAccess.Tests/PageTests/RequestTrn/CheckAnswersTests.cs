@@ -749,7 +749,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         Assert.Single(events);
         var @event = events.Single();
 
-        var supportTaskCreatedEvent = JsonSerializer.Deserialize<SupportTaskCreatedEvent>(@event.Payload);
+        var supportTaskCreatedEvent = JsonSerializer.Deserialize<SupportTaskCreatedEvent>(@event.Payload, EventBase.JsonSerializerOptions);
         Assert.Equal(supportTask!.SupportTaskReference, supportTaskCreatedEvent!.SupportTask.SupportTaskReference);
 
         var data = supportTaskCreatedEvent.SupportTask.Data as NpqTrnRequestData;

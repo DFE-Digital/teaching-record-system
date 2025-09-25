@@ -10,6 +10,7 @@ public abstract record EventBase
 {
     public static JsonSerializerOptions JsonSerializerOptions { get; } = new()
     {
+        AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order
         TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         {
             Modifiers =
@@ -29,7 +30,8 @@ public abstract record EventBase
                         propertyInfo.IsRequired = false;
                     }
                 },
-                Modifiers.OptionProperties
+                Modifiers.OptionProperties,
+                Modifiers.SupportTaskData
             }
         }
     };

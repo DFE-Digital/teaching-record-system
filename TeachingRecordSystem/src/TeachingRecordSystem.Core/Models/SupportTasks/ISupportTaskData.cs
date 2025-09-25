@@ -1,38 +1,14 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using TeachingRecordSystem.Core.Infrastructure.Json;
 
 namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
 public interface ISupportTaskData
 {
-    public static JsonSerializerOptions SerializerOptions => new()
+    static JsonSerializerOptions SerializerOptions => new()
     {
-        TypeInfoResolver = new SupportTaskDataTypeResolver()
+        AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.SupportTaskData } }
     };
-
-    private class SupportTaskDataTypeResolver : DefaultJsonTypeInfoResolver
-    {
-        public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
-        {
-            var jsonTypeInfo = base.GetTypeInfo(type, options);
-
-            if (type == typeof(ISupportTaskData))
-            {
-                jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions()
-                {
-                    TypeDiscriminatorPropertyName = "$support-task-type",
-                    UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
-                };
-
-                foreach (var supportTaskType in SupportTaskTypeRegistry.GetAll())
-                {
-                    jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(
-                        new JsonDerivedType(supportTaskType.DataType, (int)supportTaskType.SupportTaskType));
-                }
-            }
-
-            return jsonTypeInfo;
-        }
-    }
 }

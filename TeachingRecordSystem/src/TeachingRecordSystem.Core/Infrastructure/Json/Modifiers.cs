@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Optional;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Infrastructure.Json;
 
@@ -44,6 +45,26 @@ public static class Modifiers
                     "HasValue"),
                 parentParameter,
                 propertyParameter).Compile();
+        }
+    }
+
+    public static void SupportTaskData(JsonTypeInfo typeInfo)
+    {
+        if (typeInfo.Type != typeof(ISupportTaskData))
+        {
+            return;
+        }
+
+        typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+        {
+            TypeDiscriminatorPropertyName = "$support-task-type",
+            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
+        };
+
+        foreach (var supportTaskType in SupportTaskTypeRegistry.GetAll())
+        {
+            typeInfo.PolymorphismOptions.DerivedTypes.Add(
+                new JsonDerivedType(supportTaskType.DataType, (int)supportTaskType.SupportTaskType));
         }
     }
 }
