@@ -30,7 +30,7 @@ public static class SupportTaskCategoryRegistry
         SupportTaskTypeRegistry.GetCategory(supportTaskType);
 
     public static IReadOnlyCollection<SupportTaskType> GetSupportTaskTypesByCategory(SupportTaskCategory supportTaskCategory) =>
-        SupportTaskTypeRegistry.GetAll().Where(v => v.SupportTaskCategory == supportTaskCategory).Select(i => i.SupportTaskType).AsReadOnly();
+        SupportTaskTypeRegistry.All.Where(v => v.SupportTaskCategory == supportTaskCategory).Select(i => i.SupportTaskType).AsReadOnly();
 
     private static SupportTaskCategoryInfo GetInfo(SupportTaskCategory supportTaskCategory)
     {

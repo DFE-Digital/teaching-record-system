@@ -23,14 +23,14 @@ public class StatusModel(
     public InductionStatus InductionStatus { get; set; }
     public InductionStatus CurrentInductionStatus { get; set; }
 
-    public IEnumerable<InductionStatusInfo> StatusChoices
+    public IEnumerable<InductionStatusDescription> StatusChoices
     {
         get
         {
             return _inductionStatusManagedByCpd && (CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ?
                 InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
-                    .Append(InductionStatusRegistry.All.Single(i => i.Value == CurrentInductionStatus))
-                    .OrderBy(i => i.Value)
+                    .Append(InductionStatusRegistry.All.Single(i => i.InductionStatus == CurrentInductionStatus))
+                    .OrderBy(i => i.InductionStatus)
                     .ToArray()
                 : InductionStatusRegistry.All.ToArray()[1..];
         }
