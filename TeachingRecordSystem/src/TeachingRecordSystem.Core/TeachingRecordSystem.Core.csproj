@@ -264,6 +264,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0084_MqDqtSpecialismValue.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0085_PersonAttrs.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0086_SupportTaskTypes.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0086_SupportTaskTypesMetaColumns.sql" />
   </ItemGroup>
 
   <ItemGroup>
