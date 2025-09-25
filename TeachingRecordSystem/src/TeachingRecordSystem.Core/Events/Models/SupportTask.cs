@@ -11,7 +11,6 @@ public record SupportTask
 
     public required string SupportTaskReference { get; init; }
     public required SupportTaskType SupportTaskType { get; init; }
-    public Guid SupportTaskTypeId { get; init; }
     public required SupportTaskStatus Status { get; init; }
     public required string? OneLoginUserSubject { get; init; }
     public required Guid? PersonId { get; init; }
@@ -27,7 +26,6 @@ public record SupportTask
     {
         SupportTaskReference = model.SupportTaskReference,
         SupportTaskType = model.SupportTaskType,
-        SupportTaskTypeId = model.SupportTaskType.GetSupportTaskTypeId(),
         Status = model.Status,
         OneLoginUserSubject = model.OneLoginUserSubject,
         PersonId = model.PersonId,
