@@ -17,7 +17,7 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
 {
-    public const string JobSchedule = "0 0 31 2 *";
+    public const string JobSchedule = "0 4 * * *";
     public const string StorageContainer = "dqt-integrations";
     public const string PICKUP_FOLDER = "capita/pickup";
     private const string ProcessedFolder = "capita/processed";
