@@ -105,13 +105,15 @@ public class CheckAnswersModel(
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"{SourceApplicationUserName} request completed",
+            $"{SourceApplicationUserName} request completed for {StringHelper.JoinNonEmpty(' ', new[] { FirstName, MiddleName, LastName })}",
             buildMessageHtml: b =>
             {
                 var link = new TagBuilder("a");
                 link.AddCssClass("govuk-link");
                 link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
-                link.InnerHtml.Append($"Record created for {FirstName} {MiddleName} {LastName}");
+                link.MergeAttribute("target", "_blank");
+                link.MergeAttribute("rel", "noopener noreferrer");
+                link.InnerHtml.Append($"View record (opens in a new tab)");
                 b.AppendHtml(link);
             });
 

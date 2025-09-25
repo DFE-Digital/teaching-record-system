@@ -40,7 +40,7 @@ public class MatchesModel(
         {
             if (potentialDuplicate.HasBeenDeactivated)
             {
-                CannotMergeReason = "One of these records has been deactivated.";
+                CannotMergeReason = "One of these records has been deactivated";
                 break;
             }
 

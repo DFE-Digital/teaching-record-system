@@ -32,7 +32,7 @@ public class SetStatusTests : TestBase
         await page.ClickButtonAsync("Confirm and deactivate record");
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
-        await page.AssertFlashMessageAsync(expectedMessage: "Ethelred The Unready’s record has been deactivated.");
+        await page.AssertFlashMessageAsync(expectedMessage: "Ethelred The Unready’s record has been deactivated");
     }
 
     [Test]
