@@ -166,13 +166,15 @@ public class CheckAnswersModel(
         await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
+            $"Records merged for {FirstName} {MiddleName} {LastName}",
             buildMessageHtml: b =>
             {
                 var link = new TagBuilder("a");
                 link.AddCssClass("govuk-link");
                 link.MergeAttribute("href", LinkGenerator.PersonDetail(primaryPersonId));
-                link.InnerHtml.Append("View record");
+                link.MergeAttribute("target", "_blank");
+                link.MergeAttribute("rel", "noopener noreferrer");
+                link.InnerHtml.Append("View record (opens in new tab)");
                 b.AppendHtml(link);
             });
 
