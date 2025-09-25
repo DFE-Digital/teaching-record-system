@@ -47,7 +47,7 @@ jobs:
 
           # If project files have changed then dependencies may have been updated, which may effect lint results (e.g. namespace imports);
           # lint everything.
-          if [ $(echo "$CHANGED_FILES" | grep -c '\.csproj$') -gt 0 ]; then
+          if [ $(echo "$CHANGED_FILES" | grep -c -E '\.(csproj|props)$') -gt 0 ]; then
             INCLUDE_ARG=""
             echo "::notice::Linting entire codebase"
           else
