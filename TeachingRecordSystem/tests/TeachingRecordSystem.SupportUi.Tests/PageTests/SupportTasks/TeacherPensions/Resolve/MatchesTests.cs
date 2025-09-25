@@ -61,8 +61,8 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName = "test.txt";
         long integrationTransactionId = 1;
         var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender());
-        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
-        var duplicatePerson2 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithMiddleName(person.MiddleName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
+        var duplicatePerson2 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithMiddleName(person.MiddleName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
         var user = await TestData.CreateUserAsync();
         var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
             person.PersonId,
@@ -91,6 +91,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
         Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueForKey("First name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueForKey("Last name"));
         Assert.Equal(person.Trn, requestDetails.GetSummaryListValueForKey("TRN"));
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueForKey("Date of birth"));
@@ -105,7 +106,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var fileName = "test.txt";
         long integrationTransactionId = 1;
         var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber().WithGender(Gender.Male));
-        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!).WithGender(Gender.Male));
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithMiddleName(person.MiddleName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!).WithGender(Gender.Male));
         var user = await TestData.CreateUserAsync();
         var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
             person.PersonId,
@@ -134,6 +135,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
         Assert.Equal(duplicatePerson1.FirstName, firstMatchDetails.GetSummaryListValueForKey("First name"));
+        Assert.Equal(duplicatePerson1.MiddleName, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(duplicatePerson1.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
         Assert.Equal(duplicatePerson1.Trn, firstMatchDetails.GetSummaryListValueForKey("TRN"));
         Assert.Equal(duplicatePerson1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueForKey("Date of birth"));
