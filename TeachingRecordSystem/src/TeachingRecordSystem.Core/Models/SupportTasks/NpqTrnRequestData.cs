@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.Core.Models.SupportTaskData;
+namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
-public record NpqTrnRequestData
+public record NpqTrnRequestData : ISupportTaskData
 {
     public NpqTrnRequestDataPersonAttributes? SelectedPersonAttributes { get; init; }
     public NpqTrnRequestDataPersonAttributes? ResolvedAttributes { get; init; }

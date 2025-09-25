@@ -1,5 +1,5 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 using Xunit.Sdk;

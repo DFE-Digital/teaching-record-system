@@ -1,12 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class SupportTask
 {
+    [Obsolete("Use ISupportTaskData.SerializerOptions instead.")]
     internal static readonly JsonSerializerOptions SerializerOptions = new();
     private static readonly char[] _validReferenceChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray();
 
@@ -26,8 +27,10 @@ public class SupportTask
 
     public required object Data
     {
-        get => JsonSerializer.Deserialize(_data, GetDataType(), SerializerOptions)!;
-        init => _data = JsonSerializer.SerializeToDocument(value, GetDataType(), SerializerOptions);
+#pragma warning disable CS0618 // Type or member is obsolete
+        get => JsonSerializer.Deserialize(_data, SupportTaskType.GetDataType(), SerializerOptions)!;
+#pragma warning restore CS0618 // Type or member is obsolete
+        init => _data = JsonSerializer.SerializeToDocument(value, typeof(ISupportTaskData), ISupportTaskData.SerializerOptions);
     }
 
     public static SupportTask Create(
@@ -121,21 +124,7 @@ public class SupportTask
     {
         var currentValue = GetData<T>();
         var newValue = update(currentValue);
-        _data = JsonSerializer.SerializeToDocument(newValue, GetDataType(), SerializerOptions);
+        _data = JsonSerializer.SerializeToDocument(newValue, typeof(ISupportTaskData), ISupportTaskData.SerializerOptions);
         return newValue;
     }
-
-    internal static Type GetDataType(SupportTaskType supportTaskType) => supportTaskType switch
-    {
-        SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
-        SupportTaskType.ChangeDateOfBirthRequest => typeof(ChangeDateOfBirthRequestData),
-        SupportTaskType.ChangeNameRequest => typeof(ChangeNameRequestData),
-        SupportTaskType.ApiTrnRequest => typeof(ApiTrnRequestData),
-        SupportTaskType.NpqTrnRequest => typeof(NpqTrnRequestData),
-        SupportTaskType.TrnRequestManualChecksNeeded => typeof(TrnRequestManualChecksNeededData),
-        SupportTaskType.TeacherPensionsPotentialDuplicate => typeof(TeacherPensionsPotentialDuplicateData),
-        _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
-    };
-
-    private Type GetDataType() => GetDataType(SupportTaskType);
 }

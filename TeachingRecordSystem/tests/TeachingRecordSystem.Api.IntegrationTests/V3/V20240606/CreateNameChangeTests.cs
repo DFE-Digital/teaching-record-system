@@ -1,6 +1,6 @@
 using System.Text;
 using JustEat.HttpClientInterception;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 

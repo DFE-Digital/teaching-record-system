@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.Models.SupportTaskData;
+namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
 public enum SupportRequestOutcome
 {

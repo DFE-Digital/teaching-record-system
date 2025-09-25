@@ -1,28 +1,29 @@
 using System.Reflection;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Models;
 
 public enum SupportTaskType
 {
-    [SupportTaskTypeDescription("connect GOV.UK One Login user to a teaching record", SupportTaskCategory.OneLogin)]
+    [SupportTaskTypeDescription("connect GOV.UK One Login user to a teaching record", SupportTaskCategory.OneLogin, typeof(ConnectOneLoginUserData))]
     ConnectOneLoginUser = 1,
 
-    [SupportTaskTypeDescription("change name request", SupportTaskCategory.ChangeRequests)]
+    [SupportTaskTypeDescription("change name request", SupportTaskCategory.ChangeRequests, typeof(ChangeNameRequestData))]
     ChangeNameRequest = 2,
 
-    [SupportTaskTypeDescription("change date of birth request", SupportTaskCategory.ChangeRequests)]
+    [SupportTaskTypeDescription("change date of birth request", SupportTaskCategory.ChangeRequests, typeof(ChangeDateOfBirthRequestData))]
     ChangeDateOfBirthRequest = 3,
 
-    [SupportTaskTypeDescription("TRN request from API", SupportTaskCategory.TrnRequests)]
+    [SupportTaskTypeDescription("TRN request from API", SupportTaskCategory.TrnRequests, typeof(ApiTrnRequestData))]
     ApiTrnRequest = 4,
 
-    [SupportTaskTypeDescription("TRN request from NPQ", SupportTaskCategory.TrnRequests)]
+    [SupportTaskTypeDescription("TRN request from NPQ", SupportTaskCategory.TrnRequests, typeof(NpqTrnRequestData))]
     NpqTrnRequest = 5,
 
-    [SupportTaskTypeDescription("manual checks needed", SupportTaskCategory.TrnRequests)]
+    [SupportTaskTypeDescription("manual checks needed", SupportTaskCategory.TrnRequests, typeof(TrnRequestManualChecksNeededData))]
     TrnRequestManualChecksNeeded = 6,
 
-    [SupportTaskTypeDescription("teacher pensions potential duplicate", SupportTaskCategory.TeacherPensions)]
+    [SupportTaskTypeDescription("teacher pensions potential duplicate", SupportTaskCategory.TeacherPensions, typeof(TeacherPensionsPotentialDuplicateData))]
     TeacherPensionsPotentialDuplicate = 7
 }
 
@@ -37,6 +38,9 @@ public static class SupportTaskTypeRegistry
     public static SupportTaskCategory GetCategory(this SupportTaskType supportTaskType) =>
         _info[supportTaskType].SupportTaskCategory;
 
+    public static Type GetDataType(this SupportTaskType supportTaskType) =>
+        _info[supportTaskType].DataType;
+
     public static string GetName(this SupportTaskType supportTaskType) => _info[supportTaskType].Name;
 
     public static string GetTitle(this SupportTaskType supportTaskType) => _info[supportTaskType].Title;
@@ -49,18 +53,23 @@ public static class SupportTaskTypeRegistry
             .GetCustomAttribute<SupportTaskTypeDescriptionAttribute>() ??
             throw new Exception($"{nameof(SupportTaskType)}.{supportTaskType} is missing the {nameof(SupportTaskTypeDescriptionAttribute)} attribute.");
 
-        return new SupportTaskTypeDescription(supportTaskType, attr.Name, attr.SupportTaskCategory);
+        return new SupportTaskTypeDescription(supportTaskType, attr.Name, attr.SupportTaskCategory, attr.DataType);
     }
 }
 
-public sealed record SupportTaskTypeDescription(SupportTaskType SupportTaskType, string Name, SupportTaskCategory SupportTaskCategory)
+public sealed record SupportTaskTypeDescription(
+    SupportTaskType SupportTaskType,
+    string Name,
+    SupportTaskCategory SupportTaskCategory,
+    Type DataType)
 {
     public string Title => Name[..1].ToUpper() + Name[1..];
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-file sealed class SupportTaskTypeDescriptionAttribute(string name, SupportTaskCategory category) : Attribute
+file sealed class SupportTaskTypeDescriptionAttribute(string name, SupportTaskCategory category, Type dataType) : Attribute
 {
     public string Name => name;
     public SupportTaskCategory SupportTaskCategory => category;
+    public Type DataType => dataType;
 }

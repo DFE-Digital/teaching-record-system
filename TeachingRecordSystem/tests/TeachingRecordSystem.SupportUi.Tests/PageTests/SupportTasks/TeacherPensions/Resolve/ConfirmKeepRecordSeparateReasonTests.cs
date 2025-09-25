@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 

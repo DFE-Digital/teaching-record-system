@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.Core.Models.SupportTaskData;
+namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
-public record ConnectOneLoginUserData
+public record ConnectOneLoginUserData : ISupportTaskData
 {
     public required bool Verified { get; init; }
     public required string OneLoginUserSubject { get; init; }
@@ -11,5 +11,5 @@ public record ConnectOneLoginUserData
     public required string? StatedTrn { get; init; }
     public required string? TrnTokenTrn { get; init; }
     public required Guid ClientApplicationUserId { get; init; }
-    public Guid? PersonId { get; set; }
+    public Guid? PersonId { get; init; }
 }

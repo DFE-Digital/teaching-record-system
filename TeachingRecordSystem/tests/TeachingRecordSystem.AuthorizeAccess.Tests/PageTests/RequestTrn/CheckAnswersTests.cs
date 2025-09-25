@@ -1,6 +1,6 @@
 using System.Text.Json;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
