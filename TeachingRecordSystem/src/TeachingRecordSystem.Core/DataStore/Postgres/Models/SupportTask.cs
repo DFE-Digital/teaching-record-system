@@ -1,17 +1,12 @@
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class SupportTask
 {
-    [Obsolete("Use ISupportTaskData.SerializerOptions instead.")]
-    internal static readonly JsonSerializerOptions SerializerOptions = new();
     private static readonly char[] _validReferenceChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray();
-
-    private JsonDocument _data = null!;
 
     public required string SupportTaskReference { get; set; }
     public required DateTime CreatedOn { get; init; }
@@ -24,18 +19,11 @@ public class SupportTask
     public Guid? TrnRequestApplicationUserId { get; init; }
     public string? TrnRequestId { get; init; }
     public TrnRequestMetadata? TrnRequestMetadata { get; }
-
-    public required object Data
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        get => JsonSerializer.Deserialize(_data, SupportTaskType.GetDataType(), SerializerOptions)!;
-#pragma warning restore CS0618 // Type or member is obsolete
-        init => _data = JsonSerializer.SerializeToDocument(value, typeof(ISupportTaskData), ISupportTaskData.SerializerOptions);
-    }
+    public required ISupportTaskData Data { get; set; }
 
     public static SupportTask Create(
         SupportTaskType supportTaskType,
-        object data,
+        ISupportTaskData data,
         Guid? personId,
         string? oneLoginUserSubject,
         Guid? trnRequestApplicationUserId,
@@ -118,13 +106,12 @@ public class SupportTask
         }
     }
 
-    public T GetData<T>() => (T)Data;
+    public T GetData<T>() where T : ISupportTaskData => (T)Data;
 
-    public T UpdateData<T>(Func<T, T> update)
+    public T UpdateData<T>(Func<T, T> update) where T : ISupportTaskData
     {
         var currentValue = GetData<T>();
-        var newValue = update(currentValue);
-        _data = JsonSerializer.SerializeToDocument(newValue, typeof(ISupportTaskData), ISupportTaskData.SerializerOptions);
-        return newValue;
+        Data = update(currentValue);
+        return (T)Data;
     }
 }

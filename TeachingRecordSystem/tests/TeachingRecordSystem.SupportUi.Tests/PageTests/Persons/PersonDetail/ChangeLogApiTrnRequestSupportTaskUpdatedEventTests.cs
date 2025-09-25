@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
@@ -266,6 +267,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             SupportTaskType = SupportTaskType.ApiTrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Closed,
+            Data = new ApiTrnRequestData()
         };
 
         var oldSupportTask = new EventModels.SupportTask
@@ -275,6 +277,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             SupportTaskType = SupportTaskType.ApiTrnRequest,
             OneLoginUserSubject = null,
             Status = SupportTaskStatus.Open,
+            Data = new ApiTrnRequestData()
         };
 
         var requestData = new EventModels.TrnRequestMetadata
