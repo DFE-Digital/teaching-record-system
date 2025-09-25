@@ -16,7 +16,6 @@ public class SupportTask
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public required SupportTaskType SupportTaskType { get; init; }
-    public Guid? SupportTaskTypeId { get; init; }
     public required SupportTaskStatus Status { get; set; }
     public string? OneLoginUserSubject { get; init; }
     public Guid? PersonId { get; init; }
@@ -48,7 +47,6 @@ public class SupportTask
             CreatedOn = now,
             UpdatedOn = now,
             SupportTaskType = supportTaskType,
-            SupportTaskTypeId = supportTaskType.GetSupportTaskTypeId(),
             Status = SupportTaskStatus.Open,
             Data = data,
             PersonId = personId,
