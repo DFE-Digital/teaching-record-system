@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;

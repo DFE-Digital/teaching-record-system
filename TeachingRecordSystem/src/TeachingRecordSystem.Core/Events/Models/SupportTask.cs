@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Events.Models;
 
@@ -18,8 +19,10 @@ public record SupportTask
     [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
     public object Data
     {
-        get => JsonSerializer.Deserialize(_data, DataStore.Postgres.Models.SupportTask.GetDataType(SupportTaskType), DataStore.Postgres.Models.SupportTask.SerializerOptions)!;
-        init => _data = JsonSerializer.SerializeToDocument(value, DataStore.Postgres.Models.SupportTask.GetDataType(SupportTaskType), DataStore.Postgres.Models.SupportTask.SerializerOptions);
+#pragma warning disable CS0618 // Type or member is obsolete
+        get => JsonSerializer.Deserialize(_data, SupportTaskType.GetDataType(), DataStore.Postgres.Models.SupportTask.SerializerOptions)!;
+#pragma warning restore CS0618 // Type or member is obsolete
+        init => _data = JsonSerializer.SerializeToDocument(value, SupportTaskType.GetDataType(), ISupportTaskData.SerializerOptions);
     }
 
     public static SupportTask FromModel(DataStore.Postgres.Models.SupportTask model) => new()

@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ConnectOneLoginUser;
 

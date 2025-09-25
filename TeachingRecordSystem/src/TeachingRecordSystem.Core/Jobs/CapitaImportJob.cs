@@ -194,7 +194,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                             potentialDuplicate = true;
                             var supportTask = DataStore.Postgres.Models.SupportTask.Create(
                                 SupportTaskType.TeacherPensionsPotentialDuplicate,
-                                new Models.SupportTaskData.TeacherPensionsPotentialDuplicateData()
+                                new Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
                                 {
                                     FileName = fileName,
                                     IntegrationTransactionId = integrationJob.IntegrationTransactionId

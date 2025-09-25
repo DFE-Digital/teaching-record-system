@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Events.Models;
 
@@ -12,7 +12,7 @@ public record ChangeNameRequestData
     public required string? EmailAddress { get; init; }
     public required SupportRequestOutcome? ChangeRequestOutcome { get; init; }
 
-    public static ChangeNameRequestData FromModel(Core.Models.SupportTaskData.ChangeNameRequestData model) =>
+    public static ChangeNameRequestData FromModel(Core.Models.SupportTasks.ChangeNameRequestData model) =>
         new()
         {
             FirstName = model.FirstName,

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;

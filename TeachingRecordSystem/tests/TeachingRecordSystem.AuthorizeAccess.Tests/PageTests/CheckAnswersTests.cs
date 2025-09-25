@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests;
 

@@ -1,11 +1,11 @@
-namespace TeachingRecordSystem.Core.Models.SupportTaskData;
+namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
-public record TeacherPensionsPotentialDuplicateData
+public record TeacherPensionsPotentialDuplicateData : ISupportTaskData
 {
     public TeacherPensionsPotentialDuplicateAttributes? SelectedPersonAttributes { get; init; }
     public TeacherPensionsPotentialDuplicateAttributes? ResolvedAttributes { get; init; }
-    public required string FileName { get; set; }
-    public required long IntegrationTransactionId { get; set; }
+    public required string FileName { get; init; }
+    public required long IntegrationTransactionId { get; init; }
 }
 
 public record TeacherPensionsPotentialDuplicateAttributes

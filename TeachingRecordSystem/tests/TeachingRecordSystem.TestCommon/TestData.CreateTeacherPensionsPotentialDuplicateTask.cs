@@ -137,7 +137,7 @@ public partial class TestData
             };
             var supportTask = Core.DataStore.Postgres.Models.SupportTask.Create(
                 SupportTaskType.TeacherPensionsPotentialDuplicate,
-                new Core.Models.SupportTaskData.TeacherPensionsPotentialDuplicateData()
+                new Core.Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
                 {
                     FileName = fileName,
                     IntegrationTransactionId = integrationTransactionId

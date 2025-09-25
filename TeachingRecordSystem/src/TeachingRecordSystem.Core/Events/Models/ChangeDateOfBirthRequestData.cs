@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Events.Models;
 
@@ -10,7 +10,7 @@ public record ChangeDateOfBirthRequestData
     public required string? EmailAddress { get; init; }
     public required SupportRequestOutcome? ChangeRequestOutcome { get; init; }
 
-    public static ChangeDateOfBirthRequestData FromModel(Core.Models.SupportTaskData.ChangeDateOfBirthRequestData model) =>
+    public static ChangeDateOfBirthRequestData FromModel(Core.Models.SupportTasks.ChangeDateOfBirthRequestData model) =>
         new()
         {
             DateOfBirth = model.DateOfBirth,
