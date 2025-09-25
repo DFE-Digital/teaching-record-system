@@ -134,7 +134,8 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "training_subjects",
                     "degree_types",
                     "training_providers",
-                    "support_task_types"
+                    "support_task_types",
+                    "induction_statuses"
                 ]
             });
 }
