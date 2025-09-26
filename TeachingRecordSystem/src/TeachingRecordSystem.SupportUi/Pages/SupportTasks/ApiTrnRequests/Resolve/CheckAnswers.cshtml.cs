@@ -178,7 +178,7 @@ public class CheckAnswers(
         await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"{(CreatingNewRecord ? "Record created" : "Records merged successfully")} for {FirstName} {MiddleName} {LastName}",
+            $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {FirstName} {MiddleName} {LastName}",
             buildMessageHtml: b =>
             {
                 var link = new TagBuilder("a");
