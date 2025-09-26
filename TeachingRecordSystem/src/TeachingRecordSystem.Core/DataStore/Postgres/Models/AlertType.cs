@@ -19,7 +19,6 @@ public class AlertType
     public AlertCategory? AlertCategory { get; }
     public required string Name { get; init; }
     public required string? DqtSanctionCode { get; init; }
-    public required ProhibitionLevel ProhibitionLevel { get; init; }
     public required bool InternalOnly { get; init; }
     public required bool IsActive { get; init; }
     public int? DisplayOrder { get; init; }
