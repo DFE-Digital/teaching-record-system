@@ -12,7 +12,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.TakingNpqRequireTrn(Model.JourneyInstance!.InstanceId)" asp-for="IsTakingAnNpq" method="post">
-            <govuk-radios asp-for="IsTakingAnNpq">
+            <govuk-radios for="IsTakingAnNpq">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
                     <govuk-radios-item value="@true">Yes</govuk-radios-item>

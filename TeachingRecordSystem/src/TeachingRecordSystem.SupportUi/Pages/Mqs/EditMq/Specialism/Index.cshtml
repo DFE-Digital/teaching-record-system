@@ -13,7 +13,7 @@
         <form action="@LinkGenerator.MqEditSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
 
-            <govuk-radios asp-for="Specialism" data-testid="specialism-list">
+            <govuk-radios for="Specialism" data-testid="specialism-list">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
                     @foreach (var specialism in Model.Specialisms!)

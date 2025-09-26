@@ -12,7 +12,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.TeacherPensionsKeepRecordSeparate(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
-            <govuk-radios asp-for="KeepSeparateReason">
+            <govuk-radios for="KeepSeparateReason">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
                         @ViewBag.Title
@@ -23,7 +23,7 @@
                     <govuk-radios-item value="@KeepingRecordSeparateReason.AnotherReason">
                         Another reason
                         <govuk-radios-item-conditional>
-                            <govuk-input asp-for="Reason" />
+                            <govuk-input for="Reason" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>

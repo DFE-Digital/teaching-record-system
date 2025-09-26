@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RequestTrnWorkingInSchoolOrEducationalSetting(Model.JourneyInstance!.InstanceId)" asp-for="IsWorkingInSchoolOrEducationalSetting" method="post">
-            <govuk-radios asp-for="IsWorkingInSchoolOrEducationalSetting">
+            <govuk-radios for="IsWorkingInSchoolOrEducationalSetting">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
                     <govuk-radios-item value="@true">Yes</govuk-radios-item>

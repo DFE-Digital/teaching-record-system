@@ -15,11 +15,11 @@
         <form action="@LinkGenerator.EditApplicationUser(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="Name" label-class="govuk-label--m" />
+            <govuk-input for="Name" label-class="govuk-label--m" />
 
-            <govuk-input asp-for="ShortName" input-class="govuk-input--width-10" label-class="govuk-label--m" />
+            <govuk-input for="ShortName" input-class="govuk-input--width-10" label-class="govuk-label--m" />
 
-            <govuk-checkboxes asp-for="ApiRoles">
+            <govuk-checkboxes for="ApiRoles">
                 <govuk-checkboxes-fieldset>
                     <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
                     @foreach (var role in ApiRoles.All.OrderBy(r => r))
@@ -78,31 +78,31 @@
                 <govuk-button-link href="@LinkGenerator.AddApiKey(Model.UserId)" class="govuk-button--secondary" data-testid="AddApiKey">Add API key</govuk-button-link>
             </div>
 
-            <govuk-checkboxes asp-for="IsOidcClient">
+            <govuk-checkboxes for="IsOidcClient">
                 <govuk-checkboxes-item value="@true" label-class="govuk-label--m">
                     @Html.DisplayNameFor(m => m.IsOidcClient)
                     <govuk-checkboxes-item-conditional>
-                        <govuk-input asp-for="ClientId" label-class="govuk-label--s" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false" />
+                        <govuk-input for="ClientId" label-class="govuk-label--s" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false" />
 
-                        <govuk-input asp-for="ClientSecret" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="ClientSecret" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
 
-                        <govuk-textarea asp-for="RedirectUris" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap">
+                        <govuk-textarea for="RedirectUris" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap">
                             <govuk-textarea-value>@string.Join("\n", Model.RedirectUris!)</govuk-textarea-value>
                         </govuk-textarea>
 
-                        <govuk-textarea asp-for="PostLogoutRedirectUris" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap">
+                        <govuk-textarea for="PostLogoutRedirectUris" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap">
                             <govuk-textarea-value>@string.Join("\n", Model.PostLogoutRedirectUris!)</govuk-textarea-value>
                         </govuk-textarea>
 
-                        <govuk-input asp-for="OneLoginAuthenticationSchemeName" label-class="govuk-label--s" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginAuthenticationSchemeName" label-class="govuk-label--s" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false" />
 
-                        <govuk-input asp-for="OneLoginClientId" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginClientId" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
 
-                        <govuk-textarea asp-for="OneLoginPrivateKeyPem" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap" spellcheck="false" />
+                        <govuk-textarea for="OneLoginPrivateKeyPem" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap" spellcheck="false" />
 
-                        <govuk-input asp-for="OneLoginRedirectUriPath" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginRedirectUriPath" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
 
-                        <govuk-input asp-for="OneLoginPostLogoutRedirectUriPath" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
+                        <govuk-input for="OneLoginPostLogoutRedirectUriPath" label-class="govuk-label--s" input-class="trs-monospace" spellcheck="false" />
                     </govuk-checkboxes-item-conditional>
                 </govuk-checkboxes-item>
             </govuk-checkboxes>

@@ -14,7 +14,7 @@
         <form action="@LinkGenerator.MqAddStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
 
-            <govuk-radios asp-for="Status" data-testid="status-options">
+            <govuk-radios for="Status" data-testid="status-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
                     <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="status-deferred">
@@ -32,7 +32,7 @@
                     <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="status-passed">
                         @MandatoryQualificationStatus.Passed.GetTitle()
                         <govuk-radios-item-conditional>
-                            <govuk-date-input asp-for="EndDate">
+                            <govuk-date-input for="EndDate">
                                 <govuk-date-input-fieldset>
                                     <govuk-date-input-fieldset-legend class="govuk-fieldset__legend" />
                                 </govuk-date-input-fieldset>

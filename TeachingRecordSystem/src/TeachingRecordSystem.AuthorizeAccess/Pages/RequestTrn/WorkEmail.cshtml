@@ -12,7 +12,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RequestTrnWorkEmail(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
 
-            <govuk-input asp-for="WorkEmail" type="email" autocomplete="email">
+            <govuk-input for="WorkEmail" type="email" autocomplete="email">
                 <govuk-input-label is-page-heading="true" class="govuk-label--l" />
             </govuk-input>
 

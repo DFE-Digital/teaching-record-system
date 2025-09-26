@@ -9,21 +9,21 @@
         <form action="@LinkGenerator.DebugIdentity(Model.JourneyInstance!.InstanceId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="TrnToken" disabled="true" />
+            <govuk-input for="TrnToken" disabled="true" />
 
             <h2 class="govuk-heading-m">User information</h2>
 
-            <govuk-input asp-for="Subject" disabled="true" />
+            <govuk-input for="Subject" disabled="true" />
 
-            <govuk-input asp-for="Email" type="email" disabled="true" />
+            <govuk-input for="Email" type="email" disabled="true" />
 
-            <govuk-checkboxes asp-for="IdentityVerified">
+            <govuk-checkboxes for="IdentityVerified">
                 <govuk-checkboxes-item value="@true">
                     Identity verified
 
                     <govuk-checkboxes-item-conditional>
-                        <govuk-textarea asp-for="VerifiedNames" input-class="govuk-" />
-                        <govuk-textarea asp-for="VerifiedDatesOfBirth" />
+                        <govuk-textarea for="VerifiedNames" input-class="govuk-" />
+                        <govuk-textarea for="VerifiedDatesOfBirth" />
                     </govuk-checkboxes-item-conditional>
                 </govuk-checkboxes-item>
             </govuk-checkboxes>
@@ -52,7 +52,7 @@
                         </govuk-summary-list-row>
                     </govuk-summary-list>
 
-                    <govuk-checkboxes asp-for="DetachPerson" class="govuk-checkboxes--small">
+                    <govuk-checkboxes for="DetachPerson" class="govuk-checkboxes--small">
                         <govuk-checkboxes-item value="@true">Detach teaching record</govuk-checkboxes-item>
                     </govuk-checkboxes>
                 }

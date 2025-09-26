@@ -102,7 +102,7 @@
         </tbody>
     </table>
 
-    <govuk-radios asp-for="UploadEvidence">
+    <govuk-radios for="UploadEvidence">
         <govuk-radios-fieldset>
             <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
                 Do you want to upload evidence?
@@ -117,7 +117,7 @@
                             <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
                         </p>
                     }
-                    <govuk-file-upload asp-for="EvidenceFile" input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
+                    <govuk-file-upload for="EvidenceFile" input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                         <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
                     </govuk-file-upload>
                 </govuk-radios-item-conditional>
@@ -128,7 +128,7 @@
         </govuk-radios-fieldset>
     </govuk-radios>
 
-    <govuk-textarea asp-for="MergeComments" label-class="govuk-label--s" />
+    <govuk-textarea for="MergeComments" label-class="govuk-label--s" />
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">

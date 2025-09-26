@@ -12,7 +12,7 @@
         @if (Model.SupportTaskCategories!.Length > 0)
         {
             <form action="@LinkGenerator.SupportTasks()" method="get" asp-antiforgery="false">
-                <govuk-checkboxes asp-for="Categories" name="category" class="govuk-checkboxes--small govuk-!-margin-bottom-2">
+                <govuk-checkboxes for="Categories" name="category" class="govuk-checkboxes--small govuk-!-margin-bottom-2">
                     <govuk-checkboxes-fieldset>
                         <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">Filter by category</govuk-checkboxes-fieldset-legend>
                         @foreach (var type in Model.SupportTaskCategories)
@@ -29,7 +29,7 @@
         }
 
         <form action="@LinkGenerator.SupportTasks()" method="get" asp-antiforgery="false">
-            <govuk-input asp-for="Reference" name="reference" class="govuk-!-margin-bottom-0">
+            <govuk-input for="Reference" name="reference" class="govuk-!-margin-bottom-0">
                 <govuk-input-label class="govuk-label--s">Search by reference</govuk-input-label>
             </govuk-input>
             @foreach (var category in Model.Categories!)

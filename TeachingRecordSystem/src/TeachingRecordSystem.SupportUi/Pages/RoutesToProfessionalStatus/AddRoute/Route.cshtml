@@ -50,7 +50,7 @@
         <form action="@LinkGenerator.RouteAddRoute(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-            <govuk-select asp-for="RouteId" label-class="govuk-label--m">
+            <govuk-select for="RouteId" label-class="govuk-label--m">
                 <govuk-select-hint>Start typing the name of the route</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var route in Model.Routes)
@@ -63,7 +63,7 @@
                 <govuk-details open="true">
                     <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
                     <govuk-details-text>
-                        <govuk-select asp-for=@Model.ArchivedRouteId label-class="govuk-label--m">
+                        <govuk-select for=@Model.ArchivedRouteId label-class="govuk-label--m">
                             <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
                             <govuk-select-item value=""></govuk-select-item>
                             @foreach (var route in Model.ArchivedRoutes)
@@ -79,7 +79,7 @@
                 <govuk-details open="false">
                     <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
                     <govuk-details-text>
-                        <govuk-select asp-for=@Model.ArchivedRouteId label-class="govuk-label--m">
+                        <govuk-select for=@Model.ArchivedRouteId label-class="govuk-label--m">
                             <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
                             <govuk-select-item value=""></govuk-select-item>
                             @foreach (var route in Model.ArchivedRoutes)

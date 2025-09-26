@@ -13,7 +13,7 @@
         <form action="@LinkGenerator.MqAddSpecialism(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
 
-            <govuk-radios asp-for="Specialism" data-testid="specialism-list">
+            <govuk-radios for="Specialism" data-testid="specialism-list">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
                     @foreach (var specialism in Model.Specialisms!)

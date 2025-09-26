@@ -36,11 +36,13 @@ jobs:
 
       - name: Lint
         run: |
+          set -eo pipefail
+
           git fetch origin main --quiet --depth=1
 
           CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
-          GLOBAL_SETTINGS_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.csproj$' -e '\.editorconfig$' -e '\.props$')
-          CS_FILES_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.cs$')
+          GLOBAL_SETTINGS_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.csproj$' -e '\.editorconfig$' -e '\.props$') || true
+          CS_FILES_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.cs$') || true
 
           if [ "$GLOBAL_SETTINGS_CHANGED" -gt 0 ]; then
             INCLUDE_ARG=""

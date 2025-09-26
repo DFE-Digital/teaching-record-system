@@ -30,7 +30,7 @@
         <form action="@LinkGenerator.MqEditProvider(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
 
-            <govuk-select asp-for="ProviderId" label-class="govuk-label--l">
+            <govuk-select for="ProviderId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true" />
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var provider in Model.Providers!)

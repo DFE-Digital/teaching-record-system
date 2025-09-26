@@ -75,7 +75,7 @@
                         <a href="@LinkGenerator.Index()" target="_blank" rel="noreferrer" class="govuk-link">Find a record (opens in a new tab)</a>
                     </p>
 
-                    <govuk-input asp-for="TrnOverride" input-class="govuk-input--width-10" label-class="govuk-label--s">
+                    <govuk-input for="TrnOverride" input-class="govuk-input--width-10" label-class="govuk-label--s">
                         <govuk-input-label>Connect to TRN (optional)</govuk-input-label>
                     </govuk-input>
                 }
@@ -93,7 +93,7 @@
 
                 <h2 class="govuk-heading-l">Which record do you wish to connect?</h2>
 
-                <govuk-radios asp-for="Trn">
+                <govuk-radios for="Trn">
                     @foreach (var suggestion in Model.SuggestedMatches)
                     {
                         <govuk-radios-item value="@suggestion.Trn">@suggestion.Name</govuk-radios-item>

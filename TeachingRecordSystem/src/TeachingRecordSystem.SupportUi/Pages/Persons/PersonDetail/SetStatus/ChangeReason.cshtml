@@ -21,7 +21,7 @@
 
             @if (Model.TargetStatus == PersonStatus.Deactivated)
             {
-                <govuk-radios asp-for="DeactivateReason" data-testid="deactivate-reason-options">
+                <govuk-radios for="DeactivateReason" data-testid="deactivate-reason-options">
                     <govuk-radios-fieldset>
                         <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="deactivate-reason-options-legend"/>
                         <govuk-radios-item value="@DeactivateReasonOption.RecordHolderDied">
@@ -34,7 +34,7 @@
                             @DeactivateReasonOption.AnotherReason.GetDisplayName()
 
                             <govuk-radios-item-conditional data-testid="deactivate-reason-detail">
-                                <govuk-character-count asp-for="DeactivateReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
+                                <govuk-character-count for="DeactivateReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                             </govuk-radios-item-conditional>
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
@@ -42,7 +42,7 @@
             }
             else
             {
-                <govuk-radios asp-for="ReactivateReason" data-testid="reactivate-reason-options">
+                <govuk-radios for="ReactivateReason" data-testid="reactivate-reason-options">
                     <govuk-radios-fieldset>
                         <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="reactivate-reason-options-legend"/>
                         <govuk-radios-item value="@ReactivateReasonOption.DeactivatedByMistake">
@@ -52,14 +52,14 @@
                             @ReactivateReasonOption.AnotherReason.GetDisplayName()
 
                             <govuk-radios-item-conditional data-testid="reactivate-reason-detail">
-                                <govuk-character-count asp-for="ReactivateReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
+                                <govuk-character-count for="ReactivateReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                             </govuk-radios-item-conditional>
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
             }
 
-            <govuk-radios asp-for="UploadEvidence" data-testid="upload-evidence-options">
+            <govuk-radios for="UploadEvidence" data-testid="upload-evidence-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="upload-evidence-options-legend" />
                     <govuk-radios-item value="@true">
@@ -76,7 +76,7 @@
                                 <input type="hidden" asp-for="EvidenceFileSizeDescription" />
                                 <input type="hidden" asp-for="UploadedEvidenceFileUrl" />
                             }
-                            <govuk-file-upload asp-for="EvidenceFile" 
+                            <govuk-file-upload for="EvidenceFile"
                                                label-class="govuk-label--m"
                                                input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                                 <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
