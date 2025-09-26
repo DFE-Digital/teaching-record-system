@@ -13,9 +13,9 @@
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">        
+    <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RejectChangeRequest(Model.SupportTaskReference)" method="post">
-            <govuk-radios asp-for="RejectionReasonChoice">
+            <govuk-radios for="RejectionReasonChoice">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>
                         <h3 class="govuk-heading-m">Reason for rejecting</h3>

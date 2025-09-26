@@ -13,7 +13,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteAddAgeRangeSpecialism(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
-            <govuk-radios asp-for="@Model.TrainingAgeSpecialism.AgeRangeType">
+            <govuk-radios for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
                         @Model.PageHeading
@@ -28,8 +28,8 @@
                     <govuk-radios-item value="@TrainingAgeSpecialismType.Range">
                         Enter an age range
                         <govuk-radios-item-conditional>
-                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeFrom" input-class="govuk-input--width-2" />
-                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeTo" input-class="govuk-input--width-2"  />
+                            <govuk-input for="TrainingAgeSpecialism.AgeRangeFrom" input-class="govuk-input--width-2" />
+                            <govuk-input for="TrainingAgeSpecialism.AgeRangeTo" input-class="govuk-input--width-2"  />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>

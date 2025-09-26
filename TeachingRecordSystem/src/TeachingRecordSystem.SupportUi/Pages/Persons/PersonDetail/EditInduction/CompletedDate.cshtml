@@ -13,7 +13,7 @@
         <form data-testid="submit-form" action="@LinkGenerator.PersonInductionEditCompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
 
-            <govuk-date-input asp-for="CompletedDate">
+            <govuk-date-input for="CompletedDate">
                 <govuk-date-input-fieldset>
                     <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
                     <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>

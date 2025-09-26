@@ -27,7 +27,7 @@
                     <govuk-inset-text>@message</govuk-inset-text>
                 }
             }
-            <govuk-checkboxes asp-for="ExemptionReasonIds">
+            <govuk-checkboxes for="ExemptionReasonIds">
                 <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
                 @foreach (var category in Model.ExemptionReasons)
                 {

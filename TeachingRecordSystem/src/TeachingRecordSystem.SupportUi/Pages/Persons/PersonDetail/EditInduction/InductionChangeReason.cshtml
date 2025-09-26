@@ -12,7 +12,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.PersonInductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
-            <govuk-radios asp-for="ChangeReason" data-testid="reason-options">
+            <govuk-radios for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true"/>
                     <govuk-radios-item value="@InductionChangeReasonOption.IncompleteDetails">
@@ -30,13 +30,13 @@
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <govuk-radios asp-for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
+            <govuk-radios for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="has-additional-reason_detail-options-legend" />
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional data-testid="additional-detail">
-                            <govuk-character-count asp-for="ChangeReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count for="ChangeReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">
@@ -45,7 +45,7 @@
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <govuk-radios asp-for="UploadEvidence" data-testid="upload-evidence-options">
+            <govuk-radios for="UploadEvidence" data-testid="upload-evidence-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="upload-evidence-options-legend" />
                     <govuk-radios-item value="@true">
@@ -62,7 +62,7 @@
                                 <input type="hidden" asp-for="EvidenceFileSizeDescription" />
                                 <input type="hidden" asp-for="UploadedEvidenceFileUrl" />
                             }
-                            <govuk-file-upload asp-for="EvidenceFile"
+                            <govuk-file-upload for="EvidenceFile"
                                                label-class="govuk-label--m"
                                                input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                                 <govuk-file-upload-label>Upload a file</govuk-file-upload-label>

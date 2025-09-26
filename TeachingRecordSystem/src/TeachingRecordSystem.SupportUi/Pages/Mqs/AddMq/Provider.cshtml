@@ -30,7 +30,7 @@
         <form action="@LinkGenerator.MqAddProvider(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
 
-            <govuk-select asp-for="ProviderId" label-class="govuk-label--l">
+            <govuk-select for="ProviderId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true" />
                 <govuk-select-hint>Start typing the name of the training provider</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>

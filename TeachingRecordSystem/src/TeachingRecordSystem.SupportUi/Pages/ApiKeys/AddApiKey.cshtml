@@ -13,7 +13,7 @@
         <form action="@LinkGenerator.AddApiKey(Model.ApplicationUserId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="Key" input-class="govuk-input--width-20 trs-monospace" label-class="govuk-label--m" />
+            <govuk-input for="Key" input-class="govuk-input--width-20 trs-monospace" label-class="govuk-label--m" />
 
             <govuk-button type="submit">Save</govuk-button>
         </form>

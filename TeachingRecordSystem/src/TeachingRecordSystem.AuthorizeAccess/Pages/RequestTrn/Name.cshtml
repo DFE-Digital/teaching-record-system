@@ -12,9 +12,9 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RequestTrnName(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-            <govuk-input asp-for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name" />
-            <govuk-input asp-for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name" />
-            <govuk-input asp-for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name" />
+            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name" />
+            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name" />
+            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name" />
 
             <govuk-button type="submit">Continue</govuk-button>
         </form>

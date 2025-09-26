@@ -12,7 +12,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteEditInductionExemption(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
-            <govuk-radios asp-for=@Model.IsExemptFromInduction data-testid="induction-exemption">
+            <govuk-radios for=@Model.IsExemptFromInduction data-testid="induction-exemption">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="induction-exemption-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
                     <govuk-radios-item value="@true">

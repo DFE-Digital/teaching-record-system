@@ -14,7 +14,7 @@
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
         <form action="@LinkGenerator.NpqTrnRequests()" method="get" asp-antiforgery="false">
-            <govuk-input asp-for="Search" label-class="govuk-label--s" autocomplete="off" />
+            <govuk-input for="Search" label-class="govuk-label--s" autocomplete="off" />
             @* TODO move this inside input when GFA library is updated *@
             <govuk-button type="submit">Search</govuk-button>
         </form>
@@ -73,7 +73,7 @@
                 }
             </tbody>
         </table>
-        
+
         <partial name="_Pagination" model=@Model.Pagination />
     </div>
 </div>

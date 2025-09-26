@@ -15,7 +15,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RequestTrnPersonalEmail(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
 
-            <govuk-input asp-for="PersonalEmail" type="PersonalEmail" autocomplete="email">
+            <govuk-input for="PersonalEmail" type="PersonalEmail" autocomplete="email">
                 <govuk-input-label is-page-heading="true" class="govuk-label--l" />
             </govuk-input>
 

@@ -17,7 +17,6 @@
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
 
-    <NoWarn>GFA0001</NoWarn>
     <NoWarn Condition="'$(IsTestProject)' == 'true'">$(NoWarn);CA1707;CA1711;CA1816</NoWarn>
   </PropertyGroup>
 

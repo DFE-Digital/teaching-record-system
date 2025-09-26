@@ -11,15 +11,15 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RequestTrnPreviousName(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <govuk-radios asp-for="HasPreviousName">
+            <govuk-radios for="HasPreviousName">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-input asp-for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-first-name" />
-                            <govuk-input asp-for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-middle-name" />
-                            <govuk-input asp-for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-last-name" />
+                            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-first-name" />
+                            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-middle-name" />
+                            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="previous-last-name" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">No</govuk-radios-item>

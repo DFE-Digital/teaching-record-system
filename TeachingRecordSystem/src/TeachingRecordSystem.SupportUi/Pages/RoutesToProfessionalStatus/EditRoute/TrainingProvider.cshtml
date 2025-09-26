@@ -43,7 +43,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteEditTrainingProvider(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
-            <govuk-select asp-for="TrainingProviderId" label-class="govuk-label--l">
+            <govuk-select for="TrainingProviderId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
                     @Model.PageHeading
                 </govuk-select-label>

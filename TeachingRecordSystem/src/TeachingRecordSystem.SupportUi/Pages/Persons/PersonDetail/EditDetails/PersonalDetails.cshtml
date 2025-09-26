@@ -36,26 +36,26 @@
             <span class="govuk-caption-l" data-testid="edit-details-caption">@Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name" />
+            <govuk-input for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name" />
 
-            <govuk-input asp-for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name" />
+            <govuk-input for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name" />
 
-            <govuk-input asp-for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name"/>
+            <govuk-input for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name"/>
 
-            <govuk-date-input asp-for="DateOfBirth" data-testid="edit-details-date-of-birth">
+            <govuk-date-input for="DateOfBirth" data-testid="edit-details-date-of-birth">
                 <govuk-date-input-fieldset>
                     <govuk-date-input-hint>For example, 31 3 1980</govuk-date-input-hint>
                     <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--s" />
                 </govuk-date-input-fieldset>
             </govuk-date-input>
 
-            <govuk-input asp-for="EmailAddress" type="email" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-email-address"/>
+            <govuk-input for="EmailAddress" type="email" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-email-address"/>
 
-            <govuk-input asp-for="NationalInsuranceNumber" label-class="govuk-label--s" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" data-testid="edit-details-national-insurance-number">
+            <govuk-input for="NationalInsuranceNumber" label-class="govuk-label--s" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" data-testid="edit-details-national-insurance-number">
                 <govuk-input-hint>For example, &lsquo;QQ 12 34 56 C&rsquo;</govuk-input-hint>
             </govuk-input>
 
-            <govuk-radios asp-for="Gender" data-testid="edit-details-gender-options">
+            <govuk-radios for="Gender" data-testid="edit-details-gender-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s" data-testid="edit-details-gender-options-legend"/>
                     <govuk-radios-item value="@Gender.Male">

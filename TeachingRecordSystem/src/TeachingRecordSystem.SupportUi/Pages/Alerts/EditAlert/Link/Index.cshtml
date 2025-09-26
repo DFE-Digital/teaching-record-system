@@ -12,7 +12,7 @@
 
             @if (string.IsNullOrEmpty(Model.CurrentLink))
             {
-                <govuk-radios asp-for="AddLink">
+                <govuk-radios for="AddLink">
                     <govuk-radios-fieldset>
                         <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l">Do you want to add a link to a panel outcome?</govuk-radios-fieldset-legend>
                         <govuk-radios-hint>
@@ -22,7 +22,7 @@
                         <govuk-radios-item value="@true">
                            Yes
                             <govuk-radios-item-conditional>
-                                <govuk-input asp-for="Link" />
+                                <govuk-input for="Link" />
                             </govuk-radios-item-conditional>
                         </govuk-radios-item>
                         <govuk-radios-item value="@false">
@@ -33,7 +33,7 @@
             }
             else
             {
-                <govuk-radios asp-for="AddLink">
+                <govuk-radios for="AddLink">
                     <govuk-radios-fieldset>
                         <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l">Do you want to change or delete the link to the panel outcome?</govuk-radios-fieldset-legend>
                         <govuk-radios-hint>
@@ -43,7 +43,7 @@
                         <govuk-radios-item value="@true">
                             Change link
                             <govuk-radios-item-conditional>
-                                <govuk-input asp-for="Link" />
+                                <govuk-input for="Link" />
                             </govuk-radios-item-conditional>
                         </govuk-radios-item>
                         <govuk-radios-item value="@false">
@@ -51,7 +51,7 @@
                         </govuk-radios-item>
                     </govuk-radios-fieldset>
                 </govuk-radios>
-            }            
+            }
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>

@@ -13,7 +13,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteAddHoldsFrom(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
-            <govuk-date-input asp-for=@Model.HoldsFrom>
+            <govuk-date-input for=@Model.HoldsFrom>
                 <govuk-date-input-fieldset>
                      <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" >
                         @Model.PageHeading

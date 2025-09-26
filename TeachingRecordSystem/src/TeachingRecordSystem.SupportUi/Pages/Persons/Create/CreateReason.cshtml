@@ -13,7 +13,7 @@
     <div class="govuk-grid-column-full">
         <form action=@LinkGenerator.PersonCreateCreateReason(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="create-reason-caption">Create a record</span>
-            <govuk-radios asp-for="CreateReason" data-testid="create-reason-options">
+            <govuk-radios for="CreateReason" data-testid="create-reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="create-reason-options-legend"/>
                     <govuk-radios-item value="@CreateReasonOption.MandatoryQualification">
@@ -29,13 +29,13 @@
                         @CreateReasonOption.AnotherReason.GetDisplayName()
 
                         <govuk-radios-item-conditional data-testid="create-reason-detail">
-                            <govuk-character-count asp-for="CreateReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count for="CreateReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <govuk-radios asp-for="UploadEvidence" data-testid="upload-evidence-options">
+            <govuk-radios for="UploadEvidence" data-testid="upload-evidence-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="upload-evidence-options-legend" />
                     <govuk-radios-item value="@true">
@@ -52,7 +52,7 @@
                                 <input type="hidden" asp-for="EvidenceFileSizeDescription" />
                                 <input type="hidden" asp-for="EvidenceFileUrl" />
                             }
-                            <govuk-file-upload asp-for="EvidenceFile"
+                            <govuk-file-upload for="EvidenceFile"
                                                label-class="govuk-label--m"
                                                input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                                 <govuk-file-upload-label>Upload a file</govuk-file-upload-label>

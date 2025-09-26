@@ -14,11 +14,11 @@
         <form action="@LinkGenerator.EditUser(Model.UserId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true" />
+            <govuk-input for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true" />
 
-            <govuk-input asp-for="Name" input-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)" />
+            <govuk-input for="Name" input-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)" />
 
-            <govuk-radios asp-for="@Model.Role" radios-class="trs-user-roles" radios-style="--trs-user-permission-columns: @UserPermissionTypes.All.Count">
+            <govuk-radios for="@Model.Role" radios-class="trs-user-roles" radios-style="--trs-user-permission-columns: @UserPermissionTypes.All.Count">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
 
