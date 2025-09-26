@@ -40,25 +40,25 @@ public class MatchesModel(
         {
             if (potentialDuplicate.HasBeenDeactivated)
             {
-                CannotMergeReason = "One of these records has been deactivated.";
+                CannotMergeReason = "One of these records has been deactivated";
                 break;
             }
 
             if (potentialDuplicate.HasActiveAlerts && potentialDuplicate.HasInvalidInductionStatus)
             {
-                CannotMergeReason = $"One of these records has an alert and an induction status of {potentialDuplicate.InductionStatus.GetDisplayName()}.";
+                CannotMergeReason = $"One of these records has an alert and an induction status of {potentialDuplicate.InductionStatus.GetDisplayName()}";
                 break;
             }
 
             if (potentialDuplicate.HasActiveAlerts)
             {
-                CannotMergeReason = "One of these records has an alert.";
+                CannotMergeReason = "One of these records has an alert";
                 break;
             }
 
             if (potentialDuplicate.HasInvalidInductionStatus)
             {
-                CannotMergeReason = $"The induction status of one of these records is {potentialDuplicate.InductionStatus.GetDisplayName()}.";
+                CannotMergeReason = $"The induction status of one of these records is {potentialDuplicate.InductionStatus.GetDisplayName()}";
                 break;
             }
         }

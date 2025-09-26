@@ -33,7 +33,7 @@ public class EditDetailsTests : TestBase
         await page.ClickButtonAsync("Confirm changes");
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
-        await page.AssertFlashMessageAsync(expectedMessage: "Personal details have been updated successfully.");
+        await page.AssertFlashMessageAsync(expectedHeader: "Personal details have been updated");
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class EditDetailsTests : TestBase
         await page.ClickButtonAsync("Confirm changes");
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
-        await page.AssertFlashMessageAsync(expectedMessage: "Personal details have been updated successfully.");
+        await page.AssertFlashMessageAsync(expectedHeader: "Personal details have been updated");
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class EditDetailsTests : TestBase
         await page.ClickButtonAsync("Confirm changes");
 
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
-        await page.AssertFlashMessageAsync(expectedMessage: "Personal details have been updated successfully.");
+        await page.AssertFlashMessageAsync(expectedHeader: "Personal details have been updated");
     }
 
     [Test]

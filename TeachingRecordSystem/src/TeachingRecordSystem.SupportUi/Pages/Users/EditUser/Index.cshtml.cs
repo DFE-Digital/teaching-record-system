@@ -92,11 +92,11 @@ public class IndexModel(
                 .ToLowerInvariantFirstLetter()
                 .WithIndefiniteArticle();
 
-            TempData.SetFlashSuccess(messageText: $"{Name} has been changed to {roleText}.");
+            TempData.SetFlashSuccess($"{Name} has been changed to {roleText}");
         }
         else
         {
-            TempData.SetFlashSuccess(messageText: $"{Name} has been updated.");
+            TempData.SetFlashSuccess($"{Name} has been updated.");
         }
 
         return Redirect(linkGenerator.Users());
@@ -126,7 +126,7 @@ public class IndexModel(
         });
 
         await dbContext.SaveChangesAsync();
-        TempData.SetFlashSuccess(messageText: $"{_user.Name}\u2019s account has been reactivated.");
+        TempData.SetFlashSuccess($"{_user.Name}\u2019s account has been reactivated");
 
         return Redirect(linkGenerator.Users());
     }

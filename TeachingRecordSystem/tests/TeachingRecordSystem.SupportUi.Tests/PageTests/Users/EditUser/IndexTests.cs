@@ -273,8 +273,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
     [Theory]
     [InlineData(true, false, true, UserUpdatedEventChanges.Name, "has been updated.")]
-    [InlineData(false, true, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions).")]
-    [InlineData(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions).")]
+    [InlineData(false, true, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
+    [InlineData(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
     [InlineData(false, false, false, UserUpdatedEventChanges.None, "has been updated.")]
     public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage(
         bool changeName,
@@ -337,7 +337,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{newName} {expectedFlashMessage}");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{newName} {expectedFlashMessage}");
     }
 
     [Fact]
@@ -460,7 +460,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been reactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{existingUser.Name}\u2019s account has been reactivated");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";

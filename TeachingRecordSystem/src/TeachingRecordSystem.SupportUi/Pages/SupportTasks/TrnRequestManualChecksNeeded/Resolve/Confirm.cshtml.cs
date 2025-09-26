@@ -24,7 +24,7 @@ public class Confirm(TrsDbContext dbContext, IClock clock, TrsLinkGenerator link
 
         await dbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccess($"The TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} has been completed");
+        TempData.SetFlashSuccess($"TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} completed");
 
         return Redirect(linkGenerator.TrnRequestManualChecksNeeded());
     }

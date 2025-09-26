@@ -201,7 +201,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             var oneLoginPropertyHasChanged = changes != oldChanges;
             if (oneLoginPropertyHasChanged)
             {
-                flashMessage = "Changes to One Login configuration make take a few minutes before they’re updated everywhere.";
+                flashMessage = "Changes to One Login configuration may take a few minutes before they’re updated everywhere.";
             }
         }
 

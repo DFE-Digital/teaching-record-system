@@ -42,9 +42,9 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and update primary record");
 
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
-        await page.AssertBannerAsync("Success", $"Records merged successfully for {person1.FirstName} {person1.MiddleName} {person1.LastName}");
+        await page.AssertBannerAsync("Success", $"Records merged for {person1.FirstName} {person1.MiddleName} {person1.LastName}");
 
-        await page.FollowBannerLink("View record");
+        await page.FollowBannerLink("View record (opens in a new tab)");
         await page.AssertOnPersonDetailPageAsync(person2.PersonId);
     }
 
@@ -96,9 +96,9 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and update primary record");
 
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
-        await page.AssertBannerAsync("Success", $"Records merged successfully for {person2.FirstName} {person2.MiddleName} {person2.LastName}");
+        await page.AssertBannerAsync("Success", $"Records merged for {person2.FirstName} {person2.MiddleName} {person2.LastName}");
 
-        await page.FollowBannerLink("View record");
+        await page.FollowBannerLink("View record (opens in a new tab)");
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
