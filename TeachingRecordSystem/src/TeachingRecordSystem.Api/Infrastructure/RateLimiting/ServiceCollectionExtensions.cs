@@ -12,66 +12,67 @@ public static class ServiceCollectionExtensions
 {
     private const string UnknownUserPartitionKey = "__UNKNOWN__";
 
-    public static IServiceCollection AddRateLimiting(
-        this IServiceCollection services,
-        IWebHostEnvironment environment,
-        IConfiguration configuration)
+    public static IHostApplicationBuilder AddRateLimiting(this IHostApplicationBuilder builder)
     {
-        if (environment.IsProduction())
+        builder.Services.AddRateLimiting(builder.Configuration);
+
+        return builder;
+    }
+
+    public static IServiceCollection AddRateLimiting(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<ClientIdRateLimiterOptions>()
+            .Bind(configuration.GetSection("RateLimiting"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddRateLimiter(options =>
         {
-            services.AddOptions<ClientIdRateLimiterOptions>()
-                .Bind(configuration.GetSection("RateLimiting"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
+            const string _windowSecondsHttpContextKey = "RateLimitWindowSeconds";
 
-            services.AddRateLimiter(options =>
+            options.OnRejected = async (context, token) =>
             {
-                const string _windowSecondsHttpContextKey = "RateLimitWindowSeconds";
+                await RateLimitMetadata.OnRejected(context.HttpContext, context.Lease, token);
 
-                options.OnRejected = async (context, token) =>
+                if (context.Lease.TryGetMetadata(RateLimitMetadataName.Limit, out var limit) &&
+                    context.HttpContext.Items.TryGetValue(_windowSecondsHttpContextKey, out var windowSeconds))
                 {
-                    await RateLimitMetadata.OnRejected(context.HttpContext, context.Lease, token);
+                    var message = $"A maximum of {limit} calls per {windowSeconds} seconds are permitted.";
 
-                    if (context.Lease.TryGetMetadata(RateLimitMetadataName.Limit, out var limit) &&
-                        context.HttpContext.Items.TryGetValue(_windowSecondsHttpContextKey, out var windowSeconds))
+                    var problemDetails = new ProblemDetails()
                     {
-                        var message = $"A maximum of {limit} calls per {windowSeconds} seconds are permitted.";
+                        Title = "API calls quota exceeded",
+                        Detail = message,
+                        Status = context.HttpContext.Response.StatusCode
+                    };
 
-                        var problemDetails = new ProblemDetails
-                        {
-                            Title = "API calls quota exceeded",
-                            Detail = message,
-                            Status = context.HttpContext.Response.StatusCode
-                        };
+                    await context.HttpContext.Response.WriteAsJsonAsync(
+                        problemDetails,
+                        type: typeof(ProblemDetails),
+                        options: null,
+                        contentType: "application/problem+json",
+                        token);
+                }
+            };
 
-                        await context.HttpContext.Response.WriteAsJsonAsync(
-                            problemDetails,
-                            type: typeof(ProblemDetails),
-                            options: null,
-                            contentType: "application/problem+json",
-                            token);
-                    }
-                };
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+            {
+                var rateLimiterOptions = httpContext.RequestServices.GetRequiredService<IOptions<ClientIdRateLimiterOptions>>().Value;
+                var connectionMultiplexerFactory = () => httpContext.RequestServices.GetRequiredService<IConnectionMultiplexer>();
+                var partitionKey = ClaimsPrincipalCurrentUserProvider.TryGetCurrentApplicationUserFromHttpContext(httpContext, out var userId) ? userId.ToString() : UnknownUserPartitionKey;
+                var clientRateLimit = rateLimiterOptions.ClientRateLimits.TryGetValue(partitionKey, out var windowOptions) ? windowOptions : rateLimiterOptions.DefaultRateLimit;
 
-                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                // Window isn't available via RateLimitMetadata so stash it on the HttpContext instead
+                httpContext.Items.TryAdd(_windowSecondsHttpContextKey, clientRateLimit.Window.TotalSeconds);
+
+                return RedisRateLimitPartition.GetFixedWindowRateLimiter(partitionKey, key => new RedisFixedWindowRateLimiterOptions()
                 {
-                    var rateLimiterOptions = httpContext.RequestServices.GetRequiredService<IOptions<ClientIdRateLimiterOptions>>().Value;
-                    var connectionMultiplexerFactory = () => httpContext.RequestServices.GetRequiredService<IConnectionMultiplexer>();
-                    var partitionKey = ClaimsPrincipalCurrentUserProvider.TryGetCurrentApplicationUserFromHttpContext(httpContext, out var userId) ? userId.ToString() : UnknownUserPartitionKey;
-                    var clientRateLimit = rateLimiterOptions.ClientRateLimits.TryGetValue(partitionKey, out var windowOptions) ? windowOptions : rateLimiterOptions.DefaultRateLimit;
-
-                    // Window isn't available via RateLimitMetadata so stash it on the HttpContext instead
-                    httpContext.Items.TryAdd(_windowSecondsHttpContextKey, clientRateLimit.Window.TotalSeconds);
-
-                    return RedisRateLimitPartition.GetFixedWindowRateLimiter(partitionKey, key => new RedisFixedWindowRateLimiterOptions
-                    {
-                        Window = clientRateLimit.Window,
-                        PermitLimit = clientRateLimit.PermitLimit,
-                        ConnectionMultiplexerFactory = connectionMultiplexerFactory
-                    });
+                    Window = clientRateLimit.Window,
+                    PermitLimit = clientRateLimit.PermitLimit,
+                    ConnectionMultiplexerFactory = connectionMultiplexerFactory,
                 });
             });
-        }
+        });
 
         return services;
     }

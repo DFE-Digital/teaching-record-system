@@ -15,6 +15,11 @@ public class TestScopedServices
         BlobStorageFileService = new();
     }
 
+    public static void ConfigureServices(IServiceCollection services) =>
+        services
+            .AddTestScoped<IClock>(tss => tss.Clock)
+            .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object);
+
     public static TestScopedServices GetCurrent() =>
         _current.Value ?? throw new InvalidOperationException("No current instance has been set.");
 
@@ -35,4 +40,13 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 
     public Mock<IFileService> BlobStorageFileService { get; }
+}
+
+file static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
+        where T : class
+    {
+        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
+    }
 }

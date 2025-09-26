@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
+using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
+using Constants = TeachingRecordSystem.Api.Infrastructure.ApplicationModel.Constants;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
@@ -8,6 +11,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOpenApi(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddTransient<IApiDescriptionProvider, HybridBodyApiDescriptionProvider>();
+
         services.AddSwaggerGen(options =>
         {
             options.EnableAnnotations();
