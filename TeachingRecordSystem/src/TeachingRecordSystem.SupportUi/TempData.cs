@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace TeachingRecordSystem.SupportUi;
@@ -40,6 +41,25 @@ public static class TempDataExtensions
                 Message = messageText,
                 MessageHtml = messageHtml
             }.Serialize());
+    }
+
+    public static void SetFlashSuccessWithLinkToRecord(
+        this ITempDataDictionary tempData,
+        string heading,
+        string link)
+    {
+        tempData.SetFlashSuccess(
+            heading,
+            buildMessageHtml: htmlBuilder =>
+            {
+                var linkTag = new TagBuilder("a");
+                linkTag.AddCssClass("govuk-link");
+                linkTag.MergeAttribute("href", link);
+                linkTag.MergeAttribute("target", "_blank");
+                linkTag.MergeAttribute("rel", "noopener noreferrer");
+                linkTag.InnerHtml.Append("View record (opens in a new tab)");
+                htmlBuilder.AppendHtml(linkTag);
+            });
     }
 
     public static bool TryGetFlashSuccess(

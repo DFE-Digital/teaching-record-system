@@ -71,7 +71,7 @@ public class ConfirmKeepRecordSeparateReasonModel(TrsDbContext dbContext, TrsLin
 
         TempData.SetFlashSuccess(
             "Teachers’ Pensions duplicate task completed",
-            $"The records were not merged.");
+            "The records were not merged.");
 
         await JourneyInstance!.CompleteAsync();
         return Redirect(linkGenerator.TeacherPensions());
