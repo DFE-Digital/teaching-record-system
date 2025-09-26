@@ -62,6 +62,7 @@ public partial class TestData
         private Option<string> _npqEvidenceFileName;
         private Option<SupportTaskStatus> _status;
         private bool _withMatches = true;
+        private Option<DateTime> _createdOn;
 
         public CreateNpqTrnRequestSupportTaskBuilder WithMatches(bool withMatches = true)
         {
@@ -104,7 +105,6 @@ public partial class TestData
             _npqEvidenceFileName = Option.Some(npqEvidenceFileName);
             return this;
         }
-        public Option<DateTime> _createdOn;
 
         public CreateNpqTrnRequestSupportTaskBuilder WithFirstName(string firstName)
         {

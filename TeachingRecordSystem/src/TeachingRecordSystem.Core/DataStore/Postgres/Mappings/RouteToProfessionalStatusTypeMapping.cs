@@ -20,7 +20,7 @@ public class RouteToProfessionalStatusTypeMapping : IEntityTypeConfiguration<Rou
         builder.Property(x => x.TrainingAgeSpecialismTypeRequired).IsRequired();
         builder.Property(x => x.TrainingSubjectsRequired).IsRequired();
         builder.HasIndex(x => x.InductionExemptionReasonId).HasDatabaseName(RouteToProfessionalStatusType.InductionExemptionReasonIdIndexName);
-        builder.HasOne<InductionExemptionReason>(x => x.InductionExemptionReason).WithMany().HasForeignKey(x => x.InductionExemptionReasonId).HasConstraintName(RouteToProfessionalStatusType.InductionExemptionReasonForeignKeyName);
+        builder.HasOne(x => x.InductionExemptionReason).WithMany().HasForeignKey(x => x.InductionExemptionReasonId).HasConstraintName(RouteToProfessionalStatusType.InductionExemptionReasonForeignKeyName);
         builder.Navigation(x => x.InductionExemptionReason).AutoInclude();
         builder.HasData(
             new RouteToProfessionalStatusType { RouteToProfessionalStatusTypeId = new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713"), Name = "Apply for Qualified Teacher Status in England", ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus, IsActive = true, TrainingStartDateRequired = FieldRequirement.NotApplicable, TrainingEndDateRequired = FieldRequirement.NotApplicable, HoldsFromRequired = FieldRequirement.Mandatory, InductionExemptionRequired = FieldRequirement.Mandatory, TrainingProviderRequired = FieldRequirement.NotApplicable, DegreeTypeRequired = FieldRequirement.NotApplicable, TrainingCountryRequired = FieldRequirement.Mandatory, TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional, TrainingSubjectsRequired = FieldRequirement.Optional, InductionExemptionReasonId = InductionExemptionReason.OverseasTrainedTeacherId },

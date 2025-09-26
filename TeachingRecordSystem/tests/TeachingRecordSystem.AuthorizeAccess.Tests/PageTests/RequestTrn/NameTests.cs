@@ -112,7 +112,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ["FirstName"] = TestData.GenerateFirstName(),
                 ["MiddleName"] = TestData.GenerateMiddleName(),
                 ["LastName"] = TestData.GenerateLastName()
-            }),
+            })
         };
 
         // Act
@@ -139,7 +139,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ["FirstName"] = TestData.GenerateFirstName(),
                 ["MiddleName"] = TestData.GenerateMiddleName(),
                 ["LastName"] = TestData.GenerateLastName()
-            }),
+            })
         };
 
         // Act
@@ -168,7 +168,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ["FirstName"] = firstName,
                 ["MiddleName"] = middleName,
                 ["LastName"] = lastName
-            }),
+            })
         };
 
         // Act

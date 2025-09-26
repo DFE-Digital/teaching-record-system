@@ -24,12 +24,12 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     public static IEnumerable<object[]> InductionExemptedRoutes()
     {
-        yield return new object[] { RouteToProfessionalStatusType.ScotlandRId, true };
-        yield return new object[] { RouteToProfessionalStatusType.NiRId, true };
-        yield return new object[] { RouteToProfessionalStatusType.QtlsAndSetMembershipId, true };
-        yield return new object[] { RouteToProfessionalStatusType.ScotlandRId, false };
-        yield return new object[] { RouteToProfessionalStatusType.NiRId, false };
-        yield return new object[] { RouteToProfessionalStatusType.QtlsAndSetMembershipId, false };
+        yield return [RouteToProfessionalStatusType.ScotlandRId, true];
+        yield return [RouteToProfessionalStatusType.NiRId, true];
+        yield return [RouteToProfessionalStatusType.QtlsAndSetMembershipId, true];
+        yield return [RouteToProfessionalStatusType.ScotlandRId, false];
+        yield return [RouteToProfessionalStatusType.NiRId, false];
+        yield return [RouteToProfessionalStatusType.QtlsAndSetMembershipId, false];
     }
     [Theory]
     [MemberData(nameof(InductionExemptedRoutes))]

@@ -20,7 +20,7 @@ public abstract class TestBase : IAsyncLifetime
     {
         Converters =
         {
-            new JsonStringEnumConverter(),
+            new JsonStringEnumConverter()
         },
         TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         {
@@ -90,14 +90,12 @@ public abstract class TestBase : IAsyncLifetime
     public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read", string? version = null)
     {
         // The actual access tokens contain many more claims than this but these are the two we care about
-        var subject = new ClaimsIdentity(new[]
-        {
+        var subject = new ClaimsIdentity([
             new Claim("scope", scope),
             new Claim("trn", trn)
-        });
+        ]);
 
-        var jwtHandler = new JwtSecurityTokenHandler();
-        jwtHandler.MapInboundClaims = false;
+        var jwtHandler = new JwtSecurityTokenHandler { MapInboundClaims = false };
 
         var signingCredentials = HostFixture.JwtSigningCredentials;
 

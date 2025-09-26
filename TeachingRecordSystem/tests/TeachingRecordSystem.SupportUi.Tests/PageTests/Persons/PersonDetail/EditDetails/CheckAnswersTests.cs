@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 [Collection(nameof(DisableParallelization))]
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private const string _changeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+    private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
     [Fact]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
@@ -189,7 +189,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -202,7 +202,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertRow("Reason for personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
         doc.AssertRow("Evidence uploaded", v =>
         {
@@ -232,7 +232,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
                 .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "other-evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -246,7 +246,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         doc.AssertRow("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
         doc.AssertRow("Other personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
         doc.AssertRows("Evidence", v =>
         {
@@ -374,7 +374,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithGender(gender)
                 .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
                 .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
-                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, ChangeReasonDetails)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
@@ -425,7 +425,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(nameEvidenceFileId, actualEvent.NameChangeEvidenceFile!.FileId);
             Assert.Equal("name-evidence.pdf", actualEvent.NameChangeEvidenceFile.Name);
             Assert.Equal("Another reason", actualEvent.DetailsChangeReason);
-            Assert.Equal(_changeReasonDetails, actualEvent.DetailsChangeReasonDetail);
+            Assert.Equal(ChangeReasonDetails, actualEvent.DetailsChangeReasonDetail);
             Assert.Equal(otherEvidenceFileId, actualEvent.DetailsChangeEvidenceFile!.FileId);
             Assert.Equal("other-evidence.png", actualEvent.DetailsChangeEvidenceFile.Name);
             Assert.Equal(changes, actualEvent.Changes);
@@ -445,7 +445,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithFirstName("Alfred")
             .WithMiddleName("The")
             .WithLastName("Great")
-            .WithPreviousNames([("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate)])
+            .WithPreviousNames(("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate))
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -499,7 +499,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithFirstName("Alfred")
             .WithMiddleName("The")
             .WithLastName("Great")
-            .WithPreviousNames([("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate)])
+            .WithPreviousNames(("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate))
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
         var journeyInstance = await CreateJourneyInstanceAsync(

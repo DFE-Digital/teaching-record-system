@@ -28,13 +28,13 @@ public record EytsInfo
         Debug.Assert(oldestRoute is null || oldestRoute.HoldsFrom == person.QtsDate);
 
         return person.EytsDate is not null
-            ? new EytsInfo()
+            ? new EytsInfo
             {
                 HoldsFrom = person.EytsDate.Value,
                 CertificateUrl = "/v3/certificates/eyts",
                 StatusDescription = "Qualified",
                 Routes = holdsRoutes
-                    .Select(r => new EytsInfoRoute()
+                    .Select(r => new EytsInfoRoute
                     {
                         RouteToProfessionalStatusType = r.RouteToProfessionalStatusType!
                     })

@@ -19,7 +19,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -391,7 +391,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = firstMatchId
@@ -421,7 +421,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel
@@ -442,17 +442,16 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .IsChecked());
     }
 
-    public static TheoryData<PersonMatchedAttribute[]> HighlightedDifferencesData { get; } = new()
-    {
-        // We could go nuts creating loads of combinations here, but checking every attribute once seems sufficient
-        new[] { PersonMatchedAttribute.FirstName },
-        new[] { PersonMatchedAttribute.MiddleName },
-        new[] { PersonMatchedAttribute.LastName },
-        new[] { PersonMatchedAttribute.DateOfBirth },
-        new[] { PersonMatchedAttribute.EmailAddress },
-        new[] { PersonMatchedAttribute.NationalInsuranceNumber },
-        new[] { PersonMatchedAttribute.Gender }
-    };
+    public static TheoryData<PersonMatchedAttribute[]> HighlightedDifferencesData { get; } =
+    [
+        [PersonMatchedAttribute.FirstName],
+        [PersonMatchedAttribute.MiddleName],
+        [PersonMatchedAttribute.LastName],
+        [PersonMatchedAttribute.DateOfBirth],
+        [PersonMatchedAttribute.EmailAddress],
+        [PersonMatchedAttribute.NationalInsuranceNumber],
+        [PersonMatchedAttribute.Gender]
+    ];
 
     [Theory]
     [MemberData(nameof(HighlightedDifferencesData))]
@@ -535,7 +534,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", personId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
 
         // Act
@@ -561,7 +560,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", personId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
 
         // Act
@@ -609,7 +608,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", personId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
 
         // Act
@@ -640,7 +639,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", personId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
 
         // Act
@@ -682,7 +681,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", selectedPersonId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", selectedPersonId } }
         };
 
         // Act
@@ -723,7 +722,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", selectedPersonId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", selectedPersonId } }
         };
 
         // Act

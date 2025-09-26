@@ -11,7 +11,7 @@ public static class UserRoles
     public static readonly IReadOnlyCollection<UserPermission> ViewerPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.View),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.View),
-        new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
+        new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View)
     ];
 
     [Display(Name = "Record manager")]
@@ -21,7 +21,7 @@ public static class UserRoles
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
-        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit),
+        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Alerts manager (TRA decisions)")]
@@ -31,7 +31,7 @@ public static class UserRoles
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.View),
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.View),
-        new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
+        new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Alerts manager (TRA and DBS decisions)")]
@@ -41,7 +41,7 @@ public static class UserRoles
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.View),
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
+        new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Access manager")]
@@ -52,21 +52,21 @@ public static class UserRoles
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit),
+        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Administrator")]
     public const string Administrator = nameof(Administrator);
 
-    public static IReadOnlyCollection<string> All { get; } = new[]
-    {
+    public static IReadOnlyCollection<string> All { get; } =
+    [
         Viewer,
         RecordManager,
         AlertsManagerTra,
         AlertsManagerTraDbs,
         AccessManager,
         Administrator
-    };
+    ];
 
     public static string GetDisplayNameForRole(string role)
     {

@@ -280,9 +280,9 @@ public class TpsCsvExtractProcessor(
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = item.PersonId,
-                    TpsEmployment = Core.Events.Models.TpsEmployment.FromModel(personEmployment),
+                    TpsEmployment = EventModels.TpsEmployment.FromModel(personEmployment),
                     CreatedUtc = clock.UtcNow,
-                    RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                    RaisedBy = SystemUser.SystemUserId
                 };
 
                 events.Add(createdEvent);
@@ -483,7 +483,7 @@ public class TpsCsvExtractProcessor(
                         },
                         Changes = changes,
                         CreatedUtc = clock.UtcNow,
-                        RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                        RaisedBy = SystemUser.SystemUserId
                     };
 
                     events.Add(updatedEvent);
@@ -646,7 +646,7 @@ public class TpsCsvExtractProcessor(
                     },
                     Changes = TpsEmploymentUpdatedEventChanges.EstablishmentId,
                     CreatedUtc = clock.UtcNow,
-                    RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                    RaisedBy = SystemUser.SystemUserId
                 };
 
                 events.Add(updatedEvent);
@@ -761,7 +761,7 @@ public class TpsCsvExtractProcessor(
                     },
                     Changes = TpsEmploymentUpdatedEventChanges.EndDate,
                     CreatedUtc = clock.UtcNow,
-                    RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                    RaisedBy = SystemUser.SystemUserId
                 };
 
                 events.Add(updatedEvent);
@@ -882,7 +882,7 @@ public class TpsCsvExtractProcessor(
                         },
                         Changes = changes,
                         CreatedUtc = clock.UtcNow,
-                        RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                        RaisedBy = SystemUser.SystemUserId
                     };
 
                     events.Add(updatedEvent);

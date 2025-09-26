@@ -21,7 +21,7 @@ public enum MandatoryQualificationSpecialism
     NotApplicable = 4,
 
     [MandatoryQualificationSpecialismInfo(name: "visual", dqtValue: "Visual")]
-    Visual = 5,
+    Visual = 5
 }
 
 public static class MandatoryQualificationSpecialismRegistry

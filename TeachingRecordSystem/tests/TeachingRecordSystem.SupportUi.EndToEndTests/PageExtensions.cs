@@ -212,7 +212,7 @@ public static class PageExtensions
     {
         var radioButton = page.GetByTestId("upload-evidence-options").Locator($"input[type='radio'][value='{uploadFile}']");
         await radioButton.ClickAsync();
-        if (uploadFile == true)
+        if (uploadFile)
         {
             if (evidenceFileName is null)
             {

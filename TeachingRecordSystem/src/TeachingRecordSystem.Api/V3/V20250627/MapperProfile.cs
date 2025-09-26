@@ -6,11 +6,11 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Core.DataStore.Postgres.Models.RouteToProfessionalStatusType, RouteToProfessionalStatusType>();
-        CreateMap<Core.DataStore.Postgres.Models.InductionExemptionReason, InductionExemptionReason>();
-        CreateMap<Core.DataStore.Postgres.Models.TrainingSubject, TrainingSubject>();
-        CreateMap<Core.DataStore.Postgres.Models.TrainingProvider, TrainingProvider>();
-        CreateMap<Core.DataStore.Postgres.Models.DegreeType, DegreeType>();
+        CreateMap<PostgresModels.RouteToProfessionalStatusType, RouteToProfessionalStatusType>();
+        CreateMap<PostgresModels.InductionExemptionReason, InductionExemptionReason>();
+        CreateMap<PostgresModels.TrainingSubject, TrainingSubject>();
+        CreateMap<PostgresModels.TrainingProvider, TrainingProvider>();
+        CreateMap<PostgresModels.DegreeType, DegreeType>();
         CreateMap<Implementation.Dtos.TrainingCountry, TrainingCountry>();
         CreateMap<Implementation.Dtos.InductionInfo, InductionInfo>();
         CreateMap<Implementation.Dtos.QtsInfo, QtsInfo>();

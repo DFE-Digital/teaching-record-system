@@ -45,7 +45,9 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
         Guid clientApplicationUserId = default;
         if (properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.ClientApplicationUserId, out var clientApplicationUserIdStr))
         {
+#pragma warning disable CA1806
             Guid.TryParse(clientApplicationUserIdStr, out clientApplicationUserId);
+#pragma warning restore CA1806
         }
 
         properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.TrnToken, out var trnToken);

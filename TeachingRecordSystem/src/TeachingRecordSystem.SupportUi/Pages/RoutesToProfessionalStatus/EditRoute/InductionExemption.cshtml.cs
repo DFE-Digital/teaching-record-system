@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string PageTitle = "Edit induction exemption";
+    public string PageTitle => "Edit induction exemption";
 
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]

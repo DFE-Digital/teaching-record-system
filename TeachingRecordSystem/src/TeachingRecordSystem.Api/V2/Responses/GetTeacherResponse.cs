@@ -1,6 +1,4 @@
 #nullable disable
-using TeachingRecordSystem.Api.V2.ApiModels;
-
 namespace TeachingRecordSystem.Api.V2.Responses;
 
 public class GetTeacherResponse
@@ -16,7 +14,7 @@ public class GetTeacherResponse
     public DateOnly? EytsDate { get; set; }
     public string HusId { get; set; }
     public GetTeacherResponseEarlyYearsStatus EarlyYearsStatus { get; set; }
-    public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; set; }
+    public IEnumerable<object> InitialTeacherTraining { get; set; }
     public bool AllowPIIUpdates { get; set; }
 }
 
@@ -24,20 +22,4 @@ public class GetTeacherResponseEarlyYearsStatus
 {
     public string Value { get; set; }
     public string Name { get; set; }
-}
-
-public class GetTeacherResponseInitialTeacherTraining
-{
-    public DateOnly? ProgrammeStartDate { get; set; }
-    public DateOnly? ProgrammeEndDate { get; set; }
-    public IttProgrammeType? ProgrammeType { get; set; }
-    public IttOutcome? Result { get; set; }
-    public GetTeacherResponseInitialTeacherTrainingProvider Provider { get; set; }
-    public string HusId { get; set; }
-    public bool Active { get; set; }
-}
-
-public class GetTeacherResponseInitialTeacherTrainingProvider
-{
-    public string Ukprn { get; set; }
 }

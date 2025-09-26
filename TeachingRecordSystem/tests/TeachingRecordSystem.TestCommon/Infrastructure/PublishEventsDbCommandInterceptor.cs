@@ -33,7 +33,7 @@ public class PublishEventsDbCommandInterceptor(IEventObserver eventObserver) : S
             return (DbContextOptions<TrsDbContext>)inner.WithExtension(
                 coreOptionsExtension.WithInterceptors(
                 [
-                    sp.GetRequiredService<PublishEventsDbCommandInterceptor>(),
+                    sp.GetRequiredService<PublishEventsDbCommandInterceptor>()
                 ]));
         });
 

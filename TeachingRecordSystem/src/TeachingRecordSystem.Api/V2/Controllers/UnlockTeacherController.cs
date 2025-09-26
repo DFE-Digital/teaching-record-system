@@ -17,5 +17,5 @@ public class UnlockTeacherController : ControllerBase
         Description = "Unlocks the teacher record allowing the teacher to sign in to the portals")]
     [ProducesResponseType(typeof(UnlockTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public IActionResult UnlockTeacher() => Ok(new UnlockTeacherResponse() { HasBeenUnlocked = false });
+    public IActionResult UnlockTeacher() => Ok(new UnlockTeacherResponse { HasBeenUnlocked = false });
 }

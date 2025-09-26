@@ -144,12 +144,14 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             requestData.Gender,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.Gender));
 
-        PersonName = StringHelper.JoinNonEmpty(' ', new string?[] { personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName });
+        PersonName = StringHelper.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 
         SourceApplicationUserName = requestData.ApplicationUser!.Name;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
+#pragma warning disable CA1711
     public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
+#pragma warning restore CA1711
 }

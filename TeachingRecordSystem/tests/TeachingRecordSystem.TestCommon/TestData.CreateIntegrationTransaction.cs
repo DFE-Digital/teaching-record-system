@@ -22,7 +22,7 @@ public partial class TestData
         private IntegrationTransactionInterfaceType? _interfaceType;
         private DateTime? _createdOn;
 
-        private readonly List<Action<CreateIntegrationTransactionRecordBuilder>> _rowConfigurations = new();
+        private readonly List<Action<CreateIntegrationTransactionRecordBuilder>> _rowConfigurations = [];
 
         public CreateIntegrationTransactionBuilder WithTotalCount(int totalCount)
         {

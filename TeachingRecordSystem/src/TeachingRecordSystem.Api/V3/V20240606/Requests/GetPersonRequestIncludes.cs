@@ -19,7 +19,9 @@ public enum GetPersonRequestIncludes
     PreviousNames = 1 << 8,
 
     [ExcludeFromSchema]
+#pragma warning disable CA1707
     _AllowIdSignInWithProhibitions = 1 << 9,
+#pragma warning restore CA1707
 
     All = Induction | InitialTeacherTraining | NpqQualifications | MandatoryQualifications | PendingDetailChanges | HigherEducationQualifications | Sanctions | Alerts | PreviousNames
 }

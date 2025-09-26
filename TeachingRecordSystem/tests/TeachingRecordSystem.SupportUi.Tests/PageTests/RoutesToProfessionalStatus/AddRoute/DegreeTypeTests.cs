@@ -144,7 +144,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "DegreeTypeId", degreeType.DegreeTypeId.ToString()}
             }
@@ -182,7 +182,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "DegreeTypeId", degreeType.DegreeTypeId.ToString()}
             }

@@ -42,7 +42,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name }
             }
@@ -63,7 +63,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name }
             }
@@ -84,7 +84,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name }
             }
@@ -106,7 +106,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name },
                 { "ShortName", shortName }

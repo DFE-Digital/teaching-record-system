@@ -13,9 +13,9 @@ public partial class TestData
 
     public class TpsCsvExtractBuilder
     {
-        private readonly string[] validGenderValues = ["Male", "Female"];
-        private readonly string[] validFullOrPartTimeIndicatorValues = ["FT", "PTI", "PTR"];
-        private readonly List<TpsCsvExtractItem> _items = new();
+        private readonly string[] _validGenderValues = ["Male", "Female"];
+        private readonly string[] _validFullOrPartTimeIndicatorValues = ["FT", "PTI", "PTR"];
+        private readonly List<TpsCsvExtractItem> _items = [];
         private Guid? _tpsCsvExtractId;
         private string? _filename;
 
@@ -59,7 +59,7 @@ public partial class TestData
         {
             nationalInsuranceNumber ??= Faker.Identification.UkNationalInsuranceNumber();
             dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            fullOrPartTimeIndicator ??= validFullOrPartTimeIndicatorValues[Faker.RandomNumber.Next(0, 2)];
+            fullOrPartTimeIndicator ??= _validFullOrPartTimeIndicatorValues[Faker.RandomNumber.Next(0, 2)];
 
             _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate, memberPostcode, withdrawalIndicator, memberEmailAddress, employerEmailAddress));
             return this;
@@ -109,7 +109,7 @@ public partial class TestData
                         FullOrPartTimeIndicator = item.FullOrPartTimeIndicator,
                         WithdrawalIndicator = item.WithdrawalIndicator,
                         ExtractDate = item.ExtractDate.ToString("dd/MM/yyyy"),
-                        Gender = validGenderValues[Faker.RandomNumber.Next(0, 1)],
+                        Gender = _validGenderValues[Faker.RandomNumber.Next(0, 1)],
                         Errors = TpsCsvExtractItemLoadErrors.None,
                         Created = DateTime.UtcNow
                     };

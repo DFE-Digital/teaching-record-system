@@ -53,7 +53,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -81,7 +81,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "ProviderId", mqEstablishmentValue }
             }
@@ -124,7 +124,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = oldProvider.MandatoryQualificationProviderId
@@ -132,7 +132,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "ProviderId", newProvider.MandatoryQualificationProviderId }
             }
@@ -155,7 +155,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = provider.MandatoryQualificationProviderId
@@ -191,7 +191,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = provider.MandatoryQualificationProviderId

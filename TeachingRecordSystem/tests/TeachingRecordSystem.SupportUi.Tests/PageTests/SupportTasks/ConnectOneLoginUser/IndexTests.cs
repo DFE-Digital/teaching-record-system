@@ -104,7 +104,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Trn", person.Trn! }
             }
@@ -147,7 +147,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Trn", person.Trn! }
             }
@@ -171,7 +171,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Trn", ConnectOneLoginUserIndexModel.NoneOfTheAboveTrnSentinel },
                 { "TrnOverride", person.Trn! }

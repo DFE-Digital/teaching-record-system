@@ -12,7 +12,7 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
     {
         var alertType = await GetKnownAlertTypeAsync();
 
-        return await CreateJourneyInstanceAsync(personId, new AddAlertState()
+        return await CreateJourneyInstanceAsync(personId, new AddAlertState
         {
             AlertTypeId = alertType.AlertTypeId,
             AlertTypeName = alertType.Name,
@@ -52,20 +52,20 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
                 JourneySteps.New or JourneySteps.Index =>
                     CreateEmptyJourneyInstanceAsync(personId),
                 JourneySteps.AlertType =>
-                    CreateJourneyInstanceAsync(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name
                     }),
                 JourneySteps.Details =>
-                    CreateJourneyInstanceAsync(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name,
                         Details = "Alert Details"
                     }),
                 JourneySteps.Link =>
-                    CreateJourneyInstanceAsync(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name,
@@ -74,7 +74,7 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
                         Link = populateOptional ? "https://www.example.com" : null
                     }),
                 JourneySteps.StartDate =>
-                    CreateJourneyInstanceAsync(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name,

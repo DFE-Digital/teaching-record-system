@@ -27,12 +27,12 @@ public record Alert
                 AlertCategory = new()
                 {
                     AlertCategoryId = alertType.AlertCategoryId,
-                    Name = alertType.AlertCategory!.Name,
+                    Name = alertType.AlertCategory!.Name
                 }
             },
             Details = alert.Details,
             StartDate = alert.StartDate,
-            EndDate = alert.EndDate,
+            EndDate = alert.EndDate
         };
     }
 }

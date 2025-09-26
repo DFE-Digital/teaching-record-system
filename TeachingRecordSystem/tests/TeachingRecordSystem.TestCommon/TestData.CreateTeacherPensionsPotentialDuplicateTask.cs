@@ -113,7 +113,7 @@ public partial class TestData
             var integrationTransactionId = _integrationTransactionId;
             var fileName = _fileName ?? string.Empty;
 
-            var trnRequestMetadata = new Core.DataStore.Postgres.Models.TrnRequestMetadata()
+            var trnRequestMetadata = new TrnRequestMetadata()
             {
                 ApplicationUserId = userId,
                 RequestId = Guid.NewGuid().ToString(),
@@ -129,13 +129,13 @@ public partial class TestData
                 NationalInsuranceNumber = nationalInsuranceNumber,
                 Gender = gender,
                 PotentialDuplicate = true,
-                Matches = new Core.DataStore.Postgres.Models.TrnRequestMatches()
+                Matches = new TrnRequestMatches()
                 {
                     MatchedPersons = matchedPersons
 
                 }
             };
-            var supportTask = Core.DataStore.Postgres.Models.SupportTask.Create(
+            var supportTask = SupportTask.Create(
                 SupportTaskType.TeacherPensionsPotentialDuplicate,
                 new Core.Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
                 {

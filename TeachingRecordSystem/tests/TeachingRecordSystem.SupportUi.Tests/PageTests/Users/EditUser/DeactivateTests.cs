@@ -363,7 +363,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
                 { "UploadEvidence", true },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(), "invalidfile.cs" },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(), "invalidfile.cs" }
             }
         };
 
@@ -390,7 +390,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             {
                 { "HasMoreInformation", false },
                 { "UploadEvidence", true },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" }
             }
         };
 
@@ -433,7 +433,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
                 { "EvidenceFileId", evidenceFileId },
                 { "EvidenceFileName", "testfile.jpg" },
                 { "EvidenceFileSizeDescription", "3 KB" },
-                { "UploadedEvidenceFileUrl", "http://test.com/file" },
+                { "UploadedEvidenceFileUrl", "http://test.com/file" }
             }
         };
 
@@ -473,7 +473,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
                 { "HasMoreInformation", false },
                 { "UploadEvidence", true },
                 { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" },
-                { "EvidenceFileId", evidenceFileId },
+                { "EvidenceFileId", evidenceFileId }
             }
         };
 
@@ -502,7 +502,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             {
                 { "HasMoreInformation", false },
                 { "UploadEvidence", false },
-                { "EvidenceFileId", evidenceFileId },
+                { "EvidenceFileId", evidenceFileId }
             }
         };
 
@@ -625,7 +625,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
                 { "HasMoreInformation", true },
                 { "MoreInformationDetail", "Some more information" },
                 { "UploadEvidence", true },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" }
             }
         };
 
@@ -673,7 +673,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
                 { "UploadEvidence", true },
-                { "EvidenceFileId", evidenceFileId },
+                { "EvidenceFileId", evidenceFileId }
             }
         };
 
@@ -723,7 +723,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
                 { "HasMoreInformation", false },
                 { "MoreInformationDetail", "Some more information" },
                 { "UploadEvidence", false },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" }
             }
         };
 

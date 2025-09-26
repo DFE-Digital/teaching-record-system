@@ -1029,7 +1029,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     {
         var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption == true)
+            .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
             .RandomOne();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();

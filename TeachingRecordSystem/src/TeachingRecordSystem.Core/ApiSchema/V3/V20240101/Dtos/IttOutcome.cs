@@ -13,5 +13,5 @@ public enum IttOutcome
     Info,
     InTraining,
     NoResultSubmitted,
-    UnderAssessment,
+    UnderAssessment
 }

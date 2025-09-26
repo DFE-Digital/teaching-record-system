@@ -90,7 +90,7 @@ public class Alert
             PersonId = PersonId,
             Alert = EventModels.Alert.FromModel(this),
             DeletionReasonDetail = deletionReasonDetail,
-            EvidenceFile = evidenceFile,
+            EvidenceFile = evidenceFile
         };
     }
 

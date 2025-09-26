@@ -149,7 +149,7 @@ public readonly struct JourneyInstanceId(string journeyName, IReadOnlyDictionary
 
     private static bool IsKeyOptional(string key, out string normalizedKey)
     {
-        if (key.EndsWith("?"))
+        if (key.EndsWith('?'))
         {
             normalizedKey = key[0..^1];
             return true;

@@ -74,7 +74,7 @@ public class CreateNameChangeRequestHandler(
 
         var getAnIdentityApplicationUserId = configuration.GetValue<Guid>("GetAnIdentityApplicationUserId");
 
-        var supportTask = PostgresModels.SupportTask.Create(
+        var supportTask = SupportTask.Create(
             SupportTaskType.ChangeNameRequest,
             changeRequestData,
             person.PersonId,

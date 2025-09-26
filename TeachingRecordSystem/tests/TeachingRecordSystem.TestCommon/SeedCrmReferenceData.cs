@@ -112,7 +112,7 @@ public class SeedCrmReferenceData : IStartupTask
             ("T8", "FOR INTERNAL INFORMATION ONLY - see alert details"),
             ("T9", "Council Members never de-register"),
             ("Z1", "Council Member  -  do not register"),
-            ("Z2", ""),
+            ("Z2", "")
         };
 
         Array.ForEach(sanctionCodesAndNames, s => _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
@@ -249,7 +249,7 @@ public class SeedCrmReferenceData : IStartupTask
         _xrmFakedContext.CreateEntity(new dfeta_earlyyearsstatus()
         {
             dfeta_Value = "220",
-            dfeta_name = "Early Years Trainee",
+            dfeta_name = "Early Years Trainee"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_earlyyearsstatus()

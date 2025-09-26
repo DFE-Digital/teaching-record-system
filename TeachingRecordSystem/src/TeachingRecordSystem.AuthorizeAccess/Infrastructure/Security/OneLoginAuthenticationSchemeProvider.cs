@@ -24,7 +24,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
     private static readonly TimeSpan _pollDbInterval = TimeSpan.FromMinutes(2);
 
     // Whether _schemeCache has been populated.
-    private bool _loaded = false;
+    private bool _loaded;
 
     // A map of authentication scheme names -> AuthenticationScheme + ApplicationUser.
     private readonly ConcurrentDictionary<string, AuthenticationSchemeAndApplicationUser> _schemeCache = [];

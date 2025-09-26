@@ -9,15 +9,15 @@ public class SetCpdInductionStatusTests : TestBase
         SetCurrentApiClient([ApiRoles.SetCpdInduction]);
     }
 
-    public static TheoryData<InductionStatus> AllStatusesExceptNoneData => new()
-    {
+    public static TheoryData<InductionStatus> AllStatusesExceptNoneData =>
+    [
         InductionStatus.RequiredToComplete,
         InductionStatus.InProgress,
         InductionStatus.Passed,
         InductionStatus.Failed,
         InductionStatus.Exempt,
         InductionStatus.FailedInWales
-    };
+    ];
 
     [Fact]
     public async Task Put_UserDoesNotHavePermission_ReturnsForbidden()

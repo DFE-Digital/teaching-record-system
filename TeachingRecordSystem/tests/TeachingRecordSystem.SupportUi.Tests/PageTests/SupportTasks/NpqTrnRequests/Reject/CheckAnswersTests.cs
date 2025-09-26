@@ -21,7 +21,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
 
         var state = new RejectNpqTrnRequestState
         {
-            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch
         };
         var journeyInstance = await CreateJourneyInstance(
             JourneyNames.RejectNpqTrnRequest,
@@ -54,7 +54,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
 
         var state = new RejectNpqTrnRequestState
         {
-            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch
         };
         var journeyInstance = await CreateJourneyInstance(
             JourneyNames.RejectNpqTrnRequest,
@@ -84,7 +84,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             .ExecuteAsync(TestData);
         var state = new RejectNpqTrnRequestState
         {
-            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch
         };
         var journeyInstance = await CreateJourneyInstance(
                 JourneyNames.RejectNpqTrnRequest,
@@ -142,7 +142,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
 
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"TRN request for {StringHelper.JoinNonEmpty(' ', new string?[] { requestMetadata.FirstName, requestMetadata.MiddleName, requestMetadata.LastName })} rejected");
+            $"TRN request for {StringHelper.JoinNonEmpty(' ', requestMetadata.FirstName, requestMetadata.MiddleName, requestMetadata.LastName)} rejected");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);

@@ -6,18 +6,26 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private const string _changeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+    private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
     public static IEnumerable<object[]> GetInductionStatusData()
     {
-        yield return new object[] {
-            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithCompletedDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build() };
-        yield return new object[] {
-            new EditInductionStateBuilder().WithInitializedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build() };
-        yield return new object[] {
-            new EditInductionStateBuilder().WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build() };
-        yield return new object[] {
-            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).Build() };
+        yield return
+        [
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithCompletedDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build()
+        ];
+        yield return
+        [
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build()
+        ];
+        yield return
+        [
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build()
+        ];
+        yield return
+        [
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).Build()
+        ];
     }
 
     [Theory]
@@ -380,7 +388,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithStartDate(startDate)
             .WithCompletedDate(completedDate)
             .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-            .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+            .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
             .WithFileUploadChoice(uploadFile: false)
             .Build();
 
@@ -407,7 +415,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var labelDetails = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason details");
         Assert.NotNull(labelDetails);
         var valueDetails = labelDetails.NextElementSibling;
-        Assert.Equal(_changeReasonDetails, valueDetails!.TrimmedText());
+        Assert.Equal(ChangeReasonDetails, valueDetails!.TrimmedText());
 
         var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Do you have evidence to upload");
         Assert.NotNull(labelFileUpload);
@@ -438,7 +446,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+                .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
                 .WithFileUploadChoice(uploadFile: false)
                 .Build());
 
@@ -480,7 +488,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+                .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
                 .WithFileUploadChoice(uploadFile: false)
                 .Build());
 
@@ -521,7 +529,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+                .WithReasonDetailsChoice(addDetails: true, ChangeReasonDetails)
                 .WithFileUploadChoice(uploadFile: true)
                 .Build());
 

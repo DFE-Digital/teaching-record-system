@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
                 return false;
             });
 
-            options.AddSecurityDefinition(SecuritySchemes.ApiKey, new OpenApiSecurityScheme()
+            options.AddSecurityDefinition(SecuritySchemes.ApiKey, new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
                 Name = "Authorization",
@@ -47,7 +47,7 @@ public static class ServiceCollectionExtensions
                 Type = SecuritySchemeType.Http
             });
 
-            options.AddSecurityDefinition(SecuritySchemes.GetAnIdentityAccessToken, new OpenApiSecurityScheme()
+            options.AddSecurityDefinition(SecuritySchemes.GetAnIdentityAccessToken, new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
                 Scheme = "Bearer",
@@ -67,7 +67,7 @@ public static class ServiceCollectionExtensions
             {
                 options.SwaggerDoc(
                     OpenApiDocumentHelper.GetDocumentName(version, minorVersion),
-                    new OpenApiInfo()
+                    new OpenApiInfo
                     {
                         Version = OpenApiDocumentHelper.GetVersionName(version, minorVersion),
                         Title = OpenApiDocumentHelper.Title

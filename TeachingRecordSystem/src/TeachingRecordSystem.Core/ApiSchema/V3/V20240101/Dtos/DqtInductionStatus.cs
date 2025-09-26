@@ -10,5 +10,5 @@ public enum DqtInductionStatus
     NotYetCompleted,
     Pass,
     PassedinWales,
-    RequiredtoComplete,
+    RequiredtoComplete
 }

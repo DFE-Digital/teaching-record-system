@@ -51,5 +51,5 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     public static TheoryData<PersonStatus> AllStatuses =>
-        new TheoryData<PersonStatus> { PersonStatus.Active, PersonStatus.Deactivated };
+        [PersonStatus.Active, PersonStatus.Deactivated];
 }

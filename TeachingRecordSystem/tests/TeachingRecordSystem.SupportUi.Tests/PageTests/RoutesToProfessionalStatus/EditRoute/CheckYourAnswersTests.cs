@@ -670,7 +670,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         editRouteState.EnsureInitialized(qualification);
         action(editRouteState);
         editRouteState.ChangeReason = ChangeReasonOption.AnotherReason;
-        editRouteState.ChangeReasonDetail = new ChangeReasonDetailsState()
+        editRouteState.ChangeReasonDetail = new ChangeReasonDetailsState
         {
             HasAdditionalReasonDetail = false,
             ChangeReasonDetail = null,

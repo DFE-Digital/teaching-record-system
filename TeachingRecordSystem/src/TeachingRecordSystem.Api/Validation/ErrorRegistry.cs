@@ -32,7 +32,7 @@ public static class ErrorRegistry
         ErrorDescriptor.Create(10027),  // Unable to change Failed Result.
         ErrorDescriptor.Create(10028),  // The specified URL does not exist
         ErrorDescriptor.Create(10029),  // Request has already been submitted
-        ErrorDescriptor.Create(10030),  // Unable to update QTLS Date
+        ErrorDescriptor.Create(10030) // Unable to update QTLS Date
     }.ToDictionary(d => d.ErrorCode, d => d);
 
     public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);

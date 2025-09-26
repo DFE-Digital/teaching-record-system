@@ -13,21 +13,21 @@ public class OneLoginUserMapping : IEntityTypeConfiguration<OneLoginUser>
         builder.HasKey(o => o.Subject);
         builder.Property(o => o.Subject).HasMaxLength(255);
         builder.Property(o => o.Email).HasMaxLength(200);
-        builder.HasOne<Person>(o => o.Person).WithOne().HasForeignKey<OneLoginUser>(o => o.PersonId);
-        builder.Property(o => o.VerifiedNames).HasColumnType("jsonb").HasConversion<string>(
+        builder.HasOne(o => o.Person).WithOne().HasForeignKey<OneLoginUser>(o => o.PersonId);
+        builder.Property(o => o.VerifiedNames).HasColumnType("jsonb").HasConversion(
             v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
             v => JsonSerializer.Deserialize<string[][]>(v, (JsonSerializerOptions?)null),
             new ValueComparer<string[][]>(
                 (a, b) => (a == null && b == null) || (a != null && b != null && a.SequenceEqual(b, new StringArrayEqualityComparer())),
                 v => HashCode.Combine(v.Select(names => string.Join(" ", names)))));
-        builder.Property(o => o.VerifiedDatesOfBirth).HasColumnType("jsonb").HasConversion<string>(
+        builder.Property(o => o.VerifiedDatesOfBirth).HasColumnType("jsonb").HasConversion(
             v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
             v => JsonSerializer.Deserialize<DateOnly[]>(v, (JsonSerializerOptions?)null),
             new ValueComparer<DateOnly[]>(
                 (a, b) => (a == null && b == null) || (a != null && b != null && a.SequenceEqual(b)),
                 v => HashCode.Combine(v)));
         builder.Property(o => o.LastCoreIdentityVc).HasColumnType("jsonb");
-        builder.Property(o => o.MatchedAttributes).HasColumnType("jsonb").HasConversion<string>(
+        builder.Property(o => o.MatchedAttributes).HasColumnType("jsonb").HasConversion(
             v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
             v => JsonSerializer.Deserialize<KeyValuePair<PersonMatchedAttribute, string>[]>(v, (JsonSerializerOptions?)null),
             new ValueComparer<KeyValuePair<PersonMatchedAttribute, string>[]>(

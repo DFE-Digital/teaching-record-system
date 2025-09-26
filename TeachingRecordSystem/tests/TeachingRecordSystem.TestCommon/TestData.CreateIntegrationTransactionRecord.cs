@@ -1,5 +1,7 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
+namespace TeachingRecordSystem.TestCommon;
+
 public class CreateIntegrationTransactionRecordBuilder
 {
     private string? _rowData;

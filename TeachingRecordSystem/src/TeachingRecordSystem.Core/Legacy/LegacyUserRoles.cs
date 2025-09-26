@@ -26,15 +26,15 @@ public static class LegacyUserRoles
     [Display(Name = "Induction - read & write")]
     public const string InductionReadWrite = "InductionReadWrite";
 
-    public static IReadOnlyCollection<string> All { get; } = new[]
-    {
+    public static IReadOnlyCollection<string> All { get; } =
+    [
         Administrator,
         Helpdesk,
         AlertsReadWrite,
         DbsAlertsReadOnly,
         DbsAlertsReadWrite,
         InductionReadWrite
-    };
+    ];
 
     public static string GetDisplayNameForRole(string role)
     {

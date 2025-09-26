@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -55,10 +54,10 @@ public class HostFixture : WebApplicationFactory<Program>
 
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
-            services.AddSingleton<TestData>(
+            services.AddSingleton(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
-                    (IClock)new ForwardToTestScopedClock(),
+                    new ForwardToTestScopedClock(),
                     TestDataPersonDataSource.CrmAndTrs));
             services.AddFakeXrm();
             services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
@@ -67,7 +66,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton(GetMockFileService());
-            services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object);
+            services.AddTestScoped(tss => tss.GetAnIdentityApiClient.Object);
 
             IFileService GetMockFileService()
             {
@@ -132,6 +131,6 @@ file static class ServiceCollectionExtensions
     public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
         where T : class
     {
-        return services.AddTransient<T>(_ => resolveService(TestScopedServices.GetCurrent()));
+        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
     }
 }

@@ -16,9 +16,9 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
             await HandleDefaultRequestAsync() :
             await HandleStrictRequestAsync();
 
-        return new FindTeachersResponse()
+        return new FindTeachersResponse
         {
-            Results = result.Select(p => new FindTeacherResult()
+            Results = result.Select(p => new FindTeacherResult
             {
                 Trn = p.Trn!,
                 EmailAddresses = !string.IsNullOrEmpty(p.EmailAddress) ? [p.EmailAddress] : [],
@@ -40,30 +40,30 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
             var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty().SelectMany(PostgresModels.PersonSearchAttribute.SplitName);
 
             return await dbContext.Persons.FromSqlRaw(
-                $"""
-                 WITH matches AS (
-                    SELECT
-                        person_id,
-                        array_agg(DISTINCT attribute_type) attribute_types,
-                        array_agg(DISTINCT attribute_type) FILTER (WHERE attribute_type IN ('FirstName', 'LastName')) name_attribute_types,
-                        array_agg(DISTINCT attribute_type) FILTER (WHERE attribute_type NOT IN ('FirstName', 'LastName')) non_name_attribute_types
-                    FROM person_search_attributes
+                    """
+                    WITH matches AS (
+                       SELECT
+                           person_id,
+                           array_agg(DISTINCT attribute_type) attribute_types,
+                           array_agg(DISTINCT attribute_type) FILTER (WHERE attribute_type IN ('FirstName', 'LastName')) name_attribute_types,
+                           array_agg(DISTINCT attribute_type) FILTER (WHERE attribute_type NOT IN ('FirstName', 'LastName')) non_name_attribute_types
+                       FROM person_search_attributes
+                       WHERE
+                           (attribute_type = 'FirstName' AND attribute_value = ANY((:first_names collate "case_insensitive"))) OR
+                           (attribute_type = 'LastName' AND attribute_value = ANY((:last_names collate "case_insensitive"))) OR
+                           (attribute_type = 'DateOfBirth' AND attribute_value = (:date_of_birth collate "case_insensitive")) OR
+                           (attribute_type = 'EmailAddress' AND attribute_value = (:email_address collate "case_insensitive")) OR
+                           (attribute_type = 'Trn' AND attribute_value = (:trn collate "case_insensitive")) OR
+                           (attribute_type = 'NationalInsuranceNumber' AND attribute_value = (:national_insurance_number collate "case_insensitive"))
+                       GROUP BY person_id
+                    )
+                    SELECT p.* FROM matches m
+                    JOIN persons p ON p.person_id = m.person_id
+                    -- Only return persons that match on at least 3 distinct attributes, counting full name (first + last) as a single attribute
                     WHERE
-                        (attribute_type = 'FirstName' AND attribute_value = ANY((:first_names collate "case_insensitive"))) OR
-                        (attribute_type = 'LastName' AND attribute_value = ANY((:last_names collate "case_insensitive"))) OR
-                        (attribute_type = 'DateOfBirth' AND attribute_value = (:date_of_birth collate "case_insensitive")) OR
-                        (attribute_type = 'EmailAddress' AND attribute_value = (:email_address collate "case_insensitive")) OR
-                        (attribute_type = 'Trn' AND attribute_value = (:trn collate "case_insensitive")) OR
-                        (attribute_type = 'NationalInsuranceNumber' AND attribute_value = (:national_insurance_number collate "case_insensitive"))
-                    GROUP BY person_id
-                 )
-                 SELECT p.* FROM matches m
-                 JOIN persons p ON p.person_id = m.person_id
-                 -- Only return persons that match on at least 3 distinct attributes, counting full name (first + last) as a single attribute
-                 WHERE
-                    CASE WHEN ARRAY['FirstName', 'LastName']::varchar[] <@ m.name_attribute_types THEN 1 ELSE 0 END +
-                    array_length(m.non_name_attribute_types, 1) >= 3
-                 """,
+                       CASE WHEN ARRAY['FirstName', 'LastName']::varchar[] <@ m.name_attribute_types THEN 1 ELSE 0 END +
+                       array_length(m.non_name_attribute_types, 1) >= 3
+                    """,
                 // ReSharper disable once FormatStringProblem
                 parameters: [
                     new NpgsqlParameter("first_names", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = firstNames.ToArray() },
@@ -74,7 +74,7 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
                     new NpgsqlParameter("national_insurance_number", NpgsqlDbType.Varchar) { Value = (object?)request.NationalInsuranceNumber ?? DBNull.Value }
                 ])
                 .ApplyBaseFilters()
-                .ToArrayAsync();
+                .ToArrayAsync(cancellationToken);
         }
 
         async Task<IEnumerable<PostgresModels.Person>> HandleStrictRequestAsync()
@@ -93,7 +93,7 @@ public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindT
                     p.Trn == request.Trn && (
                         (p.NationalInsuranceNumber != null && p.NationalInsuranceNumber == normalizedNino) ||
                         (p.NationalInsuranceNumber == null && p.FirstName == request.FirstName && p.LastName == request.LastName)))
-                .ToArrayAsync();
+                .ToArrayAsync(cancellationToken: cancellationToken);
         }
     }
 }

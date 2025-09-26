@@ -29,7 +29,7 @@ public class FlagsEnumStringListModelBinder : IModelBinder
         {
             if (!Enum.TryParse(modelType, v, ignoreCase: true, out var parsed))
             {
-                logger.LogDebug($"Failed to parse '{v}' as {modelType}.");
+                logger.LogDebug("Failed to parse '{Value}' as {ModelType}.", v, modelType);
 
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;
@@ -44,7 +44,7 @@ public class FlagsEnumStringListModelBinder : IModelBinder
             }
             else
             {
-                logger.LogDebug($"Value '{parsed}' is not a single flag of {modelType}.");
+                logger.LogDebug("Value '{Result}' is not a single flag of {ModelType}.", parsed, modelType);
 
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;

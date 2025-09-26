@@ -141,6 +141,6 @@ public class MandatoryQualificationProvider
         {
             MandatoryQualificationProviderId = new Guid("d4fc958b-21de-47ec-9f03-36ae237a1b11"),
             Name = "University College, Swansea"
-        },
+        }
     ];
 }

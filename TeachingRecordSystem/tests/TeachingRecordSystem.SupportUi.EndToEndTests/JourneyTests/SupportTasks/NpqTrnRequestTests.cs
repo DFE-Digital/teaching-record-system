@@ -74,7 +74,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
             applicationUser.UserId,
             t =>
             {
-                t.WithMatchedPersons([matchedPerson1.PersonId, matchedPerson2.PersonId]);
+                t.WithMatchedPersons(matchedPerson1.PersonId, matchedPerson2.PersonId);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
                 t.WithEmailAddress(matchedPerson1.Email!);

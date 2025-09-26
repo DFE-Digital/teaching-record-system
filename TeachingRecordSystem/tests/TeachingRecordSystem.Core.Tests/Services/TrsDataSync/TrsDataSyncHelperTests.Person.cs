@@ -53,7 +53,7 @@ public partial class TrsDataSyncHelperTests
         await Helper.SyncPersonAsync(existingEntity, syncAudit: false, ignoreInvalid: false);
 
         // Act
-        await Helper.DeleteRecordsAsync(TrsDataSyncHelper.ModelTypes.Person, new[] { contactId });
+        await Helper.DeleteRecordsAsync(TrsDataSyncHelper.ModelTypes.Person, [contactId]);
 
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
@@ -83,7 +83,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(entity.LastName, person.LastName);
             Assert.Equal(entity.BirthDate?.ToDateOnlyWithDqtBstFix(isLocalTime: false), person.DateOfBirth);
             Assert.Equal(entity.EMailAddress1, person.EmailAddress);
-            Assert.Equal(entity.dfeta_NINumber, (string?)person.NationalInsuranceNumber);
+            Assert.Equal(entity.dfeta_NINumber, person.NationalInsuranceNumber);
             Assert.Equal((int)entity.StateCode!, person.DqtState);
             Assert.Equal(entity.CreatedOn, person.DqtCreatedOn);
             Assert.Equal(entity.ModifiedOn, person.DqtModifiedOn);

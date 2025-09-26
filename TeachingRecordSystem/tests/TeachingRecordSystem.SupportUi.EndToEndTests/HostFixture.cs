@@ -21,8 +21,8 @@ public sealed class HostFixture : IAsyncDisposable
     public const string BaseUrl = "http://localhost:55642";
 
     private readonly IConfiguration _configuration;
-    private bool _initialized = false;
-    private bool _disposed = false;
+    private bool _initialized;
+    private bool _disposed;
     private Host<Program>? _host;
     private IPlaywright? _playwright;
     private IBrowser? _browser;
@@ -79,7 +79,7 @@ public sealed class HostFixture : IAsyncDisposable
 
                     services.AddSingleton<CurrentUserProvider>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
-                    services.AddSingleton<TestData>(
+                    services.AddSingleton(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataPersonDataSource.CrmAndTrs));
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
@@ -159,7 +159,7 @@ public sealed class HostFixture : IAsyncDisposable
         var browserOptions = new BrowserTypeLaunchOptions()
         {
             Timeout = 10000,
-            Args = new[] { "--start-maximized" }
+            Args = ["--start-maximized"]
         };
 
         if (Debugger.IsAttached)
@@ -208,7 +208,9 @@ public sealed class HostFixture : IAsyncDisposable
 
         public IServiceProvider Services => _applicationFactory.Services;
 
+#pragma warning disable CA1000
         public static Host<T> CreateHost(
+#pragma warning restore CA1000
             string url,
             Action<IWebHostBuilder> configureWebHostBuilder)
         {

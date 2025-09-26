@@ -13,7 +13,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new DeleteMqState()
+            new DeleteMqState
             {
                 Initialized = true
             });
@@ -101,7 +101,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new DeleteMqState()
+            new DeleteMqState
             {
                 Initialized = true
             });
@@ -145,7 +145,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new DeleteMqState()
+            new DeleteMqState
             {
                 Initialized = true,
                 DeletionReason = deletionReason,
@@ -172,7 +172,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var expectedMqDeletedEvent = new MandatoryQualificationDeletedEvent()
+            var expectedMqDeletedEvent = new MandatoryQualificationDeletedEvent
             {
                 EventId = Guid.Empty,
                 CreatedUtc = Clock.UtcNow,
@@ -195,7 +195,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 },
                 DeletionReason = deletionReason.GetDisplayName(),
                 DeletionReasonDetail = deletionReasonDetail,
-                EvidenceFile = new Core.Events.Models.File()
+                EvidenceFile = new EventModels.File
                 {
                     FileId = evidenceFileId,
                     Name = evidenceFileName
@@ -218,7 +218,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new DeleteMqState()
+            new DeleteMqState
             {
                 Initialized = true,
                 DeletionReason = MqDeletionReasonOption.ProviderRequest,
@@ -272,7 +272,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new DeleteMqState()
+            new DeleteMqState
             {
                 Initialized = true,
                 DeletionReason = deletionReason,

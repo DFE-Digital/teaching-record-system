@@ -58,7 +58,7 @@ public class HybridBodyApiDescriptionProvider : IApiDescriptionProvider
                                 }
                             }
 
-                            apiDescription.ParameterDescriptions.Add(new ApiParameterDescription()
+                            apiDescription.ParameterDescriptions.Add(new ApiParameterDescription
                             {
                                 BindingInfo = bindingInfo,
                                 Name = name,

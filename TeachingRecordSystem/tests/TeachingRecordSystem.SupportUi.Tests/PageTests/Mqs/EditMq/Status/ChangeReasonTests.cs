@@ -23,12 +23,12 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
-        // Arrange        
+        // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true
             });
@@ -54,12 +54,12 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
-                CurrentStatus = oldStatus,
+                CurrentStatus = oldStatus
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -134,7 +134,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 CurrentStatus = oldStatus,
@@ -145,7 +145,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "UploadEvidence", "False" }
             }
@@ -169,19 +169,19 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
-                CurrentStatus = oldStatus,
+                CurrentStatus = oldStatus
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                 { "ChangeReason", MqChangeStatusReasonOption.ChangeOfStatus.ToString() },
+                 { "ChangeReason", MqChangeStatusReasonOption.ChangeOfStatus.ToString() }
             }
         };
 
@@ -203,17 +203,17 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
-                CurrentStatus = oldStatus,
+                CurrentStatus = oldStatus
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                  { "ChangeReason", MqChangeStatusReasonOption.ChangeOfStatus.ToString() },
                  { "UploadEvidence", "True" }
@@ -238,12 +238,12 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
-                CurrentStatus = oldStatus,
+                CurrentStatus = oldStatus
             });
 
         var multipartContent = CreateFormFileUpload(".cs");
@@ -314,7 +314,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 CurrentStatus = oldStatus,
@@ -353,12 +353,12 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
-                CurrentStatus = oldStatus,
+                CurrentStatus = oldStatus
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/change-reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -394,12 +394,12 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
-                CurrentStatus = oldStatus,
+                CurrentStatus = oldStatus
             });
 
         var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -413,7 +413,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {
-        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        var byteArrayContent = new ByteArrayContent([]);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
 
         var multipartContent = new MultipartFormDataContent

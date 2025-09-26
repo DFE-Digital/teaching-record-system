@@ -8,7 +8,9 @@ using Xunit.Sdk;
 
 namespace TeachingRecordSystem.UiTestCommon;
 
+#pragma warning disable CA1711
 public static partial class AssertEx
+#pragma warning restore CA1711
 {
     public static void ResponseIsRedirectTo(HttpResponseMessage response, string expectedUrl)
     {
@@ -333,7 +335,7 @@ public static partial class AssertEx
         Assert.NotNull(container);
 
         var label = container.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
-        AssertRowValueCore<T>(label, valueAssertion);
+        AssertRowValueCore(label, valueAssertion);
     }
 
     private static void AssertRowsCore<T>(this IElement doc, string? containerTestId, string keyContent, params Action<T>[] valueAssertions)

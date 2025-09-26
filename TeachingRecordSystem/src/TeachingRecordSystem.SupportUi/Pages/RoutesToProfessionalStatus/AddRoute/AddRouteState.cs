@@ -52,7 +52,7 @@ public class AddRouteState : IRegisterJourney
                 TrainingAgeSpecialismRangeFrom != null ||
                 TrainingAgeSpecialismRangeTo != null,
             AddRoutePage.SubjectSpecialisms =>
-                TrainingSubjectIds.Any(),
+                TrainingSubjectIds.Length != 0,
             AddRoutePage.ChangeReason =>
                 ChangeReason != null ||
                 ChangeReasonDetail.ChangeReasonDetail != null ||

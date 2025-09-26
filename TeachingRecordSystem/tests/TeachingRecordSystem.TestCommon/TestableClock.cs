@@ -14,10 +14,7 @@ public class TestableClock : IClock
 
     public DateTime Advance(TimeSpan ts)
     {
-        if (ts < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(ts));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(ts, TimeSpan.Zero);
 
         return UtcNow += ts;
     }

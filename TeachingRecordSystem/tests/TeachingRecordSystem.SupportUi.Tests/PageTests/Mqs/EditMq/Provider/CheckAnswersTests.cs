@@ -13,7 +13,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true
             });
@@ -43,7 +43,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
@@ -88,7 +88,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true
             });
@@ -120,14 +120,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
                 CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
                 ChangeReasonDetail = "Some reason",
-                UploadEvidence = false,
+                UploadEvidence = false
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -155,7 +155,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
+            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent
             {
                 EventId = Guid.Empty,
                 CreatedUtc = Clock.UtcNow,
@@ -212,14 +212,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
                 CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
                 ChangeReasonDetail = "Some reason",
-                UploadEvidence = false,
+                UploadEvidence = false
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -260,14 +260,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = newProvider.MandatoryQualificationProviderId,
                 CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
                 ChangeReasonDetail = "Some reason",
-                UploadEvidence = false,
+                UploadEvidence = false
             });
 
         var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/provider/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");

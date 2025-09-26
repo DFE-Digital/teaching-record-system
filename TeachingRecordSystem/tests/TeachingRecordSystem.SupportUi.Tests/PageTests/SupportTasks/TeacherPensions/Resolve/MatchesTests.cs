@@ -34,7 +34,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId, duplicatePerson2.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId, duplicatePerson2.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -69,7 +69,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId, duplicatePerson2.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId, duplicatePerson2.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -113,7 +113,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -155,7 +155,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -195,7 +195,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -213,7 +213,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             HttpMethod.Post,
             $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", person.PersonId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", person.PersonId } }
         };
 
         // Act
@@ -235,7 +235,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -255,7 +255,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             HttpMethod.Post,
             $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", personId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
 
         // Act
@@ -277,7 +277,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -294,7 +294,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             HttpMethod.Post,
             $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", duplicatePerson1.PersonId } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", duplicatePerson1.PersonId } }
         };
 
         // Act
@@ -322,7 +322,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -339,7 +339,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             HttpMethod.Post,
             $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder() { { "PersonId", Guid.Empty } }
+            Content = new FormUrlEncodedContentBuilder { { "PersonId", Guid.Empty } }
         };
 
         // Act

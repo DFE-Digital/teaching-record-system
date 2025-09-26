@@ -51,7 +51,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = journeyStartDate
@@ -79,7 +79,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "StartDate", startDate }
             }
@@ -127,11 +127,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "StartDate.Day", $"{newStartDate:%d}" },
                 { "StartDate.Month", $"{newStartDate:%M}" },
-                { "StartDate.Year", $"{newStartDate:yyyy}" },
+                { "StartDate.Year", $"{newStartDate:yyyy}" }
             }
         };
 
@@ -154,11 +154,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "StartDate.Day", $"{newStartDate:%d}" },
                 { "StartDate.Month", $"{newStartDate:%M}" },
-                { "StartDate.Year", $"{newStartDate:yyyy}" },
+                { "StartDate.Year", $"{newStartDate:yyyy}" }
             }
         };
 

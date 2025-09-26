@@ -12,11 +12,11 @@ using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUse
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
+public sealed class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory) : IDisposable
 {
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
-    private bool _haveResetSchema = false;
+    private bool _haveResetSchema;
 
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; } = dbContextFactory;
 
@@ -138,4 +138,9 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "induction_statuses"
                 ]
             });
+
+    public void Dispose()
+    {
+        _schemaLock.Dispose();
+    }
 }

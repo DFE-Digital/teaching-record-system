@@ -103,12 +103,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Status", status.ToString() },
                 { "EndDate.Day", $"{endDate:%d}" },
                 { "EndDate.Month", $"{endDate:%M}" },
-                { "EndDate.Year", $"{endDate:yyyy}" },
+                { "EndDate.Year", $"{endDate:yyyy}" }
             }
         };
 
@@ -131,12 +131,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Status", status.ToString() },
                 { "EndDate.Day", $"{endDate:%d}" },
                 { "EndDate.Month", $"{endDate:%M}" },
-                { "EndDate.Year", $"{endDate:yyyy}" },
+                { "EndDate.Year", $"{endDate:yyyy}" }
             }
         };
 
@@ -179,9 +179,9 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { "Status", status.ToString() },
+                { "Status", status.ToString() }
             }
         };
 
@@ -207,12 +207,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Status", status.ToString() },
                 { "EndDate.Day", $"{endDate:%d}" },
                 { "EndDate.Month", $"{endDate:%M}" },
-                { "EndDate.Year", $"{endDate:yyyy}" },
+                { "EndDate.Year", $"{endDate:yyyy}" }
             }
         };
 
@@ -235,12 +235,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Status", status.ToString() },
                 { "EndDate.Day", $"{endDate:%d}" },
                 { "EndDate.Month", $"{endDate:%M}" },
-                { "EndDate.Year", $"{endDate:yyyy}" },
+                { "EndDate.Year", $"{endDate:yyyy}" }
             }
         };
 
@@ -286,7 +286,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, Action<AddMqState>? configureState = null)
     {
-        var state = new AddMqState()
+        var state = new AddMqState
         {
             ProviderId = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham").MandatoryQualificationProviderId,
             Specialism = MandatoryQualificationSpecialism.Visual,

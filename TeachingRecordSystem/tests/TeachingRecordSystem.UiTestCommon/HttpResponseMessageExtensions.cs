@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Resources;
 using AngleSharp;
 using AngleSharp.Dom;
@@ -102,8 +103,8 @@ public static class HttpResponseMessageExtensions
     private static string[] GetTestDataStrings()
     {
         var resourceManager = new ResourceManager("Faker.Resources.Name", typeof(Faker.Name).Assembly);
-        var allNames = resourceManager.GetString("First")!.Split(';', StringSplitOptions.TrimEntries)
-            .Concat(resourceManager.GetString("Last")!.Split(';', StringSplitOptions.TrimEntries));
+        var allNames = resourceManager.GetString("First", CultureInfo.InvariantCulture)!.Split(';', StringSplitOptions.TrimEntries)
+            .Concat(resourceManager.GetString("Last", CultureInfo.InvariantCulture)!.Split(';', StringSplitOptions.TrimEntries));
         return allNames.ToArray();
     }
 }

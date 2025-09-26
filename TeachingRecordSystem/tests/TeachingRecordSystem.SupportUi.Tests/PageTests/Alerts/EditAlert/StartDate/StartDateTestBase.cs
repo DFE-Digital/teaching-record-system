@@ -9,7 +9,7 @@ public abstract class StartDateTestBase(HostFixture hostFixture) : TestBase(host
         CreateJourneyInstanceAsync(alertId, new());
 
     protected Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState()
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState
         {
             Initialized = true,
             CurrentStartDate = alert.StartDate,
@@ -27,13 +27,13 @@ public abstract class StartDateTestBase(HostFixture hostFixture) : TestBase(host
         step switch
         {
             JourneySteps.New =>
-                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState
                 {
                     Initialized = true,
                     CurrentStartDate = alert.StartDate
                 }),
             JourneySteps.Index =>
-                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState
                 {
                     Initialized = true,
                     CurrentStartDate = alert.StartDate,

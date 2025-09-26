@@ -10,7 +10,7 @@ public class ListTextItemsTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        if (TextItems != null && TextItems.Any())
+        if (TextItems != null && TextItems.Length != 0)
         {
             output.TagName = "ul";
             output.AddClass("govuk-list", HtmlEncoder.Default);

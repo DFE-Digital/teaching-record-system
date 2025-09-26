@@ -133,7 +133,7 @@ public class DeactivateModel(
             CreatedUtc = clock.UtcNow,
             DeactivatedReason = HasAdditionalReason is true ? AdditionalReasonDetail : null,
             DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
-            EvidenceFileId = EvidenceFileId,
+            EvidenceFileId = EvidenceFileId
         });
 
         await dbContext.SaveChangesAsync();

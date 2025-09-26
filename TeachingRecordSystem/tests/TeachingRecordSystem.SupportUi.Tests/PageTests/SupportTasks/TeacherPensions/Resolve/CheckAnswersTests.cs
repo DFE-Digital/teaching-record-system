@@ -9,7 +9,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arranges
         var taskReference = "1234567";
-        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = [] };
+        var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [] };
         var journeyInstance = await CreateJourneyInstance(taskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{taskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -35,7 +35,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -47,18 +47,21 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
-        state.TeachersPensionPersonId = person.PersonId;
-        state.FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.PersonId = duplicatePerson1.PersonId;
-        state.PersonAttributeSourcesSet = true;
-        state.EvidenceFileId = Guid.NewGuid();
-        state.EvidenceFileName = evidenceFileName;
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersonIds = [duplicatePerson1.PersonId],
+            TeachersPensionPersonId = person.PersonId,
+            FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            PersonId = duplicatePerson1.PersonId,
+            PersonAttributeSourcesSet = true,
+            EvidenceFileId = Guid.NewGuid(),
+            EvidenceFileName = evidenceFileName
+        };
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -102,7 +105,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -114,16 +117,19 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
-        state.TeachersPensionPersonId = person.PersonId;
-        state.DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.PersonId = duplicatePerson1.PersonId;
-        state.PersonAttributeSourcesSet = true;
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersonIds = [duplicatePerson1.PersonId],
+            TeachersPensionPersonId = person.PersonId,
+            DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            PersonId = duplicatePerson1.PersonId,
+            PersonAttributeSourcesSet = true
+        };
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -153,7 +159,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             user.UserId,
             s =>
             {
-                s.WithMatchedPersons(new[] { duplicatePerson1.PersonId });
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
                 s.WithLastName(person.LastName);
                 s.WithFirstName(person.FirstName);
                 s.WithMiddleName(person.MiddleName);
@@ -165,18 +171,21 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
                 s.WithStatus(SupportTaskStatus.Open);
             });
 
-        var state = new ResolveTeacherPensionsPotentialDuplicateState() { MatchedPersonIds = new[] { duplicatePerson1.PersonId } };
-        state.TeachersPensionPersonId = person.PersonId;
-        state.FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord;
-        state.NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest;
-        state.PersonId = duplicatePerson1.PersonId;
-        state.PersonAttributeSourcesSet = true;
-        state.UploadEvidence = false;
-        state.MergeComments = mergeComments;
+        var state = new ResolveTeacherPensionsPotentialDuplicateState
+        {
+            MatchedPersonIds = [duplicatePerson1.PersonId],
+            TeachersPensionPersonId = person.PersonId,
+            FirstNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            MiddleNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            LastNameSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            DateOfBirthSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            GenderSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.ExistingRecord,
+            NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
+            PersonId = duplicatePerson1.PersonId,
+            PersonAttributeSourcesSet = true,
+            UploadEvidence = false,
+            MergeComments = mergeComments
+        };
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
         EventPublisher.Clear();

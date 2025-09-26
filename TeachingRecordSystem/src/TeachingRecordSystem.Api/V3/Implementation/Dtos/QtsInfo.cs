@@ -28,7 +28,7 @@ public record QtsInfo
         var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).FirstOrDefault();
         Debug.Assert(oldestRoute is null || oldestRoute.HoldsFrom == person.QtsDate);
 
-        return new QtsInfo()
+        return new QtsInfo
         {
             HoldsFrom = person.QtsDate!.Value,
             CertificateUrl = "/v3/certificates/qts",
@@ -37,7 +37,7 @@ public record QtsInfo
                 : "Qualified",
             AwardedOrApprovedCount = holdsRoutes.Length,
             Routes = holdsRoutes
-                .Select(r => new QtsInfoRoute()
+                .Select(r => new QtsInfoRoute
                 {
                     RouteToProfessionalStatusType = r.RouteToProfessionalStatusType!
                 })

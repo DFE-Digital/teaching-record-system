@@ -215,7 +215,7 @@ public class LegacyDataCache
         new("Qualified teacher (under the EC Directive) further qualifed to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959", "97", false),
         new("Qualified teacher (by virtue of other qualifications) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959 a maintained school.", "99", false),
         new("QTS Awarded in error", "999", false),
-        new("Qualified Teacher: QTS awarded in Wales", "213", true),
+        new("Qualified Teacher: QTS awarded in Wales", "213", true)
     ];
 
     public IReadOnlyCollection<EarlyYearsStatus> EarlyYearsStatuses =

@@ -114,7 +114,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
                     jobMetaData.Metadata = new Dictionary<string, string>
                     {
                         {
-                            LastRunDateKey, clock.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                            LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
                         }
                     };
                 }
@@ -127,7 +127,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
                         Metadata = new Dictionary<string, string>
                         {
                             {
-                                LastRunDateKey, clock.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                                LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
                             }
                         }
                     };

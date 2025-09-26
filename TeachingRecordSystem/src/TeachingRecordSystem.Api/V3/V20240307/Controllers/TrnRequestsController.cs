@@ -38,7 +38,7 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher, IMapper
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
             IdentityVerified = null,
             OneLoginUserSubject = null,
-            Gender = null,
+            Gender = null
         };
 
         var result = await commandDispatcher.DispatchAsync(command);

@@ -161,8 +161,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
     public static IEnumerable<object[]> SpecificInductionExemptedRoutesRequiringFilteredExemptionReasonsData()
     {
-        yield return new object[] { RouteToProfessionalStatusType.ScotlandRId };
-        yield return new object[] { RouteToProfessionalStatusType.NiRId };
+        yield return [RouteToProfessionalStatusType.ScotlandRId];
+        yield return [RouteToProfessionalStatusType.NiRId];
     }
     [Theory]
     [MemberData(nameof(SpecificInductionExemptedRoutesRequiringFilteredExemptionReasonsData))]
@@ -218,12 +218,12 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
     public static IEnumerable<object[]> InductionExemptedRoutesRequiringRouteExemptionMessageData()
     {
-        yield return new object[] { RouteToProfessionalStatusType.ScotlandRId, true };
-        yield return new object[] { RouteToProfessionalStatusType.NiRId, true };
-        yield return new object[] { RouteToProfessionalStatusType.QtlsAndSetMembershipId, true };
-        yield return new object[] { RouteToProfessionalStatusType.ScotlandRId, false };
-        yield return new object[] { RouteToProfessionalStatusType.NiRId, false };
-        yield return new object[] { RouteToProfessionalStatusType.QtlsAndSetMembershipId, false };
+        yield return [RouteToProfessionalStatusType.ScotlandRId, true];
+        yield return [RouteToProfessionalStatusType.NiRId, true];
+        yield return [RouteToProfessionalStatusType.QtlsAndSetMembershipId, true];
+        yield return [RouteToProfessionalStatusType.ScotlandRId, false];
+        yield return [RouteToProfessionalStatusType.NiRId, false];
+        yield return [RouteToProfessionalStatusType.QtlsAndSetMembershipId, false];
     }
 
     [Theory]
@@ -259,7 +259,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         if (hasExemption)
         {
             var expectedMessage = $"This person has an induction exemption \"{route.InductionExemptionReason?.Name}\" on the \"{route.Name}\" route.";
-            var messageDisplayed = doc.GetElementsByClassName("govuk-inset-text").Where(e => e.TextContent.Contains("This person has an induction exemption")).Single();
+            var messageDisplayed = doc.GetElementsByClassName("govuk-inset-text").Single(e => e.TextContent.Contains("This person has an induction exemption"));
             Assert.Equal(expectedMessage, messageDisplayed.TextContent.Trim());
         }
         else

@@ -6,8 +6,7 @@ public static class PageDriver
 {
     public static AddRoutePage? NextPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, AddRoutePage currentPage)
     {
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
+        var pagesInOrder = Enum.GetValues<AddRoutePage>()
             .Where(p => p > currentPage)
             .OrderBy(p => p);
 
@@ -36,8 +35,7 @@ public static class PageDriver
 
     public static AddRoutePage? PreviousPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, AddRoutePage currentPage)
     {
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
+        var pagesInOrder = Enum.GetValues<AddRoutePage>()
             .Where(p => p < currentPage)
             .OrderByDescending(p => p);
 

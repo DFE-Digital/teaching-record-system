@@ -54,7 +54,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = journeySpecialism
@@ -86,7 +86,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = specialism
@@ -119,7 +119,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = specialism
@@ -151,7 +151,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "SpecialismValue", specialismValue }
             }
@@ -194,7 +194,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = oldSpecialism
@@ -202,7 +202,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Specialism", newSpecialism }
             }
@@ -225,7 +225,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = specialism
@@ -262,7 +262,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = specialism

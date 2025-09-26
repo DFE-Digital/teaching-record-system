@@ -148,14 +148,14 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/start-and-end-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingStartDate.Day", $"{startDate:%d}" },
                 { "TrainingStartDate.Month", $"{startDate:%M}" },
                 { "TrainingStartDate.Year", $"{startDate:yyyy}" },
                 { "TrainingEndDate.Day", $"{endDate:%d}" },
                 { "TrainingEndDate.Month", $"{endDate:%M}" },
-                { "TrainingEndDate.Year", $"{endDate:yyyy}" },
+                { "TrainingEndDate.Year", $"{endDate:yyyy}" }
             }
         };
 
@@ -198,7 +198,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/start-and-end-date?personId={person.PersonId}&FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingStartDate.Day", $"{startDate:%d}" },
                 { "TrainingStartDate.Month", $"{startDate:%M}" },
@@ -247,7 +247,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/start-and-end-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingStartDate.Day", $"{startDate:%d}" },
                 { "TrainingStartDate.Month", $"{startDate:%M}" },

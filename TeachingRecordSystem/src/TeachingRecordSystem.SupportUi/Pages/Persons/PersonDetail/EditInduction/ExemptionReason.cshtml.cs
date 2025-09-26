@@ -29,7 +29,7 @@ public class ExemptionReasonModel(
 
     public Dictionary<ExemptionReasonCategory, IEnumerable<InductionExemptionReason>> ExemptionReasons { get; set; } = new();
 
-    protected IEnumerable<RouteWithExemption>? RoutesWithInductionExemptions;
+    protected IEnumerable<RouteWithExemption>? RoutesWithInductionExemptions { get; private set; }
 
     public bool ShowInductionExemptionReasonNotAvailableMessage =>
         RoutesWithInductionExemptions?
@@ -45,7 +45,7 @@ public class ExemptionReasonModel(
             }
             else
             {
-                List<string> messages = new();
+                List<string> messages = [];
                 foreach (var route in RoutesWithInductionExemptions!)
                 {
                     messages.Add($"This person has an induction exemption \"{route.InductionExemptionReasonName}\" on the \"{route.RouteToProfessionalStatusName}\" route.");
@@ -65,7 +65,7 @@ public class ExemptionReasonModel(
             }
             else
             {
-                List<string> messages = new();
+                List<string> messages = [];
                 foreach (var route in RoutesWithInductionExemptions!
                     .Where(r => ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)))
                 {

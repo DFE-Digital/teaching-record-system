@@ -102,7 +102,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.Range },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom },
@@ -144,9 +144,9 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
-        var contentBuilder = new FormUrlEncodedContentBuilder()
+        var contentBuilder = new FormUrlEncodedContentBuilder
         {
-            { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), radioChoice },
+            { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), radioChoice }
         };
         if (ageFrom is not null)
         {
@@ -190,9 +190,9 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
-        var contentBuilder = new FormUrlEncodedContentBuilder()
+        var contentBuilder = new FormUrlEncodedContentBuilder
         {
-            { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), radioChoice },
+            { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), radioChoice }
         };
         if (ageFrom is not null)
         {
@@ -238,9 +238,9 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.KeyStage4 },
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.KeyStage4 }
             }
         };
 

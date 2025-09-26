@@ -13,4049 +13,4049 @@
 
 namespace TeachingRecordSystem.Core.Dqt.Models
 {
-	
-	
+
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_AccountCategoryCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("College", 2)]
 		College = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Employment Agency", 1)]
 		EmploymentAgency = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("HEI", 3)]
 		HEI = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Local Authority", 4)]
 		LocalAuthority = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 5)]
 		Other = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("School", 0)]
-		School = 1,
-	}
-	
+		School = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_AccountClassificationCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_AccountRatingCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_Address1_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Bill To", 0)]
 		BillTo = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 3)]
 		Other = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Primary", 2)]
 		Primary = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Ship To", 1)]
-		ShipTo = 2,
-	}
-	
+		ShipTo = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_Address1_FreightTermsCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("FOB", 0)]
 		FOB = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("No Charge", 1)]
-		NoCharge = 2,
-	}
-	
+		NoCharge = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_Address1_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Airborne", 0)]
 		Airborne = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DHL", 1)]
 		DHL = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("FedEx", 2)]
 		FedEx = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Full Load", 5)]
 		FullLoad = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Postal Mail", 4)]
 		PostalMail = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("UPS", 3)]
 		UPS = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Will Call", 6)]
-		WillCall = 7,
-	}
-	
+		WillCall = 7
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_Address2_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_Address2_FreightTermsCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_Address2_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_BusinessTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_CustomerSizeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_CustomerTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Competitor", 0)]
 		Competitor = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Consultant", 1)]
 		Consultant = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Customer", 2)]
 		Customer = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Influencer", 5)]
 		Influencer = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Investor", 3)]
 		Investor = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 11)]
 		Other = 12,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Partner", 4)]
 		Partner = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Press", 6)]
 		Press = 7,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Prospect", 7)]
 		Prospect = 8,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Reseller", 8)]
 		Reseller = 9,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Supplier", 9)]
 		Supplier = 10,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Vendor", 10)]
-		Vendor = 11,
-	}
-	
+		Vendor = 11
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_IndustryCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Accounting", 0)]
 		Accounting = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Agriculture and Non-petrol Natural Resource Extraction", 1)]
 		AgricultureandNonpetrolNaturalResourceExtraction = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Broadcasting Printing and Publishing", 2)]
 		BroadcastingPrintingandPublishing = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Brokers", 3)]
 		Brokers = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Building Supply Retail", 4)]
 		BuildingSupplyRetail = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Business Services", 5)]
 		BusinessServices = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Consulting", 6)]
 		Consulting = 7,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Consumer Services", 7)]
 		ConsumerServices = 8,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Design, Direction and Creative Management", 8)]
 		DesignDirectionandCreativeManagement = 9,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Distributors, Dispatchers and Processors", 9)]
 		DistributorsDispatchersandProcessors = 10,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Doctor\'s Offices and Clinics", 10)]
 		DoctorsOfficesandClinics = 11,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Durable Manufacturing", 11)]
 		DurableManufacturing = 12,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Eating and Drinking Places", 12)]
 		EatingandDrinkingPlaces = 13,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Entertainment Retail", 13)]
 		EntertainmentRetail = 14,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Equipment Rental and Leasing", 14)]
 		EquipmentRentalandLeasing = 15,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Financial", 15)]
 		Financial = 16,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Food and Tobacco Processing", 16)]
 		FoodandTobaccoProcessing = 17,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inbound Capital Intensive Processing", 17)]
 		InboundCapitalIntensiveProcessing = 18,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inbound Repair and Services", 18)]
 		InboundRepairandServices = 19,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Insurance", 19)]
 		Insurance = 20,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Legal Services", 20)]
 		LegalServices = 21,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Non-Durable Merchandise Retail", 21)]
 		NonDurableMerchandiseRetail = 22,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Outbound Consumer Service", 22)]
 		OutboundConsumerService = 23,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Petrochemical Extraction and Distribution", 23)]
 		PetrochemicalExtractionandDistribution = 24,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Service Retail", 24)]
 		ServiceRetail = 25,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("SIG Affiliations", 25)]
 		SIGAffiliations = 26,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Social Services", 26)]
 		SocialServices = 27,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Special Outbound Trade Contractors", 27)]
 		SpecialOutboundTradeContractors = 28,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Specialty Realty", 28)]
 		SpecialtyRealty = 29,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Transportation", 29)]
 		Transportation = 30,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Utility Creation and Distribution", 30)]
 		UtilityCreationandDistribution = 31,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Vehicle Retail", 31)]
 		VehicleRetail = 32,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Wholesale", 32)]
-		Wholesale = 33,
-	}
-	
+		Wholesale = 33
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_OwnershipCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 3)]
 		Other = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Private", 1)]
 		Private = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Public", 0)]
 		Public = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Subsidiary", 2)]
-		Subsidiary = 3,
-	}
-	
+		Subsidiary = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_PaymentTermsCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("2% 10, Net 30", 1)]
 		_210Net30 = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Net 30", 0)]
 		Net30 = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Net 45", 2)]
 		Net45 = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Net 60", 3)]
-		Net60 = 4,
-	}
-	
+		Net60 = 4
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_PreferredAppointmentDayCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Friday", 5)]
 		Friday = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Monday", 1)]
 		Monday = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Saturday", 6)]
 		Saturday = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sunday", 0)]
 		Sunday = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Thursday", 4)]
 		Thursday = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Tuesday", 2)]
 		Tuesday = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Wednesday", 3)]
-		Wednesday = 3,
-	}
-	
+		Wednesday = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_PreferredAppointmentTimeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Afternoon", 1)]
 		Afternoon = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Evening", 2)]
 		Evening = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Morning", 0)]
-		Morning = 1,
-	}
-	
+		Morning = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_PreferredContactMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Any", 0)]
 		Any = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("E-mail", 1)]
 		Email = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Fax", 3)]
 		Fax = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mail", 4)]
 		Mail = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Phone", 2)]
-		Phone = 3,
-	}
-	
+		Phone = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Account_TerritoryCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum activitypointer_DeliveryPriorityCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("High", 2)]
 		High = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Low", 0)]
 		Low = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Normal", 1)]
-		Normal = 1,
-	}
-	
+		Normal = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Audit_Action
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Activate", 4)]
 		Activate = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Add Item", 31)]
 		AddItem = 37,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Add Member", 25)]
 		AddMember = 31,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Add Members", 29)]
 		AddMembers = 35,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Add Privileges to Role", 51)]
 		AddPrivilegestoRole = 57,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Add Substitute", 33)]
 		AddSubstitute = 39,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Add To Queue", 46)]
 		AddToQueue = 52,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("ApplicationBasedAccessAllowed", 82)]
 		ApplicationBasedAccessAllowed = 122,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("ApplicationBasedAccessDenied", 81)]
 		ApplicationBasedAccessDenied = 121,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Approve", 22)]
 		Approve = 28,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Archive", 75)]
 		Archive = 115,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Assign", 8)]
 		Assign = 13,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Assign Role To Team", 47)]
 		AssignRoleToTeam = 53,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Assign Role To User", 49)]
 		AssignRoleToUser = 55,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Associate Entities", 27)]
 		AssociateEntities = 33,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Attribute Audit Started", 66)]
 		AttributeAuditStarted = 106,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Attribute Audit Stopped", 69)]
 		AttributeAuditStopped = 109,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Audit Change at Attribute Level", 63)]
 		AuditChangeatAttributeLevel = 103,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Audit Change at Entity Level", 62)]
 		AuditChangeatEntityLevel = 102,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Audit Change at Org Level", 64)]
 		AuditChangeatOrgLevel = 104,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Audit Disabled", 70)]
 		AuditDisabled = 110,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Audit Enabled", 67)]
 		AuditEnabled = 107,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Audit Log Deletion", 71)]
 		AuditLogDeletion = 111,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Book", 44)]
 		Book = 50,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Cancel", 12)]
 		Cancel = 17,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Cascade", 6)]
 		Cascade = 11,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Clone", 55)]
 		Clone = 61,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Close", 11)]
 		Close = 16,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Complete", 13)]
 		Complete = 18,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Create", 1)]
 		Create = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Create - AI assisted", 83)]
 		CreateAIassisted = 123,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deactivate", 5)]
 		Deactivate = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Delete", 3)]
 		Delete = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Delete Attribute", 61)]
 		DeleteAttribute = 101,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Delete Entity", 60)]
 		DeleteEntity = 100,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Disassociate Entities", 28)]
 		DisassociateEntities = 34,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Disqualify", 19)]
 		Disqualify = 25,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Enabled for organization", 57)]
 		Enabledfororganization = 63,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Entity Audit Started", 65)]
 		EntityAuditStarted = 105,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Entity Audit Stopped", 68)]
 		EntityAuditStopped = 108,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Fulfill", 16)]
 		Fulfill = 22,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Generate Quote From Opportunity", 45)]
 		GenerateQuoteFromOpportunity = 51,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Hold", 24)]
 		Hold = 30,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Import Mappings", 54)]
 		ImportMappings = 60,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Internal Processing", 40)]
 		InternalProcessing = 46,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invoice", 23)]
 		Invoice = 29,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("IPFirewallAcccesAllowed", 79)]
 		IPFirewallAcccesAllowed = 119,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("IPFirewallAcccesDenied", 78)]
 		IPFirewallAcccesDenied = 118,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Lose", 39)]
 		Lose = 45,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Merge", 7)]
 		Merge = 12,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Modify Share", 42)]
 		ModifyShare = 48,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Paid", 17)]
 		Paid = 23,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Qualify", 18)]
 		Qualify = 24,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Reject", 21)]
 		Reject = 27,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Remove Item", 32)]
 		RemoveItem = 38,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Remove Member", 26)]
 		RemoveMember = 32,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Remove Members", 30)]
 		RemoveMembers = 36,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Remove Privileges From Role", 52)]
 		RemovePrivilegesFromRole = 58,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Remove Role From Team", 48)]
 		RemoveRoleFromTeam = 54,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Remove Role From User", 50)]
 		RemoveRoleFromUser = 56,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Remove Substitute", 34)]
 		RemoveSubstitute = 40,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Renew", 36)]
 		Renew = 42,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Reopen", 15)]
 		Reopen = 21,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Replace Privileges In Role", 53)]
 		ReplacePrivilegesInRole = 59,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Reschedule", 41)]
 		Reschedule = 47,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Resolve", 14)]
 		Resolve = 20,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Restore", 80)]
 		Restore = 120,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Retain", 76)]
 		Retain = 116,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Retrieve", 10)]
 		Retrieve = 15,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Revise", 37)]
 		Revise = 43,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("RollbackRetain", 77)]
 		RollbackRetain = 117,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Send Direct Email", 56)]
 		SendDirectEmail = 62,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Set State", 35)]
 		SetState = 41,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Share", 9)]
 		Share = 14,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Submit", 20)]
 		Submit = 26,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Unknown", 0)]
 		Unknown = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Unshare", 43)]
 		Unshare = 49,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Update", 2)]
 		Update = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Update - AI assisted", 84)]
 		UpdateAIassisted = 124,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Upsert", 74)]
 		Upsert = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("User Access Audit Started", 72)]
 		UserAccessAuditStarted = 112,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("User Access Audit Stopped", 73)]
 		UserAccessAuditStopped = 113,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("User Access via Web", 58)]
 		UserAccessviaWeb = 64,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("User Access via Web Services", 59)]
 		UserAccessviaWebServices = 65,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Win", 38)]
-		Win = 44,
-	}
-	
+		Win = 44
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Audit_Operation
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Access", 3)]
 		Access = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Archive", 5)]
 		Archive = 115,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Create", 0)]
 		Create = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("CustomOperation", 9)]
 		CustomOperation = 200,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Delete", 2)]
 		Delete = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Restore", 8)]
 		Restore = 118,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Retain", 6)]
 		Retain = 116,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("RollbackRetain", 7)]
 		RollbackRetain = 117,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Update", 1)]
 		Update = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Upsert", 4)]
-		Upsert = 5,
-	}
-	
+		Upsert = 5
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum BusinessUnit_Address1_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum BusinessUnit_Address1_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum BusinessUnit_Address2_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum BusinessUnit_Address2_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum ComponentState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deleted", 2)]
 		Deleted = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deleted Unpublished", 3)]
 		DeletedUnpublished = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Published", 0)]
 		Published = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Unpublished", 1)]
-		Unpublished = 1,
-	}
-	
+		Unpublished = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_AccountRoleCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Decision Maker", 0)]
 		DecisionMaker = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Employee", 1)]
 		Employee = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Influencer", 2)]
-		Influencer = 3,
-	}
-	
+		Influencer = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address1_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Bill To", 0)]
 		BillTo = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 3)]
 		Other = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Primary", 2)]
 		Primary = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Ship To", 1)]
-		ShipTo = 2,
-	}
-	
+		ShipTo = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address1_FreightTermsCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("FOB", 0)]
 		FOB = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("No Charge", 1)]
-		NoCharge = 2,
-	}
-	
+		NoCharge = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address1_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Airborne", 0)]
 		Airborne = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DHL", 1)]
 		DHL = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("FedEx", 2)]
 		FedEx = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Full Load", 5)]
 		FullLoad = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Postal Mail", 4)]
 		PostalMail = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("UPS", 3)]
 		UPS = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Will Call", 6)]
-		WillCall = 7,
-	}
-	
+		WillCall = 7
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address2_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address2_FreightTermsCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address2_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address3_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address3_FreightTermsCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_Address3_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_CustomerSizeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_CustomerTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_dfeta_addressverificationflag
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Customer Preferred", 2)]
 		CustomerPreferred = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Failed", 1)]
 		Failed = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Verified", 0)]
-		Verified = 1,
-	}
-	
+		Verified = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_dfeta_suppressionflag
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deceased", 0)]
 		Deceased = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Goneaway", 1)]
-		Goneaway = 1,
-	}
-	
+		Goneaway = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_EducationCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_FamilyStatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Divorced", 2)]
 		Divorced = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Married", 1)]
 		Married = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Single", 0)]
 		Single = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Widowed", 3)]
-		Widowed = 4,
-	}
-	
+		Widowed = 4
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_GenderCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Female", 1)]
 		Female = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Male", 0)]
 		Male = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not available", 4, "#0000ff")]
 		Notavailable = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not provided", 3, "#0000ff")]
 		Notprovided = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 2)]
-		Other = 389040000,
-	}
-	
+		Other = 389040000
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_HasChildrenCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_LeadSourceCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_msdyn_decisioninfluencetag
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Blocker", 2, "#FF0000")]
 		Blocker = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Decision maker", 0, "#32C100")]
 		Decisionmaker = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Influencer", 1, "#FFD74B")]
 		Influencer = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Unknown", 3, "#E1DFDD")]
-		Unknown = 3,
-	}
-	
+		Unknown = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_msdyn_orgchangestatus
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Ignore", 2, "#0000ff")]
 		Ignore = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("No Feedback", 0, "#0000ff")]
 		NoFeedback = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not at Company", 1, "#0000ff")]
-		NotatCompany = 1,
-	}
-	
+		NotatCompany = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_PaymentTermsCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("2% 10, Net 30", 1)]
 		_210Net30 = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Net 30", 0)]
 		Net30 = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Net 45", 2)]
 		Net45 = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Net 60", 3)]
-		Net60 = 4,
-	}
-	
+		Net60 = 4
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_PreferredAppointmentDayCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Friday", 5)]
 		Friday = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Monday", 1)]
 		Monday = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Saturday", 6)]
 		Saturday = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sunday", 0)]
 		Sunday = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Thursday", 4)]
 		Thursday = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Tuesday", 2)]
 		Tuesday = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Wednesday", 3)]
-		Wednesday = 3,
-	}
-	
+		Wednesday = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_PreferredAppointmentTimeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Afternoon", 1)]
 		Afternoon = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Evening", 2)]
 		Evening = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Morning", 0)]
-		Morning = 1,
-	}
-	
+		Morning = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_PreferredContactMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Any", 0)]
 		Any = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("E-mail", 1)]
 		Email = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Home Phone", 3)]
 		HomePhone = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mobile Phone", 2)]
 		MobilePhone = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Work Phone", 4)]
-		WorkPhone = 5,
-	}
-	
+		WorkPhone = 5
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Administrative reason", 1)]
 		Administrativereason = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Alive", 0)]
 		Alive = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deceased", 2)]
-		Deceased = 389040000,
-	}
-	
+		Deceased = 389040000
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Contact_TerritoryCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_AgeRange
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("00", 0)]
 		_00 = 389040029,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("01", 1)]
 		_01 = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("02", 2)]
 		_02 = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("03", 3)]
 		_03 = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("04", 4)]
 		_04 = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("05", 5)]
 		_05 = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("06", 6)]
 		_06 = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("07", 7)]
 		_07 = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("08", 8)]
 		_08 = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("09", 9)]
 		_09 = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("10", 10)]
 		_10 = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("11", 11)]
 		_11 = 389040010,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("12", 12)]
 		_12 = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("13", 13)]
 		_13 = 389040012,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("14", 14)]
 		_14 = 389040013,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("15", 15)]
 		_15 = 389040014,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("16", 16)]
 		_16 = 389040015,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("17", 17)]
 		_17 = 389040016,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("18", 18)]
 		_18 = 389040017,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("19", 19)]
 		_19 = 389040018,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("99", 20)]
 		_99 = 389040019,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Foundation Stage", 22)]
 		FoundationStage = 389040021,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Further Education", 21)]
 		FurtherEducation = 389040020,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Key Stage 1", 23)]
 		KeyStage1 = 389040022,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Key Stage 2", 24)]
 		KeyStage2 = 389040023,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Key Stage 3", 25)]
 		KeyStage3 = 389040024,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Key Stage 4", 26)]
 		KeyStage4 = 389040025,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not applicable", 27)]
 		Notapplicable = 389040026,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 28)]
 		Other = 389040027,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Post 16", 29)]
-		Post16 = 389040028,
-	}
-	
+		Post16 = 389040028
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_AppealOutcome
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Allowed", 0)]
 		Allowed = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Dismissed", 1)]
 		Dismissed = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Extension", 2)]
 		Extension = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Extension Appeal Dismissed", 4)]
 		ExtensionAppealDismissed = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Substitute Extension period", 3)]
 		SubstituteExtensionperiod = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Withdrawn Appeal", 5)]
-		WithdrawnAppeal = 389040005,
-	}
-	
+		WithdrawnAppeal = 389040005
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_businesseventaudit_dfeta_Event
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Create", 0)]
 		Create = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Update", 1)]
-		Update = 2,
-	}
-	
+		Update = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_businesseventaudit_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_classdivision
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Aegrotat (whether to honours or pass)", 7)]
 		Aegrotat_whethertohonoursorpass = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Distinction", 11)]
 		Distinction = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("First class honours", 0)]
 		Firstclasshonours = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Fourth class honours", 5)]
 		Fourthclasshonours = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("General Degree - degree awarded after following a non-honours course/degree that " +
 			"was not available to be classified", 10)]
 		GeneralDegreedegreeawardedafterfollowinganonhonourscoursedegreethatwasnotavailabletobeclassified = 389040010,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Higher Degree", 16)]
 		HigherDegree = 389040016,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Lower second class honours", 2)]
 		Lowersecondclasshonours = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Merit", 12)]
 		Merit = 389040012,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not applicable", 14)]
 		Notapplicable = 389040014,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not Known", 15)]
 		NotKnown = 389040015,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Ordinary (including divisions of ordinary, if any) degree awarded after following" +
 			" a non-honours course", 9)]
 		Ordinary_includingdivisionsofordinaryifanydegreeawardedafterfollowinganonhonourscourse = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 17, "#0000ff")]
 		Other = 389040017,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pass", 13)]
 		Pass = 389040013,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pass - degree awarded without honours following an honours course", 8)]
 		Passdegreeawardedwithouthonoursfollowinganhonourscourse = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Third class honours", 4)]
 		Thirdclasshonours = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Unclassified honours", 6)]
 		Unclassifiedhonours = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Undivided second class honours", 3)]
 		Undividedsecondclasshonours = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Upper second class honours", 1)]
-		Uppersecondclasshonours = 389040001,
-	}
-	
+		Uppersecondclasshonours = 389040001
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_country_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_CourseUnit
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Days", 0)]
 		Days = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Months", 1)]
 		Months = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Terms", 2)]
 		Terms = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Weeks", 3)]
 		Weeks = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Years", 4)]
-		Years = 389040004,
-	}
-	
+		Years = 389040004
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_document_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Failed Validation", 2)]
 		FailedValidation = 100000001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 4)]
 		Inactive = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pending Validation", 1)]
 		PendingValidation = 100000000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Valid", 3)]
-		Valid = 100000002,
-	}
-	
+		Valid = 100000002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_DocumentType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Change of Name / DOB Evidence", 1)]
 		ChangeofNameDOBEvidence = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Email", 7)]
 		Email = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Identity", 0)]
 		Identity = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Letter", 6)]
 		Letter = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("MR Additional Training evidence", 5)]
 		MRAdditionalTrainingevidence = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("MR HE Quals and Translations", 3)]
 		MRHEQualsandTranslations = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("MR ITT quals, transcripts, and translations", 2)]
 		MRITTqualstranscriptsandtranslations = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("MR OTT supporting letter", 4)]
-		MROTTsupportingletter = 389040004,
-	}
-	
+		MROTTsupportingletter = 389040004
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_earlyyearsstatus_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_he_firstdegreeflag
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("No", 0)]
 		No = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Yes", 1)]
-		Yes = 389040001,
-	}
-	
+		Yes = 389040001
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_hequalification_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_hesubject_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_induction_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_InductionExemptionReason
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Exempt", 8)]
 		Exempt = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Exempt - Data Loss/Error Criteria", 9)]
 		ExemptDataLossErrorCriteria = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Extended on appeal", 0)]
 		Extendedonappeal = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Has, or is eligible for, full registration in Scotland", 17)]
 		HasoriseligibleforfullregistrationinScotland = 389040017,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Overseas Trained Teacher", 10)]
 		OverseasTrainedTeacher = 389040010,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Qualified before 07 May 1999", 11)]
 		Qualifiedbefore07May1999 = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Qualified between 07 May 1999 and 01 April 2003. First post was in Wales and last" +
 			"ed a minimum of two terms.", 12)]
 		Qualifiedbetween07May1999and01April2003FirstpostwasinWalesandlastedaminimumoftwoterms = 389040012,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Qualified through EEA mutual recognition route", 13)]
 		QualifiedthroughEEAmutualrecognitionroute = 389040013,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Qualified through FE route between 01 Sep 2001 and 01 Sep 2004", 14)]
 		QualifiedthroughFEroutebetween01Sep2001and01Sep2004 = 389040014,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Qualified through Independent route between 01 Oct 2000 and 01 Sep 2004", 15)]
 		QualifiedthroughIndependentroutebetween01Oct2000and01Sep2004 = 389040015,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Registered Teacher (having at least two year\'s full time teaching experience)", 16)]
 		RegisteredTeacher_havingatleasttwoyearsfulltimeteachingexperience = 389040016,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Successfully completed induction in Guernsey", 2)]
 		SuccessfullycompletedinductioninGuernsey = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Successfully completed induction in Isle Of Man", 3)]
 		SuccessfullycompletedinductioninIsleOfMan = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Successfully completed induction in Jersey", 4)]
 		SuccessfullycompletedinductioninJersey = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Successfully completed induction in Northern Ireland", 5)]
 		SuccessfullycompletedinductioninNorthernIreland = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Successfully completed induction in Service Children\'s Education schools in Germa" +
 			"ny or Cyprus", 6)]
 		SuccessfullycompletedinductioninServiceChildrensEducationschoolsinGermanyorCyprus = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Successfully completed induction in Wales", 7)]
 		SuccessfullycompletedinductioninWales = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Successfully completed probationary period in Gibraltar", 1)]
 		SuccessfullycompletedprobationaryperiodinGibraltar = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Teacher has been awarded QTLS and is exempt provided they maintain their membersh" +
 			"ip with the Society for Education and Training", 18)]
-		TeacherhasbeenawardedQTLSandisexemptprovidedtheymaintaintheirmembershipwiththeSocietyforEducationandTraining = 389040018,
-	}
-	
+		TeacherhasbeenawardedQTLSandisexemptprovidedtheymaintaintheirmembershipwiththeSocietyforEducationandTraining = 389040018
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_inductionperiod_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_InductionProgrammeType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Core Induction Programme", 1, "#0000ff")]
 		CoreInductionProgramme = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Full Induction Programme", 0, "#0000ff")]
 		FullInductionProgramme = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("School-based Induction Programme", 2, "#0000ff")]
-		SchoolbasedInductionProgramme = 389040002,
-	}
-	
+		SchoolbasedInductionProgramme = 389040002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_InductionStatus
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Exempt", 0)]
 		Exempt = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Fail", 1)]
 		Fail = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Failed in Wales", 8)]
 		FailedinWales = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Induction Extended", 2)]
 		InductionExtended = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("In Progress", 6)]
 		InProgress = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not Yet Completed", 3)]
 		NotYetCompleted = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pass", 4)]
 		Pass = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Passed in Wales", 5)]
 		PassedinWales = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Required to Complete", 7)]
-		RequiredtoComplete = 389040007,
-	}
-	
+		RequiredtoComplete = 389040007
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_initialteachertraining_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_IntegrationInterface
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Appropriate Body Import", 7)]
 		AppropriateBodyImport = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Capita Export Amend", 10)]
 		CapitaExportAmend = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Capita Export New", 9)]
 		CapitaExportNew = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Capita Import", 8)]
 		CapitaImport = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DMS Export QTS Date", 15)]
 		DMSExportQTSDate = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DMS Export TRN", 14)]
 		DMSExportTRN = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DMS Import", 13)]
 		DMSImport = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DMS Import TTR1", 0)]
 		DMSImportTTR1 = 389040014,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DMS Import TTR4\\TTR5", 1)]
 		DMSImportTTR4TTR5 = 389040015,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Edubase", 11)]
 		Edubase = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Edubase Links", 12)]
 		EdubaseLinks = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("GTC Wales Import", 4)]
 		GTCWalesImport = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("HESA Export", 3)]
 		HESAExport = 389040012,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("HESA Import", 6)]
 		HESAImport = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("ITTPUpdate", 2)]
 		ITTPUpdate = 389040013,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQ Export", 17, "#0000ff")]
 		NPQExport = 389040017,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQ Import", 16, "#0000ff")]
 		NPQImport = 389040016,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Training Provider Import", 5)]
-		TrainingProviderImport = 389040010,
-	}
-	
+		TrainingProviderImport = 389040010
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_integrationtransaction_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_integrationtransactionrecord_dfeta_DuplicateStatus
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Duplicate", 0)]
 		Duplicate = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Duplicate Resolved", 1)]
 		DuplicateResolved = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not Applicable", 3)]
 		NotApplicable = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Third Party Notified", 2)]
-		ThirdPartyNotified = 389040001,
-	}
-	
+		ThirdPartyNotified = 389040001
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_integrationtransactionrecord_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Fail", 1)]
 		Fail = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 2)]
 		Inactive = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Success", 0)]
-		Success = 1,
-	}
-	
+		Success = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ITTProgrammeType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Apprenticeship", 20)]
 		Apprenticeship = 389040019,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Assessment Only Route", 11)]
 		AssessmentOnlyRoute = 389040010,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Core", 0)]
 		Core = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Core Flexible", 1)]
 		CoreFlexible = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("EYITT - Assessment Only", 14, "", "EYITTAOR")]
 		EYITTAssessmentOnly = 389040014,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("EYITT - Graduate Employment Based", 17, "", "EYITTGEB")]
 		EYITTGraduateEmploymentBased = 389040016,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("EYITT - Graduate Entry", 15, "", "EYITTGE")]
 		EYITTGraduateEntry = 389040015,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("EYITT - School Direct (Early Years)", 19, "", "EYITTSD")]
 		EYITTSchoolDirect_EarlyYears = 389040018,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("EYITT - Undergraduate", 18, "", "EYITTGUR")]
 		EYITTUndergraduate = 389040017,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Future Teaching Scholars", 23, "#0000ff")]
 		FutureTeachingScholars = 389040020,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Graduate Teacher Programme", 10)]
 		GraduateTeacherProgramme = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("HEI", 2)]
 		HEI = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("High potential ITT", 16, "#0000ff")]
 		HighpotentialITT = 389040024,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("International qualified teacher status", 24, "#0000ff")]
 		Internationalqualifiedteacherstatus = 389040023,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Licensed Teacher Programme", 12, "", "Added by helpdesk call R120680")]
 		LicensedTeacherProgramme = 389040012,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Overseas Trained Teacher Programme", 8)]
 		OverseasTrainedTeacherProgramme = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Primary and secondary postgraduate fee funded", 26, "#0000ff")]
 		Primaryandsecondarypostgraduatefeefunded = 389040026,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Primary and secondary undergraduate fee funded", 25, "#0000ff")]
 		Primaryandsecondaryundergraduatefeefunded = 389040025,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Provider-led (postgrad)", 21, "#0000ff")]
 		Providerled_postgrad = 389040021,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Provider-led (undergrad)", 22, "#0000ff")]
 		Providerled_undergrad = 389040022,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Registered Teacher Programme", 9)]
 		RegisteredTeacherProgramme = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("School Direct training programme", 5)]
 		SchoolDirecttrainingprogramme = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("School Direct training programme (Salaried)", 4)]
 		SchoolDirecttrainingprogramme_Salaried = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("School Direct training programme (Self funded)", 3)]
 		SchoolDirecttrainingprogramme_Selffunded = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Teach First Programme", 7)]
 		TeachFirstProgramme = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Teach First Programme (CC)", 6)]
 		TeachFirstProgramme_CC = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Undergraduate Opt In", 13)]
-		UndergraduateOptIn = 389040013,
-	}
-	
+		UndergraduateOptIn = 389040013
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ittqualification_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ITTQualificationAim
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Academic award only", 0)]
 		Academicawardonly = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Professional status and academic award", 2)]
 		Professionalstatusandacademicaward = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Professional status by assessment only", 3)]
 		Professionalstatusbyassessmentonly = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Professional status only", 1)]
-		Professionalstatusonly = 389040000,
-	}
-	
+		Professionalstatusonly = 389040000
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ITTResult
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Application Received", 8)]
 		ApplicationReceived = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Application Unsuccessful", 9)]
 		ApplicationUnsuccessful = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Approved", 4)]
 		Approved = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deferred", 5)]
 		Deferred = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deferred for Skills Tests", 6)]
 		DeferredforSkillsTests = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Fail", 1)]
 		Fail = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Info", 10)]
 		Info = 389040010,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("In Training", 3)]
 		InTraining = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("No Result Submitted", 11)]
 		NoResultSubmitted = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pass", 0)]
 		Pass = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Under Assessment", 7)]
 		UnderAssessment = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Withdrawn", 2)]
-		Withdrawn = 389040002,
-	}
-	
+		Withdrawn = 389040002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ITTServiceLeaver
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Information refused", 3, "#0000ff")]
 		Informationrefused = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not known", 0, "#0000ff")]
 		Notknown = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Trainee has left full time employment in the British Army, Royal Air Force or Roy" +
 			"al Navy in the past 5 years", 2, "#0000ff")]
 		TraineehasleftfulltimeemploymentintheBritishArmyRoyalAirForceorRoyalNavyinthepast5years = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Trainee has NOT LEFT full time employment in the British Army, Royal Air Force or" +
 			" Royal Navy in the past 5 years", 1, "#0000ff")]
-		TraineehasNOTLEFTfulltimeemploymentintheBritishArmyRoyalAirForceorRoyalNavyinthepast5years = 389040001,
-	}
-	
+		TraineehasNOTLEFTfulltimeemploymentintheBritishArmyRoyalAirForceorRoyalNavyinthepast5years = 389040001
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ittsubject_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_mqestablishment_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_MRApplicationDocumentType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Degree", 1)]
 		Degree = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Details", 3)]
 		Details = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Employment", 0)]
 		Employment = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Others", 4)]
 		Others = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Training", 2)]
-		Training = 389040002,
-	}
-	
+		Training = 389040002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_NameType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("First Name", 1)]
 		FirstName = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Last Name", 3)]
 		LastName = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Middle Name", 2)]
 		MiddleName = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Title", 0)]
-		Title = 389040003,
-	}
-	
+		Title = 389040003
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_PersonTitle
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Baron", 0)]
 		Baron = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Baroness", 1)]
 		Baroness = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Canon", 2)]
 		Canon = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Captain", 3)]
 		Captain = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Dame", 4)]
 		Dame = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Dr.", 5)]
 		Dr = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Earl", 6)]
 		Earl = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Father", 7)]
 		Father = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Lady", 8)]
 		Lady = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Lord", 9)]
 		Lord = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Lt.", 10)]
 		Lt = 389040010,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Major", 11)]
 		Major = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Miss", 12)]
 		Miss = 389040012,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mr.", 13)]
 		Mr = 389040013,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mrs.", 14)]
 		Mrs = 389040014,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Ms.", 15)]
 		Ms = 389040015,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mx.", 16, "#0000ff")]
 		Mx = 389040023,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pastor", 17)]
 		Pastor = 389040016,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Prof", 18)]
 		Prof = 389040017,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Rabbi", 19)]
 		Rabbi = 389040018,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Rev", 20)]
 		Rev = 389040019,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Rt Hon", 21)]
 		RtHon = 389040020,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sir", 22)]
 		Sir = 389040021,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sister", 23)]
-		Sister = 389040022,
-	}
-	
+		Sister = 389040022
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_previousname_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_qtsregistration_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_qualification_dfeta_HLTA_ModerationOutcome
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("TBD", 0)]
-		TBD = 389040000,
-	}
-	
+		TBD = 389040000
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_qualification_dfeta_MQ_Status
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deferred", 1)]
 		Deferred = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Extended", 2)]
 		Extended = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Failed", 3)]
 		Failed = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("In Progress", 0)]
 		InProgress = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Passed", 4)]
 		Passed = 389040004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Withdrawn", 5)]
-		Withdrawn = 389040005,
-	}
-	
+		Withdrawn = 389040005
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_qualification_dfeta_Type
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Higher Education", 5)]
 		HigherEducation = 389040000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("HLTA", 8)]
 		HLTA = 389040003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mandatory Qualification", 7)]
 		MandatoryQualification = 389040002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQEL", 11, "#0000ff")]
 		NPQEL = 389040006,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQEYL", 0, "#0000ff")]
 		NPQEYL = 389040010,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQH", 6)]
 		NPQH = 389040001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQLBC", 4, "#0000ff")]
 		NPQLBC = 389040009,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQLL", 1, "#0000ff")]
 		NPQLL = 389040011,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQLT", 2, "#0000ff")]
 		NPQLT = 389040007,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQLTD", 3, "#0000ff")]
 		NPQLTD = 389040008,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQML", 9)]
 		NPQML = 389040005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("NPQSL", 10)]
-		NPQSL = 389040004,
-	}
-	
+		NPQSL = 389040004
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_qualification_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_sanction_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_sanctioncode_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_specialism_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_teacherstatus_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_TRSEvent_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_TrsOutboxMessage_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Active", 0)]
 		Active = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Inactive", 1)]
-		Inactive = 2,
-	}
-	
+		Inactive = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_CaseOriginCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Email", 2, "#00B294")]
 		Email = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Facebook", 4, "#0086FF")]
 		Facebook = 2483,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("IoT", 0, "#0000ff")]
 		IoT = 700610000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Phone", 1, "#FCD116")]
 		Phone = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Twitter", 5, "#0086FF")]
 		Twitter = 3986,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Web", 3, "#FF8C00")]
-		Web = 3,
-	}
-	
+		Web = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_CaseTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Problem", 1, "#E71022")]
 		Problem = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Question", 0, "#FF8C00")]
 		Question = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Request", 2, "#0072C6")]
-		Request = 3,
-	}
-	
+		Request = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_ContractServiceLevelCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Bronze", 2)]
 		Bronze = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Gold", 0)]
 		Gold = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Silver", 1)]
-		Silver = 2,
-	}
-	
+		Silver = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_CustomerSatisfactionCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Dissatisfied", 3)]
 		Dissatisfied = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Neutral", 2)]
 		Neutral = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Satisfied", 1)]
 		Satisfied = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Very Dissatisfied", 4)]
 		VeryDissatisfied = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Very Satisfied", 0)]
-		VerySatisfied = 5,
-	}
-	
+		VerySatisfied = 5
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_FirstResponseSLAStatus
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("In Progress", 0)]
 		InProgress = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Nearing Noncompliance", 1)]
 		NearingNoncompliance = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Noncompliant", 3)]
 		Noncompliant = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Succeeded", 2)]
-		Succeeded = 3,
-	}
-	
+		Succeeded = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_IncidentStageCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_msdyn_casesentiment
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("N/A", 0)]
 		NA = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Negative", 2)]
 		Negative = 8,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Neutral", 4)]
 		Neutral = 10,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Positive", 6)]
 		Positive = 12,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Slightly negative", 3)]
 		Slightlynegative = 9,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Slightly positive", 5)]
 		Slightlypositive = 11,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Very negative", 1)]
 		Verynegative = 7,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Very positive", 7)]
-		Verypositive = 13,
-	}
-	
+		Verypositive = 13
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_PriorityCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("High", 0)]
 		High = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Low", 2)]
 		Low = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Normal", 1)]
-		Normal = 2,
-	}
-	
+		Normal = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_ResolveBySLAStatus
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("In Progress", 0)]
 		InProgress = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Nearing Noncompliance", 1)]
 		NearingNoncompliance = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Noncompliant", 3)]
 		Noncompliant = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Succeeded", 2)]
-		Succeeded = 3,
-	}
-	
+		Succeeded = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_SeverityCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Incident_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Approved", 4, "#358717")]
 		Approved = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Canceled", 6, "#666666")]
 		Canceled = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("In Progress", 0, "#3B79B7")]
 		InProgress = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Merged", 7, "#806c00")]
 		Merged = 2000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("On Hold", 1, "#D43900")]
 		OnHold = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Rejected", 5, "#358717")]
 		Rejected = 1000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Researching", 3, "#007A7C")]
 		Researching = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Waiting for Details", 2, "#8C24B5")]
-		WaitingforDetails = 3,
-	}
-	
+		WaitingforDetails = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IncidentResolution_InstanceTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not Recurring", 0)]
 		NotRecurring = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Recurring Exception", 3)]
 		RecurringException = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Recurring Future Exception", 4)]
 		RecurringFutureException = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Recurring Instance", 2)]
 		RecurringInstance = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Recurring Master", 1)]
-		RecurringMaster = 1,
-	}
-	
+		RecurringMaster = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IncidentResolution_PriorityCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("High", 2)]
 		High = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Low", 0)]
 		Low = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Normal", 1)]
-		Normal = 1,
-	}
-	
+		Normal = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IncidentResolution_ResolutionTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Information Provided", 1)]
 		InformationProvided = 1000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Problem Solved", 0)]
-		ProblemSolved = 5,
-	}
-	
+		ProblemSolved = 5
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IncidentResolution_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Canceled", 2)]
 		Canceled = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Closed", 1)]
 		Closed = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Open", 0)]
-		Open = 1,
-	}
-	
+		Open = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IsInherited
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Direct User (Basic) access level and Team privileges", 1)]
 		DirectUser_BasicaccesslevelandTeamprivileges = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Team privileges only", 0)]
-		Teamprivilegesonly = 0,
-	}
-	
+		Teamprivilegesonly = 0
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum msft_DataState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default", 0)]
 		Default = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Retain", 1)]
-		Retain = 1,
-	}
-	
+		Retain = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum powerpagelanguages
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Arabic", 0, "#0000ff")]
 		Arabic = 1025,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Basque - Basque", 1, "#0000ff")]
 		BasqueBasque = 1069,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Bulgarian - Bulgaria", 2, "#0000ff")]
 		BulgarianBulgaria = 1026,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Catalan - Catalan", 3, "#0000ff")]
 		CatalanCatalan = 1027,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Chinese - China", 4, "#0000ff")]
 		ChineseChina = 2052,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Chinese - Hong Kong SAR", 5, "#0000ff")]
 		ChineseHongKongSAR = 3076,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Chinese - Traditional", 6, "#0000ff")]
 		ChineseTraditional = 1028,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Croatian - Croatia", 7, "#0000ff")]
 		CroatianCroatia = 1050,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Czech - Czech Republic", 8, "#0000ff")]
 		CzechCzechRepublic = 1029,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Danish - Denmark", 9, "#0000ff")]
 		DanishDenmark = 1030,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Dutch - Netherlands", 10, "#0000ff")]
 		DutchNetherlands = 1043,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("English", 11, "#0000ff")]
 		English = 1033,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Estonian - Estonia", 12, "#0000ff")]
 		EstonianEstonia = 1061,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Finnish - Finland", 13, "#0000ff")]
 		FinnishFinland = 1035,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("French - France", 14, "#0000ff")]
 		FrenchFrance = 1036,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Galician - Spain", 15, "#0000ff")]
 		GalicianSpain = 1110,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("German - Germany", 16, "#0000ff")]
 		GermanGermany = 1031,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Greek - Greece", 17, "#0000ff")]
 		GreekGreece = 1032,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Hebrew", 18, "#0000ff")]
 		Hebrew = 1037,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Hindi - India", 19, "#0000ff")]
 		HindiIndia = 1081,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Hungarian - Hungary", 20, "#0000ff")]
 		HungarianHungary = 1038,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Indonesian - Indonesia", 21, "#0000ff")]
 		IndonesianIndonesia = 1057,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Italian - Italy", 22, "#0000ff")]
 		ItalianItaly = 1040,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Japanese - Japan", 23, "#0000ff")]
 		JapaneseJapan = 1041,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Kazakh - Kazakhstan", 24, "#0000ff")]
 		KazakhKazakhstan = 1087,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Korean - Korea", 25, "#0000ff")]
 		KoreanKorea = 1042,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Latvian - Latvia", 26, "#0000ff")]
 		LatvianLatvia = 1062,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Lithuanian - Lithuania", 27, "#0000ff")]
 		LithuanianLithuania = 1063,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Malay - Malaysia", 28, "#0000ff")]
 		MalayMalaysia = 1086,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Norwegian (Bokmål) - Norway", 29, "#0000ff")]
 		Norwegian_BokmlNorway = 1044,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Polish - Poland", 30, "#0000ff")]
 		PolishPoland = 1045,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Portuguese - Brazil", 31, "#0000ff")]
 		PortugueseBrazil = 1046,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Portuguese - Portugal", 32, "#0000ff")]
 		PortuguesePortugal = 2070,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Romanian - Romania", 33, "#0000ff")]
 		RomanianRomania = 1048,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Russian - Russia", 34, "#0000ff")]
 		RussianRussia = 1049,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Serbian (Cyrillic) - Serbia", 35, "#0000ff")]
 		Serbian_CyrillicSerbia = 3098,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Serbian (Latin) - Serbia", 36, "#0000ff")]
 		Serbian_LatinSerbia = 2074,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Slovak - Slovakia", 37, "#0000ff")]
 		SlovakSlovakia = 1051,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Slovenian - Slovenia", 38, "#0000ff")]
 		SlovenianSlovenia = 1060,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Spanish (Traditional Sort) - Spain", 39, "#0000ff")]
 		Spanish_TraditionalSortSpain = 3082,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Swedish - Sweden", 40, "#0000ff")]
 		SwedishSweden = 1053,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Thai - Thailand", 41, "#0000ff")]
 		ThaiThailand = 1054,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Turkish - Türkiye", 42, "#0000ff")]
 		TurkishTrkiye = 1055,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Ukrainian - Ukraine", 43, "#0000ff")]
 		UkrainianUkraine = 1058,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Vietnamese - Vietnam", 44, "#0000ff")]
-		VietnameseVietnam = 1066,
-	}
-	
+		VietnameseVietnam = 1066
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SdkMessageProcessingStep_InvocationSource
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Child", 2)]
 		Child = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Internal", 0)]
 		Internal = -1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Parent", 1)]
-		Parent = 0,
-	}
-	
+		Parent = 0
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SdkMessageProcessingStep_Mode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Asynchronous", 1)]
 		Asynchronous = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Synchronous", 0)]
-		Synchronous = 0,
-	}
-	
+		Synchronous = 0
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SdkMessageProcessingStep_Stage
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Final Post-operation (For internal use only)", 10)]
 		FinalPostoperation_Forinternaluseonly = 55,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Initial Pre-operation (For internal use only)", 0)]
 		InitialPreoperation_Forinternaluseonly = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Internal Post-operation After External Plugins (For internal use only)", 8)]
 		InternalPostoperationAfterExternalPlugins_Forinternaluseonly = 45,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Internal Post-operation Before External Plugins (For internal use only)", 6)]
 		InternalPostoperationBeforeExternalPlugins_Forinternaluseonly = 35,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Internal Pre-operation After External Plugins (For internal use only)", 4)]
 		InternalPreoperationAfterExternalPlugins_Forinternaluseonly = 25,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Internal Pre-operation Before External Plugins (For internal use only)", 2)]
 		InternalPreoperationBeforeExternalPlugins_Forinternaluseonly = 15,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Main Operation (For internal use only)", 5)]
 		MainOperation_Forinternaluseonly = 30,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Post-Commit stage fired after transaction commit (For internal use only)", 12)]
 		PostCommitstagefiredaftertransactioncommit_Forinternaluseonly = 90,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Post-operation", 7)]
 		Postoperation = 40,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Post-operation (Deprecated)", 9)]
 		Postoperation_Deprecated = 50,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pre-Commit stage fired before transaction commit (For internal use only)", 11)]
 		PreCommitstagefiredbeforetransactioncommit_Forinternaluseonly = 80,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pre-operation", 3)]
 		Preoperation = 20,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pre-validation", 1)]
-		Prevalidation = 10,
-	}
-	
+		Prevalidation = 10
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SdkMessageProcessingStep_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Disabled", 1)]
 		Disabled = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Enabled", 0)]
-		Enabled = 1,
-	}
-	
+		Enabled = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SdkMessageProcessingStep_SupportedDeployment
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Both", 2)]
 		Both = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Microsoft Dynamics 365 Client for Outlook Only", 1)]
 		MicrosoftDynamics365ClientforOutlookOnly = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Server Only", 0)]
-		ServerOnly = 0,
-	}
-	
+		ServerOnly = 0
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SdkMessageProcessingStepImage_ImageType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Both", 2)]
 		Both = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("PostImage", 1)]
 		PostImage = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("PreImage", 0)]
-		PreImage = 0,
-	}
-	
+		PreImage = 0
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum securityrole_IsAutoAssigned
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("No", 0)]
 		No = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Yes", 1)]
-		Yes = 1,
-	}
-	
+		Yes = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum ServiceStage
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Identify", 0)]
 		Identify = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Research", 1)]
 		Research = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Resolve", 2)]
-		Resolve = 2,
-	}
-	
+		Resolve = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SocialActivity_PostMessageType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Private Message", 1)]
 		PrivateMessage = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Public Message", 0)]
-		PublicMessage = 0,
-	}
-	
+		PublicMessage = 0
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SocialProfile_Community
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Apple Messages For Business", 11, "#0000ff")]
 		AppleMessagesForBusiness = 16,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Cortana", 0, "#0000ff")]
 		Cortana = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Direct Line", 1, "#0000ff")]
 		DirectLine = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Direct Line Speech", 3, "#0000ff")]
 		DirectLineSpeech = 8,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Email", 4, "#0000ff")]
 		Email = 9,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Facebook", 15, "", "Facebook item.")]
 		Facebook = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Google\'s Business Messages", 12, "#0000ff")]
 		GooglesBusinessMessages = 17,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("GroupMe", 5, "#0000ff")]
 		GroupMe = 10,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Kik", 6, "#0000ff")]
 		Kik = 11,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Line", 13, "#0000ff")]
 		Line = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Microsoft Teams", 2, "#0000ff")]
 		MicrosoftTeams = 7,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 17, "", "Other default")]
 		Other = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Skype", 8, "#0000ff")]
 		Skype = 13,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Slack", 9, "#0000ff")]
 		Slack = 14,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Telegram", 7, "#0000ff")]
 		Telegram = 12,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Twitter", 16, "", "Twitter.")]
 		Twitter = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Wechat", 14, "#0000ff")]
 		Wechat = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("WhatsApp", 10, "#0000ff")]
-		WhatsApp = 15,
-	}
-	
+		WhatsApp = 15
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_AccessMode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Administrative", 1)]
 		Administrative = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Delegated Admin", 5)]
 		DelegatedAdmin = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Non-interactive", 4)]
 		Noninteractive = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Read", 2)]
 		Read = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Read-Write", 0)]
 		ReadWrite = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Support User", 3)]
-		SupportUser = 3,
-	}
-	
+		SupportUser = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_Address1_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_Address1_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_Address2_AddressTypeCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_Address2_ShippingMethodCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_AzureState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Exists", 0)]
 		Exists = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not found or hard deleted", 2)]
 		Notfoundorharddeleted = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Soft deleted", 1)]
-		Softdeleted = 1,
-	}
-	
+		Softdeleted = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_CALType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Administrative", 1)]
 		Administrative = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Basic", 2)]
 		Basic = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Device Basic", 4)]
 		DeviceBasic = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Device Enterprise", 8)]
 		DeviceEnterprise = 8,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Device Essential", 6)]
 		DeviceEssential = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Device Professional", 3)]
 		DeviceProfessional = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Enterprise", 7)]
 		Enterprise = 7,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Essential", 5)]
 		Essential = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Field Service", 11)]
 		FieldService = 11,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Professional", 0)]
 		Professional = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Project Service", 12)]
 		ProjectService = 12,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sales", 9)]
 		Sales = 9,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Service", 10)]
-		Service = 10,
-	}
-	
+		Service = 10
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_DeletedState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not deleted", 0)]
 		Notdeleted = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Soft deleted", 1)]
-		Softdeleted = 1,
-	}
-	
+		Softdeleted = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_EmailRouterAccessApproval
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Approved", 1)]
 		Approved = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Empty", 0)]
 		Empty = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pending Approval", 2)]
 		PendingApproval = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Rejected", 3)]
-		Rejected = 3,
-	}
-	
+		Rejected = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_IncomingEmailDeliveryMethod
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Forward Mailbox", 3)]
 		ForwardMailbox = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Microsoft Dynamics 365 for Outlook", 1)]
 		MicrosoftDynamics365forOutlook = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("None", 0)]
 		None = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Server-Side Synchronization or Email Router", 2)]
-		ServerSideSynchronizationorEmailRouter = 2,
-	}
-	
+		ServerSideSynchronizationorEmailRouter = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_InviteStatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invitation Accepted", 4)]
 		InvitationAccepted = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invitation Expired", 3)]
 		InvitationExpired = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invitation Near Expired", 2)]
 		InvitationNearExpired = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invitation Not Sent", 0)]
 		InvitationNotSent = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invitation Rejected", 5)]
 		InvitationRejected = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invitation Revoked", 6)]
 		InvitationRevoked = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Invited", 1)]
-		Invited = 1,
-	}
-	
+		Invited = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_msdyn_AgentType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Application user", 0, "#0000ff")]
 		Applicationuser = 192350000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Bot application user", 1, "#0000ff")]
-		Botapplicationuser = 192350001,
-	}
-	
+		Botapplicationuser = 192350001
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_msdyn_BotProvider
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("None", 2, "#0000ff", "Indicates that the user is not a bot")]
 		None = 192350002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 1, "#0000ff", "Other type of bot")]
 		Other = 192350001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Virtual Agent", 0, "#0000ff", "CCI first party Bot")]
-		VirtualAgent = 192350000,
-	}
-	
+		VirtualAgent = 192350000
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_msdyn_UserType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("BOT User", 1, "#0000ff")]
 		BOTUser = 192350001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("CRM User", 0, "#0000ff")]
-		CRMUser = 192350000,
-	}
-	
+		CRMUser = 192350000
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_OutgoingEmailDeliveryMethod
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Microsoft Dynamics 365 for Outlook", 1)]
 		MicrosoftDynamics365forOutlook = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("None", 0)]
 		None = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Server-Side Synchronization or Email Router", 2)]
-		ServerSideSynchronizationorEmailRouter = 2,
-	}
-	
+		ServerSideSynchronizationorEmailRouter = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_PreferredAddressCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mailing Address", 0)]
 		MailingAddress = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other Address", 1)]
-		OtherAddress = 2,
-	}
-	
+		OtherAddress = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_PreferredEmailCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Default Value", 0)]
-		DefaultValue = 1,
-	}
-	
+		DefaultValue = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_PreferredPhoneCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Home Phone", 2)]
 		HomePhone = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Main Phone", 0)]
 		MainPhone = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mobile Phone", 3)]
 		MobilePhone = 4,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other Phone", 1)]
-		OtherPhone = 2,
-	}
-	
+		OtherPhone = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SystemUser_SystemManagedUserType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("C2 User", 1)]
 		C2User = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Entra User", 0)]
 		EntraUser = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Impersonable Stub User", 2)]
-		ImpersonableStubUser = 2,
-	}
-	
+		ImpersonableStubUser = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Task_PriorityCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("High", 2)]
 		High = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Low", 0)]
 		Low = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Normal", 1)]
-		Normal = 1,
-	}
-	
+		Normal = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Task_StatusCode
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Canceled", 4)]
 		Canceled = 6,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Completed", 3)]
 		Completed = 5,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Deferred", 5)]
 		Deferred = 7,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("In Progress", 1)]
 		InProgress = 3,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Not Started", 0)]
 		NotStarted = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Waiting on someone else", 2)]
-		Waitingonsomeoneelse = 4,
-	}
-	
+		Waitingonsomeoneelse = 4
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum aiinsightcard_Surface
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Table", 0, "#0000ff")]
 		Table = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Record", 1, "#0000ff")]
-		Record = 1,
-	}
-	
+		Record = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum appaction_ClientType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Browser", 0, "#0000ff")]
 		Browser = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mobile", 1, "#0000ff")]
 		Mobile = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mail App", 2, "#0000ff")]
-		MailApp = 2,
-	}
-	
+		MailApp = 2
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum card_Sizes
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Small", 0, "#0000ff")]
 		Small = 200000000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Medium", 1, "#0000ff")]
 		Medium = 200000001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Large", 2, "#0000ff")]
-		Large = 200000002,
-	}
-	
+		Large = 200000002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum credential_UsageType
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Connection", 0, null, "authorize this credential in connection", "connection")]
 		Connection = 280920000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DesktopScript", 1, null, "authorize this credential in power automate for desktop script", "DesktopScript")]
 		DesktopScript = 280920001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Network", 2, null, "authorize this credential in power automate for network", "Network")]
-		Network = 280920002,
-	}
-	
+		Network = 280920002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum msdyn_forecastsettingsandsummary_msdyn_ForecastJobStatus
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Success", 0, "#0000ff")]
 		Success = 192350000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Data Failure", 1, "#0000ff")]
 		DataFailure = 192350001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pipeline Failure", 2, "#0000ff")]
-		PipelineFailure = 192350002,
-	}
-	
+		PipelineFailure = 192350002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum formmappingallowedoperations
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Create", 0)]
 		Create = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Update", 1)]
-		Update = 1,
-	}
-	
+		Update = 1
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum msdyn_knowledgemanagementsetting_msdyn_actionlist
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Link / unlink article", 0, "#0000ff")]
 		Linkunlinkarticle = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Copy URL", 1, "#0000ff")]
 		CopyURL = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Link article and email URL", 2, "#0000ff")]
 		LinkarticleandemailURL = 2,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Link article and send article content", 3, "#0000ff")]
-		Linkarticleandsendarticlecontent = 3,
-	}
-	
+		Linkarticleandsendarticlecontent = 3
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum msdyn_msdyn_liveworkstream_msdyn_BlockCapacityforConsult
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Chat consult", 0, "#0000ff", "Chat consult")]
 		Chatconsult = 192350001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Voice consult", 1, "#0000ff", "Voice consult")]
-		Voiceconsult = 192350002,
-	}
-	
+		Voiceconsult = 192350002
+    }
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum msdyn_oc_daysofweek
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sun", 0, "#0000ff", "Sunday")]
 		Sun = 192350000,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mon", 1, "#0000ff", "Monday")]
 		Mon = 192350001,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Tue", 2, "#0000ff", "Tuesday")]
 		Tue = 192350002,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Wed", 3, "#0000ff", "Wednesday")]
 		Wed = 192350003,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Thu", 4, "#0000ff", "Thursday")]
 		Thu = 192350004,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Fri", 5, "#0000ff", "Friday")]
 		Fri = 192350005,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sat", 6, "#0000ff", "Saturday")]
-		Sat = 192350006,
-	}
+		Sat = 192350006
+    }
 }
 

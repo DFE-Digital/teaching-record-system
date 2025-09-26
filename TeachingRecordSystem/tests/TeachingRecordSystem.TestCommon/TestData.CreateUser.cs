@@ -25,7 +25,7 @@ public partial class TestData
                 Email = email,
                 Role = role,
                 UserId = Guid.NewGuid(),
-                AzureAdUserId = azureAdUserId?.ToString(),
+                AzureAdUserId = azureAdUserId?.ToString()
             };
 
             dbContext.Users.Add(user);

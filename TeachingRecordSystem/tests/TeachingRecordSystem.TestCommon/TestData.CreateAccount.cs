@@ -14,8 +14,8 @@ public partial class TestData
 
     public class CreateAccountBuilder
     {
-        private string? _name = null;
-        private string? _accountnumber = null;
+        private string? _name;
+        private string? _accountnumber;
 
         public CreateAccountBuilder WithName(string name)
         {

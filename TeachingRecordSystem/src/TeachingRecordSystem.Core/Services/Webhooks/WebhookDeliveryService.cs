@@ -37,7 +37,7 @@ public class WebhookDeliveryService(
         TimeSpan.FromHours(10),
         TimeSpan.FromHours(14),
         TimeSpan.FromHours(20),
-        TimeSpan.FromHours(24),
+        TimeSpan.FromHours(24)
     ];
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

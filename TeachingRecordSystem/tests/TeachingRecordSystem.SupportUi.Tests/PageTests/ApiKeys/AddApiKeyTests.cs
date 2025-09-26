@@ -63,7 +63,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Key", key }
             }
@@ -86,7 +86,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Key", key }
             }
@@ -109,7 +109,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Key", key }
             }
@@ -132,7 +132,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Key", key }
             }
@@ -154,7 +154,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Key", anotherKey.Key }
             }
@@ -177,7 +177,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Key", key }
             }

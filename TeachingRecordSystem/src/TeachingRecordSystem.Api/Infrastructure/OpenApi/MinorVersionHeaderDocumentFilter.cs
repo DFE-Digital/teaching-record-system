@@ -9,7 +9,7 @@ public class MinorVersionHeaderDocumentFilter : IDocumentFilter
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
         var documentVersion = swaggerDoc.Info.Version;
-        var isMinorVersion = documentVersion.StartsWith("v3_");
+        var isMinorVersion = documentVersion.StartsWith("v3_", StringComparison.Ordinal);
 
         if (!isMinorVersion)
         {
@@ -22,24 +22,24 @@ public class MinorVersionHeaderDocumentFilter : IDocumentFilter
 
         swaggerDoc.Components.Schemas.Add(
             headerValueSchemaName,
-            new OpenApiSchema()
+            new OpenApiSchema
             {
                 Type = "string",
-                Enum = new[] { new OpenApiString(minorVersion) }  // TODO Use const when Swashbuckle supports openapi 3.1
+                Enum = [new OpenApiString(minorVersion)] // TODO Use const when Swashbuckle supports openapi 3.1
             });
 
         foreach (var (_, path) in swaggerDoc.Paths)
         {
             foreach (var (_, operation) in path.Operations)
             {
-                operation.Parameters.Add(new OpenApiParameter()
+                operation.Parameters.Add(new OpenApiParameter
                 {
                     Name = VersionRegistry.MinorVersionHeaderName,
                     Required = true,
                     In = ParameterLocation.Header,
-                    Schema = new OpenApiSchema()
+                    Schema = new OpenApiSchema
                     {
-                        Reference = new OpenApiReference() { Id = headerValueSchemaName, Type = ReferenceType.Schema }
+                        Reference = new OpenApiReference { Id = headerValueSchemaName, Type = ReferenceType.Schema }
                     }
                 });
             }

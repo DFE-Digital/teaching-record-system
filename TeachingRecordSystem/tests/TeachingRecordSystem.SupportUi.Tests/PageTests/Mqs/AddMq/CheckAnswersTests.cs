@@ -35,7 +35,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
-            new AddMqState()
+            new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
@@ -68,7 +68,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
-            new AddMqState()
+            new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
@@ -133,7 +133,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
-            new AddMqState()
+            new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
@@ -174,7 +174,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var expectedMqCreatedEvent = new MandatoryQualificationCreatedEvent()
+            var expectedMqCreatedEvent = new MandatoryQualificationCreatedEvent
             {
                 EventId = Guid.Empty,
                 CreatedUtc = Clock.UtcNow,
@@ -215,7 +215,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
-            new AddMqState()
+            new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
@@ -265,7 +265,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
-            new AddMqState()
+            new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,

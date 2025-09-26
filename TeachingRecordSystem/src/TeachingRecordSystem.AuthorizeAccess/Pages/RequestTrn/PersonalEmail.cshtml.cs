@@ -58,13 +58,10 @@ public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, TrsD
         }
     }
 
-    private async Task<bool> SearchForOpenTasksForEmailAddressAsync(string emailAddress)
-    {
-        var openTasks = await dbContext.SupportTasks
-            .Where(s => s.Status == SupportTaskStatus.Open && s.SupportTaskType == SupportTaskType.NpqTrnRequest)
-                .Where(s => s.TrnRequestMetadata!.EmailAddress != null &&
-                        s.TrnRequestMetadata.EmailAddress.ToLower() == emailAddress.ToLower())
-            .AnyAsync();
-        return openTasks;
-    }
+    private Task<bool> SearchForOpenTasksForEmailAddressAsync(string emailAddress) =>
+        dbContext.SupportTasks.AnyAsync(s =>
+            s.Status == SupportTaskStatus.Open &&
+            s.SupportTaskType == SupportTaskType.NpqTrnRequest &&
+            s.TrnRequestMetadata!.EmailAddress != null &&
+            EF.Functions.Collate(s.TrnRequestMetadata.EmailAddress, Collations.CaseInsensitive) == emailAddress);
 }

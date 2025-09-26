@@ -51,7 +51,7 @@ public class IndexTests : TestBase
         var deletionReason = MqDeletionReasonOption.ProviderRequest;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualification.QualificationId,
-            new DeleteMqState()
+            new DeleteMqState
             {
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = "My deletion reason detail",
@@ -107,7 +107,7 @@ public class IndexTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "UploadEvidence", "False" }
             }
@@ -130,9 +130,9 @@ public class IndexTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                 { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() },
+                 { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() }
             }
         };
 
@@ -153,7 +153,7 @@ public class IndexTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                  { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() },
                  { "UploadEvidence", "True" }
@@ -272,7 +272,7 @@ public class IndexTests : TestBase
 
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {
-        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        var byteArrayContent = new ByteArrayContent([]);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
 
         var multipartContent = new MultipartFormDataContent

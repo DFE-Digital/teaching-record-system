@@ -10,7 +10,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/notes/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Text", "" }
             }
@@ -33,7 +33,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/notes/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Text", text }
             }
@@ -117,7 +117,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var request = new HttpRequestMessage(httpMethod, $"/persons/{person.PersonId}/notes/add");
         if (httpMethod == HttpMethod.Post)
         {
-            request.Content = new FormUrlEncodedContentBuilder()
+            request.Content = new FormUrlEncodedContentBuilder
             {
                 { "Text", Faker.Lorem.Paragraph() }
             };

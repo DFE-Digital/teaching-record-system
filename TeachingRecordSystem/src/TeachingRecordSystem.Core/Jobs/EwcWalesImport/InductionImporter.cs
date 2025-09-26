@@ -105,7 +105,7 @@ public class InductionImporter
                                  awardedDate.HasValue,
                                  startDate,
                                  awardedDate,
-                                  DataStore.Postgres.Models.SystemUser.SystemUserId,
+                                  SystemUser.SystemUserId,
                                  _clock.UtcNow,
                                  out var updatedEvent);
 

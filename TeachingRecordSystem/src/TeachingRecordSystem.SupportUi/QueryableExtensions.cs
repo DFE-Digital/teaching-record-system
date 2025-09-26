@@ -27,7 +27,7 @@ public static class QueryableExtensions
         int itemsPerPage,
         int? total = null)
     {
-        return ResultPage.CreateFromQueryAsync<T>(source, currentPage, itemsPerPage, total);
+        return ResultPage.CreateFromQueryAsync(source, currentPage, itemsPerPage, total);
     }
 }
 

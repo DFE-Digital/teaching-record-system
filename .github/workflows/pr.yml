@@ -38,25 +38,21 @@ jobs:
         run: |
           git fetch origin main --quiet --depth=1
 
-          CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^TeachingRecordSystem\/\K.*\.cs(proj)?$' || true; })
+          CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
+          GLOBAL_SETTINGS_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.csproj$' -e '\.editorconfig$' -e '\.props$')
+          CS_FILES_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.cs$')
 
-          if [ "$CHANGED_FILES" == "" ]; then
+          if [ "$GLOBAL_SETTINGS_CHANGED" -gt 0 ]; then
+            INCLUDE_ARG=""
+            echo "::notice::Linting entire .NET solution"
+          elif [ "$CS_FILES_CHANGED" -eq 0 ]; then
             echo "::notice::No changes to lint"
             exit 0
-          fi
-
-          # If project files have changed then dependencies may have been updated, which may effect lint results (e.g. namespace imports);
-          # lint everything.
-          if [ $(echo "$CHANGED_FILES" | grep -c -E '\.(csproj|props)$') -gt 0 ]; then
-            INCLUDE_ARG=""
-            echo "::notice::Linting entire codebase"
           else
-            INCLUDE_ARG="--include $(echo "$CHANGED_FILES" | grep '\.cs$' | tr '\n' ' ')"
-            echo "::notice::Linting changed files only"
+            INCLUDE_ARG="--include $(echo "CS_FILES_CHANGED" | sed 's/^TeachingRecordSystem\///g' | tr '\n' ' ')"
           fi
 
-          dotnet dotnet-format --verify-no-changes $INCLUDE_ARG
-        working-directory: TeachingRecordSystem
+          cd TeachingRecordSystem && dotnet dotnet-format --verify-no-changes $INCLUDE_ARG
 
   validate_terraform:
     name: Validate Terraform

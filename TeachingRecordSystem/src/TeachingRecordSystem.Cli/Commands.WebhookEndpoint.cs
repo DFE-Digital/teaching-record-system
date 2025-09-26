@@ -44,7 +44,7 @@ public partial class Commands
             return apiVersion;
         }
 
-        static string NormalizeApiVersion(string version) => version.StartsWith("V") ? version[1..] : version;
+        static string NormalizeApiVersion(string version) => version.StartsWith('V') ? version[1..] : version;
 
         Command CreateCreateCommand()
         {

@@ -9,7 +9,7 @@ public abstract class CloseAlertTestBase(HostFixture hostFixture) : TestBase(hos
         CreateJourneyInstanceAsync(alertId, new());
 
     protected Task<JourneyInstance<CloseAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstanceAsync(alert.AlertId, new CloseAlertState()
+        CreateJourneyInstanceAsync(alert.AlertId, new CloseAlertState
         {
             EndDate = alert.StartDate!.Value.AddDays(2),
             ChangeReason = CloseAlertReasonOption.AnotherReason,
@@ -27,7 +27,7 @@ public abstract class CloseAlertTestBase(HostFixture hostFixture) : TestBase(hos
             JourneySteps.New =>
                 CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index =>
-                CreateJourneyInstanceAsync(alert.AlertId, new CloseAlertState()
+                CreateJourneyInstanceAsync(alert.AlertId, new CloseAlertState
                 {
                     EndDate = alert.StartDate!.Value.AddDays(2)
                 }),

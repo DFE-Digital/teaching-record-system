@@ -460,7 +460,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             PersonId = trsPerson.PersonId,
             Gender = trsPerson.Gender,
             ChangeType = PersonAttributesChanges.DateOfBirth,
-            Created = DateTime.UtcNow,
+            Created = DateTime.UtcNow
         };
 
         // Act
@@ -533,7 +533,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             PersonId = trsPerson.PersonId,
             Gender = trsPerson.Gender,
             ChangeType = PersonAttributesChanges.DateOfBirth,
-            Created = DateTime.UtcNow,
+            Created = DateTime.UtcNow
         };
 
         // Act
@@ -606,7 +606,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             PersonId = trsPerson.PersonId,
             Gender = trsPerson.Gender,
             ChangeType = PersonAttributesChanges.DateOfBirth,
-            Created = DateTime.UtcNow,
+            Created = DateTime.UtcNow
         };
 
         // Act
@@ -683,7 +683,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
                 PersonId = trsPerson.PersonId,
                 Gender = trsPerson.Gender,
                 ChangeType = PersonAttributesChanges.NationalInsuranceNumber,
-                Created = DateTime.UtcNow,
+                Created = DateTime.UtcNow
             };
 
             // Act

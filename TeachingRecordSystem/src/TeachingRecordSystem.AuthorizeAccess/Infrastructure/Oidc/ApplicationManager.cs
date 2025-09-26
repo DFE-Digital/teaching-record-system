@@ -19,5 +19,5 @@ public class ApplicationManager : OpenIddictApplicationManager<OpenIddictEntityF
         throw new NotSupportedException();
 
     protected override ValueTask<bool> ValidateClientSecretAsync(string secret, string comparand, CancellationToken cancellationToken = default) =>
-        ValueTask.FromResult(secret.Equals(comparand));
+        ValueTask.FromResult(secret.Equals(comparand, StringComparison.Ordinal));
 }

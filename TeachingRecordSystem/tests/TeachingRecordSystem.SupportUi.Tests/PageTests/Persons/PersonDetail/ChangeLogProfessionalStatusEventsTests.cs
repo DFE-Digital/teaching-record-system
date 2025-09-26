@@ -17,7 +17,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var endDate = Clock.Today.AddDays(-1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = RouteToProfessionalStatusStatus.InTraining;
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -165,7 +165,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var startDate = oldStartDate.AddDays(1);
         var endDate = oldEndDate.AddDays(1);
         var route = oldRoute;
-        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.TrainingSubjectId != oldSubject.TrainingSubjectId).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.TrainingSubjectId != oldSubject.TrainingSubjectId).Where(s => !s.Name.Contains('\'')).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => x.TrainingProviderId != oldTrainingProvider.TrainingProviderId).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).Where(x => x.DegreeTypeId != oldDegreeType.DegreeTypeId).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Where(x => x.CountryId != oldCountry.CountryId).RandomOne();
@@ -273,7 +273,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .RandomOne();
         var status = RouteToProfessionalStatusStatus.Holds;
-        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -424,7 +424,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync(ProfessionalStatusType.QualifiedTeacherStatus);
         var status = RouteToProfessionalStatusStatus.Holds;
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -667,7 +667,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var awardDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = populateOptional ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -702,7 +702,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         if (populateOptional)
         {
-            routeToProfessionalStatus = new EventModels.RouteToProfessionalStatus()
+            routeToProfessionalStatus = new EventModels.RouteToProfessionalStatus
             {
                 QualificationId = Guid.NewGuid(),
                 RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
@@ -723,7 +723,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 ExemptFromInductionDueToQtsDate = true
             };
 
-            dqtQtsRegistration = new EventModels.DqtQtsRegistration()
+            dqtQtsRegistration = new EventModels.DqtQtsRegistration
             {
                 QtsRegistrationId = Guid.NewGuid(),
                 TeacherStatusName = qualifiedTeacherStatus.Name,
@@ -735,7 +735,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 PartialRecognitionDate = pqtsDate
             };
 
-            dqtInitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            dqtInitialTeacherTraining = new EventModels.DqtInitialTeacherTraining
             {
                 InitialTeacherTrainingId = Guid.NewGuid(),
                 SlugId = sourceApplicationReference,
@@ -762,7 +762,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         }
         else
         {
-            routeToProfessionalStatus = new EventModels.RouteToProfessionalStatus()
+            routeToProfessionalStatus = new EventModels.RouteToProfessionalStatus
             {
                 QualificationId = Guid.NewGuid(),
                 RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
@@ -784,7 +784,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             };
         }
 
-        var migratedEvent = new RouteToProfessionalStatusMigratedEvent()
+        var migratedEvent = new RouteToProfessionalStatusMigratedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -863,13 +863,13 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var ittResult = dfeta_ITTResult.InTraining;
         var createdByUser = await TestData.CreateUserAsync();
 
-        var createdEvent = new DqtInitialTeacherTrainingCreatedEvent()
+        var createdEvent = new DqtInitialTeacherTrainingCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
-            InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining
             {
                 Result = ittResult.ToString()
             }
@@ -904,17 +904,17 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var oldIttResult = dfeta_ITTResult.InTraining;
         var createdByUser = await TestData.CreateUserAsync();
 
-        var updatedEvent = new DqtInitialTeacherTrainingUpdatedEvent()
+        var updatedEvent = new DqtInitialTeacherTrainingUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
-            InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            InitialTeacherTraining = new EventModels.DqtInitialTeacherTraining
             {
                 Result = ittResult.ToString()
             },
-            OldInitialTeacherTraining = new EventModels.DqtInitialTeacherTraining()
+            OldInitialTeacherTraining = new EventModels.DqtInitialTeacherTraining
             {
                 Result = oldIttResult.ToString()
             },
@@ -957,13 +957,13 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var eytsDate = Clock.Today.AddDays(-50);
         var createdByUser = await TestData.CreateUserAsync();
 
-        var createdEvent = new DqtQtsRegistrationCreatedEvent()
+        var createdEvent = new DqtQtsRegistrationCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
-            QtsRegistration = new EventModels.DqtQtsRegistration()
+            QtsRegistration = new EventModels.DqtQtsRegistration
             {
                 TeacherStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue ? teacherStatusName : null,
                 EarlyYearsStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue ? earlyYearsStatusName : null,
@@ -1045,20 +1045,20 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var eytsDate = oldEytsDate.AddDays(1);
         var createdByUser = await TestData.CreateUserAsync();
 
-        var updatedEvent = new DqtQtsRegistrationUpdatedEvent()
+        var updatedEvent = new DqtQtsRegistrationUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
-            QtsRegistration = new EventModels.DqtQtsRegistration()
+            QtsRegistration = new EventModels.DqtQtsRegistration
             {
                 TeacherStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue ? teacherStatusName : null,
                 EarlyYearsStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue ? earlyYearsStatusName : null,
                 QtsDate = changes == DqtQtsRegistrationUpdatedEventChanges.QtsDate ? qtsDate : null,
                 EytsDate = changes == DqtQtsRegistrationUpdatedEventChanges.EytsDate ? eytsDate : null
             },
-            OldQtsRegistration = new EventModels.DqtQtsRegistration()
+            OldQtsRegistration = new EventModels.DqtQtsRegistration
             {
                 TeacherStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue ? oldTeacherStatusName : null,
                 EarlyYearsStatusName = changes == DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue ? oldEarlyYearsStatusName : null,

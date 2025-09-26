@@ -49,7 +49,7 @@ public partial class PersonMatchingServiceTests
                 NameArgumentOption.MatchesAlias => [[alias!, person.LastName]],
                 NameArgumentOption.SpecifiedButDifferentFirstName => [[TestData.GenerateChangedFirstName(person.FirstName), person.LastName]],
                 NameArgumentOption.SpecifiedButDifferentLastName => [[person.FirstName, TestData.GenerateChangedLastName(person.LastName)]],
-                _ => [],
+                _ => []
             };
 
             DateOnly[] datesOfBirth = dateOfBirthOption switch
@@ -567,7 +567,7 @@ public partial class PersonMatchingServiceTests
             TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ false,
             null
-        },
+        }
     };
 
     public static class OneLogin

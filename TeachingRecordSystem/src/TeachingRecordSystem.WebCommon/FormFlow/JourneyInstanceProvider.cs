@@ -127,7 +127,7 @@ public class JourneyInstanceProvider(
         IReadOnlyDictionary<object, object>? properties = null)
         where TState : new()
     {
-        return GetOrCreateInstanceAsync<TState>(actionContext, () => new TState(), properties);
+        return GetOrCreateInstanceAsync(actionContext, () => new TState(), properties);
     }
 
     public async Task<JourneyInstance<TState>> GetOrCreateInstanceAsync<TState>(

@@ -17,9 +17,9 @@ public partial class TestData
 
     public class UpdatePersonBuilder
     {
-        private Guid? _personId = null;
-        private (string FirstName, string? MiddleName, string LastName)? _updatedName = null;
-        private bool? _contactsMigrated = null;
+        private Guid? _personId;
+        private (string FirstName, string? MiddleName, string LastName)? _updatedName;
+        private bool? _contactsMigrated;
 
         public UpdatePersonBuilder WithPersonId(Guid personId)
         {

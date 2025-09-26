@@ -5,7 +5,9 @@ public class CreateFieldState<T>(string raw, T? parsed) where T : class, IParsab
     public string Raw { get; } = raw;
     public T? Parsed { get; } = parsed;
 
+#pragma warning disable CA1000
     public static CreateFieldState<T> FromRawValue(string? rawValue)
+#pragma warning restore CA1000
     {
         return new(rawValue ?? "", T.TryParse(rawValue, null, out var parsed) ? (T?)parsed : null);
     }

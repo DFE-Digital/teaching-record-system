@@ -222,7 +222,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
                 PersonMatchedAttribute.EmailAddress => PersonsMergedEventChanges.EmailAddress,
                 PersonMatchedAttribute.NationalInsuranceNumber => PersonsMergedEventChanges.NationalInsuranceNumber,
                 PersonMatchedAttribute.Gender => PersonsMergedEventChanges.Gender,
-                _ => PersonsMergedEventChanges.None,
+                PersonMatchedAttribute.FullName => throw new NotImplementedException(),
+                PersonMatchedAttribute.Trn => throw new NotImplementedException(),
+                _ => PersonsMergedEventChanges.None
             };
             Assert.Equal(expectedChange, actualEvent.Changes);
         });
@@ -309,7 +311,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
         )
     ];
 
-    public static IEnumerable<object[]> PersonAttributeInfoData { get; } = PersonAttributeInfos.SelectMany(i => new object[][] { new object[] { i, false }, new object[] { i, true } });
+    public static IEnumerable<object[]> PersonAttributeInfoData { get; } = PersonAttributeInfos.SelectMany(i => new object[][] { [i, false], [i, true] });
 
     public record PersonAttributeInfo(
         PersonMatchedAttribute Attribute,

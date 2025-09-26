@@ -9,7 +9,7 @@ public abstract class EndDateTestBase(HostFixture hostFixture) : TestBase(hostFi
         CreateJourneyInstanceAsync(alertId, new());
 
     protected Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState()
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState
         {
             Initialized = true,
             CurrentEndDate = alert.EndDate,
@@ -27,13 +27,13 @@ public abstract class EndDateTestBase(HostFixture hostFixture) : TestBase(hostFi
         step switch
         {
             JourneySteps.New =>
-                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState
                 {
                     Initialized = true,
                     CurrentEndDate = alert.EndDate
                 }),
             JourneySteps.Index =>
-                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState
                 {
                     Initialized = true,
                     CurrentEndDate = alert.EndDate,

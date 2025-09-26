@@ -7,7 +7,7 @@ public record Note
     public required string Content { get; init; }
     public required File? File { get; init; }
 
-    public static Note FromModel(Core.DataStore.Postgres.Models.Note model) =>
+    public static Note FromModel(DataStore.Postgres.Models.Note model) =>
         new()
         {
             NoteId = model.NoteId,

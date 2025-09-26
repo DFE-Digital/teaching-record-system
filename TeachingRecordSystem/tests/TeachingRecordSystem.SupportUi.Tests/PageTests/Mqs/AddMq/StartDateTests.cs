@@ -91,11 +91,11 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "StartDate.Day", $"{startDate:%d}" },
                 { "StartDate.Month", $"{startDate:%M}" },
-                { "StartDate.Year", $"{startDate:yyyy}" },
+                { "StartDate.Year", $"{startDate:yyyy}" }
             }
         };
 
@@ -117,11 +117,11 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "StartDate.Day", $"{startDate:%d}" },
                 { "StartDate.Month", $"{startDate:%M}" },
-                { "StartDate.Year", $"{startDate:yyyy}" },
+                { "StartDate.Year", $"{startDate:yyyy}" }
             }
         };
 
@@ -167,11 +167,11 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "StartDate.Day", $"{startDate:%d}" },
                 { "StartDate.Month", $"{startDate:%M}" },
-                { "StartDate.Year", $"{startDate:yyyy}" },
+                { "StartDate.Year", $"{startDate:yyyy}" }
             }
         };
 
@@ -193,11 +193,11 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "StartDate.Day", $"{startDate:%d}" },
                 { "StartDate.Month", $"{startDate:%M}" },
-                { "StartDate.Year", $"{startDate:yyyy}" },
+                { "StartDate.Year", $"{startDate:yyyy}" }
             }
         };
 
@@ -235,7 +235,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, Action<AddMqState>? configureState = null)
     {
-        var state = new AddMqState()
+        var state = new AddMqState
         {
             ProviderId = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham").MandatoryQualificationProviderId,
             Specialism = MandatoryQualificationSpecialism.Visual

@@ -66,7 +66,9 @@ public static class IdModelTypes
     public enum UserType
     {
         Default = 0,
+#pragma warning disable CA1069
         Teacher = 0,
+#pragma warning restore CA1069
         Staff = 1
     }
 
@@ -76,7 +78,7 @@ public static class IdModelTypes
         Api = 1,
         SupportUi = 2,
         UserImport = 3,
-        TrnToken = 4,
+        TrnToken = 4
     }
 
     public enum TrnVerificationLevel

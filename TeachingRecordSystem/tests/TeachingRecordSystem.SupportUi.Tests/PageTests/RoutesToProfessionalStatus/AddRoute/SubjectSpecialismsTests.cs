@@ -139,11 +139,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "SubjectId1", subjects[0].TrainingSubjectId},
                 { "SubjectId2", subjects[1].TrainingSubjectId },
-                { "SubjectId3", subjects[2].TrainingSubjectId },
+                { "SubjectId3", subjects[2].TrainingSubjectId }
             }
         };
 

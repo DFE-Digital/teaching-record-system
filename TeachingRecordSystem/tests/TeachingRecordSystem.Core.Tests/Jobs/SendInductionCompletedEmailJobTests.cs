@@ -39,7 +39,7 @@ public class SendInductionCompletedEmailJobTests : NightlyEmailJobTestBase
             var personalisation = new Dictionary<string, string>()
             {
                 { "first name", firstName },
-                { "last name", lastName },
+                { "last name", lastName }
             };
 
             var batchJob = new InductionCompletedEmailsJob
@@ -100,8 +100,7 @@ public class SendInductionCompletedEmailJobTests : NightlyEmailJobTestBase
                 .ToListAsync();
             var emailSentEvent = events
                 .Select(e => JsonSerializer.Deserialize<InductionCompletedEmailSentEvent>(e.Payload))
-                .Where(e => e!.InductionCompletedEmailsJobId == inductionCompletedEmailsJobId && e.PersonId == personId)
-                .SingleOrDefault();
+.SingleOrDefault(e => e!.InductionCompletedEmailsJobId == inductionCompletedEmailsJobId && e.PersonId == personId);
             Assert.NotNull(emailSentEvent);
         });
 }

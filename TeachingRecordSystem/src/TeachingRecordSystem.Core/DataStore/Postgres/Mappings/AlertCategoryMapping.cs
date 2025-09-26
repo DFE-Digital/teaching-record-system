@@ -9,7 +9,7 @@ public class AlertCategoryMapping : IEntityTypeConfiguration<AlertCategory>
     {
         builder.ToTable("alert_categories");
         builder.HasKey(x => x.AlertCategoryId);
-        builder.Property(x => x.Name).IsRequired().HasMaxLength(AlertCategory.NameMaxLength).UseCollation("case_insensitive");
+        builder.Property(x => x.Name).IsRequired().HasMaxLength(AlertCategory.NameMaxLength).UseCollation(Collations.CaseInsensitive);
         builder.HasIndex(x => x.DisplayOrder).HasDatabaseName(AlertCategory.DisplayOrderIndexName).IsUnique();
         builder.HasData(
             new AlertCategory { AlertCategoryId = Guid.Parse("ee78d44d-abf8-44a9-b22b-87a821f8d3c9"), Name = "EEA Decision", DisplayOrder = 1 },

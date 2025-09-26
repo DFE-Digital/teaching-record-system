@@ -12,9 +12,9 @@ public class UserBaseMapping : IEntityTypeConfiguration<UserBase>
         builder.HasDiscriminator(e => e.UserType)
             .HasValue<User>(UserType.Person)
             .HasValue<ApplicationUser>(UserType.Application)
-            .HasValue<Models.SystemUser>(UserType.System);
+            .HasValue<SystemUser>(UserType.System);
         builder.Property(e => e.UserType).IsRequired();
-        builder.Property(e => e.Name).IsRequired().HasMaxLength(User.NameMaxLength);
+        builder.Property(e => e.Name).IsRequired().HasMaxLength(UserBase.NameMaxLength);
     }
 }
 
@@ -52,10 +52,10 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
     }
 }
 
-public class SystemUserMapping : IEntityTypeConfiguration<Models.SystemUser>
+public class SystemUserMapping : IEntityTypeConfiguration<SystemUser>
 {
-    public void Configure(EntityTypeBuilder<Models.SystemUser> builder)
+    public void Configure(EntityTypeBuilder<SystemUser> builder)
     {
-        builder.HasData(Models.SystemUser.Instance);
+        builder.HasData(SystemUser.Instance);
     }
 }

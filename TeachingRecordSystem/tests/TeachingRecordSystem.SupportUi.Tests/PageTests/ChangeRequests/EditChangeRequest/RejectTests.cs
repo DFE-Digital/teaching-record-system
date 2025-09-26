@@ -117,7 +117,7 @@ public class RejectTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{supportTask.SupportTaskReference}/reject")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "RejectionReasonChoice", "RequestAndProofDontMatch" }
             }
@@ -155,7 +155,7 @@ public class RejectTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{supportTask.SupportTaskReference}/reject")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "RejectionReasonChoice", "RequestAndProofDontMatch" }
             }
@@ -249,7 +249,7 @@ public class RejectTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{supportTask.SupportTaskReference}/reject")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "RejectionReasonChoice", "ChangeNoLongerRequired" }
             }

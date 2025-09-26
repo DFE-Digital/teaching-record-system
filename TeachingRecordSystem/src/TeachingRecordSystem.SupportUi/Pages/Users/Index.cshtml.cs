@@ -26,7 +26,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
     [BindProperty(SupportsGet = true)]
     public string? Role { get; set; }
 
-    public bool HasUsers { get; private set; } = false;
+    public bool HasUsers { get; private set; }
 
     public IEnumerable<UserViewModel> CurrentPageUsers { get; private set; } = [];
 
@@ -41,7 +41,15 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         var filters = new FilterCollection<User>([
             new SingleValueFilter<User>(nameof(Keywords), "Search", Request.Query,
+#pragma warning disable CA1862
+#pragma warning disable CA1862
+#pragma warning disable CA1304
+#pragma warning disable CA1311
                 value => u => u.Name.ToLower().Contains(value.ToLower()) || u.Email!.ToLower().Contains(value.ToLower())),
+#pragma warning restore CA1311
+#pragma warning restore CA1304
+#pragma warning restore CA1304
+#pragma warning restore CA1862
 
             new MultiValueFilter<User>(nameof(Role), "Role", Request.Query,
                 u => u.Role,

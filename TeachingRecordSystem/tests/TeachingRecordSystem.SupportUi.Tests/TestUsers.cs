@@ -23,7 +23,7 @@ public class TestUsers(IDbContextFactory<TrsDbContext> dbContextFactory)
 
             var userNumber = _users.Count + 1;
 
-            user = new User()
+            user = new User
             {
                 Active = true,
                 Email = $"test.user.{userNumber}@localhost",

@@ -9,8 +9,8 @@ public class NameSynonymsMapping : IEntityTypeConfiguration<NameSynonyms>
     {
         builder.ToTable("name_synonyms");
         builder.HasKey(e => e.NameSynonymsId);
-        builder.Property(e => e.Name).HasMaxLength(NameSynonyms.NameMaxLength).IsRequired().UseCollation("case_insensitive");
+        builder.Property(e => e.Name).HasMaxLength(NameSynonyms.NameMaxLength).IsRequired().UseCollation(Collations.CaseInsensitive);
         builder.HasIndex(e => e.Name).IsUnique().HasDatabaseName(NameSynonyms.NameSynonymsIndexName);
-        builder.Property(e => e.Synonyms).IsRequired().UseCollation("case_insensitive");
+        builder.Property(e => e.Synonyms).IsRequired().UseCollation(Collations.CaseInsensitive);
     }
 }

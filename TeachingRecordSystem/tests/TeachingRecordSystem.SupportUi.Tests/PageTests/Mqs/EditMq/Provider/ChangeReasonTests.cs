@@ -29,12 +29,12 @@ public class ChangeReasonTests : TestBase
     [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
-        // Arrange        
+        // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true
             });
@@ -52,14 +52,14 @@ public class ChangeReasonTests : TestBase
     [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsOK()
     {
-        // Arrange        
+        // Arrange
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -100,7 +100,7 @@ public class ChangeReasonTests : TestBase
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -108,7 +108,7 @@ public class ChangeReasonTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "UploadEvidence", "False" }
             }
@@ -131,7 +131,7 @@ public class ChangeReasonTests : TestBase
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -139,9 +139,9 @@ public class ChangeReasonTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                 { "ChangeReason", MqChangeProviderReasonOption.ChangeOfTrainingProvider.ToString() },
+                 { "ChangeReason", MqChangeProviderReasonOption.ChangeOfTrainingProvider.ToString() }
             }
         };
 
@@ -162,7 +162,7 @@ public class ChangeReasonTests : TestBase
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -170,7 +170,7 @@ public class ChangeReasonTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                  { "ChangeReason", MqChangeProviderReasonOption.ChangeOfTrainingProvider.ToString() },
                  { "UploadEvidence", "True" }
@@ -194,7 +194,7 @@ public class ChangeReasonTests : TestBase
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -227,7 +227,7 @@ public class ChangeReasonTests : TestBase
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -261,7 +261,7 @@ public class ChangeReasonTests : TestBase
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -299,7 +299,7 @@ public class ChangeReasonTests : TestBase
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqProviderState()
+            new EditMqProviderState
             {
                 Initialized = true,
                 ProviderId = journeyProvider.MandatoryQualificationProviderId
@@ -316,7 +316,7 @@ public class ChangeReasonTests : TestBase
 
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {
-        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        var byteArrayContent = new ByteArrayContent([]);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
 
         var multipartContent = new MultipartFormDataContent

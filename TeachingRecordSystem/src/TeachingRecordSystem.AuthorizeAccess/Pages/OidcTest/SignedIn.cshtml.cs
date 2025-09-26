@@ -10,6 +10,8 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages.OidcTest;
 [Authorize(AuthenticationSchemes = TestAppConfiguration.AuthenticationSchemeName)]
 public class SignedInModel : PageModel
 {
+    private static JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
+
     [Display(Name = "Access token")]
     public string? AccessToken { get; set; }
 
@@ -22,6 +24,6 @@ public class SignedInModel : PageModel
 
         ClaimsJson = JsonSerializer.Serialize(
             User.Claims.ToDictionary(c => c.Type, c => c.Value),
-            new JsonSerializerOptions() { WriteIndented = true });
+            _serializerOptions);
     }
 }

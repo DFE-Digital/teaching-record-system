@@ -13,7 +13,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true
             });
@@ -43,7 +43,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism,
@@ -88,7 +88,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true
             });
@@ -124,14 +124,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism,
                 CurrentSpecialism = oldMqSpecialism,
                 ChangeReason = changeReason,
                 ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = false,
+                UploadEvidence = false
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -159,7 +159,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
+            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent
             {
                 EventId = Guid.Empty,
                 CreatedUtc = Clock.UtcNow,
@@ -216,7 +216,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism,
@@ -263,7 +263,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism,

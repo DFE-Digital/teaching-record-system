@@ -17,7 +17,7 @@ public class CheckYourAnswersModel(
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
-    public ChangeReasonOption? ChangeReason;
+    public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
     public string? UploadedEvidenceFileUrl { get; set; }
 
@@ -84,8 +84,7 @@ public class CheckYourAnswersModel(
     {
         await base.OnPageHandlerExecutingAsync(context);
 
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
+        var pagesInOrder = Enum.GetValues<AddRoutePage>()
             .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
             .OrderBy(p => p);
 

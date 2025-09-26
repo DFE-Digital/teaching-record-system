@@ -35,7 +35,7 @@ public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenera
             return BadRequest();
         }
 
-        var oldApiKey = Core.Events.Models.ApiKey.FromModel(_apiKey!);
+        var oldApiKey = EventModels.ApiKey.FromModel(_apiKey!);
 
         _apiKey!.Expires = clock.UtcNow;
 
@@ -44,7 +44,7 @@ public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenera
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,
             RaisedBy = User.GetUserId(),
-            ApiKey = Core.Events.Models.ApiKey.FromModel(_apiKey),
+            ApiKey = EventModels.ApiKey.FromModel(_apiKey),
             OldApiKey = oldApiKey,
             Changes = ApiKeyUpdatedEventChanges.Expires
         };

@@ -40,7 +40,7 @@ public class SchoolOrEducationalSettingTests(HostFixture hostFixture) : TestBase
 
         var selectedRadio = document
             .QuerySelectorAll<IHtmlInputElement>("input[type=radio][name=IsWorkingInSchoolOrEducationalSetting]")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
 
         Assert.Equal("True", selectedRadio);
     }

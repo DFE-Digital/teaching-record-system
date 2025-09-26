@@ -21,7 +21,7 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
     public async Task DeleteStaleJourneyStatesJob_RemovesJourneyStatesOlderThanOneDay_UpdatesMetadataLastRunDate()
     {
         // Arrange
-        var journeyState1 = new Core.DataStore.Postgres.Models.JourneyState
+        var journeyState1 = new JourneyState
         {
             InstanceId = Guid.NewGuid().ToString(),
             Created = Clock.UtcNow.AddDays(-2),
@@ -29,7 +29,7 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
             UserId = Guid.NewGuid().ToString(),
             Updated = Clock.UtcNow.AddDays(-2)
         };
-        var journeyState2 = new Core.DataStore.Postgres.Models.JourneyState
+        var journeyState2 = new JourneyState
         {
             InstanceId = Guid.NewGuid().ToString(),
             Created = Clock.UtcNow.AddDays(-1).AddMinutes(Random.Shared.Next(0, 60)),
@@ -37,7 +37,7 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
             UserId = Guid.NewGuid().ToString(),
             Updated = Clock.UtcNow.AddDays(-1).AddMinutes(Random.Shared.Next(0, 60))
         };
-        var journeyState3 = new Core.DataStore.Postgres.Models.JourneyState
+        var journeyState3 = new JourneyState
         {
             InstanceId = Guid.NewGuid().ToString(),
             Created = Clock.UtcNow.AddMinutes(Random.Shared.Next(-60, 0)),

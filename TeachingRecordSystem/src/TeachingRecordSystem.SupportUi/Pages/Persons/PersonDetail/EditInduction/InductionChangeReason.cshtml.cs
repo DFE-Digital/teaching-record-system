@@ -67,7 +67,7 @@ public class InductionChangeReasonModel(
                 _ when InductionStatus.RequiresCompletedDate() => GetPageLink(InductionJourneyPage.CompletedDate),
                 _ when InductionStatus.RequiresStartDate() => GetPageLink(InductionJourneyPage.StartDate),
                 _ when InductionStatus.RequiresExemptionReasons() => GetPageLink(InductionJourneyPage.ExemptionReason),
-                _ => GetPageLink(InductionJourneyPage.Status),
+                _ => GetPageLink(InductionJourneyPage.Status)
             };
         }
     }

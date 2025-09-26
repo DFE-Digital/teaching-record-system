@@ -20,7 +20,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -49,7 +49,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = null
@@ -79,7 +79,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
@@ -285,7 +285,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = null
@@ -318,7 +318,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
@@ -416,12 +416,12 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             HttpMethod.Post,
             $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "DateOfBirthSource", dateOfBirthSelection },
                 { "EmailAddressSource", emailAddressSelection },
                 { "NationalInsuranceNumberSource", nationalInsuranceNumberSelection },
-                { "GenderSource", genderSelection },
+                { "GenderSource", genderSelection }
             }
         };
 

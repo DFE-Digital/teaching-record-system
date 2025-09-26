@@ -80,7 +80,7 @@ if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 
     builder.Services
         .Decorate<IAuthenticationSchemeProvider, OneLoginAuthenticationSchemeProvider>()
-        .AddSingleton<OneLoginAuthenticationSchemeProvider>(sp => (OneLoginAuthenticationSchemeProvider)sp.GetRequiredService<IAuthenticationSchemeProvider>())
+        .AddSingleton(sp => (OneLoginAuthenticationSchemeProvider)sp.GetRequiredService<IAuthenticationSchemeProvider>())
         .AddSingleton<IConfigureOptions<OneLoginOptions>>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>())
         .AddSingleton<IHostedService>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>());
 }

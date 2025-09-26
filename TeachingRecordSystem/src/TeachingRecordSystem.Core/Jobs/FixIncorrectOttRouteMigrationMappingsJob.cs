@@ -32,7 +32,7 @@ public class FixIncorrectOttRouteMigrationMappingsJob(
                 changeReason: "AnotherReason",
                 changeReasonDetail: "Route type incorrectly mapped during migration",
                 evidenceFile: null,
-                updatedBy: DataStore.Postgres.Models.SystemUser.SystemUserId,
+                updatedBy: SystemUser.SystemUserId,
                 clock.UtcNow,
                 out var updatedEvent);
 

@@ -24,13 +24,13 @@ public sealed class MvcTestFixture : IDisposable
                             options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
                                 journeyName: "MissingInstanceActionFilterTests",
                                 stateType: typeof(MissingInstanceActionFilterTestsState),
-                                requestDataKeys: new[] { "id" },
+                                requestDataKeys: ["id"],
                                 appendUniqueKey: false));
 
                             options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
                                 journeyName: "E2ETests",
                                 stateType: typeof(E2ETestsState),
-                                requestDataKeys: new[] { "id", "subid" },
+                                requestDataKeys: ["id", "subid"],
                                 appendUniqueKey: true));
                         });
 

@@ -13,7 +13,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true
             });
@@ -82,7 +82,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 CurrentStatus = oldStatus,
@@ -152,7 +152,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true
             });
@@ -236,7 +236,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 CurrentStatus = oldStatus,
@@ -278,7 +278,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
+            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent
             {
                 EventId = Guid.Empty,
                 CreatedUtc = Clock.UtcNow,
@@ -317,7 +317,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ChangeReason = changeReason,
                 ChangeReasonDetail = changeReasonDetail,
                 EvidenceFile = uploadEvidence ?
-                    new Core.Events.Models.File()
+                    new EventModels.File
                     {
                         FileId = evidenceFileId!.Value,
                         Name = evidenceFileName!
@@ -343,7 +343,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,
@@ -395,7 +395,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = newStatus,

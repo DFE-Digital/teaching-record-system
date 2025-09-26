@@ -13,7 +13,7 @@ public static class Setup
         await Services.GetRequiredService<DbHelper>().EnsureSchemaAsync();
     }
 
-    private static IServiceProvider CreateServiceProvider()
+    private static ServiceProvider CreateServiceProvider()
     {
         var services = new ServiceCollection();
 

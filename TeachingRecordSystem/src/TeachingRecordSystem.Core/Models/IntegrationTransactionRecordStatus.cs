@@ -11,6 +11,6 @@ namespace TeachingRecordSystem.Core.Models
 
         [Description("Failure")]
         [Display(Name = "Failure")]
-        Failure = 1,
+        Failure = 1
     }
 }

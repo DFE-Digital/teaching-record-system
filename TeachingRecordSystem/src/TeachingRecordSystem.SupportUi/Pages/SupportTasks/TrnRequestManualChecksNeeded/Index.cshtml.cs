@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -74,12 +75,13 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
         {
             var nameParts = Search
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(n => n.ToLower())
+                .Select(n => n.ToLower(CultureInfo.InvariantCulture))
                 .ToArray();
 
             if (nameParts.Length > 0)
             {
-                tasks = tasks.Where(t => nameParts.All(n => t.Task.TrnRequestMetadata!.Name.Select(m => m.ToLower()).Contains(n)));
+                tasks = tasks.Where(t =>
+                    nameParts.All(n => t.Task.TrnRequestMetadata!.Name.Select(m => EF.Functions.Collate(m, Collations.CaseInsensitive)).Contains(n)));
             }
         }
 

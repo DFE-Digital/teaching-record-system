@@ -213,7 +213,7 @@ public class CreateTrnRequestTests : TestBase
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 EmailAddresses = [email],
-                NationalInsuranceNumber = nationalInsuranceNumber,
+                NationalInsuranceNumber = nationalInsuranceNumber
             }
         });
 
@@ -260,7 +260,7 @@ public class CreateTrnRequestTests : TestBase
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 EmailAddresses = [email],
-                NationalInsuranceNumber = nationalInsuranceNumber,
+                NationalInsuranceNumber = nationalInsuranceNumber
             }
         });
 
@@ -318,7 +318,7 @@ public class CreateTrnRequestTests : TestBase
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 EmailAddresses = [email],
-                NationalInsuranceNumber = invalidNino,
+                NationalInsuranceNumber = invalidNino
             }
         });
 
@@ -396,7 +396,7 @@ public class CreateTrnRequestTests : TestBase
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 EmailAddresses = [email],
-                NationalInsuranceNumber = nationalInsuranceNumber,
+                NationalInsuranceNumber = nationalInsuranceNumber
             }
         });
 
@@ -456,7 +456,7 @@ public class CreateTrnRequestTests : TestBase
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 EmailAddresses = [email],
-                NationalInsuranceNumber = nationalInsuranceNumber,
+                NationalInsuranceNumber = nationalInsuranceNumber
             }
         });
 
@@ -535,7 +535,7 @@ public class CreateTrnRequestTests : TestBase
                 MiddleName = middleName,
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
-                EmailAddresses = new[] { (string?)null }!
+                EmailAddresses = [null!]
             }
         });
 

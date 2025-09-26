@@ -50,8 +50,8 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         var validFormatSchoolClosedDate = "03/02/2023";
         var invalidFormatSchoolClosedDate = "1234";
 
-        return new TheoryData<TpsEstablishmentFileImportTestScenarioData>
-        {
+        return
+        [
             new TpsEstablishmentFileImportTestScenarioData
             {
                 Row = new TpsEstablishmentCsvRow
@@ -64,6 +64,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                 },
                 IsExpectedToBeImported = true
             },
+
             new TpsEstablishmentFileImportTestScenarioData
             {
                 Row = new TpsEstablishmentCsvRow
@@ -76,6 +77,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                 },
                 IsExpectedToBeImported = false
             },
+
             new TpsEstablishmentFileImportTestScenarioData
             {
                 Row = new TpsEstablishmentCsvRow
@@ -88,6 +90,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                 },
                 IsExpectedToBeImported = false
             },
+
             new TpsEstablishmentFileImportTestScenarioData
             {
                 Row = new TpsEstablishmentCsvRow
@@ -100,18 +103,17 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                 },
                 IsExpectedToBeImported = false
             }
-        };
+        ];
     }
 
     public static TheoryData<TpsEstablishmentRefreshTestScenarioData> GetRefreshEstablishmentsTestScenarioData()
     {
-        return new TheoryData<TpsEstablishmentRefreshTestScenarioData>
-        {
-            // Don't add a new establishment for TPS source if it already exists in GIAS
+        return
+        [
             new TpsEstablishmentRefreshTestScenarioData
             {
-                TpsEstablishments = new[]
-                {
+                TpsEstablishments =
+                [
                     new TpsEstablishment
                     {
                         TpsEstablishmentId = Guid.NewGuid(),
@@ -121,16 +123,17 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                         SchoolGiasName = null,
                         SchoolClosedDate = null
                     }
-                },
+                ],
                 IsExpectedToGenerateEstablishment = false,
                 ExpectedLaName = null,
                 ExpectedEstablishmentName = null
             },
             // If the establishment is within the range of TPS establishment types and the employers name corresponds to an LA name from GIAS, use the short description from TPS establishment types
+
             new TpsEstablishmentRefreshTestScenarioData
             {
-                TpsEstablishments = new[]
-                {
+                TpsEstablishments =
+                [
                     new TpsEstablishment
                     {
                         TpsEstablishmentId = Guid.NewGuid(),
@@ -140,16 +143,17 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                         SchoolGiasName = null,
                         SchoolClosedDate = null
                     }
-                },
+                ],
                 IsExpectedToGenerateEstablishment = true,
                 ExpectedLaName = KnownGiasLaNameHackney,
                 ExpectedEstablishmentName = KnownTpsEstablishmentTypeShortDescription
             },
             // If the establishment is within the range of TPS establishment types and the employers name corresponds to an LA name from TPS, use the short description from TPS establishment types
+
             new TpsEstablishmentRefreshTestScenarioData
             {
-                TpsEstablishments = new[]
-                {
+                TpsEstablishments =
+                [
                     new TpsEstablishment
                     {
                         TpsEstablishmentId = Guid.NewGuid(),
@@ -159,16 +163,17 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                         SchoolGiasName = null,
                         SchoolClosedDate = null
                     }
-                },
+                ],
                 IsExpectedToGenerateEstablishment = true,
                 ExpectedLaName = KnownGiasLaNameCityOfLondon,
                 ExpectedEstablishmentName = KnownTpsEstablishmentTypeShortDescription
             },
             // If the establishment is within the range of TPS establishment types and the employers name does not correspond to an LA name from GIAS, use the employers name from TPS
+
             new TpsEstablishmentRefreshTestScenarioData
             {
-                TpsEstablishments = new[]
-                {
+                TpsEstablishments =
+                [
                     new TpsEstablishment
                     {
                         TpsEstablishmentId = Guid.NewGuid(),
@@ -178,16 +183,17 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                         SchoolGiasName = null,
                         SchoolClosedDate = null
                     }
-                },
+                ],
                 IsExpectedToGenerateEstablishment = true,
                 ExpectedLaName = KnownGiasLaNameHackney,
                 ExpectedEstablishmentName = "Employers Name"
             },
             // If the LA code is not in the GIAS data, set the LA Name to null
+
             new TpsEstablishmentRefreshTestScenarioData
             {
-                TpsEstablishments = new[]
-                {
+                TpsEstablishments =
+                [
                     new TpsEstablishment
                     {
                         TpsEstablishmentId = Guid.NewGuid(),
@@ -197,16 +203,17 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                         SchoolGiasName = "School Gias Name",
                         SchoolClosedDate = null
                     }
-                },
+                ],
                 IsExpectedToGenerateEstablishment = true,
                 ExpectedLaName = null,
                 ExpectedEstablishmentName = "Employers Name"
             },
             // If there are multiple records for the same LA code and establishment code, prefer the first one where the school closed date is null
+
             new TpsEstablishmentRefreshTestScenarioData
             {
-                TpsEstablishments = new[]
-                {
+                TpsEstablishments =
+                [
                     new TpsEstablishment
                     {
                         TpsEstablishmentId = Guid.NewGuid(),
@@ -225,12 +232,12 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
                         SchoolGiasName = null,
                         SchoolClosedDate = null
                     }
-                },
+                ],
                 IsExpectedToGenerateEstablishment = true,
                 ExpectedLaName = KnownGiasLaNameHackney,
                 ExpectedEstablishmentName = "Employers Name 2"
             }
-        };
+        ];
     }
 
     [Theory]

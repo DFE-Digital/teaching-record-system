@@ -81,7 +81,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nameResults = doc.GetAllElementsByTestId("name");
         Assert.NotNull(nameResults);
-        Assert.All(nameResults.Select(r => r.TrimmedText()), t => Assert.Contains(search, t.ToLower()));
+        Assert.All(nameResults.Select(r => r.TrimmedText()), t => Assert.Contains(search, t, StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 using StackExchange.Redis;
+
 namespace TeachingRecordSystem.Api.Infrastructure.Redis;
 
 public static class ServiceCollectionExtensions

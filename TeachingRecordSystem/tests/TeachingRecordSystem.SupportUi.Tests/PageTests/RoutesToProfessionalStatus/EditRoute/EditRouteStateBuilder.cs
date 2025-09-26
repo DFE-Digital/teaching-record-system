@@ -187,7 +187,7 @@ public class EditRouteStateBuilder()
         {
             throw new InvalidOperationException("RouteToProfessionalStatusId and CurrentStatus must be set");
         }
-        return new EditRouteState()
+        return new EditRouteState
         {
             Initialized = true,
             RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
@@ -206,7 +206,7 @@ public class EditRouteStateBuilder()
             ChangeReason = _changeReasonOption,
             QualificationType = _qualificationType,
             DegreeTypeId = _degreeTypeId,
-            ChangeReasonDetail = new ChangeReasonDetailsState()
+            ChangeReasonDetail = new ChangeReasonDetailsState
             {
                 ChangeReasonDetail = _changeReasonDetail.ChangeReasonDetail,
                 EvidenceFileId = _changeReasonDetail.EvidenceFileId,
@@ -265,7 +265,7 @@ public class EditRouteStatusStateBuilder
             HoldsFrom = _holdsFrom,
             InductionExemption = _inductionExemption,
             RouteImplicitExemption = _routeImplicitExemption,
-            Status = _status,
+            Status = _status
             //TrainingEndDate = _trainingEndDate
         };
     }
