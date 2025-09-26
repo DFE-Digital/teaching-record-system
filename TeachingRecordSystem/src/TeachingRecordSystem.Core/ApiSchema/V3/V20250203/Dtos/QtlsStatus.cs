@@ -4,5 +4,5 @@ public enum QtlsStatus
 {
     None = 0,
     Expired = 1,
-    Active = 2,
+    Active = 2
 }

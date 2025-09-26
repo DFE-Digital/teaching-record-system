@@ -15,9 +15,9 @@ public partial class TestData
 
     public class CreateNoteBuilder
     {
-        private Guid? _personId = null;
-        private string? _subject = null;
-        private string? _description = null;
+        private Guid? _personId;
+        private string? _subject;
+        private string? _description;
 
         public CreateNoteBuilder WithPersonId(Guid personId)
         {

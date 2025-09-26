@@ -201,7 +201,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
         {
             var actualAlertUpdatedEvent = Assert.IsType<AlertUpdatedEvent>(e);
 
-            var expectedAlertUpdatedEvent = new AlertUpdatedEvent()
+            var expectedAlertUpdatedEvent = new AlertUpdatedEvent
             {
                 EventId = actualAlertUpdatedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,

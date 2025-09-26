@@ -270,7 +270,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
                 Timestamp = timestamp ?? Clock.UtcNow,
                 NextDeliveryAttempt = Clock.UtcNow,
                 WebhookEndpointId = endpoint.WebhookEndpointId,
-                WebhookMessageId = Guid.NewGuid(),
+                WebhookMessageId = Guid.NewGuid()
             };
             configureMessage?.Invoke(message);
             dbContext.WebhookMessages.Add(message);

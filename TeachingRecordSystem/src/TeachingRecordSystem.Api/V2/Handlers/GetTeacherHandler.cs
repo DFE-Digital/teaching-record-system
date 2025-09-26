@@ -13,11 +13,11 @@ public class GetTeacherHandler(TrsDbContext dbContext) :
     {
         var person = await dbContext.Persons
             .Include(p => p.Alerts).AsSplitQuery()
-            .SingleOrDefaultAsync(p => p.Trn == request.Trn);
+            .SingleOrDefaultAsync(p => p.Trn == request.Trn, cancellationToken: cancellationToken);
 
         var hasActiveAlert = person.Alerts!.Any(a => a.IsOpen);
 
-        return new GetTeacherResponse()
+        return new GetTeacherResponse
         {
             DateOfBirth = person.DateOfBirth,
             FirstName = person.FirstName,

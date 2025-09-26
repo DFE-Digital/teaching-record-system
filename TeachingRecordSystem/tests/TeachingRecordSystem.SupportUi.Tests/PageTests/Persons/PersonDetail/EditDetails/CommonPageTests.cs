@@ -16,7 +16,7 @@ public class CommonPageTests : TestBase
             "/edit-details",
             "/edit-details/other-details-change-reason",
             "/edit-details/name-change-reason",
-            "/edit-details/check-answers",
+            "/edit-details/check-answers"
         },
         new[] { UserRoles.Viewer, null },
         TestHttpMethods.GetAndPost)]

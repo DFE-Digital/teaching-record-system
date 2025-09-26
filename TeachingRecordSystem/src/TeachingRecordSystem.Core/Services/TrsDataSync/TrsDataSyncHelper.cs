@@ -171,7 +171,7 @@ public class TrsDataSyncHelper(
         (await SyncPersonsAsync([contactId], syncAudit, ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
 
     public async Task<bool> SyncPersonAsync(Contact entity, bool syncAudit, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
-        (await SyncPersonsAsync(new[] { entity }, syncAudit, ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
+        (await SyncPersonsAsync([entity], syncAudit, ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
 
     public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(
         IReadOnlyCollection<Contact> entities,
@@ -503,7 +503,7 @@ public class TrsDataSyncHelper(
             {
                 var request = new ExecuteMultipleRequest()
                 {
-                    Requests = new(),
+                    Requests = [],
                     Settings = new()
                     {
                         ContinueOnError = false,
@@ -586,7 +586,7 @@ public class TrsDataSyncHelper(
                     }
 
                     // Try and sync the audit record from CRM if it doesn't exist in the audit repository
-                    await SyncAuditAsync(entityLogicalName, new[] { id }, skipIfExists: false, cancellationToken);
+                    await SyncAuditAsync(entityLogicalName, [id], skipIfExists: false, cancellationToken);
                     retryCount++;
                 }
 
@@ -675,7 +675,7 @@ public class TrsDataSyncHelper(
             "date_of_death"
         };
 
-        var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
+        var columnsToUpdate = columnNames.Except(["person_id", "dqt_contact_id"]).ToArray();
 
         var columnList = string.Join(", ", columnNames);
 

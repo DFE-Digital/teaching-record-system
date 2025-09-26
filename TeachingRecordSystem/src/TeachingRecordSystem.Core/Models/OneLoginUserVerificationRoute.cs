@@ -4,5 +4,5 @@ public enum OneLoginUserVerificationRoute
 {
     OneLogin = 1,
     Support = 2,
-    External = 3,
+    External = 3
 }

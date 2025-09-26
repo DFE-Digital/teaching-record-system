@@ -110,7 +110,7 @@ public class CheckAnswersModel(
             DateOfBirth = DateOfBirth,
             EmailAddress = EmailAddress,
             NationalInsuranceNumber = NationalInsuranceNumber,
-            Gender = Gender,
+            Gender = Gender
         };
 
         // update the person

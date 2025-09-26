@@ -11,7 +11,7 @@ public record Email
     public required IReadOnlyDictionary<string, object> Metadata { get; init; }
     public required DateTime? SentOn { get; init; }
 
-    public static Email FromModel(TeachingRecordSystem.Core.DataStore.Postgres.Models.Email email) => new()
+    public static Email FromModel(DataStore.Postgres.Models.Email email) => new()
     {
         EmailId = email.EmailId,
         TemplateId = email.TemplateId,

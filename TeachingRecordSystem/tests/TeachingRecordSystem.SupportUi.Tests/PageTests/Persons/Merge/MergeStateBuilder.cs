@@ -135,7 +135,7 @@ public class MergeStateBuilder
             EvidenceFileId = EvidenceFileId,
             EvidenceFileName = EvidenceFileName,
             EvidenceFileSizeDescription = EvidenceFileSizeDescription,
-            Comments = Comments,
+            Comments = Comments
         };
     }
 }

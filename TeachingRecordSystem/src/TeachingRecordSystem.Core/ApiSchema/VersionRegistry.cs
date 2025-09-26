@@ -25,7 +25,7 @@ public static class VersionRegistry
         V3MinorVersions.V20250627,
         V3MinorVersions.V20250804,
         V3MinorVersions.V20250905,
-        V3MinorVersions.VNext,
+        V3MinorVersions.VNext
     ];
 
     public static string DefaultV3MinorVersion => V3MinorVersions.V20240101;
@@ -44,7 +44,7 @@ public static class VersionRegistry
                 {
                     foreach (var minorVersion in AllV3MinorVersions)
                     {
-                        if (minorVersion != VersionRegistry.VNextVersion || allowVNextEndpoints)
+                        if (minorVersion != VNextVersion || allowVNextEndpoints)
                         {
                             yield return (version, minorVersion);
                         }

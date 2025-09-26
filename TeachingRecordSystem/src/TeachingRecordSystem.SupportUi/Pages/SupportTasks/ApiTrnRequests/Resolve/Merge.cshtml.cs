@@ -208,5 +208,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
+#pragma warning disable CA1711
     public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
+#pragma warning restore CA1711
 }

@@ -27,7 +27,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -74,7 +74,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -105,7 +105,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -138,7 +138,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -147,7 +147,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
                 { "Role", role }
@@ -176,7 +176,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
                 { "Role", role }
@@ -202,7 +202,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var userId = Guid.NewGuid().ToString();
         var role = UserRoles.RecordManager;
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -211,9 +211,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { "Role", role },
+                { "Role", role }
             }
         };
 
@@ -236,7 +236,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -245,9 +245,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { "Name", name },
+                { "Name", name }
             }
         };
 
@@ -270,7 +270,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -279,7 +279,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name },
                 { "Role", "XXXXXX" }
@@ -304,7 +304,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -313,7 +313,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name },
                 { "Role", UserRoles.Administrator }
@@ -338,7 +338,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -347,7 +347,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", name },
                 { "Role", UserRoles.Administrator }
@@ -374,7 +374,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
 
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -383,7 +383,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
                 { "Role", role }

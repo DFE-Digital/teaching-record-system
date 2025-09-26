@@ -166,12 +166,12 @@ public class DetailsTests : AddAlertTestBase
         Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    public static TheoryData<Guid> AlertTypesRequiringNoDetails => new()
-    {
+    public static TheoryData<Guid> AlertTypesRequiringNoDetails =>
+    [
         AlertType.ProhibitionBySoSMisconduct,
         AlertType.InterimProhibitionBySoS,
         AlertType.SosDecisionNoProhibition
-    };
+    ];
 
     [Fact]
     public async Task Post_DetailsAreTooLong_ReturnsError()

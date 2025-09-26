@@ -46,12 +46,12 @@ public class BackFillVersionedEndpointsConvention : IApplicationModelConvention
                 ep.Controller.Actions.Remove(ep.Action);
             }
 
-            var acceptedVersions = new List<string>()
+            var acceptedVersions = new List<string>
             {
                 ep.MinorVersion
             };
 
-            var laterVersions = sortedVersions.Where(v => string.Compare(v, ep.MinorVersion) > 0);
+            var laterVersions = sortedVersions.Where(v => String.CompareOrdinal(v, ep.MinorVersion) > 0);
             foreach (var version in laterVersions)
             {
                 var epForThisVersion = versionedEndpoints.SingleOrDefault(

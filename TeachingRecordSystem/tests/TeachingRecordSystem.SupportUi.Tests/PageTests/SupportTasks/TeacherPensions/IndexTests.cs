@@ -58,7 +58,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { duplicatePerson1.PersonId, duplicatePerson2.PersonId });
+                           s.WithMatchedPersons(duplicatePerson1.PersonId, duplicatePerson2.PersonId);
                            s.WithLastName(person.LastName);
                            s.WithFirstName(person.FirstName);
                            s.WithMiddleName(person.MiddleName);
@@ -106,7 +106,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person1Duplicate.PersonId, });
+                           s.WithMatchedPersons(person1Duplicate.PersonId);
                            s.WithLastName(person1.LastName);
                            s.WithFirstName(person1.FirstName);
                            s.WithMiddleName(person1.MiddleName);
@@ -121,7 +121,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person2Duplicate.PersonId, });
+                           s.WithMatchedPersons(person2Duplicate.PersonId);
                            s.WithLastName(person2.LastName);
                            s.WithFirstName(person2.FirstName);
                            s.WithMiddleName(person2.MiddleName);
@@ -157,7 +157,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person1Duplicate.PersonId, });
+                           s.WithMatchedPersons(person1Duplicate.PersonId);
                            s.WithLastName(person1.LastName);
                            s.WithFirstName(person1.FirstName);
                            s.WithMiddleName(person1.MiddleName);
@@ -172,7 +172,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person2Duplicate.PersonId, });
+                           s.WithMatchedPersons(person2Duplicate.PersonId);
                            s.WithLastName(person2.LastName);
                            s.WithFirstName(person2.FirstName);
                            s.WithMiddleName(person2.MiddleName);
@@ -210,7 +210,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person1Duplicate.PersonId, });
+                           s.WithMatchedPersons(person1Duplicate.PersonId);
                            s.WithLastName(person1.LastName);
                            s.WithFirstName(person1.FirstName);
                            s.WithMiddleName(person1.MiddleName);
@@ -227,7 +227,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person2Duplicate.PersonId, });
+                           s.WithMatchedPersons(person2Duplicate.PersonId);
                            s.WithLastName(person2.LastName);
                            s.WithFirstName(person2.FirstName);
                            s.WithMiddleName(person2.MiddleName);
@@ -265,7 +265,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person1Duplicate.PersonId, });
+                           s.WithMatchedPersons(person1Duplicate.PersonId);
                            s.WithLastName(person1.LastName);
                            s.WithFirstName(person1.FirstName);
                            s.WithMiddleName(person1.MiddleName);
@@ -281,7 +281,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person2Duplicate.PersonId, });
+                           s.WithMatchedPersons(person2Duplicate.PersonId);
                            s.WithLastName(person2.LastName);
                            s.WithFirstName(person2.FirstName);
                            s.WithMiddleName(person2.MiddleName);
@@ -320,7 +320,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person1Duplicate.PersonId, });
+                           s.WithMatchedPersons(person1Duplicate.PersonId);
                            s.WithLastName(person1.LastName);
                            s.WithFirstName(person1.FirstName);
                            s.WithMiddleName(person1.MiddleName);
@@ -336,7 +336,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person2Duplicate.PersonId, });
+                           s.WithMatchedPersons(person2Duplicate.PersonId);
                            s.WithLastName(person2.LastName);
                            s.WithFirstName(person2.FirstName);
                            s.WithMiddleName(person2.MiddleName);
@@ -375,7 +375,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person1Duplicate.PersonId, });
+                           s.WithMatchedPersons(person1Duplicate.PersonId);
                            s.WithLastName(person1.LastName);
                            s.WithFirstName(person1.FirstName);
                            s.WithMiddleName(person1.MiddleName);
@@ -391,7 +391,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person2Duplicate.PersonId, });
+                           s.WithMatchedPersons(person2Duplicate.PersonId);
                            s.WithLastName(person2.LastName);
                            s.WithFirstName(person2.FirstName);
                            s.WithMiddleName(person2.MiddleName);
@@ -430,7 +430,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person1Duplicate.PersonId, });
+                           s.WithMatchedPersons(person1Duplicate.PersonId);
                            s.WithLastName(person1.LastName);
                            s.WithFirstName(person1.FirstName);
                            s.WithMiddleName(person1.MiddleName);
@@ -446,7 +446,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                        user.UserId,
                        s =>
                        {
-                           s.WithMatchedPersons(new[] { person2Duplicate.PersonId, });
+                           s.WithMatchedPersons(person2Duplicate.PersonId);
                            s.WithLastName(person2.LastName);
                            s.WithFirstName(person2.FirstName);
                            s.WithMiddleName(person2.MiddleName);

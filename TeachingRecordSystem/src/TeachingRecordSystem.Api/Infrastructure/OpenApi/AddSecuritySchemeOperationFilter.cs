@@ -23,12 +23,12 @@ public class AddSecuritySchemeOperationFilter : IOperationFilter
 
         if (authorizationPolicy == AuthorizationPolicies.ApiKey)
         {
-            requirement = new OpenApiSecurityRequirement()
+            requirement = new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme()
+                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference() { Type = ReferenceType.SecurityScheme, Id = SecuritySchemes.ApiKey },
+                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = SecuritySchemes.ApiKey }
                     },
                     []
                 }
@@ -36,12 +36,12 @@ public class AddSecuritySchemeOperationFilter : IOperationFilter
         }
         else if (authorizationPolicy == AuthorizationPolicies.IdentityUserWithTrn)
         {
-            requirement = new OpenApiSecurityRequirement()
+            requirement = new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme()
+                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference() { Type = ReferenceType.SecurityScheme, Id = SecuritySchemes.GetAnIdentityAccessToken },
+                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = SecuritySchemes.GetAnIdentityAccessToken }
                     },
                     []
                 }

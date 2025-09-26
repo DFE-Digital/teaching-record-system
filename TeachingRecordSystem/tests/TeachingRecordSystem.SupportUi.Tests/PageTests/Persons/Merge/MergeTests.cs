@@ -223,7 +223,7 @@ public class MergeTests : MergeTestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var uploadEvidenceChoices = doc.GetChildElementsOfTestId<IHtmlInputElement>("upload-evidence-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(true.ToString(), uploadEvidenceChoices);
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));

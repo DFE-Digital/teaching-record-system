@@ -22,7 +22,7 @@ public class CheckYourAnswersModel(
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
 
-    public ChangeReasonOption? ChangeReason;
+    public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     public string BackLink => linkGenerator.RouteDeleteChangeReason(QualificationId, JourneyInstance!.InstanceId);

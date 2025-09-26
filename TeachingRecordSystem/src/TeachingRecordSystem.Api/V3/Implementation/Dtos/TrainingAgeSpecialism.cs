@@ -13,7 +13,7 @@ public static class TrainingAgeSpecialismExtensions
 {
     public static TrainingAgeSpecialism? FromRoute(PostgresModels.RouteToProfessionalStatus route) =>
         route.TrainingAgeSpecialismType is not null || route.TrainingAgeSpecialismRangeFrom is not null || route.TrainingAgeSpecialismRangeTo is not null ?
-            new TrainingAgeSpecialism()
+            new TrainingAgeSpecialism
             {
                 Type = route.TrainingAgeSpecialismType,
                 From = route.TrainingAgeSpecialismRangeFrom.ToOption(),

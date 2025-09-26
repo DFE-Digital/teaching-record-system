@@ -178,7 +178,7 @@ public abstract class TestBase : IDisposable
             TrnTokenTrn = trnTokenTrn
         };
 
-    private static int _lastTrnToken = 0;
+    private static int _lastTrnToken;
 
     public async Task<IdTrnToken> CreateTrnTokenAsync(string trn, string? email = null)
     {

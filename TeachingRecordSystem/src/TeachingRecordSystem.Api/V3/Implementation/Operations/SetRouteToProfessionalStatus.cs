@@ -87,7 +87,7 @@ public class SetRouteToProfessionalStatusHandler(
         }
 
         var allTrainingSubjects = await referenceDataCache.GetTrainingSubjectsAsync(activeOnly: true);
-        List<Guid> subjectIds = new();
+        List<Guid> subjectIds = [];
         foreach (var subjectReference in command.TrainingSubjectReferences)
         {
             var subject = allTrainingSubjects.SingleOrDefault(s => s.Reference == subjectReference);
@@ -172,12 +172,9 @@ public class SetRouteToProfessionalStatusHandler(
                 case RouteToProfessionalStatusStatus.Holds:
                     return ApiError.RouteToProfessionalStatusAlreadyAwarded();
                 case RouteToProfessionalStatusStatus.Failed:
-                    switch (command.Status)
+                    if (command.Status is RouteToProfessionalStatusStatus.Deferred or RouteToProfessionalStatusStatus.InTraining or RouteToProfessionalStatusStatus.UnderAssessment)
                     {
-                        case RouteToProfessionalStatusStatus.Deferred:
-                        case RouteToProfessionalStatusStatus.InTraining:
-                        case RouteToProfessionalStatusStatus.UnderAssessment:
-                            return ApiError.UnableToChangeFailProfessionalStatusStatus();
+                        return ApiError.UnableToChangeFailProfessionalStatusStatus();
                     }
                     break;
                 case RouteToProfessionalStatusStatus.Withdrawn:

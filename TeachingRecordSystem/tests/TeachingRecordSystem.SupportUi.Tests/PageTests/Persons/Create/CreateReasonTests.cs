@@ -65,14 +65,14 @@ public class CreateReasonTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var reasonChoiceSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("create-reason-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(reasonChoice.ToString(), reasonChoiceSelection);
 
         var additionalDetailTextArea = doc.GetElementByTestId("create-reason-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
         Assert.Equal(reasonDetail, additionalDetailTextArea!.Value);
 
         var uploadEvidenceChoices = doc.GetChildElementsOfTestId<IHtmlInputElement>("upload-evidence-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(true.ToString(), uploadEvidenceChoices);
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));

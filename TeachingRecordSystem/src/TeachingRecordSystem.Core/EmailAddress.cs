@@ -37,7 +37,7 @@ public sealed partial class EmailAddress : IEquatable<EmailAddress>, IParsable<E
     public override string ToString() => NormalizedValue;
 
     public bool Equals(EmailAddress? other) =>
-        other is not null && NormalizedValue.Equals(other.NormalizedValue);
+        other is not null && NormalizedValue.Equals(other.NormalizedValue, StringComparison.Ordinal);
 
     public override bool Equals([NotNullWhen(true)] object? obj) =>
         obj is EmailAddress other && Equals(other);

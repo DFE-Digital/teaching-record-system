@@ -6,10 +6,7 @@ public static class ErrorExceptionExtensions
 {
     public static ObjectResult ToResult(this ErrorException ex, int statusCode)
     {
-        if (ex is null)
-        {
-            throw new ArgumentNullException(nameof(ex));
-        }
+        ArgumentNullException.ThrowIfNull(ex);
 
         var error = ex.Error;
 

@@ -10,5 +10,5 @@ public enum NpqQualificationType
     NPQLT,
     NPQLTD,
     NPQML,
-    NPQSL,
+    NPQSL
 }

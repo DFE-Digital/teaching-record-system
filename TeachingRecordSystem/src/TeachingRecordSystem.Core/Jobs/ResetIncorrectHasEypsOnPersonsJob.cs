@@ -43,7 +43,7 @@ public class ResetIncorrectHasEypsOnPersonsJob(
                 EventId = Guid.NewGuid(),
                 CreatedUtc = clock.UtcNow,
                 PersonId = person.PersonId,
-                RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId,
+                RaisedBy = SystemUser.SystemUserId,
                 RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(eytsRoute!),
                 OldRouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(eytsRoute!),
                 ChangeReason = "Data fix for incorrectly set Has EYPS flag",

@@ -9,13 +9,13 @@ public class AlertTypeMapping : IEntityTypeConfiguration<AlertType>
     {
         builder.ToTable("alert_types");
         builder.HasKey(x => x.AlertTypeId);
-        builder.Property(x => x.Name).IsRequired().HasMaxLength(AlertType.NameMaxLength).UseCollation("case_insensitive");
-        builder.Property(x => x.DqtSanctionCode).HasMaxLength(AlertType.DqtSanctionCodeMaxLength).UseCollation("case_insensitive");
+        builder.Property(x => x.Name).IsRequired().HasMaxLength(AlertType.NameMaxLength).UseCollation(Collations.CaseInsensitive);
+        builder.Property(x => x.DqtSanctionCode).HasMaxLength(AlertType.DqtSanctionCodeMaxLength).UseCollation(Collations.CaseInsensitive);
         builder.Property(x => x.IsActive).IsRequired();
         builder.Ignore(x => x.IsDbsAlertType);
         builder.HasIndex(x => x.AlertCategoryId).HasDatabaseName(AlertType.AlertCategoryIdIndexName);
         builder.HasIndex(x => new { x.AlertCategoryId, x.DisplayOrder }).HasDatabaseName(AlertType.DisplayOrderIndexName).IsUnique().HasFilter("display_order is not null and is_active = true");
-        builder.HasOne<AlertCategory>(x => x.AlertCategory).WithMany(c => c.AlertTypes).HasForeignKey(x => x.AlertCategoryId).HasConstraintName(AlertType.AlertCategoryForeignKeyName);
+        builder.HasOne(x => x.AlertCategory).WithMany(c => c.AlertTypes).HasForeignKey(x => x.AlertCategoryId).HasConstraintName(AlertType.AlertCategoryForeignKeyName);
         builder.Navigation(x => x.AlertCategory).AutoInclude();
         builder.HasData(
             new AlertType { AlertTypeId = new Guid("2ca98658-1d5b-49d5-b05f-cc08c8b8502c"), AlertCategoryId = new Guid("ee78d44d-abf8-44a9-b22b-87a821f8d3c9"), Name = "Teacher sanctioned in other EEA member state", DqtSanctionCode = "T8", InternalOnly = true, IsActive = true, DisplayOrder = 1 },

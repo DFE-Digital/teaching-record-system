@@ -16,7 +16,7 @@ public class ConfirmModel(
     IClock clock,
     TrsLinkGenerator linkGenerator) : PageModel
 {
-    private Services.AzureActiveDirectory.User? _user;
+    private User? _user;
 
     [BindProperty(SupportsGet = true)]
     public string? UserId { get; set; }
@@ -27,7 +27,7 @@ public class ConfirmModel(
     [BindProperty]
     [Display(Name = "Name")]
     [Required(ErrorMessage = "Enter a name")]
-    [MaxLength(Core.DataStore.Postgres.Models.User.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
+    [MaxLength(Core.DataStore.Postgres.Models.UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
     [BindProperty]
@@ -80,7 +80,7 @@ public class ConfirmModel(
         await dbContext.AddEventAndBroadcastAsync(new UserAddedEvent()
         {
             EventId = Guid.NewGuid(),
-            User = Core.Events.Models.User.FromModel(newUser),
+            User = EventModels.User.FromModel(newUser),
             RaisedBy = User.GetUserId(),
             CreatedUtc = clock.UtcNow
         });

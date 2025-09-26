@@ -60,12 +60,12 @@ public class ApiKeyAuthenticationHandler(
 
         if (apiKey is null)
         {
-            return AuthenticateResult.Fail($"No client found with specified API key.");
+            return AuthenticateResult.Fail("No client found with specified API key.");
         }
 
         if (apiKey.Expires <= DateTime.UtcNow)
         {
-            return AuthenticateResult.Fail($"API key is expired.");
+            return AuthenticateResult.Fail("API key is expired.");
         }
 
         var applicationUser = apiKey.ApplicationUser!;
@@ -75,7 +75,7 @@ public class ApiKeyAuthenticationHandler(
 
         LogContext.PushProperty("ApplicationUserId", applicationUser.UserId);
 
-        SentrySdk.ConfigureScope(scope => scope.User = new SentryUser()
+        SentrySdk.ConfigureScope(scope => scope.User = new SentryUser
         {
             Id = applicationUser.UserId.ToString(),
             Username = applicationUser.Name

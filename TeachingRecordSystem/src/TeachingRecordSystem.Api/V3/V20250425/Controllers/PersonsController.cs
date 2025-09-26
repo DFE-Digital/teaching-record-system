@@ -73,7 +73,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher, IMapper map
             DateOfBirth = request.DateOfBirth,
             EmailAddress = request.EmailAddress,
             NationalInsuranceNumber = request.NationalInsuranceNumber,
-            Gender = request.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null,
+            Gender = request.Gender is Gender gender ? mapper.Map<Core.Models.Gender>(gender) : null
         };
 
         var result = await commandDispatcher.DispatchAsync(command);

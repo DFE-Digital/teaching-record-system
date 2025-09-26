@@ -23,7 +23,7 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
             {
                 (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
                 (AddRoutePage.Route, _) => LinkGenerator.PersonQualifications(PersonId),
-                _ => LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers),
+                _ => LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers)
             };
         }
     }

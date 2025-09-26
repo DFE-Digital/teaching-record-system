@@ -46,7 +46,7 @@ public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator li
         await dbContext.AddEventAndBroadcastAsync(new ApplicationUserCreatedEvent()
         {
             EventId = Guid.NewGuid(),
-            ApplicationUser = Core.Events.Models.ApplicationUser.FromModel(newUser),
+            ApplicationUser = EventModels.ApplicationUser.FromModel(newUser),
             RaisedBy = User.GetUserId(),
             CreatedUtc = clock.UtcNow
         });

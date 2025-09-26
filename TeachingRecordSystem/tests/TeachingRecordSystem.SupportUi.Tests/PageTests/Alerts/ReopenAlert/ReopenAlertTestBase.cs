@@ -9,7 +9,7 @@ public abstract class ReopenAlertTestBase(HostFixture hostFixture) : TestBase(ho
         CreateJourneyInstanceAsync(alertId, new());
 
     protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstanceAsync(alert.AlertId, new ReopenAlertState()
+        CreateJourneyInstanceAsync(alert.AlertId, new ReopenAlertState
         {
             ChangeReason = ReopenAlertReasonOption.ClosedInError,
             HasAdditionalReasonDetail = populateOptional ? true : false,

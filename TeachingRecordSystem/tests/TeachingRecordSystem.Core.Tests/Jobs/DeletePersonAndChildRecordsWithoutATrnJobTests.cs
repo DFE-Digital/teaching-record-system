@@ -485,9 +485,9 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         var date = DateTime.Parse("1 Jan 2000").ToUniversalTime();
         // Arrange
         var (personsWithNoTrn, _, previousNamesForPersonsWithNoTrn, _) = await CreatePersonsWithNoTrnAsync(3, p => p
-            .WithPreviousNames([("Joan", "Of", "Arc", date), ("Winnie", "The", "Pooh", date)]));
+            .WithPreviousNames(("Joan", "Of", "Arc", date), ("Winnie", "The", "Pooh", date)));
         var (personsWithTrn, _, previousNamesForPersonsWithTrn, _) = await CreatePersonsWithTrnAsync(3, p => p
-            .WithPreviousNames([("Joan", "Of", "Arc", date), ("Winnie", "The", "Pooh", date)]));
+            .WithPreviousNames(("Joan", "Of", "Arc", date), ("Winnie", "The", "Pooh", date)));
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -513,10 +513,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         var (personsWithNoTrn, _, _, qualificationsForPersonsWithNoTrn) = await CreatePersonsWithNoTrnAsync(3, p => p
             .WithMandatoryQualification(mq => mq
-                .WithCreatedByUser(Events.Models.RaisedByUserInfo.FromUserId(user.UserId))));
+                .WithCreatedByUser(EventModels.RaisedByUserInfo.FromUserId(user.UserId))));
         var (personsWithTrn, _, _, qualificationsForPersonsWithTrn) = await CreatePersonsWithTrnAsync(3, p => p
             .WithMandatoryQualification(mq => mq
-                .WithCreatedByUser(Events.Models.RaisedByUserInfo.FromUserId(user.UserId))));
+                .WithCreatedByUser(EventModels.RaisedByUserInfo.FromUserId(user.UserId))));
 
         var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
 
@@ -1131,6 +1131,8 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
             trnGenerator,
             TestDataPersonDataSource.Trs);
 
+        DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
+
         FileServiceMock.Setup(mock => mock.UploadFileAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string?>()))
             .Callback(async (string fileName, Stream stream, string? contentType) =>
             {
@@ -1148,17 +1150,16 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
     public ILoggerFactory LoggerFactory { get; }
     public TestData TestData { get; }
     public Mock<IFileService> FileServiceMock { get; } = new Mock<IFileService>();
-    public TrsDbContext DbContext = null!;
+    public TrsDbContext DbContext { get; }
 
     public async Task InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
 
-        DbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         FileServiceMock.Invocations.Clear();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public async Task DisposeAsync() => await DbContext.DisposeAsync();
 
     public UploadedFile? GetLastUploadedFile() => _uploadedFiles.LastOrDefault();
 }
@@ -1174,7 +1175,7 @@ public class TestOutputLogger(ITestOutputHelper outputHelper) : ILogger<DeletePe
         outputHelper.WriteLine($"{logLevel}: {formatter(state, exception)}");
     }
 
-    public class Scope : IDisposable
+    public sealed class Scope : IDisposable
     {
         public void Dispose()
         {

@@ -127,7 +127,7 @@ public class QtsImporter
                            trainingProviderId: null,
                            degreeTypeId: null,
                            isExemptFromInduction: null,
-                           createdBy: DataStore.Postgres.Models.SystemUser.SystemUserId,
+                           createdBy: SystemUser.SystemUserId,
                            now: _clock.UtcNow,
                            changeReason: null,
                            changeReasonDetail: null,

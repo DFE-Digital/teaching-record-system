@@ -21,5 +21,5 @@ public enum TpsCsvExtractItemLoadErrors
     WithdrawlIndicatorIncorrectFormat = 1 << 13,
     ExtractDateIncorrectFormat = 1 << 14,
     GenderIncorrectFormat = 1 << 15,
-    EstablishmentEmailAddressIncorrectFormat = 1 << 16,
+    EstablishmentEmailAddressIncorrectFormat = 1 << 16
 }

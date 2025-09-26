@@ -24,7 +24,7 @@ public static class IttOutcomeExtensions
     {
         if (!input.TryConvertFromITTResult(out var result))
         {
-            throw new FormatException($"Unknown {typeof(dfeta_ITTResult).Name}: '{input}'.");
+            throw new FormatException($"Unknown {nameof(dfeta_ITTResult)}: '{input}'.");
         }
 
         return result;
@@ -34,7 +34,7 @@ public static class IttOutcomeExtensions
     {
         if (!input.TryConvertToITTResult(out var result))
         {
-            throw new FormatException($"Unknown {typeof(IttOutcome).Name}: '{input}'.");
+            throw new FormatException($"Unknown {nameof(IttOutcome)}: '{input}'.");
         }
 
         return result;
@@ -64,11 +64,9 @@ public static class IttOutcomeExtensions
             result = mapped.Value;
             return true;
         }
-        else
-        {
-            result = default;
-            return false;
-        }
+
+        result = default;
+        return false;
     }
 
     public static bool TryConvertToITTResult(this IttOutcome input, out dfeta_ITTResult result)
@@ -95,10 +93,8 @@ public static class IttOutcomeExtensions
             result = mapped.Value;
             return true;
         }
-        else
-        {
-            result = default;
-            return false;
-        }
+
+        result = default;
+        return false;
     }
 }

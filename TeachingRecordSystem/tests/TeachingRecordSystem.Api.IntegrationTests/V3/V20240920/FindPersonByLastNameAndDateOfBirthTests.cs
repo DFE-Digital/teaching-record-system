@@ -56,7 +56,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                     },
                     details = alert.Details,
                     startDate = alert.StartDate,
-                    endDate = alert.EndDate,
+                    endDate = alert.EndDate
                 }
             },
             responseAlerts);

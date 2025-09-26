@@ -97,7 +97,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertCreatedEventGeneratedInDqt_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertCreatedEvent = await CreateAlertCreatedEventFromDqtAsync(person.PersonId, createdByDqtUser, populateOptional: populateOptional, isOpenAlert: true);
 
@@ -137,7 +137,7 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertCreatedEvent = await CreateAlertCreatedEventFromDqtAsync(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
 
@@ -210,7 +210,7 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertCreatedEvent = await CreateAlertDeletedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
 
@@ -241,7 +241,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDqtDeactivatedEvent_RendersExpectedContent(bool populateOptional, bool isOpenAlert)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertDqtDeactivatedEvent = await CreateAlertDqtDeactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional, isOpenAlert);
 
@@ -285,7 +285,7 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertCreatedEvent = await CreateAlertDqtDeactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
 
@@ -314,7 +314,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDqtImportedEvent_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertDqtImportedEvent = await CreateAlertDqtImportedEventAsync(person.PersonId, createdByDqtUser, populateOptional);
 
@@ -354,7 +354,7 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertCreatedEvent = await CreateAlertDqtImportedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
 
@@ -383,7 +383,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDqtReactivatedEvent_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertDqtImportedEvent = await CreateAlertDqtReactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional);
 
@@ -423,7 +423,7 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertCreatedEvent = await CreateAlertDqtReactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
 
@@ -450,7 +450,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertMigratedEvent_RendersExpectedContent()
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertMigratedEvent = await CreateAlertMigratedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true);
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertMigratedEvent.Alert.AlertTypeId!.Value);
@@ -492,7 +492,7 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alertCreatedEvent = await CreateAlertMigratedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
 
@@ -521,7 +521,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventStartChangedFromDqt_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { StartDate = populateOptional ? null : Clock.Today.AddDays(-30) };
@@ -594,7 +594,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventDetailsChangedFromDqt_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { Details = populateOptional ? null : "Old details" };
@@ -709,7 +709,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventEndDateChangedFromDqt_RendersExpectedContent(EndDateChangeType changeType, string expectedHeading)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional: true, isOpenAlert: changeType == EndDateChangeType.Reopen);
         var oldAlert = alert with { EndDate = changeType == EndDateChangeType.Close ? null : Clock.Today.AddDays(-6) };
@@ -782,7 +782,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventDqtSpentChanged_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { DqtSpent = populateOptional ? null : true };
@@ -818,7 +818,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventDqtSanctionCodeChanged_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { DqtSpent = populateOptional ? null : true };
@@ -864,7 +864,7 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional: true, isOpenAlert: true, isDbsAlertType);
         var oldAlert = alert with { Details = "Old details" };
@@ -897,7 +897,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventMultipleChanges_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
         var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { Details = populateOptional ? null : "Old details", DqtSpent = populateOptional ? null : true };
@@ -929,11 +929,11 @@ public class ChangeLogAlertEventsTests : TestBase
                 });
     }
 
-    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromDqtAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromDqtAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
 
-        var alertCreatedEvent = new AlertCreatedEvent()
+        var alertCreatedEvent = new AlertCreatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -954,7 +954,7 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertCreatedEvent;
     }
 
-    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromTrsAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromTrsAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
         var reason = populateOptional ? AddAlertReasonOption.RoutineNotificationFromStakeholder.GetDisplayName() : null;
@@ -966,7 +966,7 @@ public class ChangeLogAlertEventsTests : TestBase
         }
         : null;
 
-        var alertCreatedEvent = new AlertCreatedEvent()
+        var alertCreatedEvent = new AlertCreatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -987,7 +987,7 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertCreatedEvent;
     }
 
-    private async Task<AlertDeletedEvent> CreateAlertDeletedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertDeletedEvent> CreateAlertDeletedEventAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
         var reasonDetail = populateOptional ? "Reason detail" : null;
@@ -998,7 +998,7 @@ public class ChangeLogAlertEventsTests : TestBase
         }
         : null;
 
-        var alertDeletedEvent = new AlertDeletedEvent()
+        var alertDeletedEvent = new AlertDeletedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -1018,11 +1018,11 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDeletedEvent;
     }
 
-    private async Task<AlertDqtDeactivatedEvent> CreateAlertDqtDeactivatedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertDqtDeactivatedEvent> CreateAlertDqtDeactivatedEventAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
 
-        var alertDqtDeactivatedEvent = new AlertDqtDeactivatedEvent()
+        var alertDqtDeactivatedEvent = new AlertDqtDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -1040,11 +1040,11 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDqtDeactivatedEvent;
     }
 
-    private async Task<AlertDqtImportedEvent> CreateAlertDqtImportedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
+    private async Task<AlertDqtImportedEvent> CreateAlertDqtImportedEventAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
 
-        var alertDqtImportedEvent = new AlertDqtImportedEvent()
+        var alertDqtImportedEvent = new AlertDqtImportedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -1063,11 +1063,11 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDqtImportedEvent;
     }
 
-    private async Task<AlertDqtReactivatedEvent> CreateAlertDqtReactivatedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
+    private async Task<AlertDqtReactivatedEvent> CreateAlertDqtReactivatedEventAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
 
-        var alertDqtReactivatedEvent = new AlertDqtReactivatedEvent()
+        var alertDqtReactivatedEvent = new AlertDqtReactivatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -1085,7 +1085,7 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDqtReactivatedEvent;
     }
 
-    private async Task<AlertMigratedEvent> CreateAlertMigratedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
+    private async Task<AlertMigratedEvent> CreateAlertMigratedEventAsync(Guid personId, RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
     {
         var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId!.Value);
@@ -1099,10 +1099,10 @@ public class ChangeLogAlertEventsTests : TestBase
                 Value = dqtSanctionCode.Value
             }
             : null,
-            DqtSpent = populateOptional ? true : (bool?)null,
+            DqtSpent = populateOptional ? true : null
         };
 
-        var alertMigratedEvent = new AlertMigratedEvent()
+        var alertMigratedEvent = new AlertMigratedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
@@ -1121,9 +1121,9 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertMigratedEvent;
     }
 
-    private async Task<AlertUpdatedEvent> CreateAlertUpdatedEventAsync(Guid personId, EventModels.Alert alert, EventModels.Alert oldAlert, AlertUpdatedEventChanges changes, EventModels.RaisedByUserInfo createdByUser, bool hasReason)
+    private async Task<AlertUpdatedEvent> CreateAlertUpdatedEventAsync(Guid personId, EventModels.Alert alert, EventModels.Alert oldAlert, AlertUpdatedEventChanges changes, RaisedByUserInfo createdByUser, bool hasReason)
     {
-        var alertUpdatedEvent = new AlertUpdatedEvent()
+        var alertUpdatedEvent = new AlertUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,

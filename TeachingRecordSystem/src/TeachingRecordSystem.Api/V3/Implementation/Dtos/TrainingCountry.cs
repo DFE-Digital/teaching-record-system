@@ -5,7 +5,7 @@ public record TrainingCountry
     public required string Reference { get; init; }
     public required string Name { get; init; }
 
-    public static TrainingCountry? FromModel(Core.DataStore.Postgres.Models.Country? model) =>
+    public static TrainingCountry? FromModel(PostgresModels.Country? model) =>
         model is null ?
             null :
             new()

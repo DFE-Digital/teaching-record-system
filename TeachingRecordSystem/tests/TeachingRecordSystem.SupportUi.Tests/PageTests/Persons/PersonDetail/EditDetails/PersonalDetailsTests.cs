@@ -93,7 +93,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
         var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
         var genderSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true);
+            .Single(i => i.IsChecked);
 
         Assert.Equal("Alfred", firstName.Value.Trim());
         Assert.Equal("The", middleName.Value.Trim());
@@ -167,7 +167,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
         var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
         var genderSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true);
+            .Single(i => i.IsChecked);
 
         Assert.Equal("Alfred", firstName.Value.Trim());
         Assert.Equal("The", middleName.Value.Trim());

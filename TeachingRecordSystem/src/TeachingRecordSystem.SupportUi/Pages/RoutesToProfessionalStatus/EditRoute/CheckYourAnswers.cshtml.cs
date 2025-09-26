@@ -23,7 +23,7 @@ public class CheckYourAnswersModel(
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
 
-    public ChangeReasonOption? ChangeReason;
+    public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
     public string? UploadedEvidenceFileUrl { get; set; }
 
@@ -103,8 +103,7 @@ public class CheckYourAnswersModel(
         var route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         var status = JourneyInstance!.State.Status;
 
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
+        var pagesInOrder = Enum.GetValues<AddRoutePage>()
             .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
             .OrderBy(p => p);
 

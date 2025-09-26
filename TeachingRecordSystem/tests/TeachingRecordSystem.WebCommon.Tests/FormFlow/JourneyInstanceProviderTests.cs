@@ -61,7 +61,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, descriptorStateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, descriptorStateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -95,7 +95,7 @@ public class JourneyInstanceProviderTests
         var instanceId = new JourneyInstanceId(journeyName, new Dictionary<string, StringValues>()
         {
             { "id", id.ToString() },
-            { "subid", subid.ToString() },
+            { "subid", subid.ToString() }
         });
 
         var stateType = typeof(TestState);
@@ -118,7 +118,7 @@ public class JourneyInstanceProviderTests
         var routeData = new RouteData(routeValues);
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, requestDataKeys: new[] { "id", "subid" }, appendUniqueKey: false));
+            new JourneyDescriptor(journeyName, stateType, requestDataKeys: ["id", "subid"], appendUniqueKey: false));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -170,7 +170,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -212,7 +212,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, descriptorStateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, descriptorStateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -279,7 +279,7 @@ public class JourneyInstanceProviderTests
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
-        _options.Value.JourneyRegistry.RegisterJourney(new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+        _options.Value.JourneyRegistry.RegisterJourney(new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -324,7 +324,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -378,7 +378,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -455,7 +455,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -499,7 +499,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -545,7 +545,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -598,7 +598,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -645,7 +645,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -677,7 +677,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -714,7 +714,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -747,7 +747,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -802,7 +802,7 @@ public class JourneyInstanceProviderTests
         var instanceId = new JourneyInstanceId(journeyName, new Dictionary<string, StringValues>()
         {
             { "id", id.ToString() },
-            { "subid", subid.ToString() },
+            { "subid", subid.ToString() }
         });
 
         var stateType = typeof(TestState);
@@ -825,7 +825,7 @@ public class JourneyInstanceProviderTests
             new JourneyDescriptor(
                 journeyName,
                 stateType,
-                requestDataKeys: new[] { "id", "subid" },
+                requestDataKeys: ["id", "subid"],
                 appendUniqueKey: false));
 
         var actionDescriptor = new ActionDescriptor();
@@ -854,7 +854,7 @@ public class JourneyInstanceProviderTests
         var httpContext = new DefaultHttpContext();
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -888,7 +888,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -929,10 +929,10 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(otherJourneyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(otherJourneyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(otherJourneyName));
@@ -973,7 +973,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, descriptorStateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, descriptorStateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -1013,7 +1013,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -1049,7 +1049,7 @@ public class JourneyInstanceProviderTests
         var instanceId = new JourneyInstanceId(journeyName, new Dictionary<string, StringValues>()
         {
             { "id", id.ToString() },
-            { "subid", subid.ToString() },
+            { "subid", subid.ToString() }
         });
 
         var stateType = typeof(TestState);
@@ -1074,7 +1074,7 @@ public class JourneyInstanceProviderTests
             new JourneyDescriptor(
                 journeyName,
                 stateType,
-                requestDataKeys: new[] { "id", "subid" },
+                requestDataKeys: ["id", "subid"],
                 appendUniqueKey: false));
 
         var actionDescriptor = new ActionDescriptor();
@@ -1122,7 +1122,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));
@@ -1162,7 +1162,7 @@ public class JourneyInstanceProviderTests
         httpContext.Request.QueryString = new QueryString($"?ffiid={uniqueKey}");
 
         _options.Value.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(journeyName, stateType, Array.Empty<string>(), appendUniqueKey: true));
+            new JourneyDescriptor(journeyName, stateType, [], appendUniqueKey: true));
 
         var actionDescriptor = new ActionDescriptor();
         actionDescriptor.SetProperty(new ActionJourneyMetadata(journeyName));

@@ -147,7 +147,7 @@ public class CheckAnswersTests : AddAlertTestBase
         {
             var actualAlertCreatedEvent = Assert.IsType<AlertCreatedEvent>(e);
 
-            var expectedAlertCreatedEvent = new AlertCreatedEvent()
+            var expectedAlertCreatedEvent = new AlertCreatedEvent
             {
                 EventId = actualAlertCreatedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,

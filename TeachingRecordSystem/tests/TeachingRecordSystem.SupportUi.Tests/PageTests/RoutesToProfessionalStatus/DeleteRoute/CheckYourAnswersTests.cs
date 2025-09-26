@@ -15,7 +15,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -58,7 +58,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -110,7 +110,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithInductionExemption(true)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -153,7 +153,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -191,7 +191,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         EventPublisher.Clear();
 
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -253,7 +253,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         EventPublisher.Clear();
 
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -313,7 +313,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var qualificationIdEarliestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromEarliest).QualificationId;
         var qualificationIdLatestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromLatest).QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -366,7 +366,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             await dbContext.SaveChangesAsync();
         });
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var deleteRouteState = new DeleteRouteState()
+        var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
             ChangeReasonDetail = new ChangeReasonStateBuilder()

@@ -11,9 +11,9 @@ public class PersonSearchAttributeMapping : IEntityTypeConfiguration<PersonSearc
         builder.HasKey(e => e.PersonSearchAttributeId);
         builder.Property(e => e.PersonId).IsRequired();
         builder.HasIndex(e => e.PersonId).HasDatabaseName(PersonSearchAttribute.PersonIdIndexName);
-        builder.Property(e => e.AttributeType).HasMaxLength(PersonSearchAttribute.AttributeTypeMaxLength).IsRequired().UseCollation("case_insensitive");
-        builder.Property(e => e.AttributeValue).HasMaxLength(PersonSearchAttribute.AttributeValueMaxLength).IsRequired().UseCollation("case_insensitive");
-        builder.Property(e => e.AttributeKey).HasMaxLength(PersonSearchAttribute.AttributeKeyMaxLength).UseCollation("case_insensitive");
+        builder.Property(e => e.AttributeType).HasMaxLength(PersonSearchAttribute.AttributeTypeMaxLength).IsRequired().UseCollation(Collations.CaseInsensitive);
+        builder.Property(e => e.AttributeValue).HasMaxLength(PersonSearchAttribute.AttributeValueMaxLength).IsRequired().UseCollation(Collations.CaseInsensitive);
+        builder.Property(e => e.AttributeKey).HasMaxLength(PersonSearchAttribute.AttributeKeyMaxLength).UseCollation(Collations.CaseInsensitive);
         builder.HasIndex(e => new { e.AttributeType, e.AttributeValue }).HasDatabaseName(PersonSearchAttribute.AttributeTypeAndValueIndexName);
     }
 }

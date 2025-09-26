@@ -182,7 +182,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.Range },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom },
@@ -226,9 +226,9 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.KeyStage4 },
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.KeyStage4 }
             }
         };
 

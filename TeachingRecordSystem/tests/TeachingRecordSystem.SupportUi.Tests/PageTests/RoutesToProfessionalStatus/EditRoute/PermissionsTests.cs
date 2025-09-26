@@ -8,17 +8,17 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 [Collection(nameof(DisableParallelization))]
 public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> RoleAccess = [
+    private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> _roleAccess = [
         (null, false),
         (UserRoles.Viewer, false),
         (UserRoles.AlertsManagerTra, false),
         (UserRoles.AlertsManagerTraDbs, false),
         (UserRoles.RecordManager, true),
         (UserRoles.AccessManager, true),
-        (UserRoles.Administrator, true),
+        (UserRoles.Administrator, true)
     ];
 
-    private static readonly IReadOnlyCollection<(string, string)> PageFormats = [
+    private static readonly IReadOnlyCollection<(string, string)> _pageFormats = [
         // {0}: qualification ID
         // {1}: journey ID
         // {2}: person ID
@@ -46,7 +46,7 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
         (JourneyNames.EditRouteToProfessionalStatus, "/route/{0}/edit/subjects?{1}"),
         (JourneyNames.EditRouteToProfessionalStatus, "/route/{0}/edit/training-provider?{1}"),
         (JourneyNames.DeleteRouteToProfessionalStatus, "/route/{0}/delete/change-reason?{1}"),
-        (JourneyNames.DeleteRouteToProfessionalStatus, "/route/{0}/delete/check-answers?{1}"),
+        (JourneyNames.DeleteRouteToProfessionalStatus, "/route/{0}/delete/check-answers?{1}")
     ];
 
     Guid _personId;
@@ -61,9 +61,7 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
             .First();
 
         _status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .First()
-            .Value;
+.First(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable).Value;
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -103,7 +101,7 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
 
             _ => await CreateJourneyInstance(
                 JourneyNames.DeleteRouteToProfessionalStatus,
-                new DeleteRouteState()
+                new DeleteRouteState
                 {
                     ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
                     ChangeReasonDetail = new ChangeReasonStateBuilder()
@@ -134,9 +132,9 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
     {
         var data = new TheoryData<string, string, string?, bool>();
 
-        foreach (var (journeyName, pageFormat) in PageFormats)
+        foreach (var (journeyName, pageFormat) in _pageFormats)
         {
-            foreach (var (role, canEdit) in RoleAccess)
+            foreach (var (role, canEdit) in _roleAccess)
             {
                 data.Add(journeyName, pageFormat, role, canEdit);
             }

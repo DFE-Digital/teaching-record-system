@@ -211,7 +211,7 @@ public partial class DqtReportingService : BackgroundService
                 _entityMetadata[Annotation.EntityLogicalName].EntityMetadata.Attributes
                 .Where(a => a.AttributeOf is null)
                 .Select(a => a.LogicalName)
-                .Except(new[] { Annotation.Fields.DocumentBody })
+                .Except([Annotation.Fields.DocumentBody])
                 .ToArray());
         }
 
@@ -672,7 +672,7 @@ public partial class DqtReportingService : BackgroundService
     internal enum TrsReplicationStatus
     {
         ReplicationSlotEstablished = 0,
-        MessageConsumed = 1,
+        MessageConsumed = 1
     }
 }
 

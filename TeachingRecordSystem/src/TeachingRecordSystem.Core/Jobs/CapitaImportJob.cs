@@ -96,7 +96,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         var failureRowCount = 0;
         var failureMessage = new StringBuilder();
 
-        var integrationJob = new DataStore.Postgres.Models.IntegrationTransaction()
+        var integrationJob = new IntegrationTransaction()
         {
             IntegrationTransactionId = 0,
             InterfaceType = IntegrationTransactionInterfaceType.CapitaImport,
@@ -154,7 +154,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
-                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, clock.UtcNow, out var @event);
                             if (@event is not null)
                             {
                                 await dbContext.AddEventAndBroadcastAsync(@event);
@@ -168,7 +168,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         //create task
                         if (potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches || potentialMatches.Outcome == TrnRequestMatchResultOutcome.DefiniteMatch)
                         {
-                            var trnRequestMetadata = new DataStore.Postgres.Models.TrnRequestMetadata()
+                            var trnRequestMetadata = new TrnRequestMetadata()
                             {
                                 ApplicationUserId = capitaUser.Value.CapitaTpsUserId,
                                 RequestId = Guid.NewGuid().ToString(),
@@ -187,12 +187,12 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 NationalInsuranceNumber = newPerson.NationalInsuranceNumber,
                                 Gender = newPerson.Gender,
                                 PotentialDuplicate = true,
-                                Matches = new DataStore.Postgres.Models.TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new DataStore.Postgres.Models.TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] }
+                                Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] }
                             };
                             dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
                             potentialDuplicate = true;
-                            var supportTask = DataStore.Postgres.Models.SupportTask.Create(
+                            var supportTask = SupportTask.Create(
                                 SupportTaskType.TeacherPensionsPotentialDuplicate,
                                 new Models.SupportTasks.TeacherPensionsPotentialDuplicateData()
                                 {
@@ -225,7 +225,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
                             person.DateOfDeath = dateOfDeath;
-                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, DataStore.Postgres.Models.SystemUser.Instance.UserId, clock.UtcNow, out var @event);
+                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, null, SystemUser.Instance.UserId, clock.UtcNow, out var @event);
                             if (@event is not null)
                             {
                                 await dbContext.AddEventAndBroadcastAsync(@event);
@@ -381,9 +381,9 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
 
     public async Task<TrnRequestMatchResult> GetPotentialMatchingPersonsAsync(CapitaImportRecord row)
     {
-        var requestData = new DataStore.Postgres.Models.TrnRequestMetadata()
+        var requestData = new TrnRequestMetadata()
         {
-            ApplicationUserId = DataStore.Postgres.Models.SystemUser.SystemUserId,
+            ApplicationUserId = SystemUser.SystemUserId,
             RequestId = Guid.NewGuid().ToString(),
             CreatedOn = clock.UtcNow,
             IdentityVerified = null,

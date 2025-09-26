@@ -12,7 +12,7 @@ public class CheckboxFilterViewModel : FilterViewModel
         {
             Name = filter.Name,
             DisplayName = filter.DisplayName,
-            Values = filter.Values.Select(CheckboxFilterValueViewModel.Create),
+            Values = filter.Values.Select(CheckboxFilterValueViewModel.Create)
         };
     }
 }

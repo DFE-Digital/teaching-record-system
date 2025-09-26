@@ -36,17 +36,17 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var reasonChoiceSelection = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(editRouteState.ChangeReason.ToString(), reasonChoiceSelection);
 
         var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(true.ToString(), additionalDetailChoices);
 
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(false.ToString(), uploadEvidenceChoices);
 
         var additionalDetailTextArea = doc.GetElementByTestId("additional-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
@@ -94,12 +94,12 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Select(i => i.Value);
-        Assert.Equal(new[] { "True", "False" }, additionalDetailChoices);
+        Assert.Equal(["True", "False"], additionalDetailChoices);
 
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Select(i => i.Value);
-        Assert.Equal(new[] { "True", "False" }, uploadEvidenceChoices);
+        Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
     [Fact]

@@ -23,12 +23,12 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
-        // Arrange        
+        // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true
             });
@@ -46,14 +46,14 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsOK()
     {
-        // Arrange        
+        // Arrange
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -94,7 +94,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -102,7 +102,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "UploadEvidence", "False" }
             }
@@ -125,7 +125,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -133,9 +133,9 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                 { "ChangeReason", MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString() },
+                 { "ChangeReason", MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString() }
             }
         };
 
@@ -156,7 +156,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -164,7 +164,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                  { "ChangeReason", MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString() },
                  { "UploadEvidence", "True" }
@@ -188,7 +188,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -220,7 +220,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -254,7 +254,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -292,7 +292,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqSpecialismState()
+            new EditMqSpecialismState
             {
                 Initialized = true,
                 Specialism = newMqSpecialism
@@ -309,7 +309,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {
-        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        var byteArrayContent = new ByteArrayContent([]);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
 
         var multipartContent = new MultipartFormDataContent

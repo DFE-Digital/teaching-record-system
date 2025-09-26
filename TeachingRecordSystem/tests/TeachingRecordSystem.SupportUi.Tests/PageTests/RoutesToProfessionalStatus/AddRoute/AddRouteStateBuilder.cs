@@ -159,7 +159,7 @@ public class AddRouteStateBuilder()
 
     public AddRouteState Build()
     {
-        return new AddRouteState()
+        return new AddRouteState
         {
             Initialized = true,
             RouteToProfessionalStatusId = _routeToProfessionalStatusId,

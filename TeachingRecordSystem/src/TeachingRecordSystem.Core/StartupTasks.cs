@@ -23,7 +23,7 @@ public static partial class ServiceCollectionExtensions
             services.Insert(0, ServiceDescriptor.Transient<IHostedService, RunStartupTasksHostedService>());
         }
 
-        services.AddTransient<IStartupTask>(sp => createTask(sp));
+        services.AddTransient(sp => createTask(sp));
 
         return services;
     }

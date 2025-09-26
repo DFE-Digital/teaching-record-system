@@ -66,7 +66,7 @@ public class OAuth2Controller(
                     { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, client.Name },
                     { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, serviceUrl },
                     { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ClientApplicationUserId, client.UserId.ToString() },
-                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, trnToken },
+                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, trnToken }
                 }
             };
 

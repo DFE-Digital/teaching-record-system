@@ -23,7 +23,7 @@ public partial class TestData
         private EventModels.RaisedByUserInfo? _createdByUser;
         private string? _changeReason;
         private string? _changeReasonDetail;
-        private Core.Events.Models.File? _evidenceFile { get; set; }
+        private EventModels.File? _evidenceFile;
         private string? _sourceApplicationReference;
 
         internal RouteToProfessionalStatusStatus Status => _status;
@@ -120,7 +120,7 @@ public partial class TestData
 
         public CreatePersonRouteToProfessionalStatusBuilder WithEvidenceFile(string name)
         {
-            _evidenceFile = new Core.Events.Models.File()
+            _evidenceFile = new EventModels.File()
             {
                 FileId = Guid.NewGuid(),
                 Name = name

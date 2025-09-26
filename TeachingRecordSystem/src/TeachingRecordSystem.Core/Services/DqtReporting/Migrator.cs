@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text;
 using DbUp;
 using DbUp.Engine;

@@ -162,7 +162,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             // Clear any errors for any OIDC-related fields (since we're not saving them if IsOidcClient is false)
             foreach (var key in ModelState.Keys)
             {
-                if (key.StartsWith("OneLogin") ||
+                if (key.StartsWith("OneLogin", StringComparison.Ordinal) ||
                     key is nameof(ClientId) or nameof(ClientSecret) or nameof(RedirectUris) or nameof(PostLogoutRedirectUris))
                 {
                     ModelState.Remove(key);

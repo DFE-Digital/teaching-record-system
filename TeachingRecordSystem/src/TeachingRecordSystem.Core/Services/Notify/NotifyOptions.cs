@@ -9,7 +9,7 @@ public class NotifyOptions
 
     public bool ApplyDomainFiltering { get; set; }
 
-    public string[] DomainAllowList { get; set; } = Array.Empty<string>();
+    public string[] DomainAllowList { get; set; } = [];
 
     public string? NoSendApiKey { get; set; }
 }

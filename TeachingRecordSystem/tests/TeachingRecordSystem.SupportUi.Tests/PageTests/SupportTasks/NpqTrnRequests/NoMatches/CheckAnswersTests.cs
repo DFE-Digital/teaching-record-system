@@ -13,7 +13,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
     {
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
             {
                 Email = req.Email,
                 ExpiresUtc = Clock.UtcNow.AddDays(1),
@@ -82,7 +82,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var nextPageDoc = await nextPage.GetDocumentAsync();
         var linkToPersonRecord = GetLinkToPersonFromBanner(nextPageDoc);
         Assert.NotNull(linkToPersonRecord);
-        var personId = Guid.Parse(linkToPersonRecord!.Substring("/persons/".Length));
+        var personId = Guid.Parse(linkToPersonRecord.AsSpan("/persons/".Length));
 
         // person record is updated
         await WithDbContext(async dbContext =>
@@ -110,7 +110,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             Assert.Equal(personId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
             Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
-            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
+            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes
             {
                 FirstName = requestMetadata.FirstName!,
                 MiddleName = requestMetadata.MiddleName ?? string.Empty,

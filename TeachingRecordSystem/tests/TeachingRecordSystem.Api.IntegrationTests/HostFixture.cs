@@ -4,13 +4,11 @@ using JustEat.HttpClientInterception;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -73,14 +71,14 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddMvc().AddApplicationPart(typeof(HostFixture).Assembly);
             services.AddSingleton<CurrentApiClientProvider>();
             services.AddTestScoped<IClock>(tss => tss.Clock);
-            services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
-            services.AddTestScoped<IOptions<AccessYourTeachingQualificationsOptions>>(tss => tss.AccessYourTeachingQualificationsOptions);
-            services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);
+            services.AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object);
+            services.AddTestScoped(tss => tss.AccessYourTeachingQualificationsOptions);
+            services.AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object);
             services.AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
-            services.AddSingleton<TestData>(
+            services.AddSingleton(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
-                    (IClock)new ForwardToTestScopedClock(),
+                    new ForwardToTestScopedClock(),
                     TestDataPersonDataSource.CrmAndTrs));
             services.AddFakeXrm();
             services.AddSingleton<FakeTrnGenerator>();
@@ -112,7 +110,7 @@ public class HostFixture : WebApplicationFactory<Program>
                     {
                         KeyId = "testkey",
                         CertificatePem = certPem,
-                        PrivateKeyPem = keyPem,
+                        PrivateKeyPem = keyPem
                     }];
             });
 
@@ -170,6 +168,6 @@ file static class ServiceCollectionExtensions
     public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
         where T : class
     {
-        return services.AddTransient<T>(_ => resolveService(TestScopedServices.GetCurrent()));
+        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
     }
 }

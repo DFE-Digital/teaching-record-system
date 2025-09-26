@@ -8,5 +8,5 @@ public enum InductionStatus
     InProgress = 3,
     Passed = 4,
     Failed = 5,
-    FailedInWales = 6,
+    FailedInWales = 6
 }

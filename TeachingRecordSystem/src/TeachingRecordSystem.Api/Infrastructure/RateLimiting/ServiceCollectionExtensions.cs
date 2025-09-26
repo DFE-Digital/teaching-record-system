@@ -37,14 +37,19 @@ public static class ServiceCollectionExtensions
                     {
                         var message = $"A maximum of {limit} calls per {windowSeconds} seconds are permitted.";
 
-                        var problemDetails = new ProblemDetails()
+                        var problemDetails = new ProblemDetails
                         {
                             Title = "API calls quota exceeded",
                             Detail = message,
                             Status = context.HttpContext.Response.StatusCode
                         };
 
-                        await context.HttpContext.Response.WriteAsJsonAsync(problemDetails, type: typeof(ProblemDetails), options: null, contentType: "application/problem+json");
+                        await context.HttpContext.Response.WriteAsJsonAsync(
+                            problemDetails,
+                            type: typeof(ProblemDetails),
+                            options: null,
+                            contentType: "application/problem+json",
+                            token);
                     }
                 };
 
@@ -58,11 +63,11 @@ public static class ServiceCollectionExtensions
                     // Window isn't available via RateLimitMetadata so stash it on the HttpContext instead
                     httpContext.Items.TryAdd(_windowSecondsHttpContextKey, clientRateLimit.Window.TotalSeconds);
 
-                    return RedisRateLimitPartition.GetFixedWindowRateLimiter(partitionKey, key => new RedisFixedWindowRateLimiterOptions()
+                    return RedisRateLimitPartition.GetFixedWindowRateLimiter(partitionKey, key => new RedisFixedWindowRateLimiterOptions
                     {
                         Window = clientRateLimit.Window,
                         PermitLimit = clientRateLimit.PermitLimit,
-                        ConnectionMultiplexerFactory = connectionMultiplexerFactory,
+                        ConnectionMultiplexerFactory = connectionMultiplexerFactory
                     });
                 });
             });

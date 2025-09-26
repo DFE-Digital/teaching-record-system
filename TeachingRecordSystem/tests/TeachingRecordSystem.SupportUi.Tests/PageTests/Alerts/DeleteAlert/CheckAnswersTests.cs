@@ -176,7 +176,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
         {
             var actualAlertDeletedEvent = Assert.IsType<AlertDeletedEvent>(e);
 
-            var expectedAlertDeletedEvent = new AlertDeletedEvent()
+            var expectedAlertDeletedEvent = new AlertDeletedEvent
             {
                 EventId = actualAlertDeletedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,
@@ -189,7 +189,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
                     Details = alert.Details,
                     ExternalLink = alert.ExternalLink,
                     StartDate = alert.StartDate,
-                    EndDate = alert.EndDate,
+                    EndDate = alert.EndDate
                 },
                 DeletionReasonDetail = journeyInstance.State.DeleteReasonDetail,
                 EvidenceFile = new()

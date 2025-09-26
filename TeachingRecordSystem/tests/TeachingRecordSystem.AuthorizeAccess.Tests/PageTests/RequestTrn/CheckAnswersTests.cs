@@ -236,8 +236,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.WorkEmail, doc.GetSummaryListValueForKey("Work email"));
         Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueForKey("Personal email"));
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', new string?[] { state.FirstName, state.MiddleName, state.LastName }), doc.GetSummaryListValueForKey("Name"));
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', new string?[] { state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName }), doc.GetSummaryListValueForKey("Previous name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.FirstName, state.MiddleName, state.LastName), doc.GetSummaryListValueForKey("Name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName), doc.GetSummaryListValueForKey("Previous name"));
         Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
         Assert.Contains(state.EvidenceFileName!, doc.GetSummaryListValueForKey("Proof of identity"));
         if (hasNationalInsuranceNumber)
@@ -613,7 +613,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         await AssertSupportTaskCreatedAsync();
-        await AssertMetadataExpectedAsync(state, true, new List<Guid>() { person1.PersonId, person2.PersonId });
+        await AssertMetadataExpectedAsync(state, true, [person1.PersonId, person2.PersonId]);
     }
 
     [Fact]
@@ -640,7 +640,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         await AssertSupportTaskCreatedAsync();
-        await AssertMetadataExpectedAsync(state, true, new List<Guid>() { person.PersonId });
+        await AssertMetadataExpectedAsync(state, true, [person.PersonId]);
     }
 
     [Fact]

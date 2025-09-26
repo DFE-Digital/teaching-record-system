@@ -243,7 +243,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFile
             person.Trn,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
 
-        PersonName = StringHelper.JoinNonEmpty(' ', new string?[] { personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName });
+        PersonName = StringHelper.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
@@ -251,6 +251,8 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFile
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
-}
 
-public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
+#pragma warning disable CA1711
+    public record PersonAttribute<T>(T ExistingRecordValue, T TrnRequestValue, bool Different);
+#pragma warning restore CA1711
+}

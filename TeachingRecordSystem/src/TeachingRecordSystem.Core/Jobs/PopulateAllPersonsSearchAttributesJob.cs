@@ -26,17 +26,17 @@ public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContex
 
             await writeDbContext.Database.ExecuteSqlRawAsync(
                 "CALL p_refresh_person_search_attributes(:person_ids)",
-                parameters: new object[]
-                {
+                parameters:
+                [
                     new NpgsqlParameter("person_ids", value: chunk)
-                });
+                ]);
 
             await writeDbContext.Database.ExecuteSqlRawAsync(
                 "CALL p_refresh_previous_names_person_search_attributes(:person_ids)",
-                parameters: new object[]
-                {
+                parameters:
+                [
                     new NpgsqlParameter("person_ids", value: chunk)
-                });
+                ]);
         }
     }
 }

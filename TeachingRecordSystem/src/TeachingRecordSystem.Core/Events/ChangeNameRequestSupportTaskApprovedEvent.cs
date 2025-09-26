@@ -16,5 +16,5 @@ public enum ChangeNameRequestSupportTaskApprovedEventChanges
     FirstName = PersonAttributesChanges.FirstName,
     MiddleName = PersonAttributesChanges.MiddleName,
     LastName = PersonAttributesChanges.LastName,
-    NameChange = FirstName | MiddleName | LastName,
+    NameChange = FirstName | MiddleName | LastName
 }

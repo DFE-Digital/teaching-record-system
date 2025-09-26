@@ -66,7 +66,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
                     },
                     details = alert.Details,
                     startDate = alert.StartDate,
-                    endDate = alert.EndDate,
+                    endDate = alert.EndDate
                 }
             },
             responseAlerts);

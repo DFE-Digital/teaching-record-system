@@ -194,7 +194,7 @@ public abstract class TestBase : IDisposable
         {
             foreach (var item2 in ToObjectEnumerable(param2))
             {
-                yield return new object?[] { item1, item2 };
+                yield return [item1, item2];
             }
         }
     }
@@ -207,7 +207,7 @@ public abstract class TestBase : IDisposable
             {
                 foreach (var item3 in ToObjectEnumerable(param3))
                 {
-                    yield return new object?[] { item1, item2, item3 };
+                    yield return [item1, item2, item3];
                 }
             }
         }
@@ -223,7 +223,7 @@ public abstract class TestBase : IDisposable
                 {
                     foreach (var item4 in ToObjectEnumerable(param4))
                     {
-                        yield return new object?[] { item1, item2, item3, item4 };
+                        yield return [item1, item2, item3, item4];
                     }
                 }
             }

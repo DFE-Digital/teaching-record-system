@@ -4,8 +4,6 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PersonMatching;
@@ -60,10 +58,10 @@ public static class Setup
         services
             .AddSingleton<IConfiguration>(configuration)
             .AddSingleton<DbFixture>()
-            .AddSingleton<TestData>(
+            .AddSingleton(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
-                    (IClock)new ForwardToTestScopedClock(),
+                    new ForwardToTestScopedClock(),
                     TestDataPersonDataSource.CrmAndTrs))
             .AddTrsBaseServices()
             .AddApiCommands()
@@ -71,13 +69,13 @@ public static class Setup
             .AddSingleton<FakeTrnGenerator>()
             .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
             .AddFakeXrm()
-            .AddSingleton<ICurrentUserProvider>(Mock.Of<ICurrentUserProvider>())
+            .AddSingleton(Mock.Of<ICurrentUserProvider>())
             .AddNameSynonyms()
-            .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object)
-            .AddTestScoped<IFileService>(tss => tss.BlobStorageFileService.Object)
+            .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
+            .AddTestScoped(tss => tss.BlobStorageFileService.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
-            .AddTestScoped<CaptureEventObserver>(tss => tss.EventObserver)
+            .AddTestScoped(tss => tss.EventObserver)
             .AddSingleton<WebhookMessageFactory>()
             .AddSingleton<EventMapperRegistry>()
             .AddMemoryCache()
@@ -85,7 +83,7 @@ public static class Setup
             .AddPersonMatching()
             .AddTrnRequestService(configuration)
             .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>()
-            .AddTestScoped<IOptions<TrnRequestOptions>>(tss => Options.Create(tss.TrnRequestOptions))
+            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
             .AddSingleton<INotificationSender, NoopNotificationSender>();
 
         return services.BuildServiceProvider();
@@ -135,6 +133,6 @@ file static class ServiceCollectionExtensions
     public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
         where T : class
     {
-        return services.AddTransient<T>(_ => resolveService(TestScopedServices.GetCurrent()));
+        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
     }
 }

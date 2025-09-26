@@ -13,7 +13,7 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateDropDqtReportingReplicationSlotCommand(configuration),
     Commands.CreateGenerateWebhookSignatureCertificateCommand(configuration),
     Commands.CreateWebhookEndpointCommand(configuration),
-    Commands.CreateAddTrnRangeCommand(configuration),
+    Commands.CreateAddTrnRangeCommand(configuration)
 };
 
 return await rootCommand.InvokeAsync(args);

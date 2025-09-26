@@ -46,6 +46,9 @@ public class InductionModel(
         InductionStatus.InProgress => InductionWarnings.InductionIsManagedByCpdWarningInProgress,
         InductionStatus.Passed => InductionWarnings.InductionIsManagedByCpdWarningPassed,
         InductionStatus.Failed => InductionWarnings.InductionIsManagedByCpdWarningFailed,
+        InductionStatus.None => throw new NotImplementedException(),
+        InductionStatus.Exempt => throw new NotImplementedException(),
+        InductionStatus.FailedInWales => throw new NotImplementedException(),
         _ => InductionWarnings.InductionIsManagedByCpdWarningOther
     };
 

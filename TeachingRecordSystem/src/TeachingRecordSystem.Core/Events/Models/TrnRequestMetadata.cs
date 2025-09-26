@@ -36,7 +36,7 @@ public record TrnRequestMetadata
     public required Guid? NpqEvidenceFileId { get; init; }
     public required string? NpqEvidenceFileName { get; init; }
 
-    public static TrnRequestMetadata FromModel(Core.DataStore.Postgres.Models.TrnRequestMetadata model) =>
+    public static TrnRequestMetadata FromModel(DataStore.Postgres.Models.TrnRequestMetadata model) =>
         new()
         {
             ApplicationUserId = model.ApplicationUserId,

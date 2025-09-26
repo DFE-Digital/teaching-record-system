@@ -21,7 +21,7 @@ public class PopulateNameSynonymsJob(TrsDbContext dbContext, INameSynonymProvide
                 nameSynonyms = new NameSynonyms
                 {
                     Name = name,
-                    Synonyms = synonyms.ToArray(),
+                    Synonyms = synonyms.ToArray()
                 };
 
                 dbContext.NameSynonyms.Add(nameSynonyms);

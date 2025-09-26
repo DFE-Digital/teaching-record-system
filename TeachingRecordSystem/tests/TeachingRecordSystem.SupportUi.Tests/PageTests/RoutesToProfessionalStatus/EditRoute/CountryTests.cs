@@ -232,7 +232,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/country?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingCountryId", country.CountryId.ToString()}
             }
@@ -274,7 +274,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/country?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingCountryId", country.CountryId.ToString()}
             }

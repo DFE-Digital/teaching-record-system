@@ -95,7 +95,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "ChecksCompleted", "true" }
             }
@@ -135,7 +135,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "ChecksCompleted", "false" }
             }

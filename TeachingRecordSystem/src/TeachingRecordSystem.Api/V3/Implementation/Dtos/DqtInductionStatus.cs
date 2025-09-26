@@ -12,7 +12,7 @@ public enum DqtInductionStatus
     NotYetCompleted = 6,
     Pass = 7,
     PassedInWales = 8,
-    RequiredToComplete = 9,
+    RequiredToComplete = 9
 }
 
 public static class DqtInductionStatusExtensions

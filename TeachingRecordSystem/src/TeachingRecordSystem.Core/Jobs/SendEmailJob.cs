@@ -37,7 +37,7 @@ public class SendEmailJob(TrsDbContext dbContext, INotificationSender notificati
             EventId = Guid.NewGuid(),
             Email = EventModels.Email.FromModel(email),
             CreatedUtc = clock.UtcNow,
-            RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+            RaisedBy = SystemUser.SystemUserId
         });
 
         await dbContext.SaveChangesAsync();

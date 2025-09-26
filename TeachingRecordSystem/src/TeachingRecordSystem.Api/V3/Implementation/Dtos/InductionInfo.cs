@@ -11,7 +11,7 @@ public record InductionInfo
         PostgresModels.Person person,
         ReferenceDataCache referenceDataCache)
     {
-        return new InductionInfo()
+        return new InductionInfo
         {
             Status = person.InductionStatus,
             StartDate = person.InductionStartDate,

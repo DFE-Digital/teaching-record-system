@@ -315,7 +315,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 LegacyDataCache.Instance.GetMqEstablishmentByValue(mqEstablishmentValue) :
                 null;
 
-            var reactivatedEvent = new MandatoryQualificationDqtReactivatedEvent()
+            var reactivatedEvent = new MandatoryQualificationDqtReactivatedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
@@ -325,7 +325,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 {
                     QualificationId = qualification.QualificationId,
                     Provider = qualification.ProviderId is not null || mqEstablishment is not null ?
-                        new EventModels.MandatoryQualificationProvider()
+                        new EventModels.MandatoryQualificationProvider
                         {
                             MandatoryQualificationProviderId = qualification.ProviderId,
                             Name = qualification.ProviderId is not null ?
@@ -376,7 +376,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
-            var migratedEvent = new MandatoryQualificationMigratedEvent()
+            var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = Clock.UtcNow,
@@ -421,7 +421,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
-            var migratedEvent = new MandatoryQualificationMigratedEvent()
+            var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = Clock.UtcNow,
@@ -469,7 +469,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             mq.ProviderId = migratedProvider.MandatoryQualificationProviderId;
             await dbContext.SaveChangesAsync();
 
-            var migratedEvent = new MandatoryQualificationMigratedEvent()
+            var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = Clock.UtcNow,
@@ -524,7 +524,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             Debug.Assert(migratedSpecialism is not null);
             mq.Specialism = migratedSpecialism;
 
-            var migratedEvent = new MandatoryQualificationMigratedEvent()
+            var migratedEvent = new MandatoryQualificationMigratedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = Clock.UtcNow,
@@ -979,7 +979,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             LegacyDataCache.Instance.GetMqEstablishmentByValue(mqEstablishmentValue) :
             null;
 
-        var deletedEvent = new MandatoryQualificationDqtDeactivatedEvent()
+        var deletedEvent = new MandatoryQualificationDqtDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -989,7 +989,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             {
                 QualificationId = qualification.QualificationId,
                 Provider = qualification.ProviderId is not null || mqEstablishment is not null ?
-                    new EventModels.MandatoryQualificationProvider()
+                    new EventModels.MandatoryQualificationProvider
                     {
                         MandatoryQualificationProviderId = qualification.ProviderId,
                         Name = qualification.ProviderId is not null ?
@@ -1030,11 +1030,11 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 LegacyDataCache.Instance.GetMqSpecialismByValue(oldMqEstablishmentValue) :
                 null;
 
-            var oldMq = new EventModels.MandatoryQualification()
+            var oldMq = new EventModels.MandatoryQualification
             {
                 QualificationId = qualification.QualificationId,
                 Provider = qualification.ProviderId is not null || oldMqEstablishment is not null ?
-                    new EventModels.MandatoryQualificationProvider()
+                    new EventModels.MandatoryQualificationProvider
                     {
                         MandatoryQualificationProviderId = qualification.ProviderId,
                         Name = qualification.ProviderId is not null ?
@@ -1057,7 +1057,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 LegacyDataCache.Instance.GetMqSpecialismByValue(mqEstablishmentValue) :
                 null;
 
-            var updatedEvent = new MandatoryQualificationUpdatedEvent()
+            var updatedEvent = new MandatoryQualificationUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
@@ -1067,7 +1067,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 {
                     QualificationId = qualification.QualificationId,
                     Provider = qualification.ProviderId is not null || mqEstablishment is not null ?
-                        new EventModels.MandatoryQualificationProvider()
+                        new EventModels.MandatoryQualificationProvider
                         {
                             MandatoryQualificationProviderId = qualification.ProviderId,
                             Name = qualification.ProviderId is not null ?
@@ -1086,7 +1086,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 ChangeReason = changeReason,
                 ChangeReasonDetail = changeReasonDetail,
                 EvidenceFile = evidenceFile is not null ?
-                    new EventModels.File()
+                    new EventModels.File
                     {
                         FileId = evidenceFile.Value.FileId,
                         Name = evidenceFile.Value.Name

@@ -227,7 +227,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "DegreeTypeId", "" }
             }
@@ -271,7 +271,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "DegreeTypeId", "" }
             }
@@ -313,7 +313,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "DegreeTypeId", degreeType.DegreeTypeId.ToString()}
             }
@@ -355,7 +355,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "DegreeTypeId", degreeType.DegreeTypeId.ToString()}
             }

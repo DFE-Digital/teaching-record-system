@@ -173,6 +173,7 @@ public partial class TrsLinkGenerator
             AddRoutePage.SubjectSpecialisms => RouteEditSubjectSpecialisms(personId, journeyInstanceId, fromCheckAnswers),
             AddRoutePage.ChangeReason => RouteEditChangeReason(personId, journeyInstanceId, fromCheckAnswers),
             AddRoutePage.CheckYourAnswers => RouteEditCheckYourAnswers(personId, journeyInstanceId),
+            AddRoutePage.Route => throw new NotImplementedException(),
             _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
         };
 }

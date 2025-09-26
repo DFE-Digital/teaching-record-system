@@ -52,7 +52,7 @@ public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerat
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,
             RaisedBy = User.GetUserId(),
-            ApiKey = Core.Events.Models.ApiKey.FromModel(apiKey)
+            ApiKey = EventModels.ApiKey.FromModel(apiKey)
         };
         await dbContext.AddEventAndBroadcastAsync(@event);
 

@@ -1230,7 +1230,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                     new Dictionary<PersonMatchedAttribute, string>()
                     {
                         { PersonMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
-                        { PersonMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
+                        { PersonMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! }
                     }));
 
             // Act

@@ -85,7 +85,7 @@ public class MandatoryQualification : Qualification
             MandatoryQualification = EventModels.MandatoryQualification.FromModel(this),
             DeletionReason = deletionReason,
             DeletionReasonDetail = deletionReasonDetail,
-            EvidenceFile = evidenceFile,
+            EvidenceFile = evidenceFile
         };
     }
 

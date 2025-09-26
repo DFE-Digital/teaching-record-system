@@ -74,7 +74,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/provider?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "ProviderId", provider.MandatoryQualificationProviderId }
             }
@@ -118,7 +118,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "ProviderId", provider.MandatoryQualificationProviderId }
             }

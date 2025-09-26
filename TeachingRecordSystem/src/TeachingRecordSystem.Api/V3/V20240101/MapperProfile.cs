@@ -34,6 +34,6 @@ public class AlertInfoTypeConverter : ITypeConverter<Implementation.Dtos.Alert, 
             AlertType = AlertType.Prohibition,
             DqtSanctionCode = source.AlertType.DqtSanctionCode!,
             StartDate = source.StartDate,
-            EndDate = source.EndDate,
+            EndDate = source.EndDate
         };
 }

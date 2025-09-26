@@ -42,7 +42,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
             DataContentType = DataContentType,
             DataSchema = dataSchema,
             Time = message.Timestamp,
-            Data = message.Data,
+            Data = message.Data
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, message.WebhookEndpoint.Address)
@@ -90,7 +90,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
 
         // The cert is added to the container rather than being created directly in the registration for ISigner
         // so it's tracked by the container and gets disposed with the container.
-        services.AddKeyedSingleton<X509Certificate2>(nameof(WebhookSender), (sp, _) =>
+        services.AddKeyedSingleton(nameof(WebhookSender), (sp, _) =>
         {
             var options = sp.GetRequiredService<IOptions<WebhookOptions>>().Value;
             var signingKeyId = options.SigningKeyId;

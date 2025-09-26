@@ -33,7 +33,7 @@ public class TestModel : PageModel
                         { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, AuthenticationScheme },
                         { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, "Test service" },
                         { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, Request.GetEncodedUrl() },
-                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, TrnToken },
+                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, TrnToken }
                     },
                     RedirectUri = Request.GetEncodedUrl()
                 },

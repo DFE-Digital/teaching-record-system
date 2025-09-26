@@ -73,7 +73,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Email", "" }
             }
@@ -101,7 +101,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Email", email }
             }
@@ -126,7 +126,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Email", email }
             }
@@ -150,7 +150,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var name = TestData.GenerateName();
         var userId = Guid.NewGuid().ToString();
 
-        ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -159,7 +159,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Email", email }
             }
@@ -185,7 +185,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var userId = Guid.NewGuid();
         var existingUser = await TestData.CreateUserAsync(name: name, email: email, azureAdUserId: userId);
 
-        ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User()
+        ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User
         {
             Email = email,
             Name = name,
@@ -194,7 +194,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Email", email }
             }

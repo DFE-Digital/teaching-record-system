@@ -108,7 +108,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", user.Name },
                 { "Role", user.Role! }
@@ -131,7 +131,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(Guid.NewGuid()))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", "Some Name" },
                 { "Role", UserRoles.RecordManager }
@@ -157,9 +157,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { "Role", role },
+                { "Role", role }
             }
         };
 
@@ -182,9 +182,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { "Name", "New Name" },
+                { "Name", "New Name" }
             }
         };
 
@@ -207,7 +207,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", existingUser.Name },
                 { "Role", "XXXXXX" }
@@ -232,7 +232,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", existingUser.Name },
                 { "Role", UserRoles.Administrator }
@@ -257,7 +257,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", existingUser.Name },
                 { "Role", UserRoles.Administrator }
@@ -293,7 +293,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
                 { "Role", newRole! }

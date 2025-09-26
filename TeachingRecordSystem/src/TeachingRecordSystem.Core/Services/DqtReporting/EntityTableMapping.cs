@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 using System.Text;
 using Microsoft.Data.SqlClient;
@@ -61,8 +60,8 @@ public class EntityTableMapping
                     new AttributeColumnMapping()
                     {
                         AttributeName = attr.LogicalName,
-                        ColumnDefinitions = new[]
-                        {
+                        ColumnDefinitions =
+                        [
                             new AttributeColumnDefinition()
                             {
                                 ColumnName = attr.LogicalName,
@@ -70,14 +69,14 @@ public class EntityTableMapping
                                 ColumnDefinition = columnDefinition,
                                 GetColumnValueFromAttribute = getColumnValueFromAttribute ?? (attrValue => attrValue)
                             }
-                        }
+                        ]
                     };
 
                 AttributeColumnMapping CreateIdMapping() => new AttributeColumnMapping()
                 {
                     AttributeName = attr.LogicalName,
-                    ColumnDefinitions = new[]
-                    {
+                    ColumnDefinitions =
+                    [
                         new AttributeColumnDefinition()
                         {
                             ColumnName = IdColumnName,
@@ -85,7 +84,7 @@ public class EntityTableMapping
                             ColumnDefinition = "uniqueidentifier",
                             GetColumnValueFromAttribute = attrValue => attrValue
                         }
-                    }
+                    ]
                 };
 
                 AttributeColumnMapping CreateStringMapping()
@@ -98,8 +97,8 @@ public class EntityTableMapping
                 AttributeColumnMapping CreateLookupMapping() => new AttributeColumnMapping()
                 {
                     AttributeName = attr.LogicalName,
-                    ColumnDefinitions = new[]
-                    {
+                    ColumnDefinitions =
+                    [
                         new AttributeColumnDefinition()
                         {
                             ColumnName = attr.LogicalName,
@@ -114,14 +113,14 @@ public class EntityTableMapping
                             ColumnDefinition = "nvarchar(128)",
                             GetColumnValueFromAttribute = attrValue => ((EntityReference)attrValue).LogicalName
                         }
-                    }
+                    ]
                 };
 
                 AttributeColumnMapping CreateEntityNameMapping() => new AttributeColumnMapping()
                 {
                     AttributeName = attr.LogicalName,
-                    ColumnDefinitions = new[]
-                    {
+                    ColumnDefinitions =
+                    [
                         new AttributeColumnDefinition()
                         {
                             ColumnName = attr.LogicalName,
@@ -129,7 +128,7 @@ public class EntityTableMapping
                             ColumnDefinition = "nvarchar(4000)",
                             GetColumnValueFromAttribute = attrValue => attrValue
                         }
-                    }
+                    ]
                 };
 
                 AttributeColumnMapping CreateDoubleMapping()

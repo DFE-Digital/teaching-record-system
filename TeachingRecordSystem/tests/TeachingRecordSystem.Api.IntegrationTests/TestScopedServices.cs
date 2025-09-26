@@ -19,7 +19,7 @@ public class TestScopedServices
 
         AccessYourTeachingQualificationsOptions = Options.Create(new AccessYourTeachingQualificationsOptions()
         {
-            BaseAddress = "https://aytq.com",
+            BaseAddress = "https://aytq.com"
         });
     }
 

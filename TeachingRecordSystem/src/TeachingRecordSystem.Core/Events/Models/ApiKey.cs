@@ -7,7 +7,7 @@ public record ApiKey
     public required string Key { get; init; }
     public required DateTime? Expires { get; init; }
 
-    public static ApiKey FromModel(Core.DataStore.Postgres.Models.ApiKey model) => new()
+    public static ApiKey FromModel(DataStore.Postgres.Models.ApiKey model) => new()
     {
         ApiKeyId = model.ApiKeyId,
         ApplicationUserId = model.ApplicationUserId,

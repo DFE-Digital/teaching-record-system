@@ -48,12 +48,12 @@ public class StatusModel(
     public string? StatusWarningMessage => _inductionStatusManagedByCpd && (CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ? InductionIsManagedByCpdWarning : null;
 
     public InductionJourneyPage NextPage =>
-     InductionStatus switch
-     {
-         _ when InductionStatus.RequiresExemptionReasons() => InductionJourneyPage.ExemptionReason,
-         _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
-         _ => InductionJourneyPage.ChangeReasons
-     };
+        InductionStatus switch
+        {
+            _ when InductionStatus.RequiresExemptionReasons() => InductionJourneyPage.ExemptionReason,
+            _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
+            _ => InductionJourneyPage.ChangeReasons
+        };
 
     public string BackLink
     {
@@ -92,7 +92,7 @@ public class StatusModel(
             }
             if (!InductionStatus.RequiresExemptionReasons())
             {
-                state.ExemptionReasonIds = Array.Empty<Guid>();
+                state.ExemptionReasonIds = [];
             }
         });
 

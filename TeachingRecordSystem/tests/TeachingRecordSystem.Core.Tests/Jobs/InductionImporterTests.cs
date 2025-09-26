@@ -447,7 +447,7 @@ public class InductionImporterTests : IAsyncLifetime
             FailDate = "",
             EmployerCode = "",
             EmployerName = "",
-            InductionStatusName = "01/07/2024",
+            InductionStatusName = "01/07/2024"
         };
         var configuredRow = configurator != null ? configurator(row) : row;
         return configuredRow;

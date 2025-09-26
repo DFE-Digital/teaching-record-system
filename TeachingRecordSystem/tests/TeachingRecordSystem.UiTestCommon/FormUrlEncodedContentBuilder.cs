@@ -8,7 +8,7 @@ public class FormUrlEncodedContentBuilder : IEnumerable<KeyValuePair<string, str
 
     public FormUrlEncodedContentBuilder()
     {
-        _values = new List<KeyValuePair<string, string?>>();
+        _values = [];
     }
 
     public FormUrlEncodedContentBuilder Add(string key, object value)

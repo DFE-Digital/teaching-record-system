@@ -9,5 +9,5 @@ public enum EwcWalesMatchStatus
     NoAssociatedQts,
     TeacherHasQts,
     OneMatch,
-    MultipleMatchesFound,
+    MultipleMatchesFound
 }

@@ -6,13 +6,11 @@ using FakeXrmEasy.Middleware;
 using FakeXrmEasy.Middleware.Crud;
 using FakeXrmEasy.Middleware.Messages;
 using FakeXrmEasy.Middleware.Pipeline;
-using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.FakeMessageExecutors;
 using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.Plugins;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -27,7 +25,6 @@ public static class ServiceCollectionExtensions
             .New()
             .AddCrud()
             .AddFakeMessageExecutors(Assembly.GetAssembly(typeof(ExecuteTransactionExecutor)))
-            .AddFakeMessageExecutor<CloseIncidentRequest>(new WorkaroundCloseIncidentRequestExecutor())
             .AddPipelineSimulation()
             .Use(next => (IXrmFakedContext context, OrganizationRequest request) =>
             {
@@ -51,7 +48,7 @@ public static class ServiceCollectionExtensions
         // to ensure this task runs before the cache pre-warming task
         services.AddStartupTask<SeedCrmReferenceData>();
 
-        services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
+        services.AddSingleton(fakedXrmContext);
         var organizationService = fakedXrmContext.GetAsyncOrganizationService2();
         services.AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService);
         services.AddNamedServiceClient(TrsDataSyncHelper.CrmClientName, ServiceLifetime.Singleton, _ => organizationService);

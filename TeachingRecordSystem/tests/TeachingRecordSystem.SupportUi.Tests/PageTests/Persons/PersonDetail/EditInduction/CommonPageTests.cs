@@ -522,8 +522,8 @@ public class CommonPageTests : TestBase
         .Append(null)
         .ToArray();
 
-    private static readonly (string, InductionStatus)[] _pagesAndValidStatuses = new[]
-    {
+    private static readonly (string, InductionStatus)[] _pagesAndValidStatuses =
+    [
         ("edit-induction/status", InductionStatus.Exempt),
         ("edit-induction/status", InductionStatus.InProgress),
         ("edit-induction/status", InductionStatus.Failed),
@@ -544,5 +544,5 @@ public class CommonPageTests : TestBase
         ("edit-induction/change-reason", InductionStatus.FailedInWales),
         ("edit-induction/change-reason", InductionStatus.Passed),
         ("edit-induction/change-reason", InductionStatus.RequiredToComplete)
-    };
+    ];
 }

@@ -110,16 +110,16 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public static TheoryData<PersonMatchedAttribute[], bool> HighlightedDifferencesData { get; } = new()
     {
         // We could go nuts creating loads of combinations here, but checking every attribute once seems sufficient
-        {  new[] { PersonMatchedAttribute.FirstName }, false },
-        { new[] { PersonMatchedAttribute.MiddleName }, false },
-        { new[] { PersonMatchedAttribute.LastName }, false },
-        { new[] { PersonMatchedAttribute.DateOfBirth }, false },
-        { new[] { PersonMatchedAttribute.EmailAddress }, false },
-        { new[] { PersonMatchedAttribute.EmailAddress }, true },
-        { new[] { PersonMatchedAttribute.NationalInsuranceNumber }, false },
-        { new[] { PersonMatchedAttribute.NationalInsuranceNumber }, true },
-        { new[] { PersonMatchedAttribute.Gender }, false },
-        { new[] { PersonMatchedAttribute.Gender }, true },
+        { [PersonMatchedAttribute.FirstName], false },
+        { [PersonMatchedAttribute.MiddleName], false },
+        { [PersonMatchedAttribute.LastName], false },
+        { [PersonMatchedAttribute.DateOfBirth], false },
+        { [PersonMatchedAttribute.EmailAddress], false },
+        { [PersonMatchedAttribute.EmailAddress], true },
+        { [PersonMatchedAttribute.NationalInsuranceNumber], false },
+        { [PersonMatchedAttribute.NationalInsuranceNumber], true },
+        { [PersonMatchedAttribute.Gender], false },
+        { [PersonMatchedAttribute.Gender], true }
     };
 
     [Theory]
@@ -364,7 +364,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var primaryPersonChoice = doc.GetChildElementsOfTestId<IHtmlInputElement>("primary-person-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(personB.PersonId.ToString(), primaryPersonChoice);
     }
 

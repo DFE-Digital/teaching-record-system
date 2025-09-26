@@ -103,11 +103,11 @@ public class NameChangeReasonTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var reasonChoiceSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("change-reason-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(reasonChoice.ToString(), reasonChoiceSelection);
 
         var uploadEvidenceChoices = doc.GetChildElementsOfTestId<IHtmlInputElement>("upload-evidence-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(true.ToString(), uploadEvidenceChoices);
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
@@ -160,7 +160,7 @@ public class NameChangeReasonTests : TestBase
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
             .Select(i => i.Value);
-        Assert.Equal(new[] { "True", "False" }, uploadEvidenceChoices);
+        Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
     [Fact]

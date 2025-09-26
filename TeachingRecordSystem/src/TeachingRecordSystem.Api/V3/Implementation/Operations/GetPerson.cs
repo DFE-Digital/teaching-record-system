@@ -403,7 +403,7 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
             ExemptionReasons = await person.GetAllInductionExemptionReasonIds()
                 .ToAsyncEnumerable()
                 .SelectAwait(async id => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
-                .ToArrayAsync(),
+                .ToArrayAsync()
         };
 
         return (dqtInduction, inductionInfo);

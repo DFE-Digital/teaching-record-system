@@ -665,7 +665,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 IsExemptFromInduction = false,
                 DegreeTypeId = null,
                 ChangeReason = ChangeReasonOption.AnotherReason,
-                ChangeReasonDetail = new ChangeReasonDetailsState()
+                ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
                     UploadEvidence = false
@@ -688,7 +688,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 IsExemptFromInduction = null,
                 DegreeTypeId = null,
                 ChangeReason = ChangeReasonOption.AnotherReason,
-                ChangeReasonDetail = new ChangeReasonDetailsState()
+                ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
                     UploadEvidence = false
@@ -711,7 +711,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 IsExemptFromInduction = null,
                 DegreeTypeId = null,
                 ChangeReason = ChangeReasonOption.AnotherReason,
-                ChangeReasonDetail = new ChangeReasonDetailsState()
+                ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
                     UploadEvidence = false
@@ -734,7 +734,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 IsExemptFromInduction = null,
                 DegreeTypeId = null,
                 ChangeReason = ChangeReasonOption.AnotherReason,
-                ChangeReasonDetail = new ChangeReasonDetailsState()
+                ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
                     UploadEvidence = false

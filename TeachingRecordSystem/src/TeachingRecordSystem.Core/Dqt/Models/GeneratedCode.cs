@@ -16,19 +16,19 @@
 
 namespace TeachingRecordSystem.Core.Dqt.Models
 {
-	
-	
+
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum AccountState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
 	/// Business that represents a customer or potential customer. The company that is billed in business transactions.
 	/// </summary>
@@ -36,7 +36,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("account")]
 	public partial class Account : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the account entity
 		/// </summary>
@@ -76,32 +76,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string system_user_accounts = "system_user_accounts";
 			public const string user_accounts = "user_accounts";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Account() : 
+		public Account() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Account";
-		
+
 		public const string PrimaryIdAttribute = "accountid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "account";
-		
+
 		public const string EntityLogicalCollectionName = "accounts";
-		
+
 		public const string EntitySetName = "accounts";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -110,7 +110,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -119,7 +119,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the account.
 		/// </summary>
@@ -147,7 +147,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AccountId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountid")]
 		public override System.Guid Id
 		{
@@ -162,7 +162,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.AccountId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// User-provided account number used in correspondence about the account.
 		/// </summary>
@@ -182,9 +182,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AccountNumber");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trainingprovider")]
 		public System.Nullable<bool> dfeta_TrainingProvider
@@ -202,9 +202,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TrainingProvider");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ukprn")]
 		public string dfeta_UKPRN
@@ -222,7 +222,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_UKPRN");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the account.
 		/// </summary>
@@ -242,7 +242,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the account.
 		/// </summary>
@@ -277,7 +277,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Account_Annotation
 		/// </summary>
@@ -297,7 +297,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Account_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N account_IncidentResolutions
 		/// </summary>
@@ -317,7 +317,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("account_IncidentResolutions");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N account_master_account
 		/// </summary>
@@ -337,7 +337,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedaccount_master_account");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N account_parent_account
 		/// </summary>
@@ -357,7 +357,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedaccount_parent_account");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Account_Tasks
 		/// </summary>
@@ -377,7 +377,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Account_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N contact_customer_accounts
 		/// </summary>
@@ -397,7 +397,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_customer_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_account_dfeta_document
 		/// </summary>
@@ -417,7 +417,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_account_dfeta_inductionperiod
 		/// </summary>
@@ -437,7 +437,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_account_dfeta_initialteachertraining
 		/// </summary>
@@ -457,7 +457,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_initialteachertraining");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_account_dfeta_integrationtransaction
 		/// </summary>
@@ -477,7 +477,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_integrationtransaction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_account_dfeta_integrationtransactionrecor
 		/// </summary>
@@ -497,7 +497,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_integrationtransactionrecor");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_account_dfeta_qualification_he
 		/// </summary>
@@ -517,7 +517,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_qualification_he");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N incident_customer_accounts
 		/// </summary>
@@ -537,7 +537,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("incident_customer_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N msa_account_managingpartner
 		/// </summary>
@@ -557,7 +557,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedmsa_account_managingpartner");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N msa_contact_managingpartner
 		/// </summary>
@@ -577,7 +577,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("msa_contact_managingpartner");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 account_master_account
 		/// </summary>
@@ -598,7 +598,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingaccount_master_account");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 account_parent_account
 		/// </summary>
@@ -619,7 +619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingaccount_parent_account");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 account_primary_contact
 		/// </summary>
@@ -640,7 +640,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("account_primary_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_accounts
 		/// </summary>
@@ -661,7 +661,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_accountbase_createdby
 		/// </summary>
@@ -682,7 +682,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_accountbase_createdonbehalfby
 		/// </summary>
@@ -703,7 +703,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_accountbase_modifiedby
 		/// </summary>
@@ -724,7 +724,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_accountbase_modifiedonbehalfby
 		/// </summary>
@@ -745,7 +745,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 msa_account_managingpartner
 		/// </summary>
@@ -766,7 +766,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingmsa_account_managingpartner");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 system_user_accounts
 		/// </summary>
@@ -787,7 +787,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("system_user_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_accounts
 		/// </summary>
@@ -809,7 +809,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Note that is attached to one or more objects, including other notes.
 	/// </summary>
@@ -817,7 +817,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("annotation")]
 	public partial class Annotation : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the annotation entity
 		/// </summary>
@@ -851,32 +851,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_annotationbase_modifiedonbehalfby = "lk_annotationbase_modifiedonbehalfby";
 			public const string Task_Annotation = "Task_Annotation";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Annotation() : 
+		public Annotation() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Annotation";
-		
+
 		public const string PrimaryIdAttribute = "annotationid";
-		
+
 		public const string PrimaryNameAttribute = "subject";
-		
+
 		public const string EntityLogicalName = "annotation";
-		
+
 		public const string EntityLogicalCollectionName = "annotations";
-		
+
 		public const string EntitySetName = "annotations";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -885,7 +885,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -894,7 +894,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the note.
 		/// </summary>
@@ -922,7 +922,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AnnotationId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("annotationid")]
 		public override System.Guid Id
 		{
@@ -937,7 +937,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.AnnotationId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the note.
 		/// </summary>
@@ -957,7 +957,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the note was created.
 		/// </summary>
@@ -977,7 +977,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Contents of the note's attachment.
 		/// </summary>
@@ -997,7 +997,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("DocumentBody");
 			}
 		}
-		
+
 		/// <summary>
 		/// File name of the note.
 		/// </summary>
@@ -1017,7 +1017,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FileName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Specifies whether the note is an attachment.
 		/// </summary>
@@ -1037,7 +1037,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsDocument");
 			}
 		}
-		
+
 		/// <summary>
 		/// MIME type of the note's attachment.
 		/// </summary>
@@ -1057,7 +1057,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("MimeType");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the note.
 		/// </summary>
@@ -1077,7 +1077,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the note was last modified.
 		/// </summary>
@@ -1097,7 +1097,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Text of the note.
 		/// </summary>
@@ -1117,7 +1117,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("NoteText");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the object with which the note is associated.
 		/// </summary>
@@ -1137,7 +1137,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ObjectId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type of entity with which the note is associated.
 		/// </summary>
@@ -1157,7 +1157,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ObjectTypeCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Subject associated with the note.
 		/// </summary>
@@ -1177,7 +1177,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Subject");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Account_Annotation
 		/// </summary>
@@ -1198,7 +1198,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Account_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 annotation_owning_user
 		/// </summary>
@@ -1219,7 +1219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("annotation_owning_user");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_annotations
 		/// </summary>
@@ -1240,7 +1240,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_annotations");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Contact_Annotation
 		/// </summary>
@@ -1261,7 +1261,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Contact_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_document_Annotations
 		/// </summary>
@@ -1282,7 +1282,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_document_Annotations");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_sanction_Annotations
 		/// </summary>
@@ -1303,7 +1303,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_sanction_Annotations");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Incident_Annotation
 		/// </summary>
@@ -1324,7 +1324,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Incident_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 IncidentResolution_Annotation
 		/// </summary>
@@ -1345,7 +1345,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IncidentResolution_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_annotationbase_createdby
 		/// </summary>
@@ -1366,7 +1366,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_annotationbase_createdonbehalfby
 		/// </summary>
@@ -1387,7 +1387,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_annotationbase_modifiedby
 		/// </summary>
@@ -1408,7 +1408,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_annotationbase_modifiedonbehalfby
 		/// </summary>
@@ -1429,7 +1429,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Task_Annotation
 		/// </summary>
@@ -1451,7 +1451,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Track changes to records for analysis, record keeping, and compliance.
 	/// </summary>
@@ -1459,7 +1459,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("audit")]
 	public partial class Audit : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the audit entity
 		/// </summary>
@@ -1477,30 +1477,30 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_audit_callinguserid = "lk_audit_callinguserid";
 			public const string lk_audit_userid = "lk_audit_userid";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Audit() : 
+		public Audit() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Audit";
-		
+
 		public const string PrimaryIdAttribute = "auditid";
-		
+
 		public const string EntityLogicalName = "audit";
-		
+
 		public const string EntityLogicalCollectionName = "audits";
-		
+
 		public const string EntitySetName = "audits";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -1509,7 +1509,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -1518,7 +1518,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Actions the user can perform that cause a change
 		/// </summary>
@@ -1538,7 +1538,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Action");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the auditing instance
 		/// </summary>
@@ -1566,7 +1566,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AuditId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("auditid")]
 		public override System.Guid Id
 		{
@@ -1581,7 +1581,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.AuditId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the calling user in case of an impersonated call
 		/// </summary>
@@ -1601,7 +1601,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CallingUserId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the audit record was created.
 		/// </summary>
@@ -1621,7 +1621,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the record that is being audited
 		/// </summary>
@@ -1641,7 +1641,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ObjectId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the entity that is being audited
 		/// </summary>
@@ -1661,7 +1661,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ObjectTypeCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// The action that causes the audit--it will be create, delete, update, upsert or archive
 		/// </summary>
@@ -1681,7 +1681,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Operation");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who caused a change
 		/// </summary>
@@ -1701,7 +1701,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("UserId");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_audit_callinguserid
 		/// </summary>
@@ -1722,7 +1722,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_audit_callinguserid");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_audit_userid
 		/// </summary>
@@ -1744,7 +1744,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Business, division, or department in the Microsoft Dynamics 365 database.
 	/// </summary>
@@ -1752,7 +1752,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("businessunit")]
 	public partial class BusinessUnit : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the businessunit entity
 		/// </summary>
@@ -1788,32 +1788,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_businessunitbase_createdby = "lk_businessunitbase_createdby";
 			public const string lk_businessunitbase_modifiedby = "lk_businessunitbase_modifiedby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public BusinessUnit() : 
+		public BusinessUnit() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "BusinessUnit";
-		
+
 		public const string PrimaryIdAttribute = "businessunitid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "businessunit";
-		
+
 		public const string EntityLogicalCollectionName = "businessunits";
-		
+
 		public const string EntitySetName = "businessunits";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -1822,7 +1822,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -1831,7 +1831,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the business unit.
 		/// </summary>
@@ -1859,7 +1859,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("BusinessUnitId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("businessunitid")]
 		public override System.Guid Id
 		{
@@ -1874,7 +1874,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.BusinessUnitId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_accounts
 		/// </summary>
@@ -1894,7 +1894,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_annotations
 		/// </summary>
@@ -1914,7 +1914,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_annotations");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_contacts
 		/// </summary>
@@ -1934,7 +1934,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_contacts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_businesseventaudit
 		/// </summary>
@@ -1954,7 +1954,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_businesseventaudit");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_document
 		/// </summary>
@@ -1974,7 +1974,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_induction
 		/// </summary>
@@ -1994,7 +1994,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_induction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_inductionperiod
 		/// </summary>
@@ -2014,7 +2014,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_initialteachertraining
 		/// </summary>
@@ -2034,7 +2034,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_initialteachertraining");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_integrationtransaction
 		/// </summary>
@@ -2054,7 +2054,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_integrationtransaction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_integrationtransactionrecord
 		/// </summary>
@@ -2074,7 +2074,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_integrationtransactionrecord");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_previousname
 		/// </summary>
@@ -2094,7 +2094,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_previousname");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_qtsregistration
 		/// </summary>
@@ -2114,7 +2114,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_qualification
 		/// </summary>
@@ -2134,7 +2134,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_sanction
 		/// </summary>
@@ -2154,7 +2154,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_sanction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_trsevent
 		/// </summary>
@@ -2174,7 +2174,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_trsevent");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_dfeta_trsoutboxmessage
 		/// </summary>
@@ -2194,7 +2194,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_trsoutboxmessage");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_incident_resolution_activities
 		/// </summary>
@@ -2214,7 +2214,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_incident_resolution_activities");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_incidents
 		/// </summary>
@@ -2234,7 +2234,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_incidents");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_parent_business_unit
 		/// </summary>
@@ -2254,7 +2254,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedbusiness_unit_parent_business_unit");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_roles
 		/// </summary>
@@ -2274,7 +2274,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_roles");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_system_users
 		/// </summary>
@@ -2294,7 +2294,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_system_users");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N business_unit_task_activities
 		/// </summary>
@@ -2314,7 +2314,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_task_activities");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_parent_business_unit
 		/// </summary>
@@ -2335,7 +2335,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingbusiness_unit_parent_business_unit");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_businessunit_createdonbehalfby
 		/// </summary>
@@ -2356,7 +2356,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_businessunit_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_businessunit_modifiedonbehalfby
 		/// </summary>
@@ -2377,7 +2377,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_businessunit_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_businessunitbase_createdby
 		/// </summary>
@@ -2398,7 +2398,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_businessunitbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_businessunitbase_modifiedby
 		/// </summary>
@@ -2420,18 +2420,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum ContactState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
 	/// Person with whom a business unit has a relationship, such as customer, supplier, and colleague.
 	/// </summary>
@@ -2439,7 +2439,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("contact")]
 	public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the contact entity
 		/// </summary>
@@ -2536,34 +2536,34 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string msa_contact_managingpartner = "msa_contact_managingpartner";
 			public const string system_user_contacts = "system_user_contacts";
 		}
-		
+
 		public const string AlternateKeys = "dfeta_trnrequestid";
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Contact() : 
+		public Contact() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Contact";
-		
+
 		public const string PrimaryIdAttribute = "contactid";
-		
+
 		public const string PrimaryNameAttribute = "fullname";
-		
+
 		public const string EntityLogicalName = "contact";
-		
+
 		public const string EntityLogicalCollectionName = "contacts";
-		
+
 		public const string EntitySetName = "contacts";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -2572,7 +2572,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -2581,7 +2581,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the city for the primary address.
 		/// </summary>
@@ -2601,7 +2601,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Address1_City");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the country or region for the primary address.
 		/// </summary>
@@ -2621,7 +2621,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Address1_Country");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the first line of the primary address.
 		/// </summary>
@@ -2641,7 +2641,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Address1_Line1");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the second line of the primary address.
 		/// </summary>
@@ -2661,7 +2661,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Address1_Line2");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the third line of the primary address.
 		/// </summary>
@@ -2681,7 +2681,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Address1_Line3");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the ZIP Code or postal code for the primary address.
 		/// </summary>
@@ -2701,7 +2701,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Address1_PostalCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Birth date of the contact.
 		/// </summary>
@@ -2721,7 +2721,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("BirthDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the contact.
 		/// </summary>
@@ -2749,7 +2749,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ContactId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("contactid")]
 		public override System.Guid Id
 		{
@@ -2764,7 +2764,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.ContactId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Shows who created the record.
 		/// </summary>
@@ -2784,7 +2784,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the contact was created.
 		/// </summary>
@@ -2804,9 +2804,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_allowidsigninwithprohibitions")]
 		public System.Nullable<bool> dfeta_AllowIDSignInWithProhibitions
@@ -2824,9 +2824,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_AllowIDSignInWithProhibitions");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_allowpiiupdatesfromregister")]
 		public System.Nullable<bool> dfeta_AllowPiiUpdatesFromRegister
@@ -2844,9 +2844,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_AllowPiiUpdatesFromRegister");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_capitatrnchangedon")]
 		public System.Nullable<System.DateTime> dfeta_CapitaTRNChangedOn
@@ -2864,9 +2864,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_CapitaTRNChangedOn");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_dateofdeath")]
 		public System.Nullable<System.DateTime> dfeta_DateofDeath
@@ -2884,9 +2884,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_DateofDeath");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
 		public System.Nullable<System.DateTime> dfeta_EYTSDate
@@ -2904,9 +2904,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EYTSDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_husid")]
 		public string dfeta_HUSID
@@ -2924,9 +2924,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HUSID");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionstatus")]
 		public virtual dfeta_InductionStatus? dfeta_InductionStatus
@@ -2944,9 +2944,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InductionStatus");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_lastidentityupdate")]
 		public System.Nullable<System.DateTime> dfeta_LastIdentityUpdate
@@ -2964,9 +2964,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_LastIdentityUpdate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_loginfailedcounter")]
 		public System.Nullable<int> dfeta_loginfailedcounter
@@ -2984,7 +2984,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_loginfailedcounter");
 			}
 		}
-		
+
 		/// <summary>
 		/// Merged With
 		/// </summary>
@@ -3004,9 +3004,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_MergedWith");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ninumber")]
 		public string dfeta_NINumber
@@ -3024,9 +3024,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NINumber");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previouslastname")]
 		public string dfeta_PreviousLastName
@@ -3044,9 +3044,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PreviousLastName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtlsdate")]
 		public System.Nullable<System.DateTime> dfeta_qtlsdate
@@ -3064,9 +3064,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_qtlsdate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtlsdatehasbeenset")]
 		public System.Nullable<bool> dfeta_QtlsDateHasBeenSet
@@ -3084,9 +3084,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_QtlsDateHasBeenSet");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsdate")]
 		public System.Nullable<System.DateTime> dfeta_QTSDate
@@ -3104,9 +3104,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_QTSDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_slugid")]
 		public string dfeta_SlugId
@@ -3124,9 +3124,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_SlugId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedfirstname")]
 		public string dfeta_StatedFirstName
@@ -3144,9 +3144,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StatedFirstName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedlastname")]
 		public string dfeta_StatedLastName
@@ -3164,9 +3164,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StatedLastName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedmiddlename")]
 		public string dfeta_StatedMiddleName
@@ -3184,9 +3184,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StatedMiddleName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trn")]
 		public string dfeta_TRN
@@ -3204,9 +3204,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TRN");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trnallocaterequest")]
 		public System.Nullable<System.DateTime> dfeta_TRNAllocateRequest
@@ -3224,9 +3224,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TRNAllocateRequest");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trnrequestid")]
 		public string dfeta_TrnRequestID
@@ -3244,9 +3244,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TrnRequestID");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trnrequired")]
 		public System.Nullable<bool> dfeta_trnrequired
@@ -3264,9 +3264,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_trnrequired");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trntoken")]
 		public string dfeta_TrnToken
@@ -3284,9 +3284,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TrnToken");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_tspersonid")]
 		public string dfeta_TSPersonID
@@ -3304,7 +3304,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TSPersonID");
 			}
 		}
-		
+
 		/// <summary>
 		/// First e-mail address for the contact.
 		/// </summary>
@@ -3324,7 +3324,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("EMailAddress1");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the secondary email address for the contact.
 		/// </summary>
@@ -3344,7 +3344,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("EMailAddress2");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the contact's first name to make sure the contact is addressed correctly in sales calls, email, and marketing campaigns.
 		/// </summary>
@@ -3364,7 +3364,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FirstName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Full name of the contact.
 		/// </summary>
@@ -3384,7 +3384,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FullName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Gender of the contact.
 		/// </summary>
@@ -3404,7 +3404,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("GenderCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the contact's last name to make sure the contact is addressed correctly in sales calls, email, and marketing campaigns.
 		/// </summary>
@@ -3424,7 +3424,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("LastName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the master contact for merge.
 		/// </summary>
@@ -3444,7 +3444,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("MasterId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Shows whether the account has been merged with a master contact.
 		/// </summary>
@@ -3464,7 +3464,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Merged");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type the contact's middle name or initial to make sure the contact is addressed correctly.
 		/// </summary>
@@ -3484,7 +3484,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("MiddleName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Mobile phone number for the contact.
 		/// </summary>
@@ -3504,7 +3504,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("MobilePhone");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the contact was last modified.
 		/// </summary>
@@ -3524,7 +3524,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the contact.
 		/// </summary>
@@ -3559,7 +3559,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the contact.
 		/// </summary>
@@ -3579,7 +3579,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// First telephone number for the contact.
 		/// </summary>
@@ -3599,7 +3599,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Telephone1");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N account_primary_contact
 		/// </summary>
@@ -3619,7 +3619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("account_primary_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Contact_Annotation
 		/// </summary>
@@ -3639,7 +3639,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Contact_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N contact_as_primary_contact
 		/// </summary>
@@ -3659,7 +3659,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_as_primary_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N contact_as_responsible_contact
 		/// </summary>
@@ -3679,7 +3679,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_as_responsible_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N contact_customer_contacts
 		/// </summary>
@@ -3699,7 +3699,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedcontact_customer_contacts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N contact_master_contact
 		/// </summary>
@@ -3719,7 +3719,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedcontact_master_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N contact_parent_contact
 		/// </summary>
@@ -3739,7 +3739,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedcontact_parent_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Contact_Tasks
 		/// </summary>
@@ -3759,7 +3759,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Contact_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_businesseventaudit_Person
 		/// </summary>
@@ -3779,7 +3779,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_businesseventaudit_Person");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_document
 		/// </summary>
@@ -3799,7 +3799,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_induction
 		/// </summary>
@@ -3819,7 +3819,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_induction1
 		/// </summary>
@@ -3839,7 +3839,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction1");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_inductionperiod
 		/// </summary>
@@ -3859,7 +3859,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_initialteachertraining
 		/// </summary>
@@ -3879,7 +3879,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_initialteachertraining1
 		/// </summary>
@@ -3899,7 +3899,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining1");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_integrationtransaction
 		/// </summary>
@@ -3919,7 +3919,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_integrationtransaction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_integrationtransactionrecor
 		/// </summary>
@@ -3939,7 +3939,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_integrationtransactionrecor");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_previousname
 		/// </summary>
@@ -3959,7 +3959,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_previousname");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_qtsregistration
 		/// </summary>
@@ -3979,7 +3979,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_qtsregistration1
 		/// </summary>
@@ -3999,7 +3999,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration1");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_qualification
 		/// </summary>
@@ -4019,7 +4019,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_sanction
 		/// </summary>
@@ -4039,7 +4039,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_sanction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_MergedWith_contact
 		/// </summary>
@@ -4059,7 +4059,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referenceddfeta_contact_MergedWith_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_contact_task_potentialduplicateid
 		/// </summary>
@@ -4079,7 +4079,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_task_potentialduplicateid");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N incident_customer_contacts
 		/// </summary>
@@ -4099,7 +4099,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("incident_customer_contacts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_contacts
 		/// </summary>
@@ -4120,7 +4120,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_contacts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 contact_customer_accounts
 		/// </summary>
@@ -4141,7 +4141,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_customer_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 contact_customer_contacts
 		/// </summary>
@@ -4162,7 +4162,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingcontact_customer_contacts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 contact_master_contact
 		/// </summary>
@@ -4183,7 +4183,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingcontact_master_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 contact_owning_user
 		/// </summary>
@@ -4204,7 +4204,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_owning_user");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 contact_parent_contact
 		/// </summary>
@@ -4225,7 +4225,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingcontact_parent_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_MergedWith_contact
 		/// </summary>
@@ -4246,7 +4246,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingdfeta_contact_MergedWith_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_country_contact1
 		/// </summary>
@@ -4267,7 +4267,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_country_contact1");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_qtsregistration_contact
 		/// </summary>
@@ -4288,7 +4288,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_contact_createdonbehalfby
 		/// </summary>
@@ -4309,7 +4309,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contact_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_contact_modifiedonbehalfby
 		/// </summary>
@@ -4330,7 +4330,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contact_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_contactbase_createdby
 		/// </summary>
@@ -4351,7 +4351,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contactbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_contactbase_modifiedby
 		/// </summary>
@@ -4372,7 +4372,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contactbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 msa_contact_managingpartner
 		/// </summary>
@@ -4393,7 +4393,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("msa_contact_managingpartner");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 system_user_contacts
 		/// </summary>
@@ -4415,26 +4415,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_businesseventauditState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_businesseventaudit")]
 	public partial class dfeta_businesseventaudit : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_businesseventaudit entity
 		/// </summary>
@@ -4456,32 +4456,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_businesseventaudit_modifiedonbehalfby = "lk_dfeta_businesseventaudit_modifiedonbehalfby";
 			public const string user_dfeta_businesseventaudit = "user_dfeta_businesseventaudit";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_businesseventaudit() : 
+		public dfeta_businesseventaudit() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_businesseventaudit";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_businesseventauditid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_changedfield";
-		
+
 		public const string EntityLogicalName = "dfeta_businesseventaudit";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_businesseventaudits";
-		
+
 		public const string EntitySetName = "dfeta_businesseventaudits";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -4490,7 +4490,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -4499,7 +4499,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the record.
 		/// </summary>
@@ -4519,7 +4519,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -4539,7 +4539,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -4559,9 +4559,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_changedfield");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_event")]
 		public virtual dfeta_businesseventaudit_dfeta_Event? dfeta_Event
@@ -4579,9 +4579,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Event");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newvalue")]
 		public string dfeta_NewValue
@@ -4599,9 +4599,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NewValue");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_oldvalue")]
 		public string dfeta_OldValue
@@ -4619,7 +4619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_OldValue");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Business Event Audit.
 		/// </summary>
@@ -4639,7 +4639,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Person");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Business Event Audit
 		/// </summary>
@@ -4674,7 +4674,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_businesseventaudit
 		/// </summary>
@@ -4695,7 +4695,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_businesseventaudit");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_businesseventaudit_Person
 		/// </summary>
@@ -4716,7 +4716,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_businesseventaudit_Person");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_businesseventaudit_createdby
 		/// </summary>
@@ -4737,7 +4737,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_businesseventaudit_createdonbehalfby
 		/// </summary>
@@ -4758,7 +4758,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_businesseventaudit_modifiedby
 		/// </summary>
@@ -4779,7 +4779,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_businesseventaudit_modifiedonbehalfby
 		/// </summary>
@@ -4800,7 +4800,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_businesseventaudit
 		/// </summary>
@@ -4822,26 +4822,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_countryState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_country")]
 	public partial class dfeta_country : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_country entity
 		/// </summary>
@@ -4858,32 +4858,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_country_modifiedby = "lk_dfeta_country_modifiedby";
 			public const string lk_dfeta_country_modifiedonbehalfby = "lk_dfeta_country_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_country() : 
+		public dfeta_country() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_country";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_countryid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_country";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_countries";
-		
+
 		public const string EntitySetName = "dfeta_countries";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -4892,7 +4892,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -4901,7 +4901,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -4921,9 +4921,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -4941,7 +4941,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Country
 		/// </summary>
@@ -4976,7 +4976,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_country_contact1
 		/// </summary>
@@ -4996,7 +4996,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_country_contact1");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_country_dfeta_initialteachertrainin
 		/// </summary>
@@ -5016,7 +5016,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_country_dfeta_initialteachertrainin");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_country_dfeta_qualification_he
 		/// </summary>
@@ -5036,7 +5036,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_country_dfeta_qualification_he");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_country_createdby
 		/// </summary>
@@ -5057,7 +5057,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_country_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_country_createdonbehalfby
 		/// </summary>
@@ -5078,7 +5078,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_country_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_country_modifiedby
 		/// </summary>
@@ -5099,7 +5099,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_country_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_country_modifiedonbehalfby
 		/// </summary>
@@ -5121,26 +5121,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_documentState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_document")]
 	public partial class dfeta_document : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_document entity
 		/// </summary>
@@ -5166,32 +5166,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_document_modifiedonbehalfby = "lk_dfeta_document_modifiedonbehalfby";
 			public const string user_dfeta_document = "user_dfeta_document";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_document() : 
+		public dfeta_document() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_document";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_documentid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_document";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_documents";
-		
+
 		public const string EntitySetName = "dfeta_documents";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -5200,7 +5200,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -5209,7 +5209,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Case associated with Document.
 		/// </summary>
@@ -5229,7 +5229,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_CaseId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -5257,7 +5257,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_documentId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_documentid")]
 		public override System.Guid Id
 		{
@@ -5272,7 +5272,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_documentId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -5292,7 +5292,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Document.
 		/// </summary>
@@ -5312,9 +5312,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_type")]
 		public virtual dfeta_DocumentType? dfeta_Type
@@ -5332,7 +5332,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Type");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Document
 		/// </summary>
@@ -5367,7 +5367,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the Document
 		/// </summary>
@@ -5387,7 +5387,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_document_Annotations
 		/// </summary>
@@ -5407,7 +5407,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_document_Annotations");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_document_Tasks
 		/// </summary>
@@ -5427,7 +5427,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_document_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_document
 		/// </summary>
@@ -5448,7 +5448,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_account_dfeta_document
 		/// </summary>
@@ -5469,7 +5469,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_document
 		/// </summary>
@@ -5490,7 +5490,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_incident_dfeta_document
 		/// </summary>
@@ -5511,7 +5511,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_incident_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_document_createdby
 		/// </summary>
@@ -5532,7 +5532,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_document_createdonbehalfby
 		/// </summary>
@@ -5553,7 +5553,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_document_modifiedby
 		/// </summary>
@@ -5574,7 +5574,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_document_modifiedonbehalfby
 		/// </summary>
@@ -5595,7 +5595,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_document
 		/// </summary>
@@ -5617,26 +5617,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_earlyyearsStatusState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_earlyyearsstatus")]
 	public partial class dfeta_earlyyearsstatus : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_earlyyearsstatus entity
 		/// </summary>
@@ -5651,32 +5651,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_earlyyearsstatus_modifiedby = "lk_dfeta_earlyyearsstatus_modifiedby";
 			public const string lk_dfeta_earlyyearsstatus_modifiedonbehalfby = "lk_dfeta_earlyyearsstatus_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_earlyyearsstatus() : 
+		public dfeta_earlyyearsstatus() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_earlyyearsstatus";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_earlyyearsstatusid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_earlyyearsstatus";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_earlyyearsstatuses";
-		
+
 		public const string EntitySetName = "dfeta_earlyyearsstatuses";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -5685,7 +5685,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -5694,7 +5694,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -5714,9 +5714,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -5734,7 +5734,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Early Years Status
 		/// </summary>
@@ -5769,7 +5769,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId
 		/// </summary>
@@ -5789,7 +5789,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_earlyyearsstatus_createdby
 		/// </summary>
@@ -5810,7 +5810,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_earlyyearsstatus_createdonbehalfby
 		/// </summary>
@@ -5831,7 +5831,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_earlyyearsstatus_modifiedby
 		/// </summary>
@@ -5852,7 +5852,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_earlyyearsstatus_modifiedonbehalfby
 		/// </summary>
@@ -5874,26 +5874,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_hequalificationState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_hequalification")]
 	public partial class dfeta_hequalification : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_hequalification entity
 		/// </summary>
@@ -5910,32 +5910,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_hequalification_modifiedby = "lk_dfeta_hequalification_modifiedby";
 			public const string lk_dfeta_hequalification_modifiedonbehalfby = "lk_dfeta_hequalification_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_hequalification() : 
+		public dfeta_hequalification() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_hequalification";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_hequalificationid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_hequalification";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_hequalifications";
-		
+
 		public const string EntitySetName = "dfeta_hequalifications";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -5944,7 +5944,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -5953,7 +5953,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -5981,7 +5981,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_hequalificationId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hequalificationid")]
 		public override System.Guid Id
 		{
@@ -5996,7 +5996,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_hequalificationId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -6016,9 +6016,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -6036,7 +6036,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Qualification - HE
 		/// </summary>
@@ -6071,7 +6071,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_hequalification_dfeta_qualification
 		/// </summary>
@@ -6091,7 +6091,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hequalification_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hequalification_createdby
 		/// </summary>
@@ -6112,7 +6112,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hequalification_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hequalification_createdonbehalfby
 		/// </summary>
@@ -6133,7 +6133,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hequalification_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hequalification_modifiedby
 		/// </summary>
@@ -6154,7 +6154,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hequalification_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hequalification_modifiedonbehalfby
 		/// </summary>
@@ -6176,26 +6176,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_hesubjectState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_hesubject")]
 	public partial class dfeta_hesubject : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_hesubject entity
 		/// </summary>
@@ -6214,32 +6214,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_hesubject_modifiedby = "lk_dfeta_hesubject_modifiedby";
 			public const string lk_dfeta_hesubject_modifiedonbehalfby = "lk_dfeta_hesubject_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_hesubject() : 
+		public dfeta_hesubject() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_hesubject";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_hesubjectid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_hesubject";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_hesubjects";
-		
+
 		public const string EntitySetName = "dfeta_hesubjects";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -6248,7 +6248,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -6257,7 +6257,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -6285,7 +6285,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_hesubjectId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hesubjectid")]
 		public override System.Guid Id
 		{
@@ -6300,7 +6300,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_hesubjectId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -6320,9 +6320,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -6340,7 +6340,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the HE Subject
 		/// </summary>
@@ -6375,7 +6375,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_hesubject_dfeta_qualification1
 		/// </summary>
@@ -6395,7 +6395,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification1");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_hesubject_dfeta_qualification2
 		/// </summary>
@@ -6415,7 +6415,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification2");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_hesubject_dfeta_qualification3
 		/// </summary>
@@ -6435,7 +6435,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification3");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hesubject_createdby
 		/// </summary>
@@ -6456,7 +6456,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hesubject_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hesubject_createdonbehalfby
 		/// </summary>
@@ -6477,7 +6477,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hesubject_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hesubject_modifiedby
 		/// </summary>
@@ -6498,7 +6498,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hesubject_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_hesubject_modifiedonbehalfby
 		/// </summary>
@@ -6520,26 +6520,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_inductionState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_induction")]
 	public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_induction entity
 		/// </summary>
@@ -6569,32 +6569,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_induction_modifiedonbehalfby = "lk_dfeta_induction_modifiedonbehalfby";
 			public const string user_dfeta_induction = "user_dfeta_induction";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_induction() : 
+		public dfeta_induction() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_induction";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_inductionid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_induction";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_inductions";
-		
+
 		public const string EntitySetName = "dfeta_inductions";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -6603,7 +6603,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -6612,7 +6612,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the record.
 		/// </summary>
@@ -6632,7 +6632,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -6652,9 +6652,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_completiondate")]
 		public System.Nullable<System.DateTime> dfeta_CompletionDate
@@ -6672,9 +6672,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_CompletionDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionexemptionreason")]
 		public virtual dfeta_InductionExemptionReason? dfeta_InductionExemptionReason
@@ -6692,7 +6692,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InductionExemptionReason");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -6720,7 +6720,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_inductionId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
 		public override System.Guid Id
 		{
@@ -6735,9 +6735,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_inductionId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionstatus")]
 		public virtual dfeta_InductionStatus? dfeta_InductionStatus
@@ -6755,7 +6755,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InductionStatus");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Induction.
 		/// </summary>
@@ -6775,9 +6775,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_startdate")]
 		public System.Nullable<System.DateTime> dfeta_StartDate
@@ -6795,7 +6795,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StartDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was modified.
 		/// </summary>
@@ -6815,7 +6815,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Induction
 		/// </summary>
@@ -6850,7 +6850,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the Induction
 		/// </summary>
@@ -6870,7 +6870,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_induction_dfeta_inductionperiod
 		/// </summary>
@@ -6890,7 +6890,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_induction_dfeta_integrationtransact
 		/// </summary>
@@ -6910,7 +6910,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_integrationtransact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_induction_dfeta_qtsregistration
 		/// </summary>
@@ -6930,7 +6930,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_induction
 		/// </summary>
@@ -6951,7 +6951,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_induction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_induction
 		/// </summary>
@@ -6972,7 +6972,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_induction1
 		/// </summary>
@@ -6993,7 +6993,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction1");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_induction_createdby
 		/// </summary>
@@ -7014,7 +7014,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_induction_createdonbehalfby
 		/// </summary>
@@ -7035,7 +7035,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_induction_modifiedby
 		/// </summary>
@@ -7056,7 +7056,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_induction_modifiedonbehalfby
 		/// </summary>
@@ -7077,7 +7077,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_induction
 		/// </summary>
@@ -7099,26 +7099,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_inductionperiodState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_inductionperiod")]
 	public partial class dfeta_inductionperiod : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_inductionperiod entity
 		/// </summary>
@@ -7143,32 +7143,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_inductionperiod_modifiedonbehalfby = "lk_dfeta_inductionperiod_modifiedonbehalfby";
 			public const string user_dfeta_inductionperiod = "user_dfeta_inductionperiod";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_inductionperiod() : 
+		public dfeta_inductionperiod() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_inductionperiod";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_inductionperiodid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_inductionperiod";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_inductionperiods";
-		
+
 		public const string EntitySetName = "dfeta_inductionperiods";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -7177,7 +7177,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -7186,7 +7186,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Organisation associated with Induction Period.
 		/// </summary>
@@ -7206,9 +7206,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_AppropriateBodyId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_enddate")]
 		public System.Nullable<System.DateTime> dfeta_EndDate
@@ -7226,7 +7226,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EndDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Induction associated with Induction Period.
 		/// </summary>
@@ -7246,7 +7246,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InductionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -7274,7 +7274,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_inductionperiodId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionperiodid")]
 		public override System.Guid Id
 		{
@@ -7289,9 +7289,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_inductionperiodId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_numberofterms")]
 		public System.Nullable<int> dfeta_Numberofterms
@@ -7309,9 +7309,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Numberofterms");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_startdate")]
 		public System.Nullable<System.DateTime> dfeta_StartDate
@@ -7329,7 +7329,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StartDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Induction Period
 		/// </summary>
@@ -7364,7 +7364,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_inductionperiod_dfeta_integrationtr
 		/// </summary>
@@ -7384,7 +7384,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_inductionperiod_dfeta_integrationtr");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_inductionperiod
 		/// </summary>
@@ -7405,7 +7405,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_account_dfeta_inductionperiod
 		/// </summary>
@@ -7426,7 +7426,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_inductionperiod
 		/// </summary>
@@ -7447,7 +7447,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_induction_dfeta_inductionperiod
 		/// </summary>
@@ -7468,7 +7468,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_inductionperiod_createdby
 		/// </summary>
@@ -7489,7 +7489,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_inductionperiod_createdonbehalfby
 		/// </summary>
@@ -7510,7 +7510,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_inductionperiod_modifiedby
 		/// </summary>
@@ -7531,7 +7531,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_inductionperiod_modifiedonbehalfby
 		/// </summary>
@@ -7552,7 +7552,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_inductionperiod
 		/// </summary>
@@ -7574,26 +7574,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_initialteachertrainingState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_initialteachertraining")]
 	public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_initialteachertraining entity
 		/// </summary>
@@ -7635,32 +7635,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_initialteachertraining_modifiedonbehalfby = "lk_dfeta_initialteachertraining_modifiedonbehalfby";
 			public const string user_dfeta_initialteachertraining = "user_dfeta_initialteachertraining";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_initialteachertraining() : 
+		public dfeta_initialteachertraining() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_initialteachertraining";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_initialteachertrainingid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_initialteachertraining";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_initialteachertrainings";
-		
+
 		public const string EntitySetName = "dfeta_initialteachertrainings";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -7669,7 +7669,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -7678,9 +7678,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_agerangefrom")]
 		public virtual dfeta_AgeRange? dfeta_AgeRangeFrom
@@ -7698,9 +7698,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_AgeRangeFrom");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_agerangeto")]
 		public virtual dfeta_AgeRange? dfeta_AgeRangeTo
@@ -7718,9 +7718,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_AgeRangeTo");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_cohortyear")]
 		public string dfeta_CohortYear
@@ -7738,7 +7738,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_CohortYear");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for *Country associated with Initial Teacher Training.
 		/// </summary>
@@ -7758,7 +7758,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_CountryId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Organisation associated with Initial Teacher Training.
 		/// </summary>
@@ -7778,9 +7778,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EstablishmentId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittqualificationaim")]
 		public virtual dfeta_ITTQualificationAim? dfeta_ittqualificationaim
@@ -7798,7 +7798,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_ittqualificationaim");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Qualification - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -7818,7 +7818,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_ITTQualificationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Initial Teacher Training.
 		/// </summary>
@@ -7838,9 +7838,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_programmeenddate")]
 		public System.Nullable<System.DateTime> dfeta_ProgrammeEndDate
@@ -7858,9 +7858,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_ProgrammeEndDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_programmestartdate")]
 		public System.Nullable<System.DateTime> dfeta_ProgrammeStartDate
@@ -7878,9 +7878,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_ProgrammeStartDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_programmetype")]
 		public virtual dfeta_ITTProgrammeType? dfeta_ProgrammeType
@@ -7898,9 +7898,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_ProgrammeType");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsregistration")]
 		public Microsoft.Xrm.Sdk.EntityReference dfeta_qtsregistration
@@ -7918,9 +7918,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_result")]
 		public virtual dfeta_ITTResult? dfeta_Result
@@ -7938,9 +7938,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Result");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_slugid")]
 		public string dfeta_SlugId
@@ -7958,7 +7958,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_SlugId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Subject - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -7978,7 +7978,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Subject1Id");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Subject - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -7998,7 +7998,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Subject2Id");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Subject - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -8018,9 +8018,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Subject3Id");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_traineeid")]
 		public string dfeta_TraineeID
@@ -8038,7 +8038,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TraineeID");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Initial Teacher Training
 		/// </summary>
@@ -8073,7 +8073,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_initialteachertraining_dfeta_integr
 		/// </summary>
@@ -8093,7 +8093,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_initialteachertraining_dfeta_integr");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_initialteachertraining
 		/// </summary>
@@ -8114,7 +8114,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_initialteachertraining");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_account_dfeta_initialteachertraining
 		/// </summary>
@@ -8135,7 +8135,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_initialteachertraining");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_initialteachertraining
 		/// </summary>
@@ -8156,7 +8156,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_initialteachertraining1
 		/// </summary>
@@ -8177,7 +8177,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining1");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_country_dfeta_initialteachertrainin
 		/// </summary>
@@ -8198,7 +8198,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_country_dfeta_initialteachertrainin");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_ittqualification_dfeta_initialteach
 		/// </summary>
@@ -8219,7 +8219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittqualification_dfeta_initialteach");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_ittsubject1_dfeta_initialteachertra
 		/// </summary>
@@ -8240,7 +8240,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_ittsubject2_dfeta_initialteachertra
 		/// </summary>
@@ -8261,7 +8261,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_ittsubject3_dfeta_initialteachertra
 		/// </summary>
@@ -8282,7 +8282,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration
 		/// </summary>
@@ -8303,7 +8303,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_initialteachertraining_createdby
 		/// </summary>
@@ -8324,7 +8324,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_initialteachertraining_createdonbehalfby
 		/// </summary>
@@ -8345,7 +8345,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_initialteachertraining_modifiedby
 		/// </summary>
@@ -8366,7 +8366,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_initialteachertraining_modifiedonbehalfby
 		/// </summary>
@@ -8387,7 +8387,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_initialteachertraining
 		/// </summary>
@@ -8409,26 +8409,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_integrationtransactionState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_integrationtransaction")]
 	public partial class dfeta_integrationtransaction : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_integrationtransaction entity
 		/// </summary>
@@ -8460,32 +8460,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_integrationtransaction_modifiedonbehalfby = "lk_dfeta_integrationtransaction_modifiedonbehalfby";
 			public const string user_dfeta_integrationtransaction = "user_dfeta_integrationtransaction";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_integrationtransaction() : 
+		public dfeta_integrationtransaction() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_integrationtransaction";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_integrationtransactionid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_id";
-		
+
 		public const string EntityLogicalName = "dfeta_integrationtransaction";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_integrationtransactions";
-		
+
 		public const string EntitySetName = "dfeta_integrationtransactions";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -8494,7 +8494,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -8503,7 +8503,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the record.
 		/// </summary>
@@ -8523,7 +8523,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -8543,9 +8543,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_duplicatecount")]
 		public System.Nullable<int> dfeta_DuplicateCount
@@ -8563,9 +8563,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_DuplicateCount");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_enddate")]
 		public System.Nullable<System.DateTime> dfeta_EndDate
@@ -8583,9 +8583,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EndDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_failurecount")]
 		public System.Nullable<int> dfeta_FailureCount
@@ -8603,9 +8603,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_FailureCount");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_failuremessage")]
 		public string dfeta_FailureMessage
@@ -8623,9 +8623,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_FailureMessage");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_filename")]
 		public string dfeta_Filename
@@ -8643,7 +8643,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Filename");
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -8663,7 +8663,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_id");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Organisation associated with Integration Transaction.
 		/// </summary>
@@ -8683,7 +8683,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_ImportOrganisation");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -8711,7 +8711,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_integrationtransactionId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_integrationtransactionid")]
 		public override System.Guid Id
 		{
@@ -8726,9 +8726,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_integrationtransactionId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_interface")]
 		public virtual dfeta_IntegrationInterface? dfeta_Interface
@@ -8746,9 +8746,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Interface");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_startdate")]
 		public System.Nullable<System.DateTime> dfeta_StartDate
@@ -8766,9 +8766,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StartDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_successcount")]
 		public System.Nullable<int> dfeta_SuccessCount
@@ -8786,9 +8786,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_SuccessCount");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_totalcount")]
 		public System.Nullable<int> dfeta_TotalCount
@@ -8806,7 +8806,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TotalCount");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Integration Transaction
 		/// </summary>
@@ -8841,7 +8841,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_integrationtransaction_dfeta_integr
 		/// </summary>
@@ -8861,7 +8861,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_integrationtransaction_dfeta_integr");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_integrationtransaction
 		/// </summary>
@@ -8882,7 +8882,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_integrationtransaction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_account_dfeta_integrationtransaction
 		/// </summary>
@@ -8903,7 +8903,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_integrationtransaction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_integrationtransaction
 		/// </summary>
@@ -8924,7 +8924,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_integrationtransaction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransaction_createdby
 		/// </summary>
@@ -8945,7 +8945,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransaction_createdonbehalfby
 		/// </summary>
@@ -8966,7 +8966,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransaction_modifiedby
 		/// </summary>
@@ -8987,7 +8987,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransaction_modifiedonbehalfby
 		/// </summary>
@@ -9008,7 +9008,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_integrationtransaction
 		/// </summary>
@@ -9030,26 +9030,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_integrationtransactionrecordState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_integrationtransactionrecord")]
 	public partial class dfeta_integrationtransactionrecord : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_integrationtransactionrecord entity
 		/// </summary>
@@ -9087,32 +9087,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_integrationtransactionrecord_modifiedonbehalfby = "lk_dfeta_integrationtransactionrecord_modifiedonbehalfby";
 			public const string user_dfeta_integrationtransactionrecord = "user_dfeta_integrationtransactionrecord";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_integrationtransactionrecord() : 
+		public dfeta_integrationtransactionrecord() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_integrationtransactionrecord";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_integrationtransactionrecordid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_id";
-		
+
 		public const string EntityLogicalName = "dfeta_integrationtransactionrecord";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_integrationtransactionrecords";
-		
+
 		public const string EntitySetName = "dfeta_integrationtransactionrecords";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -9121,7 +9121,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -9130,9 +9130,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_duplicatestatus")]
 		public virtual dfeta_integrationtransactionrecord_dfeta_DuplicateStatus? dfeta_DuplicateStatus
@@ -9150,9 +9150,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_DuplicateStatus");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_failuremessage")]
 		public string dfeta_FailureMessage
@@ -9170,9 +9170,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_FailureMessage");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_filename")]
 		public string dfeta_Filename
@@ -9190,7 +9190,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Filename");
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -9210,7 +9210,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_id");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Induction associated with Integration Transaction Record.
 		/// </summary>
@@ -9230,7 +9230,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InductionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Induction Period associated with Integration Transaction Record.
 		/// </summary>
@@ -9250,7 +9250,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InductionPeriodId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Initial Teacher Training associated with Integration Transaction Record.
 		/// </summary>
@@ -9270,7 +9270,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InitialTeacherTrainingId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Integration Transaction associated with Integration Transaction Record.
 		/// </summary>
@@ -9290,7 +9290,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_IntegrationTransactionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -9318,7 +9318,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_integrationtransactionrecordId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_integrationtransactionrecordid")]
 		public override System.Guid Id
 		{
@@ -9333,7 +9333,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_integrationtransactionrecordId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Organisation associated with Integration Transaction Record.
 		/// </summary>
@@ -9353,7 +9353,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_OrganisationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Integration Transaction Record.
 		/// </summary>
@@ -9373,7 +9373,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Qualification associated with Integration Transaction Record.
 		/// </summary>
@@ -9393,9 +9393,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_QualificationId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_rowdata")]
 		public string dfeta_RowData
@@ -9413,9 +9413,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_RowData");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trefno")]
 		public string dfeta_TREFNO
@@ -9433,9 +9433,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TREFNO");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ukprn")]
 		public string dfeta_UKPRN
@@ -9453,7 +9453,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_UKPRN");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Integration Transaction Record
 		/// </summary>
@@ -9488,7 +9488,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the Integration Transaction Record
 		/// </summary>
@@ -9508,7 +9508,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_integrationtransactionrecord
 		/// </summary>
@@ -9529,7 +9529,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_integrationtransactionrecord");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_account_dfeta_integrationtransactionrecor
 		/// </summary>
@@ -9550,7 +9550,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_integrationtransactionrecor");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_integrationtransactionrecor
 		/// </summary>
@@ -9571,7 +9571,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_integrationtransactionrecor");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_induction_dfeta_integrationtransact
 		/// </summary>
@@ -9592,7 +9592,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_integrationtransact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_inductionperiod_dfeta_integrationtr
 		/// </summary>
@@ -9613,7 +9613,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_inductionperiod_dfeta_integrationtr");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_initialteachertraining_dfeta_integr
 		/// </summary>
@@ -9634,7 +9634,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_initialteachertraining_dfeta_integr");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_integrationtransaction_dfeta_integr
 		/// </summary>
@@ -9655,7 +9655,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_integrationtransaction_dfeta_integr");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_qualification_dfeta_integrationtran
 		/// </summary>
@@ -9676,7 +9676,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_qualification_dfeta_integrationtran");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransactionrecord_createdby
 		/// </summary>
@@ -9697,7 +9697,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransactionrecord_createdonbehalfby
 		/// </summary>
@@ -9718,7 +9718,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransactionrecord_modifiedby
 		/// </summary>
@@ -9739,7 +9739,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_integrationtransactionrecord_modifiedonbehalfby
 		/// </summary>
@@ -9760,7 +9760,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_integrationtransactionrecord
 		/// </summary>
@@ -9782,26 +9782,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ittqualificationState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_ittqualification")]
 	public partial class dfeta_ittqualification : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_ittqualification entity
 		/// </summary>
@@ -9816,32 +9816,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_ittqualification_modifiedby = "lk_dfeta_ittqualification_modifiedby";
 			public const string lk_dfeta_ittqualification_modifiedonbehalfby = "lk_dfeta_ittqualification_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_ittqualification() : 
+		public dfeta_ittqualification() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_ittqualification";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_ittqualificationid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_ittqualification";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_ittqualifications";
-		
+
 		public const string EntitySetName = "dfeta_ittqualifications";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -9850,7 +9850,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -9859,7 +9859,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -9879,9 +9879,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -9899,7 +9899,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the ITT Qualification
 		/// </summary>
@@ -9934,7 +9934,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_ittqualification_dfeta_initialteach
 		/// </summary>
@@ -9954,7 +9954,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittqualification_dfeta_initialteach");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittqualification_createdby
 		/// </summary>
@@ -9975,7 +9975,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittqualification_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittqualification_createdonbehalfby
 		/// </summary>
@@ -9996,7 +9996,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittqualification_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittqualification_modifiedby
 		/// </summary>
@@ -10017,7 +10017,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittqualification_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittqualification_modifiedonbehalfby
 		/// </summary>
@@ -10039,26 +10039,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ittsubjectState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_ittsubject")]
 	public partial class dfeta_ittsubject : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_ittsubject entity
 		/// </summary>
@@ -10075,32 +10075,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_ittsubject_modifiedby = "lk_dfeta_ittsubject_modifiedby";
 			public const string lk_dfeta_ittsubject_modifiedonbehalfby = "lk_dfeta_ittsubject_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_ittsubject() : 
+		public dfeta_ittsubject() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_ittsubject";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_ittsubjectid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_ittsubject";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_ittsubjects";
-		
+
 		public const string EntitySetName = "dfeta_ittsubjects";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -10109,7 +10109,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -10118,7 +10118,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -10138,9 +10138,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -10158,7 +10158,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the ITT Subject
 		/// </summary>
@@ -10193,7 +10193,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_ittsubject1_dfeta_initialteachertra
 		/// </summary>
@@ -10213,7 +10213,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_ittsubject2_dfeta_initialteachertra
 		/// </summary>
@@ -10233,7 +10233,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_ittsubject3_dfeta_initialteachertra
 		/// </summary>
@@ -10253,7 +10253,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittsubject_createdby
 		/// </summary>
@@ -10274,7 +10274,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittsubject_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittsubject_createdonbehalfby
 		/// </summary>
@@ -10295,7 +10295,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittsubject_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittsubject_modifiedby
 		/// </summary>
@@ -10316,7 +10316,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_ittsubject_modifiedonbehalfby
 		/// </summary>
@@ -10338,26 +10338,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_mqestablishmentState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_mqestablishment")]
 	public partial class dfeta_mqestablishment : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_mqestablishment entity
 		/// </summary>
@@ -10374,32 +10374,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_mqestablishment_modifiedby = "lk_dfeta_mqestablishment_modifiedby";
 			public const string lk_dfeta_mqestablishment_modifiedonbehalfby = "lk_dfeta_mqestablishment_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_mqestablishment() : 
+		public dfeta_mqestablishment() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_mqestablishment";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_mqestablishmentid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_mqestablishment";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_mqestablishments";
-		
+
 		public const string EntitySetName = "dfeta_mqestablishments";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -10408,7 +10408,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -10417,7 +10417,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -10445,7 +10445,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_mqestablishmentId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mqestablishmentid")]
 		public override System.Guid Id
 		{
@@ -10460,7 +10460,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_mqestablishmentId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -10480,9 +10480,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -10500,7 +10500,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the MQ Establishment
 		/// </summary>
@@ -10535,7 +10535,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_mqestablishment_dfeta_qualification
 		/// </summary>
@@ -10555,7 +10555,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_mqestablishment_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_mqestablishment_createdby
 		/// </summary>
@@ -10576,7 +10576,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_mqestablishment_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_mqestablishment_createdonbehalfby
 		/// </summary>
@@ -10597,7 +10597,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_mqestablishment_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_mqestablishment_modifiedby
 		/// </summary>
@@ -10618,7 +10618,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_mqestablishment_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_mqestablishment_modifiedonbehalfby
 		/// </summary>
@@ -10640,26 +10640,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_previousnameState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_previousname")]
 	public partial class dfeta_previousname : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_previousname entity
 		/// </summary>
@@ -10681,32 +10681,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_previousname_modifiedonbehalfby = "lk_dfeta_previousname_modifiedonbehalfby";
 			public const string user_dfeta_previousname = "user_dfeta_previousname";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_previousname() : 
+		public dfeta_previousname() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_previousname";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_previousnameid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_previousname";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_previousnames";
-		
+
 		public const string EntitySetName = "dfeta_previousnames";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -10715,7 +10715,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -10724,7 +10724,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -10744,9 +10744,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_changedon")]
 		public System.Nullable<System.DateTime> dfeta_ChangedOn
@@ -10764,7 +10764,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_ChangedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -10784,7 +10784,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Previous Name.
 		/// </summary>
@@ -10804,7 +10804,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -10832,7 +10832,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_previousnameId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previousnameid")]
 		public override System.Guid Id
 		{
@@ -10847,9 +10847,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_previousnameId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_type")]
 		public virtual dfeta_NameType? dfeta_Type
@@ -10867,7 +10867,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Type");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Previous Name
 		/// </summary>
@@ -10902,7 +10902,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_previousname
 		/// </summary>
@@ -10923,7 +10923,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_previousname");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_previousname
 		/// </summary>
@@ -10944,7 +10944,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_previousname");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_previousname_createdby
 		/// </summary>
@@ -10965,7 +10965,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_previousname_createdonbehalfby
 		/// </summary>
@@ -10986,7 +10986,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_previousname_modifiedby
 		/// </summary>
@@ -11007,7 +11007,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_previousname_modifiedonbehalfby
 		/// </summary>
@@ -11028,7 +11028,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_previousname
 		/// </summary>
@@ -11050,26 +11050,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_qtsregistrationState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_qtsregistration")]
 	public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_qtsregistration entity
 		/// </summary>
@@ -11101,32 +11101,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_qtsregistration_modifiedonbehalfby = "lk_dfeta_qtsregistration_modifiedonbehalfby";
 			public const string user_dfeta_qtsregistration = "user_dfeta_qtsregistration";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_qtsregistration() : 
+		public dfeta_qtsregistration() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_qtsregistration";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_qtsregistrationid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_qtsregistration";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_qtsregistrations";
-		
+
 		public const string EntitySetName = "dfeta_qtsregistrations";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -11135,7 +11135,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -11144,7 +11144,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -11164,7 +11164,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date field for EEA teachers to teach SEN children
 		/// </summary>
@@ -11184,7 +11184,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_DateofRecognition");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Early Years Status associated with QTS Registration.
 		/// </summary>
@@ -11204,9 +11204,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EarlyYearsStatusId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
 		public System.Nullable<System.DateTime> dfeta_EYTSDate
@@ -11224,7 +11224,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EYTSDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Induction associated with QTS.
 		/// </summary>
@@ -11244,7 +11244,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_InductionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -11264,7 +11264,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with QTS Registration.
 		/// </summary>
@@ -11284,9 +11284,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsdate")]
 		public System.Nullable<System.DateTime> dfeta_QTSDate
@@ -11304,7 +11304,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_QTSDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -11332,7 +11332,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_qtsregistrationId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsregistrationid")]
 		public override System.Guid Id
 		{
@@ -11347,7 +11347,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_qtsregistrationId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Teacher Status associated with QTS Registration.
 		/// </summary>
@@ -11367,7 +11367,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TeacherStatusId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the QTS Registration
 		/// </summary>
@@ -11402,7 +11402,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_qtsregistration_contact
 		/// </summary>
@@ -11422,7 +11422,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration
 		/// </summary>
@@ -11442,7 +11442,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_qtsregistration
 		/// </summary>
@@ -11463,7 +11463,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_qtsregistration
 		/// </summary>
@@ -11484,7 +11484,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_qtsregistration1
 		/// </summary>
@@ -11505,7 +11505,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration1");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId
 		/// </summary>
@@ -11526,7 +11526,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_induction_dfeta_qtsregistration
 		/// </summary>
@@ -11547,7 +11547,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_teacherstatus_dfeta_qtsregistration
 		/// </summary>
@@ -11568,7 +11568,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_teacherstatus_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qtsregistration_createdby
 		/// </summary>
@@ -11589,7 +11589,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qtsregistration_createdonbehalfby
 		/// </summary>
@@ -11610,7 +11610,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qtsregistration_modifiedby
 		/// </summary>
@@ -11631,7 +11631,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qtsregistration_modifiedonbehalfby
 		/// </summary>
@@ -11652,7 +11652,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_qtsregistration
 		/// </summary>
@@ -11674,26 +11674,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_qualificationState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_qualification")]
 	public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_qualification entity
 		/// </summary>
@@ -11760,32 +11760,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_qualification_modifiedonbehalfby = "lk_dfeta_qualification_modifiedonbehalfby";
 			public const string user_dfeta_qualification = "user_dfeta_qualification";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_qualification() : 
+		public dfeta_qualification() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_qualification";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_qualificationid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_qualification";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_qualifications";
-		
+
 		public const string EntitySetName = "dfeta_qualifications";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -11794,7 +11794,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -11803,7 +11803,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the record.
 		/// </summary>
@@ -11823,7 +11823,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -11843,9 +11843,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_completionorawarddate")]
 		public System.Nullable<System.DateTime> dfeta_CompletionorAwardDate
@@ -11863,9 +11863,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_CompletionorAwardDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_createdbyapi")]
 		public System.Nullable<bool> dfeta_createdbyapi
@@ -11883,9 +11883,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_createdbyapi");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_classdivision")]
 		public virtual dfeta_classdivision? dfeta_HE_ClassDivision
@@ -11903,9 +11903,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_ClassDivision");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_completiondate")]
 		public System.Nullable<System.DateTime> dfeta_HE_CompletionDate
@@ -11923,7 +11923,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_CompletionDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Country associated with Qualification.
 		/// </summary>
@@ -11943,7 +11943,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_CountryId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Organisation associated with Qualification.
 		/// </summary>
@@ -11963,7 +11963,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_EstablishmentId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for HE Qualification associated with Qualification.
 		/// </summary>
@@ -11983,7 +11983,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_HEQualificationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for HE Subject associated with Qualification.
 		/// </summary>
@@ -12003,7 +12003,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_HESubject1Id");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for HE Subject associated with Qualification.
 		/// </summary>
@@ -12023,7 +12023,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_HESubject2Id");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for HE Subject associated with Qualification.
 		/// </summary>
@@ -12043,9 +12043,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_HE_HESubject3Id");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_date")]
 		public System.Nullable<System.DateTime> dfeta_MQ_Date
@@ -12063,7 +12063,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_MQ_Date");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for MQ Establishment associated with Qualification.
 		/// </summary>
@@ -12083,7 +12083,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_MQ_MQEstablishmentId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Specialism associated with Qualification.
 		/// </summary>
@@ -12103,9 +12103,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_MQ_SpecialismId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_status")]
 		public virtual dfeta_qualification_dfeta_MQ_Status? dfeta_MQ_Status
@@ -12123,9 +12123,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_MQ_Status");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mqstartdate")]
 		public System.Nullable<System.DateTime> dfeta_MQStartDate
@@ -12143,7 +12143,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_MQStartDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -12163,9 +12163,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqel_awarded")]
 		public System.Nullable<bool> dfeta_NPQEL_Awarded
@@ -12183,9 +12183,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NPQEL_Awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqel_date")]
 		public System.Nullable<System.DateTime> dfeta_NPQEL_Date
@@ -12203,9 +12203,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NPQEL_Date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqeyl_awarded")]
 		public System.Nullable<bool> dfeta_npqeyl_awarded
@@ -12223,9 +12223,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqeyl_awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqeyl_date")]
 		public System.Nullable<System.DateTime> dfeta_npqeyl_date
@@ -12243,9 +12243,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqeyl_date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqh_awarded")]
 		public System.Nullable<bool> dfeta_NPQH_Awarded
@@ -12263,9 +12263,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NPQH_Awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqh_date")]
 		public System.Nullable<System.DateTime> dfeta_NPQH_Date
@@ -12283,9 +12283,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NPQH_Date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlbc_awarded")]
 		public System.Nullable<bool> dfeta_npqlbc_awarded
@@ -12303,9 +12303,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqlbc_awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlbc_date")]
 		public System.Nullable<System.DateTime> dfeta_npqlbc_date
@@ -12323,9 +12323,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqlbc_date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqll_awarded")]
 		public System.Nullable<bool> dfeta_npqll_awarded
@@ -12343,9 +12343,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqll_awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqll_date")]
 		public System.Nullable<System.DateTime> dfeta_npqll_date
@@ -12363,9 +12363,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqll_date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlt_awarded")]
 		public System.Nullable<bool> dfeta_npqlt_awarded
@@ -12383,9 +12383,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqlt_awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlt_date")]
 		public System.Nullable<System.DateTime> dfeta_npqlt_date
@@ -12403,9 +12403,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqlt_date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqltd_awarded")]
 		public System.Nullable<bool> dfeta_npqltd_awarded
@@ -12423,9 +12423,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqltd_awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqltd_date")]
 		public System.Nullable<System.DateTime> dfeta_npqltd_date
@@ -12443,9 +12443,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqltd_date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqml_awarded")]
 		public System.Nullable<bool> dfeta_npqml_awarded
@@ -12463,9 +12463,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqml_awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqml_date")]
 		public System.Nullable<System.DateTime> dfeta_npqml_date
@@ -12483,9 +12483,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqml_date");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqsl_awarded")]
 		public System.Nullable<bool> dfeta_npqsl_awarded
@@ -12503,9 +12503,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqsl_awarded");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqsl_date")]
 		public System.Nullable<System.DateTime> dfeta_npqsl_date
@@ -12523,7 +12523,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_npqsl_date");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Qualification.
 		/// </summary>
@@ -12543,7 +12543,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -12571,7 +12571,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_qualificationId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qualificationid")]
 		public override System.Guid Id
 		{
@@ -12586,9 +12586,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_qualificationId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trsevent")]
 		public string dfeta_TRSEvent
@@ -12606,9 +12606,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TRSEvent");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_type")]
 		public virtual dfeta_qualification_dfeta_Type? dfeta_Type
@@ -12626,7 +12626,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Type");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was modified.
 		/// </summary>
@@ -12646,7 +12646,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Qualification
 		/// </summary>
@@ -12681,7 +12681,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the Qualification
 		/// </summary>
@@ -12701,7 +12701,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_qualification_dfeta_integrationtran
 		/// </summary>
@@ -12721,7 +12721,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_qualification_dfeta_integrationtran");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_qualification
 		/// </summary>
@@ -12742,7 +12742,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_account_dfeta_qualification_he
 		/// </summary>
@@ -12763,7 +12763,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_account_dfeta_qualification_he");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_qualification
 		/// </summary>
@@ -12784,7 +12784,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_country_dfeta_qualification_he
 		/// </summary>
@@ -12805,7 +12805,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_country_dfeta_qualification_he");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_hequalification_dfeta_qualification
 		/// </summary>
@@ -12826,7 +12826,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hequalification_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_hesubject_dfeta_qualification1
 		/// </summary>
@@ -12847,7 +12847,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification1");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_hesubject_dfeta_qualification2
 		/// </summary>
@@ -12868,7 +12868,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification2");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_hesubject_dfeta_qualification3
 		/// </summary>
@@ -12889,7 +12889,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification3");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_mqestablishment_dfeta_qualification
 		/// </summary>
@@ -12910,7 +12910,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_mqestablishment_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_specialism_dfeta_qualification_mq
 		/// </summary>
@@ -12931,7 +12931,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_specialism_dfeta_qualification_mq");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qualification_createdby
 		/// </summary>
@@ -12952,7 +12952,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qualification_createdonbehalfby
 		/// </summary>
@@ -12973,7 +12973,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qualification_modifiedby
 		/// </summary>
@@ -12994,7 +12994,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_qualification_modifiedonbehalfby
 		/// </summary>
@@ -13015,7 +13015,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_qualification
 		/// </summary>
@@ -13037,26 +13037,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_sanctionState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_sanction")]
 	public partial class dfeta_sanction : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_sanction entity
 		/// </summary>
@@ -13087,32 +13087,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_sanction_modifiedonbehalfby = "lk_dfeta_sanction_modifiedonbehalfby";
 			public const string user_dfeta_sanction = "user_dfeta_sanction";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_sanction() : 
+		public dfeta_sanction() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_sanction";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_sanctionid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_sanction";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_sanctions";
-		
+
 		public const string EntitySetName = "dfeta_sanctions";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -13121,7 +13121,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -13130,7 +13130,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the record.
 		/// </summary>
@@ -13150,7 +13150,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -13170,9 +13170,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_detailslink")]
 		public string dfeta_DetailsLink
@@ -13190,9 +13190,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_DetailsLink");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_enddate")]
 		public System.Nullable<System.DateTime> dfeta_EndDate
@@ -13210,9 +13210,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EndDate");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_noreappuntildate")]
 		public System.Nullable<System.DateTime> dfeta_NoReAppuntildate
@@ -13230,7 +13230,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NoReAppuntildate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Sanction.
 		/// </summary>
@@ -13250,7 +13250,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Sanction Code associated with Sanction.
 		/// </summary>
@@ -13270,9 +13270,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_SanctionCodeId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctiondetails")]
 		public string dfeta_SanctionDetails
@@ -13290,7 +13290,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_SanctionDetails");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -13318,7 +13318,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_sanctionId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctionid")]
 		public override System.Guid Id
 		{
@@ -13333,9 +13333,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_sanctionId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_spent")]
 		public System.Nullable<bool> dfeta_Spent
@@ -13353,9 +13353,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Spent");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_startdate")]
 		public System.Nullable<System.DateTime> dfeta_StartDate
@@ -13373,7 +13373,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StartDate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was modified.
 		/// </summary>
@@ -13393,7 +13393,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Sanction
 		/// </summary>
@@ -13428,7 +13428,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the Sanction
 		/// </summary>
@@ -13448,7 +13448,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_sanction_Annotations
 		/// </summary>
@@ -13468,7 +13468,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_sanction_Annotations");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_sanction
 		/// </summary>
@@ -13489,7 +13489,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_sanction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_sanction
 		/// </summary>
@@ -13510,7 +13510,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_sanction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_dfeta_sanctioncode_dfeta_sanction
 		/// </summary>
@@ -13531,7 +13531,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_sanctioncode_dfeta_sanction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanction_createdby
 		/// </summary>
@@ -13552,7 +13552,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanction_createdonbehalfby
 		/// </summary>
@@ -13573,7 +13573,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanction_modifiedby
 		/// </summary>
@@ -13594,7 +13594,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanction_modifiedonbehalfby
 		/// </summary>
@@ -13615,7 +13615,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_sanction
 		/// </summary>
@@ -13637,26 +13637,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_sanctioncodeState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_sanctioncode")]
 	public partial class dfeta_sanctioncode : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_sanctioncode entity
 		/// </summary>
@@ -13673,32 +13673,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_sanctioncode_modifiedby = "lk_dfeta_sanctioncode_modifiedby";
 			public const string lk_dfeta_sanctioncode_modifiedonbehalfby = "lk_dfeta_sanctioncode_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_sanctioncode() : 
+		public dfeta_sanctioncode() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_sanctioncode";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_sanctioncodeid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_sanctioncode";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_sanctioncodes";
-		
+
 		public const string EntitySetName = "dfeta_sanctioncodes";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -13707,7 +13707,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -13716,7 +13716,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -13736,7 +13736,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -13764,7 +13764,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_sanctioncodeId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctioncodeid")]
 		public override System.Guid Id
 		{
@@ -13779,9 +13779,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_sanctioncodeId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -13799,7 +13799,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Sanction Code
 		/// </summary>
@@ -13834,7 +13834,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_sanctioncode_dfeta_sanction
 		/// </summary>
@@ -13854,7 +13854,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_sanctioncode_dfeta_sanction");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanctioncode_createdby
 		/// </summary>
@@ -13875,7 +13875,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanctioncode_createdonbehalfby
 		/// </summary>
@@ -13896,7 +13896,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanctioncode_modifiedby
 		/// </summary>
@@ -13917,7 +13917,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanctioncode_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_sanctioncode_modifiedonbehalfby
 		/// </summary>
@@ -13939,26 +13939,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_specialismState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_specialism")]
 	public partial class dfeta_specialism : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_specialism entity
 		/// </summary>
@@ -13975,32 +13975,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_specialism_modifiedby = "lk_dfeta_specialism_modifiedby";
 			public const string lk_dfeta_specialism_modifiedonbehalfby = "lk_dfeta_specialism_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_specialism() : 
+		public dfeta_specialism() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_specialism";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_specialismid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_specialism";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_specialisms";
-		
+
 		public const string EntitySetName = "dfeta_specialisms";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -14009,7 +14009,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -14018,7 +14018,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -14038,7 +14038,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -14066,7 +14066,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_specialismId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_specialismid")]
 		public override System.Guid Id
 		{
@@ -14081,9 +14081,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_specialismId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -14101,7 +14101,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Specialism
 		/// </summary>
@@ -14136,7 +14136,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_specialism_dfeta_qualification_mq
 		/// </summary>
@@ -14156,7 +14156,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_specialism_dfeta_qualification_mq");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_specialism_createdby
 		/// </summary>
@@ -14177,7 +14177,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_specialism_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_specialism_createdonbehalfby
 		/// </summary>
@@ -14198,7 +14198,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_specialism_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_specialism_modifiedby
 		/// </summary>
@@ -14219,7 +14219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_specialism_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_specialism_modifiedonbehalfby
 		/// </summary>
@@ -14241,26 +14241,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_teacherStatusState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_teacherstatus")]
 	public partial class dfeta_teacherstatus : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_teacherstatus entity
 		/// </summary>
@@ -14276,32 +14276,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_teacherstatus_modifiedby = "lk_dfeta_teacherstatus_modifiedby";
 			public const string lk_dfeta_teacherstatus_modifiedonbehalfby = "lk_dfeta_teacherstatus_modifiedonbehalfby";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_teacherstatus() : 
+		public dfeta_teacherstatus() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_teacherstatus";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_teacherstatusid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_name";
-		
+
 		public const string EntityLogicalName = "dfeta_teacherstatus";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_teacherstatuses";
-		
+
 		public const string EntitySetName = "dfeta_teacherstatuses";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -14310,7 +14310,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -14319,7 +14319,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -14339,9 +14339,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsdaterequired")]
 		public System.Nullable<bool> dfeta_QTSDateRequired
@@ -14359,9 +14359,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_QTSDateRequired");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
 		public string dfeta_Value
@@ -14379,7 +14379,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the Teacher Status
 		/// </summary>
@@ -14414,7 +14414,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_dfeta_teacherstatus_dfeta_qtsregistration
 		/// </summary>
@@ -14434,7 +14434,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_teacherstatus_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_teacherstatus_createdby
 		/// </summary>
@@ -14455,7 +14455,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_teacherstatus_createdonbehalfby
 		/// </summary>
@@ -14476,7 +14476,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_teacherstatus_modifiedby
 		/// </summary>
@@ -14497,7 +14497,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_teacherstatus_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_teacherstatus_modifiedonbehalfby
 		/// </summary>
@@ -14519,26 +14519,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_TRSEventState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_trsevent")]
 	public partial class dfeta_TRSEvent : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_trsevent entity
 		/// </summary>
@@ -14556,32 +14556,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_trsevent_modifiedonbehalfby = "lk_dfeta_trsevent_modifiedonbehalfby";
 			public const string user_dfeta_trsevent = "user_dfeta_trsevent";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_TRSEvent() : 
+		public dfeta_TRSEvent() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_TRSEvent";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_trseventid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_eventname";
-		
+
 		public const string EntityLogicalName = "dfeta_trsevent";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_trsevents";
-		
+
 		public const string EntitySetName = "dfeta_trsevents";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -14590,7 +14590,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -14599,9 +14599,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eventname")]
 		public string dfeta_EventName
@@ -14619,9 +14619,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EventName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_payload")]
 		public string dfeta_Payload
@@ -14639,7 +14639,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Payload");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -14667,7 +14667,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TRSEventId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trseventid")]
 		public override System.Guid Id
 		{
@@ -14682,7 +14682,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_TRSEventId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the TRS Event
 		/// </summary>
@@ -14717,7 +14717,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_trsevent
 		/// </summary>
@@ -14738,7 +14738,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_trsevent");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsevent_createdby
 		/// </summary>
@@ -14759,7 +14759,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsevent_createdonbehalfby
 		/// </summary>
@@ -14780,7 +14780,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsevent_modifiedby
 		/// </summary>
@@ -14801,7 +14801,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsevent_modifiedonbehalfby
 		/// </summary>
@@ -14822,7 +14822,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_trsevent
 		/// </summary>
@@ -14844,26 +14844,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_TrsOutboxMessageState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Inactive = 1,
-	}
-	
+		Inactive = 1
+    }
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_trsoutboxmessage")]
 	public partial class dfeta_TrsOutboxMessage : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the dfeta_trsoutboxmessage entity
 		/// </summary>
@@ -14881,32 +14881,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_trsoutboxmessage_modifiedonbehalfby = "lk_dfeta_trsoutboxmessage_modifiedonbehalfby";
 			public const string user_dfeta_trsoutboxmessage = "user_dfeta_trsoutboxmessage";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public dfeta_TrsOutboxMessage() : 
+		public dfeta_TrsOutboxMessage() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "dfeta_TrsOutboxMessage";
-		
+
 		public const string PrimaryIdAttribute = "dfeta_trsoutboxmessageid";
-		
+
 		public const string PrimaryNameAttribute = "dfeta_messagename";
-		
+
 		public const string EntityLogicalName = "dfeta_trsoutboxmessage";
-		
+
 		public const string EntityLogicalCollectionName = "dfeta_trsoutboxmessages";
-		
+
 		public const string EntitySetName = "dfeta_trsoutboxmessages";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -14915,7 +14915,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -14924,9 +14924,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_messagename")]
 		public string dfeta_MessageName
@@ -14944,9 +14944,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_MessageName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_payload")]
 		public string dfeta_Payload
@@ -14964,7 +14964,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_Payload");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for entity instances
 		/// </summary>
@@ -14992,7 +14992,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_TrsOutboxMessageId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trsoutboxmessageid")]
 		public override System.Guid Id
 		{
@@ -15007,7 +15007,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.dfeta_TrsOutboxMessageId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the TRS outbox message
 		/// </summary>
@@ -15042,7 +15042,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_dfeta_trsoutboxmessage
 		/// </summary>
@@ -15063,7 +15063,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_dfeta_trsoutboxmessage");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsoutboxmessage_createdby
 		/// </summary>
@@ -15084,7 +15084,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsoutboxmessage_createdonbehalfby
 		/// </summary>
@@ -15105,7 +15105,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsoutboxmessage_modifiedby
 		/// </summary>
@@ -15126,7 +15126,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_dfeta_trsoutboxmessage_modifiedonbehalfby
 		/// </summary>
@@ -15147,7 +15147,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_dfeta_trsoutboxmessage
 		/// </summary>
@@ -15169,21 +15169,21 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IncidentState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Active = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Resolved = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Canceled = 2,
-	}
-	
+		Canceled = 2
+    }
+
 	/// <summary>
 	/// Service request case associated with a contract.
 	/// </summary>
@@ -15191,7 +15191,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("incident")]
 	public partial class Incident : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the incident entity
 		/// </summary>
@@ -15239,32 +15239,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string subject_incidents = "subject_incidents";
 			public const string system_user_incidents = "system_user_incidents";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Incident() : 
+		public Incident() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Incident";
-		
+
 		public const string PrimaryIdAttribute = "incidentid";
-		
+
 		public const string PrimaryNameAttribute = "title";
-		
+
 		public const string EntityLogicalName = "incident";
-		
+
 		public const string EntityLogicalCollectionName = "incidents";
-		
+
 		public const string EntitySetName = "incidents";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -15273,7 +15273,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -15282,7 +15282,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was created.
 		/// </summary>
@@ -15302,7 +15302,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Select the customer account or contact to provide a quick link to additional customer details, such as account information, activities, and opportunities.
 		/// </summary>
@@ -15322,7 +15322,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomerId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type additional information to describe the case to assist the service team in reaching a resolution.
 		/// </summary>
@@ -15342,9 +15342,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Description");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_emailaddress")]
 		public string dfeta_emailaddress
@@ -15362,9 +15362,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_emailaddress");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_fromidentity")]
 		public System.Nullable<bool> dfeta_FromIdentity
@@ -15382,9 +15382,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_FromIdentity");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newdateofbirth")]
 		public System.Nullable<System.DateTime> dfeta_NewDateofBirth
@@ -15402,9 +15402,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NewDateofBirth");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newfirstname")]
 		public string dfeta_NewFirstName
@@ -15422,9 +15422,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NewFirstName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newlastname")]
 		public string dfeta_NewLastName
@@ -15442,9 +15442,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NewLastName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newmiddlename")]
 		public string dfeta_NewMiddleName
@@ -15462,9 +15462,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_NewMiddleName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedfirstname")]
 		public string dfeta_StatedFirstName
@@ -15482,9 +15482,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StatedFirstName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedlastname")]
 		public string dfeta_StatedLastName
@@ -15502,9 +15502,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StatedLastName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedmiddlename")]
 		public string dfeta_StatedMiddleName
@@ -15522,7 +15522,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_StatedMiddleName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the case.
 		/// </summary>
@@ -15550,7 +15550,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IncidentId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
 		public override System.Guid Id
 		{
@@ -15565,7 +15565,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.IncidentId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the record was modified.
 		/// </summary>
@@ -15585,7 +15585,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the case.
 		/// </summary>
@@ -15620,7 +15620,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the case.
 		/// </summary>
@@ -15640,7 +15640,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Choose the subject for the case, such as catalog request or product complaint, so customer service managers can identify frequent requests or problem areas. Administrators can configure subjects under Business Management in the Settings area.
 		/// </summary>
@@ -15660,7 +15660,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SubjectId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Shows the case number for customer reference and searching capabilities. This cannot be modified.
 		/// </summary>
@@ -15680,7 +15680,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("TicketNumber");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type a subject or descriptive name, such as the request, issue, or company name, to identify the case in Microsoft Dynamics 365 views.
 		/// </summary>
@@ -15700,7 +15700,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Title");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N dfeta_incident_dfeta_document
 		/// </summary>
@@ -15720,7 +15720,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_incident_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Incident_Annotation
 		/// </summary>
@@ -15740,7 +15740,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Incident_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N incident_existingcase
 		/// </summary>
@@ -15760,7 +15760,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedincident_existingcase");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Incident_IncidentResolutions
 		/// </summary>
@@ -15780,7 +15780,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Incident_IncidentResolutions");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N incident_master_incident
 		/// </summary>
@@ -15800,7 +15800,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedincident_master_incident");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N incident_parent_incident
 		/// </summary>
@@ -15820,7 +15820,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedincident_parent_incident");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Incident_Tasks
 		/// </summary>
@@ -15840,7 +15840,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Incident_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_incidents
 		/// </summary>
@@ -15861,7 +15861,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_incidents");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 contact_as_primary_contact
 		/// </summary>
@@ -15882,7 +15882,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_as_primary_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 contact_as_responsible_contact
 		/// </summary>
@@ -15903,7 +15903,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_as_responsible_contact");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 incident_customer_accounts
 		/// </summary>
@@ -15924,7 +15924,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("incident_customer_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 incident_customer_contacts
 		/// </summary>
@@ -15945,7 +15945,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("incident_customer_contacts");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 incident_existingcase
 		/// </summary>
@@ -15966,7 +15966,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingincident_existingcase");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 incident_master_incident
 		/// </summary>
@@ -15987,7 +15987,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingincident_master_incident");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 incident_parent_incident
 		/// </summary>
@@ -16008,7 +16008,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingincident_parent_incident");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentbase_createdby
 		/// </summary>
@@ -16029,7 +16029,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentbase_createdonbehalfby
 		/// </summary>
@@ -16050,7 +16050,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentbase_modifiedby
 		/// </summary>
@@ -16071,7 +16071,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentbase_modifiedonbehalfby
 		/// </summary>
@@ -16092,7 +16092,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 subject_incidents
 		/// </summary>
@@ -16113,7 +16113,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("subject_incidents");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 system_user_incidents
 		/// </summary>
@@ -16135,21 +16135,21 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IncidentResolutionState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Open = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Completed = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Canceled = 2,
-	}
-	
+		Canceled = 2
+    }
+
 	/// <summary>
 	/// Special type of activity that includes description of the resolution, billing status, and the duration of the case.
 	/// </summary>
@@ -16157,7 +16157,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("incidentresolution")]
 	public partial class IncidentResolution : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the incidentresolution entity
 		/// </summary>
@@ -16181,32 +16181,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_incidentresolution_modifiedonbehalfby = "lk_incidentresolution_modifiedonbehalfby";
 			public const string user_incidentresolution = "user_incidentresolution";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public IncidentResolution() : 
+		public IncidentResolution() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "IncidentResolution";
-		
+
 		public const string PrimaryIdAttribute = "activityid";
-		
+
 		public const string PrimaryNameAttribute = "subject";
-		
+
 		public const string EntityLogicalName = "incidentresolution";
-		
+
 		public const string EntityLogicalCollectionName = "incidentresolutions";
-		
+
 		public const string EntitySetName = "incidentresolutions";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -16215,7 +16215,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -16224,7 +16224,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the case resolution activity.
 		/// </summary>
@@ -16252,7 +16252,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ActivityId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
 		public override System.Guid Id
 		{
@@ -16267,7 +16267,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.ActivityId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the case resolution activity.
 		/// </summary>
@@ -16287,7 +16287,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the case.
 		/// </summary>
@@ -16307,7 +16307,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IncidentId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the case resolution activity.
 		/// </summary>
@@ -16327,7 +16327,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the case resolution activity was last modified.
 		/// </summary>
@@ -16347,7 +16347,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Shows whether the case resolution is open, completed, or canceled. By default, all case resolutions are completed and the status value can't be changed.
 		/// </summary>
@@ -16382,7 +16382,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Subject associated with the case resolution activity.
 		/// </summary>
@@ -16402,7 +16402,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Subject");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N IncidentResolution_Annotation
 		/// </summary>
@@ -16422,7 +16422,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IncidentResolution_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 account_IncidentResolutions
 		/// </summary>
@@ -16443,7 +16443,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("account_IncidentResolutions");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_incident_resolution_activities
 		/// </summary>
@@ -16464,7 +16464,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_incident_resolution_activities");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Incident_IncidentResolutions
 		/// </summary>
@@ -16485,7 +16485,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Incident_IncidentResolutions");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentresolution_createdby
 		/// </summary>
@@ -16506,7 +16506,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentresolution_createdonbehalfby
 		/// </summary>
@@ -16527,7 +16527,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentresolution_modifiedby
 		/// </summary>
@@ -16548,7 +16548,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_incidentresolution_modifiedonbehalfby
 		/// </summary>
@@ -16569,7 +16569,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_incidentresolution
 		/// </summary>
@@ -16591,7 +16591,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Type that inherits from the IPlugin interface and is contained within a plug-in assembly.
 	/// </summary>
@@ -16599,7 +16599,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("plugintype")]
 	public partial class PluginType : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the plugintype entity
 		/// </summary>
@@ -16644,34 +16644,34 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_plugintype_modifiedonbehalfby = "lk_plugintype_modifiedonbehalfby";
 			public const string modifiedby_plugintype = "modifiedby_plugintype";
 		}
-		
+
 		public const string AlternateKeys = "overwritetime,plugintypeexportkey,componentstate";
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public PluginType() : 
+		public PluginType() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "PluginType";
-		
+
 		public const string PrimaryIdAttribute = "plugintypeid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "plugintype";
-		
+
 		public const string EntityLogicalCollectionName = "plugintypes";
-		
+
 		public const string EntitySetName = "plugintypes";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -16680,7 +16680,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -16689,7 +16689,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Full path name of the plug-in assembly.
 		/// </summary>
@@ -16709,7 +16709,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AssemblyName");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -16729,7 +16729,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ComponentState");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the plug-in type.
 		/// </summary>
@@ -16749,7 +16749,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the plug-in type was created.
 		/// </summary>
@@ -16769,7 +16769,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who created the plugintype.
 		/// </summary>
@@ -16789,7 +16789,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Culture code for the plug-in assembly.
 		/// </summary>
@@ -16809,7 +16809,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Culture");
 			}
 		}
-		
+
 		/// <summary>
 		/// Customization level of the plug-in type.
 		/// </summary>
@@ -16829,7 +16829,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomizationLevel");
 			}
 		}
-		
+
 		/// <summary>
 		/// Serialized Custom Activity Type information, including required arguments. For more information, see SandboxCustomActivityInfo.
 		/// </summary>
@@ -16849,7 +16849,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomWorkflowActivityInfo");
 			}
 		}
-		
+
 		/// <summary>
 		/// Description of the plug-in type.
 		/// </summary>
@@ -16869,7 +16869,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Description");
 			}
 		}
-		
+
 		/// <summary>
 		/// User friendly name for the plug-in.
 		/// </summary>
@@ -16889,9 +16889,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FriendlyName");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ismanaged")]
 		public System.Nullable<bool> IsManaged
@@ -16909,7 +16909,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsManaged");
 			}
 		}
-		
+
 		/// <summary>
 		/// Indicates if the plug-in is a custom activity for workflows.
 		/// </summary>
@@ -16929,7 +16929,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsWorkflowActivity");
 			}
 		}
-		
+
 		/// <summary>
 		/// Major of the version number of the assembly for the plug-in type.
 		/// </summary>
@@ -16949,7 +16949,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Major");
 			}
 		}
-		
+
 		/// <summary>
 		/// Minor of the version number of the assembly for the plug-in type.
 		/// </summary>
@@ -16969,7 +16969,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Minor");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the plug-in type.
 		/// </summary>
@@ -16989,7 +16989,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the plug-in type was last modified.
 		/// </summary>
@@ -17009,7 +17009,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who last modified the plugintype.
 		/// </summary>
@@ -17029,7 +17029,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the plug-in type.
 		/// </summary>
@@ -17049,7 +17049,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the organization with which the plug-in type is associated.
 		/// </summary>
@@ -17069,7 +17069,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OrganizationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -17089,7 +17089,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OverwriteTime");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the plug-in assembly that contains this plug-in type.
 		/// </summary>
@@ -17109,7 +17109,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PluginAssemblyId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Uniquely identifies the plug-in type associated with a plugin package when exporting a solution.
 		/// </summary>
@@ -17129,7 +17129,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PluginTypeExportKey");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the plug-in type.
 		/// </summary>
@@ -17157,7 +17157,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PluginTypeId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeid")]
 		public override System.Guid Id
 		{
@@ -17172,7 +17172,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PluginTypeId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the plug-in type.
 		/// </summary>
@@ -17192,7 +17192,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PluginTypeIdUnique");
 			}
 		}
-		
+
 		/// <summary>
 		/// Public key token of the assembly for the plug-in type.
 		/// </summary>
@@ -17212,7 +17212,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PublicKeyToken");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the associated solution.
 		/// </summary>
@@ -17232,7 +17232,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SolutionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -17252,7 +17252,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SupportingSolutionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Fully qualified type name of the plug-in type.
 		/// </summary>
@@ -17272,7 +17272,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("TypeName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Version number of the assembly for the plug-in type.
 		/// </summary>
@@ -17292,9 +17292,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Version");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
 		public System.Nullable<long> VersionNumber
@@ -17312,7 +17312,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("VersionNumber");
 			}
 		}
-		
+
 		/// <summary>
 		/// Group name of workflow custom activity.
 		/// </summary>
@@ -17332,7 +17332,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("WorkflowActivityGroupName");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N plugintype_sdkmessageprocessingstep
 		/// </summary>
@@ -17352,7 +17352,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("plugintype_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N plugintypeid_sdkmessageprocessingstep
 		/// </summary>
@@ -17372,7 +17372,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("plugintypeid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 createdby_plugintype
 		/// </summary>
@@ -17393,7 +17393,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_plugintype");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_plugintype_createdonbehalfby
 		/// </summary>
@@ -17414,7 +17414,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_plugintype_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_plugintype_modifiedonbehalfby
 		/// </summary>
@@ -17435,7 +17435,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_plugintype_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 modifiedby_plugintype
 		/// </summary>
@@ -17457,7 +17457,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Grouping of security privileges. Users are assigned roles that authorize their access to the Microsoft CRM system.
 	/// </summary>
@@ -17465,7 +17465,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("role")]
 	public partial class Role : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the role entity
 		/// </summary>
@@ -17485,35 +17485,35 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencingrole_parent_role = "role_parent_role";
 			public const string Referencingrole_parent_root_role = "role_parent_root_role";
 		}
-		
+
 		public const string AlternateKeys = "overwritetime,businessunitid,componentstate,parentrootroleid|overwritetime,rolete" +
 			"mplateid,componentstate,businessunitid";
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Role() : 
+		public Role() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Role";
-		
+
 		public const string PrimaryIdAttribute = "roleid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "role";
-		
+
 		public const string EntityLogicalCollectionName = "roles";
-		
+
 		public const string EntitySetName = "roles";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -17522,7 +17522,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -17531,7 +17531,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the role.
 		/// </summary>
@@ -17551,7 +17551,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the role.
 		/// </summary>
@@ -17579,7 +17579,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("RoleId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("roleid")]
 		public override System.Guid Id
 		{
@@ -17594,7 +17594,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.RoleId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N role_parent_role
 		/// </summary>
@@ -17614,7 +17614,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedrole_parent_role");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N role_parent_root_role
 		/// </summary>
@@ -17634,7 +17634,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedrole_parent_root_role");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:N systemuserroles_association
 		/// </summary>
@@ -17654,7 +17654,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("systemuserroles_association");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_roles
 		/// </summary>
@@ -17675,7 +17675,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_roles");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_role_createdonbehalfby
 		/// </summary>
@@ -17696,7 +17696,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_role_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_role_modifiedonbehalfby
 		/// </summary>
@@ -17717,7 +17717,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_role_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_rolebase_createdby
 		/// </summary>
@@ -17738,7 +17738,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_rolebase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_rolebase_modifiedby
 		/// </summary>
@@ -17759,7 +17759,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_rolebase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 role_parent_role
 		/// </summary>
@@ -17780,7 +17780,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencingrole_parent_role");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 role_parent_root_role
 		/// </summary>
@@ -17802,7 +17802,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Message that is supported by the SDK.
 	/// </summary>
@@ -17810,7 +17810,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessage")]
 	public partial class SdkMessage : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the sdkmessage entity
 		/// </summary>
@@ -17854,32 +17854,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_sdkmessage_modifiedonbehalfby = "lk_sdkmessage_modifiedonbehalfby";
 			public const string modifiedby_sdkmessage = "modifiedby_sdkmessage";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public SdkMessage() : 
+		public SdkMessage() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "SdkMessage";
-		
+
 		public const string PrimaryIdAttribute = "sdkmessageid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "sdkmessage";
-		
+
 		public const string EntityLogicalCollectionName = "sdkmessages";
-		
+
 		public const string EntitySetName = "sdkmessages";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -17888,7 +17888,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -17897,7 +17897,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Information about whether the SDK message is automatically transacted.
 		/// </summary>
@@ -17917,7 +17917,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AutoTransact");
 			}
 		}
-		
+
 		/// <summary>
 		/// Identifies where a method will be exposed. 0 - Server, 1 - Client, 2 - both.
 		/// </summary>
@@ -17937,7 +17937,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Availability");
 			}
 		}
-		
+
 		/// <summary>
 		/// If this is a categorized method, this is the name, otherwise None.
 		/// </summary>
@@ -17957,7 +17957,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CategoryName");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -17977,7 +17977,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ComponentState");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the SDK message.
 		/// </summary>
@@ -17997,7 +17997,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message was created.
 		/// </summary>
@@ -18017,7 +18017,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who created the sdkmessage.
 		/// </summary>
@@ -18037,7 +18037,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Customization level of the SDK message.
 		/// </summary>
@@ -18057,7 +18057,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomizationLevel");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the privilege that allows execution of the SDK message
 		/// </summary>
@@ -18077,7 +18077,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ExecutePrivilegeName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Indicates whether the SDK message should have its requests expanded per primary entity defined in its filters.
 		/// </summary>
@@ -18097,7 +18097,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Expand");
 			}
 		}
-		
+
 		/// <summary>
 		/// Version in which the component is introduced.
 		/// </summary>
@@ -18117,7 +18117,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IntroducedVersion");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information about whether the SDK message is active.
 		/// </summary>
@@ -18137,7 +18137,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsActive");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information that specifies whether this component is managed.
 		/// </summary>
@@ -18157,7 +18157,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsManaged");
 			}
 		}
-		
+
 		/// <summary>
 		/// Indicates whether the SDK message is private.
 		/// </summary>
@@ -18177,7 +18177,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsPrivate");
 			}
 		}
-		
+
 		/// <summary>
 		/// Identifies whether an SDK message will be ReadOnly or Read Write. false - ReadWrite, true - ReadOnly .
 		/// </summary>
@@ -18197,7 +18197,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsReadOnly");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -18217,7 +18217,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsValidForExecuteAsync");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the SDK message.
 		/// </summary>
@@ -18237,7 +18237,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message was last modified.
 		/// </summary>
@@ -18257,7 +18257,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who last modified the sdkmessage.
 		/// </summary>
@@ -18277,7 +18277,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the SDK message.
 		/// </summary>
@@ -18297,7 +18297,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the organization with which the SDK message is associated.
 		/// </summary>
@@ -18317,7 +18317,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OrganizationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -18337,7 +18337,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OverwriteTime");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message entity.
 		/// </summary>
@@ -18365,7 +18365,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageid")]
 		public override System.Guid Id
 		{
@@ -18380,7 +18380,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SdkMessageId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message.
 		/// </summary>
@@ -18400,7 +18400,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageIdUnique");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the associated solution.
 		/// </summary>
@@ -18420,7 +18420,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SolutionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -18440,7 +18440,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SupportingSolutionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Indicates whether the SDK message is a template.
 		/// </summary>
@@ -18460,7 +18460,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Template");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -18480,9 +18480,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ThrottleSettings");
 			}
 		}
-		
+
 		/// <summary>
-		/// Number that identifies a specific revision of the SDK message. 
+		/// Number that identifies a specific revision of the SDK message.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
 		public System.Nullable<long> VersionNumber
@@ -18500,7 +18500,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("VersionNumber");
 			}
 		}
-		
+
 		/// <summary>
 		/// Whether or not the SDK message can be called from a workflow.
 		/// </summary>
@@ -18520,7 +18520,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("WorkflowSdkStepEnabled");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N sdkmessageid_sdkmessagefilter
 		/// </summary>
@@ -18540,7 +18540,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("sdkmessageid_sdkmessagefilter");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N sdkmessageid_sdkmessageprocessingstep
 		/// </summary>
@@ -18560,7 +18560,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("sdkmessageid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 createdby_sdkmessage
 		/// </summary>
@@ -18581,7 +18581,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessage");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessage_createdonbehalfby
 		/// </summary>
@@ -18602,7 +18602,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessage_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessage_modifiedonbehalfby
 		/// </summary>
@@ -18623,7 +18623,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessage_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 modifiedby_sdkmessage
 		/// </summary>
@@ -18645,7 +18645,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Filter that defines which SDK messages are valid for each type of entity.
 	/// </summary>
@@ -18653,7 +18653,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessagefilter")]
 	public partial class SdkMessageFilter : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the sdkmessagefilter entity
 		/// </summary>
@@ -18693,32 +18693,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string modifiedby_sdkmessagefilter = "modifiedby_sdkmessagefilter";
 			public const string sdkmessageid_sdkmessagefilter = "sdkmessageid_sdkmessagefilter";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public SdkMessageFilter() : 
+		public SdkMessageFilter() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "SdkMessageFilter";
-		
+
 		public const string PrimaryIdAttribute = "sdkmessagefilterid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "sdkmessagefilter";
-		
+
 		public const string EntityLogicalCollectionName = "sdkmessagefilters";
-		
+
 		public const string EntitySetName = "sdkmessagefilters";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -18727,7 +18727,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -18736,7 +18736,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Identifies where a method will be exposed. 0 - Server, 1 - Client, 2 - both.
 		/// </summary>
@@ -18756,7 +18756,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Availability");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -18776,7 +18776,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ComponentState");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the SDK message filter.
 		/// </summary>
@@ -18796,7 +18796,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message filter was created.
 		/// </summary>
@@ -18816,7 +18816,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who created the sdkmessagefilter.
 		/// </summary>
@@ -18836,7 +18836,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Customization level of the SDK message filter.
 		/// </summary>
@@ -18856,7 +18856,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomizationLevel");
 			}
 		}
-		
+
 		/// <summary>
 		/// Version in which the component is introduced.
 		/// </summary>
@@ -18876,7 +18876,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IntroducedVersion");
 			}
 		}
-		
+
 		/// <summary>
 		/// Indicates whether a custom SDK message processing step is allowed.
 		/// </summary>
@@ -18896,7 +18896,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsCustomProcessingStepAllowed");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information that specifies whether this component is managed.
 		/// </summary>
@@ -18916,7 +18916,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsManaged");
 			}
 		}
-		
+
 		/// <summary>
 		/// Indicates whether the filter should be visible.
 		/// </summary>
@@ -18936,7 +18936,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsVisible");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the SDK message filter.
 		/// </summary>
@@ -18956,7 +18956,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message filter was last modified.
 		/// </summary>
@@ -18976,7 +18976,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who last modified the sdkmessagefilter.
 		/// </summary>
@@ -18996,7 +18996,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the SDK message filter.
 		/// </summary>
@@ -19016,7 +19016,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the organization with which the SDK message filter is associated.
 		/// </summary>
@@ -19036,7 +19036,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OrganizationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -19056,7 +19056,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OverwriteTime");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type of entity with which the SDK message filter is primarily associated.
 		/// </summary>
@@ -19076,7 +19076,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PrimaryObjectTypeCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -19096,7 +19096,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("RestrictionLevel");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message filter entity.
 		/// </summary>
@@ -19124,7 +19124,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageFilterId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessagefilterid")]
 		public override System.Guid Id
 		{
@@ -19139,7 +19139,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SdkMessageFilterId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message filter.
 		/// </summary>
@@ -19159,7 +19159,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageFilterIdUnique");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the related SDK message.
 		/// </summary>
@@ -19179,7 +19179,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type of entity with which the SDK message filter is secondarily associated.
 		/// </summary>
@@ -19199,7 +19199,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SecondaryObjectTypeCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the associated solution.
 		/// </summary>
@@ -19219,7 +19219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SolutionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -19239,9 +19239,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SupportingSolutionId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
 		public System.Nullable<long> VersionNumber
@@ -19259,7 +19259,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("VersionNumber");
 			}
 		}
-		
+
 		/// <summary>
 		/// Whether or not the SDK message can be called from a workflow.
 		/// </summary>
@@ -19279,7 +19279,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("WorkflowSdkStepEnabled");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N sdkmessagefilterid_sdkmessageprocessingstep
 		/// </summary>
@@ -19299,7 +19299,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("sdkmessagefilterid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 createdby_sdkmessagefilter
 		/// </summary>
@@ -19320,7 +19320,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessagefilter");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessagefilter_createdonbehalfby
 		/// </summary>
@@ -19341,7 +19341,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessagefilter_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessagefilter_modifiedonbehalfby
 		/// </summary>
@@ -19362,7 +19362,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessagefilter_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 modifiedby_sdkmessagefilter
 		/// </summary>
@@ -19383,7 +19383,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessagefilter");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 sdkmessageid_sdkmessagefilter
 		/// </summary>
@@ -19405,18 +19405,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum SdkMessageProcessingStepState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Enabled = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Disabled = 1,
-	}
-	
+		Disabled = 1
+    }
+
 	/// <summary>
 	/// Stage in the execution pipeline that a plug-in is to execute.
 	/// </summary>
@@ -19424,7 +19424,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessageprocessingstep")]
 	public partial class SdkMessageProcessingStep : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the sdkmessageprocessingstep entity
 		/// </summary>
@@ -19488,32 +19488,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string sdkmessageid_sdkmessageprocessingstep = "sdkmessageid_sdkmessageprocessingstep";
 			public const string sdkmessageprocessingstepsecureconfigid_sdkmessageprocessingstep = "sdkmessageprocessingstepsecureconfigid_sdkmessageprocessingstep";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public SdkMessageProcessingStep() : 
+		public SdkMessageProcessingStep() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "SdkMessageProcessingStep";
-		
+
 		public const string PrimaryIdAttribute = "sdkmessageprocessingstepid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "sdkmessageprocessingstep";
-		
+
 		public const string EntityLogicalCollectionName = "sdkmessageprocessingsteps";
-		
+
 		public const string EntitySetName = "sdkmessageprocessingsteps";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -19522,7 +19522,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -19531,7 +19531,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Indicates whether the asynchronous system job is automatically deleted on completion.
 		/// </summary>
@@ -19551,9 +19551,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AsyncAutoDelete");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("canbebypassed")]
 		public System.Nullable<bool> CanBeBypassed
@@ -19571,9 +19571,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CanBeBypassed");
 			}
 		}
-		
+
 		/// <summary>
-		/// Identifies whether a SDK Message Processing Step type will be ReadOnly or Read Write. false - ReadWrite, true - ReadOnly 
+		/// Identifies whether a SDK Message Processing Step type will be ReadOnly or Read Write. false - ReadWrite, true - ReadOnly
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("canusereadonlyconnection")]
 		public System.Nullable<bool> CanUseReadOnlyConnection
@@ -19591,7 +19591,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CanUseReadOnlyConnection");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -19611,7 +19611,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Category");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -19631,7 +19631,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ComponentState");
 			}
 		}
-		
+
 		/// <summary>
 		/// Step-specific configuration for the plug-in type. Passed to the plug-in constructor at run time.
 		/// </summary>
@@ -19651,7 +19651,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Configuration");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the SDK message processing step.
 		/// </summary>
@@ -19671,7 +19671,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message processing step was created.
 		/// </summary>
@@ -19691,7 +19691,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who created the sdkmessageprocessingstep.
 		/// </summary>
@@ -19711,7 +19711,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Customization level of the SDK message processing step.
 		/// </summary>
@@ -19731,7 +19731,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomizationLevel");
 			}
 		}
-		
+
 		/// <summary>
 		/// Description of the SDK message processing step.
 		/// </summary>
@@ -19751,7 +19751,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Description");
 			}
 		}
-		
+
 		/// <summary>
 		/// EnablePluginProfiler
 		/// </summary>
@@ -19771,7 +19771,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("EnablePluginProfiler");
 			}
 		}
-		
+
 		/// <summary>
 		/// Configuration for sending pipeline events to the Event Expander service.
 		/// </summary>
@@ -19791,7 +19791,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("EventExpander");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the associated event handler.
 		/// </summary>
@@ -19811,7 +19811,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("EventHandler");
 			}
 		}
-		
+
 		/// <summary>
 		/// Comma-separated list of attributes. If at least one of these attributes is modified, the plug-in should execute.
 		/// </summary>
@@ -19831,7 +19831,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FilteringAttributes");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for fxexpression associated with SdkMessageProcessingStep.
 		/// </summary>
@@ -19851,7 +19851,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FxExpressionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user to impersonate context when step is executed.
 		/// </summary>
@@ -19871,7 +19871,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ImpersonatingUserId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Version in which the form is introduced.
 		/// </summary>
@@ -19891,7 +19891,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IntroducedVersion");
 			}
 		}
-		
+
 		/// <summary>
 		/// Identifies if a plug-in should be executed from a parent pipeline, a child pipeline, or both.
 		/// </summary>
@@ -19912,7 +19912,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("InvocationSource");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information that specifies whether this component can be customized.
 		/// </summary>
@@ -19932,7 +19932,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsCustomizable");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information that specifies whether this component should be hidden.
 		/// </summary>
@@ -19952,7 +19952,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsHidden");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information that specifies whether this component is managed.
 		/// </summary>
@@ -19972,7 +19972,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsManaged");
 			}
 		}
-		
+
 		/// <summary>
 		/// Run-time mode of execution, for example, synchronous or asynchronous.
 		/// </summary>
@@ -19992,7 +19992,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Mode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the SDK message processing step.
 		/// </summary>
@@ -20012,7 +20012,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message processing step was last modified.
 		/// </summary>
@@ -20032,7 +20032,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who last modified the sdkmessageprocessingstep.
 		/// </summary>
@@ -20052,7 +20052,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of SdkMessage processing step.
 		/// </summary>
@@ -20072,7 +20072,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the organization with which the SDK message processing step is associated.
 		/// </summary>
@@ -20092,7 +20092,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OrganizationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -20112,7 +20112,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OverwriteTime");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the plug-in type associated with the step.
 		/// </summary>
@@ -20133,7 +20133,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PluginTypeId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for powerfxrule associated with SdkMessageProcessingStep.
 		/// </summary>
@@ -20153,7 +20153,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("PowerfxRuleId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Processing order within the stage.
 		/// </summary>
@@ -20173,7 +20173,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Rank");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only. Holds miscellaneous properties related to runtime integration.
 		/// </summary>
@@ -20193,7 +20193,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("RuntimeIntegrationProperties");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message filter.
 		/// </summary>
@@ -20213,7 +20213,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageFilterId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message.
 		/// </summary>
@@ -20233,7 +20233,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message processing step entity.
 		/// </summary>
@@ -20261,7 +20261,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepid")]
 		public override System.Guid Id
 		{
@@ -20276,7 +20276,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SdkMessageProcessingStepId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message processing step.
 		/// </summary>
@@ -20296,7 +20296,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepIdUnique");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the Sdk message processing step secure configuration.
 		/// </summary>
@@ -20316,7 +20316,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepSecureConfigId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the associated solution.
 		/// </summary>
@@ -20336,7 +20336,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SolutionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Stage in the execution pipeline that the SDK message processing step is in.
 		/// </summary>
@@ -20356,7 +20356,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Stage");
 			}
 		}
-		
+
 		/// <summary>
 		/// Status of the SDK message processing step.
 		/// </summary>
@@ -20391,7 +20391,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Reason for the status of the SDK message processing step.
 		/// </summary>
@@ -20411,7 +20411,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StatusCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Deployment that the SDK message processing step should be executed on; server, client, or both.
 		/// </summary>
@@ -20431,7 +20431,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SupportedDeployment");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -20451,9 +20451,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SupportingSolutionId");
 			}
 		}
-		
+
 		/// <summary>
-		/// Number that identifies a specific revision of the SDK message processing step. 
+		/// Number that identifies a specific revision of the SDK message processing step.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
 		public System.Nullable<long> VersionNumber
@@ -20471,7 +20471,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("VersionNumber");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N sdkmessageprocessingstepid_sdkmessageprocessingstepimage
 		/// </summary>
@@ -20491,7 +20491,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("sdkmessageprocessingstepid_sdkmessageprocessingstepimage");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 createdby_sdkmessageprocessingstep
 		/// </summary>
@@ -20512,7 +20512,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 impersonatinguserid_sdkmessageprocessingstep
 		/// </summary>
@@ -20533,7 +20533,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("impersonatinguserid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessageprocessingstep_createdonbehalfby
 		/// </summary>
@@ -20554,7 +20554,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstep_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessageprocessingstep_modifiedonbehalfby
 		/// </summary>
@@ -20575,7 +20575,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstep_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 modifiedby_sdkmessageprocessingstep
 		/// </summary>
@@ -20596,7 +20596,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 plugintype_sdkmessageprocessingstep
 		/// </summary>
@@ -20617,7 +20617,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("plugintype_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 plugintypeid_sdkmessageprocessingstep
 		/// </summary>
@@ -20638,7 +20638,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("plugintypeid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 sdkmessagefilterid_sdkmessageprocessingstep
 		/// </summary>
@@ -20659,7 +20659,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("sdkmessagefilterid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 sdkmessageid_sdkmessageprocessingstep
 		/// </summary>
@@ -20680,7 +20680,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("sdkmessageid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 sdkmessageprocessingstepsecureconfigid_sdkmessageprocessingstep
 		/// </summary>
@@ -20702,7 +20702,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Copy of an entity's attributes before or after the core system operation.
 	/// </summary>
@@ -20710,7 +20710,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessageprocessingstepimage")]
 	public partial class SdkMessageProcessingStepImage : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the sdkmessageprocessingstepimage entity
 		/// </summary>
@@ -20749,32 +20749,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string modifiedby_sdkmessageprocessingstepimage = "modifiedby_sdkmessageprocessingstepimage";
 			public const string sdkmessageprocessingstepid_sdkmessageprocessingstepimage = "sdkmessageprocessingstepid_sdkmessageprocessingstepimage";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public SdkMessageProcessingStepImage() : 
+		public SdkMessageProcessingStepImage() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "SdkMessageProcessingStepImage";
-		
+
 		public const string PrimaryIdAttribute = "sdkmessageprocessingstepimageid";
-		
+
 		public const string PrimaryNameAttribute = "name";
-		
+
 		public const string EntityLogicalName = "sdkmessageprocessingstepimage";
-		
+
 		public const string EntityLogicalCollectionName = "sdkmessageprocessingstepimages";
-		
+
 		public const string EntitySetName = "sdkmessageprocessingstepimages";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -20783,7 +20783,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -20792,7 +20792,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Comma-separated list of attributes that are to be passed into the SDK message processing step image.
 		/// </summary>
@@ -20812,7 +20812,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Attributes1");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -20832,7 +20832,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ComponentState");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the SDK message processing step image.
 		/// </summary>
@@ -20852,7 +20852,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message processing step image was created.
 		/// </summary>
@@ -20872,7 +20872,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who created the sdkmessageprocessingstepimage.
 		/// </summary>
@@ -20892,7 +20892,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Customization level of the SDK message processing step image.
 		/// </summary>
@@ -20912,7 +20912,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomizationLevel");
 			}
 		}
-		
+
 		/// <summary>
 		/// Description of the SDK message processing step image.
 		/// </summary>
@@ -20932,7 +20932,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Description");
 			}
 		}
-		
+
 		/// <summary>
 		/// Key name used to access the pre-image or post-image property bags in a step.
 		/// </summary>
@@ -20952,7 +20952,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("EntityAlias");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type of image requested.
 		/// </summary>
@@ -20972,7 +20972,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ImageType");
 			}
 		}
-		
+
 		/// <summary>
 		/// Version in which the form is introduced.
 		/// </summary>
@@ -20992,7 +20992,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IntroducedVersion");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information that specifies whether this component can be customized.
 		/// </summary>
@@ -21012,9 +21012,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsCustomizable");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ismanaged")]
 		public System.Nullable<bool> IsManaged
@@ -21032,7 +21032,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsManaged");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the property on the Request message.
 		/// </summary>
@@ -21052,7 +21052,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("MessagePropertyName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the SDK message processing step.
 		/// </summary>
@@ -21072,7 +21072,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message processing step was last modified.
 		/// </summary>
@@ -21092,7 +21092,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who last modified the sdkmessageprocessingstepimage.
 		/// </summary>
@@ -21112,7 +21112,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of SdkMessage processing step image.
 		/// </summary>
@@ -21132,7 +21132,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Name");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the organization with which the SDK message processing step is associated.
 		/// </summary>
@@ -21152,7 +21152,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OrganizationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -21172,7 +21172,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OverwriteTime");
 			}
 		}
-		
+
 		/// <summary>
 		/// Name of the related entity.
 		/// </summary>
@@ -21192,7 +21192,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("RelatedAttributeName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message processing step.
 		/// </summary>
@@ -21212,7 +21212,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message processing step image entity.
 		/// </summary>
@@ -21240,7 +21240,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepImageId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepimageid")]
 		public override System.Guid Id
 		{
@@ -21255,7 +21255,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SdkMessageProcessingStepImageId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message processing step image.
 		/// </summary>
@@ -21275,7 +21275,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepImageIdUnique");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the associated solution.
 		/// </summary>
@@ -21295,7 +21295,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SolutionId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -21315,9 +21315,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SupportingSolutionId");
 			}
 		}
-		
+
 		/// <summary>
-		/// Number that identifies a specific revision of the step image. 
+		/// Number that identifies a specific revision of the step image.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
 		public System.Nullable<long> VersionNumber
@@ -21335,7 +21335,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("VersionNumber");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 createdby_sdkmessageprocessingstepimage
 		/// </summary>
@@ -21356,7 +21356,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessageprocessingstepimage");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessageprocessingstepimage_createdonbehalfby
 		/// </summary>
@@ -21377,7 +21377,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessageprocessingstepimage_modifiedonbehalfby
 		/// </summary>
@@ -21398,7 +21398,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 modifiedby_sdkmessageprocessingstepimage
 		/// </summary>
@@ -21419,7 +21419,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstepimage");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 sdkmessageprocessingstepid_sdkmessageprocessingstepimage
 		/// </summary>
@@ -21441,7 +21441,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Non-public custom configuration that is passed to a plug-in's constructor.
 	/// </summary>
@@ -21449,7 +21449,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessageprocessingstepsecureconfig")]
 	public partial class SdkMessageProcessingStepSecureConfig : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the sdkmessageprocessingstepsecureconfig entity
 		/// </summary>
@@ -21473,30 +21473,30 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_sdkmessageprocessingstepsecureconfig_modifiedonbehalfby = "lk_sdkmessageprocessingstepsecureconfig_modifiedonbehalfby";
 			public const string modifiedby_sdkmessageprocessingstepsecureconfig = "modifiedby_sdkmessageprocessingstepsecureconfig";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public SdkMessageProcessingStepSecureConfig() : 
+		public SdkMessageProcessingStepSecureConfig() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "SdkMessageProcessingStepSecureConfig";
-		
+
 		public const string PrimaryIdAttribute = "sdkmessageprocessingstepsecureconfigid";
-		
+
 		public const string EntityLogicalName = "sdkmessageprocessingstepsecureconfig";
-		
+
 		public const string EntityLogicalCollectionName = "sdkmessageprocessingstepsecureconfigs";
-		
+
 		public const string EntitySetName = "sdkmessageprocessingstepsecureconfigs";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -21505,7 +21505,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -21514,7 +21514,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who created the SDK message processing step.
 		/// </summary>
@@ -21534,7 +21534,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message processing step was created.
 		/// </summary>
@@ -21554,7 +21554,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who created the sdkmessageprocessingstepsecureconfig.
 		/// </summary>
@@ -21574,7 +21574,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CreatedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Customization level of the SDK message processing step secure configuration.
 		/// </summary>
@@ -21594,7 +21594,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("CustomizationLevel");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the user who last modified the SDK message processing step.
 		/// </summary>
@@ -21614,7 +21614,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Date and time when the SDK message processing step was last modified.
 		/// </summary>
@@ -21634,7 +21634,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the delegate user who last modified the sdkmessageprocessingstepsecureconfig.
 		/// </summary>
@@ -21654,7 +21654,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOnBehalfBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the organization with which the SDK message processing step is associated.
 		/// </summary>
@@ -21674,7 +21674,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("OrganizationId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message processing step secure configuration.
 		/// </summary>
@@ -21702,7 +21702,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepSecureConfigId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepsecureconfigid")]
 		public override System.Guid Id
 		{
@@ -21717,7 +21717,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SdkMessageProcessingStepSecureConfigId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the SDK message processing step.
 		/// </summary>
@@ -21737,7 +21737,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SdkMessageProcessingStepSecureConfigIdUnique");
 			}
 		}
-		
+
 		/// <summary>
 		/// Secure step-specific configuration for the plug-in type that is passed to the plug-in's constructor at run time.
 		/// </summary>
@@ -21757,7 +21757,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SecureConfig");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N sdkmessageprocessingstepsecureconfigid_sdkmessageprocessingstep
 		/// </summary>
@@ -21777,7 +21777,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("sdkmessageprocessingstepsecureconfigid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 createdby_sdkmessageprocessingstepsecureconfig
 		/// </summary>
@@ -21798,7 +21798,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessageprocessingstepsecureconfig");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessageprocessingstepsecureconfig_createdonbehalfby
 		/// </summary>
@@ -21819,7 +21819,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepsecureconfig_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_sdkmessageprocessingstepsecureconfig_modifiedonbehalfby
 		/// </summary>
@@ -21840,7 +21840,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepsecureconfig_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 modifiedby_sdkmessageprocessingstepsecureconfig
 		/// </summary>
@@ -21862,7 +21862,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Information regarding subjects available in the system.
 	/// </summary>
@@ -21870,7 +21870,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("subject")]
 	public partial class Subject : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the subject entity
 		/// </summary>
@@ -21888,32 +21888,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_subjectbase_modifiedby = "lk_subjectbase_modifiedby";
 			public const string Referencingsubject_parent_subject = "subject_parent_subject";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Subject() : 
+		public Subject() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Subject";
-		
+
 		public const string PrimaryIdAttribute = "subjectid";
-		
+
 		public const string PrimaryNameAttribute = "title";
-		
+
 		public const string EntityLogicalName = "subject";
-		
+
 		public const string EntityLogicalCollectionName = "subjects";
-		
+
 		public const string EntitySetName = "subjects";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -21922,7 +21922,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -21931,7 +21931,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Description of the subject.
 		/// </summary>
@@ -21951,7 +21951,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Description");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the subject.
 		/// </summary>
@@ -21979,7 +21979,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SubjectId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subjectid")]
 		public override System.Guid Id
 		{
@@ -21994,7 +21994,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SubjectId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Title of the subject.
 		/// </summary>
@@ -22014,7 +22014,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Title");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N subject_incidents
 		/// </summary>
@@ -22034,7 +22034,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("subject_incidents");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N subject_parent_subject
 		/// </summary>
@@ -22054,7 +22054,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedsubject_parent_subject");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_subject_createdonbehalfby
 		/// </summary>
@@ -22075,7 +22075,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subject_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_subject_modifiedonbehalfby
 		/// </summary>
@@ -22096,7 +22096,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subject_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_subjectbase_createdby
 		/// </summary>
@@ -22117,7 +22117,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subjectbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_subjectbase_modifiedby
 		/// </summary>
@@ -22138,7 +22138,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subjectbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 subject_parent_subject
 		/// </summary>
@@ -22160,7 +22160,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Person with access to the Microsoft CRM system and who owns objects in the Microsoft CRM database.
 	/// </summary>
@@ -22168,7 +22168,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("systemuser")]
 	public partial class SystemUser : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the systemuser entity
 		/// </summary>
@@ -22371,34 +22371,34 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencinglk_systemuserbase_modifiedby = "lk_systemuserbase_modifiedby";
 			public const string Referencinguser_parent_user = "user_parent_user";
 		}
-		
+
 		public const string AlternateKeys = "azureactivedirectoryobjectid";
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public SystemUser() : 
+		public SystemUser() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "SystemUser";
-		
+
 		public const string PrimaryIdAttribute = "systemuserid";
-		
+
 		public const string PrimaryNameAttribute = "fullname";
-		
+
 		public const string EntityLogicalName = "systemuser";
-		
+
 		public const string EntityLogicalCollectionName = "systemusers";
-		
+
 		public const string EntitySetName = "systemusers";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -22407,7 +22407,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -22416,7 +22416,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// This is the application directory object Id.
 		/// </summary>
@@ -22436,7 +22436,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("AzureActiveDirectoryObjectId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the business unit with which the user is associated.
 		/// </summary>
@@ -22456,7 +22456,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("BusinessUnitId");
 			}
 		}
-		
+
 		/// <summary>
 		/// First name of the user.
 		/// </summary>
@@ -22476,7 +22476,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FirstName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Full name of the user.
 		/// </summary>
@@ -22496,7 +22496,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("FullName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Information about whether the user is enabled.
 		/// </summary>
@@ -22516,7 +22516,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("IsDisabled");
 			}
 		}
-		
+
 		/// <summary>
 		/// Last name of the user.
 		/// </summary>
@@ -22536,7 +22536,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("LastName");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for the user.
 		/// </summary>
@@ -22564,7 +22564,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SystemUserId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserid")]
 		public override System.Guid Id
 		{
@@ -22579,7 +22579,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SystemUserId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N annotation_owning_user
 		/// </summary>
@@ -22599,7 +22599,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("annotation_owning_user");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N contact_owning_user
 		/// </summary>
@@ -22619,7 +22619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("contact_owning_user");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N createdby_plugintype
 		/// </summary>
@@ -22639,7 +22639,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_plugintype");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N createdby_sdkmessage
 		/// </summary>
@@ -22659,7 +22659,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessage");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N createdby_sdkmessagefilter
 		/// </summary>
@@ -22679,7 +22679,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessagefilter");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N createdby_sdkmessageprocessingstep
 		/// </summary>
@@ -22699,7 +22699,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N createdby_sdkmessageprocessingstepimage
 		/// </summary>
@@ -22719,7 +22719,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessageprocessingstepimage");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N createdby_sdkmessageprocessingstepsecureconfig
 		/// </summary>
@@ -22739,7 +22739,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("createdby_sdkmessageprocessingstepsecureconfig");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N impersonatinguserid_sdkmessageprocessingstep
 		/// </summary>
@@ -22759,7 +22759,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("impersonatinguserid_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_accountbase_createdby
 		/// </summary>
@@ -22779,7 +22779,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_accountbase_createdonbehalfby
 		/// </summary>
@@ -22799,7 +22799,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_accountbase_modifiedby
 		/// </summary>
@@ -22819,7 +22819,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_accountbase_modifiedonbehalfby
 		/// </summary>
@@ -22839,7 +22839,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_accountbase_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_annotationbase_createdby
 		/// </summary>
@@ -22859,7 +22859,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_annotationbase_createdonbehalfby
 		/// </summary>
@@ -22879,7 +22879,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_annotationbase_modifiedby
 		/// </summary>
@@ -22899,7 +22899,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_annotationbase_modifiedonbehalfby
 		/// </summary>
@@ -22919,7 +22919,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_annotationbase_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_audit_callinguserid
 		/// </summary>
@@ -22939,7 +22939,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_audit_callinguserid");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_audit_userid
 		/// </summary>
@@ -22959,7 +22959,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_audit_userid");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_businessunit_createdonbehalfby
 		/// </summary>
@@ -22979,7 +22979,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_businessunit_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_businessunit_modifiedonbehalfby
 		/// </summary>
@@ -22999,7 +22999,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_businessunit_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_businessunitbase_createdby
 		/// </summary>
@@ -23019,7 +23019,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_businessunitbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_businessunitbase_modifiedby
 		/// </summary>
@@ -23039,7 +23039,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_businessunitbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_contact_createdonbehalfby
 		/// </summary>
@@ -23059,7 +23059,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contact_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_contact_modifiedonbehalfby
 		/// </summary>
@@ -23079,7 +23079,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contact_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_contactbase_createdby
 		/// </summary>
@@ -23099,7 +23099,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contactbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_contactbase_modifiedby
 		/// </summary>
@@ -23119,7 +23119,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_contactbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_businesseventaudit_createdby
 		/// </summary>
@@ -23139,7 +23139,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_businesseventaudit_createdonbehalfby
 		/// </summary>
@@ -23159,7 +23159,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_businesseventaudit_modifiedby
 		/// </summary>
@@ -23179,7 +23179,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_businesseventaudit_modifiedonbehalfby
 		/// </summary>
@@ -23199,7 +23199,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_country_createdby
 		/// </summary>
@@ -23219,7 +23219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_country_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_country_createdonbehalfby
 		/// </summary>
@@ -23239,7 +23239,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_country_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_country_modifiedby
 		/// </summary>
@@ -23259,7 +23259,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_country_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_country_modifiedonbehalfby
 		/// </summary>
@@ -23279,7 +23279,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_country_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_document_createdby
 		/// </summary>
@@ -23299,7 +23299,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_document_createdonbehalfby
 		/// </summary>
@@ -23319,7 +23319,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_document_modifiedby
 		/// </summary>
@@ -23339,7 +23339,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_document_modifiedonbehalfby
 		/// </summary>
@@ -23359,7 +23359,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_document_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_earlyyearsstatus_createdby
 		/// </summary>
@@ -23379,7 +23379,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_earlyyearsstatus_createdonbehalfby
 		/// </summary>
@@ -23399,7 +23399,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_earlyyearsstatus_modifiedby
 		/// </summary>
@@ -23419,7 +23419,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_earlyyearsstatus_modifiedonbehalfby
 		/// </summary>
@@ -23439,7 +23439,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hequalification_createdby
 		/// </summary>
@@ -23459,7 +23459,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hequalification_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hequalification_createdonbehalfby
 		/// </summary>
@@ -23479,7 +23479,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hequalification_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hequalification_modifiedby
 		/// </summary>
@@ -23499,7 +23499,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hequalification_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hequalification_modifiedonbehalfby
 		/// </summary>
@@ -23519,7 +23519,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hequalification_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hesubject_createdby
 		/// </summary>
@@ -23539,7 +23539,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hesubject_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hesubject_createdonbehalfby
 		/// </summary>
@@ -23559,7 +23559,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hesubject_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hesubject_modifiedby
 		/// </summary>
@@ -23579,7 +23579,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hesubject_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_hesubject_modifiedonbehalfby
 		/// </summary>
@@ -23599,7 +23599,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_hesubject_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_induction_createdby
 		/// </summary>
@@ -23619,7 +23619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_induction_createdonbehalfby
 		/// </summary>
@@ -23639,7 +23639,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_induction_modifiedby
 		/// </summary>
@@ -23659,7 +23659,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_induction_modifiedonbehalfby
 		/// </summary>
@@ -23679,7 +23679,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_induction_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_inductionperiod_createdby
 		/// </summary>
@@ -23699,7 +23699,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_inductionperiod_createdonbehalfby
 		/// </summary>
@@ -23719,7 +23719,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_inductionperiod_modifiedby
 		/// </summary>
@@ -23739,7 +23739,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_inductionperiod_modifiedonbehalfby
 		/// </summary>
@@ -23759,7 +23759,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_initialteachertraining_createdby
 		/// </summary>
@@ -23779,7 +23779,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_initialteachertraining_createdonbehalfby
 		/// </summary>
@@ -23799,7 +23799,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_initialteachertraining_modifiedby
 		/// </summary>
@@ -23819,7 +23819,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_initialteachertraining_modifiedonbehalfby
 		/// </summary>
@@ -23839,7 +23839,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransaction_createdby
 		/// </summary>
@@ -23859,7 +23859,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransaction_createdonbehalfby
 		/// </summary>
@@ -23879,7 +23879,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransaction_modifiedby
 		/// </summary>
@@ -23899,7 +23899,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransaction_modifiedonbehalfby
 		/// </summary>
@@ -23919,7 +23919,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransaction_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransactionrecord_createdby
 		/// </summary>
@@ -23939,7 +23939,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransactionrecord_createdonbehalfby
 		/// </summary>
@@ -23959,7 +23959,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransactionrecord_modifiedby
 		/// </summary>
@@ -23979,7 +23979,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_integrationtransactionrecord_modifiedonbehalfby
 		/// </summary>
@@ -23999,7 +23999,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_integrationtransactionrecord_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittqualification_createdby
 		/// </summary>
@@ -24019,7 +24019,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittqualification_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittqualification_createdonbehalfby
 		/// </summary>
@@ -24039,7 +24039,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittqualification_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittqualification_modifiedby
 		/// </summary>
@@ -24059,7 +24059,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittqualification_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittqualification_modifiedonbehalfby
 		/// </summary>
@@ -24079,7 +24079,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittqualification_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittsubject_createdby
 		/// </summary>
@@ -24099,7 +24099,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittsubject_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittsubject_createdonbehalfby
 		/// </summary>
@@ -24119,7 +24119,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittsubject_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittsubject_modifiedby
 		/// </summary>
@@ -24139,7 +24139,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_ittsubject_modifiedonbehalfby
 		/// </summary>
@@ -24159,7 +24159,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_mqestablishment_createdby
 		/// </summary>
@@ -24179,7 +24179,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_mqestablishment_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_mqestablishment_createdonbehalfby
 		/// </summary>
@@ -24199,7 +24199,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_mqestablishment_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_mqestablishment_modifiedby
 		/// </summary>
@@ -24219,7 +24219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_mqestablishment_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_mqestablishment_modifiedonbehalfby
 		/// </summary>
@@ -24239,7 +24239,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_mqestablishment_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_previousname_createdby
 		/// </summary>
@@ -24259,7 +24259,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_previousname_createdonbehalfby
 		/// </summary>
@@ -24279,7 +24279,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_previousname_modifiedby
 		/// </summary>
@@ -24299,7 +24299,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_previousname_modifiedonbehalfby
 		/// </summary>
@@ -24319,7 +24319,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_previousname_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qtsregistration_createdby
 		/// </summary>
@@ -24339,7 +24339,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qtsregistration_createdonbehalfby
 		/// </summary>
@@ -24359,7 +24359,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qtsregistration_modifiedby
 		/// </summary>
@@ -24379,7 +24379,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qtsregistration_modifiedonbehalfby
 		/// </summary>
@@ -24399,7 +24399,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qualification_createdby
 		/// </summary>
@@ -24419,7 +24419,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qualification_createdonbehalfby
 		/// </summary>
@@ -24439,7 +24439,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qualification_modifiedby
 		/// </summary>
@@ -24459,7 +24459,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_qualification_modifiedonbehalfby
 		/// </summary>
@@ -24479,7 +24479,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_qualification_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanction_createdby
 		/// </summary>
@@ -24499,7 +24499,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanction_createdonbehalfby
 		/// </summary>
@@ -24519,7 +24519,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanction_modifiedby
 		/// </summary>
@@ -24539,7 +24539,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanction_modifiedonbehalfby
 		/// </summary>
@@ -24559,7 +24559,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanction_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanctioncode_createdby
 		/// </summary>
@@ -24579,7 +24579,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanctioncode_createdonbehalfby
 		/// </summary>
@@ -24599,7 +24599,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanctioncode_modifiedby
 		/// </summary>
@@ -24619,7 +24619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanctioncode_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_sanctioncode_modifiedonbehalfby
 		/// </summary>
@@ -24639,7 +24639,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_sanctioncode_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_specialism_createdby
 		/// </summary>
@@ -24659,7 +24659,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_specialism_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_specialism_createdonbehalfby
 		/// </summary>
@@ -24679,7 +24679,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_specialism_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_specialism_modifiedby
 		/// </summary>
@@ -24699,7 +24699,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_specialism_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_specialism_modifiedonbehalfby
 		/// </summary>
@@ -24719,7 +24719,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_specialism_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_teacherstatus_createdby
 		/// </summary>
@@ -24739,7 +24739,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_teacherstatus_createdonbehalfby
 		/// </summary>
@@ -24759,7 +24759,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_teacherstatus_modifiedby
 		/// </summary>
@@ -24779,7 +24779,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_teacherstatus_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_teacherstatus_modifiedonbehalfby
 		/// </summary>
@@ -24799,7 +24799,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_teacherstatus_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsevent_createdby
 		/// </summary>
@@ -24819,7 +24819,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsevent_createdonbehalfby
 		/// </summary>
@@ -24839,7 +24839,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsevent_modifiedby
 		/// </summary>
@@ -24859,7 +24859,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsevent_modifiedonbehalfby
 		/// </summary>
@@ -24879,7 +24879,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsevent_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsoutboxmessage_createdby
 		/// </summary>
@@ -24899,7 +24899,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsoutboxmessage_createdonbehalfby
 		/// </summary>
@@ -24919,7 +24919,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsoutboxmessage_modifiedby
 		/// </summary>
@@ -24939,7 +24939,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_dfeta_trsoutboxmessage_modifiedonbehalfby
 		/// </summary>
@@ -24959,7 +24959,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentbase_createdby
 		/// </summary>
@@ -24979,7 +24979,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentbase_createdonbehalfby
 		/// </summary>
@@ -24999,7 +24999,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentbase_modifiedby
 		/// </summary>
@@ -25019,7 +25019,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentbase_modifiedonbehalfby
 		/// </summary>
@@ -25039,7 +25039,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentbase_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentresolution_createdby
 		/// </summary>
@@ -25059,7 +25059,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentresolution_createdonbehalfby
 		/// </summary>
@@ -25079,7 +25079,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentresolution_modifiedby
 		/// </summary>
@@ -25099,7 +25099,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_incidentresolution_modifiedonbehalfby
 		/// </summary>
@@ -25119,7 +25119,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_incidentresolution_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_plugintype_createdonbehalfby
 		/// </summary>
@@ -25139,7 +25139,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_plugintype_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_plugintype_modifiedonbehalfby
 		/// </summary>
@@ -25159,7 +25159,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_plugintype_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_role_createdonbehalfby
 		/// </summary>
@@ -25179,7 +25179,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_role_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_role_modifiedonbehalfby
 		/// </summary>
@@ -25199,7 +25199,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_role_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_rolebase_createdby
 		/// </summary>
@@ -25219,7 +25219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_rolebase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_rolebase_modifiedby
 		/// </summary>
@@ -25239,7 +25239,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_rolebase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessage_createdonbehalfby
 		/// </summary>
@@ -25259,7 +25259,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessage_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessage_modifiedonbehalfby
 		/// </summary>
@@ -25279,7 +25279,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessage_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessagefilter_createdonbehalfby
 		/// </summary>
@@ -25299,7 +25299,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessagefilter_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessagefilter_modifiedonbehalfby
 		/// </summary>
@@ -25319,7 +25319,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessagefilter_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessageprocessingstep_createdonbehalfby
 		/// </summary>
@@ -25339,7 +25339,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstep_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessageprocessingstep_modifiedonbehalfby
 		/// </summary>
@@ -25359,7 +25359,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstep_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessageprocessingstepimage_createdonbehalfby
 		/// </summary>
@@ -25379,7 +25379,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessageprocessingstepimage_modifiedonbehalfby
 		/// </summary>
@@ -25399,7 +25399,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessageprocessingstepsecureconfig_createdonbehalfby
 		/// </summary>
@@ -25419,7 +25419,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepsecureconfig_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_sdkmessageprocessingstepsecureconfig_modifiedonbehalfby
 		/// </summary>
@@ -25439,7 +25439,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_sdkmessageprocessingstepsecureconfig_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_subject_createdonbehalfby
 		/// </summary>
@@ -25459,7 +25459,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subject_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_subject_modifiedonbehalfby
 		/// </summary>
@@ -25479,7 +25479,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subject_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_subjectbase_createdby
 		/// </summary>
@@ -25499,7 +25499,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subjectbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_subjectbase_modifiedby
 		/// </summary>
@@ -25519,7 +25519,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_subjectbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_systemuser_createdonbehalfby
 		/// </summary>
@@ -25539,7 +25539,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedlk_systemuser_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_systemuser_modifiedonbehalfby
 		/// </summary>
@@ -25559,7 +25559,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedlk_systemuser_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_systemuserbase_createdby
 		/// </summary>
@@ -25579,7 +25579,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedlk_systemuserbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_systemuserbase_modifiedby
 		/// </summary>
@@ -25599,7 +25599,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencedlk_systemuserbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_task_createdby
 		/// </summary>
@@ -25619,7 +25619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_task_createdonbehalfby
 		/// </summary>
@@ -25639,7 +25639,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_task_modifiedby
 		/// </summary>
@@ -25659,7 +25659,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N lk_task_modifiedonbehalfby
 		/// </summary>
@@ -25679,7 +25679,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N modifiedby_plugintype
 		/// </summary>
@@ -25699,7 +25699,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_plugintype");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N modifiedby_sdkmessage
 		/// </summary>
@@ -25719,7 +25719,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessage");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N modifiedby_sdkmessagefilter
 		/// </summary>
@@ -25739,7 +25739,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessagefilter");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N modifiedby_sdkmessageprocessingstep
 		/// </summary>
@@ -25759,7 +25759,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstep");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N modifiedby_sdkmessageprocessingstepimage
 		/// </summary>
@@ -25779,7 +25779,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstepimage");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N modifiedby_sdkmessageprocessingstepsecureconfig
 		/// </summary>
@@ -25799,7 +25799,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstepsecureconfig");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N system_user_accounts
 		/// </summary>
@@ -25819,7 +25819,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("system_user_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N system_user_contacts
 		/// </summary>
@@ -25839,7 +25839,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("system_user_contacts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N system_user_incidents
 		/// </summary>
@@ -25859,7 +25859,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("system_user_incidents");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_accounts
 		/// </summary>
@@ -25879,7 +25879,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_accounts");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_businesseventaudit
 		/// </summary>
@@ -25899,7 +25899,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_businesseventaudit");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_document
 		/// </summary>
@@ -25919,7 +25919,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_document");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_induction
 		/// </summary>
@@ -25939,7 +25939,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_induction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_inductionperiod
 		/// </summary>
@@ -25959,7 +25959,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_inductionperiod");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_initialteachertraining
 		/// </summary>
@@ -25979,7 +25979,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_initialteachertraining");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_integrationtransaction
 		/// </summary>
@@ -25999,7 +25999,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_integrationtransaction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_integrationtransactionrecord
 		/// </summary>
@@ -26019,7 +26019,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_integrationtransactionrecord");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_previousname
 		/// </summary>
@@ -26039,7 +26039,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_previousname");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_qtsregistration
 		/// </summary>
@@ -26059,7 +26059,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_qtsregistration");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_qualification
 		/// </summary>
@@ -26079,7 +26079,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_qualification");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_sanction
 		/// </summary>
@@ -26099,7 +26099,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_sanction");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_trsevent
 		/// </summary>
@@ -26119,7 +26119,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_trsevent");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_dfeta_trsoutboxmessage
 		/// </summary>
@@ -26139,7 +26139,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_dfeta_trsoutboxmessage");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_incidentresolution
 		/// </summary>
@@ -26159,7 +26159,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_incidentresolution");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_parent_user
 		/// </summary>
@@ -26179,7 +26179,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referenceduser_parent_user");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N user_task
 		/// </summary>
@@ -26199,7 +26199,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("user_task");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:N systemuserroles_association
 		/// </summary>
@@ -26219,7 +26219,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("systemuserroles_association");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_system_users
 		/// </summary>
@@ -26240,7 +26240,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_system_users");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_systemuser_createdonbehalfby
 		/// </summary>
@@ -26261,7 +26261,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencinglk_systemuser_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_systemuser_modifiedonbehalfby
 		/// </summary>
@@ -26282,7 +26282,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencinglk_systemuser_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_systemuserbase_createdby
 		/// </summary>
@@ -26303,7 +26303,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencinglk_systemuserbase_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_systemuserbase_modifiedby
 		/// </summary>
@@ -26324,7 +26324,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Referencinglk_systemuserbase_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_parent_user
 		/// </summary>
@@ -26346,15 +26346,15 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("systemuserroles")]
 	public partial class SystemUserRoles : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the systemuserroles entity
 		/// </summary>
@@ -26367,30 +26367,30 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string VersionNumber = "versionnumber";
 			public const string systemuserroles_association = "systemuserroles_association";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public SystemUserRoles() : 
+		public SystemUserRoles() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "SystemUserRoles";
-		
+
 		public const string PrimaryIdAttribute = "systemuserroleid";
-		
+
 		public const string EntityLogicalName = "systemuserroles";
-		
+
 		public const string EntityLogicalCollectionName = null;
-		
+
 		public const string EntitySetName = "systemuserrolescollection";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -26399,7 +26399,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -26408,9 +26408,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("roleid")]
 		public System.Nullable<System.Guid> RoleId
@@ -26428,9 +26428,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("RoleId");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserid")]
 		public System.Nullable<System.Guid> SystemUserId
@@ -26448,7 +26448,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SystemUserId");
 			}
 		}
-		
+
 		/// <summary>
 		/// For internal use only.
 		/// </summary>
@@ -26476,7 +26476,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("SystemUserRoleId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserroleid")]
 		public override System.Guid Id
 		{
@@ -26491,9 +26491,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.SystemUserRoleId = value;
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
 		public System.Nullable<long> VersionNumber
@@ -26511,7 +26511,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("VersionNumber");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:N systemuserroles_association
 		/// </summary>
@@ -26532,21 +26532,21 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum TaskState
 	{
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Open = 0,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		Completed = 1,
-		
+
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		Canceled = 2,
-	}
-	
+		Canceled = 2
+    }
+
 	/// <summary>
 	/// Generic activity representing work needed to be done.
 	/// </summary>
@@ -26554,7 +26554,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("task")]
 	public partial class Task : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-		
+
 		/// <summary>
 		/// Available fields, a the time of codegen, for the task entity
 		/// </summary>
@@ -26585,32 +26585,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_task_modifiedonbehalfby = "lk_task_modifiedonbehalfby";
 			public const string user_task = "user_task";
 		}
-		
+
 		/// <summary>
 		/// Default Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public Task() : 
+		public Task() :
 				base(EntityLogicalName)
 		{
 		}
-		
+
 		public const string EntitySchemaName = "Task";
-		
+
 		public const string PrimaryIdAttribute = "activityid";
-		
+
 		public const string PrimaryNameAttribute = "subject";
-		
+
 		public const string EntityLogicalName = "task";
-		
+
 		public const string EntityLogicalCollectionName = "tasks";
-		
+
 		public const string EntitySetName = "tasks";
-		
+
 		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-		
+
 		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanged(string propertyName)
 		{
@@ -26619,7 +26619,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		private void OnPropertyChanging(string propertyName)
 		{
@@ -26628,7 +26628,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the task.
 		/// </summary>
@@ -26656,7 +26656,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ActivityId");
 			}
 		}
-		
+
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
 		public override System.Guid Id
 		{
@@ -26671,7 +26671,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.ActivityId = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// Type a category to identify the task type, such as lead gathering or customer follow up, to tie the task to a business group or function.
 		/// </summary>
@@ -26691,7 +26691,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Category");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type additional information to describe the task.
 		/// </summary>
@@ -26711,9 +26711,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Description");
 			}
 		}
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_emailaddress")]
 		public string dfeta_EmailAddress
@@ -26731,7 +26731,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EmailAddress");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier for Person associated with Task.
 		/// </summary>
@@ -26751,7 +26751,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_potentialduplicateid");
 			}
 		}
-		
+
 		/// <summary>
 		/// Shows who last updated the record.
 		/// </summary>
@@ -26771,7 +26771,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedBy");
 			}
 		}
-		
+
 		/// <summary>
 		/// Shows the date and time when the record was last updated. The date and time are displayed in the time zone selected in Microsoft Dynamics 365 options.
 		/// </summary>
@@ -26791,7 +26791,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
-		
+
 		/// <summary>
 		/// Unique identifier of the object with which the task is associated.
 		/// </summary>
@@ -26811,7 +26811,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("RegardingObjectId");
 			}
 		}
-		
+
 		/// <summary>
 		/// Enter the expected due date and time.
 		/// </summary>
@@ -26831,7 +26831,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("ScheduledEnd");
 			}
 		}
-		
+
 		/// <summary>
 		/// Shows whether the task is open, completed, or canceled. Completed and canceled tasks are read-only and can't be edited.
 		/// </summary>
@@ -26866,7 +26866,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-		
+
 		/// <summary>
 		/// Type a short description about the objective or primary topic of the task.
 		/// </summary>
@@ -26886,7 +26886,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Subject");
 			}
 		}
-		
+
 		/// <summary>
 		/// 1:N Task_Annotation
 		/// </summary>
@@ -26906,7 +26906,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Task_Annotation");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Account_Tasks
 		/// </summary>
@@ -26927,7 +26927,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Account_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 business_unit_task_activities
 		/// </summary>
@@ -26948,7 +26948,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("business_unit_task_activities");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Contact_Tasks
 		/// </summary>
@@ -26969,7 +26969,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Contact_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_contact_task_potentialduplicateid
 		/// </summary>
@@ -26990,7 +26990,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_task_potentialduplicateid");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 dfeta_document_Tasks
 		/// </summary>
@@ -27011,7 +27011,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_document_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 Incident_Tasks
 		/// </summary>
@@ -27032,7 +27032,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Incident_Tasks");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_task_createdby
 		/// </summary>
@@ -27053,7 +27053,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_createdby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_task_createdonbehalfby
 		/// </summary>
@@ -27074,7 +27074,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_createdonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_task_modifiedby
 		/// </summary>
@@ -27095,7 +27095,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_modifiedby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 lk_task_modifiedonbehalfby
 		/// </summary>
@@ -27116,7 +27116,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("lk_task_modifiedonbehalfby");
 			}
 		}
-		
+
 		/// <summary>
 		/// N:1 user_task
 		/// </summary>
@@ -27138,22 +27138,22 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
 	/// </summary>
 	public partial class DqtCrmServiceContext : Microsoft.Xrm.Sdk.Client.OrganizationServiceContext
 	{
-		
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		[System.Diagnostics.DebuggerNonUserCode()]
-		public DqtCrmServiceContext(Microsoft.Xrm.Sdk.IOrganizationService service) : 
+		public DqtCrmServiceContext(Microsoft.Xrm.Sdk.IOrganizationService service) :
 				base(service)
 		{
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Account"/> entities.
 		/// </summary>
@@ -27165,7 +27165,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Account>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Annotation"/> entities.
 		/// </summary>
@@ -27177,7 +27177,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Annotation>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Audit"/> entities.
 		/// </summary>
@@ -27189,7 +27189,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Audit>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.BusinessUnit"/> entities.
 		/// </summary>
@@ -27201,7 +27201,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.BusinessUnit>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Contact"/> entities.
 		/// </summary>
@@ -27213,7 +27213,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Contact>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit"/> entities.
 		/// </summary>
@@ -27225,7 +27225,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_country"/> entities.
 		/// </summary>
@@ -27237,7 +27237,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_document"/> entities.
 		/// </summary>
@@ -27249,7 +27249,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus"/> entities.
 		/// </summary>
@@ -27261,7 +27261,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification"/> entities.
 		/// </summary>
@@ -27273,7 +27273,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject"/> entities.
 		/// </summary>
@@ -27285,7 +27285,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_induction"/> entities.
 		/// </summary>
@@ -27297,7 +27297,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod"/> entities.
 		/// </summary>
@@ -27309,7 +27309,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining"/> entities.
 		/// </summary>
@@ -27321,7 +27321,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_integrationtransaction"/> entities.
 		/// </summary>
@@ -27333,7 +27333,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_integrationtransaction>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_integrationtransactionrecord"/> entities.
 		/// </summary>
@@ -27345,7 +27345,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_integrationtransactionrecord>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification"/> entities.
 		/// </summary>
@@ -27357,7 +27357,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject"/> entities.
 		/// </summary>
@@ -27369,7 +27369,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_mqestablishment"/> entities.
 		/// </summary>
@@ -27381,7 +27381,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_mqestablishment>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname"/> entities.
 		/// </summary>
@@ -27393,7 +27393,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration"/> entities.
 		/// </summary>
@@ -27405,7 +27405,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification"/> entities.
 		/// </summary>
@@ -27417,7 +27417,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction"/> entities.
 		/// </summary>
@@ -27429,7 +27429,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode"/> entities.
 		/// </summary>
@@ -27441,7 +27441,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism"/> entities.
 		/// </summary>
@@ -27453,7 +27453,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus"/> entities.
 		/// </summary>
@@ -27465,7 +27465,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_TRSEvent"/> entities.
 		/// </summary>
@@ -27477,7 +27477,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_TRSEvent>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage"/> entities.
 		/// </summary>
@@ -27489,7 +27489,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Incident"/> entities.
 		/// </summary>
@@ -27501,7 +27501,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Incident>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.IncidentResolution"/> entities.
 		/// </summary>
@@ -27513,7 +27513,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.PluginType"/> entities.
 		/// </summary>
@@ -27525,7 +27525,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.PluginType>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Role"/> entities.
 		/// </summary>
@@ -27537,7 +27537,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Role>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessage"/> entities.
 		/// </summary>
@@ -27549,7 +27549,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter"/> entities.
 		/// </summary>
@@ -27561,7 +27561,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep"/> entities.
 		/// </summary>
@@ -27573,7 +27573,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage"/> entities.
 		/// </summary>
@@ -27585,7 +27585,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepSecureConfig"/> entities.
 		/// </summary>
@@ -27597,7 +27597,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepSecureConfig>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Subject"/> entities.
 		/// </summary>
@@ -27609,7 +27609,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Subject>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SystemUser"/> entities.
 		/// </summary>
@@ -27621,7 +27621,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SystemUser>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SystemUserRoles"/> entities.
 		/// </summary>
@@ -27633,7 +27633,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SystemUserRoles>();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Task"/> entities.
 		/// </summary>
@@ -27646,10 +27646,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			}
 		}
 	}
-	
+
 	internal sealed class EntityOptionSetEnum
 	{
-		
+
 		[System.Diagnostics.DebuggerNonUserCode()]
 		public static System.Nullable<int> GetEnum(Microsoft.Xrm.Sdk.Entity entity, string attributeLogicalName)
 		{
@@ -27664,39 +27664,39 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			return null;
 		}
 	}
-	
+
 	/// <summary>
 	/// Attribute to handle storing the OptionSet's Metadata.
 	/// </summary>
 	[System.AttributeUsageAttribute(System.AttributeTargets.Field)]
 	public sealed class OptionSetMetadataAttribute : System.Attribute
 	{
-		
+
 		/// <summary>
 		/// Color of the OptionSetValue.
 		/// </summary>
 		public string Color { get; set; }
-		
+
 		/// <summary>
 		/// Description of the OptionSetValue.
 		/// </summary>
 		public string Description { get; set; }
-		
+
 		/// <summary>
 		/// Display order index of the OptionSetValue.
 		/// </summary>
 		public int DisplayIndex { get; set; }
-		
+
 		/// <summary>
 		/// External value of the OptionSetValue.
 		/// </summary>
 		public string ExternalValue { get; set; }
-		
+
 		/// <summary>
 		/// Name of the OptionSetValue.
 		/// </summary>
 		public string Name { get; set; }
-		
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="OptionSetMetadataAttribute"/> class.
 		/// </summary>
@@ -27715,13 +27715,13 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			this.Name = name;
 		}
 	}
-	
+
 	/// <summary>
 	/// Extension class to handle retrieving of OptionSetMetadataAttribute.
 	/// </summary>
 	public static class OptionSetExtension
 	{
-		
+
 		/// <summary>
 		/// Returns the OptionSetMetadataAttribute for the given enum value
 		/// </summary>

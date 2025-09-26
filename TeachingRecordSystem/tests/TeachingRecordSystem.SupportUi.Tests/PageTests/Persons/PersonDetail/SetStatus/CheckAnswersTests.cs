@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Se
 [Collection(nameof(DisableParallelization))]
 public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
-    private const string _changeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+    private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
     // TODO: extra BL from ticket:
     //   * The record must be read-only when deactivated, so we need to confirm if this needs anything further than simply removing and edit/change/add/delete link
@@ -30,11 +30,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, _changeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, _changeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -52,7 +52,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         doc.AssertRow(targetStatus == PersonStatus.Deactivated
             ? "Reason for deactivating record"
             : "Reason for reactivating record", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
         doc.AssertRow("Evidence uploaded", v =>
         {
@@ -124,11 +124,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, _changeReasonDetails);
+            stateBuilder.WithDeactivateReasonChoice(DeactivateReasonOption.AnotherReason, ChangeReasonDetails);
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, _changeReasonDetails);
+            stateBuilder.WithReactivateReasonChoice(ReactivateReasonOption.AnotherReason, ChangeReasonDetails);
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -175,7 +175,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
                 ? PersonStatus.Active
                 : PersonStatus.Deactivated, actualEvent.OldStatus);
             Assert.Equal("Another reason", actualEvent.Reason);
-            Assert.Equal(_changeReasonDetails, actualEvent.ReasonDetail);
+            Assert.Equal(ChangeReasonDetails, actualEvent.ReasonDetail);
             Assert.Equal(evidenceFileId, actualEvent.EvidenceFile!.FileId);
             Assert.Equal("evidence.pdf", actualEvent.EvidenceFile.Name);
         });

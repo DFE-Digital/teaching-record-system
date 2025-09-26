@@ -36,7 +36,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var statusChoice = doc.GetElementByTestId("status")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(status.ToString(), statusChoice);
     }
 
@@ -64,7 +64,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { nameof(StatusModel.Status), status }
             }
@@ -106,7 +106,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { nameof(StatusModel.Status), status }
             }
@@ -151,7 +151,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { nameof(StatusModel.Status), newStatus }
             }
@@ -202,7 +202,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { nameof(StatusModel.Status), status }
             }
@@ -245,7 +245,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { nameof(StatusModel.Status), RouteToProfessionalStatusStatus.Holds }
             }

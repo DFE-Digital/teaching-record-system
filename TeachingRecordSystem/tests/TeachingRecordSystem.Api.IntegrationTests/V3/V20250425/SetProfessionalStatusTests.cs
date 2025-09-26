@@ -908,7 +908,7 @@ public class SetProfessionalStatusTests : TestBase
             ProfessionalStatusStatus.Withdrawn,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
-                Type = TrainingAgeSpecialismType.KeyStage4,
+                Type = TrainingAgeSpecialismType.KeyStage4
             },
             dfeta_ITTResult.Withdrawn,
             null,
@@ -921,7 +921,7 @@ public class SetProfessionalStatusTests : TestBase
             ProfessionalStatusStatus.InTraining,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
-                Type = TrainingAgeSpecialismType.KeyStage2,
+                Type = TrainingAgeSpecialismType.KeyStage2
             },
             dfeta_ITTResult.InTraining,
             "211", // Trainee Teacher
@@ -934,7 +934,7 @@ public class SetProfessionalStatusTests : TestBase
             ProfessionalStatusStatus.Awarded,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
-                Type = TrainingAgeSpecialismType.KeyStage2,
+                Type = TrainingAgeSpecialismType.KeyStage2
             },
             dfeta_ITTResult.Pass,
             "90", // Qualified teacher: by virtue of achieving international qualified teacher status
@@ -947,7 +947,7 @@ public class SetProfessionalStatusTests : TestBase
             ProfessionalStatusStatus.Withdrawn,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
-                Type = TrainingAgeSpecialismType.KeyStage2,
+                Type = TrainingAgeSpecialismType.KeyStage2
             },
             dfeta_ITTResult.Withdrawn,
             null,
@@ -960,7 +960,7 @@ public class SetProfessionalStatusTests : TestBase
             ProfessionalStatusStatus.UnderAssessment,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
-                Type = TrainingAgeSpecialismType.KeyStage3,
+                Type = TrainingAgeSpecialismType.KeyStage3
             },
             dfeta_ITTResult.UnderAssessment,
             "212", // AOR Candidate
@@ -973,7 +973,7 @@ public class SetProfessionalStatusTests : TestBase
             ProfessionalStatusStatus.Awarded,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
-                Type = TrainingAgeSpecialismType.KeyStage4,
+                Type = TrainingAgeSpecialismType.KeyStage4
             },
             dfeta_ITTResult.Pass,
             "100", // Qualified Teacher: Assessment Only Route
@@ -986,7 +986,7 @@ public class SetProfessionalStatusTests : TestBase
             ProfessionalStatusStatus.Withdrawn,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
-                Type = TrainingAgeSpecialismType.KeyStage4,
+                Type = TrainingAgeSpecialismType.KeyStage4
             },
             dfeta_ITTResult.Withdrawn,
             null,
@@ -1090,14 +1090,14 @@ public class SetProfessionalStatusTests : TestBase
         }
     };
 
-    public static TheoryData<Guid> OverseasRouteTypeData { get; } = new()
-    {
+    public static TheoryData<Guid> OverseasRouteTypeData { get; } =
+    [
         RouteToProfessionalStatusType.ApplyForQtsId,
         RouteToProfessionalStatusType.EuropeanRecognitionId,
         RouteToProfessionalStatusType.OverseasTrainedTeacherRecognitionId,
         RouteToProfessionalStatusType.NiRId,
         RouteToProfessionalStatusType.ScotlandRId
-    };
+    ];
 
     public static TheoryData<Guid, string?> RouteTypeWhichCanHaveInductionExemptionData { get; } = new()
     {

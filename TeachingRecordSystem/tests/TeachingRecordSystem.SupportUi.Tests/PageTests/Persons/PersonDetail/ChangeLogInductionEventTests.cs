@@ -36,8 +36,8 @@ public class ChangeLogInductionEventTests : TestBase
 
         DateOnly? startDate = Clock.Today.AddYears(-1);
         DateOnly? completionDate = Clock.Today.AddDays(-10);
-        dfeta_InductionStatus? inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? Core.Dqt.Models.dfeta_InductionStatus.Exempt : Core.Dqt.Models.dfeta_InductionStatus.InProgress;
-        dfeta_InductionExemptionReason? inductionExemptionReason = Core.Dqt.Models.dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
+        dfeta_InductionStatus? inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? dfeta_InductionStatus.Exempt : dfeta_InductionStatus.InProgress;
+        dfeta_InductionExemptionReason? inductionExemptionReason = dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
 
         var induction = new EventModels.DqtInduction
         {
@@ -292,13 +292,13 @@ public class ChangeLogInductionEventTests : TestBase
         var inductionId = Guid.NewGuid();
         DateOnly? oldStartDate = Clock.Today.AddYears(-1);
         DateOnly? oldCompletionDate = Clock.Today.AddDays(-10);
-        dfeta_InductionStatus? oldInductionStatus = changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason) ? Core.Dqt.Models.dfeta_InductionStatus.Exempt : Core.Dqt.Models.dfeta_InductionStatus.InProgress;
-        dfeta_InductionExemptionReason? oldInductionExemptionReason = Core.Dqt.Models.dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
+        dfeta_InductionStatus? oldInductionStatus = changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason) ? dfeta_InductionStatus.Exempt : dfeta_InductionStatus.InProgress;
+        dfeta_InductionExemptionReason? oldInductionExemptionReason = dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
 
         DateOnly? startDate = Clock.Today.AddYears(-1).AddDays(1);
         DateOnly? completionDate = Clock.Today.AddDays(-9);
-        dfeta_InductionStatus? inductionStatus = changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason) ? Core.Dqt.Models.dfeta_InductionStatus.Exempt : Core.Dqt.Models.dfeta_InductionStatus.PassedinWales;
-        dfeta_InductionExemptionReason? inductionExemptionReason = Core.Dqt.Models.dfeta_InductionExemptionReason.OverseasTrainedTeacher;
+        dfeta_InductionStatus? inductionStatus = changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason) ? dfeta_InductionStatus.Exempt : dfeta_InductionStatus.PassedinWales;
+        dfeta_InductionExemptionReason? inductionExemptionReason = dfeta_InductionExemptionReason.OverseasTrainedTeacher;
 
         var induction = new EventModels.DqtInduction
         {
@@ -409,9 +409,9 @@ public class ChangeLogInductionEventTests : TestBase
 
         DateOnly? startDate = Clock.Today.AddYears(-1);
         DateOnly? completionDate = Clock.Today.AddDays(-10);
-        dfeta_InductionStatus? inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? Core.Dqt.Models.dfeta_InductionStatus.Exempt : Core.Dqt.Models.dfeta_InductionStatus.InProgress;
+        dfeta_InductionStatus? inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? dfeta_InductionStatus.Exempt : dfeta_InductionStatus.InProgress;
         string dqtInductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? "Exempt" : "In progress";
-        dfeta_InductionExemptionReason? inductionExemptionReason = Core.Dqt.Models.dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
+        dfeta_InductionExemptionReason? inductionExemptionReason = dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
         InductionStatus migratedInductionStatus = inductionStatus == dfeta_InductionStatus.Exempt ? InductionStatus.Exempt : InductionStatus.InProgress;
         var exemptionReason = await ReferenceDataCache.GetInductionExemptionReasonByIdAsync(InductionExemptionReason.PassedInWalesId);
         Guid? migratedInductionExemptionReasonId = exemptionReason.InductionExemptionReasonId;

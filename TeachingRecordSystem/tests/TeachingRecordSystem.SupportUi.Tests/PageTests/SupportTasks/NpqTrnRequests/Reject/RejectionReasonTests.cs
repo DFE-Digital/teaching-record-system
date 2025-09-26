@@ -20,7 +20,7 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
 
         var state = new RejectNpqTrnRequestState
         {
-            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch
         };
         var journeyInstance = await CreateJourneyInstance(
             JourneyNames.RejectNpqTrnRequest,
@@ -53,7 +53,7 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
 
         var state = new RejectNpqTrnRequestState
         {
-            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch
         };
         var journeyInstance = await CreateJourneyInstance(
             JourneyNames.RejectNpqTrnRequest,
@@ -86,7 +86,7 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
 
         var state = new RejectNpqTrnRequestState
         {
-            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch,
+            RejectionReason = RejectionReasonOption.EvidenceDoesNotMatch
         };
         var journeyInstance = await CreateJourneyInstance(
             JourneyNames.RejectNpqTrnRequest,
@@ -105,7 +105,7 @@ public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBa
 
         var reasonChoiceSelection = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
 
         Assert.Equal(state.RejectionReason.ToString(), reasonChoiceSelection);
     }

@@ -3,11 +3,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>13.0</LangVersion>
     <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+    <AnalysisMode>Recommended</AnalysisMode>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <NoWarn>GFA0001</NoWarn>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <NeutralLanguage>en</NeutralLanguage>
 
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
     <IsPublishable Condition="'$(IsTestProject)' == 'true'">false</IsPublishable>
@@ -15,6 +16,9 @@
 
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
+
+    <NoWarn>GFA0001</NoWarn>
+    <NoWarn Condition="'$(IsTestProject)' == 'true'">$(NoWarn);CA1707;CA1711;CA1816</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(RequiresSharedAppsettings)' == 'true'">

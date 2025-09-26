@@ -9,7 +9,7 @@ public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixtu
         CreateJourneyInstanceAsync(alertId, new());
 
     protected Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState()
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState
         {
             Initialized = true,
             CurrentLink = populateOptional ? null : alert.ExternalLink,
@@ -30,7 +30,7 @@ public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixtu
             JourneySteps.New =>
                 CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index =>
-                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState
                 {
                     Initialized = true,
                     CurrentLink = populateOptional ? null : alert.ExternalLink,

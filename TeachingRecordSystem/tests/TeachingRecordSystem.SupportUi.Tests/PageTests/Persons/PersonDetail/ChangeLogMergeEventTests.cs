@@ -318,7 +318,7 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
             DateOfBirth = dob,
             EmailAddress = email,
             NationalInsuranceNumber = nino,
-            Gender = gender,
+            Gender = gender
         };
 
         var oldDetails = new EventModels.PersonAttributes
@@ -329,7 +329,7 @@ public class ChangeLogMergeEventTests : TestBase, IAsyncLifetime
             DateOfBirth = oldDob,
             EmailAddress = oldEmail,
             NationalInsuranceNumber = oldNino,
-            Gender = oldGender,
+            Gender = oldGender
         };
 
         var mergedEvent = new PersonsMergedEvent

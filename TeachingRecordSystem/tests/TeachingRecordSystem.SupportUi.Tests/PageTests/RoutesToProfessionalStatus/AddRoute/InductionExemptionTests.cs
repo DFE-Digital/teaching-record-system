@@ -71,7 +71,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionExemptionChoice = doc.GetElementByTestId("induction-exemption")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(true.ToString(), inductionExemptionChoice);
     }
 
@@ -104,9 +104,9 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/induction-exemption?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                { "IsExemptFromInduction", true.ToString()},
+                { "IsExemptFromInduction", true.ToString()}
             }
         };
 

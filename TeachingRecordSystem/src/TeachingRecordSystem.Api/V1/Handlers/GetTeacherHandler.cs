@@ -43,7 +43,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
                 p.InductionCompletedDate,
                 HasOpenAlert = p.Alerts.Any(a => a.IsOpen)
             })
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         // Prefer matches on TRN
         var person = matched.SingleOrDefault(p => p.Trn == request.Trn) ??
@@ -54,7 +54,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             return null;
         }
 
-        return new GetTeacherResponse()
+        return new GetTeacherResponse
         {
             Trn = person.Trn,
             NationalInsuranceNumber = person.NationalInsuranceNumber,
@@ -74,7 +74,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
             var dqtStatus = person.InductionStatus.ToDqtInductionStatus(out var statusDescription);
 
             return dqtStatus != null ?
-                new Induction()
+                new Induction
                 {
                     StartDate = person.InductionStartDate.ToDateTime(),
                     CompletionDate = person.InductionCompletedDate.ToDateTime(),

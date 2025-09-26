@@ -83,7 +83,7 @@ public class EditInductionStateBuilder
 
     public EditInductionState Build()
     {
-        return new EditInductionState()
+        return new EditInductionState
         {
             InductionStatus = InductionStatus,
             CurrentInductionStatus = CurrentInductionStatus,

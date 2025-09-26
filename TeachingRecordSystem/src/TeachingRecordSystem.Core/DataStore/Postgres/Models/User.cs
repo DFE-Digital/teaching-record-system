@@ -124,14 +124,14 @@ public class ApplicationUser : UserBase
 
     public static ApplicationUser NpqApplicationUser { get; } = new()
     {
-        UserId = ApplicationUser.NpqApplicationUserGuid,
+        UserId = NpqApplicationUserGuid,
         Name = "NPQ",
         Active = true
     };
 
     public static ApplicationUser CapitaTpsImportUser { get; } = new()
     {
-        UserId = ApplicationUser.CapitaTpsImportGuid,
+        UserId = CapitaTpsImportGuid,
         Name = "CapitaTpsImport",
         Active = true
     };

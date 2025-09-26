@@ -85,7 +85,7 @@ public class ChangeHistoryModel(
             nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)
         };
 
-        var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();
+        var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert", StringComparison.Ordinal)).ToArray();
 
         var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypesAsync(activeOnly: false)
             .ToAsyncEnumerableAsync()

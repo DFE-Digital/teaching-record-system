@@ -15,7 +15,7 @@ public class MultiLineTextTagHelper : TagHelper
 
         if (!string.IsNullOrWhiteSpace(Text))
         {
-            var lines = Text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var lines = Text.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
             for (var i = 0; i < lines.Length; i++)
             {
                 output.Content.Append(lines[i]);

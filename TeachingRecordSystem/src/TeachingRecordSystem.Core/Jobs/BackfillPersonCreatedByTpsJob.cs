@@ -24,7 +24,7 @@ public class BackfillPersonCreatedByTpsJob(IOrganizationServiceAsync2 organizati
             {
                 Count = pageSize,
                 PageNumber = 1
-            },
+            }
         };
         query.Criteria.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull);
         query.Criteria.AddCondition(Contact.Fields.dfeta_CapitaTRNChangedOn, ConditionOperator.Null);

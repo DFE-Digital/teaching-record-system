@@ -133,7 +133,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ["FirstName"] = TestData.GenerateFirstName(),
                 ["MiddleName"] = TestData.GenerateMiddleName(),
                 ["LastName"] = TestData.GenerateLastName()
-            }),
+            })
         };
 
         // Act
@@ -159,8 +159,8 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["HasPreviousName"] = "True",
-            }),
+                ["HasPreviousName"] = "True"
+            })
         };
 
         // Act
@@ -183,8 +183,8 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["HasPreviousName"] = "False",
-            }),
+                ["HasPreviousName"] = "False"
+            })
         };
 
         // Act
@@ -216,7 +216,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
                 ["FirstName"] = previousFirstName,
                 ["MiddleName"] = previousMiddleName,
                 ["LastName"] = previousLastName
-            }),
+            })
         };
 
         // Act

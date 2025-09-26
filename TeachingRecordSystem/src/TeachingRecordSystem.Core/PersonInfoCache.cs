@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core;
 public class PersonInfoCache(IDbContextFactory<TrsDbContext> dbContextFactory, IMemoryCache memoryCache)
 {
     public async Task<PersonInfo> GetPersonInfoAsync(Guid personId) =>
-        await memoryCache.GetOrCreateAsync<PersonInfo?>(CacheKeys.PersonInfo(personId), async _ =>
+        await memoryCache.GetOrCreateAsync(CacheKeys.PersonInfo(personId), async _ =>
         {
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 

@@ -82,7 +82,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Routeid", "" }
             }
@@ -114,7 +114,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "RouteId", route.RouteToProfessionalStatusTypeId.ToString() },
                 { "ArchivedRouteId", archivedRoute.RouteToProfessionalStatusTypeId.ToString() }
@@ -144,7 +144,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Routeid", route.RouteToProfessionalStatusTypeId }
             }
@@ -174,7 +174,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Routeid", route.RouteToProfessionalStatusTypeId }
             }

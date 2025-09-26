@@ -51,7 +51,7 @@ public class ChangeReasonTests : SetStatusTestBase
         if (targetStatus == PersonStatus.Deactivated)
         {
             var reasonChoiceSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("deactivate-reason-options", "input[type='radio']")
-                .Single(i => i.IsChecked == true).Value;
+                .Single(i => i.IsChecked).Value;
             Assert.Equal(DeactivateReasonOption.AnotherReason.ToString(), reasonChoiceSelection);
 
             var additionalDetailTextArea = doc.GetElementByTestId("deactivate-reason-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
@@ -60,7 +60,7 @@ public class ChangeReasonTests : SetStatusTestBase
         else
         {
             var reasonChoiceSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("reactivate-reason-options", "input[type='radio']")
-                .Single(i => i.IsChecked == true).Value;
+                .Single(i => i.IsChecked).Value;
             Assert.Equal(DeactivateReasonOption.AnotherReason.ToString(), reasonChoiceSelection);
 
             var additionalDetailTextArea = doc.GetElementByTestId("reactivate-reason-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
@@ -68,7 +68,7 @@ public class ChangeReasonTests : SetStatusTestBase
         }
 
         var uploadEvidenceChoices = doc.GetChildElementsOfTestId<IHtmlInputElement>("upload-evidence-options", "input[type='radio']")
-            .Single(i => i.IsChecked == true).Value;
+            .Single(i => i.IsChecked).Value;
         Assert.Equal(true.ToString(), uploadEvidenceChoices);
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
@@ -131,7 +131,7 @@ public class ChangeReasonTests : SetStatusTestBase
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
             .Select(i => i.Value);
-        Assert.Equal(new[] { "True", "False" }, uploadEvidenceChoices);
+        Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
     [Theory]

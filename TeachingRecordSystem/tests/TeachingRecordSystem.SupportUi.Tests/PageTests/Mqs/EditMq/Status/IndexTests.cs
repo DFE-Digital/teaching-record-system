@@ -59,7 +59,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStatusState()
+            new EditMqStatusState
             {
                 Initialized = true,
                 Status = journeyStatus,
@@ -133,7 +133,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Status", status.ToString() }
             }
@@ -161,12 +161,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Status", newStatus.ToString() },
                 { "EndDate.Day", $"{newEndDate:%d}" },
                 { "EndDate.Month", $"{newEndDate:%M}" },
-                { "EndDate.Year", $"{newEndDate:yyyy}" },
+                { "EndDate.Year", $"{newEndDate:yyyy}" }
             }
         };
 
@@ -190,12 +190,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Status", newStatus.ToString() },
                 { "EndDate.Day", $"{newEndDate:%d}" },
                 { "EndDate.Month", $"{newEndDate:%M}" },
-                { "EndDate.Year", $"{newEndDate:yyyy}" },
+                { "EndDate.Year", $"{newEndDate:yyyy}" }
             }
         };
 

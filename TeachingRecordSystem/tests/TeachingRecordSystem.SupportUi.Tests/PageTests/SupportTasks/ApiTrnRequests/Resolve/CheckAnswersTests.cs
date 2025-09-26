@@ -13,7 +13,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
     {
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
             {
                 Email = req.Email,
                 ExpiresUtc = Clock.UtcNow.AddDays(1),
@@ -62,7 +62,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -95,7 +95,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             sourcedFromRequestDataAttribute.Attribute);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var state = new ResolveApiTrnRequestState()
+        var state = new ResolveApiTrnRequestState
         {
             MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
@@ -160,7 +160,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
@@ -188,7 +188,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -219,7 +219,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -249,7 +249,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
@@ -281,7 +281,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -344,7 +344,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -381,7 +381,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel,
@@ -451,7 +451,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = matchedPerson.PersonId,
@@ -519,7 +519,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = matchedPerson.PersonId,
@@ -564,7 +564,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveApiTrnRequestState()
+            new ResolveApiTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = matchedPerson.PersonId,

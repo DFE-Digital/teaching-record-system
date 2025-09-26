@@ -44,7 +44,7 @@ public static class AngleSharpExtensions
     public static IReadOnlyList<IElement> GetSummaryListActionsForKey(this IHtmlDocument doc, string key)
     {
         var row = doc.GetSummaryListRowForKey(key);
-        return row?.QuerySelectorAll(".govuk-summary-list__actions>*").ToArray() ?? Array.Empty<IElement>();
+        return row?.QuerySelectorAll(".govuk-summary-list__actions>*").ToArray() ?? [];
     }
 
     public static int GetSummaryListRowCountForKey(this IHtmlDocument doc, string key)

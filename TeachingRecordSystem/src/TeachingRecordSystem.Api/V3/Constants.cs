@@ -2,8 +2,8 @@ namespace TeachingRecordSystem.Api.V3;
 
 public static class Constants
 {
-    public static IReadOnlyCollection<string> LegacyExposableSanctionCodes { get; } = new[]
-    {
+    public static IReadOnlyCollection<string> LegacyExposableSanctionCodes { get; } =
+    [
         "A18",
         "A7",
         "A3",
@@ -33,11 +33,11 @@ public static class Constants
         "A13",
         "A2",
         "A24",
-        "A23",
-    };
+        "A23"
+    ];
 
-    public static IReadOnlyCollection<string> LegacyProhibitionSanctionCodes { get; } = new[]
-    {
+    public static IReadOnlyCollection<string> LegacyProhibitionSanctionCodes { get; } =
+    [
         "G1",
         "B1",
         "G2",
@@ -56,6 +56,6 @@ public static class Constants
         "A5B",
         "A5A",
         "A1B",
-        "A1A",
-    };
+        "A1A"
+    ];
 }

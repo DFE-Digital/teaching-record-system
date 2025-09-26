@@ -14,7 +14,7 @@ public class FormFlowSessionMiddleware(RequestDelegate next, IDataProtectionProv
     {
         HttpOnly = true,
         IsEssential = true,
-        Secure = true,
+        Secure = true
     };
 
     public async Task InvokeAsync(HttpContext context)

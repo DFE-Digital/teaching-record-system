@@ -23,5 +23,5 @@ public enum MandatoryQualificationUpdatedEventChanges
     Specialism = 1 << 2,
     Status = 1 << 3,
     StartDate = 1 << 4,
-    EndDate = 1 << 5,
+    EndDate = 1 << 5
 }

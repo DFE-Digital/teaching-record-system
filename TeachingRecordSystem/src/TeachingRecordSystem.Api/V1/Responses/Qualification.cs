@@ -1,6 +1,5 @@
 #nullable disable
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Api.V2.ApiModels;
 
 namespace TeachingRecordSystem.Api.V1.Responses;
 
@@ -34,5 +33,5 @@ public class Qualification
     public string Subject3Code { get; set; }
 
     [JsonPropertyName("class")]
-    public ClassDivision? ClassDivision { get; set; }
+    public object ClassDivision { get; set; }
 }

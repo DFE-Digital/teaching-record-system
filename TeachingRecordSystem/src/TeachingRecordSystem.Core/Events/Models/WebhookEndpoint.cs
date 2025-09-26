@@ -9,7 +9,7 @@ public record WebhookEndpoint
     public required IReadOnlyCollection<string> CloudEventTypes { get; init; }
     public required bool Enabled { get; init; }
 
-    public static WebhookEndpoint FromModel(Core.DataStore.Postgres.Models.WebhookEndpoint model) => new()
+    public static WebhookEndpoint FromModel(DataStore.Postgres.Models.WebhookEndpoint model) => new()
     {
         WebhookEndpointId = model.WebhookEndpointId,
         ApplicationUserId = model.ApplicationUserId,

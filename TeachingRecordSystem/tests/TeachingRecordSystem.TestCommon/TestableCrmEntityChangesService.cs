@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.TestCommon;
 public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, IDisposable
 {
     private readonly ConcurrentDictionary<string, System.Reactive.Subjects.ReplaySubject<IChangedItem[]>> _entityTypeSubjects = new();
-    private bool _disposed = false;
+    private bool _disposed;
 
     public void Dispose()
     {

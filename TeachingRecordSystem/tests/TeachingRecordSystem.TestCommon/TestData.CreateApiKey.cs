@@ -26,7 +26,7 @@ public partial class TestData
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
             RaisedBy = SystemUser.SystemUserId,
-            ApiKey = Core.Events.Models.ApiKey.FromModel(apiKey)
+            ApiKey = EventModels.ApiKey.FromModel(apiKey)
         };
         dbContext.AddEventWithoutBroadcast(@event);
 

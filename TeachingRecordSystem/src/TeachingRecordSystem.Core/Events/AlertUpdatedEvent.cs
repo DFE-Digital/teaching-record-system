@@ -24,5 +24,5 @@ public enum AlertUpdatedEventChanges
     StartDate = 1 << 3,
     EndDate = 1 << 4,
     DqtSpent = 1 << 5,
-    DqtSanctionCode = 1 << 6,
+    DqtSanctionCode = 1 << 6
 }

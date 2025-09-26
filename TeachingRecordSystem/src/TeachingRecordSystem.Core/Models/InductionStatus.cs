@@ -17,7 +17,7 @@ public enum InductionStatus
     [InductionStatusDescription("failed", 0, requiresQts: true, requiresStartDate: true, requiresCompletedDate: true)]
     Failed = 5,
     [InductionStatusDescription("failed in Wales", 4, requiresQts: true, requiresStartDate: true, requiresCompletedDate: true)]
-    FailedInWales = 6,
+    FailedInWales = 6
 }
 
 public static class InductionStatusRegistry

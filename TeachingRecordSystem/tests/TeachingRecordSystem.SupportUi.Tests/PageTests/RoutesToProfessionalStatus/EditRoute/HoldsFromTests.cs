@@ -268,11 +268,11 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "HoldsFrom.Day", $"{holdsFrom:%d}" },
                 { "HoldsFrom.Month", $"{holdsFrom:%M}" },
-                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" },
+                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" }
             }
         };
 
@@ -320,11 +320,11 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "HoldsFrom.Day", $"{holdsFrom:%d}" },
                 { "HoldsFrom.Month", $"{holdsFrom:%M}" },
-                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" },
+                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" }
             }
         };
 
@@ -380,11 +380,11 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "HoldsFrom.Day", $"{holdsFrom:%d}" },
                 { "HoldsFrom.Month", $"{holdsFrom:%M}" },
-                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" },
+                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" }
             }
         };
 
@@ -466,11 +466,11 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "HoldsFrom.Day", $"{holdsFrom:%d}" },
                 { "HoldsFrom.Month", $"{holdsFrom:%M}" },
-                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" },
+                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" }
             }
         };
 

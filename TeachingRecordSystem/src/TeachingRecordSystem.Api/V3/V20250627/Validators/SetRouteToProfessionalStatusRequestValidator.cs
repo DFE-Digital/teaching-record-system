@@ -13,10 +13,10 @@ public class SetRouteToProfessionalStatusRequestValidator : AbstractValidator<Se
             .Cascade(CascadeMode.Stop)
             .IsInEnum()
             .Must(s => s != RouteToProfessionalStatusStatus.InTraining)
-            .When(r => r.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
-            .WithMessage($"Status cannot be 'InTraining' when route type is '{PostgresModels.RouteToProfessionalStatusType.AssessmentOnlyRouteId}'.")
+            .When(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
+            .WithMessage($"Status cannot be 'InTraining' when route type is '{RouteToProfessionalStatusType.AssessmentOnlyRouteId}'.")
             .Must(s => s != RouteToProfessionalStatusStatus.UnderAssessment)
-            .When(r => r.RouteToProfessionalStatusTypeId != PostgresModels.RouteToProfessionalStatusType.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
+            .When(r => r.RouteToProfessionalStatusTypeId != RouteToProfessionalStatusType.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
             .WithMessage(r => $"Status cannot be 'UnderAssessment' when route type is '{r.RouteToProfessionalStatusTypeId}'.");
 
         RuleFor(r => r.HoldsFrom)
@@ -68,17 +68,17 @@ public class SetRouteToProfessionalStatusRequestValidator : AbstractValidator<Se
                 .Must(c => !invalidOverseasCountries.Contains(c))
                 .WithMessage(r => $"Training country reference cannot be '{r.TrainingCountryReference}' when route type is '{r.RouteToProfessionalStatusTypeId}'.")
                 .Equal("GB-SCT")
-                .When(r => r.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.ScotlandRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference must be 'GB-SCT' when route type is '{PostgresModels.RouteToProfessionalStatusType.ScotlandRId}'.")
+                .When(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference must be 'GB-SCT' when route type is '{RouteToProfessionalStatusType.ScotlandRId}'.")
                 .NotEqual("GB-SCT")
-                .When(r => r.RouteToProfessionalStatusTypeId != PostgresModels.RouteToProfessionalStatusType.ScotlandRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference cannot be 'GB-SCT' when route type is not '{PostgresModels.RouteToProfessionalStatusType.ScotlandRId}'.")
+                .When(r => r.RouteToProfessionalStatusTypeId != RouteToProfessionalStatusType.ScotlandRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference cannot be 'GB-SCT' when route type is not '{RouteToProfessionalStatusType.ScotlandRId}'.")
                 .Equal("GB-NIR")
-                .When(r => r.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.NiRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference must be 'GB-NIR' when route type is '{PostgresModels.RouteToProfessionalStatusType.NiRId}'.")
+                .When(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.NiRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference must be 'GB-NIR' when route type is '{RouteToProfessionalStatusType.NiRId}'.")
                 .NotEqual("GB-NIR")
-                .When(r => r.RouteToProfessionalStatusTypeId != PostgresModels.RouteToProfessionalStatusType.NiRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference cannot be 'GB-NIR' when route type is not '{PostgresModels.RouteToProfessionalStatusType.NiRId}'.");
+                .When(r => r.RouteToProfessionalStatusTypeId != RouteToProfessionalStatusType.NiRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatusType.NiRId}'.");
         })
         .Otherwise(() =>
         {
@@ -86,15 +86,15 @@ public class SetRouteToProfessionalStatusRequestValidator : AbstractValidator<Se
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
                 .WithMessage(r => $"Training country reference must be specified when route type is '{r.RouteToProfessionalStatusTypeId}'.")
-                .When(r => r.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
+                .When(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
                 .Must(c => c == "GB-WLS" || c == "GB-CYM")
-                .When(r => r.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.WelshRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{PostgresModels.RouteToProfessionalStatusType.WelshRId}'.")
+                .When(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatusType.WelshRId}'.")
                 .Must(c => c != "GB-WLS" && c != "GB-CYM")
-                .When(r => r.RouteToProfessionalStatusTypeId != PostgresModels.RouteToProfessionalStatusType.WelshRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage(r => $"Training country reference cannot be '{r.TrainingCountryReference}' when route type is not '{PostgresModels.RouteToProfessionalStatusType.WelshRId}'.")
+                .When(r => r.RouteToProfessionalStatusTypeId != RouteToProfessionalStatusType.WelshRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage(r => $"Training country reference cannot be '{r.TrainingCountryReference}' when route type is not '{RouteToProfessionalStatusType.WelshRId}'.")
                 .Equal("GB")
-                .When(r => r.RouteToProfessionalStatusTypeId != PostgresModels.RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
+                .When(r => r.RouteToProfessionalStatusTypeId != RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
                 .WithMessage(r => $"Training country reference must be 'GB' when route type is '{r.RouteToProfessionalStatusTypeId}'.");
         });
 

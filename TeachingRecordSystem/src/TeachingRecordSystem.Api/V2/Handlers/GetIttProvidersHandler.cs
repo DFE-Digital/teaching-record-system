@@ -12,10 +12,10 @@ public class GetIttProvidersHandler(ReferenceDataCache referenceDataCache) : IRe
             .Where(p => p.Ukprn != null)
             .OrderBy(p => p.Name)
             .ThenBy(p => p.Ukprn)
-            .Select(p => new IttProviderInfo() { ProviderName = p.Name, Ukprn = p.Ukprn! })
+            .Select(p => new IttProviderInfo { ProviderName = p.Name, Ukprn = p.Ukprn! })
             .ToArray();
 
-        return new GetIttProvidersResponse()
+        return new GetIttProvidersResponse
         {
             IttProviders = ittProviders
         };

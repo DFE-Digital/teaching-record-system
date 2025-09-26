@@ -33,7 +33,7 @@ public static class ClaimsExtensions
     public static bool HasMinimumPermission(this ClaimsPrincipal user, UserPermission minimum)
     {
         var userPermissionLevel = user.FindAll(CustomClaims.Permission)
-            .SelectMany(c => UserPermission.TryParse(c.Value, out var permission) ? [permission] : new UserPermission[0])
+            .SelectMany(c => UserPermission.TryParse(c.Value, out var permission) ? [permission] : Array.Empty<UserPermission>())
             .Where(p => p.Type == minimum.Type)
             .Select(p => p.Level)
             .Append(UserPermissionLevel.None)

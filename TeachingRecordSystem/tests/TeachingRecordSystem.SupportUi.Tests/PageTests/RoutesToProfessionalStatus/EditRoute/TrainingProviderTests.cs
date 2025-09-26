@@ -224,7 +224,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/training-provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingProviderId", "" }
             }
@@ -264,7 +264,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/training-provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingProviderId", trainingProvider.TrainingProviderId.ToString()}
             }
@@ -305,7 +305,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/training-provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "TrainingProviderId" , trainingProvider.TrainingProviderId.ToString()}
             }

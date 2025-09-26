@@ -24,7 +24,7 @@ public class UrlRedactor(IHttpContextAccessor httpContextAccessor)
             "email",
             "emailaddress",
             "nationalinsurancenumber",
-            "nino",
+            "nino"
         ],
         StringComparer.OrdinalIgnoreCase);
 
@@ -107,7 +107,7 @@ public class UrlRedactor(IHttpContextAccessor httpContextAccessor)
 
         foreach (var key in query.Keys.ToArray())
         {
-            if (_knownPiiFieldNames.Contains(key) || endpointMetadata.ParameterNames.Contains(key) == true)
+            if (_knownPiiFieldNames.Contains(key) || endpointMetadata.ParameterNames.Contains(key))
             {
                 query[key] = RedactedContent;
             }

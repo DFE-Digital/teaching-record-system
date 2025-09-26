@@ -37,10 +37,9 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
         var validFormatEmailAddress = "test@myemail.com";
         var whitespace = " ";
 
-        return new()
-        {
-            // Null TRN
-            new ()
+        return
+        [
+            new()
             {
                 Row = new()
                 {
@@ -61,10 +60,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.TrnIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.TrnIncorrectFormat
             },
             // Invalid TRN
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -85,10 +85,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.TrnIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.TrnIncorrectFormat
             },
             // Null National Insurance Number
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -109,10 +110,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.NationalInsuranceNumberIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.NationalInsuranceNumberIncorrectFormat
             },
             // Invalid National Insurance Number
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -133,10 +135,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.NationalInsuranceNumberIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.NationalInsuranceNumberIncorrectFormat
             },
             // Null Date of Birth
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -157,10 +160,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.DateOfBirthIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.DateOfBirthIncorrectFormat
             },
             // Invalid Date of Birth
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -181,10 +185,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.DateOfBirthIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.DateOfBirthIncorrectFormat
             },
             // Null Date of Death
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -205,10 +210,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None
             },
             // Invalid Date of Death
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -229,10 +235,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.DateOfDeathIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.DateOfDeathIncorrectFormat
             },
             // Null Local Authority Code
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -253,10 +260,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.LocalAuthorityCodeIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.LocalAuthorityCodeIncorrectFormat
             },
             // Invalid Local Authority Code
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -277,10 +285,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.LocalAuthorityCodeIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.LocalAuthorityCodeIncorrectFormat
             },
             // Null Establishment Number
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -301,10 +310,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None
             },
             // Invalid Establishment Number
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -325,10 +335,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.EstablishmentNumberIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EstablishmentNumberIncorrectFormat
             },
             // Null Employment Start Date
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -349,10 +360,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentStartDateIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentStartDateIncorrectFormat
             },
             // Invalid Employment Start Date
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -373,10 +385,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentStartDateIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentStartDateIncorrectFormat
             },
             // Null Employment End Date
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -397,10 +410,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentEndDateIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentEndDateIncorrectFormat
             },
             // Invalid Employment End Date
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -421,10 +435,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentEndDateIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentEndDateIncorrectFormat
             },
             // Null Full or Part Time Indicator
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -445,10 +460,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.FullOrPartTimeIndicatorIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.FullOrPartTimeIndicatorIncorrectFormat
             },
             // Invalid Full or Part Time Indicator
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -469,10 +485,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.FullOrPartTimeIndicatorIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.FullOrPartTimeIndicatorIncorrectFormat
             },
             // Null Withdrawl Indicator
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -493,10 +510,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None
             },
             // Invalid Withdrawl Indicator
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -517,10 +535,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.WithdrawlIndicatorIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.WithdrawlIndicatorIncorrectFormat
             },
             // Null Extract Date
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -541,10 +560,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = null,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.ExtractDateIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.ExtractDateIncorrectFormat
             },
             // Invalid Extract Date
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -565,10 +585,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = invalidFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.ExtractDateIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.ExtractDateIncorrectFormat
             },
             // Null Gender
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -589,10 +610,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = null
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat
             },
             // Invalid Gender
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -613,10 +635,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = invalidFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat
             },
             // Invalid Member Email Address
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -637,10 +660,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat
             },
             // Whitespace in Member Email Address
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -661,10 +685,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None
             },
             // Invalid Establishment Email Address
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -685,10 +710,11 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.EstablishmentEmailAddressIncorrectFormat,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EstablishmentEmailAddressIncorrectFormat
             },
             // Whitespace in Establishment Email Address
-            new ()
+
+            new()
             {
                 Row = new()
                 {
@@ -709,9 +735,9 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None
             }
-        };
+        ];
     }
 
     [Theory]

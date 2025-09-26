@@ -9,7 +9,7 @@ public abstract class DetailsTestBase(HostFixture hostFixture) : TestBase(hostFi
         CreateJourneyInstanceAsync(alertId, new());
 
     protected Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertDetailsState()
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertDetailsState
         {
             Initialized = true,
             CurrentDetails = alert.Details,
@@ -29,7 +29,7 @@ public abstract class DetailsTestBase(HostFixture hostFixture) : TestBase(hostFi
             JourneySteps.New =>
                 CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index =>
-                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertDetailsState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertDetailsState
                 {
                     Initialized = true,
                     CurrentDetails = alert.Details,

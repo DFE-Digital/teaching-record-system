@@ -11,7 +11,7 @@ public enum SupportTaskCategory
     [SupportTaskCategoryInfo("TRN requests")]
     TrnRequests = 3,
     [SupportTaskCategoryInfo("Teacher pensions")]
-    TeacherPensions = 4,
+    TeacherPensions = 4
 }
 
 public static class SupportTaskCategoryRegistry

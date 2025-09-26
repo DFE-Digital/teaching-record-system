@@ -21,7 +21,7 @@ public class SimpleJwtBearerAuthentication(
         AuthenticateResult Core()
         {
             var authorizationHeader = Context.Request.Headers.Authorization.ToString();
-            if (!authorizationHeader.StartsWith("Bearer "))
+            if (!authorizationHeader.StartsWith("Bearer ", StringComparison.Ordinal))
             {
                 return AuthenticateResult.NoResult();
             }

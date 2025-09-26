@@ -12,7 +12,7 @@ public class JourneyInstanceIdTests
         var journeyDescriptor = new JourneyDescriptor(
             journeyName: "key",
             stateType: typeof(State),
-            requestDataKeys: new[] { "id" },
+            requestDataKeys: ["id"],
             appendUniqueKey: true);
 
         var valueProvider = new DictionaryValueProvider(new Dictionary<string, string>());
@@ -30,7 +30,7 @@ public class JourneyInstanceIdTests
     public void Create_NoDependentKeysWithoutUniqueKey_ReturnsCorrectInstance()
     {
         CreateReturnsExpectedInstance(
-            requestDataKeys: Array.Empty<string>(),
+            requestDataKeys: [],
             useUniqueKey: false,
             keys: null,
             expectedInstanceKeyCount: 0,
@@ -44,7 +44,7 @@ public class JourneyInstanceIdTests
         string? randomKey = default;
 
         CreateReturnsExpectedInstance(
-            requestDataKeys: Array.Empty<string>(),
+            requestDataKeys: [],
             useUniqueKey: true,
             keys: null,
             expectedInstanceKeyCount: 1,
@@ -62,7 +62,7 @@ public class JourneyInstanceIdTests
         var id = Guid.NewGuid().ToString();
 
         CreateReturnsExpectedInstance(
-            requestDataKeys: new[] { "id" },
+            requestDataKeys: ["id"],
             useUniqueKey: false,
             keys: new Dictionary<string, string>()
             {
@@ -83,7 +83,7 @@ public class JourneyInstanceIdTests
         string? randomKey = default;
 
         CreateReturnsExpectedInstance(
-            requestDataKeys: new[] { "id" },
+            requestDataKeys: ["id"],
             useUniqueKey: true,
             keys: new Dictionary<string, string>()
             {
@@ -105,7 +105,7 @@ public class JourneyInstanceIdTests
         string? newRandomKey = default;
 
         CreateReturnsExpectedInstance(
-            requestDataKeys: Array.Empty<string>(),
+            requestDataKeys: [],
             useUniqueKey: true,
             keys: new Dictionary<string, string>()
             {
@@ -127,7 +127,7 @@ public class JourneyInstanceIdTests
         var id = Guid.NewGuid().ToString();
 
         CreateReturnsExpectedInstance(
-            requestDataKeys: new[] { "id?" },
+            requestDataKeys: ["id?"],
             useUniqueKey: false,
             keys: new Dictionary<string, string>()
             {
@@ -147,7 +147,7 @@ public class JourneyInstanceIdTests
         var id = Guid.NewGuid().ToString();
 
         CreateReturnsExpectedInstance(
-            requestDataKeys: new[] { "id?" },
+            requestDataKeys: ["id?"],
             useUniqueKey: false,
             keys: null,
             expectedInstanceKeyCount: 0,
@@ -162,7 +162,7 @@ public class JourneyInstanceIdTests
         var journeyDescriptor = new JourneyDescriptor(
             journeyName: "key",
             stateType: typeof(State),
-            requestDataKeys: new[] { "id" },
+            requestDataKeys: ["id"],
             appendUniqueKey: false);
 
         var valueProvider = new DictionaryValueProvider(new Dictionary<string, string>());
@@ -181,7 +181,7 @@ public class JourneyInstanceIdTests
         var journeyDescriptor = new JourneyDescriptor(
             journeyName: "key",
             stateType: typeof(State),
-            requestDataKeys: new[] { "id" },
+            requestDataKeys: ["id"],
             appendUniqueKey: true);
 
         var valueProvider = new DictionaryValueProvider(new Dictionary<string, string>()
@@ -200,7 +200,7 @@ public class JourneyInstanceIdTests
     public void TryResolve_NoDependentKeysWithoutUniqueKey_ReturnsCorrectInstance()
     {
         TryResolveReturnsExpectedInstance(
-            requestDataKeys: Array.Empty<string>(),
+            requestDataKeys: [],
             useUniqueKey: false,
             keys: null,
             expectedInstanceKeyCount: 0,
@@ -214,7 +214,7 @@ public class JourneyInstanceIdTests
         var randomKey = Guid.NewGuid().ToString();
 
         TryResolveReturnsExpectedInstance(
-            requestDataKeys: Array.Empty<string>(),
+            requestDataKeys: [],
             useUniqueKey: true,
             keys: new Dictionary<string, string>()
             {
@@ -234,7 +234,7 @@ public class JourneyInstanceIdTests
         var id = Guid.NewGuid().ToString();
 
         TryResolveReturnsExpectedInstance(
-            requestDataKeys: new[] { "id" },
+            requestDataKeys: ["id"],
             useUniqueKey: false,
             keys: new Dictionary<string, string>()
             {
@@ -255,7 +255,7 @@ public class JourneyInstanceIdTests
         var randomKey = Guid.NewGuid().ToString();
 
         TryResolveReturnsExpectedInstance(
-            requestDataKeys: new[] { "id" },
+            requestDataKeys: ["id"],
             useUniqueKey: true,
             keys: new Dictionary<string, string>()
             {
@@ -276,7 +276,7 @@ public class JourneyInstanceIdTests
         var id = Guid.NewGuid().ToString();
 
         TryResolveReturnsExpectedInstance(
-            requestDataKeys: new[] { "id?" },
+            requestDataKeys: ["id?"],
             useUniqueKey: false,
             keys: new Dictionary<string, string>()
             {
@@ -296,7 +296,7 @@ public class JourneyInstanceIdTests
         var id = Guid.NewGuid().ToString();
 
         TryResolveReturnsExpectedInstance(
-            requestDataKeys: new[] { "id?" },
+            requestDataKeys: ["id?"],
             useUniqueKey: false,
             keys: null,
             expectedInstanceKeyCount: 0,

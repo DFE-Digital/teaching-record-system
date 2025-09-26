@@ -14,7 +14,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
     {
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
             {
                 Email = req.Email,
                 ExpiresUtc = Clock.UtcNow.AddDays(1),
@@ -63,7 +63,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -96,7 +96,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             sourcedFromRequestDataAttribute.Attribute);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var state = new ResolveNpqTrnRequestState()
+        var state = new ResolveNpqTrnRequestState
         {
             MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
@@ -161,7 +161,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel
@@ -189,7 +189,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -220,7 +220,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -250,7 +250,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -283,11 +283,11 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel,
-                PersonAttributeSourcesSet = true,
+                PersonAttributeSourcesSet = true
             });
 
         var expectedBackLink = $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
@@ -346,7 +346,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId,
@@ -385,7 +385,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Clock.Advance();
 
         var comments = Faker.Lorem.Paragraph();
-        var state = new ResolveNpqTrnRequestState()
+        var state = new ResolveNpqTrnRequestState
         {
             MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
@@ -470,7 +470,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             var nationalInsuranceNumber = attribute == PersonMatchedAttribute.NationalInsuranceNumber ? requestData.NationalInsuranceNumber : matchedPerson.NationalInsuranceNumber;
             var gender = attribute == PersonMatchedAttribute.Gender ? requestData.Gender : matchedPerson.Gender;
 
-            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
+            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes
             {
                 FirstName = matchedPerson.FirstName,
                 MiddleName = matchedPerson.MiddleName,
@@ -519,7 +519,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             attributeSourcedFromRequestData.Attribute);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var state = new ResolveNpqTrnRequestState()
+        var state = new ResolveNpqTrnRequestState
         {
             MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
@@ -562,7 +562,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             attributeSourcedFromRequestData.Attribute);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var state = new ResolveNpqTrnRequestState()
+        var state = new ResolveNpqTrnRequestState
         {
             MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
             PersonId = matchedPerson.PersonId,
@@ -594,7 +594,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
             Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
-            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
+            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes
             {
                 FirstName = matchedPerson.FirstName,
                 MiddleName = matchedPerson.MiddleName,
@@ -625,7 +625,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var comments = Faker.Lorem.Paragraph();
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            new ResolveNpqTrnRequestState()
+            new ResolveNpqTrnRequestState
             {
                 MatchedPersonIds = supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.Select(p => p.PersonId).AsReadOnly(),
                 PersonId = CreateNewRecordPersonIdSentinel,
@@ -651,7 +651,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var nextPageDoc = await nextPage.GetDocumentAsync();
         var linkToPersonRecord = GetLinkToPersonFromBanner(nextPageDoc);
         Assert.NotNull(linkToPersonRecord);
-        var personId = Guid.Parse(linkToPersonRecord!.Substring("/persons/".Length));
+        var personId = Guid.Parse(linkToPersonRecord.AsSpan("/persons/".Length));
 
         // person record is updated
         await WithDbContext(async dbContext =>
@@ -679,7 +679,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             Assert.Equal(personId, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
             var supportTaskData = updatedSupportTask.GetData<NpqTrnRequestData>();
             Assert.Equal(SupportRequestOutcome.Approved, supportTaskData.SupportRequestOutcome);
-            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes()
+            AssertPersonAttributesMatch(supportTaskData.ResolvedAttributes, new NpqTrnRequestDataPersonAttributes
             {
                 FirstName = requestMetadata.FirstName!,
                 MiddleName = requestMetadata.MiddleName ?? string.Empty,

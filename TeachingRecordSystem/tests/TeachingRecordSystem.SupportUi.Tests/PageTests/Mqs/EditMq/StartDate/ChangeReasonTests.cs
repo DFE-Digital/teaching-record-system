@@ -28,7 +28,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true
             });
@@ -53,7 +53,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -95,7 +95,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -104,7 +104,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "UploadEvidence", "False" }
             }
@@ -127,7 +127,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -136,9 +136,9 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
-                 { "ChangeReason", MqChangeStartDateReasonOption.ChangeOfStartDate.ToString() },
+                 { "ChangeReason", MqChangeStartDateReasonOption.ChangeOfStartDate.ToString() }
             }
         };
 
@@ -159,7 +159,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -168,7 +168,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                  { "ChangeReason", MqChangeStartDateReasonOption.ChangeOfStartDate.ToString() },
                  { "UploadEvidence", "True" }
@@ -192,7 +192,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -225,7 +225,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -260,7 +260,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -299,7 +299,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            new EditMqStartDateState()
+            new EditMqStartDateState
             {
                 Initialized = true,
                 StartDate = newStartDate,
@@ -317,7 +317,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
     {
-        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        var byteArrayContent = new ByteArrayContent([]);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
 
         var multipartContent = new MultipartFormDataContent

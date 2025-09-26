@@ -479,7 +479,7 @@ public partial class TestData
                     DqtLastName = mappedPersonInfo.DqtLastName,
                     Gender = mappedPersonInfo.Gender,
                     CreatedByTps = mappedPersonInfo.CreatedByTps,
-                    MergedWithPersonId = _mergedWithPersonId,
+                    MergedWithPersonId = _mergedWithPersonId
                 });
 
                 await dbContext.SaveChangesAsync();
@@ -652,8 +652,8 @@ public partial class TestData
                 Email = contact.EMailAddress1,
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 Gender = contact.GenderCode.ToGender(),
-                QtsDate = person?.QtsDate,
-                EytsDate = person?.EytsDate,
+                QtsDate = person.QtsDate,
+                EytsDate = person.EytsDate,
                 MandatoryQualifications = mqs,
                 Alerts = alerts,
                 DqtContactAuditDetail = auditDetail,
@@ -948,7 +948,7 @@ public partial class TestData
                             new()
                             {
                                 MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                                Name = provider.Name,
+                                Name = provider.Name
                             } :
                             null,
                         Specialism = specialism,
@@ -979,7 +979,7 @@ public partial class TestData
                             new()
                             {
                                 MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                                Name = provider.Name,
+                                Name = provider.Name
                             } :
                             null,
                         Specialism = specialism,
@@ -1087,8 +1087,12 @@ public partial class TestData
         internal static DateOnly? GetDefaultCompletedDate(InductionStatus status, DateOnly? startDate) =>
             status.RequiresCompletedDate() ? startDate!.Value.AddMonths(12) : null;
 
+#pragma warning disable IDE1007
+#pragma warning disable format
         internal static Guid[] GetDefaultExemptionReasonIds(InductionStatus status) =>
-            status is InductionStatus.Exempt ? new[] { InductionExemptionReason.PassedInWalesId } : Array.Empty<Guid>();
+            status is InductionStatus.Exempt ? [InductionExemptionReason.PassedInWalesId] : [];
+#pragma warning restore format
+#pragma warning restore IDE1007
     }
 
     public record CreatePersonResult

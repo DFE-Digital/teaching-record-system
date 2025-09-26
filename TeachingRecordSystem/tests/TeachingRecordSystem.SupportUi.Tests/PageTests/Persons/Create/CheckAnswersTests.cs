@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Create;
 [Collection(nameof(DisableParallelization))]
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private const string _changeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+    private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
     [Fact]
     public async Task Get_ConfirmAndCancelButtons_ExistOnPage()
@@ -106,7 +106,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new CreateStateBuilder()
                 .WithInitializedState()
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithCreateReasonChoice(CreateReasonOption.AnotherReason, _changeReasonDetails)
+                .WithCreateReasonChoice(CreateReasonOption.AnotherReason, ChangeReasonDetails)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
@@ -119,7 +119,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertRow("Reason for creating record", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
         doc.AssertRow("Evidence", v =>
         {
@@ -179,7 +179,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithEmail(emailAddress)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithGender(gender)
-                .WithCreateReasonChoice(CreateReasonOption.AnotherReason, _changeReasonDetails)
+                .WithCreateReasonChoice(CreateReasonOption.AnotherReason, ChangeReasonDetails)
                 .WithUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
@@ -231,7 +231,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(nationalInsuranceNumber, actualEvent.PersonAttributes.NationalInsuranceNumber);
             Assert.Equal(gender, actualEvent.PersonAttributes.Gender);
             Assert.Equal("Another reason", actualEvent.CreateReason);
-            Assert.Equal(_changeReasonDetails, actualEvent.CreateReasonDetail);
+            Assert.Equal(ChangeReasonDetails, actualEvent.CreateReasonDetail);
             Assert.Equal(otherEvidenceFileId, actualEvent.EvidenceFile!.FileId);
             Assert.Equal("other-evidence.png", actualEvent.EvidenceFile.Name);
         });

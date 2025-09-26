@@ -15,7 +15,7 @@ public enum MandatoryQualificationStatus
     [MandatoryQualificationStatusInfo(name: "failed")]
     Failed = 4,
     [MandatoryQualificationStatusInfo(name: "withdrawn")]
-    Withdrawn = 5,
+    Withdrawn = 5
 }
 
 public static class MandatoryQualificationStatusRegistry

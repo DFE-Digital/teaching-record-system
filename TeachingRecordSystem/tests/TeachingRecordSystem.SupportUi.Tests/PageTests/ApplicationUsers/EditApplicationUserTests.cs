@@ -88,7 +88,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName }
             }
@@ -110,7 +110,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName }
             }
@@ -132,7 +132,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName }
             }
@@ -154,7 +154,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName }
             }
@@ -187,7 +187,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", applicationUser.Name },
                 { "ApiRoles", applicationUser.ApiRoles ?? [] },
@@ -200,7 +200,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 { "OneLoginClientKeyPem", oneLoginClientKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
                 { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
-                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath },
+                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath }
             }
         };
 
@@ -232,7 +232,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
                 { "ShortName", newShortName },
@@ -246,7 +246,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
                 { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
-                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath },
+                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath }
             }
         };
 
@@ -514,7 +514,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "PostLogoutRedirectUris",
             "One or more post logout redirect URIs are not valid"
-        ],
+        ]
     ];
 
     private static readonly string _privateKeyPem = RSA.Create().ExportPkcs8PrivateKeyPem();
