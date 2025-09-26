@@ -148,10 +148,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        var expectedHeader = targetStatus == PersonStatus.Deactivated
+        var expectedMessage = targetStatus == PersonStatus.Deactivated
             ? "Lily The Pink\u2019s record has been deactivated"
             : "Lily The Pink\u2019s record has been reactivated";
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: expectedHeader);
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage);
 
         await WithDbContext(async dbContext =>
         {

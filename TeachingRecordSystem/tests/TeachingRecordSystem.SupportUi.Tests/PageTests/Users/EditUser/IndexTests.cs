@@ -337,7 +337,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{newName} {expectedFlashMessage}");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{newName} {expectedFlashMessage}");
     }
 
     [Fact]
@@ -460,7 +460,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been reactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{existingUser.Name}\u2019s account has been reactivated");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";

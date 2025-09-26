@@ -418,7 +418,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{newName} has been added as a record manager.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{newName} has been added as a record manager.");
     }
 
     private void ConfigureUserServiceMock(string userId, Services.AzureActiveDirectory.User? user) =>

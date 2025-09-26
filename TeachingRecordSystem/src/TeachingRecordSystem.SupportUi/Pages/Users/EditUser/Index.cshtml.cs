@@ -126,7 +126,7 @@ public class IndexModel(
         });
 
         await dbContext.SaveChangesAsync();
-        TempData.SetFlashSuccess($"{_user.Name}\u2019s account has been reactivated.");
+        TempData.SetFlashSuccess($"{_user.Name}\u2019s account has been reactivated");
 
         return Redirect(linkGenerator.Users());
     }
