@@ -137,7 +137,7 @@ public class DeactivateModel(
         });
 
         await dbContext.SaveChangesAsync();
-        TempData.SetFlashSuccess(messageText: $"{_user.Name}\u2019s account has been deactivated");
+        TempData.SetFlashSuccess($"{_user.Name}\u2019s account has been deactivated");
 
         return Redirect(linkGenerator.Users());
     }
