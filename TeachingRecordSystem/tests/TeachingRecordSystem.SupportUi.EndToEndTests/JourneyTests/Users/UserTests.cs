@@ -93,7 +93,7 @@ public class UserTests : TestBase
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name}\u2019s account has been deactivated.");
+        await page.AssertFlashMessageAsync($"{user.Name}\u2019s account has been deactivated");
     }
 
     [Test]

@@ -91,7 +91,7 @@ public class ConfirmModel(
             .ToLowerInvariantFirstLetter()
             .WithIndefiniteArticle();
 
-        TempData.SetFlashSuccess(messageText: $"{Name} has been added as {roleText}.");
+        TempData.SetFlashSuccess($"{Name} has been added as {roleText}.");
         return Redirect(linkGenerator.Users());
     }
 
