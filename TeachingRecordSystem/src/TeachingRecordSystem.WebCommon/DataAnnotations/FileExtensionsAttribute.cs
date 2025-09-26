@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
-namespace TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
+namespace TeachingRecordSystem.WebCommon.DataAnnotations;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class FileExtensionsAttribute : ValidationAttribute
