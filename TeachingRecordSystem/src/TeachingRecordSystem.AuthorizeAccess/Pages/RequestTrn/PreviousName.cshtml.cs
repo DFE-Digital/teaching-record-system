@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.WebCommon.DataAnnotations;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -23,7 +22,6 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 
     [BindProperty]
     [Display(Name = "Previous first name")]
-    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Enter your previous first name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous first name must be 100 characters or less")]
     public string? FirstName { get; set; }
 
@@ -34,7 +32,6 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 
     [BindProperty]
     [Display(Name = "Previous last name")]
-    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Enter your previous last name")]
     [MaxLength(Person.FirstNameMaxLength, ErrorMessage = $"Previous last name must be 100 characters or less")]
     public string? LastName { get; set; }
 
@@ -48,6 +45,19 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (HasPreviousName == true)
+        {
+            if (FirstName is null)
+            {
+                ModelState.AddModelError(nameof(FirstName), "Enter your previous first name");
+            }
+
+            if (LastName is null)
+            {
+                ModelState.AddModelError(nameof(LastName), "Enter your previous last name");
+            }
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
