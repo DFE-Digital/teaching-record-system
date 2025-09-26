@@ -105,7 +105,7 @@ public class CheckAnswersModel(
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"{SourceApplicationUserName} request completed for {StringHelper.JoinNonEmpty(' ', new[] { FirstName, MiddleName, LastName })}",
+            $"TRN request completed for {StringHelper.JoinNonEmpty(' ', new[] { FirstName, MiddleName, LastName })}",
             buildMessageHtml: b =>
             {
                 var link = new TagBuilder("a");
@@ -113,7 +113,7 @@ public class CheckAnswersModel(
                 link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
                 link.MergeAttribute("target", "_blank");
                 link.MergeAttribute("rel", "noopener noreferrer");
-                link.InnerHtml.Append($"View record (opens in a new tab)");
+                link.InnerHtml.Append("View record (opens in a new tab)");
                 b.AppendHtml(link);
             });
 
