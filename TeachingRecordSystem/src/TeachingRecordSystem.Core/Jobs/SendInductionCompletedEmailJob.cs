@@ -33,7 +33,7 @@ public class SendInductionCompletedEmailJob(
             item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
         }
 
-        await notificationSender.SendEmailAsync(EmailTemplateIds.InductionCompletedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
+        await notificationSender.SendEmailAsync(EmailTemplateIds.InductionCompletedEmailConfirmation, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
         dbContext.AddEventWithoutBroadcast(new InductionCompletedEmailSentEvent

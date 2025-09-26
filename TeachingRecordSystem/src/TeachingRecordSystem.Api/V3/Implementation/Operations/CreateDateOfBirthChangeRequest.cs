@@ -91,8 +91,8 @@ public class CreateDateOfBirthChangeRequestHandler(
             var email = new Email
             {
                 EmailId = Guid.NewGuid(),
-                TemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthSubmittedEmailConfirmationTemplateId,
-                EmailAddress = emailAddress!,
+                TemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthSubmittedEmailConfirmation,
+                EmailAddress = emailAddress,
                 Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, person.FirstName } }
             };
 

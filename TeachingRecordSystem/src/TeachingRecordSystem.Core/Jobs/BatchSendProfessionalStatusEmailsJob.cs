@@ -92,8 +92,8 @@ public class BatchSendProfessionalStatusEmailsJob(
             foreach (var qtsAwardee in qtsAwardees.DistinctBy(p => p.Trn))
             {
                 var templateId = qtsAwardee.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId
-                    ? EmailTemplateIds.InternationalQtsAwardedEmailConfirmationTemplateId
-                    : EmailTemplateIds.QtsAwardedEmailConfirmationTemplateId;
+                    ? EmailTemplateIds.InternationalQtsAwardedEmailConfirmation
+                    : EmailTemplateIds.QtsAwardedEmailConfirmation;
 
                 var personalization = new Dictionary<string, string>
                 {
@@ -161,7 +161,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                 var email = new Email
                 {
                     EmailId = Guid.NewGuid(),
-                    TemplateId = EmailTemplateIds.EytsAwardedEmailConfirmationTemplateId,
+                    TemplateId = EmailTemplateIds.EytsAwardedEmailConfirmation,
                     EmailAddress = eytsAwardee.EmailAddress!,
                     Personalization = personalization,
                     Metadata = metadata
@@ -208,7 +208,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                 var email = new Email
                 {
                     EmailId = Guid.NewGuid(),
-                    TemplateId = EmailTemplateIds.QtlsLapsedTemplateId,
+                    TemplateId = EmailTemplateIds.QtlsLapsed,
                     EmailAddress = qtlsLoser.EmailAddress!,
                     Personalization = new Dictionary<string, string>()
                 };
