@@ -46,7 +46,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and create record");
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", $"TRN request for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName} completed");
+        await page.AssertBannerAsync("Success", $"TRN request for {StringHelper.JoinNonEmpty(' ', [requestData.FirstName, requestData.MiddleName, requestData.LastName])} completed");
         await page.FollowBannerLink("View record (opens in a new tab)");
 
         await page.AssertOnAPersonDetailPageAsync();

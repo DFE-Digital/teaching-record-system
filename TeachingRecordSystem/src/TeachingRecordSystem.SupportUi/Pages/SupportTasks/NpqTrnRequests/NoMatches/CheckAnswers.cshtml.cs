@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -104,18 +103,9 @@ public class CheckAnswersModel(
         await dbContext.AddEventAndBroadcastAsync(@event);
         await dbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccess(
-            $"TRN request completed for {StringHelper.JoinNonEmpty(' ', new[] { FirstName, MiddleName, LastName })}",
-            buildMessageHtml: b =>
-            {
-                var link = new TagBuilder("a");
-                link.AddCssClass("govuk-link");
-                link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
-                link.MergeAttribute("target", "_blank");
-                link.MergeAttribute("rel", "noopener noreferrer");
-                link.InnerHtml.Append("View record (opens in a new tab)");
-                b.AppendHtml(link);
-            });
+        TempData.SetFlashSuccessWithLinkToRecord(
+            $"TRN request completed for {StringHelper.JoinNonEmpty(' ', [FirstName, MiddleName, LastName])}",
+            linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
 
         return Redirect(linkGenerator.NpqTrnRequests());
     }
