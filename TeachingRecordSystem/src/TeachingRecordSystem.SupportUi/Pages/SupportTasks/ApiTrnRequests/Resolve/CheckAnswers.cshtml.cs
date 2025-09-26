@@ -184,7 +184,9 @@ public class CheckAnswers(
                 var link = new TagBuilder("a");
                 link.AddCssClass("govuk-link");
                 link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
-                link.InnerHtml.Append("View record");
+                link.MergeAttribute("target", "_blank");
+                link.MergeAttribute("rel", "noopener noreferrer");
+                link.InnerHtml.Append("View record (opens in a new tab)");
                 b.AppendHtml(link);
             });
 
