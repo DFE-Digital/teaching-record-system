@@ -179,7 +179,7 @@ public class RejectTests : TestBase
                     .SingleOrDefaultAsync();
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
-                Assert.Equal(ChangeRequestEmailConstants.GetAnIdentityChangeOfNameRejectedEmailConfirmationTemplateId, email.TemplateId);
+                Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation, email.TemplateId);
             }
             else
             {
@@ -190,7 +190,7 @@ public class RejectTests : TestBase
                     .SingleOrDefaultAsync();
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
-                Assert.Equal(ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmationTemplateId, email.TemplateId);
+                Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation, email.TemplateId);
             }
         });
 

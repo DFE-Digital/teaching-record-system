@@ -20,14 +20,6 @@ public class BatchSendProfessionalStatusEmailsJob(
         public const string LastHoldsFromEnd = "LastHoldsFromEnd";
     }
 
-    public static class TemplateIds
-    {
-        public const string EytsAwardedEmailConfirmationTemplateId = "f85babdb-049b-4f32-9579-2a812acc0a2b";
-        public const string InternationalQtsAwardedEmailConfirmationTemplateId = "f4200027-de67-4a55-808a-b37ae2653660";
-        public const string QtsAwardedEmailConfirmationTemplateId = "68814f63-b63a-4f79-b7df-c52f5cd55710";
-        public const string QtlsLapsedTemplateId = "269cefcc-71ac-4ca0-b348-719d4ee6d9d2";
-    }
-
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         // Ensure enqueued Hangfire jobs are run in the same transaction as the database changes
@@ -100,8 +92,8 @@ public class BatchSendProfessionalStatusEmailsJob(
             foreach (var qtsAwardee in qtsAwardees.DistinctBy(p => p.Trn))
             {
                 var templateId = qtsAwardee.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId
-                    ? TemplateIds.InternationalQtsAwardedEmailConfirmationTemplateId
-                    : TemplateIds.QtsAwardedEmailConfirmationTemplateId;
+                    ? EmailTemplateIds.InternationalQtsAwardedEmailConfirmation
+                    : EmailTemplateIds.QtsAwardedEmailConfirmation;
 
                 var personalization = new Dictionary<string, string>
                 {
@@ -169,7 +161,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                 var email = new Email
                 {
                     EmailId = Guid.NewGuid(),
-                    TemplateId = TemplateIds.EytsAwardedEmailConfirmationTemplateId,
+                    TemplateId = EmailTemplateIds.EytsAwardedEmailConfirmation,
                     EmailAddress = eytsAwardee.EmailAddress!,
                     Personalization = personalization,
                     Metadata = metadata
@@ -216,7 +208,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                 var email = new Email
                 {
                     EmailId = Guid.NewGuid(),
-                    TemplateId = TemplateIds.QtlsLapsedTemplateId,
+                    TemplateId = EmailTemplateIds.QtlsLapsed,
                     EmailAddress = qtlsLoser.EmailAddress!,
                     Personalization = new Dictionary<string, string>()
                 };

@@ -155,7 +155,7 @@ public class AcceptTests : TestBase
                     .SingleOrDefaultAsync();
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
-                Assert.Equal(ChangeRequestEmailConstants.GetAnIdentityChangeOfNameApprovedEmailConfirmationTemplateId, email.TemplateId);
+                Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation, email.TemplateId);
 
                 var updatedPerson = await dbContext.Persons
                     .SingleAsync(p => p.PersonId == createPersonResult.PersonId);
@@ -180,7 +180,7 @@ public class AcceptTests : TestBase
                     .SingleOrDefaultAsync();
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
-                Assert.Equal(ChangeRequestEmailConstants.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmationTemplateId, email.TemplateId);
+                Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation, email.TemplateId);
             }
         });
 
