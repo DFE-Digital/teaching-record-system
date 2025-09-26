@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
+namespace TeachingRecordSystem.WebCommon.DataAnnotations;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class EvidenceFileAttribute : FileExtensionsAttribute
