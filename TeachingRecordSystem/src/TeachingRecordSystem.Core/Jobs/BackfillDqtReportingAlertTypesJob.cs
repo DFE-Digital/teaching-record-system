@@ -73,7 +73,7 @@ public class BackfillDqtReportingAlertTypesJob(IOptions<DqtReportingOptions> dqt
                     at.AlertCategoryId,
                     at.Name,
                     at.DqtSanctionCode,
-                    at.ProhibitionLevel,
+                    at.InternalOnly,
                     at.IsActive,
                     at.DisplayOrder,
                     clock.UtcNow,
