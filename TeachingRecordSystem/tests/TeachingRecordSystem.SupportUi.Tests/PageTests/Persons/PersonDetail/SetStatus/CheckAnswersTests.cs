@@ -49,12 +49,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow(targetStatus == PersonStatus.Deactivated
-            ? "Reason for deactivating record"
-            : "Reason for reactivating record", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertRow("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertRow("More details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertRow("Evidence uploaded", v =>
+        doc.AssertRow("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
@@ -96,14 +94,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            doc.AssertRow("Reason for deactivating record", v => Assert.Equal("The record holder died", v.TrimmedText()));
+            doc.AssertRow("Reason", v => Assert.Equal("The record holder died", v.TrimmedText()));
         }
         else
         {
-            doc.AssertRow("Reason for reactivating record", v => Assert.Equal("The record was deactivated by mistake", v.TrimmedText()));
+            doc.AssertRow("Reason", v => Assert.Equal("The record was deactivated by mistake", v.TrimmedText()));
         }
-        doc.AssertRow("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRows("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRow("More details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertRows("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Theory]
@@ -148,10 +146,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        var expectedMessage = targetStatus == PersonStatus.Deactivated
+        var expectedHeading = targetStatus == PersonStatus.Deactivated
             ? "Lily The Pink\u2019s record has been deactivated."
             : "Lily The Pink\u2019s record has been reactivated.";
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: expectedMessage);
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading);
 
         await WithDbContext(async dbContext =>
         {
