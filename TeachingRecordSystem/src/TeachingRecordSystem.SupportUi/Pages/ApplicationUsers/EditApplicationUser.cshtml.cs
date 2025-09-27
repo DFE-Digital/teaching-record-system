@@ -175,8 +175,6 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             return this.PageWithErrors();
         }
 
-        string? flashMessage = null;
-
         var changes = ApplicationUserUpdatedEventChanges.None |
             (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
             (ShortName != _user!.ShortName ? ApplicationUserUpdatedEventChanges.ShortName : 0) |
@@ -185,8 +183,6 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
 
         if (IsOidcClient)
         {
-            var oldChanges = changes;
-
             changes |=
                 (ClientId != _user.ClientId ? ApplicationUserUpdatedEventChanges.ClientId : 0) |
                 (ClientSecret != _user.ClientSecret ? ApplicationUserUpdatedEventChanges.ClientSecret : 0) |
@@ -197,12 +193,6 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
                 (OneLoginAuthenticationSchemeName != _user.OneLoginAuthenticationSchemeName ? ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName : 0) |
                 (OneLoginRedirectUriPath != _user.OneLoginRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath : 0) |
                 (OneLoginPostLogoutRedirectUriPath != _user.OneLoginPostLogoutRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath : 0);
-
-            var oneLoginPropertyHasChanged = changes != oldChanges;
-            if (oneLoginPropertyHasChanged)
-            {
-                flashMessage = "Changes to One Login configuration make take a few minutes before they’re updated everywhere.";
-            }
         }
 
         if (changes != ApplicationUserUpdatedEventChanges.None)
@@ -240,9 +230,12 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             await dbContext.AddEventAndBroadcastAsync(@event);
 
             await dbContext.SaveChangesAsync();
+
+            // Notify TeacherAuth about changes to the application user
+            await dbContext.Database.ExecuteSqlRawAsync($"NOTIFY {ChannelNames.OneLoginClient}");
         }
 
-        TempData.SetFlashSuccess("Application user updated", messageText: flashMessage);
+        TempData.SetFlashSuccess("Application user updated");
         return Redirect(linkGenerator.ApplicationUsers());
     }
 

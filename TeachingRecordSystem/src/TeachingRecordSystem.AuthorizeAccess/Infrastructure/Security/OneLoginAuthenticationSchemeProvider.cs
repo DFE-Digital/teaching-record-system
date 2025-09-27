@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using GovUk.OneLogin.AspNetCore;
@@ -6,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -21,15 +21,8 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         ILogger<OneLoginAuthenticationSchemeProvider> logger) :
     IAuthenticationSchemeProvider, IConfigureNamedOptions<OneLoginOptions>, IDisposable, IHostedService
 {
-    private static readonly TimeSpan _pollDbInterval = TimeSpan.FromMinutes(2);
+    private IReadOnlyCollection<AuthenticationSchemeAndApplicationUser> _schemeCache = [];
 
-    // Whether _schemeCache has been populated.
-    private bool _loaded;
-
-    // A map of authentication scheme names -> AuthenticationScheme + ApplicationUser.
-    private readonly ConcurrentDictionary<string, AuthenticationSchemeAndApplicationUser> _schemeCache = [];
-
-    private Task? _reloadSchemesTask;
     private CancellationTokenSource? _stoppingCts;
 
     public void AddScheme(AuthenticationScheme scheme) =>
@@ -37,9 +30,12 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
     public async Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
     {
-        await EnsureLoadedAsync();
+        var innerProviderSchemes = await innerProvider.GetAllSchemesAsync();
 
-        return (await innerProvider.GetAllSchemesAsync()).Concat(_schemeCache.Values.Select(v => v.Scheme));
+        lock (_schemeCache)
+        {
+            return innerProviderSchemes.Concat(_schemeCache.Select(v => v.Scheme));
+        }
     }
 
     public Task<AuthenticationScheme?> GetDefaultAuthenticateSchemeAsync() =>
@@ -59,17 +55,25 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
     public async Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync()
     {
-        await EnsureLoadedAsync();
+        var innerProviderSchemes = await innerProvider.GetRequestHandlerSchemesAsync();
 
-        return (await innerProvider.GetRequestHandlerSchemesAsync()).Concat(_schemeCache.Values.Select(v => v.Scheme));
+        lock (_schemeCache)
+        {
+            return innerProviderSchemes.Concat(_schemeCache.Select(v => v.Scheme));
+        }
     }
 
     public async Task<AuthenticationScheme?> GetSchemeAsync(string name)
     {
-        await EnsureLoadedAsync();
+        if (await innerProvider.GetSchemeAsync(name) is { } scheme)
+        {
+            return scheme;
+        }
 
-        return (await innerProvider.GetSchemeAsync(name)) ??
-            (_schemeCache.TryGetValue(name, out var userAndScheme) ? userAndScheme.Scheme : default);
+        lock (_schemeCache)
+        {
+            return _schemeCache.SingleOrDefault(v => v.Scheme.Name == name)?.Scheme;
+        }
     }
 
     public void RemoveScheme(string name) =>
@@ -80,48 +84,33 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         _stoppingCts?.Dispose();
     }
 
-    private async Task EnsureLoadedAsync()
-    {
-        if (!_loaded)
-        {
-            await ReloadSchemesAsync();
-            _loaded = true;
-        }
-    }
-
     private async Task ReloadSchemesAsync()
     {
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        var applicationUsers = await dbContext.ApplicationUsers.AsNoTracking().Where(u => u.IsOidcClient).ToListAsync();
+        var applicationUsers = await dbContext.ApplicationUsers.AsNoTracking().Where(u => u.IsOidcClient).ToArrayAsync();
 
-        var seenSchemes = new List<string>();
-
+        var newSchemes = new List<AuthenticationSchemeAndApplicationUser>();
         foreach (var user in applicationUsers)
         {
             user.EnsureConfiguredForOneLogin();
-            var schemeName = user.OneLoginAuthenticationSchemeName;
-
-            if (_schemeCache.TryGetValue(schemeName, out var schemeAndUser))
-            {
-                schemeAndUser.User = user;
-
-                // Force OneLoginOptions to be recomputed for this scheme
-                oneLoginOptionsMonitorCache.TryRemove(schemeName);
-            }
-            else
-            {
-                _schemeCache.TryAdd(schemeName, new() { Scheme = CreateAuthenticationScheme(user), User = user });
-            }
-
-            seenSchemes.Add(schemeName);
+            newSchemes.Add(new(user, CreateAuthenticationScheme(user)));
         }
 
-        foreach (var kvp in _schemeCache)
+        var oldAndNewSchemes = new HashSet<string>();
+        lock (_schemeCache)
         {
-            if (!seenSchemes.Contains(kvp.Key))
+            foreach (var (_, scheme) in _schemeCache)
             {
-                _schemeCache.TryRemove(kvp);
+                oldAndNewSchemes.Add(scheme.Name);
             }
+
+            _schemeCache = newSchemes;
+        }
+
+        foreach (var scheme in oldAndNewSchemes)
+        {
+            // Force OneLoginOptions to be recomputed for all schemes
+            oneLoginOptionsMonitorCache.TryRemove(scheme);
         }
 
         static AuthenticationScheme CreateAuthenticationScheme(ApplicationUser user) =>
@@ -130,9 +119,11 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
     private ApplicationUser GetApplicationUserForScheme(string schemeName)
     {
-        return _schemeCache.TryGetValue(schemeName, out var userAndScheme) ?
-            userAndScheme.User :
-            throw new ArgumentException($"Scheme '{schemeName}' was not found.", nameof(schemeName));
+        lock (_schemeCache)
+        {
+            return _schemeCache.SingleOrDefault(v => v.Scheme.Name == schemeName)?.User ??
+                throw new ArgumentException($"Scheme '{schemeName}' was not found.", nameof(schemeName));
+        }
     }
 
     void IConfigureNamedOptions<OneLoginOptions>.Configure(string? name, OneLoginOptions options)
@@ -228,42 +219,35 @@ public sealed class OneLoginAuthenticationSchemeProvider(
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _reloadSchemesTask = UpdateSchemesFromDbAsync(cancellationToken);
-        return Task.CompletedTask;
+        _ = RefreshOnNotificationAsync(_stoppingCts.Token);
+        return ReloadSchemesAsync();
 
-        async Task UpdateSchemesFromDbAsync(CancellationToken cancellationToken)
+        async Task RefreshOnNotificationAsync(CancellationToken cancellationToken)
         {
-            var timer = new PeriodicTimer(_pollDbInterval);
-
-            while (await timer.WaitForNextTickAsync(cancellationToken))
+            while (!_stoppingCts.Token.IsCancellationRequested)
             {
                 try
                 {
+                    await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+                    var conn = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+                    await conn.OpenAsync(cancellationToken);
+
+                    await using var cmd = conn.CreateCommand();
+                    cmd.CommandText = $"LISTEN {ChannelNames.OneLoginClient};";
+                    await cmd.ExecuteNonQueryAsync(cancellationToken);
+
+                    await conn.WaitAsync(cancellationToken);
                     await ReloadSchemesAsync();
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Failed refreshing One Login authentication schemes.");
+                    logger.LogError(ex, $"Failed waiting for notifications from {ChannelNames.OneLoginClient}.");
                 }
             }
         }
     }
 
-    async Task IHostedService.StopAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            _stoppingCts!.Cancel();
-        }
-        finally
-        {
-            await _reloadSchemesTask!.WaitAsync(cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
-        }
-    }
+    Task IHostedService.StopAsync(CancellationToken cancellationToken) => _stoppingCts!.CancelAsync();
 
-    private record AuthenticationSchemeAndApplicationUser
-    {
-        public required ApplicationUser User { get; set; }
-        public required AuthenticationScheme Scheme { get; init; }
-    };
+    private record AuthenticationSchemeAndApplicationUser(ApplicationUser User, AuthenticationScheme Scheme);
 }
