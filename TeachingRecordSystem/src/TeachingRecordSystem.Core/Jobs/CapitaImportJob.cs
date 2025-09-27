@@ -186,8 +186,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 EmailAddress = null,
                                 NationalInsuranceNumber = newPerson.NationalInsuranceNumber,
                                 Gender = newPerson.Gender,
-                                PotentialDuplicate = true,
-                                Matches = new TrnRequestMatches() { MatchedPersons = potentialMatches.Outcome == TrnRequestMatchResultOutcome.PotentialMatches ? potentialMatches.PotentialMatchesPersonIds.Select(x => new TrnRequestMatchedPerson() { PersonId = x }).ToList() : [] }
+                                PotentialDuplicate = true
                             };
                             dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 

@@ -147,19 +147,6 @@ public class CreateTrnRequestHandler(
         trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is TrnRequestMatchResultOutcome.PotentialMatches;
         trnRequestMetadata.TrnToken = trnToken;
 
-        trnRequestMetadata.Matches = new PostgresModels.TrnRequestMatches()
-        {
-            MatchedPersons = matchResult.Outcome switch
-            {
-                TrnRequestMatchResultOutcome.PotentialMatches =>
-                    matchResult.PotentialMatchesPersonIds
-                        .Select(id => new PostgresModels.TrnRequestMatchedPerson() { PersonId = id })
-                        .ToList(),
-                TrnRequestMatchResultOutcome.DefiniteMatch => [new PostgresModels.TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
-                _ => []
-            }
-        };
-
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
         await trnRequestService.TryEnsureTrnTokenAsync(trnRequestMetadata, trn);
