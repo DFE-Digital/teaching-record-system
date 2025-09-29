@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
+using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
@@ -103,7 +104,9 @@ public static class Extensions
 
         if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
-            services.AddAzureAdAuthentication(configuration);
+            services
+                .AddAzureAdAuthentication(configuration)
+                .AddIdentityApi(configuration);
         }
 
         return services;
