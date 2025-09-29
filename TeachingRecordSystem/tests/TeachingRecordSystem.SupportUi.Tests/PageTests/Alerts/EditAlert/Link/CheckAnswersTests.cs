@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Legacy;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
 public class CheckAnswersTests(HostFixture hostFixture) : LinkTestBase(hostFixture)

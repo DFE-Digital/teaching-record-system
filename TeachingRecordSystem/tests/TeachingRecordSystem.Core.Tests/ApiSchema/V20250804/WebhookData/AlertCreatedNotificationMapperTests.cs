@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
 

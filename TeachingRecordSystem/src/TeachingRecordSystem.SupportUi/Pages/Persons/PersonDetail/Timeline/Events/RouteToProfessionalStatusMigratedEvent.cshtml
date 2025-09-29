@@ -3,7 +3,7 @@
 @using TeachingRecordSystem.Core.Services.Files
 @inject ReferenceDataCache ReferenceDataCache
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<RouteToProfessionalStatusMigratedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.RouteToProfessionalStatusMigratedEvent>>
 @{
     var migratedEvent = Model.ItemModel.Event;
     var professionalStatus = migratedEvent.RouteToProfessionalStatus;

@@ -1,7 +1,8 @@
 @using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events.Legacy
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService;
-@model TimelineItem<TimelineEvent<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>>
 @{
     var mergedEvent = Model.ItemModel.Event;
 

@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 

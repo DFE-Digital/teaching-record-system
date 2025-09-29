@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Legacy;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)

@@ -1,7 +1,7 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<PersonStatusUpdatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.PersonStatusUpdatedEvent>>
 @{
     var statusUpdatedEvent = Model.ItemModel.Event;
     var (actionPastParticiple, actionNoun) = statusUpdatedEvent.Status == PersonStatus.Deactivated

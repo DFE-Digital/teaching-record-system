@@ -1,5 +1,6 @@
 @using TeachingRecordSystem.Core.Events
-@model TimelineItem<TimelineEvent<MandatoryQualificationMigratedEvent>>
+@using TeachingRecordSystem.Core.Events.Legacy
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.MandatoryQualificationMigratedEvent>>
 @{
     var migratedEvent = Model.ItemModel.Event;
     var mandatoryQualification = migratedEvent.MandatoryQualification;

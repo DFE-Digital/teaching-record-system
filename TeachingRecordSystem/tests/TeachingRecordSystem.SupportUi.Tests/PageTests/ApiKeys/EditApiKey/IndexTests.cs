@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Legacy;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys.EditApiKey;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)

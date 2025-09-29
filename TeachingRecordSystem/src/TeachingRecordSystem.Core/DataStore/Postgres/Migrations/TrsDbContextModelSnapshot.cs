@@ -286,6 +286,78 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.ToTable("oidc_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Action", b =>
+                {
+                    b.Property<Guid>("ActionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("action_id");
+
+                    b.Property<int>("ActionType")
+                        .HasColumnType("integer")
+                        .HasColumnName("action_type");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.PrimitiveCollection<Guid[]>("PersonIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("person_ids");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("ActionId")
+                        .HasName("pk_actions");
+
+                    b.HasIndex("PersonIds")
+                        .HasDatabaseName("ix_actions_person_ids");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds"), "GIN");
+
+                    b.ToTable("actions", (string)null);
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ActionEvent", b =>
+                {
+                    b.Property<Guid>("ActionEventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("action_event_id");
+
+                    b.Property<Guid>("ActionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("action_id");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("event_name");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.PrimitiveCollection<Guid[]>("PersonIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("person_ids");
+
+                    b.HasKey("ActionEventId")
+                        .HasName("pk_action_events");
+
+                    b.HasIndex("PersonIds")
+                        .HasDatabaseName("ix_action_events_person_ids");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds"), "GIN");
+
+                    b.ToTable("action_events", (string)null);
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Alert", b =>
                 {
                     b.Property<Guid>("AlertId")
@@ -19901,6 +19973,16 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("Authorization");
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ActionEvent", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Action", null)
+                        .WithMany("Events")
+                        .HasForeignKey("ActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_action_events_action_action_id");
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Alert", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertType", "AlertType")
@@ -20320,6 +20402,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreAuthorization<System.Guid>", b =>
                 {
                     b.Navigation("Tokens");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Action", b =>
+                {
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertCategory", b =>

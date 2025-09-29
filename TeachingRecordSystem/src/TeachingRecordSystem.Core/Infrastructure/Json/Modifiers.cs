@@ -67,4 +67,29 @@ public static class Modifiers
                 new JsonDerivedType(supportTaskType.DataType, (int)supportTaskType.SupportTaskType));
         }
     }
+
+    public static void Events(JsonTypeInfo typeInfo)
+    {
+        if (typeInfo.Type != typeof(IEvent))
+        {
+            return;
+        }
+
+        typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+        {
+            TypeDiscriminatorPropertyName = "$event-name",
+            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
+        };
+
+        var eventTypes = typeof(IEvent).Assembly.GetTypes()
+            .Where(t => typeof(IEvent).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
+
+        foreach (var eventType in eventTypes)
+        {
+            var eventName = eventType.Name;
+
+            typeInfo.PolymorphismOptions.DerivedTypes.Add(
+                new JsonDerivedType(eventType, eventName));
+        }
+    }
 }

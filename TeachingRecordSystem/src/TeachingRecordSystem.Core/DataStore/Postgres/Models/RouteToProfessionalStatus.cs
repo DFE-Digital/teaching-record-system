@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 

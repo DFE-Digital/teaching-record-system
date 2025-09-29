@@ -1,7 +1,7 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<PersonCreatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.PersonCreatedEvent>>
 @{
     var updatedEvent = Model.ItemModel.Event;
     var details = updatedEvent.PersonAttributes;

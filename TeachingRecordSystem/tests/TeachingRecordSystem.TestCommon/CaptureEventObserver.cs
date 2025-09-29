@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using Xunit;
 

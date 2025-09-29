@@ -1,7 +1,7 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<MandatoryQualificationDeletedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.MandatoryQualificationDeletedEvent>>
 @{
     var deletedEvent = Model.ItemModel.Event;
     var mandatoryQualification = deletedEvent.MandatoryQualification;

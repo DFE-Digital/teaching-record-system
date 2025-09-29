@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Legacy;
+
 namespace TeachingRecordSystem.TestCommon.Infrastructure;
 
 public interface IEventObserver
