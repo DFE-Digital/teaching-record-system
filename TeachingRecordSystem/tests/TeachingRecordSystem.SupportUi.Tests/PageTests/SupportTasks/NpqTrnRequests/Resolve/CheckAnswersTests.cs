@@ -501,7 +501,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"TRN request for {StringHelper.JoinNonEmpty(' ', [matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName])} completed");
+            $"TRN request for {StringHelper.JoinNonEmpty(' ', matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName)} completed");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);

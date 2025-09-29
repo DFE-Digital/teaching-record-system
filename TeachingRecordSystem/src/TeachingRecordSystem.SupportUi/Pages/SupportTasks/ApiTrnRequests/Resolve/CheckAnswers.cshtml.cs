@@ -177,7 +177,7 @@ public class CheckAnswers(
         await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccessWithLinkToRecord(
-            $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', [FirstName, MiddleName, LastName])}",
+            $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
             linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
 
         return Redirect(linkGenerator.ApiTrnRequests());

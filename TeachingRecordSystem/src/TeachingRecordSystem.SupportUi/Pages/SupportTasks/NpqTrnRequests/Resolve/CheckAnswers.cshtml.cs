@@ -170,7 +170,7 @@ public class CheckAnswersModel(
         await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccessWithLinkToRecord(
-            $"TRN request for {StringHelper.JoinNonEmpty(' ', [FirstName, MiddleName, LastName])} completed",
+            $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed",
             linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
 
         await JourneyInstance!.CompleteAsync();
