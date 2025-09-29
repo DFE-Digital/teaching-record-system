@@ -632,7 +632,15 @@ public partial class DqtReportingService : BackgroundService
 
         using var cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddRange(parameters.ToArray());
-        await cmd.ExecuteNonQueryAsync();
+
+        try
+        {
+            await cmd.ExecuteNonQueryAsync();
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Failed executing query:\n" + sql, e);
+        }
     }
 
     private async Task DeleteRowFromTrsAsync(string targetTableName, string idColumnName, object id)
