@@ -220,19 +220,19 @@
       },
       "Google.Apis": {
         "type": "Transitive",
-        "resolved": "1.67.0",
-        "contentHash": "XM8/fViJaB1pN61OdXy5RMZoQEqd3hKlWvA/K431gFSb5XtQ48BynfgrbBkUtFcPbSRa4BdjBHzSbkBh/skyMg==",
+        "resolved": "1.71.0",
+        "contentHash": "xKVk+SLZXeBPKuEKzNTg2K7ptr5ZL40+VSR8e5+yJbzTE9uRCCDPlAzT/ij3urh4usBsn5IiW5rXQI+xAc3bRQ==",
         "dependencies": {
-          "Google.Apis.Core": "1.67.0"
+          "Google.Apis.Core": "1.71.0"
         }
       },
       "Google.Apis.Auth": {
         "type": "Transitive",
-        "resolved": "1.67.0",
-        "contentHash": "Bs9BlbZ12Y4NXzMONjpzQhZr9VbwLUTGMHkcQRF36aYnk2fYrmj5HNVNh7PPHDDq1fcEQpCtPic2nSlpYQLKXw==",
+        "resolved": "1.71.0",
+        "contentHash": "AshxDrFfj0QQPkmGQWvWhT+iZ8Vif23hLa9mFZ6cnbwvfXmXwXOWK9bP6uWnLj+sO6otAYKm+7SMZYgwi1AdJA==",
         "dependencies": {
-          "Google.Apis": "1.67.0",
-          "Google.Apis.Core": "1.67.0",
+          "Google.Apis": "1.71.0",
+          "Google.Apis.Core": "1.71.0",
           "System.Management": "7.0.2"
         }
       },
@@ -247,8 +247,8 @@
       },
       "Google.Apis.Core": {
         "type": "Transitive",
-        "resolved": "1.67.0",
-        "contentHash": "IPq0I3B01NYZraPoMl8muELFLg4Vr2sbfyZp4PR2Xe3MAhHkZCiKyV28Yh1L14zIKUb0X0snol1sR5/mx4S6Iw==",
+        "resolved": "1.71.0",
+        "contentHash": "tCsg4USOGBVCIrSOyLht1akZe/+ioH7+LVWix6XuxP5fFiw5kEFSBXL+Of93aK/ztJa1dQI+p03dJ+AKgViRuw==",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3"
         }
@@ -2453,7 +2453,7 @@
         "type": "Project",
         "dependencies": {
           "DartSassBuilder": "[1.1.0, )",
-          "Dfe.Analytics": "[0.2.6, )",
+          "Dfe.Analytics": "[0.3.0-alpha.0.84, )",
           "GovUk.Frontend.AspNetCore": "[3.2.2, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.0, )",
           "Humanizer.Core": "[2.14.1, )",
@@ -2643,10 +2643,11 @@
       },
       "Dfe.Analytics": {
         "type": "CentralTransitive",
-        "requested": "[0.2.6, )",
-        "resolved": "0.2.6",
-        "contentHash": "LzoMC1m+lLQPA//S4aT2hIa2DbvqkYkk7NamkKc47ELWyLO179k0IiDC0zKgpSOlliAFIvkxul7BkqI9kSU1Ew==",
+        "requested": "[0.3.0-alpha.0.84, )",
+        "resolved": "0.3.0-alpha.0.84",
+        "contentHash": "wBEkmdbLBn/gK6ZMlVPuAfZVooujD6Hyoudi9+JQPeW2LdSjFJreVlaVzDGq56A1oW52wQeIWp6cdUuVPlKTRw==",
         "dependencies": {
+          "Google.Apis.Auth": "1.71.0",
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
           "Microsoft.Extensions.Configuration": "8.0.0",
           "Microsoft.Extensions.Logging": "8.0.0",

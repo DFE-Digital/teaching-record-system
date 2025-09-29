@@ -38,8 +38,6 @@ public static class Extensions
 
     public static IServiceCollection AddAuthorizeAccessServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-
-
         services.AddGovUkFrontend(options =>
         {
             options.Rebrand = true;
@@ -48,7 +46,6 @@ public static class Extensions
         });
 
         services.AddDfeAnalytics()
-            .UseFederatedAksBigQueryClientProvider()
             .AddAspNetCoreIntegration(options =>
             {
                 options.UserIdClaimType = ClaimTypes.Subject;
