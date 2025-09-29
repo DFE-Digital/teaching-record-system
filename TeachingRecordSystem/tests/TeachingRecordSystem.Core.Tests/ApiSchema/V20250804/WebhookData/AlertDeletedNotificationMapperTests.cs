@@ -11,7 +11,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
-                .RandomOneExcept(a => a.InternalOnly);
+                .SingleRandom(a => !a.InternalOnly);
 
             var person = await TestData.CreatePersonAsync(p => p
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
@@ -56,7 +56,7 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
         {
             // Arrange
             var alertType = (await ReferenceDataCache.GetAlertTypesAsync())
-                .RandomOneExcept(a => !a.InternalOnly);
+                .SingleRandom(a => a.InternalOnly);
 
             var person = await TestData.CreatePersonAsync(p => p
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));

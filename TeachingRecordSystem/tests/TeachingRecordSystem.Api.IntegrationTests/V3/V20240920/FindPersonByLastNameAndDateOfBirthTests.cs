@@ -18,7 +18,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
-        var alertType = alertTypes.Where(at => !at.InternalOnly).RandomOne();
+        var alertType = alertTypes.Where(at => !at.InternalOnly).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithLastName(lastName)

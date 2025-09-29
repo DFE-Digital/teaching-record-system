@@ -39,7 +39,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var setSubject = await TestData.ReferenceDataCache.GetTrainingSubjectByIdAsync(new Guid("015d862e-2aed-49df-9e5f-d17b0d426972"));
         var setTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
-            .RandomOne();
+            .SingleRandom();
 
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
@@ -152,7 +152,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var editCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("XQZ");
         var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
         var editTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
-            .RandomOne();
+            .SingleRandom();
 
         await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
         await page.AssertOnRouteEditStartAndEndDatePageAsync(qualificationId);
@@ -673,7 +673,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne();
+            .SingleRandom();
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -780,7 +780,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
-        var newTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var newTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -834,8 +834,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne();
-        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+            .SingleRandom();
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -902,9 +902,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .Where(r => r.Name == "Northern Irish Recognition")
             .First();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne();
+            .SingleRandom();
         var status = RouteToProfessionalStatusStatus.Holds;
-        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -971,10 +971,10 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 e => e.InductionExemptionReasonId,
                 (r, e) => r
             )
-            .RandomOne();
+            .SingleRandom();
 
         var status = RouteToProfessionalStatusStatus.InTraining;
-        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -1030,12 +1030,12 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
-            .RandomOne();
+            .SingleRandom();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
-            .RandomOne();
+            .SingleRandom();
         var status = RouteToProfessionalStatusStatus.InTraining;
-        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
-        var provider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
+        var provider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -1100,7 +1100,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
-            .RandomOne();
+            .SingleRandom();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -1141,10 +1141,10 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 e => e.InductionExemptionReasonId,
                 (r, e) => r
             )
-            .RandomOne();
+            .SingleRandom();
 
         var status = RouteToProfessionalStatusStatus.InTraining;
-        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder

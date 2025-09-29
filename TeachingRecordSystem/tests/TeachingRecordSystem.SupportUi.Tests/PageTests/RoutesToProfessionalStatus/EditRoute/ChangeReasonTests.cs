@@ -297,9 +297,9 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -342,9 +342,9 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r

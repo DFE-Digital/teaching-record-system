@@ -12,10 +12,10 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -44,10 +44,10 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition") // a route with mandatory induction exemption that isn't implicit (requires a yes/no answer)
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -88,7 +88,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .First();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -126,10 +126,10 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition")
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -158,10 +158,10 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "Northern Irish Recognition") // a route that requires the induction exemption question
-            .RandomOne();
+            .SingleRandom();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -207,7 +207,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .First();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
+            .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
         await WithDbContext(async dbContext =>

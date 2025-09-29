@@ -175,7 +175,7 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: UserRoles.Viewer));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
 
@@ -197,7 +197,7 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
 

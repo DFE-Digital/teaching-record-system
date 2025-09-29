@@ -88,7 +88,7 @@ public class FindTeachersTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
-        var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
+        var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).SingleRandom();
 
         var person1 = await TestData.CreatePersonAsync(p => p
 

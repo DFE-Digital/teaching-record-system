@@ -92,9 +92,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -182,7 +182,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [Fact]
     public async Task Post_Confirm_DeletesRecordCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -242,7 +242,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
-            .RandomOne();
+            .SingleRandom();
         var status = RouteToProfessionalStatusStatus.Holds;
         var qtsDate = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p
@@ -297,7 +297,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
-            .RandomOne();
+            .SingleRandom();
         var holdsFromEarliest = Clock.Today.AddYears(-1);
         var holdsFromLatest = holdsFromEarliest.AddMonths(1);
         var person = await TestData.CreatePersonAsync(p => p

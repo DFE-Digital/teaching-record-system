@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Using Include="Microsoft.EntityFrameworkCore" />
+    <Using Include="MoreLinq" />
     <Using Include="TeachingRecordSystem.Core" />
     <Using Include="TeachingRecordSystem.Core.CoreConstants" Static="true" />
     <Using Include="TeachingRecordSystem.Core.Events" />

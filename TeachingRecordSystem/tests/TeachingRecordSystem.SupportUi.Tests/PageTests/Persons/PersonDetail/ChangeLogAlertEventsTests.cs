@@ -15,7 +15,7 @@ public class ChangeLogAlertEventsTests : TestBase
             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
-        Clock.UtcNow = nows.RandomOne();
+        Clock.UtcNow = nows.SingleRandom();
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
@@ -1154,7 +1154,7 @@ public class ChangeLogAlertEventsTests : TestBase
     private async Task<EventModels.Alert> CreateEventAlertFromTrsAsync(Guid personId, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var dbsAlertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(AlertType.DbsAlertTypeId);
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync()).Where(t => t.IsDbsAlertType == isDbsAlertType).RandomOne();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync()).Where(t => t.IsDbsAlertType == isDbsAlertType).SingleRandom();
 
         var alertDetails = "My alert details";
         var externalLink = populateOptional ? TestData.GenerateUrl() : null;
@@ -1184,7 +1184,7 @@ public class ChangeLogAlertEventsTests : TestBase
             .Select(c => c.DqtSanctionCode);
         var dqtSanctionCode = LegacyDataCache.Instance.GetAllSanctionCodes(activeOnly: false)
             .Where(s => migratedSanctionCodes.Contains(s.Value) && (isDbsAlertType ? s.Value == dbsAlertType.DqtSanctionCode : s.Value != dbsAlertType.DqtSanctionCode))
-            .RandomOne();
+            .SingleRandom();
         var alertDqtSanctionCode = new AlertDqtSanctionCode
         {
             Name = dqtSanctionCode.Name,
