@@ -1,5 +1,6 @@
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -9,6 +10,11 @@ using Serilog;
 using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.NameSynonyms;
+using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core;
@@ -25,23 +31,70 @@ public static class Extensions
             .AddJsonFile($"appsettings.aks_{deployedEnvironmentName}_shared.json");
     }
 
-    public static IHostApplicationBuilder AddBackgroundWorkScheduler(this IHostApplicationBuilder builder)
+    public static IServiceCollection AddBackgroundWorkScheduler(this IServiceCollection services, IHostEnvironment environment)
     {
-        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
+        if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
-            builder.Services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
+            services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
         }
+
+        return services;
+    }
+
+    public static IServiceCollection AddBlobStorage(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    {
+        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        {
+            services.AddAzureClients(clientBuilder =>
+            {
+                clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
+            });
+        }
+
+        return services;
+    }
+
+    public static IHostApplicationBuilder AddCoreServices(this IHostApplicationBuilder builder)
+    {
+        builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
 
         return builder;
     }
 
-    public static IHostApplicationBuilder AddDatabase(this IHostApplicationBuilder builder)
+    public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        var pgConnectionString = GetPostgresConnectionString(builder.Configuration);
+        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        {
+            services.AddOptions<AccessYourTeachingQualificationsOptions>()
+                .Bind(configuration.GetSection("AccessYourTeachingQualifications"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
-        builder.Services.AddDatabase(pgConnectionString);
+            services.AddTrnGeneration();
+        }
 
-        return builder;
+        services
+            .AddSingleton<IClock, Clock>()
+            .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
+            .AddDatabase(configuration)
+            .AddHangfire(environment)
+            .AddBackgroundWorkScheduler(environment)
+            .AddWebhookMessageFactory()
+            .AddSingleton<ReferenceDataCache>()
+            .AddBlobStorage(configuration, environment)
+            .AddFileService()
+            .AddNameSynonyms()
+            .AddTrnRequestService(configuration)
+            .AddPersonMatching();
+
+        return services;
+    }
+
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetPostgresConnectionString();
+
+        return services.AddDatabase(connectionString);
     }
 
     public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
@@ -60,6 +113,13 @@ public static class Extensions
 
     public static IHostApplicationBuilder AddHangfire(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddHangfire(builder.Environment);
+
+        return builder;
+    }
+
+    public static IServiceCollection AddHangfire(this IServiceCollection services, IHostEnvironment environment)
+    {
         var prepareSchemaIfNecessary = true;
 
         var schemaPreparedMarkerFile = Path.Combine(
@@ -68,14 +128,14 @@ public static class Extensions
             "hangfire-schema-prepared");
 
         // Try to skip schema preparation in development to speed up startup
-        if (builder.Environment.IsDevelopment() && File.Exists(schemaPreparedMarkerFile))
+        if (environment.IsDevelopment() && File.Exists(schemaPreparedMarkerFile))
         {
             prepareSchemaIfNecessary = false;
         }
 
-        if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
+        if (!environment.IsTests() && !environment.IsEndToEndTests())
         {
-            builder.Services.AddHangfire((sp, configuration) => configuration
+            services.AddHangfire((sp, configuration) => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
@@ -87,22 +147,23 @@ public static class Extensions
                     }));
         }
 
-        if (builder.Environment.IsDevelopment() && !File.Exists(schemaPreparedMarkerFile))
+        if (environment.IsDevelopment() && !File.Exists(schemaPreparedMarkerFile))
         {
             Directory.CreateDirectory(Directory.GetParent(schemaPreparedMarkerFile)!.FullName);
             File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
         }
 
-        return builder;
+        return services;
     }
 
-    public static IHostApplicationBuilder AddWebhookMessageFactory(this IHostApplicationBuilder builder)
+    public static IServiceCollection AddWebhookMessageFactory(this IServiceCollection services)
     {
-        builder.Services.AddSingleton<WebhookMessageFactory>();
-        builder.Services.AddSingleton<EventMapperRegistry>();
-        builder.Services.TryAddSingleton<PersonInfoCache>();
+        services
+            .AddSingleton<WebhookMessageFactory>()
+            .AddSingleton<EventMapperRegistry>()
+            .TryAddSingleton<PersonInfoCache>();
 
-        return builder;
+        return services;
     }
 
     public static void ConfigureSerilog(
@@ -126,11 +187,7 @@ public static class Extensions
     }
 
     public static string GetPostgresConnectionString(this IConfiguration configuration) =>
-        new NpgsqlConnectionStringBuilder(configuration.GetRequiredValue("ConnectionStrings:DefaultConnection"))
-        {
-            // We rely on error details to get the offending duplicate key values in the TrsDataSyncHelper
-            IncludeErrorDetail = true
-        }.ConnectionString;
+        configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
 
     private class DbDataSourceConnectionFactory(NpgsqlDataSource dataSource) : IConnectionFactory
     {

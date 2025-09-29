@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -16,11 +15,5 @@ public static class Extensions
             .ValidateOnStart();
 
         return services;
-    }
-
-    public static IHostApplicationBuilder AddTrnRequestService(this IHostApplicationBuilder builder)
-    {
-        builder.Services.AddTrnRequestService(builder.Configuration);
-        return builder;
     }
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -20,6 +21,15 @@ public class TestScopedServices
         TrnRequestOptions = new();
         BlobStorageFileService = new();
     }
+
+    public static void ConfigureServices(IServiceCollection services) =>
+        services
+            .AddTestScoped<IClock>(tss => tss.Clock)
+            .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
+            .AddTestScoped(tss => tss.BlobStorageFileService.Object)
+            .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
+            .AddTestScoped(tss => tss.EventObserver)
+            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions));
 
     public static TestScopedServices GetCurrent() =>
         TryGetCurrent(out var current) ? current : throw new InvalidOperationException("No current instance has been set.");
@@ -57,4 +67,13 @@ public class TestScopedServices
     public TrnRequestOptions TrnRequestOptions { get; }
 
     public Mock<IFileService> BlobStorageFileService { get; }
+}
+
+file static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
+        where T : class
+    {
+        return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
+    }
 }

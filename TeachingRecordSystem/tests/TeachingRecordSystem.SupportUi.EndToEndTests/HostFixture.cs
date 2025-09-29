@@ -70,27 +70,26 @@ public sealed class HostFixture : IAsyncDisposable
 
                 builder.ConfigureServices((context, services) =>
                 {
-                    DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
+                    DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
 
                     services.Configure<GovUkFrontendOptions>(options => options.DefaultFileUploadJavaScriptEnhancements = false);
 
                     services.AddAuthentication()
                         .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
-                    services.AddSingleton<CurrentUserProvider>();
-                    services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
-                    services.AddSingleton(
-                        sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataPersonDataSource.CrmAndTrs));
-                    services.AddFakeXrm();
-                    services.AddSingleton<FakeTrnGenerator>();
-                    services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
-                    services.AddSingleton<TrsDataSyncHelper>();
-                    services.AddSingleton<IAuditRepository, TestableAuditRepository>();
-                    services.AddSingleton(GetMockFileService());
-                    services.AddSingleton(GetMockAdUserService());
-                    services.AddSingleton(GetMockGetAnIdentityApiClient());
-                    services.AddStartupTask<SeedLookupData>();
-                    services.AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
+                    services
+                        .AddSingleton<CurrentUserProvider>()
+                        .AddStartupTask<TestUsers.CreateUsersStartupTask>()
+                        .AddFakeXrm()
+                        .AddSingleton(sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataPersonDataSource.Trs))
+                        .AddSingleton<FakeTrnGenerator>()
+                        .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
+                        .AddSingleton<IAuditRepository, TestableAuditRepository>()
+                        .AddSingleton(GetMockFileService())
+                        .AddSingleton(GetMockAdUserService())
+                        .AddSingleton(GetMockGetAnIdentityApiClient())
+                        .AddStartupTask<SeedLookupData>()
+                        .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
 
                     IFileService GetMockFileService()
                     {

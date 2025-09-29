@@ -1,39 +1,10 @@
-using System.Security.Cryptography;
-using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
 using GovUk.Frontend.AspNetCore;
-using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using OpenIddict.EntityFrameworkCore.Models;
-using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Oidc;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
-using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
-using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Infrastructure;
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
-using TeachingRecordSystem.Core.Services.TrnRequests;
-using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
-using TeachingRecordSystem.WebCommon.Filters;
-using TeachingRecordSystem.WebCommon.FormFlow;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,164 +16,12 @@ builder.WebHost.UseDefaultServiceProvider(options =>
 
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
-builder.AddServiceDefaults(dataProtectionBlobName: "AuthorizeAccess");
-
 builder.ConfigureLogging();
 
-builder.Services.AddGovUkFrontend(options =>
-{
-    options.Rebrand = true;
-    options.DefaultButtonPreventDoubleClick = true;
-    options.DefaultFileUploadJavaScriptEnhancements = true;
-});
-
-builder.Services.AddCsp(nonceByteAmount: 32);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = AuthenticationSchemes.MatchToTeachingRecord;
-
-    options.AddScheme(AuthenticationSchemes.FormFlowJourney, scheme =>
-    {
-        scheme.HandlerType = typeof(FormFlowJourneySignInHandler);
-    });
-
-    options.AddScheme(AuthenticationSchemes.MatchToTeachingRecord, scheme =>
-    {
-        scheme.HandlerType = typeof(MatchToTeachingRecordAuthenticationHandler);
-    });
-});
-
-if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
-{
-    builder.Services
-        .TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OneLoginOptions>, OneLoginPostConfigureOptions>());
-
-    builder.Services
-        .Decorate<IAuthenticationSchemeProvider, OneLoginAuthenticationSchemeProvider>()
-        .AddSingleton(sp => (OneLoginAuthenticationSchemeProvider)sp.GetRequiredService<IAuthenticationSchemeProvider>())
-        .AddSingleton<IConfigureOptions<OneLoginOptions>>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>())
-        .AddSingleton<IHostedService>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>());
-}
-
-builder.Services.AddOpenIddict()
-    .AddCore(options =>
-    {
-        options
-            .UseEntityFrameworkCore()
-                .UseDbContext<TrsDbContext>()
-                .ReplaceDefaultEntities<Guid>();
-
-        options.ReplaceApplicationManager<OpenIddictEntityFrameworkCoreApplication<Guid>, ApplicationManager>();
-    })
-    .AddServer(options =>
-    {
-        options
-            .SetAuthorizationEndpointUris("oauth2/authorize")
-            .SetEndSessionEndpointUris("oauth2/logout")
-            .SetTokenEndpointUris("oauth2/token")
-            .SetUserInfoEndpointUris("oauth2/userinfo");
-
-        options.SetIssuer(builder.Configuration.GetRequiredValue("AuthorizeAccessIssuer"));
-
-        options.RegisterScopes(Scopes.Email, Scopes.Profile, CustomScopes.TeachingRecord);
-
-        options.AllowAuthorizationCodeFlow();
-
-        options.DisableAccessTokenEncryption();
-        options.SetAccessTokenLifetime(TimeSpan.FromHours(1));
-
-        if (builder.Environment.IsProduction())
-        {
-            var encryptionKeysConfig = builder.Configuration.GetSection("EncryptionKeys").Get<string[]>() ?? [];
-            var signingKeysConfig = builder.Configuration.GetSection("SigningKeys").Get<string[]>() ?? [];
-
-            foreach (var value in encryptionKeysConfig)
-            {
-                options.AddEncryptionKey(LoadKey(value));
-            }
-
-            foreach (var value in signingKeysConfig)
-            {
-                options.AddSigningKey(LoadKey(value));
-            }
-
-            static SecurityKey LoadKey(string configurationValue)
-            {
-                using var rsa = RSA.Create();
-                rsa.FromXmlString(configurationValue);
-                return new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true));
-            }
-        }
-        else
-        {
-            options
-                .AddDevelopmentEncryptionCertificate()
-                .AddDevelopmentSigningCertificate();
-        }
-
-        options.UseAspNetCore()
-            .EnableAuthorizationEndpointPassthrough()
-            .EnableEndSessionEndpointPassthrough()
-            .EnableTokenEndpointPassthrough()
-            .EnableUserInfoEndpointPassthrough()
-            .EnableStatusCodePagesIntegration();
-    });
-
-builder.Services.AddDfeAnalytics()
-    .UseFederatedAksBigQueryClientProvider()
-    .AddAspNetCoreIntegration(options =>
-    {
-        options.UserIdClaimType = ClaimTypes.Subject;
-
-        options.RequestFilter = ctx =>
-            ctx.Request.Path != "/status" &&
-            ctx.Request.Path != "/health" &&
-            ctx.Features.Any(f => f.Key == typeof(IEndpointFeature));
-    });
-
-builder.Services
-    .AddRazorPages()
-    .AddMvcOptions(options =>
-    {
-        options.Filters.Add(new NoCachePageFilter());
-        options.Filters.Add(new AssignViewDataFromFormFlowJourneyResultFilterFactory());
-    });
-
-if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
-{
-    builder.Services.AddDbContext<IdDbContext>(options => options.UseNpgsql(builder.Configuration.GetRequiredConnectionString("Id")));
-}
-
 builder
-    .AddBlobStorage()
-    .AddIdentityApi()
-    .AddTrnRequestService();
-
-builder.Services
-    .AddTrsBaseServices()
-    .AddTransient<AuthorizeAccessLinkGenerator, RoutingAuthorizeAccessLinkGenerator>()
-    .AddTransient<FormFlowJourneySignInHandler>()
-    .AddTransient<MatchToTeachingRecordAuthenticationHandler>()
-    .AddHttpContextAccessor()
-    .AddSingleton<IStartupFilter, FormFlowSessionMiddlewareStartupFilter>()
-    .AddFormFlow(options =>
-    {
-        options.JourneyRegistry.RegisterJourney(SignInJourneyState.JourneyDescriptor);
-        options.JourneyRegistry.RegisterJourney(RequestTrnJourneyState.JourneyDescriptor);
-    })
-    .AddSingleton<ICurrentUserIdProvider, FormFlowSessionCurrentUserIdProvider>()
-    .AddTransient<SignInJourneyHelper>()
-    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
-    .AddFileService()
-    .AddPersonMatching()
-    .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
-    .AddTrnGeneration();
-
-builder.Services.AddOptions<AuthorizeAccessOptions>()
-    .Bind(builder.Configuration)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+    .AddServiceDefaults(dataProtectionBlobName: "AuthorizeAccess")
+    .AddCoreServices()
+    .AddAuthorizeAccessServices();
 
 builder.AddTestApp();
 
