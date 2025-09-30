@@ -164,9 +164,9 @@ public class CheckAnswersModel(
         await DbContext.AddEventAndBroadcastAsync(@event);
         await DbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccessWithLinkToRecord(
+        TempData.SetFlashSuccess(
             $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            LinkGenerator.PersonDetail(primaryPersonId)
+            buildMessageHtml: LinkTagBuilder.BuildLink(LinkGenerator.PersonDetail(primaryPersonId))
             );
 
 

@@ -169,9 +169,9 @@ public class CheckAnswersModel(
 
         await DbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccessWithLinkToRecord(
+        TempData.SetFlashSuccess(
             $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed",
-            linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
+            buildMessageHtml: LinkTagBuilder.BuildLink(linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)));
 
         await JourneyInstance!.CompleteAsync();
         return Redirect(linkGenerator.NpqTrnRequests());

@@ -103,9 +103,9 @@ public class CheckAnswersModel(
         await dbContext.AddEventAndBroadcastAsync(@event);
         await dbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccessWithLinkToRecord(
+        TempData.SetFlashSuccess(
             $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed",
-            linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
+            buildMessageHtml: LinkTagBuilder.BuildLink(linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)));
 
         return Redirect(linkGenerator.NpqTrnRequests());
     }
