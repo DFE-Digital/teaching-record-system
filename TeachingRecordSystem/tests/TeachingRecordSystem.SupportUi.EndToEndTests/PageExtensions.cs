@@ -179,6 +179,20 @@ public static class PageExtensions
         return link.ClickAsync();
     }
 
+    public static async Task AssertBannerLinksToPersonRecord(this IPage page)
+    {
+        var href = await page.Locator("a.govuk-link").GetAttributeAsync("href");
+        await Assert.That(href).Contains($"/persons/");
+        var parts = href!.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        await Assert.That(Guid.TryParse(parts.Last(), out _)).IsTrue();
+    }
+
+    public static async Task AssertBannerLinksToPersonRecord(this IPage page, Guid personId)
+    {
+        var href = await page.Locator("a.govuk-link:has-text('View record (opens in a new tab)')").GetAttributeAsync("href");
+        await Assert.That(href).Contains($"/persons/{personId}");
+    }
+
     public static Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null) =>
         page.SelectReasonMoreDetailsAsync("Add additional detail", addAdditionalDetail, details);
 
