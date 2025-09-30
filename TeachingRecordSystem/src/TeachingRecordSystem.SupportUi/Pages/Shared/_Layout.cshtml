@@ -1,9 +1,14 @@
 @using Microsoft.AspNetCore.Authorization;
 @using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 @inject IAuthorizationService AuthorizationService
+@inject IWebHostEnvironment Environment
 @{
     Layout = "_GovUkPageTemplate";
     ViewBag.Title = ViewBag.Title + (ViewBag.Title is not null ? " - " : "") + "Teaching record system";
+
+    var headerClass = Environment.IsDevelopment() ? "trs-header--local" :
+        System.Environment.GetEnvironmentVariable("ENVIRONMENT_NAME") is string aksEnvName ? $"trs-header--{aksEnvName}" :
+        null;
 }
 
 @section Head {
@@ -14,7 +19,7 @@
 }
 
 @section Header {
-    <header class="govuk-header" data-module="govuk-header">
+    <header class="govuk-header @(headerClass)" data-module="govuk-header">
         <div class="govuk-header__container govuk-width-container">
             <div class="govuk-header__logo">
                 <a href="/" class="govuk-header__link govuk-header__link--homepage">

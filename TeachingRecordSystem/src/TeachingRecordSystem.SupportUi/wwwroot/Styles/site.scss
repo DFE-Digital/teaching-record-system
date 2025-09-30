@@ -15,6 +15,22 @@
   font-family: $govuk-font-family;
 }
 
+.trs-header {
+  $env-colors: (
+    "local": "orange",
+    "dev": "light-green",
+    "review": "pink",
+    "pre-production": "bright-purple",
+    "tps-sandbox": "turquoise"
+  );
+
+  @each $env, $color in $env-colors {
+    &--#{$env} {
+      outline: 5px solid govuk-colour($color);
+    }
+  }
+}
+
 .trs-table__header--no-border,
 .trs-table__cell--no-border,
 .trs-table--no-border {
