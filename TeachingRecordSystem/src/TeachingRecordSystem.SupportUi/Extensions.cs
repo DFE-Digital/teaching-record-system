@@ -114,7 +114,7 @@ public static class Extensions
 
     private static IServiceCollection AddAzureAdAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
+        var graphApiScopes = new[] { "User.Read" };
 
         services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
             .AddMicrosoftIdentityWebApp(configuration, "AzureAd", cookieScheme: CookieAuthenticationDefaults.AuthenticationScheme)

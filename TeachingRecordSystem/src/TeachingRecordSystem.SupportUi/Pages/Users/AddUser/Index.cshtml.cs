@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Identity.Web;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -9,6 +10,7 @@ using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
+[AuthorizeForScopes(Scopes = ["User.ReadBasic.All"])]  // For the AD user lookup
 public class IndexModel(
     TrsDbContext dbContext,
     IAadUserService userService,
