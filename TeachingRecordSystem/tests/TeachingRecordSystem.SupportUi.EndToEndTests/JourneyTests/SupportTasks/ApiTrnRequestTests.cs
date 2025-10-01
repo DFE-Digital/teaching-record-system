@@ -29,6 +29,8 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.WaitForUrlPathAsync("/support-tasks/api-trn-requests");
+
+        await page.AssertBannerLinksToPersonRecord();
     }
 
     [Test]
@@ -77,6 +79,8 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and update existing record");
 
         await page.WaitForUrlPathAsync("/support-tasks/api-trn-requests");
+
+        await page.AssertBannerLinksToPersonRecord(match.PersonId);
     }
 }
 
