@@ -35,7 +35,7 @@ public class UserTests : TestBase
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{testAzAdUser.Name} has been added as a record manager.");
+        await page.AssertFlashMessageAsync(expectedHeader: $"{testAzAdUser.Name} has been added as a record manager.");
     }
 
     [Test]
