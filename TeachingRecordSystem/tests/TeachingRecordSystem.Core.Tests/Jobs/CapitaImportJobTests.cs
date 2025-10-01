@@ -111,6 +111,76 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
     }
 
     [Fact]
+    public async Task Import_TrnMatchesTrnOnDeactivatedRecord_ReturnsExpectedCounts()
+    {
+        // Arrange
+        var fileName = "SingleFile.txt";
+        var expectedTotalRowCount = 1;
+        var expectedSuccessCount = 0;
+        var expectedDuplicateRowCount = 0;
+        var expectedFailureRowCount = 1;
+        var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
+        var expectedDob = new DateOnly(1972, 01, 01);
+        var expectedGender = Gender.Male;
+        var expectedLastName = Faker.Name.Last();
+        var expectedFirstName = Faker.Name.First();
+        var expectedStatus = IntegrationTransactionImportStatus.Success;
+        var expectedDateOfDeath = Clock.UtcNow.AddDays(-1);
+        var existingPerson = await TestData.CreatePersonAsync(item =>
+        {
+            item.WithFirstName(Faker.Name.First());
+            item.WithLastName(Faker.Name.Last());
+            item.WithGender(Gender.Male);
+            item.WithNationalInsuranceNumber(expectedNI);
+            item.WithDateOfBirth(expectedDob);
+        });
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var selectedPerson = dbContext.Persons.Single(x => x.Trn == existingPerson.Trn);
+        selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", null, SystemUser.SystemUserId, Clock.UtcNow, out var _);
+        await dbContext.SaveChangesAsync();
+
+        var csvContent = $"{existingPerson.Trn};{(int)expectedGender};{expectedLastName};{expectedFirstName};;{expectedDob.ToString("yyyyMMdd")};{expectedNI};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+        var expectedRow = $"{existingPerson.Trn};" +
+                          $"{(int)expectedGender};" +
+                          $"{expectedLastName};" +
+                          $"{expectedFirstName};" +
+                          $";" +
+                          $"{expectedDob.ToString("yyyyMMdd")};" +
+                          $"{expectedNI};" +
+                          $";" +
+                          $";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;";
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync(reader, fileName);
+
+        // Assert
+        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionId);
+        Assert.NotNull(integrationTransaction);
+        Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
+        Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
+        Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+        Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
+        Assert.Equal(fileName, integrationTransaction.FileName);
+        Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
+        Assert.NotEmpty(integrationTransaction.IntegrationTransactionRecords);
+        Assert.Collection(integrationTransaction.IntegrationTransactionRecords!,
+                item1 =>
+                {
+                    Assert.Null(item1.PersonId);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Failure, item1.Status);
+                    Assert.Null(item1.HasActiveAlert);
+                    Assert.False(item1.Duplicate);
+                    Assert.NotNull(item1.RowData);
+                    Assert.Equal(expectedRow, item1.RowData);
+                    Assert.Contains($"de-activated record exists for trn {existingPerson.Trn}", item1.FailureMessage);
+                });
+    }
+
+    [Fact]
     public async Task Import_MatchesExistingRecordOnNIAndDateOfBirth_RaisesDuplicateAndReturnsExpectedContent()
     {
         // Arrange
