@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace TeachingRecordSystem.SupportUi;
 
 public static class LinkTagBuilder
 {
-    public static Action<IHtmlContentBuilder> BuildLink(string link)
+    public static Action<IHtmlContentBuilder> BuildViewRecordLink(string link)
     {
         return htmlBuilder =>
             {

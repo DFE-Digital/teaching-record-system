@@ -166,7 +166,7 @@ public class CheckAnswersModel(
 
         TempData.SetFlashSuccess(
             $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildLink(LinkGenerator.PersonDetail(primaryPersonId))
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.PersonDetail(primaryPersonId))
             );
 
 

@@ -178,7 +178,7 @@ public class CheckAnswers(
 
         TempData.SetFlashSuccess(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildLink(linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)));
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)));
 
         return Redirect(linkGenerator.ApiTrnRequests());
     }
