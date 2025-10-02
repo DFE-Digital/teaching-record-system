@@ -48,11 +48,11 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         if (SearchTextIsDate(out var dateOfBirth))
         {
-            query = dbContext.Persons.Where(p => p.DateOfBirth == dateOfBirth);
+            query = dbContext.Persons.IgnoreQueryFilters().Where(p => p.DateOfBirth == dateOfBirth);
         }
         else if (SearchTextIsTrn())
         {
-            query = dbContext.Persons.Where(p => p.Trn == Search);
+            query = dbContext.Persons.IgnoreQueryFilters().Where(p => p.Trn == Search);
         }
         else if (!string.IsNullOrWhiteSpace(Search))
         {
@@ -70,11 +70,10 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
         }
         else
         {
-            query = dbContext.Persons;
+            query = dbContext.Persons.IgnoreQueryFilters();
         }
 
         var groupedByStatus = await query
-            .IgnoreQueryFilters()
             .Select(p => p.Status)
             .GroupBy(p => p)
             .Select(g => new { Status = g.Key, Count = g.Count() })
