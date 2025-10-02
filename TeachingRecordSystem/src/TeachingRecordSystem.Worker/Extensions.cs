@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
@@ -67,7 +68,8 @@ public static class Extensions
         {
             services
                 .AddIdentityApi(configuration)
-                .AddPublishApi(configuration);
+                .AddPublishApi(configuration)
+                .AddBackgroundJobs(configuration);
         }
 
         if (configuration.GetValue<bool>("DqtReporting:RunService"))

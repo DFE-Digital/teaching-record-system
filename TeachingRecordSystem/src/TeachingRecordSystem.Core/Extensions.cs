@@ -73,11 +73,6 @@ public static class Extensions
             services.AddTrnGeneration();
         }
 
-        services.AddOptions<CapitaTpsUserOption>()
-            .BindConfiguration("RecurringJobs:CapitaTpsImport")
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
         services
             .AddSingleton<IClock, Clock>()
             .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
