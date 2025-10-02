@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Services.Files;
@@ -166,15 +165,10 @@ public class CheckAnswersModel(
         await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
-            buildMessageHtml: b =>
-            {
-                var link = new TagBuilder("a");
-                link.AddCssClass("govuk-link");
-                link.MergeAttribute("href", LinkGenerator.PersonDetail(primaryPersonId));
-                link.InnerHtml.Append("View record");
-                b.AppendHtml(link);
-            });
+            $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.PersonDetail(primaryPersonId))
+            );
+
 
         await JourneyInstance!.CompleteAsync();
 

@@ -35,7 +35,7 @@ public class UserTests : TestBase
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{testAzAdUser.Name} has been added as a record manager.");
+        await page.AssertFlashMessageAsync(expectedHeader: $"{testAzAdUser.Name} has been added as a record manager.");
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class UserTests : TestBase
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name} has been changed to a record manager.");
+        await page.AssertFlashMessageAsync(expectedHeader: $"{user.Name} has been changed to a record manager");
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class UserTests : TestBase
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name}\u2019s account has been deactivated.");
+        await page.AssertFlashMessageAsync($"{user.Name}\u2019s account has been deactivated");
     }
 
     [Test]
@@ -117,6 +117,6 @@ public class UserTests : TestBase
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name}\u2019s account has been reactivated.");
+        await page.AssertFlashMessageAsync(expectedHeader: $"{user.Name}\u2019s account has been reactivated");
     }
 }

@@ -32,7 +32,7 @@ public class CreateTests : TestBase
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.WaitForURLAsync(new Regex(@"/persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
-        await page.AssertFlashMessageAsync(expectedMessage: "Record created successfully for Alfred The Great.");
+        await page.AssertFlashMessageAsync(expectedHeader: "Record created for Alfred The Great");
     }
 
     [Test]

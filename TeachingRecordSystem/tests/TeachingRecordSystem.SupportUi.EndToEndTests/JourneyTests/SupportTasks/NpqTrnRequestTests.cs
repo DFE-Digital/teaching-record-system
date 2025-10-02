@@ -1,5 +1,3 @@
-using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
-
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
 public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -46,10 +44,9 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and create record");
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", "NPQ request completed");
+        await page.AssertBannerAsync("Success", $"TRN request for {StringHelper.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed");
 
-        await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
-        await page.AssertOnAPersonDetailPageAsync();
+        await page.AssertBannerLinksToPersonRecord();
     }
 
     [Test]
@@ -115,10 +112,9 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
         await page.ClickButtonAsync("Confirm and update existing record");
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", "NPQ request completed");
+        await page.AssertBannerAsync("Success", $"TRN request for {StringHelper.JoinNonEmpty(' ', matchedPerson1.FirstName, matchedPerson1.MiddleName, matchedPerson1.LastName)} completed");
 
-        await page.FollowBannerLink($"Record updated for {matchedPerson1.FirstName} {matchedPerson1.MiddleName} {matchedPerson1.LastName}");
-        await page.AssertOnPersonDetailPageAsync(matchedPerson1.PersonId);
+        await page.AssertBannerLinksToPersonRecord(matchedPerson1.PersonId);
     }
 
     [Test]
@@ -159,10 +155,9 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.AssertOnListPageAsync();
-        await page.AssertBannerAsync("Success", "NPQ request completed");
+        await page.AssertBannerAsync("Success", $"TRN request for {StringHelper.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName)} completed");
 
-        await page.FollowBannerLink($"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
-        await page.AssertOnAPersonDetailPageAsync();
+        await page.AssertBannerLinksToPersonRecord();
     }
 
     [Test]

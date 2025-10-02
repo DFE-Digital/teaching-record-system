@@ -233,7 +233,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
         var nextPageDoc = await nextPage.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(
             nextPageDoc,
-            $"Records merged successfully for {primaryPerson.FirstName} {primaryPerson.MiddleName} {primaryPerson.LastName}");
+            $"Records merged for {primaryPerson.FirstName} {primaryPerson.MiddleName} {primaryPerson.LastName}");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);

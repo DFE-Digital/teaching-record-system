@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -178,15 +177,8 @@ public class CheckAnswers(
         await DbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess(
-            $"{(CreatingNewRecord ? "Record created" : "Records merged successfully")} for {FirstName} {MiddleName} {LastName}",
-            buildMessageHtml: b =>
-            {
-                var link = new TagBuilder("a");
-                link.AddCssClass("govuk-link");
-                link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
-                link.InnerHtml.Append("View record");
-                b.AppendHtml(link);
-            });
+            $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)));
 
         return Redirect(linkGenerator.ApiTrnRequests());
     }
