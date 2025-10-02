@@ -1,8 +1,9 @@
+using System.Transactions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.Internal;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -11,25 +12,43 @@ namespace TeachingRecordSystem.Api.UnitTests;
 
 public static class Setup
 {
-    private static readonly SemaphoreSlim _createdApplicationUserLock = new(1, 1);
-    private static bool _applicationUserCreated;
+    private static readonly Mock<ICurrentUserProvider> _currentUserProviderMock = new();
 
     public static IServiceProvider Services { get; } = CreateServiceProvider();
 
     [Before(Assembly)]
-    public static async Task AssemblySetup(AssemblyHookContext context)
+    public static async Task AssemblySetup()
     {
         await Services.GetRequiredService<DbHelper>().EnsureSchemaAsync();
+
+        var applicationUser = await CreateApplicationUser();
+        _currentUserProviderMock
+            .Setup(mock => mock.GetCurrentApplicationUser())
+            .Returns((applicationUser.UserId, applicationUser.Name));
     }
 
     [BeforeEvery(Test)]
-    public static async Task TestSetup(TestContext context)
+    public static void TestSetup(TestContext context)
     {
+        var transactionScope = new TransactionScope(
+            TransactionScopeOption.RequiresNew,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
+
         var testScopedServices = TestScopedServices.Reset(Services);
-        await EnsureApplicationUser();
         testScopedServices.EventObserver.Clear();
 
         context.AddAsyncLocalValues();
+    }
+
+    [AfterEvery(Test)]
+    public static void TestTeardown(TestContext context)
+    {
+        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
+        {
+            txn.Dispose();
+        }
     }
 
     private static IServiceProvider CreateServiceProvider()
@@ -64,9 +83,8 @@ public static class Setup
                     TestDataPersonDataSource.CrmAndTrs))
             .AddSingleton<FakeTrnGenerator>()
             .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
-            .AddSingleton(Mock.Of<ICurrentUserProvider>())
+            .AddSingleton(_currentUserProviderMock.Object)
             .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
-            .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>()
             .AddSingleton<INotificationSender, NoopNotificationSender>();
 
         TestScopedServices.ConfigureServices(services);
@@ -74,30 +92,12 @@ public static class Setup
         return services.BuildServiceProvider();
     }
 
-    private static async Task EnsureApplicationUser()
+    private static async Task<ApplicationUser> CreateApplicationUser()
     {
-        await _createdApplicationUserLock.WaitAsync();
-
-        try
-        {
-            if (_applicationUserCreated)
-            {
-                return;
-            }
-
-            using var scope = Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var applicationUser = await scope.ServiceProvider.GetRequiredService<TestData>().CreateApplicationUserAsync();
-
-            Mock.Get(Services.GetRequiredService<ICurrentUserProvider>())
-                .Setup(mock => mock.GetCurrentApplicationUser())
-                .Returns((applicationUser.UserId, applicationUser.Name));
-
-            _applicationUserCreated = true;
-        }
-        finally
-        {
-            _createdApplicationUserLock.Release();
-        }
+        // HACK until TestData is easier to construct
+        using var scope = Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        TestScopedServices.Reset(scope.ServiceProvider);
+        return await scope.ServiceProvider.GetRequiredService<TestData>().CreateApplicationUserAsync();
     }
 
     private class ForwardToTestScopedClock : IClock

@@ -69,6 +69,7 @@ public partial class TestData
             dbContext.AddEventWithoutBroadcast(@event);
 
             await dbContext.SaveChangesAsync();
+            dbContext.Entry(user).State = EntityState.Detached;
 
             return user;
         });

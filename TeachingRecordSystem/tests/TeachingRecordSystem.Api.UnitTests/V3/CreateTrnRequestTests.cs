@@ -8,7 +8,6 @@ using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-[NotInParallel]
 public class CreateTrnRequestTests : OperationTestBase
 {
     [Before(Test)]
@@ -24,9 +23,6 @@ public class CreateTrnRequestTests : OperationTestBase
                 TrnToken = Guid.NewGuid().ToString()
             });
     }
-
-    [Before(Test)]
-    public Task ClearDb() => DbHelper.DeleteAllPersonsAsync();
 
     [Test]
     public async Task HandleAsync_RequestForSameUserAndIdAlreadyExists_ReturnsError()
