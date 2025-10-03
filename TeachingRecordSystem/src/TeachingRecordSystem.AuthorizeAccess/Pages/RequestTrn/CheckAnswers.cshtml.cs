@@ -133,19 +133,6 @@ public class CheckAnswersModel(
         var matchResult = await matchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
         trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is not TrnRequestMatchResultOutcome.NoMatches;
 
-        trnRequestMetadata.Matches = new TrnRequestMatches()
-        {
-            MatchedPersons = matchResult.Outcome switch
-            {
-                TrnRequestMatchResultOutcome.PotentialMatches =>
-                    matchResult.PotentialMatchesPersonIds
-                        .Select(id => new TrnRequestMatchedPerson() { PersonId = id })
-                        .ToList(),
-                TrnRequestMatchResultOutcome.DefiniteMatch => [new TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
-                _ => []
-            }
-        };
-
         dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
         var supportTask = SupportTask.Create(

@@ -1,5 +1,3 @@
-using Dapper;
-
 namespace TeachingRecordSystem.Core.Events.Models;
 
 public record TrnRequestMetadata
@@ -28,7 +26,6 @@ public record TrnRequestMetadata
     public required string? Country { get; init; }
     public required string? TrnToken { get; set; }
     public required Guid? ResolvedPersonId { get; set; }
-    public required TrnRequestMatches? Matches { get; set; }
     public required bool? NpqWorkingInEducationalSetting { get; init; }
     public required string? NpqApplicationId { get; init; }
     public required string? NpqName { get; init; }
@@ -63,17 +60,6 @@ public record TrnRequestMetadata
             Country = model.Country,
             TrnToken = model.TrnToken,
             ResolvedPersonId = model.ResolvedPersonId,
-            Matches = model.Matches is not null && model.Matches.MatchedPersons is not null ?
-                new TrnRequestMatches()
-                {
-                    MatchedPersons = model.Matches.MatchedPersons
-                        .Select(m => new TrnRequestMatchedPerson()
-                        {
-                            PersonId = m.PersonId
-                        })
-                        .AsList()
-                } :
-                null,
             NpqApplicationId = model.NpqApplicationId,
             NpqEvidenceFileId = model.NpqEvidenceFileId,
             NpqEvidenceFileName = model.NpqEvidenceFileName,
@@ -81,14 +67,4 @@ public record TrnRequestMetadata
             NpqTrainingProvider = model.NpqTrainingProvider,
             NpqWorkingInEducationalSetting = model.NpqWorkingInEducationalSetting
         };
-}
-
-public record TrnRequestMatches
-{
-    public required IReadOnlyList<TrnRequestMatchedPerson> MatchedPersons { get; init; }
-}
-
-public record TrnRequestMatchedPerson
-{
-    public required Guid PersonId { get; init; }
 }
