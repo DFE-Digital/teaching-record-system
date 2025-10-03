@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -17,15 +16,14 @@ namespace TeachingRecordSystem.SupportUi.Tests;
 public class HostFixture : WebApplicationFactory<Program>
 {
     private readonly IConfiguration _configuration;
+    private readonly DbHelper _dbHelper;
 
-    public HostFixture(IConfiguration configuration)
+    public HostFixture(IConfiguration configuration, DbHelper dbHelper)
     {
         _configuration = configuration;
+        _dbHelper = dbHelper;
         _ = base.Services;  // Start the host
     }
-
-    public Task InitializeAsync() =>
-        Services.GetRequiredService<DbHelper>().EnsureSchemaAsync();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -37,8 +35,6 @@ public class HostFixture : WebApplicationFactory<Program>
 
         builder.ConfigureServices((context, services) =>
         {
-            DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
-
             services.AddAuthentication()
                 .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
@@ -50,8 +46,8 @@ public class HostFixture : WebApplicationFactory<Program>
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
             services
+                .AddSingleton(_dbHelper)
                 .AddSingleton<CurrentUserProvider>()
-                .AddSingleton<TestUsers>()
                 .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
                 .AddFakeXrm()
                 .AddSingleton(sp => ActivatorUtilities.CreateInstance<TestData>(
@@ -63,9 +59,8 @@ public class HostFixture : WebApplicationFactory<Program>
                 .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
                 .AddSingleton<TrsDataSyncHelper>()
                 .AddSingleton<IAuditRepository, TestableAuditRepository>()
-                .AddStartupTask<AddTestRouteTypesStartupTask>()
-                .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>()
-                .AddSingleton<INotificationSender, NoopNotificationSender>();
+                .AddSingleton<INotificationSender, NoopNotificationSender>()
+                .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
 
             TestScopedServices.ConfigureServices(services);
         });
@@ -109,5 +104,21 @@ public class HostFixture : WebApplicationFactory<Program>
     private class ForwardToTestScopedClock : IClock
     {
         public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
+    }
+
+    public class ExecuteScheduledJobsStartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) =>
+            app =>
+            {
+                app.Use(async (_, next) =>
+                {
+                    await next();
+
+                    await TestScopedServices.GetCurrent().BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+                });
+
+                next(app);
+            };
     }
 }

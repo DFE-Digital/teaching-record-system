@@ -4,7 +4,6 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
-[NotInParallel]
 public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
     [Test]

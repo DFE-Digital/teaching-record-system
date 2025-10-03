@@ -5,7 +5,6 @@ using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-[NotInParallel]
 public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> _roleAccess = [
@@ -77,7 +76,7 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_RoutesPage_UserRoles_CanViewPageAsExpected(string journeyName, string pageFormat, string? userRole, bool canViewPage)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(userRole));
+        SetCurrentUser(await TestData.CreateUserAsync(role: userRole));
 
         JourneyInstance journey = journeyName switch
         {

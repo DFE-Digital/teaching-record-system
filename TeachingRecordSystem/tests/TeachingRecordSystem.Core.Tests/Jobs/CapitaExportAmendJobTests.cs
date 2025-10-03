@@ -56,7 +56,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -106,7 +106,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -213,7 +213,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -319,7 +319,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -438,7 +438,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -511,7 +511,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -586,7 +586,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -662,7 +662,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
                 .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-            var user = await TestData.CreateUserAsync();
+            var user = await TestData.CreateApplicationUserAsync();
 
             var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
             var jobOption = Options.Create(option);
@@ -739,7 +739,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
@@ -781,7 +781,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);

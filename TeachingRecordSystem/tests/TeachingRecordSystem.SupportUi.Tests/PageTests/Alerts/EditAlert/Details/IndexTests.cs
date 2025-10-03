@@ -1,20 +1,18 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Details;
 
-public class IndexTests : DetailsTestBase
+public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
 {
     private const string ThisStep = JourneySteps.Index;
 
-    public IndexTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
-    }
+    [Before(Test)]
+    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
     [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
@@ -99,7 +97,7 @@ public class IndexTests : DetailsTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);

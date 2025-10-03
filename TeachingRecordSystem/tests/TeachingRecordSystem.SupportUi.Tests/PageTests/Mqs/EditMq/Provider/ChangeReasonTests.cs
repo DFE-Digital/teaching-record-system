@@ -3,13 +3,8 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
 
-public class ChangeReasonTests : TestBase
+public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ChangeReasonTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Test]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {

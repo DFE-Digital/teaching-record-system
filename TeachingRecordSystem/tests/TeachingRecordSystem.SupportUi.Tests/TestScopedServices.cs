@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
@@ -28,6 +30,8 @@ public class TestScopedServices
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
         GetAnIdentityApiClientMock = new();
         TrnRequestOptions = new TrnRequestOptions();
+        BackgroundJobScheduler = new(serviceProvider);
+        CurrentUserProvider = new();
     }
 
     public static void ConfigureServices(IServiceCollection services) =>
@@ -37,7 +41,9 @@ public class TestScopedServices
             .AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
-            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions));
+            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
+            .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler)
+            .AddTestScoped(tss => tss.CurrentUserProvider);
 
     public static TestScopedServices GetCurrent() =>
         _current.Value ?? throw new InvalidOperationException("No current instance has been set.");
@@ -65,6 +71,10 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public TrnRequestOptions TrnRequestOptions { get; }
+
+    public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
+
+    public CurrentUserProvider CurrentUserProvider { get; }
 }
 
 file static class ServiceCollectionExtensions

@@ -3,40 +3,23 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
+public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private string _oldFirstName;
-    private string _oldMiddleName;
-    private string _oldLastName;
+    private string _oldFirstName = "Alfred";
+    private string _oldMiddleName = "The";
+    private string _oldLastName = "Great";
     private DateOnly _oldDob;
-    private string _oldEmail;
-    private string _oldNino;
-    private Gender _oldGender;
+    private string _oldEmail = "old@email-address.com";
+    private string _oldNino = "AB 12 34 56 D";
+    private Gender _oldGender = Gender.Male;
 
-    private string _firstName;
-    private string _middleName;
-    private string _lastName;
+    private string _firstName = "Megan";
+    private string _middleName = "Thee";
+    private string _lastName = "Stallion";
     private DateOnly _dob;
-    private string _email;
-    private string _nino;
-    private Gender _gender;
-
-    public ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        _oldFirstName = "Alfred";
-        _oldMiddleName = "The";
-        _oldLastName = "Great";
-        _oldEmail = "old@email-address.com";
-        _oldNino = "AB 12 34 56 D";
-        _oldGender = Gender.Male;
-
-        _firstName = "Megan";
-        _middleName = "Thee";
-        _lastName = "Stallion";
-        _email = "new@email-address.com";
-        _nino = "XY 98 76 54 A";
-        _gender = Gender.Female;
-    }
+    private string _email = "new@email-address.com";
+    private string _nino = "XY 98 76 54 A";
+    private Gender _gender = Gender.Female;
 
     [Before(Test)]
     public void Initialize()

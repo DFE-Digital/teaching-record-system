@@ -4,13 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions;
 
-[NotInParallel]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Before(Test)]
-    public Task DeleteSupportTasksAsync() =>
-        WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
-
     private static IElement[] GetResultRows(IHtmlDocument doc) =>
         doc
             .GetElementsByTagName("tbody")

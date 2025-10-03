@@ -16,7 +16,6 @@ public partial class TestData
             active ??= true;
             name ??= GenerateName();
             email ??= GenerateUniqueEmail();
-            role ??= UserRoles.RecordManager;
 
             var user = new User()
             {

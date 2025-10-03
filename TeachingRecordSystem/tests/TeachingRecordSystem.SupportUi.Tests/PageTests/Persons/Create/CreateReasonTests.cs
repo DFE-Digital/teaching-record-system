@@ -4,7 +4,6 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Create;
 
-[NotInParallel]
 public class CreateReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]

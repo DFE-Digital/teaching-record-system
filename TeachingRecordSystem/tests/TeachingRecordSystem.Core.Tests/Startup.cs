@@ -18,6 +18,7 @@ public class Startup
             .ConfigureServices((context, services) =>
             {
                 DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
+                services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());
 
                 services
                     .AddMemoryCache()

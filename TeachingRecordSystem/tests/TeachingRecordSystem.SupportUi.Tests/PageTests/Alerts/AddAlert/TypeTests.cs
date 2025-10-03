@@ -2,22 +2,20 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class TypeTests : AddAlertTestBase
+public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.Index;
     private const string ThisStep = JourneySteps.AlertType;
 
-    public TypeTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
-    }
+    [Before(Test)]
+    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
     [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
@@ -67,7 +65,7 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsAlertType()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
@@ -87,7 +85,7 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_DoesNotShowDbsAlertType()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
@@ -107,7 +105,7 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_UserHasAlertsReadWriteRole_ShowsAllNonDbsRoles()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
@@ -148,7 +146,7 @@ public class TypeTests : AddAlertTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);

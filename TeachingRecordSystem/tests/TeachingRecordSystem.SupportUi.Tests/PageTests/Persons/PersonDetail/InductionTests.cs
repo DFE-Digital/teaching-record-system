@@ -221,8 +221,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         SetCurrentUser(hasReadWriteAccess
-            ? TestUsers.GetUser(UserRoles.RecordManager)
-            : TestUsers.GetUser(UserRoles.Viewer));
+            ? await TestData.CreateUserAsync(role: UserRoles.RecordManager)
+            : await TestData.CreateUserAsync(role: UserRoles.Viewer));
 
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
@@ -276,7 +276,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsNoWarning(InductionStatus trsInductionStatus)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
@@ -371,7 +371,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_InductionExemption_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: userRole));
+        SetCurrentUser(await TestData.CreateUserAsync(role: userRole));
 
         var holdsFromDate = Clock.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -416,7 +416,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_InductionStartAndEndDate_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: userRole));
+        SetCurrentUser(await TestData.CreateUserAsync(role: userRole));
 
         var person = await TestData.CreatePersonAsync(
             builder => builder

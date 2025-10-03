@@ -18,7 +18,7 @@ public static class Setup
     [Before(Assembly)]
     public static async Task AssemblySetup()
     {
-        await Services.GetRequiredService<DbHelper>().EnsureSchemaAsync();
+        await Services.GetRequiredService<DbHelper>().InitializeAsync();
 
         var applicationUser = await CreateApplicationUser();
         _currentUserProviderMock

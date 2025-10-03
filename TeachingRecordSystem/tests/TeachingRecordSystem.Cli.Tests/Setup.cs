@@ -10,7 +10,7 @@ public static class Setup
     [Before(Assembly)]
     public static async Task AssemblySetup(AssemblyHookContext context)
     {
-        await Services.GetRequiredService<DbHelper>().EnsureSchemaAsync();
+        await Services.GetRequiredService<DbHelper>().InitializeAsync();
     }
 
     private static ServiceProvider CreateServiceProvider()

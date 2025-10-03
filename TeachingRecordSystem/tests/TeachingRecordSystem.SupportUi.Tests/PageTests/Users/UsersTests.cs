@@ -2,23 +2,12 @@ using AngleSharp.Dom;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
-[NotInParallel]
 public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string RequestPath = "/users";
 
     [Before(Test)]
-    public async Task DeleteUsersAsync()
-    {
-        await WithDbContext(async dbContext =>
-        {
-            await dbContext.Notes.ExecuteDeleteAsync();
-            await dbContext.SupportTasks.ExecuteDeleteAsync();
-            await dbContext.Users.ExecuteDeleteAsync();
-        });
-
-        TestUsers.ClearCache();
-    }
+    public Task DeleteUsersAsync() => WithDbContext(dbContext => dbContext.Users.ExecuteDeleteAsync());
 
     [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()

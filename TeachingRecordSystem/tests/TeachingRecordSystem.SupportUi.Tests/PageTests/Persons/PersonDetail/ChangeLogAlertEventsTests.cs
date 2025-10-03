@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Before(Test)]
-    public void Initialize()
+    public async Task Initialize()
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -17,7 +17,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
         Clock.UtcNow = nows.SingleRandom();
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertCreatedEventGeneratedInTrs_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync();
@@ -136,7 +136,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertCreatedEventGeneratedInDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
@@ -209,7 +209,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertDeletedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
@@ -284,7 +284,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertDqtDeactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
@@ -353,7 +353,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertDqtImportedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
@@ -422,7 +422,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertDqtReactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
@@ -491,7 +491,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertMigratedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();
@@ -863,7 +863,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     public async Task Person_WithAlertUpdatedEventFromDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var createdByDqtUser = RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePersonAsync();

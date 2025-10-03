@@ -3,7 +3,6 @@
 //
 // namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 //
-// [NotInParallel]
 // public class CommonPageTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 // {
 //     [Test]
