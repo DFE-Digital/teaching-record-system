@@ -203,7 +203,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person2Duplicate = await TestData.CreatePersonAsync(x => x.WithFirstName(person2.FirstName).WithLastName(person2.LastName).WithNationalInsuranceNumber(person2.NationalInsuranceNumber!));
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?_f=1&sortBy={TeacherPensionsSortOptions.Name}&sortDirection={SortDirection.Ascending}");
         var supportTask1 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
+                       person2.PersonId,
                        user.UserId,
                        s =>
                        {
@@ -220,7 +220,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Clock.Advance();
 
         var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
+                       person2.PersonId,
                        user.UserId,
                        s =>
                        {
@@ -274,7 +274,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                        });
 
         var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
+                       person2.PersonId,
                        user.UserId,
                        s =>
                        {
@@ -329,7 +329,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                        });
 
         var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
+                       person2.PersonId,
                        user.UserId,
                        s =>
                        {
@@ -384,7 +384,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                        });
 
         var supportTask2 = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
-                       person1.PersonId,
+                       person2.PersonId,
                        user.UserId,
                        s =>
                        {
