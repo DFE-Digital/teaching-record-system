@@ -410,7 +410,7 @@ public class CommonPageTests : TestBase
     public async Task UserDoesNotHavePermission_ReturnsForbidden(string page, string? role, InductionStatus inductionStatus, HttpMethod httpMethod)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var person = await TestData.CreatePersonAsync(
             p => p

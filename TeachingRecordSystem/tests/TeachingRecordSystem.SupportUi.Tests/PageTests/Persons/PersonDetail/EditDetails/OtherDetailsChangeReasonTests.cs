@@ -4,13 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-[NotInParallel]
-public class OtherDetailsChangeReasonTests : TestBase
+public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public OtherDetailsChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
-    {
-    }
-
     [Test]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {

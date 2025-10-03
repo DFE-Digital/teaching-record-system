@@ -4,13 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests;
 
-[NotInParallel]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Before(Test)]
-    public Task DeleteNpqTrnRequestSupportTasks() => WithDbContext(dbContext =>
-        dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
-
     [Test]
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
@@ -286,10 +281,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Test]
     public async Task Get_SortByEmailAscending_ShowsRequestsInCorrectOrder()
     {
-        // Start with a blank slate of tasks
-        await WithDbContext(dbContext =>
-            dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
-
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 

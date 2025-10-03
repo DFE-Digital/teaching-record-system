@@ -3,7 +3,6 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Create;
 
-[NotInParallel]
 public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]

@@ -7,14 +7,14 @@ public class IndexTests : TestBase
     public IndexTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
+        SetCurrentUser(TestUsers.CreateUser(UserRoles.RecordManager));
     }
 
     [Test]
     public async Task Get_UserWithNoRoles_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(TestUsers.CreateUser(role: null));
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
@@ -34,7 +34,7 @@ public class IndexTests : TestBase
     public async Task Get_UserWithoutSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,

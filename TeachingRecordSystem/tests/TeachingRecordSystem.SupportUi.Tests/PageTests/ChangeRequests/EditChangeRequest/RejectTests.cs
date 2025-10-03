@@ -8,14 +8,14 @@ public class RejectTests : TestBase
     public RejectTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
+        SetCurrentUser(TestUsers.CreateUser(UserRoles.RecordManager));
     }
 
     [Test]
     public async Task Get_WhenUserHasNoRoles_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(TestUsers.CreateUser(role: null));
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
@@ -35,7 +35,7 @@ public class RejectTests : TestBase
     public async Task Get_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
@@ -109,7 +109,7 @@ public class RejectTests : TestBase
     public async Task Post_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             createPersonResult.PersonId,
