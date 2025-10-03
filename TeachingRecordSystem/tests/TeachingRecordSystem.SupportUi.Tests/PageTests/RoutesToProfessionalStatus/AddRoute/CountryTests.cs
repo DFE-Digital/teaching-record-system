@@ -5,12 +5,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Theory]
-    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Test Route With NotApplicable Country", RouteToProfessionalStatusStatus.Holds, true)]
+    [Test]
+    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Test Route With NotApplicable Country", RouteToProfessionalStatusStatus.Holds, true)]
     public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -44,12 +44,12 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Theory]
-    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Test Route With NotApplicable Country", RouteToProfessionalStatusStatus.Holds, true)]
+    [Test]
+    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Test Route With NotApplicable Country", RouteToProfessionalStatusStatus.Holds, true)]
     public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -80,7 +80,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -120,7 +120,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SelectCountry_PersistsSelection()
     {
         // Arrange
@@ -158,7 +158,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(country.CountryId, journeyInstance.State.TrainingCountryId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenCountryIsEntered_RedirectsToAgeRangePage()
     {
         // Arrange
@@ -196,8 +196,8 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

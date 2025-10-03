@@ -14,6 +14,12 @@
         "resolved": "0.57.24",
         "contentHash": "AlYB7WuC1ZY88LG61AcCzFxO7Z036xBUixsJ+xO+5P/mo6MU0AkJeQ5Omy5ye1XcPWsxneSsjja+/YU93ScWzw=="
       },
+      "TUnit.Core": {
+        "type": "Direct",
+        "requested": "[0.61.58, )",
+        "resolved": "0.61.58",
+        "contentHash": "UtjSRz4N7sR7pz72TKlyKi9++m9g2qhh6WbfjGC6jwQkwBBfVzrWc+iX5zHWeIo3dxsKyuOC++KwpYiZ/bYKyQ=="
+      },
       "Apache.Arrow": {
         "type": "Transitive",
         "resolved": "11.0.0",

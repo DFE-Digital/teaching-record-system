@@ -2325,11 +2325,6 @@
         "resolved": "6.1.0",
         "contentHash": "UGdtyKWJqXXinyvGB9X6NVoIYbTAidoZYmn3aXzxeEYC9+OL8vF36eDt1qjb6RqBkWDl4v7iE84ecI+dFhA80A=="
       },
-      "TUnit.Core": {
-        "type": "Transitive",
-        "resolved": "0.61.58",
-        "contentHash": "UtjSRz4N7sR7pz72TKlyKi9++m9g2qhh6WbfjGC6jwQkwBBfVzrWc+iX5zHWeIo3dxsKyuOC++KwpYiZ/bYKyQ=="
-      },
       "TUnit.Engine": {
         "type": "Transitive",
         "resolved": "0.61.58",
@@ -3270,6 +3265,12 @@
         "requested": "[0.57.24, )",
         "resolved": "0.61.58",
         "contentHash": "k59ZEh5KoIIR05nFqw07GI0shQBfIlBMQP9w/rRmfX0qQtB1LuykQHovmMsu9rR6VUP7yivEYXwtA3do9jDkHQ=="
+      },
+      "TUnit.Core": {
+        "type": "CentralTransitive",
+        "requested": "[0.61.58, )",
+        "resolved": "0.61.58",
+        "contentHash": "UtjSRz4N7sR7pz72TKlyKi9++m9g2qhh6WbfjGC6jwQkwBBfVzrWc+iX5zHWeIo3dxsKyuOC++KwpYiZ/bYKyQ=="
       },
       "xunit.assert": {
         "type": "CentralTransitive",

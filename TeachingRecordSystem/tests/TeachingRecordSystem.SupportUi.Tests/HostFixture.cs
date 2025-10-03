@@ -13,6 +13,7 @@ using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
+[SharedDependenciesDataSource]
 public class HostFixture : WebApplicationFactory<Program>
 {
     private readonly IConfiguration _configuration;
@@ -22,6 +23,9 @@ public class HostFixture : WebApplicationFactory<Program>
         _configuration = configuration;
         _ = base.Services;  // Start the host
     }
+
+    public Task InitializeAsync() =>
+        Services.GetRequiredService<DbHelper>().EnsureSchemaAsync();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

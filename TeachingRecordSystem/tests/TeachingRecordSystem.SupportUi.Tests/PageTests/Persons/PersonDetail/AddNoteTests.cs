@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Post_ContentIsEmpty_ReturnsError()
     {
         // Arrange
@@ -23,7 +23,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Text", "Enter text for the note");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ContentWithoutFile_CreatesNoteAndEventAndRedirects()
     {
         // Arrange
@@ -51,7 +51,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(text, note.Content);
         Assert.Null(note.FileId);
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var noteCreatedEvent = Assert.IsType<NoteCreatedEvent>(e);
             Assert.Equal(note.NoteId, noteCreatedEvent.Note.NoteId);
@@ -61,7 +61,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ContentWithFile_CreatesNoteAndEventAndRedirects()
     {
         // Arrange
@@ -90,7 +90,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(text, note.Content);
         Assert.NotNull(note.FileId);
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var noteCreatedEvent = Assert.IsType<NoteCreatedEvent>(e);
             Assert.Equal(note.NoteId, noteCreatedEvent.Note.NoteId);
@@ -101,8 +101,8 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

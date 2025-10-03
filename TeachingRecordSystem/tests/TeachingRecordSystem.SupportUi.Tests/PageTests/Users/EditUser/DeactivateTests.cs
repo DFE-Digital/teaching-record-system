@@ -2,28 +2,23 @@ using AngleSharp.Html.Dom;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
-[Collection(nameof(DisableParallelization))]
-public class DeactivateTests : TestBase, IAsyncLifetime
+[NotInParallel]
+public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public DeactivateTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    public async Task InitializeAsync()
+    [Before(Test)]
+    public async Task DeleteUsersAsync()
     {
         await WithDbContext(async dbContext =>
         {
             await dbContext.Notes.ExecuteDeleteAsync();
+            await dbContext.SupportTasks.ExecuteDeleteAsync();
             await dbContext.Users.ExecuteDeleteAsync();
         });
 
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    [Fact]
+    [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -42,7 +37,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -58,7 +53,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -84,7 +79,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -108,7 +103,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserExistsButIsAlreadyDeactivated_ReturnsBadRequest()
     {
         // Arrange
@@ -134,7 +129,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAdministratorRole_DeactivatingUserWithAdministratorRole_ReturnsBadRequest()
     {
         // Arrange
@@ -160,7 +155,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithAdministratorRole_DeactivatingUserWithAdministratorRole_ReturnsFound()
     {
         // Arrange
@@ -186,7 +181,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_HasAdditionalReasonNotSelected_RendersError()
     {
         // Arrange
@@ -212,7 +207,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReason", "Select a reason for deactivating this user");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_HasAdditionalReasonSetToYes_ButAdditionalReasonDetailNotEntered_RendersError()
     {
         // Arrange
@@ -240,7 +235,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalReasonDetail", "Enter a reason");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_HasMoreInformationNotSelected_RendersError()
     {
         // Arrange
@@ -266,7 +261,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasMoreInformation", "Select yes if you want to provide more details");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_HasMoreInformationSetToYes_ButMoreInformationDetailNotEntered_RendersError()
     {
         // Arrange
@@ -294,7 +289,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         await AssertEx.HtmlResponseHasErrorAsync(response, "MoreInformationDetail", "Enter more details");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceNotSelected_RendersError()
     {
         // Arrange
@@ -320,7 +315,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_ButNoEvidenceFileSelected_RendersError()
     {
         // Arrange
@@ -347,7 +342,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -375,7 +370,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -414,7 +409,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -456,7 +451,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal("http://test.com/file", doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -486,7 +481,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -515,7 +510,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task PostCancel_RedirectsToEditUserPage()
     {
         // Arrange
@@ -535,7 +530,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.StartsWith($"/users/{existingUser.UserId}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task PostCancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFileAndRedirectsToEditUserPage()
     {
         // Arrange
@@ -563,7 +558,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_DeactivatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -593,7 +588,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         Assert.False(updatedUser.Active);
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
@@ -608,7 +603,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_WithAdditionalReasonMoreInformationAndEvidenceFile_DeactivatesUserUploadsEvidenceFileEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -642,7 +637,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
@@ -657,7 +652,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_WithPreviouslyUploadedEvidenceFile_DeactivatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -690,7 +685,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
@@ -705,7 +700,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DeactivatesUserAndDiscardsAdditionalInfo()
     {
         // Arrange
@@ -740,7 +735,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);

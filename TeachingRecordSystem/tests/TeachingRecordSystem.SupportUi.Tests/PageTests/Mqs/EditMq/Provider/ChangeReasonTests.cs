@@ -10,7 +10,7 @@ public class ChangeReasonTests : TestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -26,7 +26,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -49,7 +49,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal($"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsOK()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -90,7 +90,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError()
     {
         // Arrange
@@ -121,7 +121,7 @@ public class ChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
         // Arrange
@@ -152,7 +152,7 @@ public class ChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
@@ -184,7 +184,7 @@ public class ChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
@@ -217,7 +217,7 @@ public class ChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidInput_RedirectsToCheckAnswersPage()
     {
         // Arrange
@@ -252,7 +252,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal($"/mqs/{qualificationId}/provider/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
@@ -282,8 +282,8 @@ public class ChangeReasonTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

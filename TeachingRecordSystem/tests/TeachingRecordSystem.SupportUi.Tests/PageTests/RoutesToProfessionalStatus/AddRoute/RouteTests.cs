@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithPreviouslyStoredRoute_ShowsSelectedRoute()
     {
         // Arrange
@@ -35,7 +35,8 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(route.RouteToProfessionalStatusTypeId.ToString(), ((IHtmlSelectElement)doc.GetElementById("RouteId")!).Value);
     }
 
-    [Fact(Skip = "Waiting for archived routes")]
+    [Test]
+    [Skip("Waiting for archived routes")]
     public async Task Get_WithPreviouslyStoredArchivedRoute_ShowsSelectedRoute()
     {
         // Arrange
@@ -66,7 +67,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(route.RouteToProfessionalStatusTypeId.ToString(), ((IHtmlSelectElement)doc.GetElementById("ArchivedRouteId")!).Value);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoRouteSelected_ShowsError()
     {
         // Arrange
@@ -95,7 +96,8 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "RouteId", "Enter a route type");
     }
 
-    [Fact(Skip = "Waiting for archived route data")]
+    [Test]
+    [Skip("Waiting for archived route data")]
     public async Task Post_TwoRoutesSelected_ShowsError()
     {
         // Arrange
@@ -128,7 +130,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "RouteId", "Enter only one route type");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SelectRoute_PersistsSelection()
     {
         // Arrange
@@ -158,7 +160,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(route.RouteToProfessionalStatusTypeId, journeyInstance.State.RouteToProfessionalStatusId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenRouteIsEntered_RedirectsToStatus()
     {
         // Arrange
@@ -188,7 +190,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyStateAndRedirectsToQualifications()
     {
         // Arrange
@@ -220,8 +222,8 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

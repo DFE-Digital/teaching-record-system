@@ -5,10 +5,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Theory]
-    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Test]
+    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -42,10 +42,10 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
     }
 
-    [Theory]
-    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Test]
+    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, false)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -74,7 +74,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -116,7 +116,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Fact]
+    [Test]
     public async Task RouteMandatesProvider_NoTrainingProviderSelected_ShowsError()
     {
         // Arrange
@@ -152,7 +152,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SelectTrainingProvider_PersistsSelection()
     {
         // Arrange
@@ -190,7 +190,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(trainingProvider.TrainingProviderId, journeyInstance.State.TrainingProviderId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenTrainingProviderIsEntered_RedirectsToNextPage()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -227,7 +227,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/route/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_TrainingProviderIsOptional_WhenNoTrainingProviderIsEntered_RedirectsToNextPage()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -258,8 +258,8 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/route/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

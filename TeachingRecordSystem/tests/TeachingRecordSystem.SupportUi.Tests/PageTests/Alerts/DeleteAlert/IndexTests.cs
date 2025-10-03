@@ -10,7 +10,7 @@ public class IndexTests : DeleteAlertTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +29,7 @@ public class IndexTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -45,9 +45,9 @@ public class IndexTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Get_ValidRequest_ReturnsOk(bool isOpenAlert)
     {
         // Arrange
@@ -64,9 +64,9 @@ public class IndexTests : DeleteAlertTestBase
 
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsExpectedContent(bool isOpenAlert)
     {
         // Arrange
@@ -96,7 +96,7 @@ public class IndexTests : DeleteAlertTestBase
         }
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -118,7 +118,7 @@ public class IndexTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode); ;
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -134,9 +134,9 @@ public class IndexTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_NoHasAdditionalReasonDetailIsSelected_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -156,9 +156,9 @@ public class IndexTests : DeleteAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add why you are deleting this alert");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_AdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -180,9 +180,9 @@ public class IndexTests : DeleteAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReasonDetail", "Enter additional detail");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -204,9 +204,9 @@ public class IndexTests : DeleteAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -228,9 +228,9 @@ public class IndexTests : DeleteAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage(bool isOpenAlert)
     {
         // Arrange
@@ -263,9 +263,9 @@ public class IndexTests : DeleteAlertTestBase
         Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_ValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage(bool isOpenAlert)
     {
         // Arrange
@@ -298,9 +298,9 @@ public class IndexTests : DeleteAlertTestBase
         Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_Cancel_DeletesJourneyAndRedirects(bool isOpenAlert)
     {
         // Arrange
@@ -327,8 +327,8 @@ public class IndexTests : DeleteAlertTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

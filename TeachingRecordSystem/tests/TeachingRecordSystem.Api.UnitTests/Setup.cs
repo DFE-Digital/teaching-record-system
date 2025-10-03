@@ -1,4 +1,3 @@
-using System.Transactions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.Internal;
@@ -25,30 +24,6 @@ public static class Setup
         _currentUserProviderMock
             .Setup(mock => mock.GetCurrentApplicationUser())
             .Returns((applicationUser.UserId, applicationUser.Name));
-    }
-
-    [BeforeEvery(Test)]
-    public static void TestSetup(TestContext context)
-    {
-        var transactionScope = new TransactionScope(
-            TransactionScopeOption.RequiresNew,
-            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
-            TransactionScopeAsyncFlowOption.Enabled);
-        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
-
-        var testScopedServices = TestScopedServices.Reset(Services);
-        testScopedServices.EventObserver.Clear();
-
-        context.AddAsyncLocalValues();
-    }
-
-    [AfterEvery(Test)]
-    public static void TestTeardown(TestContext context)
-    {
-        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
-        {
-            txn.Dispose();
-        }
     }
 
     private static IServiceProvider CreateServiceProvider()

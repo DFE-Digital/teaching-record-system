@@ -1,22 +1,22 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
-[Collection(nameof(DisableParallelization))]
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public async Task InitializeAsync()
+    [Before(Test)]
+    public async Task DeleteUsersAsync()
     {
         await WithDbContext(async dbContext =>
         {
             await dbContext.Notes.ExecuteDeleteAsync();
+            await dbContext.SupportTasks.ExecuteDeleteAsync();
             await dbContext.Users.ExecuteDeleteAsync();
         });
 
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    [Fact]
+    [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -35,7 +35,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -53,7 +53,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithoutAdministratorRole_CannotViewAdministratorInRoleOptions()
     {
         // Arrange
@@ -75,7 +75,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.DoesNotContain(UserRoles.Administrator, roleNames);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithAdministratorRole_CanViewAdministratorInRoleOptions()
     {
         // Arrange
@@ -97,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Contains(UserRoles.Administrator, roleNames);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoName_RendersError()
     {
         // Arrange
@@ -171,7 +171,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoRole_RendersError()
     {
         // Arrange
@@ -196,7 +196,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         await AssertEx.HtmlResponseHasErrorAsync(response, "Role", "Select a role");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAdministratorRole_UpdatingUserWithNonExistentRole_ReturnsBadRequest()
     {
         // Arrange
@@ -221,7 +221,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAdministratorRole_UpdatingUserWithAdministratorRole_ReturnsBadRequest()
     {
         // Arrange
@@ -246,7 +246,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithAdministratorRole_UpdatingUserWithAdministratorRole_ReturnsFound()
     {
         // Arrange
@@ -271,11 +271,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true, false, true, UserUpdatedEventChanges.Name, "has been updated.")]
-    [InlineData(false, true, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
-    [InlineData(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
-    [InlineData(false, false, false, UserUpdatedEventChanges.None, "has been updated.")]
+    [Test]
+    [Arguments(true, false, true, UserUpdatedEventChanges.Name, "has been updated.")]
+    [Arguments(false, true, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
+    [Arguments(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
+    [Arguments(false, false, false, UserUpdatedEventChanges.None, "has been updated.")]
     public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage(
         bool changeName,
         bool changeRole,
@@ -318,7 +318,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         if (expectedEvent)
         {
-            EventPublisher.AssertEventsSaved(e =>
+            EventObserver.AssertEventsSaved(e =>
             {
                 var userCreatedEvent = Assert.IsType<UserUpdatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
@@ -332,7 +332,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         }
         else
         {
-            EventPublisher.AssertNoEventsSaved();
+            EventObserver.AssertNoEventsSaved();
         }
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
@@ -340,7 +340,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, $"{newName} {expectedFlashMessage}");
     }
 
-    [Fact]
+    [Test]
     public async Task PostActivate_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -359,7 +359,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task PostActivate_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -375,7 +375,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task PostActivate_UserExistsButIsAlreadyActive_ReturnsBadRequest()
     {
         // Arrange
@@ -393,7 +393,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task PostActivate_UserWithoutAdministratorRole_ActivatingUserWithAdministratorRole_ReturnsBadRequest()
     {
         // Arrange
@@ -411,7 +411,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task PostActivate_UserWithAdministratorRole_ActivatingUserWithAdministratorRole_ReturnsFound()
     {
         // Arrange
@@ -429,7 +429,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task PostActivate_ValidRequest_ActivatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -451,7 +451,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         Assert.True(updatedUser.Active);
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);

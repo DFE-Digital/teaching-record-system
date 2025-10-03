@@ -9,7 +9,7 @@ public class IndexTests : DetailsTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -28,7 +28,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -44,7 +44,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -60,7 +60,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -77,7 +77,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(alert.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -94,7 +94,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -117,7 +117,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -133,7 +133,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -149,7 +149,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithUnchangedDetails_ReturnsError()
     {
         // Arrange
@@ -169,7 +169,7 @@ public class IndexTests : DetailsTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter changed details");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithEmptyDetails_ReturnsError()
     {
         // Arrange
@@ -189,7 +189,7 @@ public class IndexTests : DetailsTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter details");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenChangedDetailsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -213,7 +213,7 @@ public class IndexTests : DetailsTestBase
         Assert.Equal(newDetails, journeyInstance.State.Details);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -233,8 +233,8 @@ public class IndexTests : DetailsTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

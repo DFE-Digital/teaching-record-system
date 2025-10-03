@@ -10,7 +10,7 @@ public class StartDateTests : AddAlertTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +29,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -45,7 +45,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MissingDataInJourneyState_RedirectsToLinkPage()
     {
         // Arrange
@@ -62,7 +62,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -78,7 +78,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -97,7 +97,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.Equal($"{journeyInstance.State.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -116,7 +116,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -132,7 +132,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithMissingDataInJourneyState_RedirectsToLinkPage()
     {
         // Arrange
@@ -149,7 +149,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -165,7 +165,7 @@ public class StartDateTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenStartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
@@ -185,7 +185,7 @@ public class StartDateTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date cannot be in the future");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithValidInput_UpdatesStateAndRedirectsToReasonPage()
     {
         // Arrange
@@ -209,7 +209,7 @@ public class StartDateTests : AddAlertTestBase
         Assert.Equal(startDate, journeyInstance.State.StartDate);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -228,8 +228,8 @@ public class StartDateTests : AddAlertTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

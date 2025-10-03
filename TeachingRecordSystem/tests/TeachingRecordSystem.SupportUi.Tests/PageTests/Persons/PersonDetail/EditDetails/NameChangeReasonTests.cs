@@ -4,15 +4,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-[Collection(nameof(DisableParallelization))]
-public class NameChangeReasonTests : TestBase
+[NotInParallel]
+public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public NameChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    [Fact]
+    [Test]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {
         // Arrange
@@ -40,7 +35,7 @@ public class NameChangeReasonTests : TestBase
         Assert.Equal("Change name - Alfred The Great", caption!.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -71,7 +66,7 @@ public class NameChangeReasonTests : TestBase
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -120,7 +115,7 @@ public class NameChangeReasonTests : TestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -163,7 +158,7 @@ public class NameChangeReasonTests : TestBase
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -189,7 +184,7 @@ public class NameChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.NameChangeUploadEvidence), "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -220,7 +215,7 @@ public class NameChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.NameChangeEvidenceFile), "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -252,7 +247,7 @@ public class NameChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.NameChangeEvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -295,7 +290,7 @@ public class NameChangeReasonTests : TestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -339,7 +334,7 @@ public class NameChangeReasonTests : TestBase
         Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -374,7 +369,7 @@ public class NameChangeReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -408,7 +403,7 @@ public class NameChangeReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -444,7 +439,7 @@ public class NameChangeReasonTests : TestBase
         Assert.Equal("1.2 KB", journeyInstance.State.NameChangeEvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -476,7 +471,7 @@ public class NameChangeReasonTests : TestBase
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange

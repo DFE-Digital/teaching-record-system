@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers;
 
 public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ReturnsExpectedContent()
     {
         // Arrange
@@ -32,7 +32,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         await AssertEx.HtmlResponseAsync(response);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -55,7 +55,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NameNotSpecified_RendersError()
     {
         // Arrange
@@ -76,7 +76,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NameTooLong_RendersError()
     {
         // Arrange
@@ -97,7 +97,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_CreatesApplicationUserCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -130,7 +130,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
 
         Assert.Equal($"/application-users/{applicationUser.UserId}", response.Headers.Location?.OriginalString);
 
-        EventPublisher.AssertEventsSaved(
+        EventObserver.AssertEventsSaved(
             e =>
             {
                 var applicationUserCreatedEvent = Assert.IsType<ApplicationUserCreatedEvent>(e);

@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_PersonDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonWithoutNotes_ReturnsExpectedContent()
     {
         // Arrange
@@ -37,7 +37,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("There are no notes associated with this record", noNotesMessage.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonHasDbsAlert_UserHasDbsViewPermissions_ShowsNotes()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
             n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note1.NoteId}-note-text")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonHasDbsAlert_UserDoesNotHaveDbsViewPermissions_ShowsFlagAndHidesNotes()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(notes);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoteWithoutAttachment_ReturnsExpectedContent()
     {
         // Arrange
@@ -130,7 +130,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(originalFileName);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoteWithAttachment_ReturnsExpectedContent()
     {
         // Arrange
@@ -164,7 +164,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedOriginalFileName, originalFileName.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoteWithHtml_ReturnsPlaintext()
     {
         // Arrange
@@ -188,7 +188,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedNoteText, noteText.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MultipleNotes_ReturnsContentInCorrectOrder()
     {
         // Arrange
@@ -246,9 +246,9 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
     }
 
-    [Theory]
-    [InlineData(PersonStatus.Active, true)]
-    [InlineData(PersonStatus.Deactivated, false)]
+    [Test]
+    [Arguments(PersonStatus.Active, true)]
+    [Arguments(PersonStatus.Deactivated, false)]
     public async Task Get_PersonStatus_AddButtonShownAsExpected(PersonStatus personStatus, bool canSeeAddButton)
     {
         // Arrange

@@ -5,7 +5,6 @@ using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
 [SharedDependenciesDataSource]
-[RetryOnCI(3)]
 [NotInParallel]
 public abstract class TestBase(HostFixture hostFixture)
 {

@@ -4,10 +4,14 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests;
 
-[Collection(nameof(DisableParallelization))]
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Before(Test)]
+    public Task DeleteNpqTrnRequestSupportTasks() => WithDbContext(dbContext =>
+        dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
+
+    [Test]
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
         // Arrange
@@ -24,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithTask_ShowsExpectedDataInResultsTable()
     {
         // Arrange
@@ -59,7 +63,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByFirstName_ShowsMatchingResult()
     {
         // Arrange
@@ -81,7 +85,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByMiddleName_ShowsMatchingResult()
     {
         // Arrange
@@ -103,7 +107,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByLastName_ShowsMatchingResult()
     {
         // Arrange
@@ -125,7 +129,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByMultipleNameParts_ShowsMatchingResult()
     {
         // Arrange
@@ -148,7 +152,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByEmailAddress_ShowsMatchingResult()
     {
         // Arrange
@@ -170,10 +174,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Theory]
-    [InlineData("d/M/yyyy")]
-    [InlineData("dd/MM/yyyy")]
-    [InlineData(UiDefaults.DateOnlyDisplayFormat)]
+    [Test]
+    [Arguments("d/M/yyyy")]
+    [Arguments("dd/MM/yyyy")]
+    [Arguments(UiDefaults.DateOnlyDisplayFormat)]
     public async Task Get_SearchByRequestDate_ShowsMatchingResult(string dateFormat)
     {
         // Arrange
@@ -192,7 +196,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByRequestedOnAscending()
     {
         // Arrange
@@ -221,7 +225,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByNameAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -250,7 +254,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByNameDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -279,7 +283,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByEmailAscending_ShowsRequestsInCorrectOrder()
     {
         // Start with a blank slate of tasks
@@ -312,7 +316,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByEmailDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -341,7 +345,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByRequestedOnAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -370,7 +374,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByRequestedOnDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -399,7 +403,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByPotentialDuplicateAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -434,7 +438,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByPotentialDuplicateDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -468,7 +472,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsPageOfResults()
     {
         // Arrange
@@ -494,11 +498,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
-
-    public Task InitializeAsync() => WithDbContext(dbContext =>
-        dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
-
-    public Task DisposeAsync() => Task.CompletedTask;
 
     private static IElement[] GetResultRows(IHtmlDocument doc) =>
         doc

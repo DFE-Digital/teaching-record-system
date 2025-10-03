@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
 public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -22,7 +22,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SpecialismMissingFromState_RedirectsToSpecialism()
     {
         // Arrange
@@ -40,7 +40,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -57,7 +57,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -80,7 +80,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{startDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -106,7 +106,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SpecialismMissingFromState_RedirectToSpecialism()
     {
         // Arrange
@@ -133,7 +133,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -153,9 +153,9 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(1)]
+    [Test]
+    [Arguments(0)]
+    [Arguments(1)]
     public async Task Post_StartDateIsAfterOrEqualToEndDate_RendersError(int daysAfter)
     {
         // Arrange
@@ -182,7 +182,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date must be after end date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenStartDateIsEntered_RedirectsToResultPage()
     {
         // Arrange
@@ -209,8 +209,8 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

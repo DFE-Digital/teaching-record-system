@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequ
 
 public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_HasBackLinkExpected()
     {
         // Arrange
@@ -42,7 +42,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsSelectedReason()
     {
         // Arrange
@@ -73,7 +73,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(state.RejectionReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UpdatesSupportTaskPublishesEventAndRedirects()
     {
         // Arrange
@@ -94,7 +94,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         var requestMetadata = supportTask.TrnRequestMetadata;
         Assert.NotNull(requestMetadata);
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -125,7 +125,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         {
             ResolvedPersonId = null
         };
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskRejectedEvent>(e);
             Assert.Equal(state.RejectionReason.GetDisplayName(), actualEvent.RejectionReason);
@@ -148,7 +148,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.True(journeyInstance.Completed);
     }
 
-    public string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
+    private string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
     {
         var banner = doc.GetElementsByClassName("govuk-notification-banner--success").SingleOrDefault();
 

@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_PageLegend_Expected()
     {
         // Arrange
@@ -36,7 +36,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(expectedCaption, caption!.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -65,7 +65,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal("Cancel and return to record", buttons.ElementAt(1)!.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_InductionNotManagedByCpd_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -94,11 +94,11 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(expectedChoices, statusChoices);
     }
 
-    [Theory]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.RequiredToComplete)]
-    [InlineData(InductionStatus.Failed)]
+    [Test]
+    [Arguments(InductionStatus.Passed)]
+    [Arguments(InductionStatus.InProgress)]
+    [Arguments(InductionStatus.RequiredToComplete)]
+    [Arguments(InductionStatus.Failed)]
     public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus currentInductionStatus)
     {
         // Arrange
@@ -139,9 +139,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(expectedChoices, statusChoices);
     }
 
-    [Theory]
-    [InlineData(InductionStatus.Exempt)]
-    [InlineData(InductionStatus.FailedInWales)]
+    [Test]
+    [Arguments(InductionStatus.Exempt)]
+    [Arguments(InductionStatus.FailedInWales)]
     public async Task Get_InductionManagedByCpd_StatusExemptOrFailedInWales_ExpectedRadioButtonsExistOnPage(InductionStatus status)
     {
         // Arrange
@@ -195,7 +195,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(expectedChoices, statusChoices);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_InductionStatus_ShowsSelectedRadioButton()
     {
         // Arrange
@@ -218,7 +218,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(currentInductionStatus.ToString(), selectedStatus.Value);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SelectedStatus_PersistsStatus()
     {
         // Arrange
@@ -245,7 +245,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal("Exempt", journeyInstance.State.InductionStatus.GetTitle());
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoSelectedStatus_ShowsPageError()
     {
         // Arrange
@@ -271,7 +271,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_PersonManagedByCpd_NoSelectedStatus_ShowsPageError()
     {
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
@@ -310,11 +310,11 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
 
-    [Theory]
-    [InlineData(InductionStatus.RequiredToComplete, "passed, failed, or in progress")]
-    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed")]
-    [InlineData(InductionStatus.Passed, "required to complete, failed, or in progress")]
-    [InlineData(InductionStatus.Failed, "required to complete, passed, or in progress")]
+    [Test]
+    [Arguments(InductionStatus.RequiredToComplete, "passed, failed, or in progress")]
+    [Arguments(InductionStatus.InProgress, "required to complete, passed, or failed")]
+    [Arguments(InductionStatus.Passed, "required to complete, failed, or in progress")]
+    [Arguments(InductionStatus.Failed, "required to complete, passed, or in progress")]
     public async Task Get_ForPersonWithInductionStatusManagedByCPD_ShowsWarning(InductionStatus status, string statusSpecificText)
     {
         //Arrange
@@ -378,9 +378,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Contains(statusSpecificText, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TrimmedText());
     }
 
-    [Theory]
-    [InlineData(InductionStatus.FailedInWales)]
-    [InlineData(InductionStatus.Exempt)]
+    [Test]
+    [Arguments(InductionStatus.FailedInWales)]
+    [Arguments(InductionStatus.Exempt)]
     public async Task Get_ForPersonWithInductionStatusManagedByCPD_StatusExemptOrFailedInWales_NoWarning(InductionStatus status)
     {
         //Arrange

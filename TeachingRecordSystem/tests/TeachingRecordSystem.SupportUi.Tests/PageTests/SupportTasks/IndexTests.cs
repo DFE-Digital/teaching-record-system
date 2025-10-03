@@ -1,21 +1,16 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks;
 
-[Collection(nameof(DisableParallelization))]
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public async Task InitializeAsync()
-    {
-        await WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
-        XrmFakedContext.DeleteAllEntities<Incident>();
-    }
+    [Before(Test)]
+    public Task DeleteSupportTasksAsync() =>
+        WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    [Fact]
+    [Test]
     public async Task Get_NoSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
@@ -37,7 +32,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_DateRequestedSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
@@ -59,7 +54,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_TypeSortByQueryParam_ShowsTasksSortedByType()
     {
         // Arrange
@@ -81,7 +76,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoCategoriesSpecifiedAndNoFiltersApplied_ReturnsAllCategories()
     {
         // Arrange
@@ -105,7 +100,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Contains(connectOneLoginUser.SupportTaskReference, references);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoCategoriesSpecifiedAndFiltersApplied_ReturnsNoResults()
     {
         // Arrange
@@ -123,7 +118,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Empty(references);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CategoriesSpecified_ReturnsResultsMatchingCategoriesOnly()
     {
         // Arrange
@@ -147,7 +142,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.DoesNotContain(connectOneLoginUser.SupportTaskReference, references);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ReferenceSpecified_ReturnsResultMatchingReferenceOnly()
     {
         // Arrange

@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -52,7 +52,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(addRouteState.ChangeReasonDetail.ChangeReasonDetail, additionalDetailTextArea!.Value);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -101,7 +101,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetailsAndRedirects()
     {
         // Arrange
@@ -143,7 +143,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -172,7 +172,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AdditionalDetailYes_NoDetailAdded_ReturnsError()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
@@ -205,7 +205,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -244,7 +244,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -286,7 +286,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(evidenceFileName, journeyInstance.State.ChangeReasonDetail.EvidenceFileName);
     }
 
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -329,8 +329,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

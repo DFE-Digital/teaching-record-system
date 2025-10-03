@@ -5,9 +5,10 @@ using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUse
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogMandatoryQualificationEventsTests : TestBase
+public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture) : base(hostFixture)
+    [Before(Test)]
+    public void Initialize()
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -18,7 +19,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         Clock.UtcNow = nows.SingleRandom();
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationCreatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -42,7 +43,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationCreatedEventCreatedByDqtUser_RendersExpectedRaisedBy()
     {
         // Arrange
@@ -62,7 +63,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationDeletedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -98,7 +99,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationDeletedEventWithEmptyData_RendersExpectedContent()
     {
         // Arrange
@@ -131,7 +132,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationDeletedEventWithNoEvidenceFile_DoesNotRenderEvidenceRow()
     {
         // Arrange
@@ -152,7 +153,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Null(item.GetElementByTestId("evidence")));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithDeletedMandatoryQualificationEventWithLegacyProvider_RendersExpectedProviderName()
     {
         // Arrange
@@ -173,7 +174,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(legacyProvider.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithDeletedMandatoryQualificationEventWithNoProvider_RendersNoneForProviderName()
     {
         // Arrange
@@ -194,7 +195,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal("None", item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualficationDqtDeactivatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -225,7 +226,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualficationDqtDeactivatedEventWithLegacyProvider_RendersExpectedProviderName()
     {
         // Arrange
@@ -247,7 +248,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(legacyProvider.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualficationDqtDeactivatedEventWithNoProvider_RendersExpectedContent()
     {
         // Arrange
@@ -269,7 +270,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal("None", item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationImportedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -294,7 +295,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationDqtReactivatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -363,7 +364,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationMigratedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -408,7 +409,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationMigratedEventWithNoChanges_DoesNotRenderPreviousDataSummaryList()
     {
         // Arrange
@@ -448,7 +449,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
             item => Assert.Null(item.GetElementByTestId("previous-data")));
     }
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationMigratedEventWithChangedProvider_RendersProviderRowInPreviousDataSummaryList()
     {
         // Arrange
@@ -499,7 +500,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(migratedProvider?.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationMigratedEventWithChangedSpecialism_RendersSpecialismRowInPreviousDataSummaryList()
     {
         // Arrange
@@ -554,7 +555,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(migratedSpecialism?.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -595,7 +596,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangeReason_DoesNotRenderReasonForChangeBlock()
     {
         // Arrange
@@ -627,7 +628,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithChangedProvider_RendersTrainingProviderRowWithinPreviousData()
     {
         // Arrange
@@ -656,7 +657,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(oldProvider.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangedProvider_DoesNotRenderTrainingProviderRowWithinPreviousData()
     {
         // Arrange
@@ -683,7 +684,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Null(item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithChangedSpecialism_RendersSpecialismRowWithinPreviousData()
     {
         // Arrange
@@ -711,7 +712,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(oldSpecialism.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangedSpecialism_DoesNotRenderSpecialismRowWithinPreviousData()
     {
         // Arrange
@@ -738,7 +739,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Null(item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithChangedStartDate_RendersStartDateRowWithinPreviousData()
     {
         // Arrange
@@ -766,7 +767,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangedStartDate_DoesNotRenderStartDateRowWithinPreviousData()
     {
         // Arrange
@@ -793,7 +794,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Null(item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithChangedStatus_RendersStatusRowWithinPreviousData()
     {
         // Arrange
@@ -825,7 +826,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Equal(oldStatus.GetTitle(), item.GetElementByTestId("status")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangedStatus_DoesNotRenderStatusRowWithinPreviousData()
     {
         // Arrange
@@ -852,7 +853,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             item => Assert.Null(item.GetElementByTestId("status")?.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithMandatoryQualificationUpdatedEventWithChangedEndDate_RendersEndDateRowWithinPreviousData()
     {
         // Arrange

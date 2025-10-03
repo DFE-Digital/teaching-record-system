@@ -3,10 +3,12 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <IsTUnitProject>true</IsTUnitProject>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.SupportUi\TeachingRecordSystem.SupportUi.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.TestCommon.TUnit\TeachingRecordSystem.TestCommon.TUnit.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon.XUnit\TeachingRecordSystem.UiTestCommon.XUnit.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon\TeachingRecordSystem.UiTestCommon.csproj" />
   </ItemGroup>
@@ -16,16 +18,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Moq" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.analyzers">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Xunit.DependencyInjection" />
-    <PackageReference Include="xunit.runner.visualstudio">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="xunit.assert" />
   </ItemGroup>
 
 </Project>

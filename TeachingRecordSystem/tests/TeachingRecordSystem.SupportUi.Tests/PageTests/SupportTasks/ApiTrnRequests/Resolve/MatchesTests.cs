@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequ
 
 public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -21,7 +21,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_TaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -39,7 +39,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ShowsRequestDetails()
     {
         // Arrange
@@ -72,7 +72,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueForKey("Gender"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ShowsDetailsOfMatchedRecords()
     {
         // Arrange
@@ -109,7 +109,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(firstMatch.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MatchedRecordHasActiveAlerts_ShowsAlertsTag()
     {
         // Arrange
@@ -134,7 +134,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Contains("Alerts", tags);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MatchedRecordHasQts_ShowsQtsTag()
     {
         // Arrange
@@ -159,7 +159,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Contains("QTS", tags);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MatchedRecordHasEyts_ShowsEytsTag()
     {
         // Arrange
@@ -184,7 +184,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Contains("EYTS", tags);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonIdInState_SelectsChosenRecord()
     {
         // Arrange
@@ -216,7 +216,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
                 .IsChecked());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CreateNewRecordInState_SelectsCreateNewRecordOption()
     {
         // Arrange
@@ -246,7 +246,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
                 .IsChecked());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordAndEmptyInRequest_ShowsNotProvidedNotHighlighted()
     {
         // Arrange
@@ -307,7 +307,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsRefreshedMatchedPersons()
     {
         // Arrange
@@ -345,7 +345,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Contains(subsequentMatchedPerson.PersonId, shownMatchedPersonIds);
     }
 
-    public static TheoryData<PersonMatchedAttribute[]> HighlightedDifferencesData { get; } =
+    public static PersonMatchedAttribute[][] GetHighlightedDifferencesData() =>
     [
         [PersonMatchedAttribute.FirstName],
         [PersonMatchedAttribute.MiddleName],
@@ -356,8 +356,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         [PersonMatchedAttribute.Gender]
     ];
 
-    [Theory]
-    [MemberData(nameof(HighlightedDifferencesData))]
+    [Test]
+    [MethodDataSource(nameof(GetHighlightedDifferencesData))]
     public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
     {
         // Arrange
@@ -435,7 +435,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Post_TaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -462,7 +462,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SubmittedPersonIdIsNotValid_ReturnsBadRequest()
     {
         // Arrange
@@ -488,7 +488,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoChosenPersonId_ReturnsError()
     {
         // Arrange
@@ -511,7 +511,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         await AssertEx.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidPersonIdChosen_UpdatesStateAndRedirects()
     {
         // Arrange
@@ -542,7 +542,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(personId, journeyInstance.State.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CreateNewRecordChosen_UpdatesStateAndRedirects()
     {
         // Arrange
@@ -573,7 +573,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(personId, journeyInstance.State.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_PersonIdChangedFromState_ClearsPersonAttributes()
     {
         // Arrange
@@ -620,7 +620,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.False(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_PersonIdNotChangedFromState_DoesNotClearPersonAttributes()
     {
         // Arrange

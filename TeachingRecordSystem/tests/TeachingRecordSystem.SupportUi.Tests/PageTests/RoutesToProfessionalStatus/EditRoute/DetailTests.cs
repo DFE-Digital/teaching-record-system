@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -48,7 +48,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Fact]
+    [Test]
     public async Task Continue_LinksToExpectedPage()
     {
         // Arrange
@@ -81,7 +81,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains($"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", continueButton!.Href);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_RouteAndStatusWithAllFieldsApplicable_AllFieldsShown()
     {
         // Arrange
@@ -148,7 +148,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsOptionalAnswers_AsExpected()
     {
         // Arrange
@@ -190,9 +190,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowContentMatches("Subjects", "Not provided");
     }
 
-    [Theory]
-    [InlineData("Awarded date", "HoldsFromRequired")]
-    [InlineData("Induction exemption", "InductionExemptionRequired")]
+    [Test]
+    [Arguments("Awarded date", "HoldsFromRequired")]
+    [Arguments("Induction exemption", "InductionExemptionRequired")]
     public async Task Get_FieldNotApplicable_FieldNotShown(string elementText, string propertySelector)
     {
         // Arrange
@@ -230,9 +230,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.DoesNotContain(doc.QuerySelectorAll(".govuk-summary-list__key"), e => e.TrimmedText() == elementText);
     }
 
-    [Theory]
-    [InlineData(RouteToProfessionalStatusStatus.Holds, true, "Yes")]
-    [InlineData(RouteToProfessionalStatusStatus.Holds, false, "No")]
+    [Test]
+    [Arguments(RouteToProfessionalStatusStatus.Holds, true, "Yes")]
+    [Arguments(RouteToProfessionalStatusStatus.Holds, false, "No")]
     public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(RouteToProfessionalStatusStatus status, bool? hasExemption, string expectedContent)
     {
         // Arrange
@@ -276,7 +276,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertChangeLinkExists("Induction exemption");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_RouteAndStatusWithImplictExemptionInduction_ShowsFieldButNoChangeLink()
     {
         // Arrange
@@ -324,8 +324,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertNoChangeLink("Induction exemption");
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

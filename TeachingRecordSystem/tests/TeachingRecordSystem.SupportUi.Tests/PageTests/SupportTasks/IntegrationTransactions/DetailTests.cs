@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.Integratio
 
 public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_InvalidIntegrationTransactionRecordDetails_ReturnsNotFound()
     {
         // Arrange
@@ -18,7 +18,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidIntegrationTransactionWithNoRecords_ReturnsOk()
     {
         // Arrange
@@ -58,7 +58,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{interfaceType1.GetDisplayName()} - File details", interfaceType.TextContent);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidIntegrationTransactionWithRecords_ReturnsOk()
     {
         // Arrange
@@ -102,9 +102,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertResultsContainsIntegrationTransactionRecord(itr1.IntegrationTransactionRecordId);
     }
 
-    [Theory]
-    [InlineData(IntegrationTransactionRecordStatus.Success, "govuk-tag--green", IntegrationTransactionImportStatus.Success)]
-    [InlineData(IntegrationTransactionRecordStatus.Failure, "govuk-tag--red", IntegrationTransactionImportStatus.Failed)]
+    [Test]
+    [Arguments(IntegrationTransactionRecordStatus.Success, "govuk-tag--green", IntegrationTransactionImportStatus.Success)]
+    [Arguments(IntegrationTransactionRecordStatus.Failure, "govuk-tag--red", IntegrationTransactionImportStatus.Failed)]
     public async Task Get_ValidIntegrationTransactionWithRecordsWithStatus_RendersRowExpectedCssClass(IntegrationTransactionRecordStatus recordStatus, string expectedCssClass, IntegrationTransactionImportStatus importStatus)
     {
         // Arrange
@@ -158,7 +158,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(statusElement);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_RowForUnknownPerson_RendersCorrectPersonText()
     {
         // Arrange
@@ -208,7 +208,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains("Failure", statusElement.TextContent);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ExportFailedRecords_ButtonIsVisible()
     {
         // Arrange
@@ -253,7 +253,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(exportFailuresButton);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ExportFailedRecords_ButtonIsNotVisible()
     {
         // Arrange
@@ -300,7 +300,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(exportFailuresButton);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_DownloadFailures_DownloadsFailedRecords()
     {
         // Arrange
@@ -342,7 +342,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{integrationTransaction1.IntegrationTransactionId}.{interfaceType1}.failures.csv", response.Content.Headers.ContentDisposition!.FileName);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_DownloadFailuresForNotExistentIntegrationTransaction_ReturnsNotFound()
     {
         // Arrange
@@ -384,7 +384,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidIntegrationTransaction_RendersCorrectSummaryCard()
     {
         // Arrange

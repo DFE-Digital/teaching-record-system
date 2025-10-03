@@ -6,11 +6,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Theory]
-    [InlineData(InductionStatus.None)]
-    [InlineData(InductionStatus.Exempt)]
-    [InlineData(InductionStatus.RequiredToComplete)]
-    [InlineData(InductionStatus.InProgress)]
+    [Test]
+    [Arguments(InductionStatus.None)]
+    [Arguments(InductionStatus.Exempt)]
+    [Arguments(InductionStatus.RequiredToComplete)]
+    [Arguments(InductionStatus.InProgress)]
     public async Task Get_WithInvalidJourneyState_InductionStatus_RedirectToStart(InductionStatus inductionStatus)
     {
         // Arrange
@@ -31,7 +31,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
         Assert.Equal($"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithInvalidJourneyState_StartDate_RedirectToStart()
     {
         // Arrange
@@ -52,7 +52,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
         Assert.Equal($"/persons/{person.PersonId}/edit-induction/start-date?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithCompletedDate_ShowsDate()
     {
         // Arrange
@@ -80,7 +80,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
         Assert.Equal(dateValid.Year.ToString(), CompletedDate.ElementAt(2).Value);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidCompletedDate_PersistsCompletedDate()
     {
         // Arrange
@@ -108,7 +108,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
         Assert.Equal(dateValid, journeyInstance.State.CompletedDate);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoCompletedDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -130,7 +130,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
         await AssertEx.HtmlResponseHasErrorAsync(response, "CompletedDate", "Enter an induction completed date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CompletedDateIsInTheFuture_ReturnsError()
     {
         // Arrange
@@ -156,7 +156,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
         await AssertEx.HtmlResponseHasErrorAsync(response, "CompletedDate", "The induction completed date cannot be in the future");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CompletedDateIsBeforeStartDate_ReturnsError()
     {
         // Arrange

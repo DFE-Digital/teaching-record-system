@@ -1,22 +1,22 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
-[Collection(nameof(DisableParallelization))]
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public async Task InitializeAsync()
+    [Before(Test)]
+    public async Task DeleteUsersAsync()
     {
         await WithDbContext(async dbContext =>
         {
             await dbContext.Notes.ExecuteDeleteAsync();
+            await dbContext.SupportTasks.ExecuteDeleteAsync();
             await dbContext.Users.ExecuteDeleteAsync();
         });
 
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    [Fact]
+    [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -32,7 +32,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithAccessManagerUser_ReturnsOk()
     {
         // Arrange
@@ -48,7 +48,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -64,7 +64,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoEmailEntered_RendersErrorMessage()
     {
         // Arrange
@@ -88,7 +88,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     }
 
 
-    [Fact]
+    [Test]
     public async Task Post_UserNotFound_RendersErrorMessage()
     {
         // Arrange
@@ -115,7 +115,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "User does not exist");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_EmailDoesNotHaveSuffix_AppendsEducationSuffixBeforeSearching()
     {
         // Arrange
@@ -139,7 +139,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AzureActiveDirectoryUserServiceMock.Verify(mock => mock.GetUserByEmailAsync(email + "@education.gov.uk"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserFound_RedirectsToConfirmPage()
     {
         // Arrange
@@ -173,7 +173,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal($"/users/add/confirm?userId={userId}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserFound_ButAlreadyExistsInTrs_RedirectsToEditPage()
     {
         // Arrange

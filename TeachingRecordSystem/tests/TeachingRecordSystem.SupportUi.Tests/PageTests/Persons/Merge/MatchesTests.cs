@@ -3,10 +3,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_FieldsPopulatedFromPerson()
     {
         var personA = await TestData.CreatePersonAsync(p => p
@@ -63,7 +63,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         doc.AssertRow("person-b", "TRN", v => Assert.Equal(personB.Trn, v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonHasOpenAlert_ShowsAlertCountAndLinkToAlertsPage()
     {
         // Arrange
@@ -107,23 +107,23 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         });
     }
 
-    public static TheoryData<PersonMatchedAttribute[], bool> HighlightedDifferencesData { get; } = new()
-    {
+    public static (PersonMatchedAttribute[] Attributes, bool UseNullValues)[] GetHighlightedDifferencesData() =>
+    [
         // We could go nuts creating loads of combinations here, but checking every attribute once seems sufficient
-        { [PersonMatchedAttribute.FirstName], false },
-        { [PersonMatchedAttribute.MiddleName], false },
-        { [PersonMatchedAttribute.LastName], false },
-        { [PersonMatchedAttribute.DateOfBirth], false },
-        { [PersonMatchedAttribute.EmailAddress], false },
-        { [PersonMatchedAttribute.EmailAddress], true },
-        { [PersonMatchedAttribute.NationalInsuranceNumber], false },
-        { [PersonMatchedAttribute.NationalInsuranceNumber], true },
-        { [PersonMatchedAttribute.Gender], false },
-        { [PersonMatchedAttribute.Gender], true }
-    };
+        ([PersonMatchedAttribute.FirstName], false),
+        ([PersonMatchedAttribute.MiddleName], false),
+        ([PersonMatchedAttribute.LastName], false),
+        ([PersonMatchedAttribute.DateOfBirth], false),
+        ([PersonMatchedAttribute.EmailAddress], false),
+        ([PersonMatchedAttribute.EmailAddress], true),
+        ([PersonMatchedAttribute.NationalInsuranceNumber], false),
+        ([PersonMatchedAttribute.NationalInsuranceNumber], true),
+        ([PersonMatchedAttribute.Gender], false),
+        ([PersonMatchedAttribute.Gender], true)
+    ];
 
-    [Theory]
-    [MemberData(nameof(HighlightedDifferencesData))]
+    [Test]
+    [MethodDataSource(nameof(GetHighlightedDifferencesData))]
     public async Task Get_HighlightsDifferencesBetweenPersonAAndPersonB(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes, bool useNullValues)
     {
         // Arrange
@@ -161,7 +161,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         doc.AssertMatchRowHasExpectedHighlight("person-b", "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonBIsDeactivated_ShowsWarningAndHidesContinueButton()
     {
         // Arrange
@@ -204,7 +204,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         Assert.Null(continueButton);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonBHasOpenAlert_ShowsWarningAndHidesContinueButton()
     {
         // Arrange
@@ -240,14 +240,14 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         Assert.Null(continueButton);
     }
 
-    [Theory]
-    [InlineData(InductionStatus.InProgress, false)]
-    [InlineData(InductionStatus.Passed, false)]
-    [InlineData(InductionStatus.Failed, false)]
-    [InlineData(InductionStatus.None, true)]
-    [InlineData(InductionStatus.Exempt, true)]
-    [InlineData(InductionStatus.FailedInWales, true)]
-    [InlineData(InductionStatus.RequiredToComplete, true)]
+    [Test]
+    [Arguments(InductionStatus.InProgress, false)]
+    [Arguments(InductionStatus.Passed, false)]
+    [Arguments(InductionStatus.Failed, false)]
+    [Arguments(InductionStatus.None, true)]
+    [Arguments(InductionStatus.Exempt, true)]
+    [Arguments(InductionStatus.FailedInWales, true)]
+    [Arguments(InductionStatus.RequiredToComplete, true)]
     public async Task Get_PersonBWithInductionStatus_ShowsWarningAndHidesContinueButtonAsExpected(InductionStatus status, bool expectMergeToBeAllowed)
     {
         // Arrange
@@ -295,10 +295,10 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         }
     }
 
-    [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
+    [Test]
+    [Arguments(InductionStatus.InProgress)]
+    [Arguments(InductionStatus.Passed)]
+    [Arguments(InductionStatus.Failed)]
     public async Task Get_PersonBHasOpenAlertAndInvalidInductionStatus_ShowsWarningAndHidesContinueButton(InductionStatus status)
     {
         // Arrange
@@ -338,7 +338,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         Assert.Null(continueButton);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PrimaryPersonAlreadySelected_SelectsChosenPerson()
     {
         var personA = await TestData.CreatePersonAsync(p => p
@@ -368,7 +368,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         Assert.Equal(personB.PersonId.ToString(), primaryPersonChoice);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_PrimaryPersonNotSelected_ShowsPageError()
     {
         // Arrange
@@ -399,7 +399,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "Select primary record");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_PersistsDetailsAndRedirectsToNextPage()
     {
         // Arrange
@@ -434,7 +434,7 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
         Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_PrimaryPersonChanged_SwapsPrimaryAndSecondarySources_ToKeepSelectedDataCorrect()
     {
         // Arrange

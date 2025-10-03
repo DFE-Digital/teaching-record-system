@@ -5,8 +5,8 @@ using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-[Collection(nameof(DisableParallelization))]
-public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> _roleAccess = [
         (null, false),
@@ -54,14 +54,14 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
     RouteToProfessionalStatusType? _route;
     RouteToProfessionalStatusStatus _status;
 
+    [Before(Test)]
     public async Task InitializeAsync()
     {
         _route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && r.InductionExemptionRequired != FieldRequirement.NotApplicable)
-            .First();
+            .First(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && r.InductionExemptionRequired != FieldRequirement.NotApplicable);
 
         _status = ProfessionalStatusStatusRegistry.All
-.First(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable).Value;
+            .First(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable).Value;
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -72,10 +72,8 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
         _qualificationId = person.ProfessionalStatuses.First().QualificationId;
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    [Theory]
-    [MemberData(nameof(GetData))]
+    [Test]
+    [MethodDataSource(nameof(GetData))]
     public async Task Get_RoutesPage_UserRoles_CanViewPageAsExpected(string journeyName, string pageFormat, string? userRole, bool canViewPage)
     {
         // Arrange
@@ -128,18 +126,18 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
         }
     }
 
-    public static TheoryData<string, string, string?, bool> GetData()
+    public static (string JourneyName, string PageFormat, string? UserRole, bool CanViewPage)[] GetData()
     {
-        var data = new TheoryData<string, string, string?, bool>();
+        var data = new List<(string, string, string?, bool)>();
 
         foreach (var (journeyName, pageFormat) in _pageFormats)
         {
             foreach (var (role, canEdit) in _roleAccess)
             {
-                data.Add(journeyName, pageFormat, role, canEdit);
+                data.Add((journeyName, pageFormat, role, canEdit));
             }
         }
 
-        return data;
+        return data.ToArray();
     }
 }
