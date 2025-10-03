@@ -6,7 +6,6 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
-[NotInParallel]
 public class MergeTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
     [Test]

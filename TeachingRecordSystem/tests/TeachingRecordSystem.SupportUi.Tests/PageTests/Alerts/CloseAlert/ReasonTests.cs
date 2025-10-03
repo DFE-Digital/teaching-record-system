@@ -9,7 +9,7 @@ public class ReasonTests : CloseAlertTestBase
 
     public ReasonTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(TestUsers.CreateUser(UserRoles.AlertsManagerTraDbs));
     }
 
     [Test]
@@ -17,7 +17,7 @@ public class ReasonTests : CloseAlertTestBase
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
@@ -132,7 +132,7 @@ public class ReasonTests : CloseAlertTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.New, alert);

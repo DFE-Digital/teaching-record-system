@@ -6,14 +6,14 @@ public class CheckAnswersTests : DeleteAlertTestBase
 
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(TestUsers.CreateUser(UserRoles.AlertsManagerTraDbs));
     }
 
     [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(TestUsers.CreateUser(role: null));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
@@ -94,7 +94,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);

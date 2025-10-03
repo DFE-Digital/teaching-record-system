@@ -5,13 +5,8 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNe
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequestManualChecksNeeded;
 
-[NotInParallel]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Before(Test)]
-    public Task DeleteTrnRequestManualChecksNeededSupportTasks() => WithDbContext(dbContext =>
-        dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded).ExecuteDeleteAsync());
-
     [Test]
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {

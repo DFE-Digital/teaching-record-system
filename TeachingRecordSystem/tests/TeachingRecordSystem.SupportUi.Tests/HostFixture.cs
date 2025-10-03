@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -64,8 +63,8 @@ public class HostFixture : WebApplicationFactory<Program>
                 .AddSingleton<TrsDataSyncHelper>()
                 .AddSingleton<IAuditRepository, TestableAuditRepository>()
                 .AddStartupTask<AddTestRouteTypesStartupTask>()
-                .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>()
-                .AddSingleton<INotificationSender, NoopNotificationSender>();
+                .AddSingleton<INotificationSender, NoopNotificationSender>()
+                .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
 
             TestScopedServices.ConfigureServices(services);
         });
@@ -109,5 +108,21 @@ public class HostFixture : WebApplicationFactory<Program>
     private class ForwardToTestScopedClock : IClock
     {
         public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
+    }
+
+    public class ExecuteScheduledJobsStartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) =>
+            app =>
+            {
+                app.Use(async (_, next) =>
+                {
+                    await next();
+
+                    await TestScopedServices.GetCurrent().BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+                });
+
+                next(app);
+            };
     }
 }

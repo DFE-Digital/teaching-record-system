@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -28,6 +29,7 @@ public class TestScopedServices
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
         GetAnIdentityApiClientMock = new();
         TrnRequestOptions = new TrnRequestOptions();
+        BackgroundJobScheduler = new(serviceProvider);
     }
 
     public static void ConfigureServices(IServiceCollection services) =>
@@ -37,7 +39,8 @@ public class TestScopedServices
             .AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
-            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions));
+            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
+            .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler);
 
     public static TestScopedServices GetCurrent() =>
         _current.Value ?? throw new InvalidOperationException("No current instance has been set.");
@@ -65,6 +68,8 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public TrnRequestOptions TrnRequestOptions { get; }
+
+    public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
 }
 
 file static class ServiceCollectionExtensions

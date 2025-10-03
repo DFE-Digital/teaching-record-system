@@ -1,3 +1,4 @@
+using System.Transactions;
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -18,12 +19,27 @@ public abstract class TestBase(HostFixture hostFixture)
     [Before(Test)]
     public void TestSetup(TestContext context)
     {
+        var transactionScope = new TransactionScope(
+            TransactionScopeOption.RequiresNew,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
+
         var testScopedServices = TestScopedServices.Reset(HostFixture.Services);
         testScopedServices.EventObserver.Clear();
 
-        SetCurrentUser(TestUsers.GetUser(UserRoles.Administrator));
+        SetCurrentUser(TestUsers.CreateUser(UserRoles.Administrator));
 
         context.AddAsyncLocalValues();
+    }
+
+    [After(Test)]
+    public void TestTeardown(TestContext context)
+    {
+        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
+        {
+            txn.Dispose();
+        }
     }
 
     protected HostFixture HostFixture { get; } = hostFixture;

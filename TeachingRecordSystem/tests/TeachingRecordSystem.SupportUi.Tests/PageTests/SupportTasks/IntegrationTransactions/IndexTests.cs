@@ -2,7 +2,6 @@ using AngleSharp.Html.Dom;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.IntegrationTransactions;
 
-[NotInParallel]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
@@ -23,10 +22,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/integration-transactions");
-        await WithDbContext(dbContext =>
-            dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync());
-        await WithDbContext(dbContext =>
-            dbContext.IntegrationTransactions.ExecuteDeleteAsync());
 
         // Act
         var response = await HttpClient.SendAsync(request);

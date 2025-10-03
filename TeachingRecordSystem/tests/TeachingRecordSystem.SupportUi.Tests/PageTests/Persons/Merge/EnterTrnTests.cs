@@ -3,7 +3,6 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
-[NotInParallel]
 public class EnterTrnTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
     [Test]

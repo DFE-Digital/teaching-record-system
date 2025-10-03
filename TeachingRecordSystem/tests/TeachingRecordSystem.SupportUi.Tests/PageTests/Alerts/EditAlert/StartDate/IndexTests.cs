@@ -7,7 +7,7 @@ public class IndexTests : StartDateTestBase
 
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(TestUsers.CreateUser(UserRoles.AlertsManagerTraDbs));
     }
 
     [Test]
@@ -15,7 +15,7 @@ public class IndexTests : StartDateTestBase
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
@@ -104,7 +104,7 @@ public class IndexTests : StartDateTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var newStartDate = alert.StartDate!.Value.AddDays(-18);

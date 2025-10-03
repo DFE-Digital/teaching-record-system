@@ -7,7 +7,7 @@ public class IndexTests : LinkTestBase
 
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(TestUsers.CreateUser(UserRoles.AlertsManagerTraDbs));
     }
 
     [Test]
@@ -15,7 +15,7 @@ public class IndexTests : LinkTestBase
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
@@ -101,7 +101,7 @@ public class IndexTests : LinkTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(TestUsers.CreateUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
         var newLink = TestData.GenerateUrl();

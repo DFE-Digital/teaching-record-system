@@ -4,7 +4,6 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-[NotInParallel]
 public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
