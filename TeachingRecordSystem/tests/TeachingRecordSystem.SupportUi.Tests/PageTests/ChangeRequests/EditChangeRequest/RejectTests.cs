@@ -11,7 +11,7 @@ public class RejectTests : TestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenUserHasNoRoles_ReturnsForbidden()
     {
         // Arrange
@@ -30,7 +30,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
+    [Test]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -50,7 +50,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithSupportTaskReferenceForNonExistentSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -65,7 +65,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -83,7 +83,7 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenRejectionReasonChoiceHasNoSelection_ReturnsError()
     {
         // Arrange
@@ -104,7 +104,7 @@ public class RejectTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "RejectionReasonChoice", "Select the reason for rejecting this change");
     }
 
-    [Theory]
+    [Test]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Post_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -130,9 +130,9 @@ public class RejectTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_WhenRejectionReasonChoiceIsNotChangeNoLongerRequired_RedirectsWithFlashMessage(bool isNameChange)
     {
         // Arrange
@@ -151,7 +151,7 @@ public class RejectTests : TestBase
                 b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
         }
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{supportTask.SupportTaskReference}/reject")
         {
@@ -194,7 +194,7 @@ public class RejectTests : TestBase
             }
         });
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             if (isNameChange)
             {
@@ -224,9 +224,9 @@ public class RejectTests : TestBase
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "The request has been rejected");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_WhenRejectionReasonChoiceIsChangeNoLongerRequired_RedirectsWithFlashMessage(bool isNameChange)
     {
         // Arrange
@@ -245,7 +245,7 @@ public class RejectTests : TestBase
                 b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
         }
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{supportTask.SupportTaskReference}/reject")
         {
@@ -276,7 +276,7 @@ public class RejectTests : TestBase
             }
         });
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             SupportTaskUpdatedEvent? actualEvent;
             if (isNameChange)

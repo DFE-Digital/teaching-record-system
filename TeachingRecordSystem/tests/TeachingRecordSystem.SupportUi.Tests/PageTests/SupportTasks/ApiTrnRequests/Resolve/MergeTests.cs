@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequ
 
 public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -32,7 +32,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CreateNewRecordSelected_RedirectsToCheckAnswers()
     {
         // Arrange
@@ -56,8 +56,8 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsNotDifferent_RendersDisabledAndUnselectedRadioButtons(
         PersonMatchedAttribute _,
         string fieldName)
@@ -89,8 +89,8 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         }
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsDifferent_RendersRadioButtonsWithExistingValueHighlighted(
         PersonMatchedAttribute attribute,
         string fieldName)
@@ -127,8 +127,8 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             });
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToTrnRequestInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName)
@@ -167,8 +167,8 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         Assert.True(radios[0].IsChecked());
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToExistingRecordInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName)
@@ -207,7 +207,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         Assert.True(radios[1].IsChecked());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CommentsSetInState_RendersExistingValue()
     {
         // Arrange
@@ -238,7 +238,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -265,7 +265,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CreateNewRecordSelected_RedirectsToCheckAnswers()
     {
         // Arrange
@@ -292,14 +292,14 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(PersonMatchedAttribute.FirstName, "FirstNameSource", "Select a first name")]
-    [InlineData(PersonMatchedAttribute.MiddleName, "MiddleNameSource", "Select a middle name")]
-    [InlineData(PersonMatchedAttribute.LastName, "LastNameSource", "Select a last name")]
-    [InlineData(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
-    [InlineData(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
-    [InlineData(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
-    [InlineData(PersonMatchedAttribute.Gender, "GenderSource", "Select a gender")]
+    [Test]
+    [Arguments(PersonMatchedAttribute.FirstName, "FirstNameSource", "Select a first name")]
+    [Arguments(PersonMatchedAttribute.MiddleName, "MiddleNameSource", "Select a middle name")]
+    [Arguments(PersonMatchedAttribute.LastName, "LastNameSource", "Select a last name")]
+    [Arguments(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
+    [Arguments(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
+    [Arguments(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
+    [Arguments(PersonMatchedAttribute.Gender, "GenderSource", "Select a gender")]
     public async Task Post_AttributeSourceNotSelected_RendersError(
         PersonMatchedAttribute differentAttribute,
         string fieldName,
@@ -326,7 +326,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         await AssertEx.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_EmptyRequestWithNoDifferencesToSelect_Succeeds()
     {
         // Arrange
@@ -352,7 +352,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         Assert.True((int)response.StatusCode < 400);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange
@@ -407,16 +407,16 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         Assert.Equal(genderSelection, journeyInstance.State.GenderSource);
     }
 
-    public static TheoryData<PersonMatchedAttribute, string> AttributesAndFieldsData { get; } = new()
-    {
-        { PersonMatchedAttribute.FirstName, "FirstNameSource" },
-        { PersonMatchedAttribute.MiddleName, "MiddleNameSource" },
-        { PersonMatchedAttribute.LastName, "LastNameSource" },
-        { PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource" },
-        { PersonMatchedAttribute.EmailAddress, "EmailAddressSource" },
-        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource" },
-        { PersonMatchedAttribute.Gender, "GenderSource" }
-    };
+    public static (PersonMatchedAttribute Attribute, string SourceFieldName)[] GetAttributesAndFieldsData() =>
+    [
+        (PersonMatchedAttribute.FirstName, "FirstNameSource"),
+        (PersonMatchedAttribute.MiddleName, "MiddleNameSource"),
+        (PersonMatchedAttribute.LastName, "LastNameSource"),
+        (PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource"),
+        (PersonMatchedAttribute.EmailAddress, "EmailAddressSource"),
+        (PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource"),
+        (PersonMatchedAttribute.Gender, "GenderSource")
+    ];
 
     private async Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(SupportTask supportTask, Guid? personId)
     {

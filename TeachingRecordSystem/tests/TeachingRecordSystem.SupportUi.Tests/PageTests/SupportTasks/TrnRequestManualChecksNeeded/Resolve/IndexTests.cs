@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequest
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -18,7 +18,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_TaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -32,7 +32,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ShowsRequestDetails()
     {
         // Arrange
@@ -59,7 +59,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             f => Assert.Equal("Holds EYTS", f));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -73,7 +73,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_TaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -87,7 +87,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ChecksCompletedAnsweredYes_RedirectsToConfirmPage()
     {
         // Arrange
@@ -109,7 +109,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/confirm", response.Headers.Location?.ToString());
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ChecksCompletedNotAnswered_RendersError()
     {
         // Arrange
@@ -127,7 +127,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChecksCompleted", "You must complete all checks before confirming");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ChecksCompletedAnsweredNo_RedirectsToListPage()
     {
         // Arrange

@@ -5,10 +5,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_RendersNonAttributeValues()
     {
         // Arrange
@@ -48,9 +48,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
         doc.AssertRow("Comments", v => Assert.Equal(comments, v.TrimmedText()));
     }
 
-    [Theory]
-    [MemberData(nameof(PersonAttributeInfoData))]
-    public async Task Get_AttributeSourceIsSecondaryPerson_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromSecondaryPersonAttribute, bool useNullValues)
+    [Test]
+    [MethodDataSource(nameof(GetPersonAttributeInfoData))]
+    public async Task Get_AttributeSourceIsSecondaryPerson_RendersChosenAttributeValues(
+        PersonAttributeInfo sourcedFromSecondaryPersonAttribute,
+        bool useNullValues)
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithSingleDifferenceToMatch(
@@ -110,9 +112,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
         }
     }
 
-    [Theory]
-    [MemberData(nameof(PersonAttributeInfoData))]
-    public async Task Post_UpdatesPrimaryPersonPublishesEventDeactivatesSecondaryPersonCompletesJourneyAndRedirects(PersonAttributeInfo sourcedFromSecondaryPersonAttribute, bool useNullValues)
+    [Test]
+    [MethodDataSource(nameof(GetPersonAttributeInfoData))]
+    public async Task Post_UpdatesPrimaryPersonPublishesEventDeactivatesSecondaryPersonCompletesJourneyAndRedirects(
+        PersonAttributeInfo sourcedFromSecondaryPersonAttribute,
+        bool useNullValues)
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithSingleDifferenceToMatch(
@@ -139,7 +143,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance));
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -185,7 +189,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
         }
 
         // event is published
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<PersonsMergedEvent>(e);
             Assert.Equal(personA.PersonId, actualEvent.PersonId);
@@ -311,7 +315,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergeTestBase(hostFixt
         )
     ];
 
-    public static IEnumerable<object[]> PersonAttributeInfoData { get; } = PersonAttributeInfos.SelectMany(i => new object[][] { [i, false], [i, true] });
+    public static (PersonAttributeInfo Attribute, bool UseNullValues)[] GetPersonAttributeInfoData() =>
+        PersonAttributeInfos.SelectMany(i => new[] { (i, false), (i, true) }).ToArray();
 
     public record PersonAttributeInfo(
         PersonMatchedAttribute Attribute,

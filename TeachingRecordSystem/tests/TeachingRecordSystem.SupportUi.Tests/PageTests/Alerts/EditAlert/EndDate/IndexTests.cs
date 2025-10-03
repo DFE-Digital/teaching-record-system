@@ -9,7 +9,7 @@ public class IndexTests : EndDateTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -28,7 +28,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -44,7 +44,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenAlertHasNoEndDateSet_ReturnsBadRequest()
     {
         // Arrange
@@ -60,7 +60,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -79,7 +79,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal($"{alert.EndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal($"{journeyInstance.State.EndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -117,7 +117,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -133,7 +133,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenAlertHasNoEndDateSet_ReturnsBadRequest()
     {
         // Arrange
@@ -149,7 +149,7 @@ public class IndexTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoEndDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -165,7 +165,7 @@ public class IndexTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenEndDateIsInTheFuture_ReturnsError()
     {
         // Arrange
@@ -185,7 +185,7 @@ public class IndexTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date cannot be in the future");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenEndDateIsBeforeStartDate_ReturnsError()
     {
         // Arrange
@@ -205,7 +205,7 @@ public class IndexTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after the start date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenEndDateIsUnchanged_ReturnsError()
     {
         // Arrange
@@ -225,7 +225,7 @@ public class IndexTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter a different end date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenEndDateIsEntered_RedirectsToChangeReasonPage()
     {
         // Arrange
@@ -246,7 +246,7 @@ public class IndexTests : EndDateTestBase
         Assert.StartsWith($"/alerts/{alert.AlertId}/end-date/change-reason", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -266,8 +266,8 @@ public class IndexTests : EndDateTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

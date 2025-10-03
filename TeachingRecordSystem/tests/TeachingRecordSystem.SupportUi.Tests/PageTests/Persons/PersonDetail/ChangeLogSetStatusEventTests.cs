@@ -3,9 +3,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogSetStatusEventTests : TestBase
+public class ChangeLogSetStatusEventTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ChangeLogSetStatusEventTests(HostFixture hostFixture) : base(hostFixture)
+    [Before(Test)]
+    public void Initialize()
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -16,7 +17,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         Clock.UtcNow = nows.SingleRandom();
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithPersonStatusUpdatedEvent_Deactivated_RendersExpectedContent()
     {
         // Arrange
@@ -81,7 +82,7 @@ public class ChangeLogSetStatusEventTests : TestBase
         doc.AssertRow("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithPersonStatusUpdatedEvent_Reactivated_RendersExpectedContent()
     {
         // Arrange

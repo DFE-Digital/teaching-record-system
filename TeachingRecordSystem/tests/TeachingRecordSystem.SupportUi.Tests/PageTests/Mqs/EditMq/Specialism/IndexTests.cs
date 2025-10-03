@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Specialism;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -21,7 +21,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -44,7 +44,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(databaseSpecialism.ToString(), selectedSpecialism.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(journeySpecialism.ToString(), selectedSpecialism.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_QualificationWasMigratedFromDqtWithLegacySpecialism_ShowsLegacySpecialisms()
     {
         // Arrange
@@ -108,7 +108,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Get_QualificationWasMigratedFromDqtWithNonLegacySpecialism_DoesNotShowLegacySpecialisms()
     {
         // Arrange
@@ -141,7 +141,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -164,7 +164,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoSpecialismIsSelected_ReturnsError()
     {
         // Arrange
@@ -184,7 +184,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenSpecialismIsSelected_RedirectsToReasonPage()
     {
         // Arrange
@@ -216,7 +216,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/specialism/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -246,8 +246,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

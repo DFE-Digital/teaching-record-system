@@ -4,12 +4,12 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Create;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-    [Fact]
+    [Test]
     public async Task Get_ConfirmAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -37,7 +37,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             b => Assert.Equal("Cancel", b.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsPersonalDetails_AsExpected()
     {
         // Arrange
@@ -69,7 +69,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRow("Gender", v => Assert.Equal("Other", v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsMissingOptionalPersonalDetails_AsNotProvided()
     {
         // Arrange
@@ -96,7 +96,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsCreateReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
@@ -129,7 +129,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenMissingAdditionalDetailAndEvidenceFile_ShowsAsNotProvided()
     {
         // Arrange
@@ -156,7 +156,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRows("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -183,7 +183,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance));
 
@@ -217,7 +217,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var raisedBy = GetCurrentUserId();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<PersonCreatedEvent>(e);
 

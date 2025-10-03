@@ -6,10 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Theory]
-    [InlineData(InductionStatus.None)]
-    [InlineData(InductionStatus.Exempt)]
-    [InlineData(InductionStatus.RequiredToComplete)]
+    [Test]
+    [Arguments(InductionStatus.None)]
+    [Arguments(InductionStatus.Exempt)]
+    [Arguments(InductionStatus.RequiredToComplete)]
     public async Task Get_WithInvalidJourneyState_RedirectToStart(InductionStatus inductionStatus)
     {
         // Arrange
@@ -30,7 +30,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithStartDate_ShowsDate()
     {
         // Arrange
@@ -57,7 +57,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(dateValid.Year.ToString(), startDate.ElementAt(2).Value);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidStartDate_PersistsStartDate()
     {
         // Arrange
@@ -84,7 +84,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(dateValid, journeyInstance.State.StartDate);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoStartDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -105,7 +105,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter an induction start date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_StartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
@@ -130,7 +130,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be in the future");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_StartDateIsTooEarly_ReturnsError()
     {
         // Arrange

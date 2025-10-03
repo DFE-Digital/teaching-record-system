@@ -12,7 +12,7 @@ public class ReasonTests : AddAlertTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -31,7 +31,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -47,7 +47,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MissingDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
@@ -64,7 +64,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -80,7 +80,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -111,7 +111,7 @@ public class ReasonTests : AddAlertTestBase
         }
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -130,7 +130,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -146,7 +146,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithMissingDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
@@ -163,7 +163,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoReasonIsSelected_ReturnsError()
     {
         // Arrange
@@ -182,7 +182,7 @@ public class ReasonTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "AddReason", "Select a reason");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoHasAdditionalReasonDetailIsSelected_ReturnsError()
     {
         // Arrange
@@ -203,7 +203,7 @@ public class ReasonTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re adding this alert");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenAdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError()
     {
         // Arrange
@@ -226,7 +226,7 @@ public class ReasonTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter additional detail");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
         // Arrange
@@ -248,7 +248,7 @@ public class ReasonTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
@@ -271,7 +271,7 @@ public class ReasonTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
@@ -294,7 +294,7 @@ public class ReasonTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AdditionalReasonIsTooLong_ReturnsError()
     {
         // Arrange
@@ -317,7 +317,7 @@ public class ReasonTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Additional detail must be 4000 characters or less");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
@@ -353,7 +353,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
@@ -389,7 +389,7 @@ public class ReasonTests : AddAlertTestBase
         Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -408,8 +408,8 @@ public class ReasonTests : AddAlertTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

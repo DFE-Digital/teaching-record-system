@@ -10,7 +10,7 @@ public class IndexTests : LinkTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +29,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -45,7 +45,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -78,7 +78,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(alert.ExternalLink, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -96,7 +96,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -119,7 +119,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -135,7 +135,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -154,9 +154,9 @@ public class IndexTests : LinkTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_NoAddLinkOptionSelected_ReturnsError(bool hasCurrentLink)
     {
         // Arrange
@@ -182,9 +182,9 @@ public class IndexTests : LinkTestBase
         }
     }
 
-    [Theory]
-    [InlineData("invalid url")]
-    [InlineData(null)]
+    [Test]
+    [Arguments("invalid url")]
+    [Arguments(null)]
     public async Task Post_WithInvalidLinkUrl_ReturnsError(string? invalidLink)
     {
         // Arrange
@@ -203,7 +203,7 @@ public class IndexTests : LinkTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithUnchangedLink_ReturnsError()
     {
         // Arrange
@@ -222,7 +222,7 @@ public class IndexTests : LinkTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a different link");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithNoCurrentLinkAndAddLinkOptionNoSelected_RedirectsToPersonAlertsPage()
     {
         // Arrange
@@ -245,7 +245,7 @@ public class IndexTests : LinkTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithLink_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -270,7 +270,7 @@ public class IndexTests : LinkTestBase
         Assert.Equal(newLink, journeyInstance.State.Link);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithNoLink_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -294,7 +294,7 @@ public class IndexTests : LinkTestBase
         Assert.Null(journeyInstance.State.Link);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -314,8 +314,8 @@ public class IndexTests : LinkTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

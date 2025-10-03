@@ -2,25 +2,25 @@ using AngleSharp.Dom;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
-[Collection(nameof(DisableParallelization))]
-public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string RequestPath = "/users";
 
-    public async Task InitializeAsync()
+    [Before(Test)]
+    public async Task DeleteUsersAsync()
     {
         await WithDbContext(async dbContext =>
         {
             await dbContext.Notes.ExecuteDeleteAsync();
+            await dbContext.SupportTasks.ExecuteDeleteAsync();
             await dbContext.Users.ExecuteDeleteAsync();
         });
 
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    [Fact]
+    [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -35,7 +35,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithAccessManagerRole_ReturnsOk()
     {
         // Arrange
@@ -50,7 +50,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestAndUsersFound_RendersUsers()
     {
         // Arrange
@@ -71,10 +71,10 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Contains(user.Email!, element);
     }
 
-    [Theory]
-    [InlineData("?pageNumber=1", 10, "Auser", "Juser")]
-    [InlineData("?pageNumber=2", 10, "Kuser", "Tuser")]
-    [InlineData("?pageNumber=3", 2, "Uuser", "Vuser")]
+    [Test]
+    [Arguments("?pageNumber=1", 10, "Auser", "Juser")]
+    [Arguments("?pageNumber=2", 10, "Kuser", "Tuser")]
+    [Arguments("?pageNumber=3", 2, "Uuser", "Vuser")]
     public async Task Get_ValidRequestAndUsersFound_PaginatesUsersAndSortsByFirstName(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
         // Arrange
@@ -97,18 +97,18 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Contains(expectedLastUserOnPage, userElements[expectedUserCount - 1].InnerHtml);
     }
 
-    [Theory]
-    [InlineData("?keywords=user%20laSTName1", new string[] { "Auser", "Buser", "Cuser", "Duser" })]
-    [InlineData("?keywords=USER%40org2", new string[] { "Duser", "Euser", "Fuser" })]
-    [InlineData("?role=AccessManager", new string[] { "Auser", "Buser" })]
-    [InlineData("?role=RecordManager", new string[] { "Cuser", "Duser", "Euser" })]
-    [InlineData("?role=Viewer", new string[] { "Fuser", "Guser", "Huser", "Iuser" })]
-    [InlineData("?role=AccessManager&role=RecordManager", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser" })]
-    [InlineData("?status=active", new string[] { "Auser", "Cuser", "Euser", "Guser", "Iuser" })]
-    [InlineData("?status=deactivated", new string[] { "Buser", "Duser", "Fuser", "Huser" })]
-    [InlineData("?role=AccessManager&status=active", new string[] { "Auser" })]
-    [InlineData("?role=Viewer&status=deactivated", new string[] { "Fuser", "Huser" })]
-    [InlineData("?keywords=org1&role=AccessManager&role=RecordManager&status=active&status=deactivated", new string[] { "Auser", "Buser", "Cuser" })]
+    [Test]
+    [Arguments("?keywords=user%20laSTName1", new string[] { "Auser", "Buser", "Cuser", "Duser" })]
+    [Arguments("?keywords=USER%40org2", new string[] { "Duser", "Euser", "Fuser" })]
+    [Arguments("?role=AccessManager", new string[] { "Auser", "Buser" })]
+    [Arguments("?role=RecordManager", new string[] { "Cuser", "Duser", "Euser" })]
+    [Arguments("?role=Viewer", new string[] { "Fuser", "Guser", "Huser", "Iuser" })]
+    [Arguments("?role=AccessManager&role=RecordManager", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser" })]
+    [Arguments("?status=active", new string[] { "Auser", "Cuser", "Euser", "Guser", "Iuser" })]
+    [Arguments("?status=deactivated", new string[] { "Buser", "Duser", "Fuser", "Huser" })]
+    [Arguments("?role=AccessManager&status=active", new string[] { "Auser" })]
+    [Arguments("?role=Viewer&status=deactivated", new string[] { "Fuser", "Huser" })]
+    [Arguments("?keywords=org1&role=AccessManager&role=RecordManager&status=active&status=deactivated", new string[] { "Auser", "Buser", "Cuser" })]
     public async Task Get_ValidRequestAndUsersFound_FiltersUsersByKeywordsRoleAndStatus(string query, string[] expectedUserFirstNames)
     {
         // Arrange
@@ -138,13 +138,13 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
     }
 
-    [Theory]
-    [InlineData("?role=AccessManager&pageNumber=1", 10, "Auser", "Juser")]
-    [InlineData("?role=AccessManager&pageNumber=2", 2, "Kuser", "Luser")]
-    [InlineData("?role=RecordManager&pageNumber=1", 10, "Muser", "Vuser")]
-    [InlineData("?role=RecordManager&pageNumber=2", 4, "Wuser", "Zuser")]
-    [InlineData("?role=AccessManager&role=RecordManager&status=active&pageNumber=1", 10, "Auser", "Suser")]
-    [InlineData("?role=AccessManager&role=RecordManager&status=active&pageNumber=2", 3, "Uuser", "Yuser")]
+    [Test]
+    [Arguments("?role=AccessManager&pageNumber=1", 10, "Auser", "Juser")]
+    [Arguments("?role=AccessManager&pageNumber=2", 2, "Kuser", "Luser")]
+    [Arguments("?role=RecordManager&pageNumber=1", 10, "Muser", "Vuser")]
+    [Arguments("?role=RecordManager&pageNumber=2", 4, "Wuser", "Zuser")]
+    [Arguments("?role=AccessManager&role=RecordManager&status=active&pageNumber=1", 10, "Auser", "Suser")]
+    [Arguments("?role=AccessManager&role=RecordManager&status=active&pageNumber=2", 3, "Uuser", "Yuser")]
     public async Task Get_ValidRequestAndUsersFound_PaginatesFilteredUsers(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
         // Arrange
@@ -171,8 +171,8 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Contains(expectedLastUserOnPage, userElements[expectedUserCount - 1].InnerHtml);
     }
 
-    [Theory]
-    [InlineData("?", new string[] {
+    [Test]
+    [Arguments("?", new string[] {
         "Viewer (4)",
         "Record manager (3)",
         "Alerts manager (TRA decisions) (0)",
@@ -182,7 +182,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         "Active (5)",
         "Deactivated (4)"
     })]
-    [InlineData("?status=active", new string[] {
+    [Arguments("?status=active", new string[] {
         "Viewer (2)",
         "Record manager (2)",
         "Alerts manager (TRA decisions) (0)",
@@ -192,7 +192,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         "Active (5)",
         "Deactivated (0)"
     })]
-    [InlineData("?role=AccessManager&role=RecordManager&status=deactivated", new string[] {
+    [Arguments("?role=AccessManager&role=RecordManager&status=deactivated", new string[] {
         "Viewer (0)",
         "Record manager (1)",
         "Alerts manager (TRA decisions) (0)",
@@ -233,9 +233,9 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertElementsInnerTextContains(statusLabels, expectedStatusLabels);
     }
 
-    [Theory]
-    [InlineData("?", new string[] { "Auser", "Buser", "Cuser" })]
-    [InlineData("?role=Administrator", new string[0])]
+    [Test]
+    [Arguments("?", new string[] { "Auser", "Buser", "Cuser" })]
+    [Arguments("?role=Administrator", new string[0])]
     public async Task Get_NonAdministratorUser_DoesNotShowAdministratorUsers(string query, string[] expectedUserFirstNames)
     {
         // Arrange
@@ -259,9 +259,9 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
     }
 
-    [Theory]
-    [InlineData("?", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser", "Fuser" })]
-    [InlineData("?role=Administrator", new string[] { "Duser", "Euser", "Fuser" })]
+    [Test]
+    [Arguments("?", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser", "Fuser" })]
+    [Arguments("?role=Administrator", new string[] { "Duser", "Euser", "Fuser" })]
     public async Task Get_AdministratorUser_ShowsAdministratorUsers(string query, string[] expectedUserFirstNames)
     {
         // Arrange
@@ -285,8 +285,8 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
     }
 
-    [Theory]
-    [InlineData("?", new string[] {
+    [Test]
+    [Arguments("?", new string[] {
         "Viewer (0)",
         "Record manager (0)",
         "Alerts manager (TRA decisions) (0)",
@@ -297,7 +297,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         "Active (3)",
         "Deactivated (2)"
     })]
-    [InlineData("?role=Administrator&status=active", new string[] {
+    [Arguments("?role=Administrator&status=active", new string[] {
         "Viewer (0)",
         "Record manager (0)",
         "Alerts manager (TRA decisions) (0)",

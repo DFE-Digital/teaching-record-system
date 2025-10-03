@@ -4,16 +4,11 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
-[Collection(nameof(DisableParallelization))]
-public class ChangeReasonTests : SetStatusTestBase
+[NotInParallel]
+public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
-    public ChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices(PersonStatus targetStatus)
     {
         // Arrange
@@ -81,8 +76,8 @@ public class ChangeReasonTests : SetStatusTestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ChangeReasonModel.UploadedEvidenceFileUrl)));
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Get_ExpectedRadioButtonsExistOnPage(PersonStatus targetStatus)
     {
         // Arrange
@@ -134,8 +129,8 @@ public class ChangeReasonTests : SetStatusTestBase
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_SetValidReasonDetails_PersistsDetails(PersonStatus targetStatus)
     {
         // Arrange
@@ -184,8 +179,8 @@ public class ChangeReasonTests : SetStatusTestBase
         }
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors(PersonStatus targetStatus)
     {
         // Arrange
@@ -214,8 +209,8 @@ public class ChangeReasonTests : SetStatusTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.UploadEvidence), "Select yes if you want to upload evidence");
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_AnotherReason_NoDetailAdded_ReturnsError(PersonStatus targetStatus)
     {
         // Arrange
@@ -258,8 +253,8 @@ public class ChangeReasonTests : SetStatusTestBase
         }
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError(PersonStatus targetStatus)
     {
         // Arrange
@@ -295,8 +290,8 @@ public class ChangeReasonTests : SetStatusTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.EvidenceFile), "Select a file");
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError(PersonStatus targetStatus)
     {
         // Arrange
@@ -333,8 +328,8 @@ public class ChangeReasonTests : SetStatusTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -383,8 +378,8 @@ public class ChangeReasonTests : SetStatusTestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ChangeReasonModel.UploadedEvidenceFileUrl)));
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -434,8 +429,8 @@ public class ChangeReasonTests : SetStatusTestBase
         Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(ChangeReasonModel.UploadedEvidenceFileUrl)));
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -476,8 +471,8 @@ public class ChangeReasonTests : SetStatusTestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -517,8 +512,8 @@ public class ChangeReasonTests : SetStatusTestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_SetValidFileUpload_PersistsDetails(PersonStatus targetStatus)
     {
         // Arrange
@@ -559,8 +554,8 @@ public class ChangeReasonTests : SetStatusTestBase
         Assert.Equal("1.2 KB", journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload(PersonStatus targetStatus)
     {
         // Arrange
@@ -597,8 +592,8 @@ public class ChangeReasonTests : SetStatusTestBase
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo(PersonStatus targetStatus)
     {
         // Arrange

@@ -3,12 +3,12 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-    [Fact]
+    [Test]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {
         // Arrange
@@ -37,7 +37,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ConfirmAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -66,7 +66,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsPersonalDetails_AsExpected()
     {
         // Arrange
@@ -103,7 +103,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRow("Gender", v => Assert.Equal("Male", v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsMissingOptionalPersonalDetails_AsNotProvided()
     {
         // Arrange
@@ -136,7 +136,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenNameFieldChanged_ShowsNameChangeReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
@@ -176,7 +176,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowDoesNotExist("Evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenOtherDetailsFieldChanged_ShowsDetailsChangeReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
@@ -216,7 +216,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowDoesNotExist("Evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenNameAndOtherFieldsChanged_ShowsNameChangeReasonAndOtherChangeReasonAndEvidenceFiles_AsExpected()
     {
         // Arrange
@@ -263,7 +263,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowDoesNotExist("Reason for personal details change");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenNameFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided()
     {
         // Arrange
@@ -297,7 +297,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowDoesNotExist("Evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenOtherDetailsFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided()
     {
         // Arrange
@@ -331,15 +331,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowDoesNotExist("Evidence");
     }
 
-    [Theory]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName)]
-    [InlineData(PersonDetailsUpdatedEventChanges.MiddleName)]
-    [InlineData(PersonDetailsUpdatedEventChanges.LastName)]
-    [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth)]
-    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress)]
-    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
-    [InlineData(PersonDetailsUpdatedEventChanges.Gender)]
-    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
+    [Test]
+    [Arguments(PersonDetailsUpdatedEventChanges.FirstName)]
+    [Arguments(PersonDetailsUpdatedEventChanges.MiddleName)]
+    [Arguments(PersonDetailsUpdatedEventChanges.LastName)]
+    [Arguments(PersonDetailsUpdatedEventChanges.DateOfBirth)]
+    [Arguments(PersonDetailsUpdatedEventChanges.EmailAddress)]
+    [Arguments(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
+    [Arguments(PersonDetailsUpdatedEventChanges.Gender)]
+    [Arguments(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
     public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonDetailsUpdatedEventChanges changes)
     {
         // Arrange
@@ -378,7 +378,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance));
 
@@ -408,7 +408,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var raisedBy = GetCurrentUserId();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<PersonDetailsUpdatedEvent>(e);
 
@@ -435,7 +435,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.True(journeyInstance.Completed);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsCorrectingAnError_DoesNotUpdatePersonPreviousNames()
     {
         // Arrange
@@ -487,9 +487,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Theory]
-    [InlineData(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)]
-    [InlineData(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)]
+    [Test]
+    [Arguments(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)]
+    [Arguments(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)]
     public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(EditDetailsNameChangeReasonOption reason)
     {
         // Arrange

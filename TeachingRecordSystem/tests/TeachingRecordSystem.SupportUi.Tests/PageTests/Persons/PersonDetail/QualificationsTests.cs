@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForPersonWithNoMandatoryQualifications_DisplaysNoMandatoryQualifications()
     {
         // Arrange
@@ -37,7 +37,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.NotNull(noMandatoryQualifications);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForPersonWithProfessionalStatuses_DisplaysNoProfessionalStatuses()
     {
         // Arrange
@@ -55,10 +55,10 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.NotNull(noProfessionalStatuses);
     }
 
-    [Theory]
-    [InlineData("University of Birmingham", MandatoryQualificationSpecialism.Hearing, "2022-01-05", MandatoryQualificationStatus.Passed, "2022-07-13")]
-    [InlineData("University of Birmingham", MandatoryQualificationSpecialism.Hearing, "2022-01-05", MandatoryQualificationStatus.Deferred, null)]
-    [InlineData(null, null, null, null, null)]
+    [Test]
+    [Arguments("University of Birmingham", MandatoryQualificationSpecialism.Hearing, "2022-01-05", MandatoryQualificationStatus.Passed, "2022-07-13")]
+    [Arguments("University of Birmingham", MandatoryQualificationSpecialism.Hearing, "2022-01-05", MandatoryQualificationStatus.Deferred, null)]
+    [Arguments(null, null, null, null, null)]
     public async Task Get_WithPersonIdForPersonWithMandatoryQualifications_DisplaysExpectedContent(
         string? providerName,
         MandatoryQualificationSpecialism? specialism,
@@ -100,11 +100,11 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(endDate is not null ? endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-end-date-{qualificationId}")!.TrimmedText());
     }
 
-    [Theory]
-    [InlineData(ProfessionalStatusType.EarlyYearsProfessionalStatus)]
-    [InlineData(ProfessionalStatusType.EarlyYearsTeacherStatus)]
-    [InlineData(ProfessionalStatusType.PartialQualifiedTeacherStatus)]
-    [InlineData(ProfessionalStatusType.QualifiedTeacherStatus)]
+    [Test]
+    [Arguments(ProfessionalStatusType.EarlyYearsProfessionalStatus)]
+    [Arguments(ProfessionalStatusType.EarlyYearsTeacherStatus)]
+    [Arguments(ProfessionalStatusType.PartialQualifiedTeacherStatus)]
+    [Arguments(ProfessionalStatusType.QualifiedTeacherStatus)]
     public async Task Get_PersonWithRouteToProfessionalStatus_DisplaysExpectedCardTitle(ProfessionalStatusType statusType)
     {
         // Arrange
@@ -136,7 +136,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(statusType.GetDisplayName(), cardTitle.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonWithRouteToProfessionalStatusApprenticeship_DisplaysExpectedContent()
     {
         // Arrange
@@ -188,7 +188,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "TESTREFERENCE");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonWithRouteToProfessionalStatusGraduateTeacherProgramme_DisplaysExpectedContent()
     {
         // Arrange
@@ -229,7 +229,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonWithRouteToProfessionalStatusNIRecognition_DisplaysExpectedContent()
     {
         // Arrange
@@ -266,7 +266,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonWithRouteToProfessionalStatusHoldsNIRecognition_DisplaysExpectedContent()
     {
         // Arrange
@@ -306,7 +306,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonWithRouteToProfessionalStatus_AgeRangeFromTo_DisplaysExpectedContent()
     {
         // Arrange
@@ -341,13 +341,13 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Age range", $"From {ageFrom} to {ageTo}");
     }
 
-    [Theory]
-    [InlineData(UserRoles.Viewer, true)]
-    [InlineData(UserRoles.AlertsManagerTra, true)]
-    [InlineData(UserRoles.AlertsManagerTraDbs, true)]
-    [InlineData(UserRoles.RecordManager, true)]
-    [InlineData(UserRoles.AccessManager, true)]
-    [InlineData(UserRoles.Administrator, true)]
+    [Test]
+    [Arguments(UserRoles.Viewer, true)]
+    [Arguments(UserRoles.AlertsManagerTra, true)]
+    [Arguments(UserRoles.AlertsManagerTraDbs, true)]
+    [Arguments(UserRoles.RecordManager, true)]
+    [Arguments(UserRoles.AccessManager, true)]
+    [Arguments(UserRoles.Administrator, true)]
     public async Task Get_UserRoles_CanViewPageAsExpected(string userRole, bool canViewPage)
     {
         // Arrange
@@ -365,13 +365,13 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(canViewPage ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(UserRoles.Viewer, false)]
-    [InlineData(UserRoles.AlertsManagerTra, false)]
-    [InlineData(UserRoles.AlertsManagerTraDbs, false)]
-    [InlineData(UserRoles.RecordManager, true)]
-    [InlineData(UserRoles.AccessManager, true)]
-    [InlineData(UserRoles.Administrator, true)]
+    [Test]
+    [Arguments(UserRoles.Viewer, false)]
+    [Arguments(UserRoles.AlertsManagerTra, false)]
+    [Arguments(UserRoles.AlertsManagerTraDbs, false)]
+    [Arguments(UserRoles.RecordManager, true)]
+    [Arguments(UserRoles.AccessManager, true)]
+    [Arguments(UserRoles.Administrator, true)]
     public async Task Get_UserRolesWithViewOrEditRoutesPermissions_EditLinksShownAsExpected(string userRole, bool canSeeEditLinks)
     {
         // Arrange
@@ -444,9 +444,9 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         }
     }
 
-    [Theory]
-    [InlineData(PersonStatus.Active, true)]
-    [InlineData(PersonStatus.Deactivated, false)]
+    [Test]
+    [Arguments(PersonStatus.Active, true)]
+    [Arguments(PersonStatus.Deactivated, false)]
     public async Task Get_PersonStatus_EditLinksShownAsExpected(PersonStatus personStatus, bool canSeeEditLinks)
     {
         // Arrange

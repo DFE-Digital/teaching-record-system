@@ -5,10 +5,14 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNe
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequestManualChecksNeeded;
 
-[Collection(nameof(DisableParallelization))]
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Before(Test)]
+    public Task DeleteTrnRequestManualChecksNeededSupportTasks() => WithDbContext(dbContext =>
+        dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded).ExecuteDeleteAsync());
+
+    [Test]
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
         // Arrange
@@ -24,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithTask_ShowsExpectedDataInResultsTable()
     {
         // Arrange
@@ -58,7 +62,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByFirstName_ShowsMatchingResult()
     {
         // Arrange
@@ -77,7 +81,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByMiddleName_ShowsMatchingResult()
     {
         // Arrange
@@ -96,7 +100,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByLastName_ShowsMatchingResult()
     {
         // Arrange
@@ -115,7 +119,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SearchByMultipleNameParts_ShowsMatchingResult()
     {
         // Arrange
@@ -135,7 +139,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByCreatedOnAscending()
     {
         // Arrange
@@ -158,7 +162,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByNameAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -181,7 +185,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByNameDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -204,7 +208,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByDateOfBirthAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -227,7 +231,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByDateOfBirthDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -250,7 +254,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByCreatedOnAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -275,7 +279,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortByCreatedOnDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -300,7 +304,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortBySourceAscending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -326,7 +330,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask1.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SortBySourceDescending_ShowsRequestsInCorrectOrder()
     {
         // Arrange
@@ -352,7 +356,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsPageOfResults()
     {
         // Arrange
@@ -377,7 +381,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UsesApplicationShortNameIfSetOtherwiseApplicationName()
     {
         // Arrange
@@ -409,11 +413,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             Assert.Equal(expectedSource, source.TrimmedText());
         }
     }
-
-    public Task InitializeAsync() => WithDbContext(dbContext =>
-        dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded).ExecuteDeleteAsync());
-
-    public Task DisposeAsync() => Task.CompletedTask;
 
     private static IElement[] GetResultRows(IHtmlDocument doc) =>
         doc

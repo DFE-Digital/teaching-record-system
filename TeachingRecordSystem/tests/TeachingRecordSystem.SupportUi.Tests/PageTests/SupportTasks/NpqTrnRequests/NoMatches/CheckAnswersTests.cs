@@ -7,10 +7,10 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.NoMatches;
 
-public class CheckAnswersTests : NpqTrnRequestTestBase
+public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
-    {
+    [Before(Test)]
+    public void ConfigureMocks() =>
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
             .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
@@ -20,9 +20,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
                 Trn = req.Trn,
                 TrnToken = Guid.NewGuid().ToString()
             });
-    }
 
-    [Fact]
+    [Test]
     public async Task Get_CreatingNewRecord_HasBackLinkToLandingPage()
     {
         // Arrange
@@ -46,7 +45,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventAndRedirects()
     {
         // Arrange
@@ -64,7 +63,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.NotNull(requestMetadata);
         var comments = Faker.Lorem.Paragraph();
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -127,7 +126,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         {
             ResolvedPersonId = personId
         };
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskEventIsExpected(actualEvent, expectedPersonId: personId);
@@ -138,7 +137,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         });
     }
 
-    public string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
+    private string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
     {
         var banner = doc.GetElementsByClassName("govuk-notification-banner--success").SingleOrDefault();
 

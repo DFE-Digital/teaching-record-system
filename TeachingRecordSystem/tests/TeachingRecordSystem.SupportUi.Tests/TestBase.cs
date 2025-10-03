@@ -6,68 +6,57 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public abstract class TestBase : IDisposable
+[SharedDependenciesDataSource]
+public abstract class TestBase(HostFixture hostFixture)
 {
-    private readonly TestScopedServices _testServices;
-    private readonly IDisposable _trsSyncSubscription;
-
-    protected TestBase(HostFixture hostFixture)
+    [Before(Test)]
+    public void TestSetup(TestContext context)
     {
-        HostFixture = hostFixture;
+        var testScopedServices = TestScopedServices.Reset(HostFixture.Services);
+        testScopedServices.EventObserver.Clear();
 
-        _testServices = TestScopedServices.Reset(hostFixture.Services);
         SetCurrentUser(TestUsers.GetUser(UserRoles.Administrator));
 
-        HttpClient = hostFixture.CreateClient(new()
-        {
-            AllowAutoRedirect = false
-        });
-
-        _trsSyncSubscription = hostFixture.Services.GetRequiredService<TrsDataSyncHelper>().GetSyncedEntitiesObservable()
-            .Subscribe(onNext: static (object[] synced) =>
-            {
-                var events = synced.OfType<EventBase>();
-                foreach (var e in events)
-                {
-                    TestScopedServices.GetCurrent().EventObserver.OnEventCreated(e);
-                }
-            });
+        context.AddAsyncLocalValues();
     }
 
-    public HostFixture HostFixture { get; }
+    protected HostFixture HostFixture { get; } = hostFixture;
 
-    public CaptureEventObserver EventPublisher => _testServices.EventObserver;
+    protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
 
-    public TestableClock Clock => _testServices.Clock;
+    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
 
-    public Mock<Services.AzureActiveDirectory.IAadUserService> AzureActiveDirectoryUserServiceMock => _testServices.AzureActiveDirectoryUserServiceMock;
+    protected Mock<Services.AzureActiveDirectory.IAadUserService> AzureActiveDirectoryUserServiceMock =>
+        TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;
 
-    public HttpClient HttpClient { get; }
+    protected HttpClient HttpClient { get; } = hostFixture.CreateClient(new()
+    {
+        AllowAutoRedirect = false
+    });
 
-    public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+    protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
-    public TestUsers TestUsers => HostFixture.Services.GetRequiredService<TestUsers>();
+    protected TestUsers TestUsers => HostFixture.Services.GetRequiredService<TestUsers>();
 
-    public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
+    protected IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
-    public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
+    protected TestableFeatureProvider FeatureProvider => TestScopedServices.GetCurrent().FeatureProvider;
 
-    public ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
+    protected ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
 
-    public Mock<IFileService> FileServiceMock => _testServices.BlobStorageFileServiceMock;
+    protected Mock<IFileService> FileServiceMock => TestScopedServices.GetCurrent().BlobStorageFileServiceMock;
 
-    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
+    protected Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => TestScopedServices.GetCurrent().GetAnIdentityApiClientMock;
 
-    public TrnRequestOptions TrnRequestOptions => _testServices.TrnRequestOptions;
+    protected TrnRequestOptions TrnRequestOptions => TestScopedServices.GetCurrent().TrnRequestOptions;
 
-    public async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
+    protected async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
             string journeyName,
             TState state,
             params KeyValuePair<string, object>[] keys)
@@ -95,7 +84,7 @@ public abstract class TestBase : IDisposable
         return (JourneyInstance<TState>)instance;
     }
 
-    public async Task<TState> CreateJourneyStateWithFactory<TFactory, TState>(Func<TFactory, Task<TState>> createState)
+    protected async Task<TState> CreateJourneyStateWithFactory<TFactory, TState>(Func<TFactory, Task<TState>> createState)
         where TFactory : IJourneyStateFactory<TState>
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
@@ -103,17 +92,12 @@ public abstract class TestBase : IDisposable
         return await createState(factory);
     }
 
-    public async Task<JourneyInstance<TState>> ReloadJourneyInstance<TState>(JourneyInstance<TState> journeyInstance)
+    protected async Task<JourneyInstance<TState>> ReloadJourneyInstance<TState>(JourneyInstance<TState> journeyInstance)
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
         var reloadedInstance = await stateProvider.GetInstanceAsync(journeyInstance.InstanceId, typeof(TState));
         return (JourneyInstance<TState>)reloadedInstance!;
-    }
-
-    public virtual void Dispose()
-    {
-        _trsSyncSubscription.Dispose();
     }
 
     protected Guid GetCurrentUserId()
@@ -128,14 +112,14 @@ public abstract class TestBase : IDisposable
         currentUserProvider.CurrentUser = user;
     }
 
-    public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
+    protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
         var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 
-    public virtual Task WithDbContext(Func<TrsDbContext, Task> action) =>
+    protected Task WithDbContext(Func<TrsDbContext, Task> action) =>
         WithDbContext(async dbContext =>
         {
             await action(dbContext);
@@ -174,93 +158,6 @@ public abstract class TestBase : IDisposable
         var byteArrayContent = new ByteArrayContent(content ?? []);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
         return byteArrayContent;
-    }
-
-    public static TheoryData<HttpMethod> HttpMethods(TestHttpMethods httpMethods)
-    {
-        var data = new TheoryData<HttpMethod>();
-
-        foreach (var httpMethod in httpMethods.AsHttpMethods())
-        {
-            data.Add(httpMethod);
-        }
-
-        return data;
-    }
-
-    public static IEnumerable<object?[]> AllCombinationsOf(object? param1, object? param2)
-    {
-        foreach (var item1 in ToObjectEnumerable(param1))
-        {
-            foreach (var item2 in ToObjectEnumerable(param2))
-            {
-                yield return [item1, item2];
-            }
-        }
-    }
-
-    public static IEnumerable<object?[]> AllCombinationsOf(object? param1, object? param2, object? param3)
-    {
-        foreach (var item1 in ToObjectEnumerable(param1))
-        {
-            foreach (var item2 in ToObjectEnumerable(param2))
-            {
-                foreach (var item3 in ToObjectEnumerable(param3))
-                {
-                    yield return [item1, item2, item3];
-                }
-            }
-        }
-    }
-
-    public static IEnumerable<object?[]> AllCombinationsOf(object? param1, object? param2, object? param3, object? param4)
-    {
-        foreach (var item1 in ToObjectEnumerable(param1))
-        {
-            foreach (var item2 in ToObjectEnumerable(param2))
-            {
-                foreach (var item3 in ToObjectEnumerable(param3))
-                {
-                    foreach (var item4 in ToObjectEnumerable(param4))
-                    {
-                        yield return [item1, item2, item3, item4];
-                    }
-                }
-            }
-        }
-    }
-
-    private static IEnumerable<object?> ToObjectEnumerable(object? obj) => obj switch
-    {
-        TestHttpMethods httpMethod => httpMethod.AsHttpMethods(),
-        string s => [s],
-        IEnumerable<object?> genericList => genericList,
-        System.Collections.IEnumerable list => list.Cast<object?>(),
-        _ => [obj]
-    };
-}
-
-public enum TestHttpMethods
-{
-    None = 0,
-    Get = 1 << 1,
-    Post = 1 << 2,
-    GetAndPost = Get | Post
-}
-
-public static class TestHttpMethodExtensions
-{
-    public static IEnumerable<HttpMethod> AsHttpMethods(this TestHttpMethods httpMethod)
-    {
-        if ((httpMethod & TestHttpMethods.Get) > 0)
-        {
-            yield return HttpMethod.Get;
-        }
-
-        if ((httpMethod & TestHttpMethods.Post) > 0)
-        {
-            yield return HttpMethod.Post;
-        }
     }
 }
 

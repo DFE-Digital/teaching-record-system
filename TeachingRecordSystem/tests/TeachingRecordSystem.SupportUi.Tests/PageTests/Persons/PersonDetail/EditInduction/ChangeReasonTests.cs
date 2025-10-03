@@ -4,14 +4,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
-public class ChangeReasonTests : TestBase
+public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    [Fact]
+    [Test]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -55,7 +50,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(reasonDetail, additionalDetailTextArea!.Value);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -102,7 +97,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
@@ -135,7 +130,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -158,7 +153,7 @@ public class ChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AdditionalDetailYes_NoDetailAdded_ReturnsError()
     {
         // Arrange
@@ -185,7 +180,7 @@ public class ChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -214,7 +209,7 @@ public class ChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -255,7 +250,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -296,7 +291,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal("http://test.com/file", doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -328,7 +323,7 @@ public class ChangeReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -359,7 +354,7 @@ public class ChangeReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -392,7 +387,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -424,7 +419,7 @@ public class ChangeReasonTests : TestBase
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange

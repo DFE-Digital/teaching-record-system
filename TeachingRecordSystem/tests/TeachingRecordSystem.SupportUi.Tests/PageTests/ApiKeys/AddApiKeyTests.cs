@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys;
 
 public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -21,7 +21,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ApplicationUserDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
@@ -36,7 +36,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -51,7 +51,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -76,7 +76,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ApplicationUserDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
@@ -99,7 +99,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_KeyIsTooLong_RendersErrorMessage()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key must be 100 characters or less");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_KeyIsTooShort_RendersErrorMessage()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key must be at least 16 characters");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_KeyAlreadyExists_RendersErrorMessage()
     {
         // Arrange
@@ -167,7 +167,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key is already in use");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_CreatesApiKeyCreatesEventAndRedirectsToApplicationUserWithFlashMessage()
     {
         // Arrange
@@ -183,7 +183,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
             }
         };
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -203,7 +203,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
             return apiKey;
         });
 
-        EventPublisher.AssertEventsSaved(
+        EventObserver.AssertEventsSaved(
             e =>
             {
                 var apiKeyCreatedEvent = Assert.IsType<ApiKeyCreatedEvent>(e);

@@ -10,7 +10,7 @@ public class IndexTests : TestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithNoRoles_ReturnsForbidden()
     {
         // Arrange
@@ -29,7 +29,7 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
+    [Test]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_UserWithoutSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -49,7 +49,7 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithSupportTaskReferenceForNonExistentSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -64,7 +64,7 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -82,14 +82,14 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true, false, false, false)]
-    [InlineData(false, true, false, true)]
-    [InlineData(false, false, true, false)]
-    [InlineData(true, true, false, true)]
-    [InlineData(true, false, true, false)]
-    [InlineData(false, true, true, true)]
-    [InlineData(true, true, true, true)]
+    [Test]
+    [Arguments(true, false, false, false)]
+    [Arguments(false, true, false, true)]
+    [Arguments(false, false, true, false)]
+    [Arguments(true, true, false, true)]
+    [Arguments(true, false, true, false)]
+    [Arguments(false, true, true, true)]
+    [Arguments(true, true, true, true)]
     public async Task Get_WithSupportTaskReferenceForOpenChangeNameRequestSupportTask_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName, bool evidenceIsPdf)
     {
         // Arrange
@@ -161,7 +161,7 @@ public class IndexTests : TestBase
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithSupportTaskReferenceForOpenChangeDateOfBirthRequestSupportTask_RendersExpectedContent()
     {
         // Arrange

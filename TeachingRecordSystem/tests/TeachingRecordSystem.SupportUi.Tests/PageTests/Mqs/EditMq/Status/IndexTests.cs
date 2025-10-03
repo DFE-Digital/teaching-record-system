@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -21,7 +21,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -48,7 +48,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{databaseEndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -83,7 +83,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{journeyEndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -102,7 +102,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenResultIsNotSelected_ReturnsError()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Status", "Select a status");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenResultIsSelectedAndEndDateHasNotBeenEntered_ReturnsError()
     {
         // Arrange
@@ -146,9 +146,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(1)]
+    [Test]
+    [Arguments(0)]
+    [Arguments(1)]
     public async Task Post_EndDateIsBeforeOrEqualToStartDate_RendersError(int daysBefore)
     {
         // Arrange
@@ -177,7 +177,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after start date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_RedirectsToConfirmPage()
     {
         // Arrange
@@ -207,7 +207,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -230,8 +230,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

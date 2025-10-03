@@ -10,7 +10,7 @@ public class LinkTests : AddAlertTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,10 +29,10 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
-        // Arrange        
+        // Arrange
         var personId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
@@ -45,7 +45,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MissingDetailsInJourneyState_ReturnsOk()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -77,7 +77,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -94,7 +94,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -113,7 +113,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -129,7 +129,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithMissingDetailsDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
@@ -152,7 +152,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Null(journeyInstance.State.Link);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AddLinkNotAnswered_ReturnsError()
     {
         // Arrange
@@ -171,7 +171,7 @@ public class LinkTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "AddLink", "Select yes if you want to add a link to a panel outcome");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithInvalidLinkUrl_ReturnsError()
     {
         // Arrange
@@ -190,7 +190,7 @@ public class LinkTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithLink_UpdatesStateAndRedirectsToStartDatePage()
     {
         // Arrange
@@ -215,7 +215,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Equal(link, journeyInstance.State.Link);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithNoLink_UpdatesStateAndRedirectsToStartDatePage()
     {
         // Arrange
@@ -239,7 +239,7 @@ public class LinkTests : AddAlertTestBase
         Assert.Null(journeyInstance.State.Link);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -258,8 +258,8 @@ public class LinkTests : AddAlertTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

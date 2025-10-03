@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -42,7 +42,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AttributesDifferent_ReturnsHighlightedDifferences()
     {
         // Arrange
@@ -132,7 +132,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -173,7 +173,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithoutSelectingAnswerToUploadEvidence_ReturnsError()
     {
         // Arrange
@@ -211,7 +211,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithoutSelectingAnyRadioButtons_ReturnsErrors()
     {
         // Arrange
@@ -253,7 +253,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "GenderSource", "Select a gender");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange
@@ -313,7 +313,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(false, journeyInstance.State.UploadEvidence);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequestWithEvidenceAttachment_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange

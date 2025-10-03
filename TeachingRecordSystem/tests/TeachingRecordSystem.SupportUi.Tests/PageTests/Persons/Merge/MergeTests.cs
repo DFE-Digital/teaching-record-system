@@ -6,15 +6,10 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
-[Collection(nameof(DisableParallelization))]
-public class MergeTests : MergeTestBase
+[NotInParallel]
+public class MergeTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
-    public MergeTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    [Fact]
+    [Test]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -45,8 +40,8 @@ public class MergeTests : MergeTestBase
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsNotDifferent_RendersDisabledAndUnselectedRadioButtons(
         PersonMatchedAttribute _,
         string fieldName,
@@ -79,8 +74,8 @@ public class MergeTests : MergeTestBase
         }
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsDifferent_RendersRadioButtonsWithExistingValueHighlighted(
         PersonMatchedAttribute attribute,
         string fieldName,
@@ -120,8 +115,8 @@ public class MergeTests : MergeTestBase
             });
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToPrimaryPersonInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName,
@@ -157,8 +152,8 @@ public class MergeTests : MergeTestBase
         Assert.True(radios[0].IsChecked());
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToSecondaryPersonInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName,
@@ -194,7 +189,7 @@ public class MergeTests : MergeTestBase
         Assert.True(radios[1].IsChecked());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_EvidenceAndCommentsSetInState_RendersChoices()
     {
         // Arrange
@@ -238,14 +233,14 @@ public class MergeTests : MergeTestBase
         Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TrimmedText());
     }
 
-    [Theory]
-    [InlineData(PersonMatchedAttribute.FirstName, "FirstNameSource", "Select a first name")]
-    [InlineData(PersonMatchedAttribute.MiddleName, "MiddleNameSource", "Select a middle name")]
-    [InlineData(PersonMatchedAttribute.LastName, "LastNameSource", "Select a last name")]
-    [InlineData(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
-    [InlineData(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
-    [InlineData(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
-    [InlineData(PersonMatchedAttribute.Gender, "GenderSource", "Select a gender")]
+    [Test]
+    [Arguments(PersonMatchedAttribute.FirstName, "FirstNameSource", "Select a first name")]
+    [Arguments(PersonMatchedAttribute.MiddleName, "MiddleNameSource", "Select a middle name")]
+    [Arguments(PersonMatchedAttribute.LastName, "LastNameSource", "Select a last name")]
+    [Arguments(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
+    [Arguments(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
+    [Arguments(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
+    [Arguments(PersonMatchedAttribute.Gender, "GenderSource", "Select a gender")]
     public async Task Post_AttributeSourceNotSelected_RendersError(
         PersonMatchedAttribute differentAttribute,
         string fieldName,
@@ -276,7 +271,7 @@ public class MergeTests : MergeTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -304,7 +299,7 @@ public class MergeTests : MergeTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.EvidenceFile), "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -333,7 +328,7 @@ public class MergeTests : MergeTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -374,7 +369,7 @@ public class MergeTests : MergeTestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -416,7 +411,7 @@ public class MergeTests : MergeTestBase
         Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -449,7 +444,7 @@ public class MergeTests : MergeTestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -481,7 +476,7 @@ public class MergeTests : MergeTestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -514,7 +509,7 @@ public class MergeTests : MergeTestBase
         Assert.Equal("1.2 KB", journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -543,7 +538,7 @@ public class MergeTests : MergeTestBase
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task Post_EmptyRequestWithNoDifferencesToSelect_Succeeds()
     {
         // Arrange
@@ -571,7 +566,7 @@ public class MergeTests : MergeTestBase
         Assert.True((int)response.StatusCode < 400);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange
@@ -634,19 +629,19 @@ public class MergeTests : MergeTestBase
         Assert.Equal(genderSelection, journeyInstance.State.GenderSource);
     }
 
-    public static TheoryData<PersonMatchedAttribute, string, bool> AttributesAndFieldsData { get; } = new()
-    {
-        { PersonMatchedAttribute.FirstName, "FirstNameSource", false },
-        { PersonMatchedAttribute.MiddleName, "MiddleNameSource", false },
-        { PersonMatchedAttribute.LastName, "LastNameSource", false },
-        { PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", false },
-        { PersonMatchedAttribute.EmailAddress, "EmailAddressSource", false },
-        { PersonMatchedAttribute.EmailAddress, "EmailAddressSource", true },
-        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", false },
-        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", true },
-        { PersonMatchedAttribute.Gender, "GenderSource", false },
-        { PersonMatchedAttribute.Gender, "GenderSource", true }
-    };
+    public static (PersonMatchedAttribute Attribute, string FieldName, bool UseNullValues)[] GetAttributesAndFieldsData() =>
+    [
+        (PersonMatchedAttribute.FirstName, "FirstNameSource", false),
+        (PersonMatchedAttribute.MiddleName, "MiddleNameSource", false),
+        (PersonMatchedAttribute.LastName, "LastNameSource", false),
+        (PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", false),
+        (PersonMatchedAttribute.EmailAddress, "EmailAddressSource", false),
+        (PersonMatchedAttribute.EmailAddress, "EmailAddressSource", true),
+        (PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", false),
+        (PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", true),
+        (PersonMatchedAttribute.Gender, "GenderSource", false),
+        (PersonMatchedAttribute.Gender, "GenderSource", true)
+    ];
 
     private string GetRequestPath(CreatePersonResult person, JourneyInstance<MergeState>? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/merge?{journeyInstance?.GetUniqueIdQueryParameter()}";

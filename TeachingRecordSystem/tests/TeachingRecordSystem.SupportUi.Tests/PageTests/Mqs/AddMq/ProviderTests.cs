@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
 public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -23,7 +23,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -40,7 +40,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -63,7 +63,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(provider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -87,7 +87,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoProviderIsSelected_ReturnsError()
     {
         // Arrange
@@ -107,7 +107,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "ProviderId", "Select a training provider");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenProviderIsSelected_RedirectsToSpecialismPage()
     {
         // Arrange
@@ -132,8 +132,8 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

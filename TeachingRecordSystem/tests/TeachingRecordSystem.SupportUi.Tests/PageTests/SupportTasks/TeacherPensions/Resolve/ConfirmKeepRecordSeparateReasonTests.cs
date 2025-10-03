@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -22,7 +22,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ReasonProvided_RendersCorrectContent()
     {
         // Arrange
@@ -66,7 +66,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.Contains(state.Reason, reason.TextContent);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_RecordsDoNotMatch_RendersCorrectContent()
     {
         // Arrange
@@ -110,7 +110,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.Contains(state.KeepSeparateReason.GetDisplayName()!, reason.TextContent);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_RecordsDoNotMatch_SuccessfullyClosesSupportTask()
     {
         // Arrange
@@ -139,7 +139,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], KeepSeparateReason = KeepingRecordSeparateReason.RecordDoesNotMatch };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         // Act
         var request = new HttpRequestMessage(
@@ -162,7 +162,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
             Assert.Null(supportTaskData.SelectedPersonAttributes);
         });
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
             Assert.Equal(state.KeepSeparateReason.Value.GetDisplayName(), actualEvent.Comments);
@@ -184,7 +184,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.True(journeyInstance.Completed);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AnotherReasonProvided_SuccessfullyClosesSupportTask()
     {
         // Arrange
@@ -219,7 +219,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
             Reason = keepReason
         };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         // Act
         var request = new HttpRequestMessage(
@@ -242,7 +242,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
             Assert.Null(supportTaskData.SelectedPersonAttributes);
         });
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
             Assert.Equal(keepReason, actualEvent.Comments);

@@ -10,7 +10,7 @@ public class IndexTests : StartDateTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +29,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -45,7 +45,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertIsClosed_ReturnsBadRequest()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -80,7 +80,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal($"{alert.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -99,7 +99,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal($"{journeyInstance.State.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -122,7 +122,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -141,7 +141,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AlertIsClosed_ReturnsBadRequest()
     {
         // Arrange
@@ -160,7 +160,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoStartDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -179,7 +179,7 @@ public class IndexTests : StartDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_StartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
@@ -198,7 +198,7 @@ public class IndexTests : StartDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date cannot be in the future");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_StartDateIsUnchanged_ReturnsError()
     {
         // Arrange
@@ -217,7 +217,7 @@ public class IndexTests : StartDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a different start date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidStartDateIsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -241,7 +241,7 @@ public class IndexTests : StartDateTestBase
         Assert.Equal(newStartDate, journeyInstance.State.StartDate);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -261,8 +261,8 @@ public class IndexTests : StartDateTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

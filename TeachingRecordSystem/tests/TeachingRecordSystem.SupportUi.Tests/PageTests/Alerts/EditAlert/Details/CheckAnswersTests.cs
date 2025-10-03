@@ -7,7 +7,7 @@ public class CheckAnswersTests : DetailsTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -26,7 +26,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -42,7 +42,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -58,7 +58,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -75,9 +75,9 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.StartsWith($"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Get_WithValidJourneyState_ReturnsOk(bool populateOptional)
     {
         // Arrange
@@ -98,7 +98,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -117,7 +117,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -133,7 +133,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -149,7 +149,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -166,16 +166,16 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.StartsWith($"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional)
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert(!populateOptional);
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -189,7 +189,7 @@ public class CheckAnswersTests : DetailsTestBase
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert changed");
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualAlertUpdatedEvent = Assert.IsType<AlertUpdatedEvent>(e);
 
@@ -236,7 +236,7 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.True(journeyInstance.Completed);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -256,8 +256,8 @@ public class CheckAnswersTests : DetailsTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

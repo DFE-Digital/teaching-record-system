@@ -9,7 +9,7 @@ public class AlertDetailsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -24,7 +24,7 @@ public class AlertDetailsTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertIsOpen_ReturnsBadRequest()
     {
         // Arrange
@@ -42,7 +42,7 @@ public class AlertDetailsTests : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class AlertDetailsTests : TestBase
         Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("End date"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertIsDbsAlertAndUserDoesNotHavePermissionToRead_ReturnsForbidden()
     {
         // Arrange
@@ -87,7 +87,7 @@ public class AlertDetailsTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToRead_ReturnsOk()
     {
         // Arrange
@@ -107,7 +107,7 @@ public class AlertDetailsTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToReadAndWrite_ReturnsOk()
     {
         // Arrange
@@ -127,7 +127,7 @@ public class AlertDetailsTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_DbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
     {
         // Arrange
@@ -148,7 +148,7 @@ public class AlertDetailsTests : TestBase
         Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_DbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
     {
         // Arrange
@@ -169,7 +169,7 @@ public class AlertDetailsTests : TestBase
         Assert.NotEmpty(doc.GetSummaryListActionsForKey("End date"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NonDbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
     {
         // Arrange
@@ -191,7 +191,7 @@ public class AlertDetailsTests : TestBase
         Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NonDbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
     {
         // Arrange

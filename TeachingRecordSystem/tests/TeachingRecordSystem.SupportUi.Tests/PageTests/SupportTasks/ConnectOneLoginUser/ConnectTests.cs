@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ConnectOne
 
 public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_SupportTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -17,13 +17,14 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact(Skip = "Waiting for another support task type")]
+    [Test]
+    [Skip("Waiting for another support task type")]
     public Task Get_SupportTaskIsNotConnectOneLoginUserType_ReturnsNotFound()
     {
         throw new NotImplementedException();
     }
 
-    [Fact]
+    [Test]
     public async Task Get_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
@@ -44,7 +45,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_TrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
@@ -61,7 +62,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ReturnsExpectedContent()
     {
         // Arrange
@@ -79,7 +80,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(oneLoginUser.Email, doc.GetSummaryListValueForKey("Email address"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SupportTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -92,13 +93,14 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact(Skip = "Waiting for another support task type")]
+    [Test]
+    [Skip("Waiting for another support task type")]
     public Task Post_SupportTaskIsNotConnectOneLoginUserType_ReturnsNotFound()
     {
         throw new NotImplementedException();
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
@@ -119,7 +121,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_TrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
@@ -136,7 +138,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_ClosesTaskConnectsUserToPersonAndRedirectsToSupportTaskList()
     {
         // Arrange

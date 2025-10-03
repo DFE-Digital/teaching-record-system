@@ -5,12 +5,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Theory]
-    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Test]
+    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -44,12 +44,12 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         }
     }
 
-    [Theory]
-    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
-    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
-    [InlineData("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Test]
+    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Arguments("Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -79,7 +79,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenAgeRangeFromToIsEntered_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
@@ -121,11 +121,11 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal($"/route/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(TrainingAgeSpecialismType.Range, null, null)]
-    [InlineData(TrainingAgeSpecialismType.Range, 1, null)]
-    [InlineData(TrainingAgeSpecialismType.Range, null, 5)]
-    [InlineData(TrainingAgeSpecialismType.Range, 1, 33)]
+    [Test]
+    [Arguments(TrainingAgeSpecialismType.Range, null, null)]
+    [Arguments(TrainingAgeSpecialismType.Range, 1, null)]
+    [Arguments(TrainingAgeSpecialismType.Range, null, 5)]
+    [Arguments(TrainingAgeSpecialismType.Range, 1, 33)]
     public async Task Post_WhenInputInvalid_ShowsError(TrainingAgeSpecialismType radioChoice, int? ageFrom, int? ageTo)
     {
         // Arrange
@@ -168,10 +168,10 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         var doc = await AssertEx.HtmlResponseAsync(response, StatusCodes.Status400BadRequest);
     }
 
-    [Theory]
-    [InlineData(TrainingAgeSpecialismType.KeyStage4, 1, null)]
-    [InlineData(TrainingAgeSpecialismType.KeyStage4, 1, 5)]
-    [InlineData(TrainingAgeSpecialismType.KeyStage4, 1, 33)]
+    [Test]
+    [Arguments(TrainingAgeSpecialismType.KeyStage4, 1, null)]
+    [Arguments(TrainingAgeSpecialismType.KeyStage4, 1, 5)]
+    [Arguments(TrainingAgeSpecialismType.KeyStage4, 1, 33)]
     public async Task Post_WhenTrainingAgeSpecialismTypeEntered_AndAgeRangeTextEntered_ClearsAgeRangeTextAndPersistsTrainingAgeSpecialismType(TrainingAgeSpecialismType radioChoice, int? ageFrom, int? ageTo)
     {
         // Arrange
@@ -217,7 +217,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Null(journeyInstance.State.TrainingAgeSpecialismRangeTo);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenAgeSpecialismIsEntered_PersistsDataAndRedirectsToSubjects()
     {
         // Arrange
@@ -254,7 +254,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal($"/route/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -293,8 +293,8 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

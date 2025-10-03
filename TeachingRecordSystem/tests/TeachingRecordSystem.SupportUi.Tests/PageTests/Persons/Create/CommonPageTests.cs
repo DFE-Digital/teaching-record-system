@@ -3,15 +3,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Create;
 
-public class CommonPageTests : TestBase
+public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    [Theory]
-    [MemberData(nameof(GetPagesForUserWithoutPersonDataEditPermissionData))]
+    [Test]
+    [MethodDataSource(nameof(GetPagesForUserWithoutPersonDataEditPermissionData))]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string page, string? role)
     {
         // Arrange
@@ -34,10 +29,10 @@ public class CommonPageTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData("create-reason", false, false, "personal-details")]
-    [InlineData("check-answers", false, false, "personal-details")]
-    [InlineData("check-answers", true, false, "create-reason")]
+    [Test]
+    [Arguments("create-reason", false, false, "personal-details")]
+    [Arguments("check-answers", false, false, "personal-details")]
+    [Arguments("check-answers", true, false, "create-reason")]
     public async Task Get_InvalidState_RedirectsToAppropriatePage(string attemptedPage, bool hasPersonalDetails, bool hasCreateReason, string expectedPage)
     {
         // Arrange
@@ -80,9 +75,9 @@ public class CommonPageTests : TestBase
         Assert.Equal(expectedUrl, location);
     }
 
-    [Theory]
-    [InlineData("/create-reason", "/personal-details")]
-    [InlineData("/check-answers", "/create-reason")]
+    [Test]
+    [Arguments("/create-reason", "/personal-details")]
+    [Arguments("/check-answers", "/create-reason")]
     public async Task Get_BacklinkContainsExpected(string fromPage, string expectedBackPage)
     {
         // Arrange
@@ -116,9 +111,9 @@ public class CommonPageTests : TestBase
         Assert.Contains($"/persons/create{expectedBackPage}", backlink.Href);
     }
 
-    [Theory]
-    [InlineData("/personal-details", "/create-reason")]
-    [InlineData("/create-reason", "/check-answers")]
+    [Test]
+    [Arguments("/personal-details", "/create-reason")]
+    [Arguments("/create-reason", "/check-answers")]
     public async Task Post_RedirectsToExpectedPage(string fromPage, string expectedNextPageUrl)
     {
         // Arrange
@@ -165,10 +160,10 @@ public class CommonPageTests : TestBase
         Assert.Equal(expectedUrl, location);
     }
 
-    [Theory]
-    [InlineData("personal-details")]
-    [InlineData("create-reason")]
-    [InlineData("check-answers")]
+    [Test]
+    [Arguments("personal-details")]
+    [Arguments("create-reason")]
+    [Arguments("check-answers")]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToCreateIndexPage(string page)
     {
         // Arrange
@@ -203,10 +198,10 @@ public class CommonPageTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [InlineData("personal-details")]
-    [InlineData("create-reason")]
-    [InlineData("check-answers")]
+    [Test]
+    [Arguments("personal-details")]
+    [Arguments("create-reason")]
+    [Arguments("check-answers")]
     public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile(string page)
     {
         // Arrange
@@ -241,9 +236,9 @@ public class CommonPageTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Theory]
-    [InlineData("personal-details")]
-    [InlineData("create-reason")]
+    [Test]
+    [Arguments("personal-details")]
+    [Arguments("create-reason")]
     public async Task Get_WhenLinkedToFromFromCheckAnswersPage_BacklinkLinksToCheckAnswersPage(string page)
     {
         // Arrange
@@ -276,9 +271,9 @@ public class CommonPageTests : TestBase
         Assert.Contains($"/persons/create/check-answers", backlink!.Href);
     }
 
-    [Theory]
-    [InlineData("personal-details")]
-    [InlineData("create-reason")]
+    [Test]
+    [Arguments("personal-details")]
+    [Arguments("create-reason")]
     public async Task Post_WhenLinkedToFromCheckAnswersPage_AndMoreChangesMade_RedirectsToCheckAnswersPage(string page)
     {
         // Arrange
@@ -325,7 +320,7 @@ public class CommonPageTests : TestBase
         Assert.Equal($"/persons/create/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", location);
     }
 
-    public static TheoryData<string, string?> GetPagesForUserWithoutPersonDataEditPermissionData()
+    public static IEnumerable<(string Page, string? Role)> GetPagesForUserWithoutPersonDataEditPermissionData()
     {
         var pages = new[] { "personal-details", "create-reason", "check-answers" };
 
@@ -333,13 +328,13 @@ public class CommonPageTests : TestBase
             .Append(null)
             .ToArray();
 
-        var data = new TheoryData<string, string?>();
+        var data = new List<(string Page, string? Role)>();
 
         foreach (var page in pages)
         {
             foreach (var role in rolesWithoutWritePermission)
             {
-                data.Add(page, role);
+                data.Add((page, role));
             }
         }
 

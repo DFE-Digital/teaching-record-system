@@ -7,10 +7,10 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
-public class CheckAnswersTests : ResolveApiTrnRequestTestBase
+public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
 {
-    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
-    {
+    [Before(Test)]
+    public void ConfigureMocks() =>
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
             .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
@@ -20,9 +20,8 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
                 Trn = req.Trn,
                 TrnToken = Guid.NewGuid().ToString()
             });
-    }
 
-    [Fact]
+    [Test]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -52,7 +51,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -83,8 +82,8 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(PersonAttributeInfoData))]
+    [Test]
+    [MethodDataSource(nameof(GetPersonAttributeInfos))]
     public async Task Get_AttributeSourceIsTrnRequest_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromRequestDataAttribute)
     {
         // Arrange
@@ -122,7 +121,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         foreach (var kvp in allSummaryListRowValues)
         {
-            var attributeInfo = PersonAttributeInfos.SingleOrDefault(i => i.SummaryListRowKey == kvp.Key);
+            var attributeInfo = GetPersonAttributeInfos().SingleOrDefault(i => i.SummaryListRowKey == kvp.Key);
             if (attributeInfo is null)
             {
                 continue;
@@ -144,13 +143,13 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             else
             {
                 var existingRecordValue = FormatValue(
-                    PersonAttributeInfos.Single(i => i.SummaryListRowKey == kvp.Key, kvp.Key).GetValueFromPerson(matchedPerson));
+                    GetPersonAttributeInfos().Single(i => i.SummaryListRowKey == kvp.Key, kvp.Key).GetValueFromPerson(matchedPerson));
                 Assert.Equal(existingRecordValue, kvp.Value);
             }
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CreatingNewRecord_DoesNotShowTrnRow()
     {
         // Arrange
@@ -178,7 +177,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Null(doc.GetSummaryListValueElementForKey("TRN"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UpdatingExistingRecord_DoesShowTrnRow()
     {
         // Arrange
@@ -207,7 +206,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.NotNull(doc.GetSummaryListValueElementForKey("TRN"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsComments()
     {
         // Arrange
@@ -239,7 +238,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(comments, doc.GetSummaryListValueElementForKey("Comments")?.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CreatingNewRecord_HasBackAndChangeLinksToMatchesPage()
     {
         // Arrange
@@ -271,7 +270,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
     {
         // Arrange
@@ -304,7 +303,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -334,7 +333,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -365,7 +364,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CreatingNewRecord_CreatesNewRecordUpdatesSupportTaskStatusAndRedirects()
     {
         // Arrange
@@ -388,7 +387,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
                 Comments = comments
             });
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -422,7 +421,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
         Assert.Null(supportTaskData.SelectedPersonAttributes);
 
-        EventPublisher.AssertEventsSaved(@event =>
+        EventObserver.AssertEventsSaved(@event =>
         {
             var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
             AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: false, expectedPersonId: person.PersonId, comments);
@@ -435,7 +434,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             $"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskAndRedirects()
     {
         // Arrange
@@ -462,7 +461,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var originalContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -488,7 +487,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
         AssertPersonAttributesMatchPerson(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
 
-        EventPublisher.AssertEventsSaved(@event =>
+        EventObserver.AssertEventsSaved(@event =>
         {
             var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
             AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: true, expectedPersonId: originalContact.Id, comments);
@@ -501,7 +500,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             $"Records merged for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UpdatingExistingRecordAndMatchedRecordDoesNotRequireFurtherChecks_SetsTrnRequestToCompleted()
     {
         // Arrange
@@ -546,7 +545,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Empty(furtherChecksRequiredTasks);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UpdatingExistingRecordAndMatchedRecordDoesRequireFurtherChecks_CreatesSupportTaskAndKeepsTrnRequestPending()
     {
         // Arrange
@@ -649,7 +648,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(comments, @event.Comments);
     }
 
-    public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
+    public static PersonAttributeInfo[] GetPersonAttributeInfos() =>
     [
         new(
             PersonMatchedAttribute.FirstName,
@@ -710,8 +709,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             value => ((Gender?)value)?.GetDisplayName()
         )
     ];
-
-    public static IEnumerable<object[]> PersonAttributeInfoData { get; } = PersonAttributeInfos.Select(i => new object[] { i });
 
     public record PersonAttributeInfo(
         PersonMatchedAttribute Attribute,

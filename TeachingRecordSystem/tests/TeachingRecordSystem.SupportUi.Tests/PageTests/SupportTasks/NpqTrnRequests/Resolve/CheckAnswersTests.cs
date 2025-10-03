@@ -8,10 +8,10 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
-public class CheckAnswersTests : NpqTrnRequestTestBase
+public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
-    {
+    [Before(Test)]
+    public void ConfigureMocks() =>
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
             .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
@@ -21,9 +21,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
                 Trn = req.Trn,
                 TrnToken = Guid.NewGuid().ToString()
             });
-    }
 
-    [Fact]
+    [Test]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -53,7 +52,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -84,8 +83,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(PersonAttributeInfoData))]
+    [Test]
+    [MethodDataSource(nameof(GetPersonAttributeInfos))]
     public async Task Get_AttributeSourceIsTrnRequest_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromRequestDataAttribute)
     {
         // Arrange
@@ -123,7 +122,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         foreach (var kvp in allSummaryListRowValues)
         {
-            var attributeInfo = PersonAttributeInfos.SingleOrDefault(i => i.SummaryListRowKey == kvp.Key);
+            var attributeInfo = GetPersonAttributeInfos().SingleOrDefault(i => i.SummaryListRowKey == kvp.Key);
             if (attributeInfo is null)
             {
                 continue;
@@ -145,13 +144,13 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             else
             {
                 var existingRecordValue = FormatValue(
-                    PersonAttributeInfos.Single(i => i.SummaryListRowKey == kvp.Key, kvp.Key).GetValueFromPerson(matchedPerson));
+                    GetPersonAttributeInfos().Single(i => i.SummaryListRowKey == kvp.Key, kvp.Key).GetValueFromPerson(matchedPerson));
                 Assert.Equal(existingRecordValue, kvp.Value);
             }
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CreatingNewRecord_DoesNotShowTrnRow()
     {
         // Arrange
@@ -179,7 +178,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Null(doc.GetSummaryListValueElementForKey("TRN"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UpdatingExistingRecord_DoesShowTrnRow()
     {
         // Arrange
@@ -208,7 +207,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.NotNull(doc.GetSummaryListValueElementForKey("TRN"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsComments()
     {
         // Arrange
@@ -240,7 +239,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Equal(comments, doc.GetSummaryListValueElementForKey("Comments")?.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
     {
         // Arrange
@@ -273,7 +272,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CreatingNewRecord_RequestHasMatches_HasBackLinkAndChangeLinkToMatchPage()
     {
         // Arrange
@@ -306,7 +305,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -336,7 +335,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -367,11 +366,11 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(PersonMatchedAttribute.EmailAddress)]
-    [InlineData(PersonMatchedAttribute.DateOfBirth)]
-    [InlineData(PersonMatchedAttribute.NationalInsuranceNumber)]
-    [InlineData(PersonMatchedAttribute.Gender)]
+    [Test]
+    [Arguments(PersonMatchedAttribute.EmailAddress)]
+    [Arguments(PersonMatchedAttribute.DateOfBirth)]
+    [Arguments(PersonMatchedAttribute.NationalInsuranceNumber)]
+    [Arguments(PersonMatchedAttribute.Gender)]
     public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects(PersonMatchedAttribute attribute)
     {
         // Arrange
@@ -412,7 +411,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -487,7 +486,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         {
             ResolvedPersonId = matchedPerson.PersonId
         };
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskUpdatedEventIsExpected(actualEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
@@ -507,8 +506,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.True(journeyInstance.Completed);
     }
 
-    [Theory]
-    [MemberData(nameof(PersonAttributeInfoData))]
+    [Test]
+    [MethodDataSource(nameof(GetPersonAttributeInfos))]
     public async Task Post_UpdatingExistingRecord_OnlyUpdatesAttributesSourcedFromRequestData(PersonAttributeInfo attributeSourcedFromRequestData)
     {
         // Arrange
@@ -550,8 +549,8 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         });
     }
 
-    [Theory]
-    [MemberData(nameof(PersonAttributeInfoData))]
+    [Test]
+    [MethodDataSource(nameof(GetPersonAttributeInfos))]
     public async Task Post_UpdatingExistingRecord_UpdatesSupportTask(PersonAttributeInfo attributeSourcedFromRequestData)
     {
         // Arrange
@@ -607,7 +606,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         });
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects()
     {
         // Arrange
@@ -633,7 +632,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
                 Comments = comments
             });
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -696,7 +695,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         {
             ResolvedPersonId = personId
         };
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<NpqTrnRequestSupportTaskResolvedEvent>(e);
             AssertSupportTaskUpdatedEventIsExpected(actualEvent, expectedPersonId: personId, expectOldPersonAttributes: false, comments: comments);
@@ -710,7 +709,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.True(journeyInstance.Completed);
     }
 
-    public string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
+    private string? GetLinkToPersonFromBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
     {
         var banner = doc.GetElementsByClassName("govuk-notification-banner--success").SingleOrDefault();
 
@@ -800,7 +799,7 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
         Assert.Equivalent(expected.Matches, actual.Matches);
     }
 
-    public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
+    public static PersonAttributeInfo[] GetPersonAttributeInfos() =>
     [
         new(
             PersonMatchedAttribute.DateOfBirth,
@@ -833,8 +832,6 @@ public class CheckAnswersTests : NpqTrnRequestTestBase
             value => ((Gender?)value)?.GetDisplayName()
         )
     ];
-
-    public static IEnumerable<object[]> PersonAttributeInfoData { get; } = PersonAttributeInfos.Select(i => new object[] { i });
 
     public record PersonAttributeInfo(
         PersonMatchedAttribute Attribute,

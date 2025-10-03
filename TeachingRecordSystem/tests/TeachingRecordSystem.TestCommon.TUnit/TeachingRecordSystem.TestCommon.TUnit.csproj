@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="TUnit.Assertions" />
+    <PackageReference Include="TUnit.Core" />
   </ItemGroup>
 
   <ItemGroup>

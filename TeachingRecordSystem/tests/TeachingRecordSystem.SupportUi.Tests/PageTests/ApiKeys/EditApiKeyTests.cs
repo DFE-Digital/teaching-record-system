@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys;
 
 public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -20,7 +20,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ApiKeyDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -35,7 +35,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -52,7 +52,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(apiKey.Key, doc.GetElementById("Key")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_KeyIsExpired_HasDisabledExpireButton()
     {
         // Arrange
@@ -69,7 +69,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_KeyIsNotExpired_HasNonDisabledExpireButton()
     {
         // Arrange
@@ -86,7 +86,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 
-    [Fact]
+    [Test]
     public async Task PostExpire_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -104,7 +104,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task PostExpire_KeyDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -120,7 +120,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     //
-    [Fact]
+    [Test]
     public async Task PostExpire_KeyIsAlreadyExpired_ReturnsBadRequest()
     {
         // Arrange
@@ -136,7 +136,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task PostExpire_ValidRequest_SetsExpiresOnApiKeyCreatesEventAndRedirectsToApplicationUserWithFlashMessage()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/{apiKey.ApiKeyId}/Expire");
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -160,7 +160,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(Clock.UtcNow, apiKey.Expires);
         });
 
-        EventPublisher.AssertEventsSaved(
+        EventObserver.AssertEventsSaved(
             e =>
             {
                 var apiKeyUpdatedEvent = Assert.IsType<ApiKeyUpdatedEvent>(e);

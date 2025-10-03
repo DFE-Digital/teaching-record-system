@@ -3,14 +3,14 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Merge;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Merge;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
 {
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] { "matches", "merge", "check-answers" },
-        TestHttpMethods.GetAndPost)]
-    public async Task OtherTrnNotSelected_RedirectsToEnterTrnPage(string page, HttpMethod httpMethod)
+    [Test]
+    [MatrixDataSource]
+    public async Task OtherTrnNotSelected_RedirectsToEnterTrnPage(
+        [Matrix("matches", "merge", "check-answers")] string page,
+        [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         var personA = await TestData.CreatePersonAsync(p => p
             .WithPersonDataSource(TestDataPersonDataSource.Trs));
@@ -31,11 +31,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
             $"/persons/{personA.PersonId}/merge/enter-trn?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] { "merge", "check-answers" },
-        TestHttpMethods.GetAndPost)]
-    public async Task PrimaryPersonNotSelected_RedirectsToMatches(string page, HttpMethod httpMethod)
+    [Test]
+    [MatrixDataSource]
+    public async Task PrimaryPersonNotSelected_RedirectsToMatches(
+        [Matrix("merge", "check-answers")] string page,
+        [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -56,11 +56,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
             $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        "check-answers",
-        TestHttpMethods.GetAndPost)]
-    public async Task PersonAttributeSourcesNotSet_RedirectsToMerge(string page, HttpMethod httpMethod)
+    [Test]
+    [MatrixDataSource]
+    public async Task PersonAttributeSourcesNotSet_RedirectsToMerge(
+        [Matrix("check-answers")] string page,
+        [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -83,11 +83,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        "check-answers",
-        TestHttpMethods.GetAndPost)]
-    public async Task UploadEvidenceNotSet_RedirectsToMerge(string page, HttpMethod httpMethod)
+    [Test]
+    [MatrixDataSource]
+    public async Task UploadEvidenceNotSet_RedirectsToMerge(
+        [Matrix("check-answers")] string page,
+        [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -110,11 +110,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        "check-answers",
-        TestHttpMethods.GetAndPost)]
-    public async Task UploadEvidenceSetToTrue_ButEvidenceFileNotUploaded_RedirectsToMerge(string page, HttpMethod httpMethod)
+    [Test]
+    [MatrixDataSource]
+    public async Task UploadEvidenceSetToTrue_ButEvidenceFileNotUploaded_RedirectsToMerge(
+        [Matrix("check-answers")] string page,
+        [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
@@ -138,11 +138,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
-    [Theory]
-    [InlineData("enter-trn", null)]
-    [InlineData("matches", "enter-trn")]
-    [InlineData("merge", "matches")]
-    [InlineData("check-answers", "merge")]
+    [Test]
+    [Arguments("enter-trn", null)]
+    [Arguments("matches", "enter-trn")]
+    [Arguments("merge", "matches")]
+    [Arguments("check-answers", "merge")]
     public async Task Get_BacklinkLinksToExpected(string page, string? expectedPage)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
@@ -174,11 +174,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Contains(expectedBackLink, backlink.Href);
     }
 
-    [Theory]
-    [InlineData("enter-trn", "check-answers")]
-    [InlineData("matches", "check-answers")]
-    [InlineData("merge", "check-answers")]
-    [InlineData("check-answers", "merge")]
+    [Test]
+    [Arguments("enter-trn", "check-answers")]
+    [Arguments("matches", "check-answers")]
+    [Arguments("merge", "check-answers")]
+    [Arguments("check-answers", "merge")]
     public async Task Get_FromCheckAnswers_BacklinkLinksToExpected(string page, string? expectedPage)
     {
         var (personA, personB) = await CreatePersonsWithNoDifferences();
@@ -210,11 +210,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Contains(expectedBackLink, backlink.Href);
     }
 
-    [Theory]
-    [InlineData("enter-trn", "Continue", "Cancel and return to record")]
-    [InlineData("matches", "Continue", "Cancel and return to record")]
-    [InlineData("merge", "Continue", "Cancel and return to record")]
-    [InlineData("check-answers", "Confirm and update primary record", "Cancel")]
+    [Test]
+    [Arguments("enter-trn", "Continue", "Cancel and return to record")]
+    [Arguments("matches", "Continue", "Cancel and return to record")]
+    [Arguments("merge", "Continue", "Cancel and return to record")]
+    [Arguments("check-answers", "Confirm and update primary record", "Cancel")]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage(string page, string continueButtonText, string cancelButtonText)
     {
         // Arrange
@@ -244,11 +244,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
             b => Assert.Equal(cancelButtonText, b.TrimmedText()));
     }
 
-    [Theory]
-    [InlineData("enter-trn")]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
+    [Test]
+    [Arguments("enter-trn")]
+    [Arguments("matches")]
+    [Arguments("merge")]
+    [Arguments("check-answers")]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetailPage(string page)
     {
         // Arrange
@@ -283,11 +283,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [InlineData("enter-trn")]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
+    [Test]
+    [Arguments("enter-trn")]
+    [Arguments("matches")]
+    [Arguments("merge")]
+    [Arguments("check-answers")]
     public async Task Post_PersonAIsDeactivated_ReturnsBadRequest(string page)
     {
         // Arrange
@@ -326,11 +326,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Theory]
-    [InlineData("enter-trn")]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
+    [Test]
+    [Arguments("enter-trn")]
+    [Arguments("matches")]
+    [Arguments("merge")]
+    [Arguments("check-answers")]
     public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest(string page)
     {
         // Arrange
@@ -363,11 +363,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] { "enter-trn", "matches", "merge", "check-answers" },
-        new[] { InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
-    public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(string page, InductionStatus status)
+    [Test]
+    [MatrixDataSource]
+    public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(
+        [Matrix("enter-trn", "matches", "merge", "check-answers")] string page,
+        [Matrix(InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed)] InductionStatus status)
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences(p => p
@@ -403,10 +403,10 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Theory]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
+    [Test]
+    [Arguments("matches")]
+    [Arguments("merge")]
+    [Arguments("check-answers")]
     public async Task Post_PersonBIsDeactivated_ReturnsBadRequest(string page)
     {
         // Arrange
@@ -445,10 +445,10 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Theory]
-    [InlineData("matches")]
-    [InlineData("merge")]
-    [InlineData("check-answers")]
+    [Test]
+    [Arguments("matches")]
+    [Arguments("merge")]
+    [Arguments("check-answers")]
     public async Task Post_PersonBHasOpenAlert_ReturnsBadRequest(string page)
     {
         // Arrange
@@ -481,11 +481,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] { "matches", "merge", "check-answers" },
-        new[] { InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
-    public async Task Post_PersonBHasInvalidInductionStatus_ReturnsBadRequest(string page, InductionStatus status)
+    [Test]
+    [MatrixDataSource]
+    public async Task Post_PersonBHasInvalidInductionStatus_ReturnsBadRequest(
+        [Matrix("matches", "merge", "check-answers")] string page,
+        [Matrix(InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed)] InductionStatus status)
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences(configurePersonB: p => p
@@ -521,11 +521,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Theory]
-    [InlineData("enter-trn", "matches")]
-    [InlineData("matches", "merge")]
-    [InlineData("merge", "check-answers")]
-    [InlineData("check-answers", null)]
+    [Test]
+    [Arguments("enter-trn", "matches")]
+    [Arguments("matches", "merge")]
+    [Arguments("merge", "check-answers")]
+    [Arguments("check-answers", null)]
     public async Task Post_RedirectsToExpected(string page, string? expectedPage)
     {
         // Arrange
@@ -563,11 +563,11 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
     }
 
-    [Theory]
-    [InlineData("enter-trn", "check-answers")]
-    [InlineData("matches", "check-answers")]
-    [InlineData("merge", "check-answers")]
-    [InlineData("check-answers", null)]
+    [Test]
+    [Arguments("enter-trn", "check-answers")]
+    [Arguments("matches", "check-answers")]
+    [Arguments("merge", "check-answers")]
+    [Arguments("check-answers", null)]
     public async Task Post_FromCheckAnswers_RedirectsToExpected(string page, string? expectedPage)
     {
         // Arrange

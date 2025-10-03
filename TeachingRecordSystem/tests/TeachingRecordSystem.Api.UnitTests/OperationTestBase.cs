@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
@@ -13,6 +14,30 @@ public abstract class OperationTestBase
 {
     [SharedDependenciesDataSource]
     public required IServiceProvider Services { get; init; }
+
+    [Before(Test)]
+    public void TestSetup(TestContext context)
+    {
+        var transactionScope = new TransactionScope(
+            TransactionScopeOption.RequiresNew,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
+
+        var testScopedServices = TestScopedServices.Reset(Services);
+        testScopedServices.EventObserver.Clear();
+
+        context.AddAsyncLocalValues();
+    }
+
+    [After(Test)]
+    public void TestTeardown(TestContext context)
+    {
+        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
+        {
+            txn.Dispose();
+        }
+    }
 
     protected TestableClock Clock => (TestableClock)Services.GetRequiredService<IClock>();
 

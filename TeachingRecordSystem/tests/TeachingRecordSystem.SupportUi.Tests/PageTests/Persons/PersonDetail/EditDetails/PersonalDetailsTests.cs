@@ -3,10 +3,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {
         // Arrange
@@ -33,7 +33,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("Alfred The Great", caption!.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -59,7 +59,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_InitializesJourneyStateWithPersonData()
     {
         // Arrange
@@ -107,7 +107,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("Female", genderSelection.Value.Trim());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PersonDataIsInvalid_JourneyInitializationDoesNotError()
     {
         // Arrange
@@ -137,7 +137,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("invalid", nationalInsuranceNumber.Value.Trim());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PopulatesFieldsFromJourneyState()
     {
         // Arrange
@@ -181,12 +181,12 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("Other", genderSelection.Value.Trim());
     }
 
-    [Theory]
-    [InlineData(Gender.Male, new string[] { "Male", "Female", "Other", "Not provided" })]
-    [InlineData(Gender.Female, new string[] { "Male", "Female", "Other", "Not provided" })]
-    [InlineData(Gender.Other, new string[] { "Male", "Female", "Other", "Not provided" })]
-    [InlineData(null, new string[] { "Male", "Female", "Other", "Not provided" })]
-    [InlineData(Gender.NotAvailable, new string[] { "Male", "Female", "Other", "Not available", "Not provided" })]
+    [Test]
+    [Arguments(Gender.Male, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [Arguments(Gender.Female, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [Arguments(Gender.Other, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [Arguments(null, new string[] { "Male", "Female", "Other", "Not provided" })]
+    [Arguments(Gender.NotAvailable, new string[] { "Male", "Female", "Other", "Not available", "Not provided" })]
     public async Task Get_NotAvailableGender_OptionNotVisible_UnlessPreExistingValueOnPersonRecord(Gender? preExistingGenderValue, string[] expectedOptions)
     {
         // Arrange
@@ -213,7 +213,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Collection(genderOptions, expectedOptions.Select(AssertRadioButtonLabel).ToArray());
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FirstNameMissing_ShowsPageError()
     {
         // Arrange
@@ -241,7 +241,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.FirstName), "Enter the person\u2019s first name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FirstNameWhiteSpace_ShowsPageError()
     {
         // Arrange
@@ -269,7 +269,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.FirstName), "Enter the person\u2019s first name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FirstNameMoreThan100Characters_ShowsPageError()
     {
         // Arrange
@@ -297,7 +297,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.FirstName), "Person\u2019s first name must be 100 characters or less");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_MiddleNameMoreThan100Characters_ShowsPageError()
     {
         // Arrange
@@ -325,7 +325,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.MiddleName), "Person\u2019s middle name must be 100 characters or less");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_LastNameMissing_ShowsPageError()
     {
         // Arrange
@@ -353,7 +353,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.LastName), "Enter the person\u2019s last name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_LastNameWhiteSpace_ShowsPageError()
     {
         // Arrange
@@ -381,7 +381,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.LastName), "Enter the person\u2019s last name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_LastNameMoreThan100Characters_ShowsPageError()
     {
         // Arrange
@@ -409,7 +409,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.LastName), "Person\u2019s last name must be 100 characters or less");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_DateOfBirthMissing_ShowsPageError()
     {
         // Arrange
@@ -437,7 +437,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.DateOfBirth), "Enter the person\u2019s date of birth");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_DateOfBirthInTheFuture_ShowsPageError()
     {
         // Arrange
@@ -465,7 +465,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.DateOfBirth), "Person\u2019s date of birth must be in the past");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_EmailAddressMoreThan100Characters_ShowsPageError()
     {
         // Arrange
@@ -494,18 +494,18 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.EmailAddress), "Person\u2019s email address must be 100 characters or less");
     }
 
-    [Theory]
-    [InlineData("test", false)]
-    [InlineData("test.test.test", false)]
-    [InlineData("test@test", false)]
-    [InlineData("test@test.%test", false)]
-    [InlineData("test@test..test", false)]
-    [InlineData("test@test.t", false)]
-    [InlineData("test@\"test\".test", false)]
-    [InlineData("test.test.test.test@test.test.test.test", true)]
-    [InlineData(".!#$%&'*+/=?^_`{|}~-@test.test", true)]
+    [Test]
+    [Arguments("test", false)]
+    [Arguments("test.test.test", false)]
+    [Arguments("test@test", false)]
+    [Arguments("test@test.%test", false)]
+    [Arguments("test@test..test", false)]
+    [Arguments("test@test.t", false)]
+    [Arguments("test@\"test\".test", false)]
+    [Arguments("test.test.test.test@test.test.test.test", true)]
+    [Arguments(".!#$%&'*+/=?^_`{|}~-@test.test", true)]
     // Ignore surrounding whitespace
-    [InlineData("    test@test.test    ", true)]
+    [Arguments("    test@test.test    ", true)]
     public async Task Post_ValidatesEmailAddress_ShowsPageErrorIfInvalid(string emailAddress, bool shouldBeValid)
     {
         // Arrange
@@ -541,52 +541,52 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
     }
 
-    [Theory]
+    [Test]
     // https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
     // A NINO is made up of 2 letters, 6 numbers and a final letter, which is always A, B, C, or D.
-    [InlineData("test", false)]
-    [InlineData("A 12 34 56 A", false)]
-    [InlineData("AB 12 34 56 AB", false)]
-    [InlineData("AB 12 34 5 A", false)]
-    [InlineData("AB 12 34 56 7 A", false)]
-    [InlineData("AB CD 34 56 A", false)]
-    [InlineData("AB 12 34 56 A", true)]
-    [InlineData("AB 12 34 56 B", true)]
-    [InlineData("AB 12 34 56 C", true)]
-    [InlineData("AB 12 34 56 D", true)]
-    [InlineData("AB 12 34 56 E", false)]
-    [InlineData("AB 12 34 56 X", false)]
+    [Arguments("test", false)]
+    [Arguments("A 12 34 56 A", false)]
+    [Arguments("AB 12 34 56 AB", false)]
+    [Arguments("AB 12 34 5 A", false)]
+    [Arguments("AB 12 34 56 7 A", false)]
+    [Arguments("AB CD 34 56 A", false)]
+    [Arguments("AB 12 34 56 A", true)]
+    [Arguments("AB 12 34 56 B", true)]
+    [Arguments("AB 12 34 56 C", true)]
+    [Arguments("AB 12 34 56 D", true)]
+    [Arguments("AB 12 34 56 E", false)]
+    [Arguments("AB 12 34 56 X", false)]
     // 2025-07-03: F|M|U are allowed as postfixes to accomodate legacy data
-    [InlineData("AB 12 34 56 F", true)]
-    [InlineData("AB 12 34 56 M", true)]
-    [InlineData("AB 12 34 56 U", true)]
+    [Arguments("AB 12 34 56 F", true)]
+    [Arguments("AB 12 34 56 M", true)]
+    [Arguments("AB 12 34 56 U", true)]
     // The characters D, F, I, (Q), U, and V are not used as either the first or second letter of a NINO prefix.
     // 2025-07-03: Q is allowed as a prefix to accomodate legacy data
-    [InlineData("DA 12 34 56 A", false)]
-    [InlineData("FA 12 34 56 A", false)]
-    [InlineData("IA 12 34 56 A", false)]
-    [InlineData("QA 12 34 56 A", true)]
-    [InlineData("UA 12 34 56 A", false)]
-    [InlineData("VA 12 34 56 A", false)]
-    [InlineData("AD 12 34 56 A", false)]
-    [InlineData("AF 12 34 56 A", false)]
-    [InlineData("AI 12 34 56 A", false)]
-    [InlineData("AQ 12 34 56 A", true)]
-    [InlineData("AU 12 34 56 A", false)]
-    [InlineData("AV 12 34 56 A", false)]
+    [Arguments("DA 12 34 56 A", false)]
+    [Arguments("FA 12 34 56 A", false)]
+    [Arguments("IA 12 34 56 A", false)]
+    [Arguments("QA 12 34 56 A", true)]
+    [Arguments("UA 12 34 56 A", false)]
+    [Arguments("VA 12 34 56 A", false)]
+    [Arguments("AD 12 34 56 A", false)]
+    [Arguments("AF 12 34 56 A", false)]
+    [Arguments("AI 12 34 56 A", false)]
+    [Arguments("AQ 12 34 56 A", true)]
+    [Arguments("AU 12 34 56 A", false)]
+    [Arguments("AV 12 34 56 A", false)]
     // The letter O is not used as the second letter of a prefix.
-    [InlineData("AO 12 34 56 A", false)]
+    [Arguments("AO 12 34 56 A", false)]
     // Prefixes BG, GB, KN, NK, NT, TN and ZZ are not to be used
-    [InlineData("BG 12 34 56 A", false)]
-    [InlineData("GB 12 34 56 A", false)]
-    [InlineData("KN 12 34 56 A", false)]
-    [InlineData("NK 12 34 56 A", false)]
-    [InlineData("NT 12 34 56 A", false)]
-    [InlineData("TN 12 34 56 A", false)]
-    [InlineData("ZZ 12 34 56 A", false)]
+    [Arguments("BG 12 34 56 A", false)]
+    [Arguments("GB 12 34 56 A", false)]
+    [Arguments("KN 12 34 56 A", false)]
+    [Arguments("NK 12 34 56 A", false)]
+    [Arguments("NT 12 34 56 A", false)]
+    [Arguments("TN 12 34 56 A", false)]
+    [Arguments("ZZ 12 34 56 A", false)]
     // Ignore whitespace
-    [InlineData("  AB   12   34  56    D    ", true)]
-    [InlineData("AB123456D", true)]
+    [Arguments("  AB   12   34  56    D    ", true)]
+    [Arguments("AB123456D", true)]
     public async Task Post_ValidatesNationalInsuranceNumber_ShowsPageErrorIfInvalid(string niNumber, bool shouldBeValid)
     {
         // Arrange
@@ -622,16 +622,16 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
     }
 
-    [Theory]
+    [Test]
     // https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
     // It is sometimes necessary to use a Temporary Reference Number (TRN) for Individuals. The format of a TRN is 11 a1 11 11
-    [InlineData("test", false)]
-    [InlineData("1 A2 34 56", false)]
-    [InlineData("12 BC 34 56", false)]
-    [InlineData("12 D3 45 67", true)]
+    [Arguments("test", false)]
+    [Arguments("1 A2 34 56", false)]
+    [Arguments("12 BC 34 56", false)]
+    [Arguments("12 D3 45 67", true)]
     // Ignore whitespace
-    [InlineData("  98   Z 7  6  543    ", true)]
-    [InlineData("45X67890", true)]
+    [Arguments("  98   Z 7  6  543    ", true)]
+    [Arguments("45X67890", true)]
     public async Task Post_ValidatesNationalInsuranceNumber_AllowesTemporaryNino_ShowsPageErrorIfInvalid(string niNumber, bool shouldBeValid)
     {
         // Arrange
@@ -667,7 +667,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UpdatingGenderToNotAvailable_ReturnsBadRequest()
     {
         // Arrange
@@ -707,7 +707,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_LeavingPreExistingNotAvailableGenderUnchanged_Succeeds()
     {
         // Arrange
@@ -750,7 +750,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(Gender.NotAvailable, journeyInstance.State.Gender);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UpdatingGenderToNotProvided_Succeeds()
     {
         // Arrange
@@ -793,7 +793,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Null(journeyInstance.State.Gender);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoDetailsChanged_ShowsPageError()
     {
         // Arrange
@@ -833,7 +833,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasSummaryErrorAsync(response, "Please change one or more of the person\u2019s details");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_DetailsChanged_PersistsDetails()
     {
         // Arrange
@@ -877,7 +877,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(Gender.Other, journeyInstance.State.Gender);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNamePreviouslyChangedInSameJourney_AndNameUpdatedToOriginalValue_RemovesNameChangeReasonFromState()
     {
         // Arrange
@@ -948,7 +948,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("1.3 KB", journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenOtherDetailsPreviouslyChangedInSameJourney_AndOtherDetailsUpdatedToOriginalValues_RemovesOtherDetailsChangeReasonFromState()
     {
         // Arrange

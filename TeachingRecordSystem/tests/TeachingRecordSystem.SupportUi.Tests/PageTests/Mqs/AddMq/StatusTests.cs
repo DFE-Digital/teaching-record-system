@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
 public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -21,7 +21,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_StartDateMissingFromState_RedirectsToStartDate()
     {
         // Arrange
@@ -41,7 +41,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{endDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -91,7 +91,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -119,7 +119,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_StartDateMissingFromState_RedirectsToStartDate()
     {
         // Arrange
@@ -148,7 +148,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenResultIsNotSelected_ReturnsError()
     {
         // Arrange
@@ -168,7 +168,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Status", "Select a status");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenResultIsPassedAndEndDateHasNotBeenEntered_ReturnsError()
     {
         // Arrange
@@ -192,9 +192,9 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(1)]
+    [Test]
+    [Arguments(0)]
+    [Arguments(1)]
     public async Task Post_EndDateIsBeforeOrEqualToStartDate_RendersError(int daysBefore)
     {
         // Arrange
@@ -223,7 +223,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after start date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_RedirectsToResultPage()
     {
         // Arrange
@@ -252,8 +252,8 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

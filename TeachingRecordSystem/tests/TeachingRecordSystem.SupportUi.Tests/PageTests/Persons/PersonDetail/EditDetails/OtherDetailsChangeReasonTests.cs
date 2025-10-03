@@ -4,15 +4,14 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class OtherDetailsChangeReasonTests : TestBase
 {
     public OtherDetailsChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
     {
-        FileServiceMock.Invocations.Clear();
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {
         // Arrange
@@ -43,7 +42,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -75,7 +74,7 @@ public class OtherDetailsChangeReasonTests : TestBase
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -128,7 +127,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -172,7 +171,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WhenNameAlsoChanged_PageTitleChangesAccordingly()
     {
         // Arrange
@@ -206,7 +205,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal("Why are you changing the other personal details on this record?", reasonChoicesLegend!.TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
@@ -243,7 +242,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal(changeReasonDetails, journeyInstance.State.OtherDetailsChangeReasonDetail);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -270,7 +269,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AnotherReason_NoDetailAdded_ReturnsError()
     {
         // Arrange
@@ -301,7 +300,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReasonDetail), "Enter a reason");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -333,7 +332,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -366,7 +365,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -411,7 +410,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -457,7 +456,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -494,7 +493,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -530,7 +529,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -567,7 +566,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         Assert.Equal("1.2 KB", journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -600,7 +599,7 @@ public class OtherDetailsChangeReasonTests : TestBase
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange

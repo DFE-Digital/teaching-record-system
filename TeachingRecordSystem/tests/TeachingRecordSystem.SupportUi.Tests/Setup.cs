@@ -1,15 +1,15 @@
-using TeachingRecordSystem.SupportUi.EndToEndTests;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
-[assembly: RetryOnCI(3)]
+[assembly: RetryOnTransientError(3), ParallelLimiter<LimitToDbPoolSizeLimit>]
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.Tests;
 
 public static class Setup
 {
     public static IServiceProvider Services { get; } = CreateServiceProvider();
 
     [Before(Assembly)]
-    public static async Task AssemblySetup(AssemblyHookContext context)
+    public static async Task AssemblySetup()
     {
         await Services.GetRequiredService<HostFixture>().InitializeAsync();
     }

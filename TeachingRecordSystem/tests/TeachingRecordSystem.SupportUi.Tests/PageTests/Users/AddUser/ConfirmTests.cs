@@ -1,22 +1,22 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
-[Collection(nameof(DisableParallelization))]
-public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public async Task InitializeAsync()
+    [Before(Test)]
+    public async Task DeleteUsersAsync()
     {
         await WithDbContext(async dbContext =>
         {
             await dbContext.Notes.ExecuteDeleteAsync();
+            await dbContext.SupportTasks.ExecuteDeleteAsync();
             await dbContext.Users.ExecuteDeleteAsync();
         });
 
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    [Fact]
+    [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -63,7 +63,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithoutAdministratorRole_CannotViewAdministratorInRoleOptions()
     {
         // Arrange
@@ -94,7 +94,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.DoesNotContain(UserRoles.Administrator, roleNames);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithAdministratorRole_CanViewAdministratorInRoleOptions()
     {
         // Arrange
@@ -125,7 +125,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Contains(UserRoles.Administrator, roleNames);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -161,7 +161,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -190,7 +190,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoName_RendersError()
     {
         // Arrange
@@ -225,7 +225,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoRole_RendersError()
     {
         // Arrange
@@ -259,7 +259,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         await AssertEx.HtmlResponseHasErrorAsync(response, "Role", "Select a role");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAdministratorRole_AddingUserWithNonExistentRole_ReturnsBadRequest()
     {
         // Arrange
@@ -293,7 +293,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserWithoutAdministratorRole_AddingUserWithAdministratorRole_ReturnsBadRequest()
     {
         // Arrange
@@ -327,7 +327,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserWithAdministratorRole_AddingUserWithAdministratorRole_ReturnsFound()
     {
         // Arrange
@@ -361,7 +361,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -405,7 +405,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture), IAsy
         Assert.Equal(userId, newUser.AzureAdUserId);
         Assert.Equal(role, newUser.Role);
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserAddedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);

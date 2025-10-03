@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arranges
@@ -20,7 +20,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MergeDetails_ReturnsCorrectContent()
     {
         // Arrange
@@ -91,7 +91,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(evidenceFileName, evidenceFile.TextContent);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -144,7 +144,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidData_ClosesTaskAndRedirectsToTeacherPensionsWithUpdatedDetails()
     {
         // Arrange
@@ -188,7 +188,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-        EventPublisher.Clear();
+        EventObserver.Clear();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -213,7 +213,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
         });
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
             Assert.NotNull(actualEvent);

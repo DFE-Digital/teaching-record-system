@@ -8,9 +8,9 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequ
 
 public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    [Theory]
-    [InlineData(false, "matches")]
-    [InlineData(true, "check-answers")]
+    [Test]
+    [Arguments(false, "matches")]
+    [Arguments(true, "check-answers")]
     public async Task Get_HasExpectedBackLink(bool fromCheckAnswers, string expectedBackLink)
     {
         // Arrange
@@ -39,7 +39,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.Equal($"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/{expectedBackLink}?{journeyInstance.GetUniqueIdQueryParameter()}", doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -69,7 +69,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CreateNewRecordSelected_RedirectsToCheckAnswers()
     {
         // Arrange
@@ -99,8 +99,8 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsNotDifferent_RendersDisabledAndUnselectedRadioButtons(
         PersonMatchedAttribute _,
         string fieldName)
@@ -132,8 +132,8 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         }
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsDifferent_RendersRadioButtonsWithExistingValueHighlighted(
         PersonMatchedAttribute attribute,
         string fieldName)
@@ -170,8 +170,8 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             });
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToTrnRequestInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName)
@@ -207,8 +207,8 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.True(radios[0].IsChecked());
     }
 
-    [Theory]
-    [MemberData(nameof(AttributesAndFieldsData))]
+    [Test]
+    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToExistingRecordInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName)
@@ -244,7 +244,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.True(radios[1].IsChecked());
     }
 
-    [Fact]
+    [Test]
     public async Task Get_CommentsSetInState_RendersExistingValue()
     {
         // Arrange
@@ -275,7 +275,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TrimmedText());
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -308,7 +308,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_CreateNewRecordSelected_RedirectsToCheckAnswers()
     {
         // Arrange
@@ -341,10 +341,10 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
             response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
-    [InlineData(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
-    [InlineData(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
+    [Test]
+    [Arguments(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
+    [Arguments(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
+    [Arguments(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
     public async Task Post_AttributeSourceNotSelected_RendersError(
         PersonMatchedAttribute differentAttribute,
         string fieldName,
@@ -371,7 +371,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         await AssertEx.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_EmptyRequestWithNoDifferencesToSelect_Succeeds()
     {
         // Arrange
@@ -397,7 +397,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.True((int)response.StatusCode < 400);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange
@@ -441,8 +441,7 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.Equal(genderSelection, journeyInstance.State.GenderSource);
     }
 
-
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -451,11 +450,6 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(supportTask, personId: matchedPerson.PersonId);
-
-        var dateOfBirthSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
-        var emailAddressSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
-        var nationalInsuranceNumberSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
-        var genderSelection = Enum.GetValues<PersonAttributeSource>().SingleRandom();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -479,13 +473,13 @@ public class MergeTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFix
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    public static TheoryData<PersonMatchedAttribute, string> AttributesAndFieldsData { get; } = new()
-    {
-        { PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource" },
-        { PersonMatchedAttribute.EmailAddress, "EmailAddressSource" },
-        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource" },
-        { PersonMatchedAttribute.Gender, "GenderSource" }
-    };
+    public static (PersonMatchedAttribute Attribute, string FieldName)[] GetAttributesAndFieldsData() =>
+    [
+        (PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource"),
+        (PersonMatchedAttribute.EmailAddress, "EmailAddressSource"),
+        (PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource"),
+        (PersonMatchedAttribute.Gender, "GenderSource")
+    ];
 
     private async Task<JourneyInstance<ResolveNpqTrnRequestState>> CreateJourneyInstance(SupportTask supportTask, Guid? personId)
     {

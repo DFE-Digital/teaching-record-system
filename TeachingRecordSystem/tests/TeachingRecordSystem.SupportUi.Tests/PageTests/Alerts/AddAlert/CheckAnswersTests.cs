@@ -9,7 +9,7 @@ public class CheckAnswersTests : AddAlertTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -27,7 +27,7 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MissingDataInJourneyState_RedirectsToReasonPage()
     {
         // Arrange
@@ -60,9 +60,9 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.StartsWith($"/alerts/add/reason?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk(bool populateOptional)
     {
         // Arrange
@@ -85,7 +85,7 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -104,7 +104,7 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -120,16 +120,16 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_Confirm_CreatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional);
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -143,7 +143,7 @@ public class CheckAnswersTests : AddAlertTestBase
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert added");
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualAlertCreatedEvent = Assert.IsType<AlertCreatedEvent>(e);
 
@@ -179,7 +179,7 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.True(journeyInstance.Completed);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -198,8 +198,8 @@ public class CheckAnswersTests : AddAlertTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

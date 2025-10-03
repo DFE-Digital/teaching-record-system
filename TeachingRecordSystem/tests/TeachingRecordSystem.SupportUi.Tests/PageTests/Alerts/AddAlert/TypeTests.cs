@@ -12,7 +12,7 @@ public class TypeTests : AddAlertTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -31,7 +31,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -47,7 +47,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -63,7 +63,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsAlertType()
     {
         // Arrange
@@ -83,7 +83,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Contains(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_DoesNotShowDbsAlertType()
     {
         // Arrange
@@ -103,7 +103,7 @@ public class TypeTests : AddAlertTestBase
         Assert.DoesNotContain(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserHasAlertsReadWriteRole_ShowsAllNonDbsRoles()
     {
         // Arrange
@@ -124,7 +124,7 @@ public class TypeTests : AddAlertTestBase
         Assert.True(alertTypeOptions.SequenceEqualIgnoringOrder(nonDbsAlertTypes.Select(t => t.AlertTypeId)));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -143,7 +143,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Equal(journeyInstance.State.AlertTypeId.ToString(), selectedRadioButton.GetAttribute("value"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -162,7 +162,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -178,7 +178,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenAlertTypeHasNotBeenSelected_ReturnsError()
     {
         // Arrange
@@ -194,7 +194,7 @@ public class TypeTests : AddAlertTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "AlertTypeId", "Select an alert type");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidInput_UpdatesStateAndRedirectsToDetailsPage()
     {
         // Arrange
@@ -218,7 +218,7 @@ public class TypeTests : AddAlertTestBase
         Assert.Equal(alertType.AlertTypeId, journeyInstance.State.AlertTypeId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -237,8 +237,8 @@ public class TypeTests : AddAlertTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

@@ -6,9 +6,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogInductionEventTests : TestBase
+public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ChangeLogInductionEventTests(HostFixture hostFixture) : base(hostFixture)
+    [Before(Test)]
+    public void Initialize()
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -19,15 +20,15 @@ public class ChangeLogInductionEventTests : TestBase
         Clock.UtcNow = nows.SingleRandom();
     }
 
-    [Theory]
-    [InlineData(DqtInductionFields.None)]
-    [InlineData(DqtInductionFields.StartDate)]
-    [InlineData(DqtInductionFields.CompletionDate)]
-    [InlineData(DqtInductionFields.Status)]
-    [InlineData(DqtInductionFields.ExemptionReason)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.Status)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.Status)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.Status | DqtInductionFields.ExemptionReason)]
+    [Test]
+    [Arguments(DqtInductionFields.None)]
+    [Arguments(DqtInductionFields.StartDate)]
+    [Arguments(DqtInductionFields.CompletionDate)]
+    [Arguments(DqtInductionFields.Status)]
+    [Arguments(DqtInductionFields.ExemptionReason)]
+    [Arguments(DqtInductionFields.StartDate | DqtInductionFields.Status)]
+    [Arguments(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.Status)]
+    [Arguments(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.Status | DqtInductionFields.ExemptionReason)]
     public async Task Person_WithDqtInductionCreatedEvent_RendersExpectedContent(DqtInductionFields populatedFields)
     {
         // Arrange
@@ -113,7 +114,7 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithDqtInductionImportedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -163,7 +164,7 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithDqtInductionDeactivatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -212,7 +213,7 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithDqtInductionReactivatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -261,28 +262,28 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Theory]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate, false, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate, true, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate, false, true)]
-    [InlineData(DqtInductionUpdatedEventChanges.CompletionDate, false, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.CompletionDate, true, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.CompletionDate, false, true)]
-    [InlineData(DqtInductionUpdatedEventChanges.Status, false, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.Status, true, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.Status, false, true)]
-    [InlineData(DqtInductionUpdatedEventChanges.ExemptionReason, false, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.ExemptionReason, true, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.ExemptionReason, false, true)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.Status, false, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status, false, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status | DqtInductionUpdatedEventChanges.ExemptionReason, false, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.Status, true, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status, true, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status | DqtInductionUpdatedEventChanges.ExemptionReason, true, false)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.Status, false, true)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status, false, true)]
-    [InlineData(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status | DqtInductionUpdatedEventChanges.ExemptionReason, false, true)]
+    [Test]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate, false, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate, true, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate, false, true)]
+    [Arguments(DqtInductionUpdatedEventChanges.CompletionDate, false, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.CompletionDate, true, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.CompletionDate, false, true)]
+    [Arguments(DqtInductionUpdatedEventChanges.Status, false, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.Status, true, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.Status, false, true)]
+    [Arguments(DqtInductionUpdatedEventChanges.ExemptionReason, false, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.ExemptionReason, true, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.ExemptionReason, false, true)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.Status, false, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status, false, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status | DqtInductionUpdatedEventChanges.ExemptionReason, false, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.Status, true, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status, true, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status | DqtInductionUpdatedEventChanges.ExemptionReason, true, false)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.Status, false, true)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status, false, true)]
+    [Arguments(DqtInductionUpdatedEventChanges.StartDate | DqtInductionUpdatedEventChanges.CompletionDate | DqtInductionUpdatedEventChanges.Status | DqtInductionUpdatedEventChanges.ExemptionReason, false, true)]
     public async Task Person_WithDqtInductionUpdatedEvent_RendersExpectedContent(DqtInductionUpdatedEventChanges changes, bool previousValueIsNull, bool newValueIsNull)
     {
         // Arrange
@@ -393,14 +394,14 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Theory]
-    [InlineData(DqtInductionFields.None)]
-    [InlineData(DqtInductionFields.StartDate)]
-    [InlineData(DqtInductionFields.CompletionDate)]
-    [InlineData(DqtInductionFields.Status)]
-    [InlineData(DqtInductionFields.ExemptionReason)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.ExemptionReason)]
+    [Test]
+    [Arguments(DqtInductionFields.None)]
+    [Arguments(DqtInductionFields.StartDate)]
+    [Arguments(DqtInductionFields.CompletionDate)]
+    [Arguments(DqtInductionFields.Status)]
+    [Arguments(DqtInductionFields.ExemptionReason)]
+    [Arguments(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate)]
+    [Arguments(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.ExemptionReason)]
     public async Task Person_WithInductionMigratedEvent_RendersExpectedContent(DqtInductionFields populatedFields)
     {
         // Arrange
@@ -490,7 +491,7 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithDqtContactInductionStatusChangedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -535,28 +536,28 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Theory]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionCompletedDate, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionCompletedDate, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionCompletedDate, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStatus, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStatus, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionExemptionReasons, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionStatus, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionStatus, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, true)]
+    [Test]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate, false, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate, true, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate, false, true)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionCompletedDate, false, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionCompletedDate, true, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionCompletedDate, false, true)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStatus, false, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStatus, true, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionExemptionReasons, true, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, true)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionStatus, false, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus, false, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionStatus, true, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus, true, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons, true, false)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
+    [Arguments(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, true)]
     public async Task Person_WithPersonInductionUpdatedEvent_RendersExpectedContent(PersonInductionUpdatedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
@@ -724,7 +725,7 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
-    [Fact]
+    [Test]
 
     public async Task Person_WithPersonInductionUpdatedEvent_ChangesNotRelevant_EventNotRendered()
     {

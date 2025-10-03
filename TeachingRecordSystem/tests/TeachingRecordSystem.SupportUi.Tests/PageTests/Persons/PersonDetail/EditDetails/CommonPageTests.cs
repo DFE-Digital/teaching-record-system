@@ -3,24 +3,18 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-public class CommonPageTests : TestBase
+public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] {
+    [Test]
+    [MatrixDataSource]
+    public async Task UserDoesNotHavePermission_ReturnsForbidden(
+        [Matrix(
             "/edit-details",
             "/edit-details/other-details-change-reason",
             "/edit-details/name-change-reason",
-            "/edit-details/check-answers"
-        },
-        new[] { UserRoles.Viewer, null },
-        TestHttpMethods.GetAndPost)]
-    public async Task UserDoesNotHavePermission_ReturnsForbidden(string page, string? role, HttpMethod httpMethod)
+            "/edit-details/check-answers")] string page,
+        [Matrix(UserRoles.Viewer, null)] string? role,
+        [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
@@ -45,17 +39,15 @@ public class CommonPageTests : TestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
-    [MemberData(nameof(AllCombinationsOf),
-        new[] {
+    [Test]
+    [MatrixDataSource]
+    public async Task PersonIsDeactivated_ReturnsBadRequest(
+        [Matrix(
             "/edit-details",
             "/edit-details/other-details-change-reason",
             "/edit-details/name-change-reason",
-            "/edit-details/check-answers"
-        },
-        TestHttpMethods.GetAndPost
-    )]
-    public async Task PersonIsDeactivated_ReturnsBadRequest(string page, HttpMethod httpMethod)
+            "/edit-details/check-answers")] string page,
+        [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -85,21 +77,21 @@ public class CommonPageTests : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
+    [Test]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
     public async Task Get_InvalidState_RedirectsToAppropriatePage(string attemptedPage, PersonDetailsUpdatedEventChanges changes, bool hasNameChangeReason, bool hasOtherDetailsChangeReason, string expectedPage)
     {
         // Arrange
@@ -155,17 +147,17 @@ public class CommonPageTests : TestBase
         Assert.Equal(expectedUrl, location);
     }
 
-    [Theory]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, "")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Test]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, "")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     public async Task Get_BacklinkContainsExpected(string fromPage, PersonDetailsUpdatedEventChanges changes, string expectedBackPage)
     {
         // Arrange
@@ -221,21 +213,21 @@ public class CommonPageTests : TestBase
         Assert.Contains($"/persons/{person.PersonId}{expectedBackPage}", backlink.Href);
     }
 
-    [Theory]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
+    [Test]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.None, false, false, "/edit-details")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, true, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, false, false, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, true, false, "/edit-details/other-details-change-reason")]
     public async Task Post_InvalidState_RedirectsToAppropriatePage(string attemptedPage, PersonDetailsUpdatedEventChanges changes, bool hasNameChangeReason, bool hasOtherDetailsChangeReason, string expectedPage)
     {
         // Arrange
@@ -306,46 +298,46 @@ public class CommonPageTests : TestBase
         Assert.Equal(expectedUrl, location);
     }
 
-    [Theory]
+    [Test]
     // Edit details (name changes only): redirects to change name reason page
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.FirstName, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.MiddleName, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.LastName, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.FirstName, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.MiddleName, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.LastName, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason")]
     // Edit details (other details changes only): redirects to change reason page
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     // Edit details (name and other details changes): redirects to change name reason page
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason")]
     // Name change reason (name changes only): redirects to check answers page
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.FirstName, "/edit-details/check-answers")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.MiddleName, "/edit-details/check-answers")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.LastName, "/edit-details/check-answers")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.FirstName, "/edit-details/check-answers")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.MiddleName, "/edit-details/check-answers")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.LastName, "/edit-details/check-answers")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers")]
     // Name change reason (name and other details changes): redirects to change reason page
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     // Change reason (other details changes only): redirects to check answers page
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
     // Change reason (name and other details changes): redirects to check answers page
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.DateOfBirth, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.EmailAddress, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.Gender, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
     public async Task Post_RedirectsToExpectedPage(string fromPage, PersonDetailsUpdatedEventChanges changes, string expectedNextPageUrl)
     {
         // Arrange
@@ -416,11 +408,11 @@ public class CommonPageTests : TestBase
         Assert.Equal(expectedUrl, location);
     }
 
-    [Theory]
-    [InlineData("/edit-details")]
-    [InlineData("/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers")]
+    [Test]
+    [Arguments("/edit-details")]
+    [Arguments("/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers")]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetailsPage(string fromPage)
     {
         // Arrange
@@ -460,11 +452,11 @@ public class CommonPageTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [InlineData("/edit-details")]
-    [InlineData("/edit-details/name-change-reason")]
-    [InlineData("/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers")]
+    [Test]
+    [Arguments("/edit-details")]
+    [Arguments("/edit-details/name-change-reason")]
+    [Arguments("/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers")]
     public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile(string page)
     {
         // Arrange
@@ -502,19 +494,19 @@ public class CommonPageTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Theory]
+    [Test]
     // Every page goes back to check answers page (even if a new reason page was added to the journey on this visit)
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers")]
     // Check answers page goes back to the appropriate reason page
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
-    [InlineData("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
+    [Arguments("/edit-details/check-answers", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason")]
     public async Task Get_WhenLinkedToFromFromCheckAnswersPage_BacklinkContainsExpected(string fromPage, PersonDetailsUpdatedEventChanges changes, string expectedBackPage)
     {
         // Arrange
@@ -570,28 +562,28 @@ public class CommonPageTests : TestBase
         Assert.Contains($"/persons/{person.PersonId}{expectedBackPage}", backlink!.Href);
     }
 
-    [Theory]
+    [Test]
     // No new changes: redirects to check answers page
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
     // Switches from name change to other details change (& vice versa): redirects to appropriate reason page
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason?fromCheckAnswers=True&")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason?fromCheckAnswers=True&")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason?fromCheckAnswers=True&")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/name-change-reason?fromCheckAnswers=True&")]
     // Adds name/other details change: redirects to appropriate reason page
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason?fromCheckAnswers=True&")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason?fromCheckAnswers=True&")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/other-details-change-reason?fromCheckAnswers=True&")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/name-change-reason?fromCheckAnswers=True&")]
     // Removes name/other details change: redirects to check answers page
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
-    [InlineData("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
     // Change name reason (whether original or subsequent name change): redirects to check answers page
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
-    [InlineData("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details/name-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
     // Change reason (whether original or subsequent other details change): redirects to check answers page
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
-    [InlineData("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
+    [Arguments("/edit-details/other-details-change-reason", PersonDetailsUpdatedEventChanges.NameChange, PersonDetailsUpdatedEventChanges.NameChange | PersonDetailsUpdatedEventChanges.OtherThanNameChange, "/edit-details/check-answers?")]
     public async Task Post_WhenLinkedToFromCheckAnswersPage_AndMoreChangesMade_RedirectsToExpectedPage(string page, PersonDetailsUpdatedEventChanges originalChanges, PersonDetailsUpdatedEventChanges newChanges, string expectedNextPageUrl)
     {
         // Arrange

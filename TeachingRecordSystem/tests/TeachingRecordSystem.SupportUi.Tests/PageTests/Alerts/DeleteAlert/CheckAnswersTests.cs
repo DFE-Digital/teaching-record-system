@@ -9,7 +9,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -27,7 +27,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -43,9 +43,9 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
     {
         // Arrange
@@ -62,11 +62,11 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(false, false)]
+    [Test]
+    [Arguments(true, true)]
+    [Arguments(true, false)]
+    [Arguments(false, true)]
+    [Arguments(false, false)]
     public async Task Get_WithValidJourneyState_ReturnsOk(bool isOpenAlert, bool populateOptional)
     {
         // Arrange
@@ -89,7 +89,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -108,7 +108,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -124,9 +124,9 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task GPost_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
     {
         // Arrange
@@ -143,16 +143,16 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_Confirm_DeletesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool isOpenAlert)
     {
         // Arrange
         var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -172,7 +172,7 @@ public class CheckAnswersTests : DeleteAlertTestBase
             Assert.False(alertExists);
         });
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualAlertDeletedEvent = Assert.IsType<AlertDeletedEvent>(e);
 
@@ -207,9 +207,9 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.True(journeyInstance.Completed);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public async Task Post_Cancel_DeletesJourneyAndRedirects(bool isOpenAlert)
     {
         // Arrange
@@ -236,8 +236,8 @@ public class CheckAnswersTests : DeleteAlertTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

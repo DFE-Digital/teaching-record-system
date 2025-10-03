@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -48,7 +48,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_RedirectsToExpectedPage()
     {
         // Arrange
@@ -82,7 +82,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsAnswers_AsExpected()
     {
         // Arrange
@@ -143,7 +143,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ShowsChangeReasonAnswers_AsExpected()
     {
         // Arrange
@@ -179,7 +179,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Evidence", "Not provided");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Confirm_DeletesRecordCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).SingleRandom();
@@ -188,7 +188,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState
@@ -220,7 +220,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var RaisedBy = GetCurrentUserId();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
 
@@ -237,7 +237,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.True(journeyInstance.Completed);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Confirm_WithHoldsQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -250,7 +250,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithHoldsFrom(qtsDate)));
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState
@@ -277,7 +277,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var RaisedByUserId = GetCurrentUserId();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
             Assert.Equal(RaisedByUserId, deletedEvent.RaisedBy.UserId);
@@ -292,7 +292,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.True(journeyInstance.Completed);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Confirm_WithHoldsQtsRouteType_UpdatesPersonQtsDateWithOlderRouteDateAndHasChangesInEvent()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -309,7 +309,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Holds)
                 .WithHoldsFrom(holdsFromLatest)));
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var qualificationIdEarliestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromEarliest).QualificationId;
         var qualificationIdLatestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromLatest).QualificationId;
@@ -335,7 +335,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Equal(holdsFromLatest, updatedPerson.QtsDate);
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
             Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
@@ -349,8 +349,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.True(journeyInstance.Completed);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

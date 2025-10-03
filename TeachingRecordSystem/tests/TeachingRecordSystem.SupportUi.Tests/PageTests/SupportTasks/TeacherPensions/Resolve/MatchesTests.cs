@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_PotentialDuplicateTaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -54,7 +54,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ShowsRequestDetails()
     {
         // Arrange
@@ -99,7 +99,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueForKey("Gender"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ShowsDetailsOfMatchedRecords()
     {
         // Arrange
@@ -143,7 +143,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(duplicatePerson1.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoChosenPersonId_ReturnsError()
     {
         // Arrange
@@ -183,7 +183,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_TaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -223,7 +223,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SubmittedPersonIdIsNotValid_ReturnsBadRequest()
     {
         // Arrange
@@ -265,7 +265,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidPersonIdChosen_UpdatesStateAndRedirects()
     {
         // Arrange
@@ -310,7 +310,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(duplicatePerson1.PersonId, journeyInstance.State.PersonId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_KeepRecordSeparate_UpdatesStateAndRedirects()
     {
         // Arrange

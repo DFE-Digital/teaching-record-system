@@ -4,29 +4,26 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions;
 
-[Collection(nameof(DisableParallelization))]
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[NotInParallel]
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public Task InitializeAsync()
-    {
-        return WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
+    [Before(Test)]
+    public Task DeleteSupportTasksAsync() =>
+        WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
 
     private static IElement[] GetResultRows(IHtmlDocument doc) =>
-    doc
-        .GetElementsByTagName("tbody")
-        .Single()
-        .GetElementsByClassName("govuk-table__row")
-        .ToArray();
+        doc
+            .GetElementsByTagName("tbody")
+            .Single()
+            .GetElementsByClassName("govuk-table__row")
+            .ToArray();
 
     private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
         GetResultRows(doc)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
 
-    [Fact]
+    [Test]
     public async Task Get_NoPotentialDuplicateTasks_ReturnsNoResults()
     {
         // Arrange
@@ -41,7 +38,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithSupportTask_RendersResults()
     {
         // Arrange
@@ -91,7 +88,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     }
 
 
-    [Fact]
+    [Test]
     public async Task Get_NoSortParametersSpecified_ShowsTasksOrderedByCreatedOnAscending()
     {
         // Arrange
@@ -142,7 +139,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                 result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithCreatedOnDescending_ShowsTasksOrderedByCreatedOnDescending()
     {
         // Arrange
@@ -193,7 +190,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                 result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithNameSortOrder_ShowsTasksOrderedByNameOnAscending()
     {
         // Arrange
@@ -248,7 +245,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                 result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithFilenameSortOrder_ShowsTasksOrderedByFilenameDescending()
     {
         // Arrange
@@ -303,7 +300,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                 result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithFilenameSortOrder_ShowsTasksOrderedByFilenamAscending()
     {
         // Arrange
@@ -358,7 +355,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                 result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithInterfaceIdSortOrder_ShowsTasksOrderedByInterfaceIdDescending()
     {
         // Arrange
@@ -413,7 +410,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
                 result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithInterfaceIdSortOrder_ShowsTasksOrderedByInterfaceIdAscending()
     {
         // Arrange

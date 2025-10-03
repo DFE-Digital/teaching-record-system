@@ -12,7 +12,7 @@ public class ReasonTests : EndDateTestBase
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -31,7 +31,7 @@ public class ReasonTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -47,7 +47,7 @@ public class ReasonTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -64,7 +64,7 @@ public class ReasonTests : EndDateTestBase
         Assert.StartsWith($"/alerts/{alert.AlertId}/end-date?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ReturnsOK()
     {
         // Arrange
@@ -80,7 +80,7 @@ public class ReasonTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequestWithReasonPopulatedDataInJourneyState_ReturnsExpectedContent()
     {
         // Arrange
@@ -111,7 +111,7 @@ public class ReasonTests : EndDateTestBase
         }
     }
 
-    [Theory]
+    [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -133,7 +133,7 @@ public class ReasonTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -149,7 +149,7 @@ public class ReasonTests : EndDateTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -166,7 +166,7 @@ public class ReasonTests : EndDateTestBase
         Assert.StartsWith($"/alerts/{alert.AlertId}/end-date?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError()
     {
         // Arrange
@@ -185,7 +185,7 @@ public class ReasonTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoHasAdditionalReasonDetailIsSelected_ReturnsError()
     {
         // Arrange
@@ -206,7 +206,7 @@ public class ReasonTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re changing the end date");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenAdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError()
     {
         // Arrange
@@ -229,7 +229,7 @@ public class ReasonTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
@@ -252,7 +252,7 @@ public class ReasonTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
@@ -275,7 +275,7 @@ public class ReasonTests : EndDateTestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
@@ -311,7 +311,7 @@ public class ReasonTests : EndDateTestBase
         Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
@@ -347,7 +347,7 @@ public class ReasonTests : EndDateTestBase
         Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -367,8 +367,8 @@ public class ReasonTests : EndDateTestBase
         Assert.Null(journeyInstance);
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_WithInvalidRoute_ReturnsBadRequest()
     {
         // Arrange
@@ -38,7 +38,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPreviouslyStoredChoice_ShowsChoice()
     {
         // Arrange
@@ -75,9 +75,9 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal(true.ToString(), inductionExemptionChoice);
     }
 
-    [Theory]
-    [InlineData("Graduate Teacher Programme", "training-provider")]
-    [InlineData("Apply for Qualified Teacher Status in England", "country")]
+    [Test]
+    [Arguments("Graduate Teacher Programme", "training-provider")]
+    [Arguments("Apply for Qualified Teacher Status in England", "country")]
     public async Task Post_WhenExemptionEntered_SavesDataAndRedirectsToNextPage(string routeName, string page)
     {
         // Arrange
@@ -120,7 +120,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WhenNoChoiceSelected_ReturnsError()
     {
         // Arrange
@@ -152,7 +152,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "IsExemptFromInduction", "Select yes if this route provides an induction exemption");
     }
 
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -195,8 +195,8 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

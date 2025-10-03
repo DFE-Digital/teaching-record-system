@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_ShowsExistingStatus()
     {
         // Arrange
@@ -37,9 +37,9 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(status.ToString(), statusChoice);
     }
 
-    [Theory]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, "start-and-end-date")]
-    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Failed, "country")]
+    [Test]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, "start-and-end-date")]
+    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Failed, "country")]
     public async Task Post_Status_PersistsDataAndRedirectsToExpected(string routeName, RouteToProfessionalStatusStatus status, string expected)
     {
         // Arrange
@@ -74,7 +74,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/add/{expected}?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoStatusSelected_ShowsError()
     {
         // Arrange
@@ -99,7 +99,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Status", "Select a route status");
     }
 
-    [Fact]
+    [Test]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -133,8 +133,8 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

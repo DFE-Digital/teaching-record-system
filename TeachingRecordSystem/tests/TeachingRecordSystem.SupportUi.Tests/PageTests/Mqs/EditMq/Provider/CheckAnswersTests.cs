@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
 
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -28,9 +28,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Theory]
-    [InlineData(null, false)]
-    [InlineData("Some reason", true)]
+    [Test]
+    [Arguments(null, false)]
+    [Arguments("Some reason", true)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
         string? changeReasonDetail,
         bool uploadEvidence)
@@ -80,7 +80,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -106,7 +106,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Confirm_UpdatesMqCreatesEventAndCompletesJourneyRedirectsWithFlashMessage()
     {
         // Arrange
@@ -116,7 +116,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
@@ -153,7 +153,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(newProvider.MandatoryQualificationProviderId, qualification.ProviderId);
         });
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent
             {
@@ -202,7 +202,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Fact]
+    [Test]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsAndDoesNotUpdateMq()
     {
         // Arrange
@@ -243,8 +243,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Theory]
-    [MemberData(nameof(HttpMethods), TestHttpMethods.GetAndPost)]
+    [Test]
+    [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange

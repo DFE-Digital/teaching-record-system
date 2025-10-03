@@ -4,7 +4,7 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
-[Collection(nameof(DisableParallelization))]
+[NotInParallel]
 public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
@@ -15,8 +15,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
     //   * Check - identified duplicate - you'd need to check with devs if this is still relevant under how trs will deal with these
     // TODO: End-to-end tests (including manual merge)
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Get_WhenFieldChanged_ShowsReasonAndEvidenceFile_AsExpected(PersonStatus targetStatus)
     {
         // Arrange
@@ -62,8 +62,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         });
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Get_WhenFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided(PersonStatus targetStatus)
     {
         // Arrange
@@ -106,8 +106,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         doc.AssertRows("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Theory]
-    [MemberData(nameof(AllStatuses))]
+    [Test]
+    [MethodDataSource(nameof(GetAllStatuses))]
     public async Task Post_Confirm_UpdatesPersonStatusCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonStatus targetStatus)
     {
         // Arrange
@@ -135,7 +135,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             person.PersonId,
             stateBuilder.Build());
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance));
 
@@ -164,7 +164,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         var raisedBy = GetCurrentUserId();
 
-        EventPublisher.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e =>
         {
             var actualEvent = Assert.IsType<PersonStatusUpdatedEvent>(e);
 

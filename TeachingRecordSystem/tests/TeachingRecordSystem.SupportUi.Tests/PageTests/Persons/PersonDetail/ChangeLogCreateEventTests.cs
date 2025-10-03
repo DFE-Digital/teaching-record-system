@@ -3,9 +3,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogCreateEventTests : TestBase
+public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ChangeLogCreateEventTests(HostFixture hostFixture) : base(hostFixture)
+    [Before(Test)]
+    public void Initialize()
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -16,7 +17,7 @@ public class ChangeLogCreateEventTests : TestBase
         Clock.UtcNow = nows.SingleRandom();
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithPersonCreatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -93,7 +94,7 @@ public class ChangeLogCreateEventTests : TestBase
         doc.AssertRow("create-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Person_WithPersonCreatedEvent_DoesNotRenderNullDetails_AndRendersNullReasonsAsNotProvided()
     {
         // Arrange

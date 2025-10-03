@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers;
 
 public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -22,7 +22,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_UserDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -37,7 +37,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -76,7 +76,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(applicationUser.OneLoginPrivateKeyPem, doc.GetElementById("OneLoginPrivateKeyPem")?.TrimmedText()?.Trim());
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -101,7 +101,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UserDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -123,7 +123,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NameNotProvided_RendersError()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NameTooLong_RendersError()
     {
         // Arrange
@@ -167,8 +167,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
-    [Theory]
-    [MemberData(nameof(InvalidOidcDetailsData))]
+    [Test]
+    [MethodDataSource(nameof(GetInvalidOidcDetailsData))]
     public async Task Post_WithOidcClientButInvalidDetails_RendersExpectedError(
         string clientId,
         string clientSecret,
@@ -211,7 +211,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, expectedErrorMessage);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettingsAndCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -250,7 +250,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             }
         };
 
-        EventPublisher.Clear();
+        EventObserver.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -265,7 +265,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.True(new HashSet<string>(applicationUser.ApiRoles ?? []).SetEquals(new HashSet<string>(newRoles)));
         });
 
-        EventPublisher.AssertEventsSaved(
+        EventObserver.AssertEventsSaved(
             e =>
             {
                 var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
@@ -318,9 +318,19 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Application user updated");
     }
 
-    public static object[][] InvalidOidcDetailsData =>
+    public static (string ClientId,
+        string ClientSecret,
+        string RedirectUris,
+        string PostLogoutRedirectUris,
+        string OneLoginClientId,
+        string OneLoginClientKeyPem,
+        string OneLoginAuthenticationSchemeName,
+        string OneLoginRedirectUriPath,
+        string OneLoginPostLogoutRedirectUriPath,
+        string ExpectedErrorField,
+        string ExpectedErrorMessage)[] GetInvalidOidcDetailsData() =>
     [
-        [
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -332,8 +342,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginAuthenticationSchemeName",
             "Enter an authentication scheme name"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -345,8 +355,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginAuthenticationSchemeName",
             "Authentication scheme name must be 50 characters or less"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -358,8 +368,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginPrivateKeyPem",
             "Enter the One Login private key"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -371,8 +381,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginClientId",
             "Enter the One Login client ID"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -384,8 +394,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginRedirectUriPath",
             "Enter the One Login redirect URI"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -397,8 +407,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             "",  // OneLoginPostLogoutRedirectUriPath
             "OneLoginPostLogoutRedirectUriPath",
             "Enter the One Login post logout redirect URI"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -410,8 +420,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginRedirectUriPath",
             "One Login redirect URI must be 100 characters or less"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -423,8 +433,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             new string('x', 101),  // OneLoginPostLogoutRedirectUriPath
             "OneLoginPostLogoutRedirectUriPath",
             "One Login post logout redirect URI must be 100 characters or less"
-        ],
-        [
+        ),
+        (
             "",
             "Secret0123456789",
             "https://localhost/callback",
@@ -436,8 +446,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "ClientId",
             "Enter a client ID"
-        ],
-        [
+        ),
+        (
             new string('x', 51),
             "Secret0123456789",
             "https://localhost/callback",
@@ -449,8 +459,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "ClientId",
             "Client ID must be 50 characters or less"
-        ],
-        [
+        ),
+        (
             "client_id",
             "",
             "https://localhost/callback",
@@ -462,8 +472,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "ClientSecret",
             "Enter a client secret"
-        ],
-        [
+        ),
+        (
             "client_id",
             new string('x', 201),
             "https://localhost/callback",
@@ -475,8 +485,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "ClientSecret",
             "Client secret must be 200 characters or less"
-        ],
-        [
+        ),
+        (
             "client_id",
             "S",
             "https://localhost/callback",
@@ -488,8 +498,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "ClientSecret",
             "Client secret must be at least 16 characters"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "foo",
@@ -501,8 +511,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "RedirectUris",
             "One or more redirect URIs are not valid"
-        ],
-        [
+        ),
+        (
             "client_id",
             "Secret0123456789",
             "https://localhost/callback",
@@ -514,7 +524,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "PostLogoutRedirectUris",
             "One or more post logout redirect URIs are not valid"
-        ]
+        )
     ];
 
     private static readonly string _privateKeyPem = RSA.Create().ExportPkcs8PrivateKeyPem();

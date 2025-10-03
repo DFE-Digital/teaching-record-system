@@ -4,15 +4,10 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.Create;
 
-[Collection(nameof(DisableParallelization))]
-public class CreateReasonTests : TestBase
+[NotInParallel]
+public class CreateReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public CreateReasonTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        FileServiceMock.Invocations.Clear();
-    }
-
-    [Fact]
+    [Test]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -38,7 +33,7 @@ public class CreateReasonTests : TestBase
             b => Assert.Equal("Cancel", b.TrimmedText()));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -85,7 +80,7 @@ public class CreateReasonTests : TestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -123,7 +118,7 @@ public class CreateReasonTests : TestBase
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
@@ -154,7 +149,7 @@ public class CreateReasonTests : TestBase
         Assert.Equal(changeReasonDetails, journeyInstance.State.CreateReasonDetail);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -175,7 +170,7 @@ public class CreateReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.UploadEvidence), "Select yes if you want to upload evidence");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_AnotherReason_NoDetailAdded_ReturnsError()
     {
         // Arrange
@@ -200,7 +195,7 @@ public class CreateReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.CreateReasonDetail), "Enter a reason");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -226,7 +221,7 @@ public class CreateReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.EvidenceFile), "Select a file");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -253,7 +248,7 @@ public class CreateReasonTests : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -292,7 +287,7 @@ public class CreateReasonTests : TestBase
         Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -332,7 +327,7 @@ public class CreateReasonTests : TestBase
         Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -363,7 +358,7 @@ public class CreateReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -393,7 +388,7 @@ public class CreateReasonTests : TestBase
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -424,7 +419,7 @@ public class CreateReasonTests : TestBase
         Assert.Equal("1.2 KB", journeyInstance.State.EvidenceFileSizeDescription);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -451,7 +446,7 @@ public class CreateReasonTests : TestBase
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange
