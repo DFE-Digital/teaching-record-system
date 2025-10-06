@@ -11,11 +11,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
+namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.EditApplicationUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 [BindProperties]
-public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     // From PathString
     private static readonly SearchValues<char> _validPathChars =

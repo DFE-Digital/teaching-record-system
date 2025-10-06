@@ -6,10 +6,10 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys;
+namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.EditApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     private ApiKey? _apiKey;
 

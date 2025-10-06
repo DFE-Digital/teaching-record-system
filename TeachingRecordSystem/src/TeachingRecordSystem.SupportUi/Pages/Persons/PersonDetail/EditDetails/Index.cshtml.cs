@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 [Journey(JourneyNames.EditDetails), ActivatesJourney, RequireJourneyInstance]
-public class PersonalDetailsModel(
+public class IndexModel(
     TrsDbContext dbContext,
     IClock clock,
     TrsLinkGenerator linkGenerator,

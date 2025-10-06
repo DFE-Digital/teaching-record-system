@@ -20,12 +20,12 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ClickAsync($"a{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
 
-        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches");
+        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
 
         await page.CheckAsync($"label{TextIsSelector("Create a new record from it")}");
         await page.ClickContinueButtonAsync();
 
-        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers");
+        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers");
         await page.ClickButtonAsync("Confirm and create record");
 
         await page.WaitForUrlPathAsync("/support-tasks/api-trn-requests");
@@ -66,16 +66,16 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ClickAsync($"a{TextIsSelector($"{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}")}");
 
-        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches");
+        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
 
         await page.CheckAsync("label:text-is('Merge it with Record A')");
         await page.ClickContinueButtonAsync();
 
-        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge");
+        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge");
         await page.CheckAsync($"label{HasTextSelector(requestData.MiddleName)}");
         await page.ClickContinueButtonAsync();
 
-        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers");
+        await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers");
         await page.ClickButtonAsync("Confirm and update existing record");
 
         await page.WaitForUrlPathAsync("/support-tasks/api-trn-requests");

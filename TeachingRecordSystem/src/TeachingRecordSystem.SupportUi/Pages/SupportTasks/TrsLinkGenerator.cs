@@ -16,7 +16,7 @@ public partial class TrsLinkGenerator
         supportTaskType switch
         {
             SupportTaskType.ConnectOneLoginUser => ConnectOneLoginUserSupportTask(supportTaskReference),
-            SupportTaskType.ApiTrnRequest => ApiTrnRequestMatches(supportTaskReference),
+            SupportTaskType.ApiTrnRequest => ApiTrnRequestResolve(supportTaskReference),
             SupportTaskType.TrnRequestManualChecksNeeded => ResolveTrnRequestManualChecksNeeded(supportTaskReference),
             SupportTaskType.NpqTrnRequest => NpqTrnRequestDetailsPage(supportTaskReference),
             SupportTaskType.ChangeDateOfBirthRequest => EditChangeRequest(supportTaskReference),
@@ -27,6 +27,9 @@ public partial class TrsLinkGenerator
 
     public string ApiTrnRequests(string? search = null, ApiTrnRequestsSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search, sortBy, sortDirection, pageNumber });
+
+    public string ApiTrnRequestResolve(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Index", routeValues: new { supportTaskReference });
 
     public string ApiTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
@@ -46,6 +49,9 @@ public partial class TrsLinkGenerator
     public string NpqTrnRequestDetailsPageCancel(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Details", routeValues: new { supportTaskReference }, handler: "Cancel");
 
+    public string NpqTrnRequestResolve(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Resolve/Index", routeValues: new { supportTaskReference });
+
     public string NpqTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
@@ -64,6 +70,9 @@ public partial class TrsLinkGenerator
     public string NpqTrnRequestMergeCheckAnswersCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Resolve/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
+    public string NpqTrnRequestReject(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/Index", routeValues: new { supportTaskReference });
+
     public string NpqTrnRequestRejectionReason(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/RejectionReason", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
@@ -75,6 +84,9 @@ public partial class TrsLinkGenerator
 
     public string NpqTrnRequestRejectionCheckAnswersCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
+    public string NpqTrnRequestNoMatches(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/NoMatches/Index", routeValues: new { supportTaskReference });
 
     public string NpqTrnRequestNoMatchesCheckAnswers(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/NoMatches/CheckAnswers", routeValues: new { supportTaskReference });
@@ -114,6 +126,9 @@ public partial class TrsLinkGenerator
 
     public string TeacherPensions(TeacherPensionsSortOptions? sortBy = null, SortDirection? sortDirection = null) =>
         GetRequiredPathByPage("/SupportTasks/TeacherPensions/Index", routeValues: new { sortBy, sortDirection });
+
+    public string TeacherPensionsResolve(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Index", routeValues: new { supportTaskReference });
 
     public string TeacherPensionsMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/SupportTasks/TeacherPensions/Resolve/Matches", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);

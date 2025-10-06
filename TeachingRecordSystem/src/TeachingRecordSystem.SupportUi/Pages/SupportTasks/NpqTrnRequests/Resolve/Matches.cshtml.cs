@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
-[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
+[Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
 public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFileService fileService) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }

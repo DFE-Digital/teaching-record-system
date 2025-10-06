@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys.EditApiKey;
 
-public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()

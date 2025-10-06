@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
-[Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance, ActivatesJourney]
+[Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance]
 public class RejectionReasonModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public string PersonName => StringHelper.JoinNonEmpty(' ', RequestData!.Name);

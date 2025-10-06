@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers.EditApplicationUser;
 
-public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()

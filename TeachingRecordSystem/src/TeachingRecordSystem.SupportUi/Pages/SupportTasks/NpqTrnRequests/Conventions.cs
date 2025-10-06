@@ -14,7 +14,7 @@ public class Conventions : IConfigureFolderConventions
                 var relativePath = model.RelativePath;
 
                 // Exclude this specific file
-                if (relativePath.EndsWith("Index.cshtml", StringComparison.OrdinalIgnoreCase))
+                if (relativePath.EndsWith("NpqTrnRequests/Index.cshtml", StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }

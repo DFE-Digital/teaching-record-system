@@ -7,6 +7,8 @@ public partial class TrsLinkGenerator
     public string PersonRoute(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Route", routeValues: new { personId });
 
+    public string RouteDelete(Guid qualificationId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/Index", routeValues: new { qualificationId });
     public string RouteDeleteChangeReason(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/ChangeReason", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteDeleteChangeReasonCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
@@ -16,6 +18,8 @@ public partial class TrsLinkGenerator
     public string RouteDeleteCheckYourAnswersCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/CheckYourAnswers", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
+    public string RouteEdit(Guid qualificationId, bool? fromInductions = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Index", routeValues: new { qualificationId, fromInductions });
     public string RouteEditDetail(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromInductions = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Detail", routeValues: new { qualificationId, fromInductions }, journeyInstanceId: journeyInstanceId);
     public string RouteEditDetailCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>

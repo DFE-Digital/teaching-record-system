@@ -44,12 +44,12 @@ public class DetailsModel(TrsLinkGenerator linkGenerator, IFileService fileServi
         if (CreateRecord)
         {
             return (SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?? false) ?
-               Redirect(linkGenerator.NpqTrnRequestMatches(SupportTaskReference)) :
-               Redirect(linkGenerator.NpqTrnRequestNoMatchesCheckAnswers(SupportTaskReference));
+               Redirect(linkGenerator.NpqTrnRequestResolve(SupportTaskReference)) :
+               Redirect(linkGenerator.NpqTrnRequestNoMatches(SupportTaskReference));
         }
         else
         {
-            return Redirect(linkGenerator.NpqTrnRequestRejectionReason(SupportTaskReference));
+            return Redirect(linkGenerator.NpqTrnRequestReject(SupportTaskReference));
         }
     }
 

@@ -39,7 +39,7 @@ public abstract class CommonJourneyPage(
     {
         return pageName switch
         {
-            EditDetailsJourneyPage.PersonalDetails => LinkGenerator.PersonEditDetailsPersonalDetails(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.PersonalDetails => LinkGenerator.PersonEditDetails(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
             EditDetailsJourneyPage.NameChangeReason => LinkGenerator.PersonEditDetailsNameChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
             EditDetailsJourneyPage.OtherDetailsChangeReason => LinkGenerator.PersonEditDetailsOtherDetailsChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
             EditDetailsJourneyPage.CheckAnswers => LinkGenerator.PersonEditDetailsCheckAnswers(PersonId, JourneyInstance!.InstanceId),
