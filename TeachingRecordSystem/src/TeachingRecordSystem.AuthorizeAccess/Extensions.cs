@@ -38,8 +38,6 @@ public static class Extensions
 
     public static IServiceCollection AddAuthorizeAccessServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-
-
         services.AddGovUkFrontend(options =>
         {
             options.Rebrand = true;
@@ -104,7 +102,7 @@ public static class Extensions
 
                 options.SetIssuer(configuration.GetRequiredValue("AuthorizeAccessIssuer"));
 
-                options.RegisterScopes(OpenIddictConstants.Permissions.Scopes.Email, OpenIddictConstants.Permissions.Scopes.Profile, CustomScopes.TeachingRecord);
+                options.RegisterScopes(OpenIddictConstants.Scopes.Email, OpenIddictConstants.Scopes.Profile, CustomScopes.TeachingRecord);
 
                 options.AllowAuthorizationCodeFlow();
 
