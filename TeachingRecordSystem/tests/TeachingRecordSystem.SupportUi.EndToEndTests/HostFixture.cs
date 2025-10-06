@@ -21,15 +21,17 @@ public sealed class HostFixture : IAsyncDisposable
     public const string BaseUrl = "http://localhost:55642";
 
     private readonly IConfiguration _configuration;
+    private readonly DbHelper _dbHelper;
     private bool _initialized;
     private bool _disposed;
     private Host<Program>? _host;
     private IPlaywright? _playwright;
     private IBrowser? _browser;
 
-    public HostFixture(IConfiguration configuration)
+    public HostFixture(IConfiguration configuration, DbHelper dbHelper)
     {
         _configuration = configuration;
+        _dbHelper = dbHelper;
     }
 
     public IBrowser Browser
@@ -70,14 +72,13 @@ public sealed class HostFixture : IAsyncDisposable
 
                 builder.ConfigureServices((context, services) =>
                 {
-                    DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
-
                     services.Configure<GovUkFrontendOptions>(options => options.DefaultFileUploadJavaScriptEnhancements = false);
 
                     services.AddAuthentication()
                         .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
                     services
+                        .AddSingleton(_dbHelper)
                         .AddSingleton<CurrentUserProvider>()
                         .AddStartupTask<TestUsers.CreateUsersStartupTask>()
                         .AddFakeXrm()

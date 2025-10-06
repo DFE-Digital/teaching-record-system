@@ -2,19 +2,16 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
 
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
-    }
+    [Before(Test)]
+    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
     [Test]
     public async Task Get_UserWithNoRoles_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(await TestData.CreateUserAsync(role: null));
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
@@ -34,7 +31,7 @@ public class IndexTests : TestBase
     public async Task Get_UserWithoutSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
         var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,

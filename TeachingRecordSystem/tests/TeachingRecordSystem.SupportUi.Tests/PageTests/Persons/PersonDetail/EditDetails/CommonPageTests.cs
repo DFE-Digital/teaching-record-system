@@ -17,7 +17,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync();
 

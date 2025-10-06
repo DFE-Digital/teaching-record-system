@@ -162,6 +162,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: trs
           POSTGRES_DB: trs
+          POSTGRES_INITDB_ARGS: "-c max_connections=1000"
         options: >-
           --name postgres
           --health-cmd pg_isready

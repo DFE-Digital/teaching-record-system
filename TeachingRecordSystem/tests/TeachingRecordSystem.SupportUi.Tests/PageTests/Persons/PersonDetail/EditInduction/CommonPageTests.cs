@@ -4,12 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
-public class CommonPageTests : TestBase
+public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
-    {
-    }
-
     [Test]
     [Arguments("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
     [Arguments("edit-induction/status", InductionStatus.InProgress, "edit-induction/start-date")]
@@ -410,7 +406,7 @@ public class CommonPageTests : TestBase
     public async Task UserDoesNotHavePermission_ReturnsForbidden(string page, string? role, InductionStatus inductionStatus, HttpMethod httpMethod)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync(
             p => p

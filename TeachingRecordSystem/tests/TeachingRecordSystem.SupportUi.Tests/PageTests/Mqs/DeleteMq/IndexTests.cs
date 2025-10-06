@@ -2,13 +2,8 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
 
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Test]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {

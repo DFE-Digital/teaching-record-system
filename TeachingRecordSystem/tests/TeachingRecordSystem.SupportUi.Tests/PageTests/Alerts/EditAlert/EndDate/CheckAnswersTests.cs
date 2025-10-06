@@ -1,18 +1,16 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDate;
 
-public class CheckAnswersTests : EndDateTestBase
+public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
 {
-    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
-    }
+    [Before(Test)]
+    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
     [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
@@ -103,7 +101,7 @@ public class CheckAnswersTests : EndDateTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);

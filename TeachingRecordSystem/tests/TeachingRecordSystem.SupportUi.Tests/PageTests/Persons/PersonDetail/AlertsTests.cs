@@ -118,7 +118,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHaveAddAlertPermission_DoesNotShowAddAnAlertButton()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var person = await TestData.CreatePersonAsync();
 
@@ -136,7 +136,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasAddDbsAlertPermission_DoesShowAddAnAlertButton()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync();
 
@@ -154,7 +154,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasAddNonDbsAlertPermission_DoesShowAddAnAlertButton()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
         var person = await TestData.CreatePersonAsync();
 
@@ -172,7 +172,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHaveReadPermissionToOpenDbsAlert_DoesNotShowAlertCard()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
@@ -191,7 +191,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesHaveReadPermissionToOpenDbsAlert_DoesShowAlertCard()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
@@ -210,7 +210,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadButNotWritePermissionToOpenDbsAlert_DoesNotShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
@@ -234,7 +234,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadAndWritePermissionsToOpenDbsAlert_DoesShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
@@ -258,7 +258,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadButNotWritePermissionToOpenNonDbsAlert_DoesNotShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
@@ -283,7 +283,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadAndWritePermissionsToOpenNonDbsAlert_DoesShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
@@ -308,7 +308,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHaveReadPermissionToClosedDbsAlert_DoesNotShowAlertRow()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
@@ -327,7 +327,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesHaveReadPermissionToClosedDbsAlert_DoesShowAlertRow()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
@@ -346,7 +346,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadButNotWritePermissionToClosedDbsAlert_DoesNotShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
@@ -369,7 +369,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadAndWritePermissionsToClosedDbsAlert_DoesShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
@@ -392,7 +392,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadButNotWritePermissionToClosedNonDbsAlert_DoesNotShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
@@ -416,7 +416,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasReadAndWritePermissionsToClosedNonDbsAlert_DoesShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).SingleRandom(at => at.AlertTypeId != AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePersonAsync(p => p
@@ -440,7 +440,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasOpenDbsAlertButUserCannotRead_ShowsFlagMessage()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
@@ -459,7 +459,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasClosedDbsAlertAndUserCannotRead_DoesNotShowFlagMessage()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
@@ -478,7 +478,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasOpenDbsAlertAndUserCanRead_DoesNotShowFlagMessage()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));

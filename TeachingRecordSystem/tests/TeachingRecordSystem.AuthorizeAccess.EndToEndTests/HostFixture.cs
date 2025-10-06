@@ -69,6 +69,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                 builder.ConfigureServices((context, services) =>
                 {
                     DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
+                    services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());
 
                     services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
 

@@ -2,6 +2,7 @@ using System.Data.Common;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -25,9 +26,14 @@ public sealed class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory) :
         services.AddDatabase(connectionString);
 
         services.AddSingleton<DbHelper>();
+    }
 
-        services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().EnsureSchemaAsync());
-        services.AddStartupTask<SeedLookupData>();
+    public async Task InitializeAsync()
+    {
+        await EnsureSchemaAsync();
+
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
     }
 
     public async Task ClearDataAsync()

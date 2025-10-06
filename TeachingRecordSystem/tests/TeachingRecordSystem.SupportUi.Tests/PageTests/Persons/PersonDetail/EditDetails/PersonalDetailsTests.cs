@@ -3,7 +3,6 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
-[NotInParallel]
 public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]

@@ -2,22 +2,20 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class ReasonTests : AddAlertTestBase
+public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.StartDate;
     private const string ThisStep = JourneySteps.Reason;
 
-    public ReasonTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
-    }
+    [Before(Test)]
+    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
     [Test]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
@@ -116,7 +114,7 @@ public class ReasonTests : AddAlertTestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);

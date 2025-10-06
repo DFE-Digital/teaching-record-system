@@ -8,7 +8,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(await TestData.CreateUserAsync(role: null));
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/application-users/add");
 
@@ -36,7 +36,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        SetCurrentUser(await TestData.CreateUserAsync(role: null));
 
         var name = TestData.GenerateApplicationUserName();
 

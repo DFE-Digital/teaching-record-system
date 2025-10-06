@@ -8,23 +8,15 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 
-public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticationOptions>
+public class TestAuthenticationHandler(
+    IOptionsMonitor<TestAuthenticationOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder)
+    : AuthenticationHandler<TestAuthenticationOptions>(options, logger, encoder)
 {
-    private readonly CurrentUserProvider _currentUserProvider;
-
-    public TestAuthenticationHandler(
-        CurrentUserProvider currentUserProvider,
-        IOptionsMonitor<TestAuthenticationOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder)
-        : base(options, logger, encoder)
-    {
-        _currentUserProvider = currentUserProvider;
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var currentUser = _currentUserProvider.CurrentUser;
+        var currentUser = Context.RequestServices.GetRequiredService<CurrentUserProvider>().CurrentUser;
 
         if (currentUser is not null)
         {
@@ -49,12 +41,5 @@ public class TestAuthenticationOptions : AuthenticationSchemeOptions { }
 
 public class CurrentUserProvider
 {
-    private readonly AsyncLocal<User> _currentUser = new();
-
-    [DisallowNull]
-    public User? CurrentUser
-    {
-        get => _currentUser.Value;
-        set => _currentUser.Value = value;
-    }
+    [DisallowNull] public User? CurrentUser { get; set; }
 }

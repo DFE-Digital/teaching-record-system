@@ -71,7 +71,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasDbsAlert_UserDoesNotHaveDbsViewPermissions_ShowsFlagAndHidesNotes()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a

@@ -11,6 +11,8 @@ public static class Setup
     [Before(Assembly)]
     public static async Task AssemblySetup(AssemblyHookContext context)
     {
+        await Services.GetRequiredService<DbHelper>().InitializeAsync();
+
         await Services.GetRequiredService<HostFixture>().InitializeAsync();
     }
 
@@ -22,6 +24,8 @@ public static class Setup
             .AddUserSecrets<SharedDependenciesDataSourceAttribute>()
             .AddEnvironmentVariables()
             .Build();
+
+        DbHelper.ConfigureDbServices(services, configuration.GetPostgresConnectionString());
 
         services
             .AddSingleton<IConfiguration>(configuration)

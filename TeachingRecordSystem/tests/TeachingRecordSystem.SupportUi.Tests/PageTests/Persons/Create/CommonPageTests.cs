@@ -10,7 +10,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string page, string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new CreateStateBuilder()

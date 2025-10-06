@@ -1,3 +1,4 @@
+using System.Transactions;
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -18,12 +19,27 @@ public abstract class TestBase(HostFixture hostFixture)
     [Before(Test)]
     public void TestSetup(TestContext context)
     {
+        var transactionScope = new TransactionScope(
+            TransactionScopeOption.RequiresNew,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
+
         var testScopedServices = TestScopedServices.Reset(HostFixture.Services);
         testScopedServices.EventObserver.Clear();
 
-        SetCurrentUser(TestUsers.GetUser(UserRoles.Administrator));
+        SetCurrentUser(Setup.AdminUser);
 
         context.AddAsyncLocalValues();
+    }
+
+    [After(Test)]
+    public void TestTeardown(TestContext context)
+    {
+        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
+        {
+            txn.Dispose();
+        }
     }
 
     protected HostFixture HostFixture { get; } = hostFixture;
@@ -41,8 +57,6 @@ public abstract class TestBase(HostFixture hostFixture)
     });
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
-
-    protected TestUsers TestUsers => HostFixture.Services.GetRequiredService<TestUsers>();
 
     protected IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
@@ -100,17 +114,11 @@ public abstract class TestBase(HostFixture hostFixture)
         return (JourneyInstance<TState>)reloadedInstance!;
     }
 
-    protected Guid GetCurrentUserId()
-    {
-        var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentUserProvider>();
-        return (currentUserProvider.CurrentUser ?? throw new InvalidOperationException("No current user set.")).UserId;
-    }
+    protected Guid GetCurrentUserId() =>
+        TestScopedServices.GetCurrent().CurrentUserProvider.CurrentUser?.UserId ?? throw new InvalidOperationException("No current user set.");
 
-    protected void SetCurrentUser(User user)
-    {
-        var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentUserProvider>();
-        currentUserProvider.CurrentUser = user;
-    }
+    protected void SetCurrentUser(User user) =>
+        TestScopedServices.GetCurrent().CurrentUserProvider.CurrentUser = user;
 
     protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {

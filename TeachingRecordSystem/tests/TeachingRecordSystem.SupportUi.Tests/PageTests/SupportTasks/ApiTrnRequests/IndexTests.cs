@@ -4,14 +4,8 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests;
 
-[NotInParallel]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Before(Test)]
-    public Task DeleteApiTrnRequestSupportTasks() =>
-        WithDbContext(dbContext =>
-            dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
-
     [Test]
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {

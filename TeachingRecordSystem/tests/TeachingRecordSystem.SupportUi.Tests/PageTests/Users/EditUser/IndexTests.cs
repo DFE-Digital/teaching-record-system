@@ -1,21 +1,7 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
-[NotInParallel]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Before(Test)]
-    public async Task DeleteUsersAsync()
-    {
-        await WithDbContext(async dbContext =>
-        {
-            await dbContext.Notes.ExecuteDeleteAsync();
-            await dbContext.SupportTasks.ExecuteDeleteAsync();
-            await dbContext.Users.ExecuteDeleteAsync();
-        });
-
-        TestUsers.ClearCache();
-    }
-
     [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {

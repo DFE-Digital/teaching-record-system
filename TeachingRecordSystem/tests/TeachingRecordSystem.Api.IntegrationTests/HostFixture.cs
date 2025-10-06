@@ -56,6 +56,7 @@ public class HostFixture : WebApplicationFactory<Program>
         builder.ConfigureServices((context, services) =>
         {
             DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
+            services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());
 
             // Replace authentication handlers with mechanisms we can control from tests
             services.Configure<AuthenticationOptions>(options =>

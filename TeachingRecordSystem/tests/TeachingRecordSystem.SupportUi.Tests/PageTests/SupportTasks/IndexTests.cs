@@ -1,15 +1,11 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks;
 
-[NotInParallel]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Before(Test)]
-    public Task DeleteSupportTasksAsync() =>
-        WithDbContext(dbContext => dbContext.SupportTasks.ExecuteDeleteAsync());
-
     [Test]
     public async Task Get_NoSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
