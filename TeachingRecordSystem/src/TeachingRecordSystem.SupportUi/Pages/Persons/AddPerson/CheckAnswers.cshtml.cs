@@ -1,0 +1,121 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+
+[Journey(JourneyNames.AddPerson), RequireJourneyInstance]
+public class CheckAnswersModel(
+    TrsLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
+    IClock clock,
+    IFileService fileService,
+    ITrnGenerator trnGenerator)
+    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+{
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public EmailAddress? EmailAddress { get; set; }
+    public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
+    public Gender? Gender { get; set; }
+    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public AddPersonReasonOption? CreateReason { get; set; }
+    public string? ReasonDetail { get; set; }
+    public Guid? EvidenceFileId { get; set; }
+    public string? EvidenceFileName { get; set; }
+    public string? EvidenceFileSizeDescription { get; set; }
+    public string? EvidenceFileUrl { get; set; }
+
+    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+
+    public string? ChangePersonalDetailsLink =>
+        GetPageLink(AddPersonJourneyPage.PersonalDetails, true);
+
+    public string? CreateReasonLink =>
+        GetPageLink(AddPersonJourneyPage.Reason, true);
+
+    public string BackLink => GetPageLink(AddPersonJourneyPage.Reason);
+
+    public void OnGet()
+    {
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        var now = clock.UtcNow;
+
+        var trn = await trnGenerator.GenerateTrnAsync();
+
+        var (person, personAttributes) = Person.Create(
+            trn,
+            FirstName ?? string.Empty,
+            MiddleName ?? string.Empty,
+            LastName ?? string.Empty,
+            DateOfBirth,
+            EmailAddress,
+            NationalInsuranceNumber,
+            Gender,
+            now);
+
+        var createdEvent = new PersonCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = User.GetUserId(),
+            PersonId = person.PersonId,
+            PersonAttributes = personAttributes,
+            CreateReason = CreateReason?.GetDisplayName(),
+            CreateReasonDetail = ReasonDetail,
+            EvidenceFile = EvidenceFileId is Guid detailsFileId
+                ? new EventModels.File()
+                {
+                    FileId = detailsFileId,
+                    Name = EvidenceFileName!
+                }
+                : null,
+            TrnRequestMetadata = null
+        };
+
+        DbContext.Add(person);
+        await DbContext.AddEventAndBroadcastAsync(createdEvent);
+        await DbContext.SaveChangesAsync();
+
+        await JourneyInstance!.CompleteAsync();
+
+        TempData.SetFlashSuccess($"Record created for {Name}",
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.PersonDetail(person.PersonId))
+            );
+
+        return Redirect(LinkGenerator.PersonDetail(person.PersonId));
+    }
+
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    {
+        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < AddPersonJourneyPage.CheckAnswers)
+        {
+            context.Result = Redirect(GetPageLink(NextIncompletePage));
+            return;
+        }
+
+        FirstName = JourneyInstance!.State.FirstName;
+        MiddleName = JourneyInstance.State.MiddleName;
+        LastName = JourneyInstance.State.LastName;
+        DateOfBirth = JourneyInstance.State.DateOfBirth;
+        EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
+        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
+        Gender = JourneyInstance.State.Gender;
+        CreateReason = JourneyInstance.State.CreateReason;
+        ReasonDetail = JourneyInstance.State.CreateReasonDetail;
+        EvidenceFileId = JourneyInstance.State.EvidenceFileId;
+        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
+        EvidenceFileUrl = JourneyInstance.State.EvidenceFileId is not null ?
+            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
+    }
+}

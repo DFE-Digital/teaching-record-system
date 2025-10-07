@@ -22,7 +22,7 @@ public static class JourneyNames
     public const string DeleteRouteToProfessionalStatus = nameof(DeleteRouteToProfessionalStatus);
     public const string ResolveApiTrnRequest = nameof(ResolveApiTrnRequest);
     public const string EditDetails = nameof(EditDetails);
-    public const string CreatePerson = nameof(CreatePerson);
+    public const string AddPerson = nameof(AddPerson);
     public const string MergePerson = nameof(MergePerson);
     public const string ResolveNpqTrnRequest = nameof(ResolveNpqTrnRequest);
     public const string RejectNpqTrnRequest = nameof(RejectNpqTrnRequest);

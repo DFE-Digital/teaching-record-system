@@ -10,8 +10,8 @@ public static class PersonsPageExtensions
     public static Task GoToPersonDetailPageAsync(this IPage page, Guid personId) =>
         page.GotoAsync($"/persons/{personId}");
 
-    public static Task GoToPersonCreatePageAsync(this IPage page) =>
-        page.GotoAsync($"/persons/create");
+    public static Task GoToPersonAddPersonPageAsync(this IPage page) =>
+        page.GotoAsync($"/persons/add");
 
     public static Task GoToPersonQualificationsPageAsync(this IPage page, Guid personId) =>
         page.GotoAsync($"/persons/{personId}/qualifications");
@@ -49,17 +49,17 @@ public static class PersonsPageExtensions
     public static Task AssertOnPersonEditDetailsCheckAnswersPageAsync(this IPage page, Guid personId) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/check-answers");
 
-    public static Task AssertOnPersonCreateIndexPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/create");
+    public static Task AssertOnAddPersonIndexPageAsync(this IPage page) =>
+        page.WaitForUrlPathAsync($"/persons/add");
 
-    public static Task AssertOnPersonCreatePersonalDetailsPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/create/personal-details");
+    public static Task AssertOnAddPersonPersonalDetailsPageAsync(this IPage page) =>
+        page.WaitForUrlPathAsync($"/persons/add/personal-details");
 
-    public static Task AssertOnPersonCreateCreateReasonPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/create/create-reason");
+    public static Task AssertOnAddPersonReasonPageAsync(this IPage page) =>
+        page.WaitForUrlPathAsync($"/persons/add/reason");
 
-    public static Task AssertOnPersonCreateCheckAnswersPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/create/check-answers");
+    public static Task AssertOnAddPersonCheckAnswersPageAsync(this IPage page) =>
+        page.WaitForUrlPathAsync($"/persons/add/check-answers");
 
     public static Task AssertOnPersonSetStatusChangeReasonPageAsync(this IPage page, Guid personId, PersonStatus targetStatus) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/change-reason");
@@ -67,18 +67,18 @@ public static class PersonsPageExtensions
     public static Task AssertOnPersonSetStatusCheckAnswersPageAsync(this IPage page, Guid personId, PersonStatus targetStatus) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/check-answers");
 
-    public static Task AssertOnPersonMergeEnterTrnPageAsync(this IPage page, Guid personId) =>
+    public static Task AssertOnMergePersonEnterTrnPageAsync(this IPage page, Guid personId) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/merge/enter-trn");
 
-    public static Task AssertOnPersonMergeMatchesPageAsync(this IPage page, Guid personId) =>
+    public static Task AssertOnMergePersonMatchesPageAsync(this IPage page, Guid personId) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/merge/matches");
 
-    public static Task AssertOnPersonMergeMergePageAsync(this IPage page, Guid personId) =>
+    public static Task AssertOnMergePersonMergePageAsync(this IPage page, Guid personId) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/merge/merge");
 
-    public static Task AssertOnPersonMergeChangeReasonPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/merge/change-reason");
+    public static Task AssertOnMergePersonReasonPageAsync(this IPage page, Guid personId) =>
+        page.WaitForUrlPathAsync($"/persons/{personId}/merge/reason");
 
-    public static Task AssertOnPersonMergeCheckAnswersPageAsync(this IPage page, Guid personId) =>
+    public static Task AssertOnMergePersonCheckAnswersPageAsync(this IPage page, Guid personId) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/merge/check-answers");
 }
