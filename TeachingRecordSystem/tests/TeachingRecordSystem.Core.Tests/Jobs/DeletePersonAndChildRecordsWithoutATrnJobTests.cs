@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
-using Xunit.Abstractions;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -25,12 +24,12 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public Mock<IFileService> FileService => fixture.FileServiceMock;
     public ILogger<DeletePersonAndChildRecordsWithoutATrnJob> TestOutputLogger { get; } = new TestOutputLogger(outputHelper);
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task Execute_WithDryRunTrue_DoesNotDeleteAnyPersons()
@@ -590,7 +589,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         return csv.GetRecords<CsvRow>().ToList();
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
+    private async Task<(IReadOnlyCollection<Guid>, IReadOnlyCollection<Guid>, IReadOnlyCollection<Guid>, IReadOnlyCollection<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
     {
         List<Person> persons = [];
 
@@ -615,14 +614,14 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         });
 
         return (
-            persons.Select(p => p.PersonId),
-            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []),
-            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []),
-            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? [])
+            persons.Select(p => p.PersonId).ToArray(),
+            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []).ToArray(),
+            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []).ToArray(),
+            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? []).ToArray()
         );
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
+    private async Task<(IReadOnlyCollection<Guid>, IReadOnlyCollection<Guid>, IReadOnlyCollection<Guid>, IReadOnlyCollection<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
     {
         List<Person> persons = [];
 
@@ -649,10 +648,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         });
 
         return (
-            persons.Select(p => p.PersonId),
-            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []),
-            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []),
-            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? [])
+            persons.Select(p => p.PersonId).AsReadOnly(),
+            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []).AsReadOnly(),
+            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []).AsReadOnly(),
+            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? []).AsReadOnly()
         );
     }
 
@@ -1031,32 +1030,32 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         return ids;
     }
 
-    private async Task<IEnumerable<Guid>> GetPersonsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetPersonsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.Persons
             .Select(p => p.PersonId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetAlertsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetAlertsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.Alerts
             .Select(a => a.AlertId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetNotesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetNotesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.Notes
             .Select(n => n.NoteId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetPreviousNamesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetPreviousNamesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.PreviousNames
             .Select(p => p.PreviousNameId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetQualificationsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetQualificationsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.Qualifications
             .Select(p => p.QualificationId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetTpsEmploymentsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetTpsEmploymentsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.TpsEmployments
             .Select(e => e.TpsEmploymentId)
             .ToArrayAsync());
@@ -1066,42 +1065,42 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             .Select(e => e.EstablishmentId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetAlertTypesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetAlertTypesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.AlertTypes
             .Select(a => a.AlertTypeId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetSupportTasksAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetSupportTasksAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.SupportTasks
             .Select(s => s.SupportTaskReference)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetTrnRequestsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetTrnRequestsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.TrnRequestMetadata
             .Select(m => m.RequestId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetTrnRequestMetadataAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetTrnRequestMetadataAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.TrnRequestMetadata
             .Select(m => m.RequestId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<long>> GetIntegrationTransactionRecordsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<long>> GetIntegrationTransactionRecordsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.IntegrationTransactionRecords
             .Select(itr => itr.IntegrationTransactionRecordId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetOneLoginUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetOneLoginUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.OneLoginUsers
             .Select(olu => olu.Subject)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.Users
             .Select(u => u.UserId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetApplicationUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetApplicationUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.ApplicationUsers
             .Select(u => u.UserId)
             .ToArrayAsync());
@@ -1148,14 +1147,14 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
     public Mock<IFileService> FileServiceMock { get; } = new Mock<IFileService>();
     public TrsDbContext DbContext { get; }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
 
         FileServiceMock.Invocations.Clear();
     }
 
-    public async Task DisposeAsync() => await DbContext.DisposeAsync();
+    public async ValueTask DisposeAsync() => await DbContext.DisposeAsync();
 
     public UploadedFile? GetLastUploadedFile() => _uploadedFiles.LastOrDefault();
 }

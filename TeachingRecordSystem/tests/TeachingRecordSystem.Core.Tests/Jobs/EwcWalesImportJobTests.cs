@@ -98,9 +98,9 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
 
     public Mock<ILogger<EwcWalesImportJob>> Logger { get; }
 
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
+    async ValueTask IAsyncLifetime.InitializeAsync() => await DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     public EwcWalesImportJob Job { get; }
 

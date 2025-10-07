@@ -91,9 +91,9 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         Assert.Equal(personEmployment.UpdatedOn, (DateTime)exportItem[nameof(WorkforceDataExportItem.UpdatedOn)]);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
 
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask DisposeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
     private DbFixture DbFixture { get; }
 

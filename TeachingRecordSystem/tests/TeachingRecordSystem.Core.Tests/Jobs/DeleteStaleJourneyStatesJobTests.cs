@@ -10,9 +10,9 @@ public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifet
 
     public TestableClock Clock { get; } = new();
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _trsContext = await dbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
     }

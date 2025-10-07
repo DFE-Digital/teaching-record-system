@@ -11,7 +11,7 @@ public class GetTeacherTests : TestBase
     {
     }
 
-    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
+    protected override Task InitializeAsyncCore() => DbHelper.DeleteAllPersonsAsync();
 
     [Theory]
     [InlineData("123456")]
