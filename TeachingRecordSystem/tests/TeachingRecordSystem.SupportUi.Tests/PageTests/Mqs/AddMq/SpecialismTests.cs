@@ -28,7 +28,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(person.ContactId, state => state.ProviderId = null);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state => state.ProviderId = null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -47,7 +47,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
-        var journeyInstance = await CreateJourneyInstanceAsync(person.ContactId, state => state.Specialism = specialism);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state => state.Specialism = specialism);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -171,7 +171,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
-        var journeyInstance = await CreateJourneyInstanceAsync(person.ContactId, state => state.Specialism = specialism);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state => state.Specialism = specialism);
 
         var request = new HttpRequestMessage(httpMethod, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

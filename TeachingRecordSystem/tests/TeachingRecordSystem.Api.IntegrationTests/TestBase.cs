@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using FakeXrmEasy.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -55,8 +54,6 @@ public abstract class TestBase : IAsyncLifetime
     public ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
-
-    public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
 

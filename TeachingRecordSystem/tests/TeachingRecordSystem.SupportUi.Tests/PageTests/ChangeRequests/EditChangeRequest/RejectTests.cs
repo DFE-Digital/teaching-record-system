@@ -13,7 +13,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: null));
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
@@ -33,7 +33,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
@@ -66,7 +66,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
@@ -84,7 +84,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenRejectionReasonChoiceHasNoSelection_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
@@ -107,7 +107,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
@@ -133,7 +133,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenRejectionReasonChoiceIsNotChangeNoLongerRequired_RedirectsWithFlashMessage(bool isNameChange)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         SupportTask supportTask;
         if (isNameChange)
         {
@@ -227,7 +227,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenRejectionReasonChoiceIsChangeNoLongerRequired_RedirectsWithFlashMessage(bool isNameChange)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         SupportTask supportTask;
         if (isNameChange)
         {

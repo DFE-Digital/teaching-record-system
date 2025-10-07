@@ -33,20 +33,20 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithEmail((string?)email)
             .WithNationalInsuranceNumber()
             .WithGender());
 
         await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.ContactId)
+            .WithPersonId(createPersonResult.PersonId)
             .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
         Clock.Advance();
         await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.ContactId)
+            .WithPersonId(createPersonResult.PersonId)
             .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -80,22 +80,19 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithEmail((string?)email)
             .WithNationalInsuranceNumber()
             .WithGender());
 
         await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.ContactId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName)
-            .AfterContactsMigrated());
+            .WithPersonId(createPersonResult.PersonId)
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
         Clock.Advance();
         await TestData.UpdatePersonAsync(b => b
-            .WithPersonId(createPersonResult.ContactId)
-            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName)
-            .AfterContactsMigrated());
+            .WithPersonId(createPersonResult.PersonId)
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -119,10 +116,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForExistingPersonWithMissingProperties_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(b => b
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var createPersonResult = await TestData.CreatePersonAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -143,7 +139,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithAlert(a => a.WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -160,8 +156,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasNoAlert_DoesNotShowAlertNotification()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
         Debug.Assert(person.Alerts.Count == 0);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -179,7 +174,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithAlert(a => a.WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -196,9 +191,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NotesTab_IsRendered()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -213,7 +208,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonHasNoProfessionalStatusDetails_NoSummaryCardShown()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -232,7 +227,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithQts(awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -261,7 +256,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithQtls(awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -290,7 +285,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -319,7 +314,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -348,7 +343,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs)
+
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus, awardDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -382,9 +377,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -408,9 +401,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonIsDeactivated_ChangeDetailsLinkIsHidden()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
-            .WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         await WithDbContext(async dbContext =>
         {
@@ -436,8 +427,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonIsDeactivated_DoesNotShowMergeButton()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var person = await TestData.CreatePersonAsync();
 
         await WithDbContext(async dbContext =>
         {
@@ -461,7 +451,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithAlert(a => a.WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -478,8 +467,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonDoesNotHaveOpenAlert_ShowsMergeButton()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -503,7 +491,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithInductionStatus(i => i
                 .WithStatus(status)
                 .WithStartDate(new DateOnly(2024, 1, 1))
@@ -533,8 +520,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonStatus_ShowsMergeButtonAsExpected(PersonStatus currentStatus, bool expectMergeButtonToBeShown)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var person = await TestData.CreatePersonAsync();
 
         if (currentStatus == PersonStatus.Deactivated)
         {
@@ -573,8 +559,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithFirstName("Lily")
             .WithMiddleName("The")
-            .WithLastName("Pink")
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+            .WithLastName("Pink"));
 
         if (currentStatus == PersonStatus.Deactivated)
         {
@@ -620,8 +605,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
 
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -648,8 +632,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonStatus_RendersSetStatusButtonAsExpected(PersonStatus currentStatus, string expectedButtonText, string expectedTargetStatus)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var person = await TestData.CreatePersonAsync();
 
         if (currentStatus == PersonStatus.Deactivated)
         {
@@ -678,10 +661,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWasDeactivatedAsPartOfAMerge_DoesNotShowSetStatusButton()
     {
         // Arrange
-        var primaryPerson = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var primaryPerson = await TestData.CreatePersonAsync();
         var secondaryPerson = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithMergedWithPersonId(primaryPerson.PersonId));
 
         await WithDbContext(async dbContext =>

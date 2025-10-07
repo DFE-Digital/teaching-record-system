@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
@@ -11,7 +10,6 @@ public class QtsImporterTests : IAsyncLifetime
 {
     public QtsImporterTests(
       DbFixture dbFixture,
-      IOrganizationServiceAsync2 organizationService,
       ReferenceDataCache referenceDataCache,
       FakeTrnGenerator trnGenerator,
       IServiceProvider provider)
@@ -21,11 +19,9 @@ public class QtsImporterTests : IAsyncLifetime
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
 
         Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
     }

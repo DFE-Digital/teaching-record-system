@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Faker.Net" />
-    <PackageReference Include="FakeXrmEasy.v9" />
     <PackageReference Include="Moq" />
     <PackageReference Include="Respawn" />
     <PackageReference Include="System.Linq.Async" />

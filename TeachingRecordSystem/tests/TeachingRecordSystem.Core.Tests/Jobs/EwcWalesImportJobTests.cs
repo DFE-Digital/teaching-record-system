@@ -2,7 +2,6 @@ using System.Text;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
 
@@ -23,8 +22,6 @@ public partial class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFix
     private TestData TestData => Fixture.TestData;
 
     private EwcWalesImportJobFixture Fixture { get; }
-
-    public IOrganizationServiceAsync2 OrganizationService => Fixture.OrganizationService;
 
     private EwcWalesImportJob Job => Fixture.Job;
 
@@ -78,7 +75,6 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         FakeTrnGenerator trnGenerator,
         IServiceProvider provider)
     {
-        OrganizationService = provider.GetService<IOrganizationServiceAsync2>()!;
         DbFixture = dbFixture;
         Clock = new();
 
@@ -89,11 +85,9 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         Job = ActivatorUtilities.CreateInstance<EwcWalesImportJob>(provider, blobServiceClient.Object, qtsImporter, inductionImporter, Logger.Object);
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            OrganizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
     }
 
     public DbFixture DbFixture { get; }
@@ -107,8 +101,6 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
     Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    public IOrganizationServiceAsync2 OrganizationService { get; }
 
     public EwcWalesImportJob Job { get; }
 

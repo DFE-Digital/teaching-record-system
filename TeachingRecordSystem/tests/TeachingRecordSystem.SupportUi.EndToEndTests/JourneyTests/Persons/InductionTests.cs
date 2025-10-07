@@ -22,7 +22,7 @@ public class InductionTests : TestBase
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.RequiredToComplete)));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -62,7 +62,7 @@ public class InductionTests : TestBase
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.RequiredToComplete)));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -96,7 +96,7 @@ public class InductionTests : TestBase
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.RequiredToComplete)));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -146,7 +146,7 @@ public class InductionTests : TestBase
                     .WithStartDate(startDate)
                     .WithCompletedDate(completedDate)
                 ));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -205,7 +205,7 @@ public class InductionTests : TestBase
                     .WithStartDate(startDate)
                     .WithCompletedDate(completedDate)
                 ));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -258,7 +258,7 @@ public class InductionTests : TestBase
                     .WithStartDate(startDate)
                     .WithCompletedDate(completedDate)
                 ));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -302,7 +302,7 @@ public class InductionTests : TestBase
                     .WithStatus(InductionStatus.Passed)
                     .WithStartDate(startDate)
                     .WithCompletedDate(completedDate)));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -329,7 +329,7 @@ public class InductionTests : TestBase
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.RequiredToComplete)));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -389,7 +389,7 @@ public class InductionTests : TestBase
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.RequiredToComplete)));
 
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -445,7 +445,7 @@ public class InductionTests : TestBase
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.RequiredToComplete)));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -512,7 +512,7 @@ public class InductionTests : TestBase
             .WithInductionStatus(inductionBuilder => inductionBuilder
                 .WithStatus(InductionStatus.Exempt)
                 .WithExemptionReasons(exemptionReasonId)));
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -540,7 +540,7 @@ public class InductionTests : TestBase
                     .WithStatus(InductionStatus.Exempt)
                     .WithExemptionReasons(exemptionReasonId))
                 );
-        var personId = person.ContactId;
+        var personId = person.PersonId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

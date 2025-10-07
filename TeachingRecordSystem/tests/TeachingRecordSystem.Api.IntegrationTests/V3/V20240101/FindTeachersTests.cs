@@ -8,7 +8,6 @@ public class FindTeachersTests : TestBase
     public FindTeachersTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        XrmFakedContext.DeleteAllEntities<Contact>();
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 

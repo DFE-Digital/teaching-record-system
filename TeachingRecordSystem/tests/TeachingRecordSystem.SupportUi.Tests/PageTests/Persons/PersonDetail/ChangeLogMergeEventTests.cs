@@ -39,10 +39,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         _dob = Clock.Today.AddYears(-20);
 
         _createdByUser = await TestData.CreateUserAsync();
-        _person = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
-        _secondaryPerson = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        _person = await TestData.CreatePersonAsync();
+        _secondaryPerson = await TestData.CreatePersonAsync();
 
         await WithDbContext(async dbContext =>
         {

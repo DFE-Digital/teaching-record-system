@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema;
@@ -26,7 +25,6 @@ public class EventMapperFixture
 {
     public EventMapperFixture(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         FakeTrnGenerator trnGenerator,
         IServiceProvider serviceProvider)
     {
@@ -36,11 +34,9 @@ public class EventMapperFixture
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             ReferenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
 
         Services = serviceProvider;
     }

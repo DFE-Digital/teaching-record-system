@@ -1,6 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -11,7 +9,6 @@ public class NightlyEmailJobFixture
 {
     public NightlyEmailJobFixture(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
         ILoggerFactory loggerFactory)
@@ -23,13 +20,9 @@ public class NightlyEmailJobFixture
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
-
-        CrmServiceClientProvider = new TestCrmServiceClientProvider(organizationService);
+            trnGenerator);
     }
 
     public TestableClock Clock { get; }
@@ -39,21 +32,4 @@ public class NightlyEmailJobFixture
     public ILoggerFactory LoggerFactory { get; }
 
     public TestData TestData { get; }
-
-    public ICrmServiceClientProvider CrmServiceClientProvider { get; }
-
-    private class TestCrmServiceClientProvider : ICrmServiceClientProvider
-    {
-        private readonly IOrganizationServiceAsync2 _organizationService;
-
-        public TestCrmServiceClientProvider(IOrganizationServiceAsync2 organizationService)
-        {
-            _organizationService = organizationService;
-        }
-
-        public IOrganizationServiceAsync2 GetClient(string name)
-        {
-            return _organizationService;
-        }
-    }
 }

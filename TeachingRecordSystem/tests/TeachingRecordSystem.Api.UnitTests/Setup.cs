@@ -50,12 +50,10 @@ public static class Setup
             .AddCoreServices(configuration, environment)
             .AddApiServices(configuration, environment)
             .AddSingleton<DbFixture>()
-            .AddFakeXrm()
             .AddSingleton(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
-                    new ForwardToTestScopedClock(),
-                    TestDataPersonDataSource.CrmAndTrs))
+                    new ForwardToTestScopedClock()))
             .AddSingleton<FakeTrnGenerator>()
             .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
             .AddSingleton(_currentUserProviderMock.Object)

@@ -48,7 +48,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             state => state.ProviderId = provider.MandatoryQualificationProviderId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");

@@ -4,10 +4,8 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -925,7 +923,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     public Task DisposeAsync() => Task.CompletedTask;
 }
 
-public class CapitaExportNewJobFixture : IAsyncLifetime
+public class CapitaExportNewJobFixture
 {
     public CapitaExportNewJobFixture(
         DbFixture dbFixture,
@@ -935,18 +933,8 @@ public class CapitaExportNewJobFixture : IAsyncLifetime
         ILoggerFactory loggerFactory,
         IConfiguration configuration)
     {
-        OrganizationService = provider.GetService<IOrganizationServiceAsync2>()!;
         DbFixture = dbFixture;
         Clock = new();
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            OrganizationService,
-            referenceDataCache,
-            Clock,
-            new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            BlobStorageFileService.Object,
-            configuration);
 
         Logger = new Mock<ILogger<CapitaExportNewJob>>();
 
@@ -977,11 +965,9 @@ public class CapitaExportNewJobFixture : IAsyncLifetime
         Job = ActivatorUtilities.CreateInstance<CapitaExportNewJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock);
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            OrganizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
     }
 
     public DbFixture DbFixture { get; }
@@ -990,15 +976,7 @@ public class CapitaExportNewJobFixture : IAsyncLifetime
 
     public TestableClock Clock { get; }
 
-    public TrsDataSyncHelper Helper { get; }
-
     public Mock<ILogger<CapitaExportNewJob>> Logger { get; }
-
-    Task IAsyncLifetime.InitializeAsync() => Task.CompletedTask;
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    public IOrganizationServiceAsync2 OrganizationService { get; }
 
     public CapitaExportNewJob Job { get; }
 

@@ -1,4 +1,3 @@
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 
@@ -9,7 +8,6 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 {
     public TpsCsvExtractProcessorTests(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator)
     {
@@ -18,11 +16,9 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
     }
 
     [Fact]

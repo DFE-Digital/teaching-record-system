@@ -1,5 +1,4 @@
 using System.Text;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Establishments.Tps;
 using TeachingRecordSystem.Core.Services.WorkforceData;
@@ -25,7 +24,6 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
 
     public TpsEstablishmentRefresherTests(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator)
     {
@@ -34,11 +32,9 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
     }
 
     public static TheoryData<TpsEstablishmentFileImportTestScenarioData> GetImportFileTestScenarioData()

@@ -1,6 +1,3 @@
-using FakeXrmEasy.Extensions;
-using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
 using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -56,7 +53,6 @@ public partial class TestData
         private int? _loginFailedCounter;
         private CreatePersonInductionBuilder? _inductionBuilder;
         private QtlsStatus? _qtlsStatus;
-        private TestDataPersonDataSource? _personDataSource;
         private Guid? _mergedWithPersonId;
         private bool? _createdByTps;
 
@@ -358,12 +354,6 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithPersonDataSource(TestDataPersonDataSource personDataSource)
-        {
-            _personDataSource = personDataSource;
-            return this;
-        }
-
         public CreatePersonBuilder WithMergedWithPersonId(Guid mergedWithPersonId)
         {
             _mergedWithPersonId = mergedWithPersonId;
@@ -446,11 +436,6 @@ public partial class TestData
             if (trn is not null && _trnToken is null && _email is not null)
             {
                 _trnToken = Guid.NewGuid().ToString();
-            }
-
-            if ((_personDataSource ?? testData.PersonDataSource) is TestDataPersonDataSource.CrmAndTrs)
-            {
-                testData.OrganizationService.Create(contact);
             }
 
             var (mqs, alerts, person, routes, previousNames) = await testData.WithDbContextAsync(async dbContext =>
@@ -618,29 +603,11 @@ public partial class TestData
                 }
             });
 
-            var currentDqtUser = await testData.GetCurrentCrmUserAsync();
-            var auditId = Guid.NewGuid();
-            var auditDetail = new AttributeAuditDetail()
-            {
-                AuditRecord = new Audit()
-                {
-                    Action = Audit_Action.Create,
-                    AuditId = auditId,
-                    CreatedOn = testData.Clock.UtcNow,
-                    Id = auditId,
-                    Operation = Audit_Operation.Create,
-                    UserId = currentDqtUser
-                },
-                OldValue = new Entity(Contact.EntityLogicalName),
-                NewValue = contact.Clone()
-            };
-
             return new CreatePersonResult()
             {
                 PersonId = PersonId,
                 Person = person,
                 Events = events.AsReadOnly(),
-                Contact = contact,
                 Trn = trn,
                 DateOfBirth = dateOfBirth,
                 FirstName = firstName,
@@ -656,7 +623,6 @@ public partial class TestData
                 EytsDate = person.EytsDate,
                 MandatoryQualifications = mqs,
                 Alerts = alerts,
-                DqtContactAuditDetail = auditDetail,
                 ProfessionalStatuses = routes,
                 PreviousNames = previousNames
             };
@@ -1099,9 +1065,7 @@ public partial class TestData
     {
         public required Guid PersonId { get; init; }
         public required Person Person { get; init; }
-        public Guid ContactId => PersonId;
         public required IReadOnlyCollection<EventBase> Events { get; init; }
-        public required Contact Contact { get; init; }
         public required string? Trn { get; init; }
         public required DateOnly DateOfBirth { get; init; }
         public required string FirstName { get; init; }
@@ -1119,6 +1083,5 @@ public partial class TestData
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
         public required IReadOnlyCollection<RouteToProfessionalStatus> ProfessionalStatuses { get; init; }
         public required IReadOnlyCollection<PreviousName> PreviousNames { get; init; }
-        public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
 }

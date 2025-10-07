@@ -11,8 +11,7 @@ public class CommonPageTests(HostFixture hostFixture) : MergeTestBase(hostFixtur
         [Matrix("matches", "merge", "check-answers")] string page,
         [MatrixHttpMethods(TestHttpMethods.GetAndPost)] HttpMethod httpMethod)
     {
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,

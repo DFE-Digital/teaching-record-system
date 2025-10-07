@@ -22,7 +22,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoPotentialDuplicateTasks_ReturnsNoResults()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/teacher-pensions?_f=1");
 
         // Act

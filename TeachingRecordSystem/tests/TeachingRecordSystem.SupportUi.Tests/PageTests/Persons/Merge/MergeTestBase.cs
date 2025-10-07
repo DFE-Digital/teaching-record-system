@@ -14,7 +14,6 @@ public class MergeTestBase(HostFixture hostFixture)
         configurePersonB ??= new Action<CreatePersonBuilder>(p => { });
 
         var personA = await TestData.CreatePersonAsync(p => configurePersonA(p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithEmail(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues)));
@@ -22,7 +21,6 @@ public class MergeTestBase(HostFixture hostFixture)
         var personB = await TestData.CreatePersonAsync(p =>
         {
             p
-                .WithPersonDataSource(TestDataPersonDataSource.Trs)
                 .WithFirstName(personA.FirstName)
                 .WithMiddleName(personA.MiddleName)
                 .WithLastName(personA.LastName)
@@ -53,13 +51,11 @@ public class MergeTestBase(HostFixture hostFixture)
         bool useNullValues = false)
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithEmail(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithFirstName(TestData.GenerateChangedFirstName(personA.FirstName))
             .WithMiddleName(TestData.GenerateChangedMiddleName(personA.MiddleName))
             .WithLastName(TestData.GenerateChangedLastName(personA.LastName))
@@ -76,7 +72,6 @@ public class MergeTestBase(HostFixture hostFixture)
         bool useNullValues = false)
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithEmail(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues));
@@ -84,7 +79,6 @@ public class MergeTestBase(HostFixture hostFixture)
         var personB = await TestData.CreatePersonAsync(p =>
         {
             p
-                .WithPersonDataSource(TestDataPersonDataSource.Trs)
                 .WithFirstName(
                     differentAttribute != PersonMatchedAttribute.FirstName
                         ? personA.FirstName
@@ -138,7 +132,6 @@ public class MergeTestBase(HostFixture hostFixture)
         bool useNullValues = false)
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithEmail(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues));
@@ -146,7 +139,6 @@ public class MergeTestBase(HostFixture hostFixture)
         var personB = await TestData.CreatePersonAsync(p =>
         {
             p
-                .WithPersonDataSource(TestDataPersonDataSource.Trs)
                 .WithFirstName(
                     matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
                         ? personA.FirstName

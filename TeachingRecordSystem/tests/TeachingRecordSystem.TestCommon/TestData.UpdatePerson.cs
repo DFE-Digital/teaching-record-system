@@ -1,7 +1,5 @@
-using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -19,7 +17,6 @@ public partial class TestData
     {
         private Guid? _personId;
         private (string FirstName, string? MiddleName, string LastName)? _updatedName;
-        private bool? _contactsMigrated;
 
         public UpdatePersonBuilder WithPersonId(Guid personId)
         {
@@ -43,17 +40,6 @@ public partial class TestData
             return this;
         }
 
-        public UpdatePersonBuilder AfterContactsMigrated(bool contactsMigrated = true)
-        {
-            if (_contactsMigrated is not null)
-            {
-                throw new InvalidOperationException("AfterContactsMigrated has already been set");
-            }
-
-            _contactsMigrated = contactsMigrated;
-            return this;
-        }
-
         public async Task ExecuteAsync(TestData testData)
         {
             if (_personId is null)
@@ -65,95 +51,54 @@ public partial class TestData
             {
                 var now = testData.Clock.UtcNow;
 
-                if (_contactsMigrated is true)
+                await testData.WithDbContextAsync(async dbContext =>
                 {
-                    await testData.WithDbContextAsync(async dbContext =>
-                    {
-                        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId.Value);
+                    var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId.Value);
 
-                        var updatePersonResult = person.UpdateDetails(
-                            Option.Some(_updatedName.Value.FirstName),
-                            Option.Some(_updatedName.Value.MiddleName ?? string.Empty),
-                            Option.Some(_updatedName.Value.LastName),
-                            Option.Some(person.DateOfBirth),
-                            Option.Some((EmailAddress?)person.EmailAddress),
-                            Option.Some((NationalInsuranceNumber?)person.NationalInsuranceNumber),
-                            Option.Some(person.Gender),
-                            now);
+                    var updatePersonResult = person.UpdateDetails(
+                        Option.Some(_updatedName.Value.FirstName),
+                        Option.Some(_updatedName.Value.MiddleName ?? string.Empty),
+                        Option.Some(_updatedName.Value.LastName),
+                        Option.Some(person.DateOfBirth),
+                        Option.Some((EmailAddress?)person.EmailAddress),
+                        Option.Some((NationalInsuranceNumber?)person.NationalInsuranceNumber),
+                        Option.Some(person.Gender),
+                        now);
 
-                        var updatedEvent = updatePersonResult.Changes != 0 ?
-                            new PersonDetailsUpdatedEvent
-                            {
-                                EventId = Guid.NewGuid(),
-                                CreatedUtc = now,
-                                RaisedBy = SystemUser.SystemUserId,
-                                PersonId = person.PersonId,
-                                PersonAttributes = updatePersonResult.PersonAttributes,
-                                OldPersonAttributes = updatePersonResult.OldPersonAttributes,
-                                NameChangeReason = null,
-                                NameChangeEvidenceFile = null,
-                                DetailsChangeReason = null,
-                                DetailsChangeReasonDetail = null,
-                                DetailsChangeEvidenceFile = null,
-                                Changes = PersonDetailsUpdatedEventChanges.None
-                            } :
-                            null;
-
-                        if (updatedEvent?.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) == true)
+                    var updatedEvent = updatePersonResult.Changes != 0 ?
+                        new PersonDetailsUpdatedEvent
                         {
-                            dbContext.PreviousNames.Add(new PreviousName
-                            {
-                                PreviousNameId = Guid.NewGuid(),
-                                PersonId = _personId.Value,
-                                FirstName = updatedEvent.OldPersonAttributes.FirstName,
-                                MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
-                                LastName = updatedEvent.OldPersonAttributes.LastName,
-                                CreatedOn = now,
-                                UpdatedOn = now
-                            });
-                        }
+                            EventId = Guid.NewGuid(),
+                            CreatedUtc = now,
+                            RaisedBy = SystemUser.SystemUserId,
+                            PersonId = person.PersonId,
+                            PersonAttributes = updatePersonResult.PersonAttributes,
+                            OldPersonAttributes = updatePersonResult.OldPersonAttributes,
+                            NameChangeReason = null,
+                            NameChangeEvidenceFile = null,
+                            DetailsChangeReason = null,
+                            DetailsChangeReasonDetail = null,
+                            DetailsChangeEvidenceFile = null,
+                            Changes = (PersonDetailsUpdatedEventChanges)updatePersonResult.Changes
+                        } :
+                        null;
 
-                        await dbContext.SaveChangesAsync();
-                    });
-                }
-                else
-                {
-                    await testData.OrganizationService.ExecuteAsync(new UpdateRequest()
+                    if (updatedEvent?.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) == true)
                     {
-                        Target = new Contact()
-                        {
-                            Id = _personId!.Value,
-                            FirstName = _updatedName.Value.FirstName,
-                            MiddleName = _updatedName.Value.MiddleName,
-                            LastName = _updatedName.Value.LastName,
-                            dfeta_StatedFirstName = _updatedName.Value.FirstName,
-                            dfeta_StatedMiddleName = _updatedName.Value.MiddleName,
-                            dfeta_StatedLastName = _updatedName.Value.LastName
-                        }
-                    });
-
-                    await testData.WithDbContextAsync(async dbContext =>
-                    {
-                        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == _personId);
-
                         dbContext.PreviousNames.Add(new PreviousName
                         {
                             PreviousNameId = Guid.NewGuid(),
                             PersonId = _personId.Value,
-                            FirstName = person.FirstName,
-                            MiddleName = person.MiddleName,
-                            LastName = person.LastName,
+                            FirstName = updatedEvent.OldPersonAttributes.FirstName,
+                            MiddleName = updatedEvent.OldPersonAttributes.MiddleName,
+                            LastName = updatedEvent.OldPersonAttributes.LastName,
                             CreatedOn = now,
                             UpdatedOn = now
                         });
+                    }
 
-                        person.FirstName = _updatedName.Value.FirstName;
-                        person.MiddleName = _updatedName.Value.MiddleName ?? "";
-                        person.LastName = _updatedName.Value.LastName;
-
-                        await dbContext.SaveChangesAsync();
-                    });
-                }
+                    await dbContext.SaveChangesAsync();
+                });
             }
         }
     }

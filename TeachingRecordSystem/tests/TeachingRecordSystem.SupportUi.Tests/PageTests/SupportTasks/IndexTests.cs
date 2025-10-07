@@ -10,7 +10,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var person = await TestData.CreatePersonAsync();
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
@@ -32,7 +32,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_DateRequestedSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var person = await TestData.CreatePersonAsync();
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
@@ -54,7 +54,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_TypeSortByQueryParam_ShowsTasksSortedByType()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
@@ -76,7 +76,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoCategoriesSpecifiedAndNoFiltersApplied_ReturnsAllCategories()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
@@ -118,7 +118,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_CategoriesSpecified_ReturnsResultsMatchingCategoriesOnly()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
@@ -142,7 +142,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ReferenceSpecified_ReturnsResultMatchingReferenceOnly()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person = await TestData.CreatePersonAsync();
         var dobChangeRequest = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             person.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));

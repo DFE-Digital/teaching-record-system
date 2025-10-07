@@ -11,7 +11,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var expectedWarning = "This teacher does not hold QTS ";
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -49,7 +49,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithHoldsFrom(holdsFromDate)
                 .WithInductionExemption(hasExemption)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -80,7 +80,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithQts()
                 .WithInductionStatus(setInductionStatus));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -107,7 +107,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .WithStatus(InductionStatus.Exempt)
                     .WithExemptionReasons(exemptionReasonId)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -142,7 +142,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .WithStatus(setInductionStatus)
                     .WithStartDate(setStartDate)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -167,7 +167,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .WithInductionStatus(inductionBuilder =>
                         inductionBuilder.WithStatus(InductionStatus.InProgress)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -195,7 +195,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .WithStartDate(setStartDate)
                     .WithCompletedDate(setCompletedDate)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -251,7 +251,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             await dbContext.SaveChangesAsync();
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -310,7 +310,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             await dbContext.SaveChangesAsync();
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -333,7 +333,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInductionStatus(builder => builder
                     .WithStatus(InductionStatus.InProgress)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -354,7 +354,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInductionStatus(builder => builder
                     .WithStatus(setInductionStatus)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -387,7 +387,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .WithHoldsFrom(holdsFromDate)
                     .WithInductionExemption(true)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -423,7 +423,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithQts()
                 .WithInductionStatus(b => b.WithStatus(InductionStatus.Passed)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -476,7 +476,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -520,7 +520,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/induction");
 
         // Act
         var response = await HttpClient.SendAsync(request);

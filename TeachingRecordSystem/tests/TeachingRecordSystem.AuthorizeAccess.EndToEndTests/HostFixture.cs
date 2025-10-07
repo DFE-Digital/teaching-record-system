@@ -88,10 +88,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
 
                     services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
                     services.AddSingleton<OneLoginCurrentUserProvider>();
-                    services.AddFakeXrm();
-                    services.AddSingleton(
-                        sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataPersonDataSource.CrmAndTrs));
-                    services.AddFakeXrm();
+                    services.AddSingleton<TestData>();
                     services.AddSingleton<FakeTrnGenerator>();
                     services.AddSingleton<TrsDataSyncHelper>();
                     services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
