@@ -33,7 +33,6 @@ generated_code = true
 tab_width = 4
 indent_size = 4
 
-dotnet_analyzer_diagnostic.category-Style.severity = warning
 dotnet_diagnostic.CA1849.severity = suggestion
 dotnet_diagnostic.CA1822.severity = none
 dotnet_diagnostic.CA1852.severity = none
