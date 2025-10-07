@@ -7,10 +7,10 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys;
+namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.AddApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerator linkGenerator) : PageModel
 {
     [FromQuery]
     public Guid ApplicationUserId { get; set; }

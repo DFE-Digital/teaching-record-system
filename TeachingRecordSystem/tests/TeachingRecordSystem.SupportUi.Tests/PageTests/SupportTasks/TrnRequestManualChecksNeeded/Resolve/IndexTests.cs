@@ -9,7 +9,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTaskReference = SupportTask.GenerateSupportTaskReference();
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTaskReference}/resolve");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -23,7 +23,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTask = await CreateSupportTaskAsync(SupportTaskStatus.Closed);
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -37,7 +37,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTask = await CreateSupportTaskAsync();
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -64,7 +64,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTaskReference = SupportTask.GenerateSupportTaskReference();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTaskReference}/resolve");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -78,7 +78,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTask = await CreateSupportTaskAsync(SupportTaskStatus.Closed);
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -93,7 +93,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var supportTask = await CreateSupportTaskAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -106,7 +106,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/confirm", response.Headers.Location?.ToString());
+        Assert.Equal($"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve/confirm", response.Headers.Location?.ToString());
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var supportTask = await CreateSupportTaskAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -133,7 +133,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var supportTask = await CreateSupportTaskAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve")
         {
             Content = new FormUrlEncodedContentBuilder
             {

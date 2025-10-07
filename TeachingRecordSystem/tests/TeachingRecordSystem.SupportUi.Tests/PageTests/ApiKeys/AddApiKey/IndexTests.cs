@@ -1,8 +1,8 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys.AddApiKey;
 
-public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()

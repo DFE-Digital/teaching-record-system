@@ -11,13 +11,13 @@ public static class NpqTrnRequestPageExtensions
         page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/details");
 
     public static Task AssertOnMatchesPageAsync(this IPage page, string taskReference) =>
-        page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/matches");
+        page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/resolve/matches");
 
     public static Task AssertOnMergePageAsync(this IPage page, string taskReference) =>
-        page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/merge");
+        page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/resolve/merge");
 
     public static Task AssertOnMatchesCheckYourAnswersPageAsync(this IPage page, string taskReference) =>
-        page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/check-answers");
+        page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/resolve/check-answers");
 
     public static Task AssertOnNoMatchesCheckYourAnswersPageAsync(this IPage page, string taskReference) =>
         page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/no-matches/check-answers");

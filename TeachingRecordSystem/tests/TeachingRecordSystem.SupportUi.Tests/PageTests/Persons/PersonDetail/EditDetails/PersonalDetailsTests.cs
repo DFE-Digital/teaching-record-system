@@ -237,7 +237,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.FirstName), "Enter the person\u2019s first name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Enter the person\u2019s first name");
     }
 
     [Test]
@@ -265,7 +265,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.FirstName), "Enter the person\u2019s first name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Enter the person\u2019s first name");
     }
 
     [Test]
@@ -293,7 +293,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.FirstName), "Person\u2019s first name must be 100 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Person\u2019s first name must be 100 characters or less");
     }
 
     [Test]
@@ -321,7 +321,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.MiddleName), "Person\u2019s middle name must be 100 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.MiddleName), "Person\u2019s middle name must be 100 characters or less");
     }
 
     [Test]
@@ -349,7 +349,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.LastName), "Enter the person\u2019s last name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Enter the person\u2019s last name");
     }
 
     [Test]
@@ -377,7 +377,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.LastName), "Enter the person\u2019s last name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Enter the person\u2019s last name");
     }
 
     [Test]
@@ -405,7 +405,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.LastName), "Person\u2019s last name must be 100 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Person\u2019s last name must be 100 characters or less");
     }
 
     [Test]
@@ -433,7 +433,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.DateOfBirth), "Enter the person\u2019s date of birth");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.DateOfBirth), "Enter the person\u2019s date of birth");
     }
 
     [Test]
@@ -461,7 +461,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.DateOfBirth), "Person\u2019s date of birth must be in the past");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.DateOfBirth), "Person\u2019s date of birth must be in the past");
     }
 
     [Test]
@@ -490,7 +490,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.EmailAddress), "Person\u2019s email address must be 100 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Person\u2019s email address must be 100 characters or less");
     }
 
     [Test]
@@ -536,7 +536,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.EmailAddress), "Enter a valid email address");
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Enter a valid email address");
         }
     }
 
@@ -617,7 +617,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
         }
     }
 
@@ -662,7 +662,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(PersonalDetailsModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
         }
     }
 

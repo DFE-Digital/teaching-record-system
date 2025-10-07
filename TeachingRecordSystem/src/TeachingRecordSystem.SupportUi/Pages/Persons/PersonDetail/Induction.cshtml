@@ -94,7 +94,7 @@
                         @if (Model.CanWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action data-testid="change-induction-exempted-route" href="@LinkGenerator.RouteEditDetail(exemptedRoute.QualificationId, null, fromInductions: true)" visually-hidden-text="induction exemption reason">Change</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action data-testid="change-induction-exempted-route" href="@LinkGenerator.RouteEdit(exemptedRoute.QualificationId, fromInductions: true)" visually-hidden-text="induction exemption reason">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>

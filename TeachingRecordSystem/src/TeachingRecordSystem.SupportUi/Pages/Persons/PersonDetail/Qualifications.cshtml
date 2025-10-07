@@ -36,8 +36,8 @@ else
                 <govuk-summary-card-actions>
                     @if (Model.CanEdit)
                     {
-                        <govuk-summary-card-action href="@LinkGenerator.RouteEditDetail(professionalStatus.QualificationId, null)" visually-hidden-text="edit route" data-testid="edit-route-link-@professionalStatus.QualificationId">Edit route</govuk-summary-card-action>
-                        <govuk-summary-card-action href="@LinkGenerator.RouteDeleteChangeReason(professionalStatus.QualificationId, null)" visually-hidden-text="delete route" data-testid="delete-route-link-@professionalStatus.QualificationId">Delete route</govuk-summary-card-action>
+                        <govuk-summary-card-action href="@LinkGenerator.RouteEdit(professionalStatus.QualificationId)" visually-hidden-text="edit route" data-testid="edit-route-link-@professionalStatus.QualificationId">Edit route</govuk-summary-card-action>
+                        <govuk-summary-card-action href="@LinkGenerator.RouteDelete(professionalStatus.QualificationId)" visually-hidden-text="delete route" data-testid="delete-route-link-@professionalStatus.QualificationId">Delete route</govuk-summary-card-action>
                     }
                 </govuk-summary-card-actions>
                 <govuk-summary-list>

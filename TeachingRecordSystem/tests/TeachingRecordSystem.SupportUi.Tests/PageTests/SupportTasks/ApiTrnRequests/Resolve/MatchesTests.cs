@@ -12,7 +12,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Arrange
         var taskReference = SupportTask.GenerateSupportTaskReference();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/api-trn-requests/{taskReference}/matches");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/api-trn-requests/{taskReference}/resolve/matches");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -30,7 +30,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             applicationUser.UserId,
             t => t.WithStatus(SupportTaskStatus.Closed));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -54,7 +54,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -91,7 +91,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -121,7 +121,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -146,7 +146,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -171,7 +171,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -203,7 +203,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -233,7 +233,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -271,7 +271,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -333,7 +333,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -401,7 +401,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -450,7 +450,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -476,7 +476,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -499,7 +499,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -524,7 +524,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -535,7 +535,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -555,7 +555,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -566,7 +566,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -600,7 +600,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", selectedPersonId } }
         };
@@ -647,7 +647,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", selectedPersonId } }
         };

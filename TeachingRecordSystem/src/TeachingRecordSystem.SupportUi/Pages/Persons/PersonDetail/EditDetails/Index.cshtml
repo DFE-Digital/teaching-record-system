@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.SupportUi.Pages.Common;
 @using TeachingRecordSystem.SupportUi.Pages.Shared
 @using Microsoft.AspNetCore.Mvc.ModelBinding
-@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails.PersonalDetailsModel
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails.IndexModel
 @{
     Layout = "_Layout";
     ViewBag.Title = "Edit personal details";
@@ -32,7 +32,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.PersonEditDetailsPersonalDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
+        <form action=@LinkGenerator.PersonEditDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="edit-details-caption">@Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 

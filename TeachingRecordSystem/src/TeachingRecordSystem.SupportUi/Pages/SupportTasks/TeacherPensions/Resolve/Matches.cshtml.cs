@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-[Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance, ActivatesJourney]
+[Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }

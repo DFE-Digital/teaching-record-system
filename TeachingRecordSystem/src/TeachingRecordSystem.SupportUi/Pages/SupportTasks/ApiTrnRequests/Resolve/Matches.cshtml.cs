@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
-[Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance, ActivatesJourney]
+[Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
 public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveApiTrnRequestPageModel(dbContext)
 {
     [FromRoute]

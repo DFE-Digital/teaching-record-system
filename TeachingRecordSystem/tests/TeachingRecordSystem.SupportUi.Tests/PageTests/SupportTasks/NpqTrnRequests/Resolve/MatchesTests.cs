@@ -9,7 +9,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 {
     [Test]
     [Arguments(false, "details")]
-    [Arguments(true, "check-answers")]
+    [Arguments(true, "resolve/check-answers")]
     public async Task Get_HasExpectedBackLink(bool fromCheckAnswers, string expectedBackLink)
     {
         // Arrange
@@ -28,7 +28,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}" + (fromCheckAnswers ? "&fromCheckAnswers=true" : ""));
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}" + (fromCheckAnswers ? "&fromCheckAnswers=true" : ""));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -52,7 +52,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var taskReference = SupportTask.GenerateSupportTaskReference();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/{taskReference}/matches");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/{taskReference}/resolve/matches");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -70,7 +70,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             applicationUser.UserId,
             t => t.WithStatus(SupportTaskStatus.Closed));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -93,7 +93,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -127,7 +127,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -169,7 +169,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -213,7 +213,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -259,7 +259,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -292,7 +292,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -317,7 +317,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -342,7 +342,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -367,7 +367,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -399,7 +399,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -429,7 +429,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -499,7 +499,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -532,7 +532,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -558,7 +558,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -581,7 +581,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -606,7 +606,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -617,7 +617,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -637,7 +637,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", personId } }
         };
@@ -648,7 +648,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -679,7 +679,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", selectedPersonId } }
         };
@@ -720,7 +720,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder { { "PersonId", selectedPersonId } }
         };
@@ -761,7 +761,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

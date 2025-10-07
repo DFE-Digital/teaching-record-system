@@ -20,7 +20,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -28,7 +28,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
     }
 
@@ -44,7 +44,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -52,7 +52,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
     }
 
@@ -73,7 +73,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -104,7 +104,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -156,7 +156,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -196,7 +196,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -228,7 +228,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -250,7 +250,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -261,7 +261,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
     }
 
@@ -277,7 +277,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -288,7 +288,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
     }
 
@@ -314,7 +314,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -340,7 +340,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -374,7 +374,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -394,7 +394,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/resolve/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

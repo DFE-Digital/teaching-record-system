@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-[Journey(JourneyNames.DeleteRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     IFileService fileService) : PageModel
 {

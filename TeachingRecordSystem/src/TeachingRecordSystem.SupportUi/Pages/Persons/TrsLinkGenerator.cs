@@ -26,8 +26,8 @@ public partial class TrsLinkGenerator
     public string PersonDetail(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId });
 
-    public string PersonEditDetailsPersonalDetails(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/PersonalDetails", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string PersonEditDetails(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string PersonEditDetailsNameChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/NameChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
@@ -39,7 +39,7 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string PersonEditDetailsCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/PersonalDetails", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/Index", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string PersonInductionEditStatus(Guid personId, JourneyInstanceId? journeyInstanceId, JourneyFromCheckYourAnswersPage? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/Status", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);

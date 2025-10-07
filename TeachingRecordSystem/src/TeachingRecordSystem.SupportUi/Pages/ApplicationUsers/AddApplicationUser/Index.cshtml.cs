@@ -6,10 +6,10 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
+namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.AddApplicationUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     [BindProperty]
     [Display(Name = "Name")]

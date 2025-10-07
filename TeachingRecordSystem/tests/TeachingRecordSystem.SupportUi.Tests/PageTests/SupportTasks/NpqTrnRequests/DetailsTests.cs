@@ -57,7 +57,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/matches",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/resolve",
             response.Headers.Location?.OriginalString);
     }
 
@@ -86,7 +86,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/no-matches/check-answers",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/no-matches",
             response.Headers.Location?.OriginalString);
     }
 
@@ -112,7 +112,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject/reason",
+            $"/support-tasks/npq-trn-requests/{supportTask.SupportTaskReference}/reject",
             response.Headers.Location?.OriginalString);
     }
 }

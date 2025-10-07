@@ -9,7 +9,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTaskReference = SupportTask.GenerateSupportTaskReference();
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTaskReference}/confirm");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTaskReference}/resolve/confirm");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -23,7 +23,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTask = await CreateSupportTaskAsync(SupportTaskStatus.Closed);
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/confirm");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve/confirm");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -37,7 +37,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTaskReference = SupportTask.GenerateSupportTaskReference();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTaskReference}/confirm");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTaskReference}/resolve/confirm");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -51,7 +51,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTask = await CreateSupportTaskAsync(SupportTaskStatus.Closed);
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/confirm");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve/confirm");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -65,7 +65,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var supportTask = await CreateSupportTaskAsync();
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/confirm");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/manual-checks-needed/{supportTask.SupportTaskReference}/resolve/confirm");
 
         // Act
         var response = await HttpClient.SendAsync(request);

@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class DetailModel(
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
