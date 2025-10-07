@@ -35,80 +35,80 @@ public static class RoutesToProfessionalStatusPageExtensions
         page.FillAsync("#TrainingProviderId", name);
 
     public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/status");
 
     public static Task AssertOnRouteEditStartAndEndDatePageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/start-and-end-date");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/start-and-end-date");
 
     public static Task AssertOnRouteEditHoldsFromPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/holds-from");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/holds-from");
 
     public static Task AssertOnRouteEditDegreeTypePageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/degree-type");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/degree-type");
 
     public static Task AssertOnRouteEditAgeRangePageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/age-range");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/age-range");
 
     public static Task AssertOnRouteEditCountryPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/country");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/country");
 
     public static Task AssertOnRouteEditTrainingProviderPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/training-provider");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/training-provider");
 
     public static Task AssertOnRouteEditSubjectsPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/subjects");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/subjects");
 
     public static Task AssertOnRouteEditInductionExemptionPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/induction-exemption");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/induction-exemption");
 
     public static Task AssertOnRouteChangeReasonPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/change-reason");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/reason");
 
     public static Task AssertOnRouteCheckYourAnswersPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/check-answers");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/check-answers");
 
     public static Task AssertOnRouteAddRoutePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/route");
+        page.WaitForUrlPathAsync("/routes/add/route");
 
     public static Task AssertOnRouteAddStatusPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/status");
+        page.WaitForUrlPathAsync("/routes/add/status");
 
     public static Task AssertOnRouteAddStartAndEndDatePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/start-and-end-date");
+        page.WaitForUrlPathAsync("/routes/add/start-and-end-date");
 
     public static Task AssertOnRouteAddTrainingProviderAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/training-provider");
+        page.WaitForUrlPathAsync("/routes/add/training-provider");
 
     public static Task AssertOnRouteAddHoldsFromPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/holds-from");
+        page.WaitForUrlPathAsync("/routes/add/holds-from");
 
     public static Task AssertOnRouteAddInductionExemptionPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/induction-exemption");
+        page.WaitForUrlPathAsync("/routes/add/induction-exemption");
 
     public static Task AssertOnRouteAddDegreeTypePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/degree-type");
+        page.WaitForUrlPathAsync("/routes/add/degree-type");
 
     public static Task AssertOnRouteAddCountryAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/country");
+        page.WaitForUrlPathAsync("/routes/add/country");
 
     public static Task AssertOnRouteAddAgeRangeAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/age-range");
+        page.WaitForUrlPathAsync("/routes/add/age-range");
 
     public static Task AssertOnRouteAddSubjectsPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/subjects");
+        page.WaitForUrlPathAsync("/routes/add/subjects");
 
     public static Task AssertOnRouteAddChangeReasonPage(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/change-reason");
+        page.WaitForUrlPathAsync("/routes/add/reason");
 
     public static Task AssertOnRouteAddCheckYourAnswersPage(this IPage page) =>
-        page.WaitForUrlPathAsync("/route/add/check-answers");
+        page.WaitForUrlPathAsync("/routes/add/check-answers");
 
     public static Task AssertOnRouteDeleteChangeReasonPage(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/delete/change-reason");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/delete/reason");
 
     public static Task AssertOnRouteDeleteCheckYourAnswersPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/delete/check-answers");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/delete/check-answers");
 
     public static Task AssertOnRouteDetailPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/detail");
+        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/detail");
 }

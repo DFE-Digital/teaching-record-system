@@ -21,7 +21,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -58,7 +58,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -96,7 +96,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -137,7 +137,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -174,7 +174,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             addRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -211,7 +211,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             addRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -224,7 +224,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Test]
@@ -248,14 +248,14 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             addRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Test]
@@ -287,7 +287,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             addRouteState
             );
 
-        var request = new HttpRequestMessage(httpMethod, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

@@ -1,5 +1,5 @@
-@page "/route/{qualificationId}/edit/change-reason/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.ChangeReasonModel
+@page "/routes/{qualificationId}/delete/reason/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute.ReasonModel
 @{
     ViewBag.Title = "Change reason";
 }
@@ -10,19 +10,16 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteEditChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <span class="govuk-caption-l">@Model.PageCaption</span>
+        <form action="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <span class="govuk-caption-l">Delete route - @Model.PersonName</span>
             <govuk-radios for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
-                    <govuk-radios-item value="@ChangeReasonOption.IncompleteDetails">
-                        @ChangeReasonOption.IncompleteDetails.GetDisplayName()
+                    <govuk-radios-item value="@ChangeReasonOption.CreatedInError">
+                        @ChangeReasonOption.CreatedInError.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@ChangeReasonOption.NewInformation">
-                        @ChangeReasonOption.NewInformation.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@ChangeReasonOption.NoLongerExemptFromInduction">
-                        @ChangeReasonOption.NoLongerExemptFromInduction.GetDisplayName()
+                    <govuk-radios-item value="@ChangeReasonOption.RemovedQtlsStatus">
+                        @ChangeReasonOption.RemovedQtlsStatus.GetDisplayName()
                     </govuk-radios-item>
                     <govuk-radios-item value="@ChangeReasonOption.AnotherReason">
                         @ChangeReasonOption.AnotherReason.GetDisplayName()
@@ -71,8 +68,9 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditChangeReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteDeleteChangeReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
 </div>
+

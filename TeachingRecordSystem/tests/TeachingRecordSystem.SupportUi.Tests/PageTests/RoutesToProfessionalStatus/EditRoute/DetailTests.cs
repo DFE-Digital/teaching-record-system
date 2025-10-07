@@ -28,7 +28,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -70,7 +70,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -78,7 +78,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var continueButton = doc.GetElementByTestId("continue-button") as IHtmlAnchorElement;
-        Assert.Contains($"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", continueButton!.Href);
+        Assert.Contains($"/routes/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", continueButton!.Href);
     }
 
     [Test]
@@ -123,7 +123,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -171,7 +171,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditRouteState()
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -220,7 +220,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -264,7 +264,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -312,7 +312,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -353,7 +353,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(httpMethod, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

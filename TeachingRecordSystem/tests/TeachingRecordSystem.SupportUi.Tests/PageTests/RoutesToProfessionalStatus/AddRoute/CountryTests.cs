@@ -24,7 +24,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -64,7 +64,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -100,7 +100,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -142,7 +142,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -180,7 +180,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -193,7 +193,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Test]
@@ -224,7 +224,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(httpMethod, $"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

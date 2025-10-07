@@ -59,7 +59,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -133,7 +133,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -182,7 +182,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -190,7 +190,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var document = await response.GetDocumentAsync();
         var backlink = document.QuerySelector(".govuk-back-link") as IHtmlAnchorElement;
-        Assert.Contains($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", backlink!.Href);
+        Assert.Contains($"/routes/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", backlink!.Href);
     }
 
     [Test]
@@ -223,7 +223,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -231,7 +231,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var document = await response.GetDocumentAsync();
         var backlink = document.QuerySelector(".govuk-back-link") as IHtmlAnchorElement;
-        Assert.Contains($"/route/{qualificationId}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}", backlink!.Href);
+        Assert.Contains($"/routes/{qualificationId}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}", backlink!.Href);
     }
 
     [Test]
@@ -266,7 +266,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -281,7 +281,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
     }
@@ -318,7 +318,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -333,7 +333,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationId}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/{qualificationId}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(holdsFrom, journeyInstance.State.EditStatusState!.HoldsFrom);
     }
@@ -378,7 +378,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -393,7 +393,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
         Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
@@ -425,7 +425,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>())
         };
@@ -464,7 +464,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -508,7 +508,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId, editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -568,7 +568,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(httpMethod, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

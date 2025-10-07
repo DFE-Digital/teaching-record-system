@@ -36,7 +36,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act, Assert
         var response = await HttpClient.SendAsync(request);
@@ -75,7 +75,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -122,7 +122,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -135,7 +135,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
         Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
@@ -171,7 +171,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>())
         };
@@ -212,7 +212,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -269,7 +269,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             editRouteState
             );
 
-        var request = new HttpRequestMessage(httpMethod, $"/route/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

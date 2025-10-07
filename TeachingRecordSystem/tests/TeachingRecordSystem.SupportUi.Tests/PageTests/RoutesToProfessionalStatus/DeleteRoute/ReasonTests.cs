@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRout
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.DeleteRoute;
 
-public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
@@ -28,7 +28,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             deleteRouteState
             );
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -80,7 +80,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -125,7 +125,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -143,7 +143,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason!.GetDisplayName());
         Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Test]
@@ -162,7 +162,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
@@ -189,7 +189,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -223,7 +223,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -257,7 +257,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -297,7 +297,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -345,7 +345,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             deleteRouteState
             );
 
-        var request = new HttpRequestMessage(httpMethod, $"/route/{qualificationid}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationid}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
