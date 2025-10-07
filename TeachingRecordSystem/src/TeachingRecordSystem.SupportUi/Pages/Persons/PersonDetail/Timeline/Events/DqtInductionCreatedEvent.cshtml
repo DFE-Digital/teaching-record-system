@@ -3,7 +3,7 @@
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
 @inject ReferenceDataCache ReferenceDataCache
-@model TimelineItem<TimelineEvent<DqtInductionCreatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.DqtInductionCreatedEvent>>
 @{
     var dqtCreatedEvent = Model.ItemModel.Event;
     var induction = dqtCreatedEvent.Induction;

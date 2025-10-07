@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, IClock clock, IOptions<CapitaTpsUserOption> capitaUser)
 {

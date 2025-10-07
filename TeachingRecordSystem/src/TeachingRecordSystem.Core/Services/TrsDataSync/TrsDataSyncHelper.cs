@@ -14,6 +14,7 @@ using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;

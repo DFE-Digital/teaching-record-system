@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Legacy;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
 public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)

@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
 @inject ReferenceDataCache ReferenceDataCache
-@model TimelineItem<TimelineEvent<AlertDqtReactivatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.AlertDqtReactivatedEvent>>
 @{
     var dqtReactivatedEvent = Model.ItemModel.Event;
     var alert = dqtReactivatedEvent.Alert;

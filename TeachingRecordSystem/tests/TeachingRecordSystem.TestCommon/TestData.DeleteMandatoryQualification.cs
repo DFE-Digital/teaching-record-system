@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.TestCommon;

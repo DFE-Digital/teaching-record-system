@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.TestCommon;
 

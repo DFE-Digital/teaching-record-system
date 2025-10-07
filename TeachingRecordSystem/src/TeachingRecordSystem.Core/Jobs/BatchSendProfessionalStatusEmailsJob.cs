@@ -3,6 +3,7 @@ using System.Transactions;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Core.Jobs;

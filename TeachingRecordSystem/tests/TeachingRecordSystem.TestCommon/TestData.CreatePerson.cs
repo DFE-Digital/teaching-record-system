@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
@@ -192,7 +193,7 @@ public partial class TestData
                     routeType.InductionExemptionRequired,
                     () => b.WithInductionExemption(false));
 
-                void ConfigureUnlessNotApplicable(FieldRequirement requirement, Action configure)
+                void ConfigureUnlessNotApplicable(FieldRequirement requirement, System.Action configure)
                 {
                     if (requirement is not FieldRequirement.NotApplicable)
                     {

@@ -6,6 +6,7 @@ using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using OpenIddict.EntityFrameworkCore.Models;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Infrastructure.EntityFramework;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;

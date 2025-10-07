@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 

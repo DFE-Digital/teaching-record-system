@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;

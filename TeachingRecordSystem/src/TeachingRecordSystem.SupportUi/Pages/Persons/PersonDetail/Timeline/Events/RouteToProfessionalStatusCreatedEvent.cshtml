@@ -1,9 +1,10 @@
 @using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events.Legacy
 @using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
 @using TeachingRecordSystem.Core.Services.Files
 @inject ReferenceDataCache ReferenceDataCache
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<RouteToProfessionalStatusCreatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.RouteToProfessionalStatusCreatedEvent>>
 @{
     var createdEvent = Model.ItemModel.Event;
     var professionalStatus = createdEvent.RouteToProfessionalStatus;

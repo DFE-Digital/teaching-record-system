@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Legacy;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class MandatoryQualification : Qualification

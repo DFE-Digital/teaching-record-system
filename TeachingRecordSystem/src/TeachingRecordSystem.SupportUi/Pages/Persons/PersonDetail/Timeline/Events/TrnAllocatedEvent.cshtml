@@ -1,6 +1,6 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
-@model TimelineItem<TimelineEvent<TrnAllocatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.TrnAllocatedEvent>>
 @{
     var trnAllocatedEvent = Model.ItemModel.Event;
 }

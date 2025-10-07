@@ -1,8 +1,9 @@
 @using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events.Legacy
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
 @inject ReferenceDataCache ReferenceDataCache
-@model TimelineItem<TimelineEvent<AlertUpdatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.AlertUpdatedEvent>>
 @{
     var updatedEvent = Model.ItemModel.Event;
     var alert = updatedEvent.Alert;

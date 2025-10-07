@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;

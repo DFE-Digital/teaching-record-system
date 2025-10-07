@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Legacy;
+
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 public record TimelineEvent(EventBase Event, RaisedByUserInfo RaisedByUser, ApplicationUserInfo? ApplicationUser);

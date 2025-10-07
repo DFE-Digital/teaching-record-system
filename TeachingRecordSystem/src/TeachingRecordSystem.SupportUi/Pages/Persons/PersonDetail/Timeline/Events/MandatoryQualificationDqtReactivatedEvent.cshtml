@@ -1,5 +1,5 @@
 @using TeachingRecordSystem.Core.Events
-@model TimelineItem<TimelineEvent<MandatoryQualificationDqtReactivatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.MandatoryQualificationDqtReactivatedEvent>>
 @{
     var reactivatedEvent = Model.ItemModel.Event;
     var mandatoryQualification = reactivatedEvent.MandatoryQualification;

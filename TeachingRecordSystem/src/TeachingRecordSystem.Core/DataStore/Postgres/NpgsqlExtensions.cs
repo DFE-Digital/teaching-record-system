@@ -1,6 +1,7 @@
 using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 

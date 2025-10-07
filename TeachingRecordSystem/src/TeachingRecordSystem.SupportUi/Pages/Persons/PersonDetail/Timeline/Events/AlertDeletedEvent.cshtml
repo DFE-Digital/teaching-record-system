@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
 @inject ReferenceDataCache ReferenceDataCache
-@model TimelineItem<TimelineEvent<AlertDeletedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.AlertDeletedEvent>>
 @{
     var deletedEvent = Model.ItemModel.Event;
     var alert = deletedEvent.Alert;

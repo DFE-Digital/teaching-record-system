@@ -1,5 +1,5 @@
 @using TeachingRecordSystem.Core.Events
-@model TimelineItem<TimelineEvent<DqtQtsRegistrationCreatedEvent>>
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.DqtQtsRegistrationCreatedEvent>>
 @{
     var dqtCreatedEvent = Model.ItemModel.Event;
     var qts = dqtCreatedEvent.QtsRegistration;

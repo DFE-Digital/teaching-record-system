@@ -1,6 +1,7 @@
 @using Optional.Unsafe
 @using TeachingRecordSystem.Core.Events
-@model TimelineItem<TimelineEvent<DqtInductionUpdatedEvent>>
+@using TeachingRecordSystem.Core.Events.Legacy
+@model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.DqtInductionUpdatedEvent>>
 @{
     var dqtUpdatedEvent = Model.ItemModel.Event;
     var induction = dqtUpdatedEvent.Induction;
