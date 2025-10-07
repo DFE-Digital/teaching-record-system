@@ -1,0 +1,110 @@
+@page "/persons/add/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson.CheckAnswersModel
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Check details and create record";
+}
+
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form action="@LinkGenerator.PersonCreateCheckAnswers(Model.JourneyInstance!.InstanceId)" method="post" data-testid="submit-form">
+            <span class="govuk-caption-l" data-testid="edit-details-caption">Create a record</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-summary-card>
+                <govuk-summary-card-title>Personal details</govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Full name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-details-link" href=@Model.ChangePersonalDetailsLink visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.EmailAddress?.ToDisplayString()</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="email address">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber?.ToDisplayString()</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="National Insurance number">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.Gender?.GetDisplayName()</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="gender">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+
+            <govuk-summary-card>
+                <govuk-summary-card-title>Why are you creating this record?</govuk-summary-card-title>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason for creating record</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.CreateReason?.GetDisplayName()</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-create-reason-link" href=@Model.CreateReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (Model.ReasonDetail is not null)
+                            {
+                                <multi-line-text text="@Model.ReasonDetail" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.CreateReasonLink visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (Model.EvidenceFileUrl is not null)
+                            {
+                                <a href="@Model.EvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href=@Model.CreateReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="confirm-button">Confirm and create record</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.PersonCreateCancel(Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
