@@ -1,7 +1,6 @@
 using Google.Apis.Upload;
 using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Options;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using Parquet.Serialization;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Core.Services.WorkforceData.Google;
@@ -13,7 +12,6 @@ public class WorkforceDataExporterTests : IAsyncLifetime
 {
     public WorkforceDataExporterTests(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator)
     {
@@ -22,11 +20,9 @@ public class WorkforceDataExporterTests : IAsyncLifetime
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
     }
 
     [Fact]

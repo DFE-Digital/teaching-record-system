@@ -5,7 +5,6 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 {
     public FindPersonsByTrnAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
     {
-        XrmFakedContext.DeleteAllEntities<Contact>();
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 

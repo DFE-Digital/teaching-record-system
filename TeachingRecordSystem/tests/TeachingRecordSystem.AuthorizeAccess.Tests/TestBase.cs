@@ -1,6 +1,4 @@
-using System.Reactive.Linq;
 using System.Security.Claims;
-using FakeXrmEasy.Abstractions;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -8,16 +6,14 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.WebCommon.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
-public abstract class TestBase : IDisposable
+public abstract class TestBase
 {
     private readonly TestScopedServices _testServices;
-    private readonly IDisposable _trsSyncSubscription;
 
     protected TestBase(HostFixture hostFixture)
     {
@@ -29,16 +25,6 @@ public abstract class TestBase : IDisposable
         {
             AllowAutoRedirect = false
         });
-
-        _trsSyncSubscription = hostFixture.Services.GetRequiredService<TrsDataSyncHelper>().GetSyncedEntitiesObservable()
-            .Subscribe(onNext: static (synced) =>
-            {
-                var events = synced.OfType<EventBase>();
-                foreach (var e in events)
-                {
-                    TestScopedServices.GetCurrent().EventObserver.OnEventCreated(e);
-                }
-            });
     }
 
     public HostFixture HostFixture { get; }
@@ -50,8 +36,6 @@ public abstract class TestBase : IDisposable
     public HttpClient HttpClient { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
-
-    public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public async Task<JourneyInstance<SignInJourneyState>> CreateJourneyInstanceAsync(SignInJourneyState state)
     {
@@ -80,11 +64,6 @@ public abstract class TestBase : IDisposable
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
         var reloadedInstance = await stateProvider.GetInstanceAsync(journeyInstance.InstanceId, typeof(SignInJourneyState));
         return (JourneyInstance<SignInJourneyState>)reloadedInstance!;
-    }
-
-    public virtual void Dispose()
-    {
-        _trsSyncSubscription.Dispose();
     }
 
     public virtual async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)

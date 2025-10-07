@@ -65,7 +65,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2021, 10, 5);
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             state => state.StartDate = startDate);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");

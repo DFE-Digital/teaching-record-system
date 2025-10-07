@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
@@ -10,7 +9,6 @@ public class InductionImporterTests : IAsyncLifetime
 {
     public InductionImporterTests(
       DbFixture dbFixture,
-      IOrganizationServiceAsync2 organizationService,
       ReferenceDataCache referenceDataCache,
       FakeTrnGenerator trnGenerator,
       IServiceProvider provider)
@@ -20,11 +18,9 @@ public class InductionImporterTests : IAsyncLifetime
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
 
         Importer = ActivatorUtilities.CreateInstance<InductionImporter>(provider, Clock);
     }
@@ -382,7 +378,7 @@ public class InductionImporterTests : IAsyncLifetime
         // Assert
         Assert.Equal(ContactLookupResult.NoAssociatedQts, lookups.PersonMatchStatus);
         Assert.NotNull(lookups.Person);
-        Assert.Equal(person.ContactId, lookups.Person!.PersonId);
+        Assert.Equal(person.PersonId, lookups.Person!.PersonId);
     }
 
     [Fact]
@@ -406,7 +402,7 @@ public class InductionImporterTests : IAsyncLifetime
         // Assert
         Assert.Equal(ContactLookupResult.TeacherHasQts, lookups.PersonMatchStatus);
         Assert.NotNull(lookups.Person);
-        Assert.Equal(person.ContactId, lookups.Person!.PersonId);
+        Assert.Equal(person.PersonId, lookups.Person!.PersonId);
     }
 
     [Fact]

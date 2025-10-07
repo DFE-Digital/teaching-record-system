@@ -74,12 +74,10 @@ public class HostFixture : WebApplicationFactory<Program>
 
             services
                 .AddSingleton<CurrentApiClientProvider>()
-                .AddFakeXrm()
                 .AddSingleton(
                     sp => ActivatorUtilities.CreateInstance<TestData>(
                         sp,
-                        new ForwardToTestScopedClock(),
-                        TestDataPersonDataSource.CrmAndTrs))
+                        new ForwardToTestScopedClock()))
                 .AddSingleton<FakeTrnGenerator>()
                 .AddSingleton<TrsDataSyncHelper>()
                 .AddSingleton<IAuditRepository, TestableAuditRepository>()

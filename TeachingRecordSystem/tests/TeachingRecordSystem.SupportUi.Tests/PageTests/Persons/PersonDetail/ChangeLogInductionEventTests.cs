@@ -503,7 +503,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
         var statusChangedEvent = new DqtContactInductionStatusChangedEvent
         {
             EventId = Guid.NewGuid(),
-            Key = $"{person.ContactId}-StatusChanged",
+            Key = $"{person.PersonId}-StatusChanged",
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,

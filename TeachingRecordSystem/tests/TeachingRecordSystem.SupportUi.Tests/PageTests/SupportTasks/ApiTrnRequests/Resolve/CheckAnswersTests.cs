@@ -459,8 +459,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
                 Comments = comments
             });
 
-        var originalContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
-
         EventObserver.Clear();
 
         var request = new HttpRequestMessage(
@@ -490,7 +488,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         EventObserver.AssertEventsSaved(@event =>
         {
             var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
-            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: true, expectedPersonId: originalContact.Id, comments);
+            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);

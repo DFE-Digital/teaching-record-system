@@ -24,7 +24,6 @@ public class Startup
                     .AddMemoryCache()
                     .AddSingleton<DbFixture>()
                     .AddSingleton<FakeTrnGenerator>()
-                    .AddFakeXrm()
                     .AddSingleton<ReferenceDataCache>()
                     .AddSingleton<WebhookReceiver>()
                     .AddSingleton<PersonInfoCache>()

@@ -1,4 +1,3 @@
-using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -33,8 +32,6 @@ public abstract class TestBase : IDisposable
     public HttpClient HttpClient { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
-
-    public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public async Task<JourneyInstance<RequestTrnJourneyState>> CreateJourneyInstance(RequestTrnJourneyState state)
     {

@@ -1,12 +1,11 @@
-using Microsoft.Xrm.Sdk.Messages;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task CreateNoteAsync(Action<CreateNoteBuilder>? configure)
+    public Task<Note> CreateNoteAsync(Action<CreateNoteBuilder>? configure)
     {
         var builder = new CreateNoteBuilder();
         configure?.Invoke(builder);
@@ -16,8 +15,7 @@ public partial class TestData
     public class CreateNoteBuilder
     {
         private Guid? _personId;
-        private string? _subject;
-        private string? _description;
+        private string? _content;
 
         public CreateNoteBuilder WithPersonId(Guid personId)
         {
@@ -30,47 +28,53 @@ public partial class TestData
             return this;
         }
 
-        public CreateNoteBuilder WithSubject(string subject)
+        public CreateNoteBuilder WithContent(string content)
         {
-            if (_subject is not null && _subject != subject)
-            {
-                throw new InvalidOperationException("WithSubject has already been set");
-            }
-
-            _subject = subject;
-            return this;
-        }
-
-        public CreateNoteBuilder WithDescription(string description)
-        {
-            if (_description is not null && _description != description)
+            if (_content is not null && _content != content)
             {
                 throw new InvalidOperationException("WithDescription has already been set");
             }
 
-            _description = description;
+            _content = content;
             return this;
         }
 
-        public async Task ExecuteAsync(TestData testData)
+        public Task<Note> ExecuteAsync(TestData testData)
         {
             if (_personId is null)
             {
                 throw new InvalidOperationException("WithPersonId has not been set");
             }
 
-            var subject = _subject ?? "Test Note";
-            var description = _description ?? "Test Note Description";
+            var content = _content ?? Faker.Lorem.Paragraph();
 
-            await testData.OrganizationService.ExecuteAsync(new CreateRequest()
+            return testData.WithDbContextAsync(async dbContext =>
             {
-                Target = new Annotation()
+                var now = testData.Clock.UtcNow;
+
+                var note = new Note
                 {
-                    Subject = subject,
-                    NoteText = description,
-                    ObjectId = _personId.Value.ToEntityReference(Contact.EntityLogicalName),
-                    ObjectTypeCode = Contact.EntityLogicalName
-                }
+                    NoteId = Guid.NewGuid(),
+                    PersonId = _personId.Value,
+                    Content = content,
+                    ContentHtml = null,
+                    UpdatedOn = now,
+                    CreatedOn = now,
+                    CreatedByUserId = SystemUser.SystemUserId,
+                    CreatedByDqtUserId = null,
+                    CreatedByDqtUserName = null,
+                    UpdatedByDqtUserId = null,
+                    UpdatedByDqtUserName = null,
+                    FileId = null,
+                    OriginalFileName = null
+                };
+
+                dbContext.Notes.Add(note);
+
+                await dbContext.SaveChangesAsync();
+                dbContext.Entry(note).State = EntityState.Detached;
+
+                return note;
             });
         }
     }

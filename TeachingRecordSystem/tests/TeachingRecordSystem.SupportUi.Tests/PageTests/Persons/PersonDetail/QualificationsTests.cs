@@ -25,7 +25,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -43,7 +43,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -79,7 +79,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithStatus(status, endDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -119,7 +119,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithTrainingStartDate(startDate.Value)
                 .WithTrainingEndDate(endDate.Value)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -164,7 +164,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithHoldsFrom(holdsFrom)
                 .WithSourceApplicationReference("TESTREFERENCE")));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -205,7 +205,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithTrainingEndDate(endDate.Value)
                 .WithTrainingCountryId(country.CountryId)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -242,7 +242,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithStatus(status)
                 .WithTrainingCountryId(country.CountryId)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -282,7 +282,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithHoldsFrom(holdsFromDate)
                 .WithInductionExemption(true)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -327,7 +327,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithTrainingAgeSpecialismRangeFrom(ageFrom)
                 .WithTrainingAgeSpecialismRangeTo(ageTo)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
         var response = await HttpClient.SendAsync(request);

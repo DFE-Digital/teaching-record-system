@@ -1,12 +1,11 @@
 using System.Diagnostics;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    private static readonly object _gate = new();
+    private static readonly Lock _gate = new();
     private static readonly HashSet<string> _emails = [];
     private static readonly HashSet<string> _mobileNumbers = [];
     private static int _applicationUserNumber = 1;
@@ -15,35 +14,27 @@ public partial class TestData
 
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
-        IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
         IClock clock,
-        FakeTrnGenerator trnGenerator,
-        TestDataPersonDataSource personDataSource)
+        FakeTrnGenerator trnGenerator)
         : this(
               dbContextFactory,
-              organizationService,
               referenceDataCache,
               clock,
-              generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()),
-              personDataSource)
+              generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()))
     {
     }
 
     private TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
-        IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
         IClock clock,
-        Func<Task<string>> generateTrn,
-        TestDataPersonDataSource personDataSource)
+        Func<Task<string>> generateTrn)
     {
         DbContextFactory = dbContextFactory;
-        OrganizationService = organizationService;
         ReferenceDataCache = referenceDataCache;
         Clock = clock;
         _generateTrn = generateTrn;
-        PersonDataSource = personDataSource;
     }
 
     // https://stackoverflow.com/a/30290754
@@ -62,21 +53,15 @@ public partial class TestData
 
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; }
 
-    public IOrganizationServiceAsync OrganizationService { get; }
-
     public ReferenceDataCache ReferenceDataCache { get; }
-
-    private TestDataPersonDataSource PersonDataSource { get; }
 
     public static TestData CreateWithCustomTrnGeneration(
         IDbContextFactory<TrsDbContext> dbContextFactory,
-        IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
         IClock clock,
-        Func<Task<string>> generateTrn,
-        TestDataPersonDataSource personDataSource)
+        Func<Task<string>> generateTrn)
     {
-        return new TestData(dbContextFactory, organizationService, referenceDataCache, clock, generateTrn, personDataSource);
+        return new TestData(dbContextFactory, referenceDataCache, clock, generateTrn);
     }
 
     public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)
@@ -278,7 +263,7 @@ public partial class TestData
 
     public DateOnly GenerateDate(DateOnly min, DateOnly? max = null)
     {
-        if (max is not null && max <= min)
+        if (max <= min)
         {
             throw new ArgumentOutOfRangeException(nameof(max), "max must be after min.");
         }
@@ -355,5 +340,3 @@ public partial class TestData
         await action(dbContext);
     }
 }
-
-public enum TestDataPersonDataSource { Trs, CrmAndTrs }

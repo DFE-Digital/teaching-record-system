@@ -1,4 +1,3 @@
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Tests.Services.PersonMatching;
@@ -8,7 +7,6 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
 {
     public PersonMatchingServiceTests(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator)
     {
@@ -17,11 +15,9 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
     }
 
     private DbFixture DbFixture { get; }

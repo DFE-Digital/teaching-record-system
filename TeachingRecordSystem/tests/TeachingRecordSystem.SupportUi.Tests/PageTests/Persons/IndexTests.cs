@@ -43,9 +43,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var person1 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithDateOfBirth(dateOfBirth));
-        var person3 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithDateOfBirth(dateOfBirth));
+        var person1 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
+        var person3 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
         var search = dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
@@ -66,9 +66,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var name = "Andrew";
-        var person1 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithFirstName(name));
-        var person2 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithMiddleName(name));
-        var person3 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs).WithLastName(name));
+        var person1 = await TestData.CreatePersonAsync(b => b.WithFirstName(name));
+        var person2 = await TestData.CreatePersonAsync(b => b.WithMiddleName(name));
+        var person3 = await TestData.CreatePersonAsync(b => b.WithLastName(name));
         var search = "andrew";
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
@@ -88,9 +88,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithSearchThatLooksLikeATrn_DisplaysMatchOnTrn()
     {
         // Arrange
-        var person1 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var person2 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
-        var person3 = await TestData.CreatePersonAsync(b => b.WithPersonDataSource(TestDataPersonDataSource.CrmAndTrs));
+        var person1 = await TestData.CreatePersonAsync();
+        var person2 = await TestData.CreatePersonAsync();
+        var person3 = await TestData.CreatePersonAsync();
         var search = person1.Trn;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");

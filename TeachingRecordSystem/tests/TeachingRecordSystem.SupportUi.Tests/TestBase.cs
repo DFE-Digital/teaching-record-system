@@ -1,5 +1,4 @@
 using System.Transactions;
-using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -7,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnRequests;
-using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
@@ -57,8 +55,6 @@ public abstract class TestBase(HostFixture hostFixture)
     });
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
-
-    protected IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     protected TestableFeatureProvider FeatureProvider => TestScopedServices.GetCurrent().FeatureProvider;
 

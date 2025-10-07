@@ -197,7 +197,7 @@ public class CreateTrnRequestTests : TestBase
             {
                 ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
-                TeacherId = existingContact.ContactId
+                TeacherId = existingContact.PersonId
             });
 
             await dbContext.SaveChangesAsync();
@@ -302,7 +302,7 @@ public class CreateTrnRequestTests : TestBase
             {
                 ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
-                TeacherId = existingContact.ContactId
+                TeacherId = existingContact.PersonId
             });
 
             await dbContext.SaveChangesAsync();

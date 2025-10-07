@@ -1,7 +1,6 @@
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
@@ -1110,11 +1109,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
 public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
 {
-    List<UploadedFile> _uploadedFiles = [];
+    private readonly List<UploadedFile> _uploadedFiles = [];
 
     public DeletePersonAndChildRecordsWithoutATrnJobFixture(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
         ILoggerFactory loggerFactory)
@@ -1125,11 +1123,9 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.Trs);
+            trnGenerator);
 
         DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
 

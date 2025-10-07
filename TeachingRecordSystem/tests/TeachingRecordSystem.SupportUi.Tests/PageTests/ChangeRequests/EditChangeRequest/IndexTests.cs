@@ -12,7 +12,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: null));
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
@@ -32,7 +32,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
@@ -65,7 +65,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
@@ -90,7 +90,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithSupportTaskReferenceForOpenChangeNameRequestSupportTask_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName, bool evidenceIsPdf)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
@@ -162,7 +162,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithSupportTaskReferenceForOpenChangeDateOfBirthRequestSupportTask_RendersExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var createPersonResult = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             createPersonResult.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));

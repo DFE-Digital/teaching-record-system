@@ -137,58 +137,6 @@
         "resolved": "4.0.0",
         "contentHash": "QYeAIEmNEpROosThGtU/t3yZJoCcAC9kxhfHnHAp2PmVIFIajaHcuo79CCeEiOxo2zm+mS3wfIIj6d00id7/cQ=="
       },
-      "FakeItEasy": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "4nu0fkgw1OteCbggk9BlTS0GU2JPVosen22YJ8eODbLbyuTusUzBw/EC0mpHBDzr4YFE/tB8JGazJE+O95+Rgg==",
-        "dependencies": {
-          "Castle.Core": "4.3.1"
-        }
-      },
-      "FakeXrmEasy.Abstractions.v9": {
-        "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "3EaUfMa2TLKlRcamtHFC5bIFg1jd0053QmgZcr/PlKYO190gtkKQPvjBy+FW32eivs017t9GkJYRxo6N8Qu9gg==",
-        "dependencies": {
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.22",
-          "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "1.1.22"
-        }
-      },
-      "FakeXrmEasy.Core.v9": {
-        "type": "Transitive",
-        "resolved": "3.5.1",
-        "contentHash": "6MBOZZ4spIuD3OqcrPGbH1+vYCnZIsA4L8tTclTj06nv8hvTRmbM+Tb6d4AVI1L/FugVxHVJVm9FASM4aRk62g==",
-        "dependencies": {
-          "FakeItEasy": "[6.0.0, 7.0.0)",
-          "FakeXrmEasy.Abstractions.v9": "3.5.0",
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.22",
-          "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "1.1.22"
-        }
-      },
-      "FakeXrmEasy.Messages.v9": {
-        "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "IWAXNUqNaC7E7O2ktabrQEjjhu/v8evbGBs7PMydRXHFJJKHtpBVvWExYZJkEZDfU50gHszMTxGFa3H3eKf8FQ==",
-        "dependencies": {
-          "FakeItEasy": "[6.0.0, 7.0.0)",
-          "FakeXrmEasy.Abstractions.v9": "3.5.0",
-          "FakeXrmEasy.Core.v9": "3.5.1",
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.22",
-          "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "1.1.22"
-        }
-      },
-      "FakeXrmEasy.Plugins.v9": {
-        "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "VYYI0wq/zT/shGOTju6fZqLMLOg7zz7Q7l9B+MXWVrblx+v9VB1MeCzLEv4fbqOOWofyQ8vQA5rnb58GjALkZQ==",
-        "dependencies": {
-          "FakeItEasy": "[6.0.0, 7.0.0)",
-          "FakeXrmEasy.Abstractions.v9": "3.5.0",
-          "FakeXrmEasy.Core.v9": "3.5.1",
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.22",
-          "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "1.1.22"
-        }
-      },
       "Fluid.Core": {
         "type": "Transitive",
         "resolved": "2.15.0",
@@ -2522,7 +2470,6 @@
       "teachingrecordsystem.testcommon": {
         "type": "Project",
         "dependencies": {
-          "FakeXrmEasy.v9": "[3.5.0, )",
           "Faker.Net": "[2.0.154, )",
           "Moq": "[4.20.70, )",
           "Respawn": "[6.2.0, )",
@@ -2700,21 +2647,6 @@
         "contentHash": "pkabhT7wxNR1gkPO6ga77XdeqBblaE8a1oY47eMGGvM7DMZ9S8ARZrKkRWaPUNjGCOqtH3oeQSMuEPxd98ir4w==",
         "dependencies": {
           "NETStandard.Library": "2.0.3"
-        }
-      },
-      "FakeXrmEasy.v9": {
-        "type": "CentralTransitive",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "RfvMqdNVyyNJlwqbsDuiKP2DfAKEpHjZ1v0JYARlLoXOjCg51uv+PsAbCJPLT0jDdOK/WY5UgN3PQjrVKHFIOg==",
-        "dependencies": {
-          "FakeItEasy": "[6.0.0, 7.0.0)",
-          "FakeXrmEasy.Abstractions.v9": "3.5.0",
-          "FakeXrmEasy.Core.v9": "3.5.1",
-          "FakeXrmEasy.Messages.v9": "3.5.0",
-          "FakeXrmEasy.Plugins.v9": "3.5.0",
-          "Microsoft.PowerPlatform.Dataverse.Client": "1.1.22",
-          "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "1.1.22"
         }
       },
       "Google.Cloud.Storage.V1": {

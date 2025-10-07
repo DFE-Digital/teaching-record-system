@@ -9,7 +9,6 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Get_FieldsPopulatedFromPerson()
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithFirstName("Alfred")
             .WithMiddleName("The")
             .WithLastName("Great")
@@ -19,7 +18,6 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
             .WithGender(Gender.Female));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithFirstName("Lily")
             .WithMiddleName("The")
             .WithLastName("Pink")
@@ -67,11 +65,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithAlert(a => a.WithEndDate(null)));
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithAlert(a => a.WithEndDate(null))
             .WithAlert(a => a.WithEndDate(null)));
 
@@ -164,11 +160,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Get_PersonBIsDeactivated_ShowsWarningAndHidesContinueButton()
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personB = await TestData.CreatePersonAsync();
 
         await WithDbContext(async dbContext =>
         {
@@ -207,11 +201,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Get_PersonBHasOpenAlert_ShowsWarningAndHidesContinueButton()
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithAlert(a => a.WithEndDate(null)));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -250,11 +242,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Get_PersonBWithInductionStatus_ShowsWarningAndHidesContinueButtonAsExpected(InductionStatus status, bool expectMergeToBeAllowed)
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithInductionStatus(i => i
                 .WithStatus(status)
                 .WithStartDate(new DateOnly(2024, 1, 1))
@@ -301,11 +291,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Get_PersonBHasOpenAlertAndInvalidInductionStatus_ShowsWarningAndHidesContinueButton(InductionStatus status)
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
         var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs)
             .WithAlert(a => a.WithEndDate(null))
             .WithInductionStatus(i => i
                 .WithStatus(status)
@@ -340,11 +328,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     [Test]
     public async Task Get_PrimaryPersonAlreadySelected_SelectsChosenPerson()
     {
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personB = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -371,11 +357,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Post_PrimaryPersonNotSelected_ShowsPageError()
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personB = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -402,11 +386,9 @@ public class MatchesTests(HostFixture hostFixture) : MergeTestBase(hostFixture)
     public async Task Post_PersistsDetailsAndRedirectsToNextPage()
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personA = await TestData.CreatePersonAsync();
 
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithPersonDataSource(TestDataPersonDataSource.Trs));
+        var personB = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,

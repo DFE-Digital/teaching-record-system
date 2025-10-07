@@ -34,7 +34,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         DateOnly? endDate = new DateOnly(2021, 11, 5);
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
@@ -67,7 +67,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
@@ -132,7 +132,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
@@ -214,7 +214,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         DateOnly? endDate = new DateOnly(2021, 11, 5);
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,
@@ -264,7 +264,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         DateOnly? endDate = new DateOnly(2021, 11, 5);
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             new AddMqState
             {
                 ProviderId = provider.MandatoryQualificationProviderId,

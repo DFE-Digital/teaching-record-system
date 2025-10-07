@@ -1,4 +1,3 @@
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
@@ -8,7 +7,6 @@ public class EstablishmentRefresherTests
 {
     public EstablishmentRefresherTests(
         DbFixture dbFixture,
-        IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator)
     {
@@ -17,11 +15,9 @@ public class EstablishmentRefresherTests
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
-            organizationService,
             referenceDataCache,
             Clock,
-            trnGenerator,
-            TestDataPersonDataSource.CrmAndTrs);
+            trnGenerator);
     }
 
     [Fact]

@@ -28,7 +28,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             state => state.StartDate = null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -50,7 +50,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = new DateOnly(2021, 11, 5);
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             state =>
             {
                 state.Status = status;
@@ -268,7 +268,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = new DateOnly(2021, 11, 5);
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.ContactId,
+            person.PersonId,
             state =>
             {
                 state.Status = status;

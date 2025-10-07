@@ -55,11 +55,9 @@ public class HostFixture : WebApplicationFactory<Program>
 
             services
                 .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
-                .AddFakeXrm()
                 .AddSingleton(sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
-                    new ForwardToTestScopedClock(),
-                    TestDataPersonDataSource.Trs))
+                    new ForwardToTestScopedClock()))
                 .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                 .AddSingleton<FakeTrnGenerator>()
                 .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())

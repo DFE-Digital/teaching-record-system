@@ -6,13 +6,9 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
     protected async Task<CreatePersonResult> CreatePersonWithCurrentStatus(PersonStatus currentStatus, Action<CreatePersonBuilder>? configure = null)
     {
-        configure ??= p => { };
+        configure ??= _ => { };
 
-        var person = await TestData.CreatePersonAsync(p =>
-        {
-            p.WithPersonDataSource(TestDataPersonDataSource.Trs);
-            configure(p);
-        });
+        var person = await TestData.CreatePersonAsync(configure);
 
         if (currentStatus == PersonStatus.Deactivated)
         {
@@ -29,13 +25,9 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 
     protected async Task<CreatePersonResult> CreatePersonToBecomeStatus(PersonStatus targetStatus, Action<CreatePersonBuilder>? configure = null)
     {
-        configure ??= p => { };
+        configure ??= _ => { };
 
-        var person = await TestData.CreatePersonAsync(p =>
-        {
-            p.WithPersonDataSource(TestDataPersonDataSource.Trs);
-            configure(p);
-        });
+        var person = await TestData.CreatePersonAsync(configure);
 
         if (targetStatus == PersonStatus.Active)
         {
