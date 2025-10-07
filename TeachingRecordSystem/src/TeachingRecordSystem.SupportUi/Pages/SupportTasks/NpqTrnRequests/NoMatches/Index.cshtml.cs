@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NoMat
 public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     [FromRoute]
-    public string SupportTaskReference { get; set; }
+    public required string SupportTaskReference { get; init; }
 
     public IActionResult OnGet() => Redirect(linkGenerator.NpqTrnRequestNoMatchesCheckAnswers(SupportTaskReference));
 }

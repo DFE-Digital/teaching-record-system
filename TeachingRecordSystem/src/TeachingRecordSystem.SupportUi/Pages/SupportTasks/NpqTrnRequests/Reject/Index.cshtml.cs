@@ -9,7 +9,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     public JourneyInstance<RejectNpqTrnRequestState>? JourneyInstance { get; set; }
 
     [FromRoute]
-    public string SupportTaskReference { get; set; }
+    public required string SupportTaskReference { get; init; }
 
     public IActionResult OnGet() => Redirect(linkGenerator.NpqTrnRequestRejectionReason(SupportTaskReference, JourneyInstance!.InstanceId));
 }
