@@ -6,15 +6,15 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
+namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
+[Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
+public class ReasonModel(TrsLinkGenerator linkGenerator,
     IFileService fileService) : PageModel
 {
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+    public JourneyInstance<DeleteRouteState>? JourneyInstance { get; set; }
 
     [FromQuery]
     public bool? FromCheckAnswers { get; set; }
@@ -24,12 +24,12 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you editing this route?")]
+    [Display(Name = "Why are you deleting this route?")]
     public ChangeReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
     [Display(Name = "Do you want to provide more information?")]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re editing this route")]
+    [Required(ErrorMessage = "Select yes if you want to add more information about why you\u2019re deleting this route")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
@@ -55,13 +55,11 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string NextPage => linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
+    public string NextPage => linkGenerator.RouteDeleteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
 
     public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
-
-    public string PageCaption => $"Edit route - {PersonName}";
+        ? linkGenerator.RouteDeleteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
+        : linkGenerator.PersonQualifications(PersonId);
 
     public async Task OnGetAsync()
     {
@@ -84,46 +82,47 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
         }
-        // Delete any previously uploaded file if they're uploading a new one,
-        // or choosing not to upload evidence (check for UploadEvidence != true because if
-        // UploadEvidence somehow got set to null we still want to delete the file)
-        if (EvidenceFileId.HasValue && (EvidenceFile is not null || UploadEvidence != true))
-        {
-            await fileService.DeleteFileAsync(EvidenceFileId.Value);
-            EvidenceFileName = null;
-            EvidenceFileSizeDescription = null;
-            UploadedEvidenceFileUrl = null;
-            EvidenceFileId = null;
-        }
-        // Upload the file even if the rest of the form is invalid
-        // otherwise the user will have to re-upload every time they re-submit
-        if (UploadEvidence == true)
-        {
-            if (EvidenceFile is not null)
-            {
-                using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
-                EvidenceFileId = evidenceFileId;
-                EvidenceFileName = EvidenceFile?.FileName;
-                EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-                UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
-            }
-        }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
+        if (UploadEvidence == true)
+        {
+            if (EvidenceFile is not null)
+            {
+                if (EvidenceFileId is not null)
+                {
+                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
+                }
+
+                using var stream = EvidenceFile.OpenReadStream();
+                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
+                await JourneyInstance!.UpdateStateAsync(state =>
+                {
+                    state.ChangeReasonDetail.EvidenceFileId = evidenceFileId;
+                    state.ChangeReasonDetail.EvidenceFileName = EvidenceFile.FileName;
+                    state.ChangeReasonDetail.EvidenceFileSizeDescription = EvidenceFile.Length.Bytes().Humanize();
+                });
+            }
+        }
+        else if (EvidenceFileId is not null)
+        {
+            await fileService.DeleteFileAsync(EvidenceFileId.Value);
+            await JourneyInstance!.UpdateStateAsync(state =>
+            {
+                state.ChangeReasonDetail.EvidenceFileId = null;
+                state.ChangeReasonDetail.EvidenceFileName = null;
+                state.ChangeReasonDetail.EvidenceFileSizeDescription = null;
+            });
+        }
+
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
-            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.ChangeReasonDetail.UploadEvidence = UploadEvidence;
-            state.ChangeReasonDetail.EvidenceFileId = UploadEvidence is true ? EvidenceFileId : null;
-            state.ChangeReasonDetail.EvidenceFileName = UploadEvidence is true ? EvidenceFileName : null;
-            state.ChangeReasonDetail.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
+            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
         });
 
         return Redirect(NextPage);
@@ -137,8 +136,6 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus);
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;

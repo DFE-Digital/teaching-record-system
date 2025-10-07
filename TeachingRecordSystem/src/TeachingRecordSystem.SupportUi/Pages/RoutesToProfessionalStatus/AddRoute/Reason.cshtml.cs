@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class ChangeReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache, IFileService fileService)
+public class ReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache, IFileService fileService)
     : AddRoutePostStatusPageModel(AddRoutePage.ChangeReason, linkGenerator, referenceDataCache)
 {
     [BindProperty]
