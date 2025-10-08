@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using System.Transactions;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
@@ -204,6 +205,8 @@ public class SignInJourneyHelper(
             Person? getAnIdentityPerson = null;
             OneLoginUserMatchRoute? matchRoute = null;
             IdTrnToken? trnTokenModel = null;
+
+            using var sc = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled);
 
             // First try and match on TRN Token
             if (journeyInstance.State.TrnToken is string trnToken)
