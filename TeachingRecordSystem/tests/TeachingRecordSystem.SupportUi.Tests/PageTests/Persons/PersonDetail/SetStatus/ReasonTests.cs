@@ -649,7 +649,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, PersonStatus targetStatus, JourneyInstance<SetStatusState> journeyInstance) =>
-        $"/persons/{person.PersonId}/set-status/{targetStatus}/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";
+        $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<SetStatusState>> CreateJourneyInstanceAsync(Guid personId, SetStatusState? state = null) =>
         CreateJourneyInstance(

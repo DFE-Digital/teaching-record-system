@@ -223,7 +223,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/close/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/closereason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(newEndDate, journeyInstance.State.EndDate);

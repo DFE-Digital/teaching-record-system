@@ -261,7 +261,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/link/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/linkreason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.AddLink);
@@ -285,7 +285,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/link/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/linkreason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.False(journeyInstance.State.AddLink);
