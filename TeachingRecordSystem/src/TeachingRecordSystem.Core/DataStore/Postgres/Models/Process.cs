@@ -9,5 +9,5 @@ public class Process
     public required DateTime Created { get; init; }
     public required Guid UserId { get; init; }
     public ICollection<ProcessEvent>? Events { get; }
-    public required Guid[] PersonIds { get; init; }
+    public required HashSet<Guid> PersonIds { get; init; }
 }

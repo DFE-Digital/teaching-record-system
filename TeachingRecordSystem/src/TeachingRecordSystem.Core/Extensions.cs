@@ -85,7 +85,8 @@ public static class Extensions
             .AddFileService()
             .AddNameSynonyms()
             .AddTrnRequestService(configuration)
-            .AddPersonMatching();
+            .AddPersonMatching()
+            .AddScoped<IEventPublisher, EventPublisher>();
 
         return services;
     }
