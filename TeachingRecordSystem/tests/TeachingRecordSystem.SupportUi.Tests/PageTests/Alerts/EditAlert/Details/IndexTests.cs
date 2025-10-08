@@ -205,7 +205,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/detailsreason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/details/reason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(newDetails, journeyInstance.State.Details);

@@ -20,7 +20,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -36,7 +36,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -52,7 +52,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.New, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -69,7 +69,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -85,7 +85,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -119,7 +119,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.New, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreateMinimumValidPostContent()
         };
@@ -138,7 +138,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -154,7 +154,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.New, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -171,7 +171,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(changeReason: null, hasAdditionalReasonDetail: false, uploadEvidence: false)
         };
@@ -190,7 +190,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: AlertChangeEndDateReasonOption.AnotherReason,
@@ -211,7 +211,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: AlertChangeEndDateReasonOption.AnotherReason,
@@ -234,7 +234,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: AlertChangeEndDateReasonOption.AnotherReason,
@@ -257,7 +257,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: AlertChangeEndDateReasonOption.AnotherReason,
@@ -284,7 +284,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var hasAdditionalReasonDetail = true;
         var reasonDetail = "More details";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: reason,
@@ -320,7 +320,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var hasAdditionalReasonDetail = false;
         var evidenceFileName = "evidence.pdf";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-datereason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: reason,
