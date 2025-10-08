@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Models;
 
-public enum ActionType
+public enum ProcessType
 {
     RouteToProfessionalStatusCreated = 1,
     RouteToProfessionalStatusUpdated = 2,
