@@ -55,7 +55,7 @@ public static class InductionsPageExtensions
 
     public static Task AssertOnEditInductionChangeReasonPageAsync(this IPage page, Guid personId)
     {
-        return page.WaitForUrlPathAsync($"/persons/{personId}/edit-induction/change-reason");
+        return page.WaitForUrlPathAsync($"/persons/{personId}/edit-induction/reason");
     }
 
     public static Task AssertOnEditInductionCheckYourAnswersPageAsync(this IPage page, Guid personId)

@@ -135,7 +135,7 @@
 //
 //         // Assert
 //         AssertEx.ResponseIsRedirectTo(response,
-//             $"/persons/{person.PersonId}/set-status/{targetStatus}/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+//             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
 //     [Test]
@@ -170,7 +170,7 @@
 //
 //         // Assert
 //         AssertEx.ResponseIsRedirectTo(response,
-//             $"/persons/{person.PersonId}/set-status/{targetStatus}/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+//             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
 //     [Test]
@@ -204,7 +204,7 @@
 //
 //         // Assert
 //         AssertEx.ResponseIsRedirectTo(response,
-//             $"/persons/{person.PersonId}/set-status/{targetStatus}/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+//             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
 //     [Test]
@@ -241,7 +241,7 @@
 //
 //         // Assert
 //         AssertEx.ResponseIsRedirectTo(response,
-//             $"/persons/{person.PersonId}/set-status/{targetStatus}/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+//             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
 //     [Test]

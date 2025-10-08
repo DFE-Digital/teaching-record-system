@@ -1,32 +1,29 @@
-@page "/mqs/{qualificationId}/start-date/change-reason/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate.ChangeReasonModel
+@page "/mqs/{qualificationId}/provider/reason/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider.ReasonModel
 @{
     ViewBag.Title = Html.DisplayNameFor(m => m.ChangeReason);
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditStartDate(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.MqEditProvider(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqEditStartDateChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.MqEditProviderChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
 
-            <govuk-radios for="ChangeReason" data-testid="change-reason-options">
+            <govuk-radios for="ChangeReason" page data-testid="change-reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend" />
-                    <govuk-radios-item value="@MqChangeStartDateReasonOption.IncorrectStartDate">
-                        @MqChangeStartDateReasonOption.IncorrectStartDate.GetDisplayName()
+                    <govuk-radios-item value="@MqChangeProviderReasonOption.IncorrectTrainingProvider">
+                        @MqChangeProviderReasonOption.IncorrectTrainingProvider.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@MqChangeStartDateReasonOption.ChangeOfStartDate">
-                        @MqChangeStartDateReasonOption.ChangeOfStartDate.GetDisplayName()
+                    <govuk-radios-item value="@MqChangeProviderReasonOption.ChangeOfTrainingProvider">
+                        @MqChangeProviderReasonOption.ChangeOfTrainingProvider.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@MqChangeStartDateReasonOption.UnableToConfirmIfTheDataIsCorrect">
-                        @MqChangeStartDateReasonOption.UnableToConfirmIfTheDataIsCorrect.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MqChangeStartDateReasonOption.AnotherReason">
-                        @MqChangeStartDateReasonOption.AnotherReason.GetDisplayName()
+                    <govuk-radios-item value="@MqChangeProviderReasonOption.AnotherReason">
+                        @MqChangeProviderReasonOption.AnotherReason.GetDisplayName()
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
@@ -72,7 +69,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqEditStartDateChangeReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditProviderChangeReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

@@ -241,7 +241,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/end-date/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/end-date/reason", response.Headers.Location?.OriginalString);
     }
 
     [Test]

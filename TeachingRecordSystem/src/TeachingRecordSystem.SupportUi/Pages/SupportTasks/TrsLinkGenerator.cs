@@ -74,10 +74,10 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/Index", routeValues: new { supportTaskReference });
 
     public string NpqTrnRequestRejectionReason(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/RejectionReason", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/Reason", routeValues: new { supportTaskReference, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string NpqTrnRequestRejectionReasonCancel(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/RejectionReason", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+        GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/Reason", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
     public string NpqTrnRequestRejectionCheckAnswers(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/SupportTasks/NpqTrnRequests/Reject/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);

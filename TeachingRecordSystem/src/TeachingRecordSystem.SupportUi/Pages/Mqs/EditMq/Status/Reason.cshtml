@@ -1,32 +1,54 @@
-@page "/mqs/{qualificationId}/specialism/change-reason/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism.ChangeReasonModel
+@page "/mqs/{qualificationId}/status/reason/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.ReasonModel
 @{
-    ViewBag.Title = Html.DisplayNameFor(m => m.ChangeReason);
+    ViewBag.Title = (@Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)
+        ? ViewBag.Title = Html.DisplayNameFor(m => m.EndDateChangeReason)
+        : ViewBag.Title = Html.DisplayNameFor(m => m.StatusChangeReason);
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.MqEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqEditSpecialismChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.MqEditStatusChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
 
-            <govuk-radios for="ChangeReason" data-testid="change-reason-options">
-                <govuk-radios-fieldset>
+            @if (Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)
+            {
+                <govuk-radios for="EndDateChangeReason" data-testid="change-reason-options">
+                    <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend" />
-                    <govuk-radios-item value="@MqChangeSpecialismReasonOption.IncorrectSpecialism">
-                        @MqChangeSpecialismReasonOption.IncorrectSpecialism.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MqChangeSpecialismReasonOption.ChangeOfSpecialism">
-                        @MqChangeSpecialismReasonOption.ChangeOfSpecialism.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@MqChangeSpecialismReasonOption.AnotherReason">
-                        @MqChangeSpecialismReasonOption.AnotherReason.GetDisplayName()
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
-            </govuk-radios>
+                        <govuk-radios-item value="@MqChangeEndDateReasonOption.IncorrectEndDate">
+                            @MqChangeEndDateReasonOption.IncorrectEndDate.GetDisplayName()
+                        </govuk-radios-item>
+                        <govuk-radios-item value="@MqChangeEndDateReasonOption.ChangeOfEndDate">
+                            @MqChangeEndDateReasonOption.ChangeOfEndDate.GetDisplayName()
+                        </govuk-radios-item>
+                        <govuk-radios-item value="@MqChangeEndDateReasonOption.AnotherReason">
+                            @MqChangeEndDateReasonOption.AnotherReason.GetDisplayName()
+                        </govuk-radios-item>
+                    </govuk-radios-fieldset>
+                </govuk-radios>
+            }
+            else
+            {
+                <govuk-radios for="StatusChangeReason" data-testid="change-reason-options">
+                    <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend" />
+                        <govuk-radios-item value="@MqChangeStatusReasonOption.IncorrectStatus">
+                            @MqChangeStatusReasonOption.IncorrectStatus.GetDisplayName()
+                        </govuk-radios-item>
+                        <govuk-radios-item value="@MqChangeStatusReasonOption.ChangeOfStatus">
+                            @MqChangeStatusReasonOption.ChangeOfStatus.GetDisplayName()
+                        </govuk-radios-item>
+                        <govuk-radios-item value="@MqChangeStatusReasonOption.AnotherReason">
+                            @MqChangeStatusReasonOption.AnotherReason.GetDisplayName()
+                        </govuk-radios-item>
+                    </govuk-radios-fieldset>
+                </govuk-radios>
+            }
 
             <govuk-radios for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
                 <govuk-radios-fieldset>
@@ -69,8 +91,9 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqEditSpecialismChangeReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditStatusChangeReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
 </div>
+

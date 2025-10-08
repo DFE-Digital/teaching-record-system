@@ -5,16 +5,16 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Files;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
+namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
-[Journey(JourneyNames.EditMqSpecialism), RequireJourneyInstance]
-public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+[Journey(JourneyNames.EditMqStartDate), RequireJourneyInstance]
+public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
-    public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
+    public JourneyInstance<EditMqStartDateState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -24,9 +24,9 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you changing the specialism?")]
+    [Display(Name = "Why are you changing the start date?")]
     [Required(ErrorMessage = "Select a reason")]
-    public MqChangeSpecialismReasonOption? ChangeReason { get; set; }
+    public MqChangeStartDateReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
     [Display(Name = "Do you want to provide more information?")]
@@ -115,7 +115,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(linkGenerator.MqEditSpecialismCheckAnswers(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditStartDateCheckAnswers(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -131,9 +131,9 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.Specialism is null)
+        if (JourneyInstance!.State.StartDate is null)
         {
-            context.Result = Redirect(linkGenerator.MqEditSpecialism(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqEditStartDate(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 

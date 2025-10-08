@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class ExemptionReasonModel(
+public class ExemptionReasonsModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,

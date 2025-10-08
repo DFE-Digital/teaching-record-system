@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
-public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
@@ -142,7 +142,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
@@ -460,7 +460,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditInductionState> journeyInstance) =>
-        $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";
+        $"/persons/{person.PersonId}/edit-induction/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(

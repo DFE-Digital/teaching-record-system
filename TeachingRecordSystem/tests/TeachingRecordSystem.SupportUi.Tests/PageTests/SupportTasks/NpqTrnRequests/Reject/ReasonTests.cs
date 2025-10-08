@@ -6,7 +6,7 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Reject;
 
-public class RejectionReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
     [Test]
     public async Task Get_HasBackLinkExpected()

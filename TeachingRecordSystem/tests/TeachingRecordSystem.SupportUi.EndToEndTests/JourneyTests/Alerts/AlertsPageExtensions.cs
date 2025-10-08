@@ -65,7 +65,7 @@ public static class AlertsPageExtensions
         page.WaitForUrlPathAsync($"/alerts/{alertId}/details");
 
     public static Task AssertOnEditAlertDetailsChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/details/change-reason");
+        page.WaitForUrlPathAsync($"/alerts/{alertId}/details/reason");
 
     public static Task AssertOnEditAlertDetailsCheckAnswersPageAsync(this IPage page, Guid alertId) =>
         page.WaitForUrlPathAsync($"/alerts/{alertId}/details/check-answers");
@@ -74,7 +74,7 @@ public static class AlertsPageExtensions
         page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date");
 
     public static Task AssertOnEditAlertStartDateChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/change-reason");
+        page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/reason");
 
     public static Task AssertOnEditAlertStartDateCheckAnswersPageAsync(this IPage page, Guid alertId) =>
         page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/check-answers");
@@ -83,7 +83,7 @@ public static class AlertsPageExtensions
         page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date");
 
     public static Task AssertOnEditAlertEndDateChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/change-reason");
+        page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/reason");
 
     public static Task AssertOnEditAlertEndDateCheckAnswersPageAsync(this IPage page, Guid alertId) =>
         page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/check-answers");
@@ -92,7 +92,7 @@ public static class AlertsPageExtensions
         page.WaitForUrlPathAsync($"/alerts/{alertId}/link");
 
     public static Task AssertOnEditAlertLinkChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/link/change-reason");
+        page.WaitForUrlPathAsync($"/alerts/{alertId}/link/reason");
 
     public static Task AssertOnEditAlertLinkCheckAnswersPageAsync(this IPage page, Guid alertId) =>
         page.WaitForUrlPathAsync($"/alerts/{alertId}/link/check-answers");
@@ -104,7 +104,7 @@ public static class AlertsPageExtensions
         page.WaitForUrlPathAsync($"/alerts/{alertId}/close");
 
     public static Task AssertOnCloseAlertChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/close/change-reason");
+        page.WaitForUrlPathAsync($"/alerts/{alertId}/close/reason");
 
     public static Task AssertOnCloseAlertCheckAnswersPageAsync(this IPage page, Guid alertId) =>
         page.WaitForUrlPathAsync($"/alerts/{alertId}/close/check-answers");

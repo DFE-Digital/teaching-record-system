@@ -2,7 +2,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.StartDate;
 
-public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
@@ -11,7 +11,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -33,7 +33,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -60,7 +60,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentStartDate = oldStartDate
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -76,7 +76,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -102,7 +102,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentStartDate = oldStartDate
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -134,7 +134,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentStartDate = oldStartDate
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -166,7 +166,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentStartDate = oldStartDate
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
@@ -204,7 +204,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
         multipartContent.Add(new StringContent("True"), "UploadEvidence");
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = multipartContent
         };
@@ -238,7 +238,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
         multipartContent.Add(new StringContent("True"), "UploadEvidence");
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = multipartContent
         };
@@ -267,7 +267,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentStartDate = oldStartDate
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/change-reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -306,7 +306,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CurrentStartDate = oldStartDate
             });
 
-        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/start-date/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

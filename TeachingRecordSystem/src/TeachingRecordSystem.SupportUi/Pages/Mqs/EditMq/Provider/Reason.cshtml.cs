@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 [Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
-public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
 

@@ -12,21 +12,21 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Arguments("edit-induction/status", InductionStatus.Failed, "edit-induction/start-date")]
     [Arguments("edit-induction/status", InductionStatus.FailedInWales, "edit-induction/start-date")]
     [Arguments("edit-induction/status", InductionStatus.Passed, "edit-induction/start-date")]
-    [Arguments("edit-induction/status", InductionStatus.RequiredToComplete, "edit-induction/change-reason")]
-    [Arguments("edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/change-reason")]
-    [Arguments("edit-induction/start-date", InductionStatus.InProgress, "edit-induction/change-reason")]
+    [Arguments("edit-induction/status", InductionStatus.RequiredToComplete, "edit-induction/reason")]
+    [Arguments("edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/reason")]
+    [Arguments("edit-induction/start-date", InductionStatus.InProgress, "edit-induction/reason")]
     [Arguments("edit-induction/start-date", InductionStatus.Failed, "edit-induction/date-completed")]
     [Arguments("edit-induction/start-date", InductionStatus.FailedInWales, "edit-induction/date-completed")]
     [Arguments("edit-induction/start-date", InductionStatus.Passed, "edit-induction/date-completed")]
-    [Arguments("edit-induction/date-completed", InductionStatus.Failed, "edit-induction/change-reason")]
-    [Arguments("edit-induction/date-completed", InductionStatus.FailedInWales, "edit-induction/change-reason")]
-    [Arguments("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/change-reason")]
-    [Arguments("edit-induction/change-reason", InductionStatus.Exempt, "edit-induction/check-answers")]
-    [Arguments("edit-induction/change-reason", InductionStatus.InProgress, "edit-induction/check-answers")]
-    [Arguments("edit-induction/change-reason", InductionStatus.Failed, "edit-induction/check-answers")]
-    [Arguments("edit-induction/change-reason", InductionStatus.FailedInWales, "edit-induction/check-answers")]
-    [Arguments("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
-    [Arguments("edit-induction/change-reason", InductionStatus.RequiredToComplete, "edit-induction/check-answers")]
+    [Arguments("edit-induction/date-completed", InductionStatus.Failed, "edit-induction/reason")]
+    [Arguments("edit-induction/date-completed", InductionStatus.FailedInWales, "edit-induction/reason")]
+    [Arguments("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/reason")]
+    [Arguments("edit-induction/reason", InductionStatus.Exempt, "edit-induction/check-answers")]
+    [Arguments("edit-induction/reason", InductionStatus.InProgress, "edit-induction/check-answers")]
+    [Arguments("edit-induction/reason", InductionStatus.Failed, "edit-induction/check-answers")]
+    [Arguments("edit-induction/reason", InductionStatus.FailedInWales, "edit-induction/check-answers")]
+    [Arguments("edit-induction/reason", InductionStatus.Passed, "edit-induction/check-answers")]
+    [Arguments("edit-induction/reason", InductionStatus.RequiredToComplete, "edit-induction/check-answers")]
     public async Task Post_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
@@ -74,7 +74,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Arguments("edit-induction/exemption-reasons", InductionStatus.Exempt)]
     [Arguments("edit-induction/start-date", InductionStatus.Passed)]
     [Arguments("edit-induction/date-completed", InductionStatus.Passed)]
-    [Arguments("edit-induction/change-reason", InductionStatus.InProgress)]
+    [Arguments("edit-induction/reason", InductionStatus.InProgress)]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus)
     {
         // Arrange
@@ -121,7 +121,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Arguments("edit-induction/exemption-reasons", InductionStatus.Exempt)]
     [Arguments("edit-induction/start-date", InductionStatus.Passed)]
     [Arguments("edit-induction/date-completed", InductionStatus.Passed)]
-    [Arguments("edit-induction/change-reason", InductionStatus.InProgress)]
+    [Arguments("edit-induction/reason", InductionStatus.InProgress)]
     public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile(string fromPage, InductionStatus inductionStatus)
     {
         // Arrange
@@ -213,12 +213,12 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Arguments(InductionJourneyPage.CompletedDate, "edit-induction/date-completed", InductionStatus.Failed, "induction")]
     [Arguments(InductionJourneyPage.Status, "edit-induction/date-completed", InductionStatus.Failed, "edit-induction/start-date")]
     [Arguments(InductionJourneyPage.StartDate, "edit-induction/date-completed", InductionStatus.Failed, "edit-induction/start-date")]
-    [Arguments(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
-    [Arguments(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.InProgress, "edit-induction/start-date")]
-    [Arguments(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Failed, "edit-induction/date-completed")]
-    [Arguments(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.FailedInWales, "edit-induction/date-completed")]
-    [Arguments(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Passed, "edit-induction/date-completed")]
-    [Arguments(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.RequiredToComplete, "edit-induction/status")]
+    [Arguments(InductionJourneyPage.StartDate, "edit-induction/reason", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
+    [Arguments(InductionJourneyPage.StartDate, "edit-induction/reason", InductionStatus.InProgress, "edit-induction/start-date")]
+    [Arguments(InductionJourneyPage.StartDate, "edit-induction/reason", InductionStatus.Failed, "edit-induction/date-completed")]
+    [Arguments(InductionJourneyPage.StartDate, "edit-induction/reason", InductionStatus.FailedInWales, "edit-induction/date-completed")]
+    [Arguments(InductionJourneyPage.StartDate, "edit-induction/reason", InductionStatus.Passed, "edit-induction/date-completed")]
+    [Arguments(InductionJourneyPage.StartDate, "edit-induction/reason", InductionStatus.RequiredToComplete, "edit-induction/status")]
     public async Task Get_SubjectToStartPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
     {
         // Arrange
@@ -246,7 +246,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Arguments(InductionJourneyPage.Status, "edit-induction/status", InductionStatus.Exempt, "check-answers")]
     [Arguments(InductionJourneyPage.Status, "edit-induction/start-date", InductionStatus.Passed, "check-answers")]
     [Arguments(InductionJourneyPage.Status, "edit-induction/date-completed", InductionStatus.Passed, "check-answers")]
-    [Arguments(InductionJourneyPage.Status, "edit-induction/change-reason", InductionStatus.Passed, "check-answers")]
+    [Arguments(InductionJourneyPage.Status, "edit-induction/reason", InductionStatus.Passed, "check-answers")]
     [Arguments(InductionJourneyPage.Status, "edit-induction/exemption-reasons", InductionStatus.Exempt, "check-answers")]
     public async Task Get_FromCheckYourAnswersPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
     {
@@ -308,7 +308,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Arguments("edit-induction/start-date", InductionStatus.Passed, "edit-induction/check-answers")]
     [Arguments("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/check-answers")]
     [Arguments("edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/check-answers")]
-    [Arguments("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
+    [Arguments("edit-induction/reason", InductionStatus.Passed, "edit-induction/check-answers")]
     public async Task Post_FromCya_ToPage_Post_RedirectsToExpectedPage(string page, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
@@ -518,11 +518,11 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         ("edit-induction/date-completed", InductionStatus.Failed),
         ("edit-induction/date-completed", InductionStatus.FailedInWales),
         ("edit-induction/date-completed", InductionStatus.Passed),
-        ("edit-induction/change-reason", InductionStatus.Exempt),
-        ("edit-induction/change-reason", InductionStatus.InProgress),
-        ("edit-induction/change-reason", InductionStatus.Failed),
-        ("edit-induction/change-reason", InductionStatus.FailedInWales),
-        ("edit-induction/change-reason", InductionStatus.Passed),
-        ("edit-induction/change-reason", InductionStatus.RequiredToComplete)
+        ("edit-induction/reason", InductionStatus.Exempt),
+        ("edit-induction/reason", InductionStatus.InProgress),
+        ("edit-induction/reason", InductionStatus.Failed),
+        ("edit-induction/reason", InductionStatus.FailedInWales),
+        ("edit-induction/reason", InductionStatus.Passed),
+        ("edit-induction/reason", InductionStatus.RequiredToComplete)
     ];
 }
