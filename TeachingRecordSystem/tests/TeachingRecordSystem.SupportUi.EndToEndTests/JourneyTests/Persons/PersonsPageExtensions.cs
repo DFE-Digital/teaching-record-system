@@ -62,7 +62,7 @@ public static class PersonsPageExtensions
         page.WaitForUrlPathAsync($"/persons/add/check-answers");
 
     public static Task AssertOnPersonSetStatusChangeReasonPageAsync(this IPage page, Guid personId, PersonStatus targetStatus) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/change-reason");
+        page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/reason");
 
     public static Task AssertOnPersonSetStatusCheckAnswersPageAsync(this IPage page, Guid personId, PersonStatus targetStatus) =>
         page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/check-answers");

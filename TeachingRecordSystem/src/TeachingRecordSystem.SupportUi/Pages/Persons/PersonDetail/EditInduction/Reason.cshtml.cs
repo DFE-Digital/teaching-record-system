@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Services.Files;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
-public class InductionChangeReasonModel(
+public class ReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IFileService fileService)

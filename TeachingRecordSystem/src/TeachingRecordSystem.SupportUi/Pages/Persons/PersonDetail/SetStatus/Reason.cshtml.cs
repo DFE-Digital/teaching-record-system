@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 [Journey(JourneyNames.SetStatus), RequireJourneyInstance]
 [AllowDeactivatedPerson]
-public class ChangeReasonModel(
+public class ReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IFileService fileService)

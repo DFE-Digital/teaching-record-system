@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
-public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
     [Test]
     [MethodDataSource(nameof(GetAllStatuses))]
@@ -69,10 +69,10 @@ public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(host
         Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileId)));
-        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ChangeReasonModel.UploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileId)));
+        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileName)));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileSizeDescription)));
+        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ReasonModel.UploadedEvidenceFileUrl)));
     }
 
     [Test]
@@ -199,13 +199,13 @@ public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(host
         // Assert
         if (targetStatus == PersonStatus.Deactivated)
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.DeactivateReason), "Select a reason");
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.DeactivateReason), "Select a reason");
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.ReactivateReason), "Select a reason");
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReactivateReason), "Select a reason");
         }
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.UploadEvidence), "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.UploadEvidence), "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -244,11 +244,11 @@ public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(host
         // Assert
         if (targetStatus == PersonStatus.Deactivated)
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.DeactivateReasonDetail), "Enter a reason");
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.DeactivateReasonDetail), "Enter a reason");
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.ReactivateReasonDetail), "Enter a reason");
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReactivateReasonDetail), "Enter a reason");
         }
     }
 
@@ -286,7 +286,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(host
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.EvidenceFile), "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.EvidenceFile), "Select a file");
     }
 
     [Test]
@@ -324,7 +324,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ChangeReasonModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -371,10 +371,10 @@ public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(host
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileId)));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ChangeReasonModel.UploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileId)));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileName)));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileSizeDescription)));
+        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ReasonModel.UploadedEvidenceFileUrl)));
     }
 
     [Test]
@@ -422,10 +422,10 @@ public class ChangeReasonTests(HostFixture hostFixture) : SetStatusTestBase(host
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal("http://test.com/file", link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileId)));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileName)));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue(nameof(ChangeReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(ChangeReasonModel.UploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileId)));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileName)));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileSizeDescription)));
+        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(ReasonModel.UploadedEvidenceFileUrl)));
     }
 
     [Test]

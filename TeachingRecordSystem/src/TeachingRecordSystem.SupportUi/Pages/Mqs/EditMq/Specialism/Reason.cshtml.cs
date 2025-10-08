@@ -5,16 +5,16 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Files;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
+namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
-[Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
-public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+[Journey(JourneyNames.EditMqSpecialism), RequireJourneyInstance]
+public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
-    public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
+    public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -24,12 +24,9 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you changing the status?")]
-    public MqChangeStatusReasonOption? StatusChangeReason { get; set; }
-
-    [BindProperty]
-    [Display(Name = "Why are you changing the end date?")]
-    public MqChangeEndDateReasonOption? EndDateChangeReason { get; set; }
+    [Display(Name = "Why are you changing the specialism?")]
+    [Required(ErrorMessage = "Select a reason")]
+    public MqChangeSpecialismReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
     [Display(Name = "Do you want to provide more information?")]
@@ -59,14 +56,9 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public bool? IsEndDateChange { get; set; }
-
-    public bool? IsStatusChange { get; set; }
-
     public async Task OnGetAsync()
     {
-        StatusChangeReason ??= JourneyInstance!.State.StatusChangeReason;
-        EndDateChangeReason ??= JourneyInstance!.State.EndDateChangeReason;
+        ChangeReason ??= JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail ??= JourneyInstance?.State.ChangeReasonDetail;
         UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
             await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
@@ -76,16 +68,6 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (IsEndDateChange == true && IsStatusChange == false && EndDateChangeReason is null)
-        {
-            ModelState.AddModelError(nameof(EndDateChangeReason), "Select a reason");
-        }
-
-        if (IsStatusChange == true && StatusChangeReason is null)
-        {
-            ModelState.AddModelError(nameof(StatusChangeReason), "Select a reason");
-        }
-
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
@@ -128,13 +110,12 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.StatusChangeReason = StatusChangeReason;
-            state.EndDateChangeReason = EndDateChangeReason;
+            state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail = ChangeReasonDetail;
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(linkGenerator.MqEditStatusCheckAnswersConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditSpecialismCheckAnswers(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -150,10 +131,9 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.Status is null
-            || JourneyInstance.State.Status == MandatoryQualificationStatus.Passed && !JourneyInstance.State.EndDate.HasValue)
+        if (JourneyInstance!.State.Specialism is null)
         {
-            context.Result = Redirect(linkGenerator.MqEditStatus(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqEditSpecialism(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -164,7 +144,5 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator, IFileService file
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-        IsEndDateChange = JourneyInstance?.State.IsEndDateChange;
-        IsStatusChange = JourneyInstance?.State.IsStatusChange;
     }
 }
