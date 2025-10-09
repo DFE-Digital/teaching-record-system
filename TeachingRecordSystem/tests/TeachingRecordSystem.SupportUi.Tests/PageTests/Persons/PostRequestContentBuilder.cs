@@ -26,15 +26,13 @@ public abstract class PostRequestContentBuilder
     {
         prefix ??= "";
         parent ??= this;
-        var properties = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var properties = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(f => f.GetValue(this) != null);
 
         foreach (var property in properties)
         {
             var value = property.GetValue(parent);
-            if (value is null)
-            {
-            }
-            else if (value is DateOnly date)
+            if (value is DateOnly date)
             {
                 yield return new($"{prefix}{property.Name}.Day", date.Day.ToString());
                 yield return new($"{prefix}{property.Name}.Month", date.Month.ToString());
@@ -49,11 +47,7 @@ public abstract class PostRequestContentBuilder
             }
             else if (value is (HttpContent content, string filename))
             {
-                yield return new PostRequestFileEntry(property.Name, content, filename);
-            }
-            else if (value is string str)
-            {
-                yield return new($"{prefix}{property.Name}", str);
+                yield return new PostRequestFileEntry($"{prefix}{property.Name}", content, filename);
             }
             else if (!value.GetType().IsValueType && !value.GetType().IsPrimitive && !value.GetType().IsEnum)
             {
