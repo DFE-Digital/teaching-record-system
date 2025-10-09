@@ -6,8 +6,9 @@ public abstract class PostRequestContentBuilder
 {
     public FormUrlEncodedContent BuildFormUrlEncoded()
     {
-        return new FormUrlEncodedContent(BuildContentEntries()
-            .Select(e => e.AsKeyValuePair()));
+        var entries = BuildContentEntries().Select(e => e.AsKeyValuePair());
+
+        return new FormUrlEncodedContent(entries);
     }
 
     public MultipartFormDataContent BuildMultipartFormData()
@@ -70,7 +71,7 @@ public abstract class PostRequestContentBuilder
                 continue;
             }
 
-            if (property.PropertyType is Type t && !t.IsValueType && !t.IsPrimitive && !t.IsEnum)
+            if (value.GetType() is Type t && !t.IsValueType && !t.IsPrimitive && !t.IsEnum)
             {
                 foreach (var entry in BuildContentEntries($"{prefix}{property.Name}.", value))
                 {
