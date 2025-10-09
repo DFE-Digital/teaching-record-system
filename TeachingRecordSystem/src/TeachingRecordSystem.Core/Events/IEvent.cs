@@ -8,6 +8,7 @@ public interface IEvent
 {
     Guid EventId { get; }
     EventModels.RaisedByUserInfo RaisedBy { get; }
+    Guid[] PersonIds { get; }
 
     static JsonSerializerOptions SerializerOptions => new()
     {
