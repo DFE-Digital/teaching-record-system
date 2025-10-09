@@ -105,10 +105,10 @@ public class CheckAnswersModel(
                 PersonAttributes = updateResult.PersonAttributes,
                 OldPersonAttributes = updateResult.OldPersonAttributes,
                 NameChangeReason = NameChangeReason?.GetDisplayName(),
-                NameChangeEvidenceFile = NameChangeEvidenceFile?.AsEventModel(),
+                NameChangeEvidenceFile = NameChangeEvidenceFile?.ToEventModel(),
                 DetailsChangeReason = OtherDetailsChangeReason?.GetDisplayName(),
                 DetailsChangeReasonDetail = OtherDetailsChangeReasonDetail,
-                DetailsChangeEvidenceFile = OtherDetailsChangeEvidenceFile?.AsEventModel(),
+                DetailsChangeEvidenceFile = OtherDetailsChangeEvidenceFile?.ToEventModel(),
                 Changes = (PersonDetailsUpdatedEventChanges)updateResult.Changes
             } :
             null;

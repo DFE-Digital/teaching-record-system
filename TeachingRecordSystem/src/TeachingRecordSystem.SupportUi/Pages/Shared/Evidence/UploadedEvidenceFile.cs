@@ -7,7 +7,7 @@ public class UploadedEvidenceFile
     public required string FileSizeDescription { get; set; }
     public string? PreviewUrl { get; set; }
 
-    public EventModels.File AsEventModel() => new()
+    public EventModels.File ToEventModel() => new()
     {
         FileId = FileId,
         Name = FileName

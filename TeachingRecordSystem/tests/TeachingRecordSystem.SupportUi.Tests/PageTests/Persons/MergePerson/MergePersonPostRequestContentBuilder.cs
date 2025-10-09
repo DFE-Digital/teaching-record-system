@@ -4,22 +4,22 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
 public class MergePersonPostRequestContentBuilder : PostRequestContentBuilder
 {
-    private string? OtherTrn { get; set; }
-    private Guid? PrimaryPersonId { get; set; }
-    private PersonAttributeSource? FirstNameSource { get; set; }
-    private PersonAttributeSource? MiddleNameSource { get; set; }
-    private PersonAttributeSource? LastNameSource { get; set; }
-    private PersonAttributeSource? DateOfBirthSource { get; set; }
-    private PersonAttributeSource? EmailAddressSource { get; set; }
-    private PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
-    private PersonAttributeSource? GenderSource { get; set; }
-    private bool? UploadEvidence { get; set; }
-    private (HttpContent, string)? EvidenceFile { get; set; }
-    private Guid? EvidenceFileId { get; set; }
-    private string? EvidenceFileName { get; set; }
-    private string? EvidenceFileSizeDescription { get; set; }
-    private string? EvidenceFileUrl { get; set; }
-    private string? Comments { get; set; }
+    public string? OtherTrn { get; set; }
+    public Guid? PrimaryPersonId { get; set; }
+    public PersonAttributeSource? FirstNameSource { get; set; }
+    public PersonAttributeSource? MiddleNameSource { get; set; }
+    public PersonAttributeSource? LastNameSource { get; set; }
+    public PersonAttributeSource? DateOfBirthSource { get; set; }
+    public PersonAttributeSource? EmailAddressSource { get; set; }
+    public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
+    public PersonAttributeSource? GenderSource { get; set; }
+    public bool? UploadEvidence { get; set; }
+    public (HttpContent, string)? EvidenceFile { get; set; }
+    public Guid? EvidenceFileId { get; set; }
+    public string? EvidenceFileName { get; set; }
+    public string? EvidenceFileSizeDescription { get; set; }
+    public string? EvidenceFileUrl { get; set; }
+    public string? Comments { get; set; }
 
     public MergePersonPostRequestContentBuilder WithOtherTrn(string? otherTrn)
     {

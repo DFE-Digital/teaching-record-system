@@ -26,8 +26,9 @@ public class CheckAnswersModel(
     public Gender? Gender { get; set; }
     public AddPersonReasonOption? Reason { get; set; }
     public string? ReasonDetail { get; set; }
-    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
     public UploadedEvidenceFile? EvidenceFile { get; set; }
+
+    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
     public string? ChangePersonalDetailsLink =>
         GetPageLink(AddPersonJourneyPage.PersonalDetails, true);
@@ -87,7 +88,7 @@ public class CheckAnswersModel(
             PersonAttributes = personAttributes,
             CreateReason = Reason?.GetDisplayName(),
             CreateReasonDetail = ReasonDetail,
-            EvidenceFile = EvidenceFile?.AsEventModel(),
+            EvidenceFile = EvidenceFile?.ToEventModel(),
             TrnRequestMetadata = null
         };
 
