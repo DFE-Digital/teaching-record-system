@@ -1,4 +1,5 @@
 using EntityFrameworkCore.Projectables;
+using FluentValidation;
 using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -9,6 +10,8 @@ public class Alert
     public const string AlertTypeForeignKeyName = "fk_alerts_alert_type";
     public const string PersonIdIndexName = "ix_alerts_person_id";
     public const string PersonForeignKeyName = "fk_alerts_person";
+
+    public const int DetailsMaxLength = 4000;
 
     public required Guid AlertId { get; init; }
     public AlertType? AlertType { get; }
@@ -135,5 +138,43 @@ public class Alert
             EvidenceFile = evidenceFile,
             Changes = changes
         };
+    }
+}
+
+public static class AlertValidationExtensions
+{
+    public static IRuleBuilderOptions<T, string?> AlertDetails<T>(
+        this IRuleBuilder<T, string?> ruleBuilder,
+        Func<int, string> maxLengthMessage)
+    {
+        return ruleBuilder
+            .MaximumLength(Alert.DetailsMaxLength).WithMessage(maxLengthMessage(Alert.DetailsMaxLength));
+    }
+
+    public static IRuleBuilderOptions<T, string?> AlertLink<T>(
+        this IRuleBuilder<T, string?> ruleBuilder,
+        string invalidUrlMessage)
+    {
+        return ruleBuilder
+            .Must(link => TrsUriHelper.TryCreateWebsiteUri(link, out _)).WithMessage(invalidUrlMessage);
+    }
+
+    public static IRuleBuilderOptions<T, DateOnly?> AlertStartDate<T>(
+        this IRuleBuilder<T, DateOnly?> ruleBuilder,
+        DateOnly today,
+        string requiredMessage,
+        string dateInFutureMessage)
+    {
+        return ruleBuilder
+            .NotNull().WithMessage(requiredMessage)
+            .LessThanOrEqualTo(today).WithMessage(dateInFutureMessage);
+    }
+
+    public static IRuleBuilderOptions<T, Guid?> AlertType<T>(
+        this IRuleBuilder<T, Guid?> ruleBuilder,
+        string requiredMessage)
+    {
+        return ruleBuilder
+            .NotNull().WithMessage(requiredMessage);
     }
 }
