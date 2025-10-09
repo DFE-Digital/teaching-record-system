@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
@@ -11,8 +11,8 @@ public class PersonalDetailsModel(
     TrsDbContext dbContext,
     IClock clock,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    EvidenceUploadManager evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]
     [Display(Name = "First name")]

@@ -61,9 +61,9 @@
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Reason for creating record</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.CreateReason?.GetDisplayName()</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value>@Model.Reason?.GetDisplayName()</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-create-reason-link" href=@Model.CreateReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action data-testid="change-create-reason-link" href=@Model.ChangeReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
@@ -79,23 +79,16 @@
                             }
                         </govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href=@Model.CreateReasonLink visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeReasonLink visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
-                            @if (Model.EvidenceFileUrl is not null)
-                            {
-                                <a href="@Model.EvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
-                            }
-                            else
-                            {
-                                <span use-empty-fallback></span>
-                            }
+                            <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                         </govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href=@Model.CreateReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href=@Model.ChangeReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 </govuk-summary-list>

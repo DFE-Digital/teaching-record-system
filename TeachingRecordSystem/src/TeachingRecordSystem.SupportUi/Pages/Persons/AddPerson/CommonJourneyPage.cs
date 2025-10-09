@@ -2,31 +2,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService) : PageModel
+    EvidenceUploadManager evidenceController) : PageModel
 {
     public JourneyInstance<AddPersonState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
     protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
-    protected IFileService FileService { get; } = fileService;
+    protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
 
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        if (JourneyInstance!.State.EvidenceFileId.HasValue)
-        {
-            await FileService.DeleteFileAsync(JourneyInstance!.State.EvidenceFileId.Value);
-        }
-
+        await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(LinkGenerator.PersonCreate());
     }
@@ -66,9 +62,9 @@ public abstract class CommonJourneyPage(
         }
     }
 
-    protected virtual Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public virtual Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
         => Task.CompletedTask;
 
-    protected virtual Task OnPageHandlerExecutedAsync(PageHandlerExecutedContext context)
+    public virtual Task OnPageHandlerExecutedAsync(PageHandlerExecutedContext context)
         => Task.CompletedTask;
 }

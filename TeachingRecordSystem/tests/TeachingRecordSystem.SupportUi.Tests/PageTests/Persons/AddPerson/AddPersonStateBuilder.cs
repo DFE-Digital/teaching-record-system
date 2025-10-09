@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -12,12 +13,10 @@ public class AddPersonStateBuilder
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
 
-    public AddPersonReasonOption? CreateReason { get; set; }
-    public string? CreateReasonDetail { get; set; }
+    public AddPersonReasonOption? Reason { get; set; }
+    public string? ReasonDetail { get; set; }
     public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
     private bool Initialized { get; set; }
 
@@ -62,19 +61,22 @@ public class AddPersonStateBuilder
 
     public AddPersonStateBuilder WithAddPersonReasonChoice(AddPersonReasonOption option, string? detailText = null)
     {
-        CreateReason = option;
-        CreateReasonDetail = detailText;
+        Reason = option;
+        ReasonDetail = detailText;
         return this;
     }
 
     public AddPersonStateBuilder WithUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
     {
         UploadEvidence = uploadEvidence;
-        if (evidenceFileId.HasValue)
+        if (evidenceFileId is Guid id)
         {
-            EvidenceFileId = evidenceFileId;
-            EvidenceFileName = evidenceFileName;
-            EvidenceFileSizeDescription = evidenceFileSizeDescription;
+            UploadedEvidenceFile = new()
+            {
+                FileId = id,
+                FileName = evidenceFileName ?? "evidence.jpeg",
+                FileSizeDescription = evidenceFileSizeDescription ?? "5MB"
+            };
         }
         return this;
     }
@@ -91,13 +93,13 @@ public class AddPersonStateBuilder
             NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
             Gender = Gender,
 
-            CreateReason = CreateReason,
-            CreateReasonDetail = CreateReasonDetail,
-            UploadEvidence = UploadEvidence,
-            EvidenceFileId = EvidenceFileId,
-            EvidenceFileName = EvidenceFileName,
-            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
-
+            Reason = Reason,
+            ReasonDetail = ReasonDetail,
+            Evidence = new()
+            {
+                UploadEvidence = UploadEvidence,
+                UploadedEvidenceFile = UploadedEvidenceFile,
+            },
             Initialized = Initialized
         };
     }

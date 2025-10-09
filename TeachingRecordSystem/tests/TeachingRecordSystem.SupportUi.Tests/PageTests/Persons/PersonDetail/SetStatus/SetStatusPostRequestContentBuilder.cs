@@ -4,16 +4,16 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Se
 
 public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
 {
-    private DeactivateReasonOption? DeactivateReason { get; set; }
-    private string? DeactivateReasonDetail { get; set; }
-    private ReactivateReasonOption? ReactivateReason { get; set; }
-    private string? ReactivateReasonDetail { get; set; }
-    private bool? UploadEvidence { get; set; }
-    private (HttpContent, string)? EvidenceFile { get; set; }
-    private Guid? EvidenceFileId { get; set; }
-    private string? EvidenceFileName { get; set; }
-    private string? EvidenceFileSizeDescription { get; set; }
-    private string? UploadedEvidenceFileUrl { get; set; }
+    public DeactivateReasonOption? DeactivateReason { get; set; }
+    public string? DeactivateReasonDetail { get; set; }
+    public ReactivateReasonOption? ReactivateReason { get; set; }
+    public string? ReactivateReasonDetail { get; set; }
+    public bool? UploadEvidence { get; set; }
+    public (HttpContent, string)? EvidenceFile { get; set; }
+    public Guid? EvidenceFileId { get; set; }
+    public string? EvidenceFileName { get; set; }
+    public string? EvidenceFileSizeDescription { get; set; }
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public SetStatusPostRequestContentBuilder WithDeactivateReason(DeactivateReasonOption deactivateReason, string? detail = null)
     {

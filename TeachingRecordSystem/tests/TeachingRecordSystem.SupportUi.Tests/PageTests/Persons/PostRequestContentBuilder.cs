@@ -6,8 +6,9 @@ public abstract class PostRequestContentBuilder
 {
     public FormUrlEncodedContent BuildFormUrlEncoded()
     {
-        return new FormUrlEncodedContent(BuildContentEntries()
-            .Select(e => e.AsKeyValuePair()));
+        var entries = BuildContentEntries().Select(e => e.AsKeyValuePair());
+
+        return new FormUrlEncodedContent(entries);
     }
 
     public MultipartFormDataContent BuildMultipartFormData()
@@ -22,35 +23,65 @@ public abstract class PostRequestContentBuilder
         return builder.Build();
     }
 
-    private IEnumerable<PostRequestEntry> BuildContentEntries()
+    private IEnumerable<PostRequestEntry> BuildContentEntries(string? prefix = null, object? parent = null)
     {
-        var properties = GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
-            .Where(f => f.GetValue(this) != null);
+        prefix ??= "";
+        parent ??= this;
+        var properties = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         foreach (var property in properties)
         {
-            var value = property.GetValue(this);
+            var value = property.GetValue(parent);
+
+            if (value is null)
+            {
+                continue;
+            }
+
             if (value is DateOnly date)
             {
-                yield return new($"{property.Name}.Day", date.Day.ToString());
-                yield return new($"{property.Name}.Month", date.Month.ToString());
-                yield return new($"{property.Name}.Year", date.Year.ToString());
+                yield return new($"{prefix}{property.Name}.Day", date.Day.ToString());
+                yield return new($"{prefix}{property.Name}.Month", date.Month.ToString());
+                yield return new($"{prefix}{property.Name}.Year", date.Year.ToString());
+
+                continue;
             }
-            else if (value is Array array)
+
+            if (value is Array array)
             {
                 for (var i = 0; i < array.Length; i++)
                 {
-                    yield return new($"{property.Name}[{i}]", array.GetValue(i)?.ToString());
+                    yield return new($"{prefix}{property.Name}[{i}]", array.GetValue(i)?.ToString());
                 }
+
+                continue;
             }
-            else if (value is (HttpContent content, string filename))
+
+            if (value is (HttpContent content, string filename))
             {
-                yield return new PostRequestFileEntry(property.Name, content, filename);
+                yield return new PostRequestFileEntry($"{prefix}{property.Name}", content, filename);
+
+                continue;
             }
-            else
+
+            if (value is string str)
             {
-                yield return new(property.Name, value?.ToString());
+                yield return new($"{prefix}{property.Name}", value?.ToString());
+
+                continue;
             }
+
+            if (value.GetType() is Type t && !t.IsValueType && !t.IsPrimitive && !t.IsEnum)
+            {
+                foreach (var entry in BuildContentEntries($"{prefix}{property.Name}.", value))
+                {
+                    yield return entry;
+                }
+
+                continue;
+            }
+
+            yield return new($"{prefix}{property.Name}", value?.ToString());
         }
     }
 

@@ -18,6 +18,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.WebCommon.Filters;
@@ -90,7 +91,9 @@ public static class Extensions
             .AddTransient<RequireOpenAlertFilter>()
             .AddTransient<RedirectWithPersonIdFilter>()
             .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
-            .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>();
+            .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
+            .AddTransient<EvidenceUploadManager>()
+            .AddScoped<SupportUiFormContext>();
 
         if (environment.IsProduction())
         {

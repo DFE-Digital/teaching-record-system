@@ -4,19 +4,19 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditInductionPostRequestContentBuilder : PostRequestContentBuilder
 {
-    private DateOnly? StartDate { get; set; }
-    private DateOnly? CompletedDate { get; set; }
-    private InductionStatus? InductionStatus { get; set; }
-    private Guid[]? ExemptionReasonIds { get; set; }
-    private InductionChangeReasonOption? ChangeReason { get; set; }
-    private bool? HasAdditionalReasonDetail { get; set; }
-    private string? ChangeReasonDetail { get; set; }
-    private bool? UploadEvidence { get; set; }
-    private (HttpContent, string)? EvidenceFile { get; set; }
-    private Guid? EvidenceFileId { get; set; }
-    private string? EvidenceFileName { get; set; }
-    private string? EvidenceFileSizeDescription { get; set; }
-    private string? UploadedEvidenceFileUrl { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? CompletedDate { get; set; }
+    public InductionStatus? InductionStatus { get; set; }
+    public Guid[]? ExemptionReasonIds { get; set; }
+    public InductionChangeReasonOption? ChangeReason { get; set; }
+    public bool? HasAdditionalReasonDetail { get; set; }
+    public string? ChangeReasonDetail { get; set; }
+    public bool? UploadEvidence { get; set; }
+    public (HttpContent, string)? EvidenceFile { get; set; }
+    public Guid? EvidenceFileId { get; set; }
+    public string? EvidenceFileName { get; set; }
+    public string? EvidenceFileSizeDescription { get; set; }
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public EditInductionPostRequestContentBuilder WithStartDate(DateOnly date)
     {

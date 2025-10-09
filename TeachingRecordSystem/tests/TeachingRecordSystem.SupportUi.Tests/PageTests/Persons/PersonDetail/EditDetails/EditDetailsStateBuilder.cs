@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
@@ -23,16 +24,12 @@ public class EditDetailsStateBuilder
 
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
     public bool? NameChangeUploadEvidence { get; set; }
-    public Guid? NameChangeEvidenceFileId { get; set; }
-    public string? NameChangeEvidenceFileName { get; set; }
-    public string? NameChangeEvidenceFileSizeDescription { get; set; }
+    public UploadedEvidenceFile? NameChangeEvidenceFile { get; set; }
 
     public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
     public bool? OtherDetailsChangeUploadEvidence { get; set; }
-    public Guid? OtherDetailsChangeEvidenceFileId { get; set; }
-    public string? OtherDetailsChangeEvidenceFileName { get; set; }
-    public string? OtherDetailsChangeEvidenceFileSizeDescription { get; set; }
+    public UploadedEvidenceFile? OtherDetailsChangeEvidenceFile { get; set; }
 
     private bool Initialized { get; set; }
 
@@ -96,14 +93,17 @@ public class EditDetailsStateBuilder
         return this;
     }
 
-    public EditDetailsStateBuilder WithNameChangeUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
+    public EditDetailsStateBuilder WithNameChangeUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = null, string? evidenceFileSizeDescription = null)
     {
         NameChangeUploadEvidence = uploadEvidence;
-        if (evidenceFileId.HasValue)
+        if (evidenceFileId is Guid id)
         {
-            NameChangeEvidenceFileId = evidenceFileId;
-            NameChangeEvidenceFileName = evidenceFileName;
-            NameChangeEvidenceFileSizeDescription = evidenceFileSizeDescription;
+            NameChangeEvidenceFile = new()
+            {
+                FileId = id,
+                FileName = evidenceFileName ?? "evidence.jpeg",
+                FileSizeDescription = evidenceFileSizeDescription ?? "5MB",
+            };
         }
         return this;
     }
@@ -115,14 +115,17 @@ public class EditDetailsStateBuilder
         return this;
     }
 
-    public EditDetailsStateBuilder WithOtherDetailsChangeUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
+    public EditDetailsStateBuilder WithOtherDetailsChangeUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = null, string? evidenceFileSizeDescription = null)
     {
         OtherDetailsChangeUploadEvidence = uploadEvidence;
-        if (evidenceFileId.HasValue)
+        if (evidenceFileId is Guid id)
         {
-            OtherDetailsChangeEvidenceFileId = evidenceFileId;
-            OtherDetailsChangeEvidenceFileName = evidenceFileName;
-            OtherDetailsChangeEvidenceFileSizeDescription = evidenceFileSizeDescription;
+            OtherDetailsChangeEvidenceFile = new()
+            {
+                FileId = id,
+                FileName = evidenceFileName ?? "evidence.jpeg",
+                FileSizeDescription = evidenceFileSizeDescription ?? "5MB",
+            };
         }
         return this;
     }
@@ -148,17 +151,18 @@ public class EditDetailsStateBuilder
             OriginalGender = OriginalGender,
 
             NameChangeReason = NameChangeReason,
-            NameChangeUploadEvidence = NameChangeUploadEvidence,
-            NameChangeEvidenceFileId = NameChangeEvidenceFileId,
-            NameChangeEvidenceFileName = NameChangeEvidenceFileName,
-            NameChangeEvidenceFileSizeDescription = NameChangeEvidenceFileSizeDescription,
+            NameChangeEvidence = new()
+            {
+                UploadEvidence = NameChangeUploadEvidence,
+                UploadedEvidenceFile = NameChangeEvidenceFile
+            },
             OtherDetailsChangeReason = OtherDetailsChangeReason,
             OtherDetailsChangeReasonDetail = OtherDetailsChangeReasonDetail,
-            OtherDetailsChangeUploadEvidence = OtherDetailsChangeUploadEvidence,
-            OtherDetailsChangeEvidenceFileId = OtherDetailsChangeEvidenceFileId,
-            OtherDetailsChangeEvidenceFileName = OtherDetailsChangeEvidenceFileName,
-            OtherDetailsChangeEvidenceFileSizeDescription = OtherDetailsChangeEvidenceFileSizeDescription,
-
+            OtherDetailsChangeEvidence = new()
+            {
+                UploadEvidence = OtherDetailsChangeUploadEvidence,
+                UploadedEvidenceFile = OtherDetailsChangeEvidenceFile
+            },
             Initialized = Initialized
         };
     }

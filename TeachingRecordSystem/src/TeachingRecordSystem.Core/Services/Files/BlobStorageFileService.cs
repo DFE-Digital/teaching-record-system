@@ -8,6 +8,7 @@ namespace TeachingRecordSystem.Core.Services.Files;
 public class BlobStorageFileService : IFileService
 {
     private const string UploadsContainerName = "uploads";
+
     private readonly BlobServiceClient _blobServiceClient;
     private readonly IHostEnvironment _hostEnvironment;
     private BlobContainerClient? _blobContainerClient;
