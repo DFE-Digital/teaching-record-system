@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
@@ -9,6 +9,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class LinkModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private readonly InlineValidator<LinkModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.AddLink).NotNull().WithMessage("Select yes if you want to add a link to a panel outcome"),
+        v => v.RuleFor(m => m.Link).AlertLink("Enter a valid URL").When(m => m.AddLink == true)
+    };
+
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -20,7 +26,6 @@ public class LinkModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManag
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select yes if you want to add a link to a panel outcome")]
     public bool? AddLink { get; set; }
 
     [BindProperty]
@@ -34,15 +39,7 @@ public class LinkModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManag
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (AddLink == true && !TrsUriHelper.TryCreateWebsiteUri(Link, out _))
-        {
-            ModelState.AddModelError(nameof(Link), "Enter a valid URL");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
