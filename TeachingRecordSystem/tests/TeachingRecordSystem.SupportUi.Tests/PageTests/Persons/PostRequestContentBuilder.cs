@@ -26,41 +26,61 @@ public abstract class PostRequestContentBuilder
     {
         prefix ??= "";
         parent ??= this;
-        var propertyValues = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Select(p => (p, p.GetValue(parent)))
-            .Where(x => x.Item2 is not null)
-            .Select(x => (x.Item1, x.Item2!));
+        var properties = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-        foreach (var (property, value) in propertyValues)
+        foreach (var property in properties)
         {
+            var value = property.GetValue(parent);
+
+            if (value is null)
+            {
+                continue;
+            }
+
             if (value is DateOnly date)
             {
                 yield return new($"{prefix}{property.Name}.Day", date.Day.ToString());
                 yield return new($"{prefix}{property.Name}.Month", date.Month.ToString());
                 yield return new($"{prefix}{property.Name}.Year", date.Year.ToString());
+
+                continue;
             }
-            else if (value is Array array)
+
+            if (value is Array array)
             {
                 for (var i = 0; i < array.Length; i++)
                 {
                     yield return new($"{prefix}{property.Name}[{i}]", array.GetValue(i)?.ToString());
                 }
+
+                continue;
             }
-            else if (value is (HttpContent content, string filename))
+
+            if (value is (HttpContent content, string filename))
             {
                 yield return new PostRequestFileEntry($"{prefix}{property.Name}", content, filename);
+
+                continue;
             }
-            else if (property.PropertyType is Type t && !t.IsValueType && !t.IsPrimitive && !t.IsEnum)
+
+            if (value is string str)
+            {
+                yield return new($"{prefix}{property.Name}", value?.ToString());
+
+                continue;
+            }
+
+            if (property.PropertyType is Type t && !t.IsValueType && !t.IsPrimitive && !t.IsEnum)
             {
                 foreach (var entry in BuildContentEntries($"{prefix}{property.Name}.", value))
                 {
                     yield return entry;
                 }
+
+                continue;
             }
-            else
-            {
-                yield return new($"{prefix}{property.Name}", value?.ToString());
-            }
+
+            yield return new($"{prefix}{property.Name}", value?.ToString());
         }
     }
 
