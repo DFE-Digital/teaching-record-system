@@ -1,4 +1,5 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
+using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -12,8 +13,8 @@ public class AddPersonStateBuilder
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
 
-    public AddPersonReasonOption? CreateReason { get; set; }
-    public string? CreateReasonDetail { get; set; }
+    public AddPersonReasonOption? Reason { get; set; }
+    public string? ReasonDetail { get; set; }
     public bool? UploadEvidence { get; set; }
     public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
@@ -60,8 +61,8 @@ public class AddPersonStateBuilder
 
     public AddPersonStateBuilder WithAddPersonReasonChoice(AddPersonReasonOption option, string? detailText = null)
     {
-        CreateReason = option;
-        CreateReasonDetail = detailText;
+        Reason = option;
+        ReasonDetail = detailText;
         return this;
     }
 
@@ -92,8 +93,8 @@ public class AddPersonStateBuilder
             NationalInsuranceNumber = AddPersonFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
             Gender = Gender,
 
-            CreateReason = CreateReason,
-            CreateReasonDetail = CreateReasonDetail,
+            Reason = Reason,
+            ReasonDetail = ReasonDetail,
             Evidence = new()
             {
                 UploadEvidence = UploadEvidence,

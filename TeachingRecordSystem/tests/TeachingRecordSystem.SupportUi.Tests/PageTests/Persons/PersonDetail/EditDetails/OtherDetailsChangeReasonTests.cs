@@ -555,7 +555,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.OtherDetailsChangeEvidence.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileName);
+        Assert.Equal("evidence.pdf", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile!.FileName);
         Assert.Equal("1.2 KB", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
     }
 

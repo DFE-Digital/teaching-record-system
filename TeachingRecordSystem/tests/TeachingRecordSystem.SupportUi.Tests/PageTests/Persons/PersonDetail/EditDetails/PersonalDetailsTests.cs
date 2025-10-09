@@ -940,7 +940,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
         Assert.Equal("Some reason", journeyInstance.State.OtherDetailsChangeReasonDetail);
         Assert.Equal(true, journeyInstance.State.OtherDetailsChangeEvidence.UploadEvidence);
-        Assert.Equal(otherEvidenceFileId, journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileId);
+        Assert.Equal(otherEvidenceFileId, journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile!.FileId);
         Assert.Equal("other-evidence.png", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileName);
         Assert.Equal("1.3 KB", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
     }
@@ -1000,7 +1000,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("Stallion", journeyInstance.State.LastName);
         Assert.Equal(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership, journeyInstance.State.NameChangeReason);
         Assert.Equal(true, journeyInstance.State.NameChangeEvidence.UploadEvidence);
-        Assert.Equal(nameEvidenceFileId, journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileId);
+        Assert.Equal(nameEvidenceFileId, journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile!.FileId);
         Assert.Equal("name-evidence.pdf", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileName);
         Assert.Equal("2.4 MB", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
 

@@ -1,21 +1,22 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
+using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
 public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
 {
-    private string? FirstName { get; set; }
-    private string? MiddleName { get; set; }
-    private string? LastName { get; set; }
-    private DateOnly? DateOfBirth { get; set; }
-    private string? EmailAddress { get; set; }
-    private string? MobileNumber { get; set; }
-    private string? NationalInsuranceNumber { get; set; }
-    private Gender? Gender { get; set; }
-    private AddPersonReasonOption? CreateReason { get; set; }
-    private string? CreateReasonDetail { get; set; }
-    private bool? UploadEvidence { get; set; }
-    private (HttpContent, string)? EvidenceFile { get; set; }
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string? EmailAddress { get; set; }
+    public string? MobileNumber { get; set; }
+    public string? NationalInsuranceNumber { get; set; }
+    public Gender? Gender { get; set; }
+    public AddPersonReasonOption? Reason { get; set; }
+    public string? ReasonDetail { get; set; }
+    public bool? UploadEvidence { get; set; }
+    public (HttpContent, string)? EvidenceFile { get; set; }
     public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
 
@@ -67,10 +68,10 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public AddPersonPostRequestContentBuilder WithReason(AddPersonReasonOption createReason, string? detail = null)
+    public AddPersonPostRequestContentBuilder WithReason(AddPersonReasonOption reason, string? detail = null)
     {
-        CreateReason = createReason;
-        CreateReasonDetail = detail;
+        Reason = reason;
+        ReasonDetail = detail;
         return this;
     }
 
@@ -81,14 +82,14 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public AddPersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? otherDetailsChangeEvidenceFileName, string? otherDetailsChangeEvidenceFileSizeDescription, string? otherDetailsChangeUploadedEvidenceFileUrl)
+    public AddPersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
         UploadEvidence = uploadEvidence;
         UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
         {
             FileId = id,
-            FileName = otherDetailsChangeEvidenceFileName ?? "filename.jpg",
-            FileSizeDescription = otherDetailsChangeEvidenceFileSizeDescription ?? "5 MB"
+            FileName = evidenceFileName ?? "filename.jpg",
+            FileSizeDescription = evidenceFileSizeDescription ?? "5 MB"
         };
         return this;
     }

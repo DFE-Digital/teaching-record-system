@@ -432,7 +432,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.NameChangeEvidence.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileName);
+        Assert.Equal("evidence.pdf", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile!.FileName);
         Assert.Equal("1.2 KB", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
     }
 

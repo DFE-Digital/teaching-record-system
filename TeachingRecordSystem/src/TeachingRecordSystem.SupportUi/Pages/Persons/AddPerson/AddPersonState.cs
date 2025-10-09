@@ -19,8 +19,8 @@ public class AddPersonState : IRegisterJourney
     public AddPersonFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new("", null);
     public Gender? Gender { get; set; }
 
-    public AddPersonReasonOption? CreateReason { get; set; }
-    public string? CreateReasonDetail { get; set; }
+    public AddPersonReasonOption? Reason { get; set; }
+    public string? ReasonDetail { get; set; }
 
     public EvidenceModel Evidence { get; set; } = new();
 
@@ -39,8 +39,8 @@ public class AddPersonState : IRegisterJourney
 
     [JsonIgnore]
     public bool IsCreateReasonComplete =>
-        CreateReason.HasValue &&
-        (CreateReason is not AddPersonReasonReasonOption.AnotherReason || CreateReasonDetail is not null) &&
+        Reason.HasValue &&
+        (Reason is not AddPersonReasonOption.AnotherReason || ReasonDetail is not null) &&
         Evidence.IsComplete;
 
     public void EnsureInitialized()

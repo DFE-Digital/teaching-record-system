@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
+using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -74,10 +75,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileId)));
-        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -145,8 +145,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.CreateReason!.GetDisplayName());
-        Assert.Equal(changeReasonDetails, journeyInstance.State.CreateReasonDetail);
+        Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.Reason!.GetDisplayName());
+        Assert.Equal(changeReasonDetails, journeyInstance.State.ReasonDetail);
     }
 
     [Test]
@@ -166,8 +166,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.CreateReason), "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.UploadEvidence), "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.Reason), "Select a reason");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceModel.UploadEvidence), "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -192,7 +192,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.CreateReasonDetail), "Enter a reason");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReasonDetail), "Enter a reason");
     }
 
     [Test]
@@ -218,7 +218,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.EvidenceFile), "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceModel.EvidenceFile), "Select a file");
     }
 
     [Test]
@@ -245,7 +245,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(CreateReasonModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -281,10 +281,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileId)));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -302,9 +301,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
-            Content = new CreatePostRequestContentBuilder()
-                .WithCreateReason(CreateReasonOption.AnotherReason)
-                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+            Content = new AddPersonPostRequestContentBuilder()
+                .WithReason(AddPersonReasonOption.AnotherReason)
+                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -321,10 +320,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileId)));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileName)));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(CreateReasonModel.EvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -373,9 +371,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(journeyInstance))
         {
-            Content = new CreatePostRequestContentBuilder()
-                .WithCreateReason(CreateReasonOption.AnotherReason)
-                .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+            Content = new AddPersonPostRequestContentBuilder()
+                .WithReason(AddPersonReasonOption.AnotherReason)
+                .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -415,7 +413,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.Evidence.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile.FileName);
+        Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
         Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile.FileSizeDescription);
     }
 
@@ -476,8 +474,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasNotUploaded();
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(AddPersonReasonOption.MandatoryQualification, journeyInstance.State.CreateReason);
-        Assert.Null(journeyInstance.State.CreateReasonDetail);
+        Assert.Equal(AddPersonReasonOption.MandatoryQualification, journeyInstance.State.Reason);
+        Assert.Null(journeyInstance.State.ReasonDetail);
         Assert.False(journeyInstance.State.Evidence.UploadEvidence);
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }

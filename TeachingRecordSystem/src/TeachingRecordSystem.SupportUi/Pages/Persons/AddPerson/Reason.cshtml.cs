@@ -16,12 +16,12 @@ public class ReasonModel(
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
     [Display(Name = "Why are you creating this record?")]
-    public AddPersonReasonOption? CreateReason { get; set; }
+    public AddPersonReasonOption? Reason { get; set; }
 
     [BindProperty]
     [Display(Name = "Enter details")]
     [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
-    public string? CreateReasonDetail { get; set; }
+    public string? ReasonDetail { get; set; }
 
     [BindProperty]
     public EvidenceModel Evidence { get; set; } = new();
@@ -32,12 +32,12 @@ public class ReasonModel(
             : AddPersonJourneyPage.PersonalDetails);
 
     public string NextPage => GetPageLink(
-        CreateJourneyPage.CheckAnswers,
+        AddPersonJourneyPage.CheckAnswers,
         FromCheckAnswers is true ? true : null);
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < AddPersonJourneyPage.CreateReason)
+        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < AddPersonJourneyPage.Reason)
         {
             context.Result = Redirect(GetPageLink(NextIncompletePage));
             return;
@@ -46,16 +46,16 @@ public class ReasonModel(
 
     public void OnGet()
     {
-        CreateReason = JourneyInstance!.State.CreateReason;
-        CreateReasonDetail = JourneyInstance.State.CreateReasonDetail;
+        Reason = JourneyInstance!.State.Reason;
+        ReasonDetail = JourneyInstance.State.ReasonDetail;
         Evidence = JourneyInstance.State.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (CreateReason is not null && CreateReason.Value == AddPersonReasonOption.AnotherReason && CreateReasonDetail is null)
+        if (Reason is not null && Reason.Value == AddPersonReasonOption.AnotherReason && ReasonDetail is null)
         {
-            ModelState.AddModelError(nameof(CreateReasonDetail), "Enter a reason");
+            ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
         }
 
         await EvidenceController.ValidateAndUploadAsync(Evidence, ModelState);
@@ -67,23 +67,11 @@ public class ReasonModel(
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.CreateReason = CreateReason;
-            state.CreateReasonDetail = CreateReason is CreateReasonOption.AnotherReason ? CreateReasonDetail : null;
-            state.UploadEvidence = UploadEvidence;
-            state.EvidenceFileId = UploadEvidence is true ? EvidenceFileId : null;
-            state.EvidenceFileName = UploadEvidence is true ? EvidenceFileName : null;
-            state.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
+            state.Reason = Reason;
+            state.ReasonDetail = Reason is AddPersonReasonOption.AnotherReason ? ReasonDetail : null;
+            state.Evidence = Evidence;
         });
 
         return Redirect(NextPage);
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < CreateJourneyPage.CreateReason)
-        {
-            context.Result = Redirect(GetPageLink(NextIncompletePage));
-            return;
-        }
     }
 }

@@ -13,7 +13,7 @@
     <div class="govuk-grid-column-full">
         <form action=@LinkGenerator.PersonCreateCreateReason(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="create-reason-caption">Create a record</span>
-            <govuk-radios for="CreateReason" data-testid="create-reason-options">
+            <govuk-radios for="Reason" data-testid="create-reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="create-reason-options-legend"/>
                     <govuk-radios-item value="@AddPersonReasonOption.MandatoryQualification">
@@ -29,7 +29,7 @@
                         @AddPersonReasonOption.AnotherReason.GetDisplayName()
 
                         <govuk-radios-item-conditional data-testid="create-reason-detail">
-                            <govuk-character-count for="CreateReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count for="ReasonDetail" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
