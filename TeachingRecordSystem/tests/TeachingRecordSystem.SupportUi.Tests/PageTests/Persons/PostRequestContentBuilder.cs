@@ -49,7 +49,7 @@ public abstract class PostRequestContentBuilder
             {
                 yield return new PostRequestFileEntry($"{prefix}{property.Name}", content, filename);
             }
-            else if (!value.GetType().IsValueType && !value.GetType().IsPrimitive && !value.GetType().IsEnum)
+            else if (property.PropertyType is Type t && !t.IsValueType && !t.IsPrimitive && !t.IsEnum)
             {
                 foreach (var entry in BuildContentEntries($"{prefix}{property.Name}.", value))
                 {
