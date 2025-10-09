@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
-public class EvidenceController(IFileService fileService)
+public class EvidenceUploadManager(IFileService fileService)
 {
-    public async Task ValidateAndUploadAsync(EvidenceModel evidence, ModelStateDictionary modelState)
+    public async Task ValidateAndUploadAsync(EvidenceUploadModel evidence, ModelStateDictionary modelState)
     {
         if (evidence.UploadEvidence == true && evidence.EvidenceFile is null && evidence.UploadedEvidenceFile is null)
         {

@@ -12,7 +12,7 @@ public class IndexModel(
     TrsDbContext dbContext,
     IClock clock,
     TrsLinkGenerator linkGenerator,
-    EvidenceController evidenceController)
+    EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     private Person? _person;

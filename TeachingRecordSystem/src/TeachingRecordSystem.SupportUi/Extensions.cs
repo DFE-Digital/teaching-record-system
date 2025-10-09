@@ -92,7 +92,7 @@ public static class Extensions
             .AddTransient<RedirectWithPersonIdFilter>()
             .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
             .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
-            .AddTransient<EvidenceController>()
+            .AddTransient<EvidenceUploadManager>()
             .AddScoped<SupportUiFormContext>();
 
         if (environment.IsProduction())

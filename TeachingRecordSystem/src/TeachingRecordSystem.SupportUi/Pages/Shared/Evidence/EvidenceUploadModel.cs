@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
-public class EvidenceModel
+public class EvidenceUploadModel
 {
     [BindProperty]
     [Display(Name = "Do you want to upload evidence?")]

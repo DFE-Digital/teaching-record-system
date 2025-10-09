@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared.Components.UploadEvidence;
 
 public class UploadEvidenceViewComponent(IFileService fileService) : ViewComponent
 {
-    public async Task<IViewComponentResult> InvokeAsync(EvidenceModel evidence)
+    public async Task<IViewComponentResult> InvokeAsync(EvidenceUploadModel evidence)
     {
         if (evidence.UploadedEvidenceFile is UploadedEvidenceFile file)
         {

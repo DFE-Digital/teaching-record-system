@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 public class NameChangeReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    EvidenceController evidenceController)
+    EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]
@@ -19,7 +19,7 @@ public class NameChangeReasonModel(
     public EditDetailsNameChangeReasonOption? Reason { get; set; }
 
     [BindProperty]
-    public EvidenceModel Evidence { get; set; } = new();
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public string BackLink => GetPageLink(
         FromCheckAnswers

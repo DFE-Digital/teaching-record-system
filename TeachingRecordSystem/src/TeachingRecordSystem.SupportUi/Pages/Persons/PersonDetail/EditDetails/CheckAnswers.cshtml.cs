@@ -13,7 +13,7 @@ public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    EvidenceController evidenceController)
+    EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     private Person? _person;

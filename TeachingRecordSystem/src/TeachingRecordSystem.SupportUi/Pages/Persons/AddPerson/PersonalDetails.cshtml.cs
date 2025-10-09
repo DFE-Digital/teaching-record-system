@@ -11,7 +11,7 @@ public class PersonalDetailsModel(
     TrsDbContext dbContext,
     IClock clock,
     TrsLinkGenerator linkGenerator,
-    EvidenceController evidenceController)
+    EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]

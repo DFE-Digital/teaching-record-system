@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 public class ReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    EvidenceController evidenceController)
+    EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]
@@ -24,7 +24,7 @@ public class ReasonModel(
     public string? ReasonDetail { get; set; }
 
     [BindProperty]
-    public EvidenceModel Evidence { get; set; } = new();
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public string BackLink => GetPageLink(
         FromCheckAnswers

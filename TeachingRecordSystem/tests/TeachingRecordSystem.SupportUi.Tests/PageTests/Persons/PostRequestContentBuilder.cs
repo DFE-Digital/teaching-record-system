@@ -26,12 +26,13 @@ public abstract class PostRequestContentBuilder
     {
         prefix ??= "";
         parent ??= this;
-        var properties = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(f => f.GetValue(parent) != null);
+        var propertyValues = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(p => (p, p.GetValue(parent)))
+            .Where(x => x.Item2 is not null)
+            .Select(x => (x.Item1, x.Item2!));
 
-        foreach (var property in properties)
+        foreach (var (property, value) in propertyValues)
         {
-            var value = property.GetValue(parent);
             if (value is DateOnly date)
             {
                 yield return new($"{prefix}{property.Name}.Day", date.Day.ToString());

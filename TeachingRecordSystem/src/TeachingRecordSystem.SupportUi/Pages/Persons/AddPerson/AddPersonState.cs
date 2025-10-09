@@ -21,7 +21,7 @@ public class AddPersonState : IRegisterJourney
 
     public AddPersonReasonOption? Reason { get; set; }
     public string? ReasonDetail { get; set; }
-    public EvidenceModel Evidence { get; set; } = new();
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public bool Initialized { get; set; }
 

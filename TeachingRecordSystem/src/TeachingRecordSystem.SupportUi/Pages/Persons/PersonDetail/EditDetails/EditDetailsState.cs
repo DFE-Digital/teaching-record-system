@@ -29,11 +29,11 @@ public class EditDetailsState : IRegisterJourney
     public Gender? Gender { get; set; }
 
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
-    public EvidenceModel NameChangeEvidence { get; set; } = new();
+    public EvidenceUploadModel NameChangeEvidence { get; set; } = new();
 
     public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
-    public EvidenceModel OtherDetailsChangeEvidence { get; set; } = new();
+    public EvidenceUploadModel OtherDetailsChangeEvidence { get; set; } = new();
 
     public bool Initialized { get; set; }
 

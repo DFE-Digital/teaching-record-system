@@ -14,7 +14,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     IClock clock,
     ITrnGenerator trnGenerator,
-    EvidenceController evidenceController)
+    EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     public string? FirstName { get; set; }
