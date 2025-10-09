@@ -1,4 +1,4 @@
-using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
+using TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -15,9 +15,7 @@ public class AddPersonStateBuilder
     public AddPersonReasonOption? CreateReason { get; set; }
     public string? CreateReasonDetail { get; set; }
     public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
     private bool Initialized { get; set; }
 
@@ -70,11 +68,14 @@ public class AddPersonStateBuilder
     public AddPersonStateBuilder WithUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
     {
         UploadEvidence = uploadEvidence;
-        if (evidenceFileId.HasValue)
+        if (evidenceFileId is Guid id)
         {
-            EvidenceFileId = evidenceFileId;
-            EvidenceFileName = evidenceFileName;
-            EvidenceFileSizeDescription = evidenceFileSizeDescription;
+            UploadedEvidenceFile = new()
+            {
+                FileId = id,
+                FileName = evidenceFileName ?? "evidence.jpeg",
+                FileSizeDescription = evidenceFileSizeDescription ?? "5MB"
+            };
         }
         return this;
     }
@@ -93,11 +94,11 @@ public class AddPersonStateBuilder
 
             CreateReason = CreateReason,
             CreateReasonDetail = CreateReasonDetail,
-            UploadEvidence = UploadEvidence,
-            EvidenceFileId = EvidenceFileId,
-            EvidenceFileName = EvidenceFileName,
-            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
-
+            Evidence = new()
+            {
+                UploadEvidence = UploadEvidence,
+                UploadedEvidenceFile = UploadedEvidenceFile,
+            },
             Initialized = Initialized
         };
     }

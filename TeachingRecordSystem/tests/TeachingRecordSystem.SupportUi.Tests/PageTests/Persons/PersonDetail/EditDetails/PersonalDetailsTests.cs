@@ -930,10 +930,8 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("The", journeyInstance.State.MiddleName);
         Assert.Equal("Great", journeyInstance.State.LastName);
         Assert.Null(journeyInstance.State.NameChangeReason);
-        Assert.Null(journeyInstance.State.NameChangeUploadEvidence);
-        Assert.Null(journeyInstance.State.NameChangeEvidenceFileId);
-        Assert.Null(journeyInstance.State.NameChangeEvidenceFileName);
-        Assert.Null(journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+        Assert.Null(journeyInstance.State.NameChangeEvidence.UploadEvidence);
+        Assert.Null(journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile);
 
         Assert.Equal(DateOnly.Parse("3 Aug 1999"), journeyInstance.State.DateOfBirth);
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
@@ -941,10 +939,10 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(Gender.Other, journeyInstance.State.Gender);
         Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
         Assert.Equal("Some reason", journeyInstance.State.OtherDetailsChangeReasonDetail);
-        Assert.Equal(true, journeyInstance.State.OtherDetailsChangeUploadEvidence);
-        Assert.Equal(otherEvidenceFileId, journeyInstance.State.OtherDetailsChangeEvidenceFileId);
-        Assert.Equal("other-evidence.png", journeyInstance.State.OtherDetailsChangeEvidenceFileName);
-        Assert.Equal("1.3 KB", journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
+        Assert.Equal(true, journeyInstance.State.OtherDetailsChangeEvidence.UploadEvidence);
+        Assert.Equal(otherEvidenceFileId, journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileId);
+        Assert.Equal("other-evidence.png", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileName);
+        Assert.Equal("1.3 KB", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
     }
 
     [Test]
@@ -1001,20 +999,18 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal("Thee", journeyInstance.State.MiddleName);
         Assert.Equal("Stallion", journeyInstance.State.LastName);
         Assert.Equal(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership, journeyInstance.State.NameChangeReason);
-        Assert.Equal(true, journeyInstance.State.NameChangeUploadEvidence);
-        Assert.Equal(nameEvidenceFileId, journeyInstance.State.NameChangeEvidenceFileId);
-        Assert.Equal("name-evidence.pdf", journeyInstance.State.NameChangeEvidenceFileName);
-        Assert.Equal("2.4 MB", journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+        Assert.Equal(true, journeyInstance.State.NameChangeEvidence.UploadEvidence);
+        Assert.Equal(nameEvidenceFileId, journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileId);
+        Assert.Equal("name-evidence.pdf", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileName);
+        Assert.Equal("2.4 MB", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
 
         Assert.Equal(DateOnly.Parse("1 Feb 1980"), journeyInstance.State.DateOfBirth);
         Assert.Equal("original@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
         Assert.Equal("AB123456C", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
         Assert.Null(journeyInstance.State.OtherDetailsChangeReason);
         Assert.Null(journeyInstance.State.OtherDetailsChangeReasonDetail);
-        Assert.Null(journeyInstance.State.OtherDetailsChangeUploadEvidence);
-        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileId);
-        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileName);
-        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidence.UploadEvidence);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person) =>

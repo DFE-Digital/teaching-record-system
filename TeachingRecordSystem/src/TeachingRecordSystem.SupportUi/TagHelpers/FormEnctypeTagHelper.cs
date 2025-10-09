@@ -1,44 +1,32 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace TeachingRecordSystem.SupportUi.TagHelpers;
 
 [HtmlTargetElement("form")]
-public class FormEnctypeTagHelper : TagHelper
+public class FormEnctypeTagHelper(SupportUiFormContext formContext) : TagHelper
 {
     public override int Order => -899;
 
-    public override void Init(TagHelperContext context)
-    {
-        context.Items.Add(typeof(SupportUiFormContext), new SupportUiFormContext());
-    }
-
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        var supportUiFormContext = (SupportUiFormContext)context.Items[typeof(SupportUiFormContext)];
-
         await output.GetChildContentAsync();
 
-        if (output.Attributes.ContainsName("enctype") || !supportUiFormContext.HasFileUpload)
+        if (formContext.HasFileUpload && !output.Attributes.ContainsName("enctype"))
         {
-            return;
+            output.Attributes.Add("enctype", "multipart/form-data");
         }
 
-        output.Attributes.Add("enctype", "multipart/form-data");
+        // Reset for the next form
+        formContext.HasFileUpload = false;
     }
 }
 
 [HtmlTargetElement("govuk-file-upload")]
-public class FileUploadTagHelper : TagHelper
+public class FileUploadTagHelper(SupportUiFormContext formContext) : TagHelper
 {
-    [ViewContext]
-    public ViewContext? ViewContext { get; set; }
-
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        var supportUiFormContext = (SupportUiFormContext)context.Items[typeof(SupportUiFormContext)];
-        supportUiFormContext.HasFileUpload = true;
+        formContext.HasFileUpload = true;
     }
 }
 

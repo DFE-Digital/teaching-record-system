@@ -71,14 +71,7 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>@(Model.OtherDetailsChangeReason is not null ? "Evidence" : "Evidence uploaded")</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @if (Model.NameChangeUploadedEvidenceFileUrl is not null)
-                                {
-                                    <a href="@Model.NameChangeUploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.NameChangeEvidenceFileName} (opens in new tab)")</a>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
+                                <vc:evidence-file-link evidence-file="@Model.NameChangeEvidenceFile" />
                             </govuk-summary-list-row-value>
                             <govuk-summary-list-row-actions>
                                 <govuk-summary-list-row-action href=@Model.ChangeNameChangeReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
@@ -113,14 +106,7 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>@(Model.NameChangeReason is not null ? "Evidence" : "Evidence uploaded")</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @if (Model.OtherDetailsChangeUploadedEvidenceFileUrl is not null)
-                                {
-                                    <a href="@Model.OtherDetailsChangeUploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.OtherDetailsChangeEvidenceFileName} (opens in new tab)")</a>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
+                                <vc:evidence-file-link evidence-file="@Model.OtherDetailsChangeEvidenceFile" />
                             </govuk-summary-list-row-value>
                             <govuk-summary-list-row-actions>
                                 <govuk-summary-list-row-action href=@Model.ChangeDetailsChangeReasonLink visually-hidden-text="evidence">Change</govuk-summary-list-row-action>

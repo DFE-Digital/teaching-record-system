@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -108,10 +109,9 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
-        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -149,7 +149,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(expectedChoices, reasonChoices);
 
         var uploadEvidenceChoicesLegend = doc.GetElementByTestId("upload-evidence-options-legend");
-        Assert.Equal("Do you want to upload evidence of this name change?", uploadEvidenceChoicesLegend!.TrimmedText());
+        Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TrimmedText());
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
@@ -179,8 +179,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.NameChangeReason), "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.NameChangeUploadEvidence), "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.Reason), "Select a reason");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceModel.UploadEvidence), "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -202,8 +202,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .WithNameChangeEvidence(true)
+                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithUploadEvidence(true)
                 .BuildMultipartFormData()
         };
 
@@ -211,7 +211,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.NameChangeEvidenceFile), "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceModel.EvidenceFile), "Select a file");
     }
 
     [Test]
@@ -233,8 +233,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
+                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
                 .BuildMultipartFormData()
         };
 
@@ -243,7 +243,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(NameChangeReasonModel.NameChangeEvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -265,7 +265,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .BuildMultipartFormData()
         };
 
@@ -283,10 +283,9 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -310,7 +309,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -325,12 +324,11 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
-        Assert.Equal("http://test.com/file", link.Href);
+        Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileId)));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileName)));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription)));
-        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(EvidenceModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -354,8 +352,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
-                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .BuildMultipartFormData()
         };
 
@@ -389,7 +387,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -421,8 +419,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
+                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
 
@@ -433,9 +431,9 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.NameChangeUploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.NameChangeEvidenceFileName);
-        Assert.Equal("1.2 KB", journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+        Assert.True(journeyInstance.State.NameChangeEvidence.UploadEvidence);
+        Assert.Equal("evidence.pdf", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileName);
+        Assert.Equal("1.2 KB", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
     }
 
     [Test]
@@ -457,8 +455,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
 
@@ -490,8 +488,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new EditDetailsPostRequestContentBuilder()
-                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .WithNameChangeEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .WithReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
 
@@ -505,10 +503,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(EditDetailsNameChangeReasonOption.CorrectingAnError, journeyInstance.State.NameChangeReason);
-        Assert.False(journeyInstance.State.NameChangeUploadEvidence);
-        Assert.Null(journeyInstance.State.NameChangeEvidenceFileId);
-        Assert.Null(journeyInstance.State.NameChangeEvidenceFileName);
-        Assert.Null(journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+        Assert.False(journeyInstance.State.NameChangeEvidence.UploadEvidence);
+        Assert.Null(journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>

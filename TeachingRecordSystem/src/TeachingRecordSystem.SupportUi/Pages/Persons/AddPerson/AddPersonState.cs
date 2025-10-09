@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
@@ -20,12 +21,15 @@ public class AddPersonState : IRegisterJourney
 
     public AddPersonReasonOption? CreateReason { get; set; }
     public string? CreateReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+
+    public EvidenceModel Evidence { get; set; } = new();
 
     public bool Initialized { get; set; }
+
+    [JsonIgnore]
+    public bool IsComplete =>
+        IsPersonalDetailsComplete &&
+        IsCreateReasonComplete;
 
     [JsonIgnore]
     public bool IsPersonalDetailsComplete =>
@@ -36,14 +40,8 @@ public class AddPersonState : IRegisterJourney
     [JsonIgnore]
     public bool IsCreateReasonComplete =>
         CreateReason.HasValue &&
-        (CreateReason.Value is not AddPersonReasonOption.AnotherReason || CreateReasonDetail is not null) &&
-        UploadEvidence.HasValue &&
-        (UploadEvidence.Value is not true || EvidenceFileId.HasValue);
-
-    [JsonIgnore]
-    public bool IsComplete =>
-        IsPersonalDetailsComplete &&
-        IsCreateReasonComplete;
+        (CreateReason is not AddPersonReasonReasonOption.AnotherReason || CreateReasonDetail is not null) &&
+        Evidence.IsComplete;
 
     public void EnsureInitialized()
     {

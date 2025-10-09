@@ -1,32 +1,23 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
 public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
 {
-    private string? FirstName { get; set; }
-    private string? MiddleName { get; set; }
-    private string? LastName { get; set; }
-    private DateOnly? DateOfBirth { get; set; }
-    private string? EmailAddress { get; set; }
-    private string? MobileNumber { get; set; }
-    private string? NationalInsuranceNumber { get; set; }
-    private Gender? Gender { get; set; }
-    private EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
-    private bool? NameChangeUploadEvidence { get; set; }
-    private (HttpContent, string)? NameChangeEvidenceFile { get; set; }
-    private Guid? NameChangeEvidenceFileId { get; set; }
-    private string? NameChangeEvidenceFileName { get; set; }
-    private string? NameChangeEvidenceFileSizeDescription { get; set; }
-    private string? NameChangeUploadedEvidenceFileUrl { get; set; }
-    private EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
-    private string? OtherDetailsChangeReasonDetail { get; set; }
-    private bool? OtherDetailsChangeUploadEvidence { get; set; }
-    private (HttpContent, string)? OtherDetailsChangeEvidenceFile { get; set; }
-    private Guid? OtherDetailsChangeEvidenceFileId { get; set; }
-    private string? OtherDetailsChangeEvidenceFileName { get; set; }
-    private string? OtherDetailsChangeEvidenceFileSizeDescription { get; set; }
-    private string? OtherDetailsChangeUploadedEvidenceFileUrl { get; set; }
+    public string? FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public string? LastName { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string? EmailAddress { get; set; }
+    public string? MobileNumber { get; set; }
+    public string? NationalInsuranceNumber { get; set; }
+    public Gender? Gender { get; set; }
+    public object? Reason { get; set; }
+    public string? ReasonDetail { get; set; }
+    public bool? UploadEvidence { get; set; }
+    public (HttpContent, string)? EvidenceFile { get; set; }
+    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
     public EditDetailsPostRequestContentBuilder WithFirstName(string? firstName)
     {
@@ -76,50 +67,35 @@ public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public EditDetailsPostRequestContentBuilder WithNameChangeReason(EditDetailsNameChangeReasonOption nameChangeReason)
+    public EditDetailsPostRequestContentBuilder WithReason(EditDetailsNameChangeReasonOption nameChangeReason)
     {
-        NameChangeReason = nameChangeReason;
+        Reason = nameChangeReason;
         return this;
     }
 
-    public EditDetailsPostRequestContentBuilder WithNameChangeEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
+    public EditDetailsPostRequestContentBuilder WithReason(EditDetailsOtherDetailsChangeReasonOption otherDetailsChangeReason, string? detail = null)
     {
-        NameChangeUploadEvidence = uploadEvidence;
-        NameChangeEvidenceFile = evidenceFile;
+        Reason = otherDetailsChangeReason;
+        ReasonDetail = detail;
         return this;
     }
 
-    public EditDetailsPostRequestContentBuilder WithNameChangeEvidence(bool uploadEvidence, Guid? evidenceFileId, string? nameChangeEvidenceFileName, string? nameChangeEvidenceFileSizeDescription, string? nameChangeUploadedEvidenceFileUrl)
+    public EditDetailsPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
-        NameChangeUploadEvidence = uploadEvidence;
-        NameChangeEvidenceFileId = evidenceFileId;
-        NameChangeEvidenceFileName = nameChangeEvidenceFileName;
-        NameChangeEvidenceFileSizeDescription = nameChangeEvidenceFileSizeDescription;
-        NameChangeUploadedEvidenceFileUrl = nameChangeUploadedEvidenceFileUrl;
+        UploadEvidence = uploadEvidence;
+        EvidenceFile = evidenceFile;
         return this;
     }
 
-    public EditDetailsPostRequestContentBuilder WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption otherDetailsChangeReason, string? detail = null)
+    public EditDetailsPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? otherDetailsChangeEvidenceFileName, string? otherDetailsChangeEvidenceFileSizeDescription)
     {
-        OtherDetailsChangeReason = otherDetailsChangeReason;
-        OtherDetailsChangeReasonDetail = detail;
-        return this;
-    }
-
-    public EditDetailsPostRequestContentBuilder WithOtherDetailsChangeEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
-    {
-        OtherDetailsChangeUploadEvidence = uploadEvidence;
-        OtherDetailsChangeEvidenceFile = evidenceFile;
-        return this;
-    }
-
-    public EditDetailsPostRequestContentBuilder WithOtherDetailsChangeEvidence(bool uploadEvidence, Guid? evidenceFileId, string? otherDetailsChangeEvidenceFileName, string? otherDetailsChangeEvidenceFileSizeDescription, string? otherDetailsChangeUploadedEvidenceFileUrl)
-    {
-        OtherDetailsChangeUploadEvidence = uploadEvidence;
-        OtherDetailsChangeEvidenceFileId = evidenceFileId;
-        OtherDetailsChangeEvidenceFileName = otherDetailsChangeEvidenceFileName;
-        OtherDetailsChangeEvidenceFileSizeDescription = otherDetailsChangeEvidenceFileSizeDescription;
-        OtherDetailsChangeUploadedEvidenceFileUrl = otherDetailsChangeUploadedEvidenceFileUrl;
+        UploadEvidence = uploadEvidence;
+        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        {
+            FileId = id,
+            FileName = otherDetailsChangeEvidenceFileName ?? "filename.jpg",
+            FileSizeDescription = otherDetailsChangeEvidenceFileSizeDescription ?? "5 MB"
+        };
         return this;
     }
 }

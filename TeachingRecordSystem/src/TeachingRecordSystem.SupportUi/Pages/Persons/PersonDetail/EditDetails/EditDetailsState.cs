@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -28,17 +29,11 @@ public class EditDetailsState : IRegisterJourney
     public Gender? Gender { get; set; }
 
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
-    public bool? NameChangeUploadEvidence { get; set; }
-    public Guid? NameChangeEvidenceFileId { get; set; }
-    public string? NameChangeEvidenceFileName { get; set; }
-    public string? NameChangeEvidenceFileSizeDescription { get; set; }
+    public EvidenceModel NameChangeEvidence { get; set; } = new();
 
     public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
     public string? OtherDetailsChangeReasonDetail { get; set; }
-    public bool? OtherDetailsChangeUploadEvidence { get; set; }
-    public Guid? OtherDetailsChangeEvidenceFileId { get; set; }
-    public string? OtherDetailsChangeEvidenceFileName { get; set; }
-    public string? OtherDetailsChangeEvidenceFileSizeDescription { get; set; }
+    public EvidenceModel OtherDetailsChangeEvidence { get; set; } = new();
 
     public bool Initialized { get; set; }
 
@@ -56,6 +51,12 @@ public class EditDetailsState : IRegisterJourney
         Gender != OriginalGender;
 
     [JsonIgnore]
+    public bool IsComplete =>
+        IsPersonalDetailsComplete &&
+        IsNameChangeReasonComplete &&
+        IsOtherDetailsChangeReasonComplete;
+
+    [JsonIgnore]
     public bool IsPersonalDetailsComplete =>
         FirstName is not null &&
         LastName is not null &&
@@ -65,23 +66,15 @@ public class EditDetailsState : IRegisterJourney
     [JsonIgnore]
     public bool IsNameChangeReasonComplete =>
         !NameChanged ||
-            NameChangeReason.HasValue &&
-            NameChangeUploadEvidence.HasValue &&
-            NameChangeUploadEvidence.Value is not true || NameChangeEvidenceFileId.HasValue;
+            (NameChangeReason.HasValue &&
+            NameChangeEvidence.IsComplete);
 
     [JsonIgnore]
     public bool IsOtherDetailsChangeReasonComplete =>
         !OtherDetailsChanged ||
-            OtherDetailsChangeReason.HasValue &&
+            (OtherDetailsChangeReason.HasValue &&
             (OtherDetailsChangeReason.Value is not EditDetailsOtherDetailsChangeReasonOption.AnotherReason || OtherDetailsChangeReasonDetail is not null) &&
-            OtherDetailsChangeUploadEvidence.HasValue &&
-            (OtherDetailsChangeUploadEvidence.Value is not true || OtherDetailsChangeEvidenceFileId.HasValue);
-
-    [JsonIgnore]
-    public bool IsComplete =>
-        IsPersonalDetailsComplete &&
-        IsNameChangeReasonComplete &&
-        IsOtherDetailsChangeReasonComplete;
+            OtherDetailsChangeEvidence.IsComplete);
 
     public void EnsureInitialized(Person person)
     {

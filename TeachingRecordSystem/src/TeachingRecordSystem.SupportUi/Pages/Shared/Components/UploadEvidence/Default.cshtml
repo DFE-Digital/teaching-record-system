@@ -1,0 +1,40 @@
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence
+
+@model EvidenceModel
+
+<govuk-radios for="UploadEvidence" data-testid="upload-evidence-options">
+    <govuk-radios-fieldset>
+        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="upload-evidence-options-legend" />
+        <govuk-radios-item value="@true">
+            Yes
+            <govuk-radios-item-conditional>
+                @if (Model.UploadedEvidenceFile is not null)
+                {
+                    <span class="govuk-caption-m">Currently uploaded file</span>
+                    <p class="govuk-body">
+                        <a href="@Model.UploadedEvidenceFile.PreviewUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-file-link">@($"{Model.UploadedEvidenceFile.FileName} ({Model.UploadedEvidenceFile.FileSizeDescription})")</a>
+                    </p>
+                    <input type="hidden" asp-for="UploadedEvidenceFile.FileId" />
+                    <input type="hidden" asp-for="UploadedEvidenceFile.FileName" />
+                    <input type="hidden" asp-for="UploadedEvidenceFile.FileSizeDescription" />
+                }
+                <govuk-file-upload for="EvidenceFile"
+                        label-class="govuk-label--s"
+                        input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
+                    @if (Model.UploadedEvidenceFile is null)
+                    {
+                        <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
+                    }
+                    else
+                    {
+                        <govuk-file-upload-label>Upload a new file to replace it</govuk-file-upload-label>
+                    }
+                    <govuk-file-upload-hint>Must be smaller than 50MB</govuk-file-upload-hint>
+                </govuk-file-upload>
+            </govuk-radios-item-conditional>
+        </govuk-radios-item>
+        <govuk-radios-item value="@false">
+            No
+        </govuk-radios-item>
+    </govuk-radios-fieldset>
+</govuk-radios>

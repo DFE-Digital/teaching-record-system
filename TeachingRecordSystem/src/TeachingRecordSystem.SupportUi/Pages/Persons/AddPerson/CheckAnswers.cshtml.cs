@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
@@ -14,9 +14,9 @@ public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    IFileService fileService,
-    ITrnGenerator trnGenerator)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    ITrnGenerator trnGenerator,
+    EvidenceController evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -28,12 +28,8 @@ public class CheckAnswersModel(
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
     public AddPersonReasonOption? CreateReason { get; set; }
     public string? ReasonDetail { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    public string? EvidenceFileUrl { get; set; }
-
     public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public string? ChangePersonalDetailsLink =>
         GetPageLink(AddPersonJourneyPage.PersonalDetails, true);
@@ -42,6 +38,26 @@ public class CheckAnswersModel(
         GetPageLink(AddPersonJourneyPage.Reason, true);
 
     public string BackLink => GetPageLink(AddPersonJourneyPage.Reason);
+
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    {
+        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < AddPersonJourneyPage.CheckAnswers)
+        {
+            context.Result = Redirect(GetPageLink(NextIncompletePage));
+            return;
+        }
+
+        FirstName = JourneyInstance!.State.FirstName;
+        MiddleName = JourneyInstance.State.MiddleName;
+        LastName = JourneyInstance.State.LastName;
+        DateOfBirth = JourneyInstance.State.DateOfBirth;
+        EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
+        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
+        Gender = JourneyInstance.State.Gender;
+        CreateReason = JourneyInstance.State.CreateReason;
+        ReasonDetail = JourneyInstance.State.CreateReasonDetail;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+    }
 
     public void OnGet()
     {
@@ -73,13 +89,7 @@ public class CheckAnswersModel(
             PersonAttributes = personAttributes,
             CreateReason = CreateReason?.GetDisplayName(),
             CreateReasonDetail = ReasonDetail,
-            EvidenceFile = EvidenceFileId is Guid detailsFileId
-                ? new EventModels.File()
-                {
-                    FileId = detailsFileId,
-                    Name = EvidenceFileName!
-                }
-                : null,
+            EvidenceFile = EvidenceFile?.AsEventModel(),
             TrnRequestMetadata = null
         };
 
@@ -98,7 +108,7 @@ public class CheckAnswersModel(
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < AddPersonJourneyPage.CheckAnswers)
+        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < CreateJourneyPage.CheckAnswers)
         {
             context.Result = Redirect(GetPageLink(NextIncompletePage));
             return;

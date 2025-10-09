@@ -22,34 +22,49 @@ public abstract class PostRequestContentBuilder
         return builder.Build();
     }
 
-    private IEnumerable<PostRequestEntry> BuildContentEntries()
+    private IEnumerable<PostRequestEntry> BuildContentEntries(string? prefix = null, object? parent = null)
     {
-        var properties = GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
-            .Where(f => f.GetValue(this) != null);
+        prefix ??= "";
+        parent ??= this;
+        var properties = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         foreach (var property in properties)
         {
-            var value = property.GetValue(this);
-            if (value is DateOnly date)
+            var value = property.GetValue(parent);
+            if (value is null)
             {
-                yield return new($"{property.Name}.Day", date.Day.ToString());
-                yield return new($"{property.Name}.Month", date.Month.ToString());
-                yield return new($"{property.Name}.Year", date.Year.ToString());
+            }
+            else if (value is DateOnly date)
+            {
+                yield return new($"{prefix}{property.Name}.Day", date.Day.ToString());
+                yield return new($"{prefix}{property.Name}.Month", date.Month.ToString());
+                yield return new($"{prefix}{property.Name}.Year", date.Year.ToString());
             }
             else if (value is Array array)
             {
                 for (var i = 0; i < array.Length; i++)
                 {
-                    yield return new($"{property.Name}[{i}]", array.GetValue(i)?.ToString());
+                    yield return new($"{prefix}{property.Name}[{i}]", array.GetValue(i)?.ToString());
                 }
             }
             else if (value is (HttpContent content, string filename))
             {
                 yield return new PostRequestFileEntry(property.Name, content, filename);
             }
+            else if (value is string str)
+            {
+                yield return new($"{prefix}{property.Name}", str);
+            }
+            else if (!value.GetType().IsValueType && !value.GetType().IsPrimitive && !value.GetType().IsEnum)
+            {
+                foreach (var entry in BuildContentEntries($"{prefix}{property.Name}.", value))
+                {
+                    yield return entry;
+                }
+            }
             else
             {
-                yield return new(property.Name, value?.ToString());
+                yield return new($"{prefix}{property.Name}", value?.ToString());
             }
         }
     }

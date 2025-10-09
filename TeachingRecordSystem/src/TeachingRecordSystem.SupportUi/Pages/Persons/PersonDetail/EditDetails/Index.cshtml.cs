@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -12,8 +12,8 @@ public class IndexModel(
     TrsDbContext dbContext,
     IClock clock,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    EvidenceController evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     private Person? _person;
 
@@ -145,20 +145,14 @@ public class IndexModel(
             if (!NameChanged && state.NameChangeReason is not null)
             {
                 state.NameChangeReason = null;
-                state.NameChangeUploadEvidence = null;
-                state.NameChangeEvidenceFileId = null;
-                state.NameChangeEvidenceFileName = null;
-                state.NameChangeEvidenceFileSizeDescription = null;
+                state.NameChangeEvidence.Clear();
             }
 
             if (!OtherDetailsChanged && state.OtherDetailsChangeReason is not null)
             {
                 state.OtherDetailsChangeReason = null;
                 state.OtherDetailsChangeReasonDetail = null;
-                state.OtherDetailsChangeUploadEvidence = null;
-                state.OtherDetailsChangeEvidenceFileId = null;
-                state.OtherDetailsChangeEvidenceFileName = null;
-                state.OtherDetailsChangeEvidenceFileSizeDescription = null;
+                state.OtherDetailsChangeEvidence.Clear();
             }
         });
 
