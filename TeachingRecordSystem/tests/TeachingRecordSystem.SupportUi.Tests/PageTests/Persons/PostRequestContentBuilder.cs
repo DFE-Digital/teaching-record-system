@@ -27,7 +27,7 @@ public abstract class PostRequestContentBuilder
         prefix ??= "";
         parent ??= this;
         var properties = parent.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(f => f.GetValue(this) != null);
+            .Where(f => f.GetValue(parent) != null);
 
         foreach (var property in properties)
         {
