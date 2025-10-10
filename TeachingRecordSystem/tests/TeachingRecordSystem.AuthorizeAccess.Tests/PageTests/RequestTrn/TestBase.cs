@@ -7,7 +7,7 @@ using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
-public abstract class TestBase : IDisposable
+public abstract class TestBase : IAsyncLifetime
 {
     private readonly TestScopedServices _testServices;
 
@@ -32,6 +32,14 @@ public abstract class TestBase : IDisposable
     public HttpClient HttpClient { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    public async ValueTask InitializeAsync() => await InitializeAsyncCore();
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+    protected virtual async Task InitializeAsyncCore() => await DisposeAsyncCore();
+
+    protected virtual Task DisposeAsyncCore() => Task.CompletedTask;
 
     public async Task<JourneyInstance<RequestTrnJourneyState>> CreateJourneyInstance(RequestTrnJourneyState state)
     {
@@ -84,10 +92,6 @@ public abstract class TestBase : IDisposable
         HasNationalInsuranceNumber = true,
         NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber()
     };
-
-    public virtual void Dispose()
-    {
-    }
 
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {

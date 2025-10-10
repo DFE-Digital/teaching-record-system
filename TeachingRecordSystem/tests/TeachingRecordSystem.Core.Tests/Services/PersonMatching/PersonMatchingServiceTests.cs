@@ -26,9 +26,9 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
 
     private TestableClock Clock { get; }
 
-    public Task InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory]
     [InlineData(true)]

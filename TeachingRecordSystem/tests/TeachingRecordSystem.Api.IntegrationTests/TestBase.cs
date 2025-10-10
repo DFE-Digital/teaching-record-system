@@ -62,6 +62,14 @@ public abstract class TestBase : IAsyncLifetime
 
     public Mock<IFileService> BlobStorageFileService => _testServices.BlobStorageFileServiceMock;
 
+    public async ValueTask InitializeAsync() => await InitializeAsyncCore();
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+    protected virtual async Task InitializeAsyncCore() => await DisposeAsyncCore();
+
+    protected virtual Task DisposeAsyncCore() => Task.CompletedTask;
+
     public virtual HttpClient GetHttpClient(string? version = null)
     {
         var client = HostFixture.CreateClient(new()
@@ -136,8 +144,4 @@ public abstract class TestBase : IAsyncLifetime
             await action(dbContext);
             return 0;
         });
-
-    public virtual Task InitializeAsync() => Task.CompletedTask;
-
-    public virtual Task DisposeAsync() => Task.CompletedTask;
 }
