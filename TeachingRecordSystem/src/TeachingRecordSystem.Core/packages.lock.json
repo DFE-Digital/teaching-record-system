@@ -95,6 +95,12 @@
           "Microsoft.EntityFrameworkCore": "8.0.0"
         }
       },
+      "FluentValidation": {
+        "type": "Direct",
+        "requested": "[11.11.0, )",
+        "resolved": "11.11.0",
+        "contentHash": "cyIVdQBwSipxWG8MA3Rqox7iNbUNUTK5bfJi9tIdm4CAfH71Oo5ABLP4/QyrUwuakqpUEPGtE43BDddvEehuYw=="
+      },
       "Google.Cloud.Storage.V1": {
         "type": "Direct",
         "requested": "[4.10.0, )",

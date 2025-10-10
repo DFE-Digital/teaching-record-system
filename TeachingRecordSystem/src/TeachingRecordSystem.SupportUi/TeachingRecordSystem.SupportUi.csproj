@@ -14,6 +14,7 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="DartSassBuilder" />
+    <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
