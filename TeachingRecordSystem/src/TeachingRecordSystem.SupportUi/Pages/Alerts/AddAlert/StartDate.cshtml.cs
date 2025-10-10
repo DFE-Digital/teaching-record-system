@@ -2,12 +2,21 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
+    private readonly InlineValidator<StartDateModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.StartDate).AlertStartDate(
+            clock.Today,
+            requiredMessage: "Enter a start date",
+            dateInFutureMessage: "Start date cannot be in the future")
+    };
+
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -20,7 +29,6 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : Page
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
-    [Required(ErrorMessage = "Enter a start date")]
     [Display(Name = "Enter start date")]
     public DateOnly? StartDate { get; set; }
 
@@ -31,15 +39,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : Page
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (StartDate > clock.Today)
-        {
-            ModelState.AddModelError(nameof(StartDate), "Start date cannot be in the future");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

@@ -2,12 +2,19 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 {
+    private static readonly InlineValidator<DetailsModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.Details).AlertDetails(
+            maxLengthMessage: maxLength => $"Details must be {maxLength} characters or less")
+    };
+
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -22,7 +29,6 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Display(Description = "For example, include any restrictions it places on a teacher.")]
-    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Details {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? Details { get; set; }
 
     public void OnGet()
@@ -32,10 +38,7 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
