@@ -53,6 +53,7 @@ public static class Extensions
                     .RequireAuthenticatedUser()
                     .Build();
 
+                options.Filters.Add(new FluentValidationExceptionFilter());
                 options.Filters.Add(new AuthorizeFilter(policy));
                 options.Filters.Add(new CheckUserExistsFilter());
                 options.Filters.Add(new ServiceFilterAttribute<RedirectWithPersonIdFilter> { Order = RedirectWithPersonIdFilter.Order });

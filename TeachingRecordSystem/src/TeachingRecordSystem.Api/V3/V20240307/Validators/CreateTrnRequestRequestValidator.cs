@@ -32,7 +32,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             {
                 if (value >= DateOnly.FromDateTime(clock.UtcNow) || value < new DateOnly(1940, 1, 1))
                 {
-                    ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_BirthDateIsOutOfRange);
+                    ctx.AddFailure(ctx.PropertyPath, StringResources.ErrorMessages_BirthDateIsOutOfRange);
                 }
             });
 
@@ -45,7 +45,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             {
                 if (!string.IsNullOrEmpty(value) && !NationalInsuranceNumber.TryParse(value, out _))
                 {
-                    ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
+                    ctx.AddFailure(ctx.PropertyPath, StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
                 }
             });
     }
