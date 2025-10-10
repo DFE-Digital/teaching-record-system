@@ -15,7 +15,9 @@
 
             <govuk-radios for="AlertTypeId" data-testid="alert-category-list">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true">
+                        Select an alert type
+                    </govuk-radios-fieldset-legend>
 
                     @foreach (var category in Model.Categories!)
                     {
