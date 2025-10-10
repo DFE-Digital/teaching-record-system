@@ -10,7 +10,7 @@ public class UploadEvidenceViewComponent(IFileService fileService) : ViewCompone
     {
         if (evidence.UploadedEvidenceFile is UploadedEvidenceFile file)
         {
-            file.PreviewUrl = await fileService.GetFileUrlAsync(file.FileId, FileUploadDefaults.FileUrlExpiry);
+            file.PreviewUrl = await fileService.GetFileUrlAsync(file.FileId, UiDefaults.FileUrlExpiry);
         }
 
         return View(evidence);

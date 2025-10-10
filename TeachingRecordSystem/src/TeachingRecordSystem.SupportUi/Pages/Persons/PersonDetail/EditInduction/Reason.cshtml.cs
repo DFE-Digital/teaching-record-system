@@ -25,7 +25,7 @@ public class ReasonModel(
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
-    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -35,7 +35,7 @@ public class ReasonModel(
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     [BindProperty]
@@ -82,7 +82,7 @@ public class ReasonModel(
         EvidenceFileName = JourneyInstance?.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance?.State.EvidenceFileSizeDescription;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
             null;
     }
 
@@ -122,7 +122,7 @@ public class ReasonModel(
                 EvidenceFileId = evidenceFileId;
                 EvidenceFileName = EvidenceFile?.FileName;
                 EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-                UploadedEvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
+                UploadedEvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, UiDefaults.FileUrlExpiry);
             }
         }
 

@@ -18,7 +18,7 @@
                 <li>prohibition by the Secretary of State - misconduct</li>
                 <li>Secretary of State decision - no prohibition</li>
             </govuk-inset-text>
-            <govuk-character-count for="Details" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" data-testid="details"/>
+            <govuk-character-count for="Details" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows" data-testid="details"/>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
                 <govuk-button formaction="@LinkGenerator.AlertAddDetailsCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>

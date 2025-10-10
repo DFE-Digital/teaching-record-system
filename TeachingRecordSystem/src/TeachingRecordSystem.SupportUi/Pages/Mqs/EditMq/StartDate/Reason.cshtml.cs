@@ -35,7 +35,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     [BindProperty]
     [Display(Name = "Enter details about this change")]
-    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -45,7 +45,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }

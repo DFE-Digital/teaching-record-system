@@ -48,7 +48,7 @@ public class DeactivateModel(
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     [BindProperty]
@@ -114,7 +114,7 @@ public class DeactivateModel(
                 var fileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
                 EvidenceFileName = EvidenceFile?.FileName;
                 EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-                UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(fileId, FileUploadDefaults.FileUrlExpiry);
+                UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(fileId, UiDefaults.FileUrlExpiry);
                 EvidenceFileId = fileId;
             }
         }

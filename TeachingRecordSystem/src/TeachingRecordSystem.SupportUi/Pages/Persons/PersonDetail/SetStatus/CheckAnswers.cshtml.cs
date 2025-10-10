@@ -48,7 +48,7 @@ public class CheckAnswersModel(
         EvidenceFileId = state.EvidenceFileId;
         EvidenceFileName = state.EvidenceFileName;
         UploadedEvidenceFileUrl = state.EvidenceFileId is not null ?
-            await FileService.GetFileUrlAsync(state.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            await FileService.GetFileUrlAsync(state.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
             null;
     }
 
