@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
 [RedactParameters("Search")]
-public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int PageSize = 15;
 
@@ -138,7 +138,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         Pagination = PaginationViewModel.Create(
             SearchResults!,
-            pageNumber => linkGenerator.Persons(Search, Statuses, SortBy, pageNumber));
+            pageNumber => linkGenerator.Persons.Index(Search, Statuses, SortBy, pageNumber));
 
         return Page();
 

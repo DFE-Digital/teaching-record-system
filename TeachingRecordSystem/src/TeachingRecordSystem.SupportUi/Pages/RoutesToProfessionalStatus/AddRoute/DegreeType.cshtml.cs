@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class DegreeTypeModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager)
     : AddRoutePostStatusPageModel(AddRoutePage.DegreeType, linkGenerator, referenceDataCache, evidenceUploadManager)

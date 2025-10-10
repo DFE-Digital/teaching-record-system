@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.EditApplicationUser(Model.ApplicationUserId)" />
+    <govuk-back-link href="@LinkGenerator2.ApplicationUsers.EditApplicationUser.Index(Model.ApplicationUserId)" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.AddApiKey(Model.ApplicationUserId)" method="post">
+        <form action="@LinkGenerator2.ApiKeys.AddApiKey.Index(Model.ApplicationUserId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Key" input-class="govuk-input--width-20 trs-monospace" label-class="govuk-label--m" />

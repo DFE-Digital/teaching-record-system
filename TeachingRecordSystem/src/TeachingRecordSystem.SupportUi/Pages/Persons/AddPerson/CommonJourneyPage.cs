@@ -8,13 +8,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddPersonState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
-    protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
+    protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceController { get; } = evidenceUploadManager;
 
     [FromQuery]
@@ -24,17 +24,17 @@ public abstract class CommonJourneyPage(
     {
         await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(LinkGenerator.PersonCreate());
+        return Redirect(LinkGenerator.Persons.AddPerson.Index());
     }
 
     protected string GetPageLink(AddPersonJourneyPage? pageName, bool? fromCheckAnswers = null)
     {
         return pageName switch
         {
-            AddPersonJourneyPage.PersonalDetails => LinkGenerator.PersonCreatePersonalDetails(JourneyInstance!.InstanceId, fromCheckAnswers),
-            AddPersonJourneyPage.Reason => LinkGenerator.PersonCreateCreateReason(JourneyInstance!.InstanceId, fromCheckAnswers),
-            AddPersonJourneyPage.CheckAnswers => LinkGenerator.PersonCreateCheckAnswers(JourneyInstance!.InstanceId),
-            _ => LinkGenerator.PersonCreate()
+            AddPersonJourneyPage.PersonalDetails => LinkGenerator.Persons.AddPerson.PersonalDetails(JourneyInstance!.InstanceId, fromCheckAnswers),
+            AddPersonJourneyPage.Reason => LinkGenerator.Persons.AddPerson.Reason(JourneyInstance!.InstanceId, fromCheckAnswers),
+            AddPersonJourneyPage.CheckAnswers => LinkGenerator.Persons.AddPerson.CheckAnswers(JourneyInstance!.InstanceId),
+            _ => LinkGenerator.Persons.AddPerson.Index()
         };
     }
 

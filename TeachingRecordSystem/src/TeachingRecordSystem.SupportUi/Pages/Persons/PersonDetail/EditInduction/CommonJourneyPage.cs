@@ -8,13 +8,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
-    protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
+    protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceController { get; } = evidenceUploadManager;
 
     [FromRoute]
@@ -22,26 +22,26 @@ public abstract class CommonJourneyPage(
     public string? PersonName { get; set; }
 
     [FromQuery]
-    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
+    public JourneyFromCheckAnswersPage? FromCheckAnswers { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(LinkGenerator.PersonInduction(PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Induction(PersonId));
     }
 
-    protected string GetPageLink(InductionJourneyPage? pageName, JourneyFromCheckYourAnswersPage? fromCheckYourAnswersPage = null)
+    protected string GetPageLink(InductionJourneyPage? pageName, JourneyFromCheckAnswersPage? fromCheckYourAnswersPage = null)
     {
         return pageName switch
         {
-            InductionJourneyPage.Status => LinkGenerator.PersonInductionEditStatus(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.CompletedDate => LinkGenerator.PersonInductionEditCompletedDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.ExemptionReason => LinkGenerator.PersonInductionEditExemptionReason(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.StartDate => LinkGenerator.PersonInductionEditStartDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.ChangeReasons => LinkGenerator.PersonInductionChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.CheckAnswers => LinkGenerator.PersonInductionCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
-            _ => LinkGenerator.PersonInduction(PersonId)
+            InductionJourneyPage.Status => LinkGenerator.Persons.PersonDetail.EditInduction.Status(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.CompletedDate => LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.ExemptionReason => LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.StartDate => LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.ChangeReasons => LinkGenerator.Persons.PersonDetail.EditInduction.Reason(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.CheckAnswers => LinkGenerator.Persons.PersonDetail.EditInduction.CheckAnswers(PersonId, JourneyInstance!.InstanceId),
+            _ => LinkGenerator.Persons.PersonDetail.Induction(PersonId)
         };
     }
 

@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions;
 
-public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int IntegrationTransactionsPerPage = 20;
     public ResultPage<ItResult>? Results { get; set; }
@@ -80,7 +80,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         Pagination = PaginationViewModel.Create(
             Results,
-            page => linkGenerator.IntegrationTransactions(SortBy, SortDirection, page));
+            page => linkGenerator.SupportTasks.IntegrationTransactions.Index(SortBy, SortDirection, page));
         return Page();
     }
 }

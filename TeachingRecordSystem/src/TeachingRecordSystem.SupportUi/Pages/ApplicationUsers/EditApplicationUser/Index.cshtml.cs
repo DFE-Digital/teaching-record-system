@@ -16,7 +16,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.EditApplicationU
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 [BindProperties]
-public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     // From PathString
     private static readonly SearchValues<char> _validPathChars =
@@ -237,7 +237,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, 
         }
 
         TempData.SetFlashSuccess("Application user updated");
-        return Redirect(linkGenerator.ApplicationUsers());
+        return Redirect(linkGenerator.ApplicationUsers.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

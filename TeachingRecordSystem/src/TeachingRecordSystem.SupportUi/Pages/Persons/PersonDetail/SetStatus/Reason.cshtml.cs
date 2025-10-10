@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 [Journey(JourneyNames.SetStatus), RequireJourneyInstance]
 [AllowDeactivatedPerson]
 public class ReasonModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
@@ -35,8 +35,8 @@ public class ReasonModel(
     public EvidenceUploadModel Evidence { get; set; } = new();
 
     public string BackLink => FromCheckAnswers
-        ? LinkGenerator.PersonSetStatusCheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId)
-        : LinkGenerator.PersonDetail(PersonId);
+        ? LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId)
+        : LinkGenerator.Persons.PersonDetail.Index(PersonId);
 
     public void OnGet()
     {
@@ -90,6 +90,6 @@ public class ReasonModel(
             state.Evidence = Evidence;
         });
 
-        return Redirect(LinkGenerator.PersonSetStatusCheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId));
     }
 }

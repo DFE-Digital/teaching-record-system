@@ -264,7 +264,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithCompletedDate(new DateOnly(2002, 2, 2))
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .Build());
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -292,7 +292,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithCompletedDate(new DateOnly(2002, 2, 2))
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .Build());
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswersToStartDate.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -332,7 +332,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new EditInductionPostRequestContentBuilder()
                 .WithInductionStatus(inductionStatus)
@@ -379,7 +379,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new EditInductionPostRequestContentBuilder()
                 .WithInductionStatus(inductionStatus)

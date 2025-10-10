@@ -7,12 +7,12 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 public abstract class EditRouteCommonPageModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
     : PageModel
 {
-    protected TrsLinkGenerator LinkGenerator => linkGenerator;
+    protected SupportUiLinkGenerator LinkGenerator => linkGenerator;
 
     protected ReferenceDataCache ReferenceDataCache => referenceDataCache;
 
@@ -38,7 +38,7 @@ public abstract class EditRouteCommonPageModel(
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

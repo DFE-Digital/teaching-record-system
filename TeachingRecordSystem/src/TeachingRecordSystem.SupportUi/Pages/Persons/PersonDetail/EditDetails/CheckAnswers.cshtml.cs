@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 [Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
     EvidenceUploadManager evidenceUploadManager)
@@ -139,6 +139,6 @@ public class CheckAnswersModel(
 
         TempData.SetFlashSuccess("Personal details have been updated");
 
-        return Redirect(LinkGenerator.PersonDetail(PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 }

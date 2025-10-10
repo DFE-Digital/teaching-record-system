@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.SupportTasks(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true)" />
+    <govuk-back-link href="@LinkGenerator2.SupportTasks.Index(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true)" />
 }
 
 <span class="govuk-caption-l" data-testid="heading-caption">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Change of Name" : "Change of Date of Birth") - @Model.PersonName</span>
@@ -111,12 +111,12 @@
             <div class="govuk-grid-column-full govuk-!-margin-bottom-4">
                 @if (Model.Evidence!.MimeType == "application/pdf")
                 {
-                    <object data="@LinkGenerator.ChangeRequestEvidence(Model.SupportTaskReference!)" type="application/pdf" width="100%" height="500px" class="govuk-!-margin-bottom-2" data-testid="pdf-@Model.Evidence!.FileId">
+                    <object data="@LinkGenerator2.ChangeRequests.EditChangeRequest.Evidence(Model.SupportTaskReference!)" type="application/pdf" width="100%" height="500px" class="govuk-!-margin-bottom-2" data-testid="pdf-@Model.Evidence!.FileId">
                     </object>
                 }
                 else
                 {
-                    <img src="@LinkGenerator.ChangeRequestEvidence(Model.SupportTaskReference!)" alt="@Model.Evidence.FileName" width="100%" height="auto" class="govuk-!-margin-bottom-2" data-testid="image-@Model.Evidence!.FileId" />
+                    <img src="@LinkGenerator2.ChangeRequests.EditChangeRequest.Evidence(Model.SupportTaskReference!)" alt="@Model.Evidence.FileName" width="100%" height="auto" class="govuk-!-margin-bottom-2" data-testid="image-@Model.Evidence!.FileId" />
                 }
                 <a href="@Model.Evidence!.FileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="view-larger-@Model.Evidence!.FileId">View larger (opens in new tab)</a>
             </div>
@@ -125,6 +125,6 @@
 </div>
 
 <div class="govuk-button-group">
-    <govuk-button-link href="@LinkGenerator.AcceptChangeRequest(Model.SupportTaskReference!)" class="govuk-button">Accept change</govuk-button-link>
-    <govuk-button-link href="@LinkGenerator.RejectChangeRequest(Model.SupportTaskReference!)" class="govuk-button govuk-button--warning">Reject change</govuk-button-link>
+    <govuk-button-link href="@LinkGenerator2.ChangeRequests.EditChangeRequest.Accept(Model.SupportTaskReference!)" class="govuk-button">Accept change</govuk-button-link>
+    <govuk-button-link href="@LinkGenerator2.ChangeRequests.EditChangeRequest.Reject(Model.SupportTaskReference!)" class="govuk-button govuk-button--warning">Reject change</govuk-button-link>
 </div>

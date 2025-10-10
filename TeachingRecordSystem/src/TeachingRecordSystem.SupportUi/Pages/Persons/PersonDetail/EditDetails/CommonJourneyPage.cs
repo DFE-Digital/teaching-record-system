@@ -8,13 +8,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<EditDetailsState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
-    protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
+    protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceController { get; } = evidenceUploadManager;
 
     [FromRoute]
@@ -29,18 +29,18 @@ public abstract class CommonJourneyPage(
         await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.NameChangeEvidence.UploadedEvidenceFile);
         await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.OtherDetailsChangeEvidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(LinkGenerator.PersonDetail(PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
     protected string GetPageLink(EditDetailsJourneyPage? pageName, bool? fromCheckAnswers = null)
     {
         return pageName switch
         {
-            EditDetailsJourneyPage.PersonalDetails => LinkGenerator.PersonEditDetails(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            EditDetailsJourneyPage.NameChangeReason => LinkGenerator.PersonEditDetailsNameChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            EditDetailsJourneyPage.OtherDetailsChangeReason => LinkGenerator.PersonEditDetailsOtherDetailsChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            EditDetailsJourneyPage.CheckAnswers => LinkGenerator.PersonEditDetailsCheckAnswers(PersonId, JourneyInstance!.InstanceId),
-            _ => LinkGenerator.PersonDetail(PersonId)
+            EditDetailsJourneyPage.PersonalDetails => LinkGenerator.Persons.PersonDetail.EditDetails.Index(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.NameChangeReason => LinkGenerator.Persons.PersonDetail.EditDetails.NameChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.OtherDetailsChangeReason => LinkGenerator.Persons.PersonDetail.EditDetails.OtherDetailsChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.CheckAnswers => LinkGenerator.Persons.PersonDetail.EditDetails.CheckAnswers(PersonId, JourneyInstance!.InstanceId),
+            _ => LinkGenerator.Persons.PersonDetail.Index(PersonId)
         };
     }
 

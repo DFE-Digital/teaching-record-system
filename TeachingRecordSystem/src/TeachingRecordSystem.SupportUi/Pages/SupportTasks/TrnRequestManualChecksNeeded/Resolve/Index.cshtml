@@ -5,10 +5,10 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.TrnRequestManualChecksNeeded()"/>
+    <govuk-back-link href="@LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Index()"/>
 }
 
-<form action="@LinkGenerator.ResolveTrnRequestManualChecksNeeded(Model.SupportTaskReference!)" method="post">
+<form action="@LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(Model.SupportTaskReference!)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
@@ -66,7 +66,7 @@
                                 @if (Model.HasOpenAlerts)
                                 {
                                     <li>
-                                        <a href="@LinkGenerator.PersonAlerts(Model.PersonId)" class="govuk-link" target="_blank">
+                                        <a href="@LinkGenerator2.Persons.PersonDetail.Alerts(Model.PersonId)" class="govuk-link" target="_blank">
                                             @Model.OpenAlertsCount open alert@(Model.OpenAlertsCount != 1 ? "s" : "")
                                         </a>
                                     </li>
@@ -74,7 +74,7 @@
                                 @if (Model.HasQts)
                                 {
                                     <li>
-                                        <a href="@LinkGenerator.PersonDetail(Model.PersonId)" class="govuk-link" target="_blank">
+                                        <a href="@LinkGenerator2.Persons.PersonDetail.Index(Model.PersonId)" class="govuk-link" target="_blank">
                                             Holds QTS
                                         </a>
                                     </li>
@@ -82,7 +82,7 @@
                                 @if (Model.HasEyts)
                                 {
                                     <li>
-                                        <a href="@LinkGenerator.PersonDetail(Model.PersonId)" class="govuk-link" target="_blank">
+                                        <a href="@LinkGenerator2.Persons.PersonDetail.Index(Model.PersonId)" class="govuk-link" target="_blank">
                                             Holds EYTS
                                         </a>
                                     </li>
@@ -107,7 +107,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm</govuk-button>
-                <govuk-button-link href="@LinkGenerator.TrnRequestManualChecksNeeded()" class="govuk-button--secondary">Cancel</govuk-button-link>
+                <govuk-button-link href="@LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Index()" class="govuk-button--secondary">Cancel</govuk-button-link>
             </div>
         </div>
     </div>

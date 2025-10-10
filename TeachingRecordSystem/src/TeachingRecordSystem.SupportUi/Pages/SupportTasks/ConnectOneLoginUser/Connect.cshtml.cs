@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ConnectOneLoginUser;
 
-public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, TrsLinkGenerator linkGenerator) : PageModel
+public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private SupportTask? _supportTask;
 
@@ -52,7 +52,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
             heading: "Teaching record connected",
             messageText: $"{PersonDetail.Name} will get an email to say they can sign in.");
 
-        return Redirect(linkGenerator.SupportTasks());
+        return Redirect(linkGenerator.SupportTasks.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

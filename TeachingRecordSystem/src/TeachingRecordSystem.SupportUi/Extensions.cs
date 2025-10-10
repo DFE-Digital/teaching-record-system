@@ -85,7 +85,7 @@ public static class Extensions
             .AddAzureActiveDirectory(environment)
             .AddFormFlow()
             .AddFormFlowJourneyDescriptors(typeof(Program).Assembly)
-            .AddTransient<TrsLinkGenerator>()
+            .AddTransient<SupportUiLinkGenerator>()
             .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
             .AddTransient<CheckMandatoryQualificationExistsFilter>()
             .AddTransient<CheckUserExistsFilter>()

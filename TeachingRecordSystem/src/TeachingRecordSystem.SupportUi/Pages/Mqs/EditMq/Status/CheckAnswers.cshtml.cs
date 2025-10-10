@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 [Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock) : PageModel
 {
@@ -46,7 +46,7 @@ public class CheckAnswersModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.MqEditStatus(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Mqs.EditMq.Status.Index(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -92,13 +92,13 @@ public class CheckAnswersModel(
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification changed");
 
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

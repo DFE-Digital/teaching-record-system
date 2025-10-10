@@ -7,12 +7,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.ApplicationUsers()" />
+    <govuk-back-link href="@LinkGenerator2.ApplicationUsers.Index()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.EditApplicationUser(Model.UserId!)" method="post">
+        <form action="@LinkGenerator2.ApplicationUsers.EditApplicationUser.Index(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Name" label-class="govuk-label--m" />
@@ -44,7 +44,7 @@
                         {
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">
-                                    <a href="@LinkGenerator.EditApiKey(key.ApiKeyId)" class="govuk-link trs-monospace" data-testid="EditApiKey-@key.ApiKeyId">@key.ApiKeyId</a>
+                                    <a href="@LinkGenerator2.ApiKeys.EditApiKey.Index(key.ApiKeyId)" class="govuk-link trs-monospace" data-testid="EditApiKey-@key.ApiKeyId">@key.ApiKeyId</a>
                                 </td>
                                 <td class="govuk-table__cell" data-testid="Expiry">
                                     @if (key.Expires is DateTime expires)
@@ -75,7 +75,7 @@
             </table>
 
             <div class="govuk-!-margin-bottom-1">
-                <govuk-button-link href="@LinkGenerator.AddApiKey(Model.UserId)" class="govuk-button--secondary" data-testid="AddApiKey">Add API key</govuk-button-link>
+                <govuk-button-link href="@LinkGenerator2.ApiKeys.AddApiKey.Index(Model.UserId)" class="govuk-button--secondary" data-testid="AddApiKey">Add API key</govuk-button-link>
             </div>
 
             <govuk-checkboxes for="IsOidcClient">

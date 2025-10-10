@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrnRequestService trnRequestService,
     EvidenceUploadManager evidenceController,
     IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
@@ -53,13 +53,13 @@ public class CheckAnswersModel(
 
         if (state.PersonId is not Guid personId)
         {
-            context.Result = Redirect(linkGenerator.TeacherPensionsMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 
         if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
         {
-            context.Result = Redirect(linkGenerator.TeacherPensionsMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
         Debug.Assert(state.PersonId is not null);
@@ -175,7 +175,7 @@ public class CheckAnswersModel(
             {
                 var link = new TagBuilder("a");
                 link.AddCssClass("govuk-link");
-                link.MergeAttribute("href", linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value));
+                link.MergeAttribute("href", linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value));
                 link.InnerHtml.Append($"View record.");
                 var span = new TagBuilder("span");
                 span.InnerHtml.Append($"Record updated for {FirstName} {LastName}. ");
@@ -184,7 +184,7 @@ public class CheckAnswersModel(
             });
 
         await JourneyInstance!.CompleteAsync();
-        return Redirect(linkGenerator.TeacherPensions());
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -192,6 +192,6 @@ public class CheckAnswersModel(
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.TeacherPensions());
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 }

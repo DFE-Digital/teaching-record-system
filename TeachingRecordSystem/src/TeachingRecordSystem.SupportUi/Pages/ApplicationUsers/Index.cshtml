@@ -19,7 +19,7 @@
             {
                 <tr class="govuk-table__row" data-testid="user-@user.UserId">
                     <td class="govuk-table__cell">
-                        <a href="@LinkGenerator.EditApplicationUser(user.UserId)" class="govuk-link" data-testid="edit-application-user-@user.UserId">@user.Name</a>
+                        <a href="@LinkGenerator2.ApplicationUsers.EditApplicationUser.Index(user.UserId)" class="govuk-link" data-testid="edit-application-user-@user.UserId">@user.Name</a>
                     </td>
                 </tr>
             }
@@ -35,4 +35,4 @@
     </tbody>
 </table>
 
-<govuk-button-link href="@LinkGenerator.AddApplicationUser()" class="govuk-button--secondary" data-testid="add-application-user">Add application user</govuk-button-link>
+<govuk-button-link href="@LinkGenerator2.ApplicationUsers.AddApplicationUser.Index()" class="govuk-button--secondary" data-testid="add-application-user">Add application user</govuk-button-link>

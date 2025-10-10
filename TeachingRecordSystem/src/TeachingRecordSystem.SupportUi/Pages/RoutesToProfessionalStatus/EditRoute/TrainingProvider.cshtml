@@ -36,12 +36,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RouteEditCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteEditDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator2.RoutesToProfessionalStatus.EditRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) : LinkGenerator2.RoutesToProfessionalStatus.EditRoute.Detail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteEditTrainingProvider(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator2.RoutesToProfessionalStatus.EditRoute.TrainingProvider(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="TrainingProviderId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
@@ -55,7 +55,7 @@
             </govuk-select>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditTrainingProviderCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator2.RoutesToProfessionalStatus.EditRoute.TrainingProviderCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

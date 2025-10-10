@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class HoldsFromModel(
     IClock clock,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager)
     : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache, evidenceUploadManager)

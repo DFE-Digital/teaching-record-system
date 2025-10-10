@@ -51,7 +51,7 @@
 
                     <ul id="navigation" class="govuk-header__navigation-list" style="float:right">
                         <li class="govuk-header__navigation-item">
-                            <a class="govuk-header__link" href="@LinkGenerator.SignOut()">
+                            <a class="govuk-header__link" href="@LinkGenerator2.SignOut()">
                                 Sign out
                             </a>
                         </li>
@@ -66,7 +66,7 @@
             @if (User.Identity?.IsAuthenticated == true && User.IsActiveTrsUser())
             {
                 <govuk-service-navigation-nav-item
-                    href="@LinkGenerator.Index()"
+                    href="@LinkGenerator2.Index()"
                     current="@(Context.Request.Path == "/")"
                     active="@(Context.Request.Path.StartsWithSegments("/persons"))">
                     Records
@@ -75,7 +75,7 @@
                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
                 {
                     <govuk-service-navigation-nav-item
-                        href="@LinkGenerator.Users()"
+                        href="@LinkGenerator2.Users.Index()"
                         current="@(Context.Request.Path == "/users")"
                         active="@(Context.Request.Path.StartsWithSegments("/users"))">
                         Add and manage users
@@ -85,7 +85,7 @@
                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AdminOnly)).Succeeded)
                 {
                     <govuk-service-navigation-nav-item
-                        href="@LinkGenerator.ApplicationUsers()"
+                        href="@LinkGenerator2.ApplicationUsers.Index()"
                         current="@(Context.Request.Path == "/application-users")"
                         active="@(Context.Request.Path.StartsWithSegments("/application-users") || Context.Request.Path.StartsWithSegments("/api-keys"))">
                         Application users

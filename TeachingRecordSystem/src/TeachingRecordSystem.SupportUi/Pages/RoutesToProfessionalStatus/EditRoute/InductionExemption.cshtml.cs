@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class InductionExemptionModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceUploadManager)
@@ -49,8 +49,8 @@ public class InductionExemptionModel(
         }
 
         return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
@@ -65,8 +65,8 @@ public class InductionExemptionModel(
     }
 
     public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+        LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
         JourneyInstance!.State.IsCompletingRoute ?
-            LinkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
 }

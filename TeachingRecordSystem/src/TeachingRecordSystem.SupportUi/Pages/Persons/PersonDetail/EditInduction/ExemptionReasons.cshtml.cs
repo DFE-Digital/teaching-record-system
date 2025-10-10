@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class ExemptionReasonsModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
@@ -81,7 +81,7 @@ public class ExemptionReasonsModel(
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
             {
                 return InductionJourneyPage.CheckAnswers;
             }
@@ -93,12 +93,12 @@ public class ExemptionReasonsModel(
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
             {
                 return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.ExemptionReason
-                ? LinkGenerator.PersonInduction(PersonId)
+                ? LinkGenerator.Persons.PersonDetail.Induction(PersonId)
                 : GetPageLink(InductionJourneyPage.Status);
         }
     }

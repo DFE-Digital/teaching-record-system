@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 [Journey(JourneyNames.SetStatus), RequireJourneyInstance]
 [AllowDeactivatedPerson]
 public class CheckAnswersModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
     EvidenceUploadManager evidenceController)
@@ -20,8 +20,8 @@ public class CheckAnswersModel(
     public string? ReactivateReasonDetail { get; set; }
     public UploadedEvidenceFile? EvidenceFile { get; set; }
 
-    public string BackLink => LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance!.InstanceId);
-    public string ChangeReasonLink => LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance!.InstanceId, fromCheckAnswers: true);
+    public string BackLink => LinkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance!.InstanceId);
+    public string ChangeReasonLink => LinkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance!.InstanceId, fromCheckAnswers: true);
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
@@ -31,7 +31,7 @@ public class CheckAnswersModel(
 
         if (!state.IsComplete)
         {
-            context.Result = Redirect(LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance.InstanceId));
+            context.Result = Redirect(LinkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance.InstanceId));
             return;
         }
 
@@ -74,6 +74,6 @@ public class CheckAnswersModel(
         var action = TargetStatus == PersonStatus.Deactivated ? "deactivated" : "reactivated";
         TempData.SetFlashSuccess($"{PersonName}\u2019s record has been {action}");
 
-        return Redirect(LinkGenerator.PersonDetail(PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 }

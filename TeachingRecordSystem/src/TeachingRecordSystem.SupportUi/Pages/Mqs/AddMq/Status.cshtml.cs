@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
+public class StatusModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -61,22 +61,20 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
 
-        return Redirect(FromCheckAnswers ?
-            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
-            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.Mqs.AddMq.CheckAnswers(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (JourneyInstance!.State.StartDate is null)
         {
-            context.Result = Redirect(linkGenerator.MqAddStartDate(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Mqs.AddMq.StartDate(PersonId, JourneyInstance.InstanceId));
             return;
         }
 

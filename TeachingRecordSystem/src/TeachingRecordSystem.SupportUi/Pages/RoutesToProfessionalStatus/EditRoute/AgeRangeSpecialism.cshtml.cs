@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
 public class AgeRangeSpecialismModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceController)
@@ -46,7 +46,7 @@ public class AgeRangeSpecialismModel(
             });
 
         return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId));
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId));
     }
 }

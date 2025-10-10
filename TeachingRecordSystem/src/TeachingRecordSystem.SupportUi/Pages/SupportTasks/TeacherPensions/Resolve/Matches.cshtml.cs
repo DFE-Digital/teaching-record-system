@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -61,8 +61,8 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, Evi
 
         return Redirect(
             PersonId == Guid.Empty ?
-                linkGenerator.TeacherPensionsKeepRecordSeparate(SupportTaskReference!, JourneyInstance!.InstanceId) :
-                linkGenerator.TeacherPensionsMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+                linkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(SupportTaskReference!, JourneyInstance!.InstanceId) :
+                linkGenerator.SupportTasks.TeacherPensions.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -70,7 +70,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, Evi
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.TeacherPensions());
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

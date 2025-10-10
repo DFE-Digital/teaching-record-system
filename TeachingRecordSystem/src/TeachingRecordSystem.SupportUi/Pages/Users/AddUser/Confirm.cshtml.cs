@@ -15,7 +15,7 @@ public class ConfirmModel(
     TrsDbContext dbContext,
     IAadUserService userService,
     IClock clock,
-    TrsLinkGenerator linkGenerator) : PageModel
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private User? _user;
 
@@ -93,7 +93,7 @@ public class ConfirmModel(
             .WithIndefiniteArticle();
 
         TempData.SetFlashSuccess($"{Name} has been added as {roleText}.");
-        return Redirect(linkGenerator.Users());
+        return Redirect(linkGenerator.Users.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

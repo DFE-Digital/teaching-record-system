@@ -17,7 +17,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 public class RejectModel(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     IClock clock) : PageModel
 {
     [FromRoute]
@@ -169,7 +169,7 @@ public class RejectModel(
             $"The request has been {requestStatus}",
             flashMessage);
 
-        return Redirect(linkGenerator.SupportTasks(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true));
+        return Redirect(linkGenerator.SupportTasks.Index(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

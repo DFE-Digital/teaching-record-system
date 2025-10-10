@@ -17,7 +17,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 public class AcceptModel(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     IClock clock) : PageModel
 {
     [FromRoute]
@@ -143,7 +143,7 @@ public class AcceptModel(
             $"The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 
-        return Redirect(linkGenerator.SupportTasks(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true));
+        return Redirect(linkGenerator.SupportTasks.Index(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

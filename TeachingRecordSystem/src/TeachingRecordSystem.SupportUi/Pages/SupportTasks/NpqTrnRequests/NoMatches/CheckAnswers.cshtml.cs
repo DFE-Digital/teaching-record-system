@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.NoMat
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     ITrnGenerator trnGenerator,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     IClock clock) : PageModel
 {
     public string? SourceApplicationUserName { get; set; }
@@ -106,14 +106,14 @@ public class CheckAnswersModel(
 
         TempData.SetFlashSuccess(
             $"TRN request for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)} completed",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)));
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value)));
 
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public IActionResult OnPostCancel()
     {
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

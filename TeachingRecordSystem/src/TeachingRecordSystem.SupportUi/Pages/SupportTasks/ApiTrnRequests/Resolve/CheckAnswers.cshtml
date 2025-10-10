@@ -4,11 +4,11 @@
     ViewBag.Title = Model.CreatingNewRecord ? "Check details before creating a new record" : "Check details before updating the existing record";
 
     var backLink = Model.CreatingNewRecord
-        ? LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
-        : LinkGenerator.ApiTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
+        ? LinkGenerator2.SupportTasks.ApiTrnRequests.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)
+        : LinkGenerator2.SupportTasks.ApiTrnRequests.Resolve.Merge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId);
     var changeLink = Model.CreatingNewRecord
-        ? LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)
-        : LinkGenerator.ApiTrnRequestMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true);
+        ? LinkGenerator2.SupportTasks.ApiTrnRequests.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)
+        : LinkGenerator2.SupportTasks.ApiTrnRequests.Resolve.Merge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true);
 
     var confirmButtonLabel = Model.CreatingNewRecord ? "Confirm and create record" : "Confirm and update existing record";
 }
@@ -17,7 +17,7 @@
     <govuk-back-link href="@backLink"/>
 }
 
-<form action="@LinkGenerator.ApiTrnRequestCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+<form action="@LinkGenerator2.SupportTasks.ApiTrnRequests.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
@@ -73,7 +73,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">@confirmButtonLabel</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.ApiTrnRequestCheckAnswersCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator2.SupportTasks.ApiTrnRequests.Resolve.CheckAnswersCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

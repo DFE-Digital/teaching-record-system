@@ -5,10 +5,10 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator2.SupportTasks.NpqTrnRequests.Reject.Reason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" />
 }
 
-<form action="@LinkGenerator.NpqTrnRequestRejectionCheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
+<form action="@LinkGenerator2.SupportTasks.NpqTrnRequests.Reject.CheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">TRN request - @Model.PersonName</span>
@@ -19,13 +19,13 @@
                     <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>@Model.RejectionReason?.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.NpqTrnRequestRejectionReason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" data-testid="change-link">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator2.SupportTasks.NpqTrnRequests.Reject.Reason(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" data-testid="change-link">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="submit">Confirm and reject request</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.NpqTrnRequestRejectionCheckAnswersCancel(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel and return to TRN requests</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator2.SupportTasks.NpqTrnRequests.Reject.CheckAnswersCancel(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel and return to TRN requests</govuk-button>
             </div>
         </div>
     </div>

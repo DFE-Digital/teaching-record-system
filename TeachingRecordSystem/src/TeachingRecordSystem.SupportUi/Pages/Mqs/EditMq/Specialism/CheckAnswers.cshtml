@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditSpecialismChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator2.Mqs.EditMq.Specialism.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
-        <form action="@LinkGenerator.MqEditSpecialismCheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator2.Mqs.EditMq.Specialism.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
@@ -41,7 +41,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqEditSpecialismCheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator2.Mqs.EditMq.Specialism.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

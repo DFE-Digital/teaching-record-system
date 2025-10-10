@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.EditApplicationUser(Model.ApplicationUserId)" />
+    <govuk-back-link href="@LinkGenerator2.ApplicationUsers.EditApplicationUser.Index(Model.ApplicationUserId)" />
 }
 
 <div class="govuk-grid-row">
@@ -19,7 +19,7 @@
             <govuk-button
                 type="submit"
                 class="govuk-button--warning"
-                formaction="@LinkGenerator.ExpireApiKey(Model.ApiKeyId)"
+                formaction="@LinkGenerator2.ApiKeys.EditApiKey.Expire(Model.ApiKeyId)"
                 disabled="@Model.Expires.HasValue"
                 data-testid="ExpireButton">
                 Expire

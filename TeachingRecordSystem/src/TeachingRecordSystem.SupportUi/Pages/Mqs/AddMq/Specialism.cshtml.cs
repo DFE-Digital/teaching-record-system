@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
+public class SpecialismModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -45,21 +45,21 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
         await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
-            linkGenerator.MqAddStartDate(PersonId, JourneyInstance.InstanceId));
+            linkGenerator.Mqs.AddMq.CheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            linkGenerator.Mqs.AddMq.StartDate(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (JourneyInstance!.State.ProviderId is null)
         {
-            context.Result = Redirect(linkGenerator.MqAddProvider(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Mqs.AddMq.Provider(PersonId, JourneyInstance.InstanceId));
             return;
         }
 

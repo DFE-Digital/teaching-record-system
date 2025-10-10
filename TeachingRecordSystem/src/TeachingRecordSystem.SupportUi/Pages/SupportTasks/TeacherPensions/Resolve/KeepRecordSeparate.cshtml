@@ -5,13 +5,13 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.TeacherPensionsCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
-        LinkGenerator.TeacherPensions())" />
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator2.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :
+        LinkGenerator2.SupportTasks.TeacherPensions.Index())" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.TeacherPensionsKeepRecordSeparate(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-radios for="KeepSeparateReason">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
@@ -31,7 +31,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.TeacherPensionsCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, true)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId, true)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </form>
     </div>

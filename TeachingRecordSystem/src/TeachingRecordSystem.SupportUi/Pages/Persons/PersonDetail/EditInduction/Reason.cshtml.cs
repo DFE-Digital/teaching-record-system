@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class ReasonModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     EvidenceUploadManager evidenceController)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
@@ -38,7 +38,7 @@ public class ReasonModel(
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
             {
                 return GetPageLink(InductionJourneyPage.CheckAnswers);
             }

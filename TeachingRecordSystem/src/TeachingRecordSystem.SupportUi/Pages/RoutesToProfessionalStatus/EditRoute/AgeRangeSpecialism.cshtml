@@ -4,12 +4,12 @@
     ViewBag.Title = Model.PageHeading;
 }
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == false ? LinkGenerator.RouteEditDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteEditCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == false ? LinkGenerator2.RoutesToProfessionalStatus.EditRoute.Detail(Model.QualificationId, Model.JourneyInstance!.InstanceId) : LinkGenerator2.RoutesToProfessionalStatus.EditRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator2.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
@@ -34,7 +34,7 @@
             </govuk-radios>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditAgeRangeSpecialismCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator2.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialismCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class ReasonModel(TrsLinkGenerator linkGenerator,
+public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController) : PageModel
 {
     public string? PersonName { get; set; }
@@ -39,11 +39,11 @@ public class ReasonModel(TrsLinkGenerator linkGenerator,
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    public string NextPage => linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
+    public string NextPage => linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId);
 
     public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+        ? linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId)
+        : linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
 
     public string PageCaption => $"Edit route - {PersonName}";
 
@@ -94,6 +94,6 @@ public class ReasonModel(TrsLinkGenerator linkGenerator,
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

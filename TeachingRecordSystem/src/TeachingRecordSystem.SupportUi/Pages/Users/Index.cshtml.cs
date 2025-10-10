@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int UsersPerPage = 10;
 
@@ -81,7 +81,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         Pagination = PaginationViewModel.Create(
             paginatedUsers,
-            pageNumber => linkGenerator.Users(Keywords, Status, Role, pageNumber));
+            pageNumber => linkGenerator.Users.Index(Keywords, Status, Role, pageNumber));
     }
 
     private UserViewModel CreateViewModel(User user)
@@ -90,7 +90,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
         {
             Id = user.UserId.ToString(),
             Name = user.Name,
-            EditUrl = linkGenerator.EditUser(user.UserId),
+            EditUrl = linkGenerator.Users.EditUser.Index(user.UserId),
             EmailAddress = user.Email ?? "No email address",
             Role = user.Role == null ? "No role assigned" : UserRoles.GetDisplayNameForRole(user.Role),
             Status = user.Active ? "Active" : "Inactive"

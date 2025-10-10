@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 [Journey(JourneyNames.DeleteMq), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
     IClock clock) : PageModel
 {
@@ -42,7 +42,7 @@ public class CheckAnswersModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.MqDelete(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Mqs.DeleteMq.Index(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -79,13 +79,13 @@ public class CheckAnswersModel(
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification deleted");
 
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

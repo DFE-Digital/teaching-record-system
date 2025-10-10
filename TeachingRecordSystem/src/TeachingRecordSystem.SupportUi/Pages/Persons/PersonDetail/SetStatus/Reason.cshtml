@@ -16,7 +16,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.PersonSetStatusChangeReason(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId) method="post" enctype="multipart/form-data" data-testid="submit-form">
+        <form action=@LinkGenerator2.Persons.PersonDetail.SetStatus.Reason(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId) method="post" enctype="multipart/form-data" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="set-status-caption">@caption</span>
 
             @if (Model.TargetStatus == PersonStatus.Deactivated)
@@ -63,7 +63,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.PersonSetStatusCancel(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel and return to record</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator2.Persons.PersonDetail.SetStatus.ReasonCancel(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

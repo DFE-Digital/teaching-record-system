@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 [Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
-public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
 
@@ -48,7 +48,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager e
         if (JourneyInstance!.State.Status is null
             || JourneyInstance.State.Status == MandatoryQualificationStatus.Passed && !JourneyInstance.State.EndDate.HasValue)
         {
-            context.Result = Redirect(linkGenerator.MqEditStatus(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Mqs.EditMq.Status.Index(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -95,13 +95,13 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager e
             state.Evidence = Evidence;
         });
 
-        return Redirect(linkGenerator.MqEditStatusCheckAnswersConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.Mqs.EditMq.Status.CheckAnswers(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

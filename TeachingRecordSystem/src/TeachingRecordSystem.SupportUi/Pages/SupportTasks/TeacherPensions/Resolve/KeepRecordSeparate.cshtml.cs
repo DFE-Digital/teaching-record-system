@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class KeepRecordSeparate(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class KeepRecordSeparate(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     [BindProperty]
     public string? Reason { get; set; }
@@ -38,7 +38,7 @@ public class KeepRecordSeparate(TrsDbContext dbContext, TrsLinkGenerator linkGen
             state.KeepSeparateReason = KeepSeparateReason;
         });
 
-        return Redirect(linkGenerator.TeacherPensionsConfirmKeepRecordSeparateReason(SupportTaskReference!, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReason(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -46,6 +46,6 @@ public class KeepRecordSeparate(TrsDbContext dbContext, TrsLinkGenerator linkGen
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.TeacherPensions());
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 }

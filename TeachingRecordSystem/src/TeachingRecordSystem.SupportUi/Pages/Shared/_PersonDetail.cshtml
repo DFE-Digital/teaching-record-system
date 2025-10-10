@@ -9,7 +9,7 @@
     @if (Model.CanChangeDetails)
     {
         <govuk-summary-card-actions>
-            <govuk-summary-card-action data-testid="change-details-link" href=@LinkGenerator.PersonEditDetails(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
+            <govuk-summary-card-action data-testid="change-details-link" href=@LinkGenerator2.Persons.PersonDetail.EditDetails.Index(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
         </govuk-summary-card-actions>
     }
     <govuk-summary-list>

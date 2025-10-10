@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.AlertReopen(Model.PersonId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator2.Alerts.ReopenAlert.Index(Model.PersonId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
-        <form action="@LinkGenerator.AlertReopenCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator2.Alerts.ReopenAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change closed alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
@@ -44,7 +44,7 @@
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertReopen(Model.AlertId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator2.Alerts.ReopenAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -60,7 +60,7 @@
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertCloseReason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator2.Alerts.ReopenAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -69,7 +69,7 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertReopen(Model.AlertId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator2.Alerts.ReopenAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>
@@ -77,7 +77,7 @@
             <h2 class="govuk-heading-m">Are you sure you want to re-open this alert?</h2>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm and re-open alert</govuk-button>
-                <govuk-button formaction="@LinkGenerator.AlertReopenCheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator2.Alerts.ReopenAlert.CheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

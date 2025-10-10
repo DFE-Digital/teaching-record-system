@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class DeactivateModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     TrsDbContext dbContext,
     IClock clock) : PageModel
@@ -106,12 +106,12 @@ public class DeactivateModel(
         await dbContext.SaveChangesAsync();
         TempData.SetFlashSuccess($"{_user.Name}\u2019s account has been deactivated");
 
-        return Redirect(linkGenerator.Users());
+        return Redirect(linkGenerator.Users.Index());
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(Evidence.UploadedEvidenceFile);
-        return Redirect(linkGenerator.EditUser(UserId));
+        return Redirect(linkGenerator.Users.EditUser.Index(UserId));
     }
 }

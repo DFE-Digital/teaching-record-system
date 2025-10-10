@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded;
 
-public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int TasksPerPage = 20;
 
@@ -122,7 +122,7 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
 
         Pagination = PaginationViewModel.Create(
             Results,
-            pageNumber => linkGenerator.TrnRequestManualChecksNeeded(Search, SortBy, SortDirection, pageNumber));
+            pageNumber => linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(Search, SortBy, SortDirection, pageNumber));
     }
 
     public record Result(

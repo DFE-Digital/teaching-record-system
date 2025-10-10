@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 [Journey(JourneyNames.EditMqStartDate), RequireJourneyInstance]
-public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<EditMqStartDateState>? JourneyInstance { get; set; }
 
@@ -40,7 +40,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager e
     {
         if (JourneyInstance!.State.StartDate is null)
         {
-            context.Result = Redirect(linkGenerator.MqEditStartDate(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Mqs.EditMq.StartDate.Index(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -73,13 +73,13 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager e
             state.Evidence = Evidence;
         });
 
-        return Redirect(linkGenerator.MqEditStartDateCheckAnswers(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.Mqs.EditMq.StartDate.CheckAnswers(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

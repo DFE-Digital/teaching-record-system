@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 [Journey(JourneyNames.EditAlertStartDate), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock) : PageModel
 {
@@ -39,7 +39,7 @@ public class CheckAnswersModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.AlertEditStartDate(AlertId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.EditAlert.StartDate.Index(AlertId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -77,13 +77,13 @@ public class CheckAnswersModel(
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert changed");
 
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 }

@@ -9,13 +9,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController) : PageModel
 {
     public JourneyInstance<SetStatusState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
-    protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
+    protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
     protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
     protected Person? Person { get; set; }
 
@@ -85,6 +85,6 @@ public abstract class CommonJourneyPage(
     {
         await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(LinkGenerator.PersonDetail(PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 }

@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
 [Journey(JourneyNames.CloseAlert), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock) : PageModel
 {
@@ -58,15 +58,15 @@ public class IndexModel(
         await JourneyInstance!.UpdateStateAsync(state => state.EndDate = EndDate);
 
         return Redirect(FromCheckAnswers
-            ? linkGenerator.AlertCloseCheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.AlertCloseReason(AlertId, JourneyInstance!.InstanceId));
+            ? linkGenerator.Alerts.CloseAlert.CheckAnswers(AlertId, JourneyInstance.InstanceId)
+            : linkGenerator.Alerts.CloseAlert.Reason(AlertId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

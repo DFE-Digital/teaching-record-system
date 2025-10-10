@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
+public class ProviderModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -41,14 +41,14 @@ public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
         await JourneyInstance!.UpdateStateAsync(state => state.ProviderId = ProviderId);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
-            linkGenerator.MqAddSpecialism(PersonId, JourneyInstance.InstanceId));
+            linkGenerator.Mqs.AddMq.CheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            linkGenerator.Mqs.AddMq.Specialism(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

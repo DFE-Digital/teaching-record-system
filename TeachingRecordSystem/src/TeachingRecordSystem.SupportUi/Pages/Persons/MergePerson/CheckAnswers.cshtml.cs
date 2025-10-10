@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 [Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
@@ -153,7 +153,7 @@ public class CheckAnswersModel(
 
         TempData.SetFlashSuccess(
             $"Records merged for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.PersonDetail(primaryPersonId))
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId))
             );
 
 

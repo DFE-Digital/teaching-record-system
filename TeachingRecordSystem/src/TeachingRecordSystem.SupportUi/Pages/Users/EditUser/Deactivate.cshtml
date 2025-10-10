@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.EditUser(Model.UserId)" />
+    <govuk-back-link href="@LinkGenerator2.Users.EditUser.Index(Model.UserId)" />
 }
 
 <div class="govuk-grid-row">
@@ -60,7 +60,7 @@
                 <govuk-button type="submit">Continue</govuk-button>
                 <govuk-button type="submit"
                               data-testid="cancel-button"
-                              formaction=@LinkGenerator.EditUserDeactivateCancel(Model.UserId)
+                              formaction=@LinkGenerator2.Users.EditUser.DeactivateCancel(Model.UserId)
                               class="govuk-button--secondary">
                     Cancel and return to user
                 </govuk-button>

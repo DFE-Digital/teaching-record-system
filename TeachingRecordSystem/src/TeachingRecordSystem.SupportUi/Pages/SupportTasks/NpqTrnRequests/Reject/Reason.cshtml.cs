@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Reject;
 
 [Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance]
-public class ReasonModel(TrsLinkGenerator linkGenerator) : PageModel
+public class ReasonModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public string PersonName => StringHelper.JoinNonEmpty(' ', RequestData!.Name);
 
@@ -43,13 +43,13 @@ public class ReasonModel(TrsLinkGenerator linkGenerator) : PageModel
             state.RejectionReason = RejectionReason;
         });
 
-        return Redirect(linkGenerator.NpqTrnRequestRejectionCheckAnswers(SupportTaskReference, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Reject.CheckAnswers(SupportTaskReference, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
