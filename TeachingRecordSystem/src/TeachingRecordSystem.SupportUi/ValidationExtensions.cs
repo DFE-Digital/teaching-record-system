@@ -12,7 +12,7 @@ public static class ValidationExtensions
         return ruleBuilder
             .Must(f => f is null || _evidenceFileExtensions.Any(e => f.FileName.EndsWith(e, StringComparison.OrdinalIgnoreCase)))
             .WithMessage("The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX")
-            .Must(f => f is null || f.Length <= FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024)
+            .Must(f => f is null || f.Length <= UiDefaults.MaxFileUploadSizeMb * 1024 * 1024)
             .WithMessage("The selected file must be smaller than 50MB");
     }
 }

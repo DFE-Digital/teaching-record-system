@@ -22,7 +22,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
 
     [BindProperty]
     [Display(Name = "Enter details")]
-    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -32,7 +32,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -50,7 +50,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.ChangeReasonDetail.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.ChangeReasonDetail.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.ChangeReasonDetail.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
             null;
     }
 
@@ -88,7 +88,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
                 EvidenceFileId = evidenceFileId;
                 EvidenceFileName = EvidenceFile?.FileName;
                 EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-                UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
+                UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(evidenceFileId, UiDefaults.FileUrlExpiry);
             }
         }
 

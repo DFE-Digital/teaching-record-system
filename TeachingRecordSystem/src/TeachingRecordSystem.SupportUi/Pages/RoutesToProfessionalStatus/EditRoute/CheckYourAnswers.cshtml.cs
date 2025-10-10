@@ -152,7 +152,7 @@ public class CheckYourAnswersModel(
         };
 
         UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
             null;
         await next();
     }

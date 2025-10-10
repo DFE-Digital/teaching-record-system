@@ -121,7 +121,7 @@ public class CheckYourAnswersModel(
     public async Task<string?> GetEvidenceFileUrlAsync()
     {
         return ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
             null;
     }
 

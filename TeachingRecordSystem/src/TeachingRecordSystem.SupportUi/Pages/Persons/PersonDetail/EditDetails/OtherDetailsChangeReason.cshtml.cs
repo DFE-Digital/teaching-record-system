@@ -20,7 +20,7 @@ public class OtherDetailsChangeReasonModel(
 
     [BindProperty]
     [Display(Name = "Enter details")]
-    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Reason details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ReasonDetail { get; set; }
 
     [BindProperty]

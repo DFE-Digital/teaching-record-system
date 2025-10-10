@@ -66,7 +66,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFile
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -87,7 +87,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFile
         LastNameSource = JourneyInstance!.State.LastNameSource;
         TRNSource = JourneyInstance!.State.TRNSource;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
             null;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
     }

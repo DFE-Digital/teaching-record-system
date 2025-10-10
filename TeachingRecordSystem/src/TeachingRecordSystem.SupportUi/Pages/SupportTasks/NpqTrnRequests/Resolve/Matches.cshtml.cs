@@ -119,7 +119,7 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
         NpqEvidenceFileName = RequestData.NpqEvidenceFileName;
 
         NpqEvidenceFileUrl = NpqEvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
             null;
 
         await base.OnPageHandlerExecutionAsync(context, next);

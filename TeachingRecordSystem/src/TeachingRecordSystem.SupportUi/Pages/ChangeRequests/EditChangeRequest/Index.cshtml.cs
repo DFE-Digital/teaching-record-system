@@ -80,7 +80,7 @@ public class IndexModel(
             {
                 FileId = data.EvidenceFileId,
                 FileName = data.EvidenceFileName,
-                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, FileUploadDefaults.FileUrlExpiry),
+                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, UiDefaults.FileUrlExpiry),
                 MimeType = evidenceFileMimeType
             };
         }
@@ -103,7 +103,7 @@ public class IndexModel(
             {
                 FileId = data.EvidenceFileId,
                 FileName = data.EvidenceFileName,
-                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, FileUploadDefaults.FileUrlExpiry),
+                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, UiDefaults.FileUrlExpiry),
                 MimeType = evidenceFileMimeType
             };
         }

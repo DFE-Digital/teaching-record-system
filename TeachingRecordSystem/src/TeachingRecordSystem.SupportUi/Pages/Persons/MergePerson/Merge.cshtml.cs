@@ -60,7 +60,7 @@ public class MergeModel(
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     [BindProperty]
@@ -170,7 +170,7 @@ public class MergeModel(
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance.State.EvidenceFileSizeDescription;
         EvidenceFileUrl = JourneyInstance.State.EvidenceFileId is null ? null :
-            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry);
+            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, UiDefaults.FileUrlExpiry);
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -241,7 +241,7 @@ public class MergeModel(
             EvidenceFileId = evidenceFileId;
             EvidenceFileName = EvidenceFile?.FileName;
             EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-            EvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
+            EvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, UiDefaults.FileUrlExpiry);
         }
 
         if (!ModelState.IsValid)
