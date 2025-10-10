@@ -230,14 +230,19 @@ public sealed class OneLoginAuthenticationSchemeProvider(
                 {
                     await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
                     var conn = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+
+                    conn.Notification += (sender, args) => _ = ReloadSchemesAsync();
+
                     await conn.OpenAsync(cancellationToken);
 
                     await using var cmd = conn.CreateCommand();
                     cmd.CommandText = $"LISTEN {ChannelNames.OneLoginClient};";
                     await cmd.ExecuteNonQueryAsync(cancellationToken);
 
-                    await conn.WaitAsync(cancellationToken);
-                    await ReloadSchemesAsync();
+                    while (true)
+                    {
+                        await conn.WaitAsync(cancellationToken);
+                    }
                 }
                 catch (Exception ex)
                 {
