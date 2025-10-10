@@ -21,22 +21,18 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Select a reason")]
     [Required(ErrorMessage = "Select a reason")]
     public AddAlertReasonOption? AddReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to add more information about why you’re adding this alert?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you’re adding this alert")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add additional detail")]
     [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? AddReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to upload evidence?")]
     [Required(ErrorMessage = "Select yes if you want to upload evidence")]
     public bool? UploadEvidence { get; set; }
 

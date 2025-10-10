@@ -25,7 +25,6 @@ public class TypeModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Select an alert type")]
     [Required(ErrorMessage = "Select an alert type")]
     public Guid? AlertTypeId { get; set; }
 

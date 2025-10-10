@@ -21,7 +21,6 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : Page
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
     [Required(ErrorMessage = "Enter a start date")]
-    [Display(Name = "Enter start date")]
     public DateOnly? StartDate { get; set; }
 
     public void OnGet()
