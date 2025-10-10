@@ -21,7 +21,6 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? AlertTypeName { get; set; }
 
     [BindProperty]
-    [Display(Description = "For example, include any restrictions it places on a teacher.")]
     [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Details {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? Details { get; set; }
 
