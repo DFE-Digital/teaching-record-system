@@ -1,3 +1,6 @@
+@import "/Inter/inter.css";
+$govuk-font-family: 'Inter', Arial, sans-serif;
+
 @import '../lib/govuk-frontend/index';
 @import "../lib/ministryofjustice/frontend/moj/settings/all";
 @import "../lib/ministryofjustice/frontend/moj/helpers/all";
