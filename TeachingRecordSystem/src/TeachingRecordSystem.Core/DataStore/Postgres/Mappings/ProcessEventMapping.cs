@@ -9,6 +9,7 @@ public class ProcessEventMapping : IEntityTypeConfiguration<ProcessEvent>
     public void Configure(EntityTypeBuilder<ProcessEvent> builder)
     {
         builder.ToTable("process_events");
+        builder.Property(e => e.EventName).HasMaxLength(200);
         builder.Property(e => e.Payload)
             .HasColumnType("jsonb")
             .HasConversion(
