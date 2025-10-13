@@ -14,15 +14,15 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    [Migration("20250620130437_RouteAddDqtAgeRange")]
-    partial class RouteAddDqtAgeRange
+    [Migration("20251013160706_Squash20251013")]
+    partial class Squash20251013
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -272,8 +272,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("subject");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
                         .HasColumnName("type");
 
                     b.HasKey("Id")
@@ -482,10 +482,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("name")
                         .UseCollation("case_insensitive");
 
-                    b.Property<int>("ProhibitionLevel")
-                        .HasColumnType("integer")
-                        .HasColumnName("prohibition_level");
-
                     b.HasKey("AlertTypeId")
                         .HasName("pk_alert_types");
 
@@ -508,8 +504,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T8",
                             InternalOnly = true,
                             IsActive = true,
-                            Name = "Teacher sanctioned in other EEA member state",
-                            ProhibitionLevel = 3
+                            Name = "Teacher sanctioned in other EEA member state"
                         },
                         new
                         {
@@ -519,8 +514,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "C2",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Failed induction",
-                            ProhibitionLevel = 1
+                            Name = "Failed induction"
                         },
                         new
                         {
@@ -529,8 +523,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "C1",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibited by the Secretary of State - failed probation",
-                            ProhibitionLevel = 1
+                            Name = "Prohibited by the Secretary of State - failed probation"
                         },
                         new
                         {
@@ -539,8 +532,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "C3",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Restricted by the Secretary of State - failed probation - permitted to carry out specified work for a period equal in length to a statutory induction period only",
-                            ProhibitionLevel = 1
+                            Name = "Restricted by the Secretary of State - failed probation - permitted to carry out specified work for a period equal in length to a statutory induction period only"
                         },
                         new
                         {
@@ -550,8 +542,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T9",
                             InternalOnly = true,
                             IsActive = true,
-                            Name = "FOR INTERNAL INFORMATION ONLY - see alert details",
-                            ProhibitionLevel = 0
+                            Name = "FOR INTERNAL INFORMATION ONLY - see alert details"
                         },
                         new
                         {
@@ -561,8 +552,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T10",
                             InternalOnly = true,
                             IsActive = true,
-                            Name = "FOR INTERNAL USER ONLY – known duplicate record",
-                            ProhibitionLevel = 0
+                            Name = "FOR INTERNAL USER ONLY – known duplicate record"
                         },
                         new
                         {
@@ -571,8 +561,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A18",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Conditional Registration Order - conviction of a relevant offence",
-                            ProhibitionLevel = 2
+                            Name = "Conditional Registration Order - conviction of a relevant offence"
                         },
                         new
                         {
@@ -581,8 +570,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A7",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Conditional Registration Order - serious professional incompetence",
-                            ProhibitionLevel = 2
+                            Name = "Conditional Registration Order - serious professional incompetence"
                         },
                         new
                         {
@@ -591,8 +579,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A3",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Conditional Registration Order - unacceptable professional conduct",
-                            ProhibitionLevel = 2
+                            Name = "Conditional Registration Order - unacceptable professional conduct"
                         },
                         new
                         {
@@ -601,8 +588,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A15",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "For internal information only - historic GTC finding of unsuitable for registration",
-                            ProhibitionLevel = 0
+                            Name = "For internal information only - historic GTC finding of unsuitable for registration"
                         },
                         new
                         {
@@ -611,8 +597,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A22",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "No Sanction - breach of condition(s)",
-                            ProhibitionLevel = 0
+                            Name = "No Sanction - breach of condition(s)"
                         },
                         new
                         {
@@ -621,8 +606,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A16",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "No Sanction - conviction for a relevant offence",
-                            ProhibitionLevel = 0
+                            Name = "No Sanction - conviction for a relevant offence"
                         },
                         new
                         {
@@ -631,8 +615,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A12",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "No Sanction - serious professional incompetence",
-                            ProhibitionLevel = 0
+                            Name = "No Sanction - serious professional incompetence"
                         },
                         new
                         {
@@ -641,8 +624,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A11",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "No Sanction - unacceptable professional conduct",
-                            ProhibitionLevel = 0
+                            Name = "No Sanction - unacceptable professional conduct"
                         },
                         new
                         {
@@ -651,8 +633,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A17",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Reprimand - conviction of a relevant offence",
-                            ProhibitionLevel = 0
+                            Name = "Reprimand - conviction of a relevant offence"
                         },
                         new
                         {
@@ -661,8 +642,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A8",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Reprimand - serious professional incompetence",
-                            ProhibitionLevel = 0
+                            Name = "Reprimand - serious professional incompetence"
                         },
                         new
                         {
@@ -671,8 +651,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A4",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Reprimand - unacceptable professional conduct",
-                            ProhibitionLevel = 0
+                            Name = "Reprimand - unacceptable professional conduct"
                         },
                         new
                         {
@@ -681,8 +660,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A21B",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibition Order - conviction of a relevant offence - eligible to reapply after specified time",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition Order - conviction of a relevant offence - eligible to reapply after specified time"
                         },
                         new
                         {
@@ -691,8 +669,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A21A",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibition Order - conviction of a relevant offence - ineligible to reapply",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition Order - conviction of a relevant offence - ineligible to reapply"
                         },
                         new
                         {
@@ -701,8 +678,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A5B",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibition Order - serious professional incompetence - Eligible to reapply after specified time",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition Order - serious professional incompetence - Eligible to reapply after specified time"
                         },
                         new
                         {
@@ -711,8 +687,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A5A",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibition Order - serious professional incompetence - Ineligible to reapply",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition Order - serious professional incompetence - Ineligible to reapply"
                         },
                         new
                         {
@@ -721,8 +696,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A1B",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibition Order - unacceptable professional conduct - Eligible to reapply after specified time",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition Order - unacceptable professional conduct - Eligible to reapply after specified time"
                         },
                         new
                         {
@@ -731,8 +705,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A1A",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibition Order - unacceptable professional conduct - Ineligible to reapply",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition Order - unacceptable professional conduct - Ineligible to reapply"
                         },
                         new
                         {
@@ -741,8 +714,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A20",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - conviction of a relevant offence - with conditions",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - conviction of a relevant offence - with conditions"
                         },
                         new
                         {
@@ -751,8 +723,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A19",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - conviction of a relevant offence - without conditions",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - conviction of a relevant offence - without conditions"
                         },
                         new
                         {
@@ -761,8 +732,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A14",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - serious professional incompetence - with conditions",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - serious professional incompetence - with conditions"
                         },
                         new
                         {
@@ -771,8 +741,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A6",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - serious professional incompetence - without conditions",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - serious professional incompetence - without conditions"
                         },
                         new
                         {
@@ -781,8 +750,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A13",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - unacceptable professional conduct - with conditions",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - unacceptable professional conduct - with conditions"
                         },
                         new
                         {
@@ -791,8 +759,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A2",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - unacceptable professional conduct - without conditions",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - unacceptable professional conduct - without conditions"
                         },
                         new
                         {
@@ -801,8 +768,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A24",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - with conditions - (arising from breach of previous condition(s))",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - with conditions - (arising from breach of previous condition(s))"
                         },
                         new
                         {
@@ -811,8 +777,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "A23",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Suspension order - without conditions - (arising from breach of previous condition(s))",
-                            ProhibitionLevel = 2
+                            Name = "Suspension order - without conditions - (arising from breach of previous condition(s))"
                         },
                         new
                         {
@@ -821,8 +786,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "B1",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Barring by the Secretary of State",
-                            ProhibitionLevel = 1
+                            Name = "Barring by the Secretary of State"
                         },
                         new
                         {
@@ -831,8 +795,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "G2",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Formerly barred by the Independent Safeguarding Authority",
-                            ProhibitionLevel = 1
+                            Name = "Formerly barred by the Independent Safeguarding Authority"
                         },
                         new
                         {
@@ -841,8 +804,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "B6",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Formerly on List 99",
-                            ProhibitionLevel = 1
+                            Name = "Formerly on List 99"
                         },
                         new
                         {
@@ -852,8 +814,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T2",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Interim prohibition by the Secretary of State",
-                            ProhibitionLevel = 1
+                            Name = "Interim prohibition by the Secretary of State"
                         },
                         new
                         {
@@ -863,8 +824,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T1",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Prohibition by the Secretary of State - misconduct",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition by the Secretary of State - misconduct"
                         },
                         new
                         {
@@ -873,8 +833,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "B3",
                             InternalOnly = false,
                             IsActive = false,
-                            Name = "Prohibited by an Independent Schools Tribunal or Secretary of State",
-                            ProhibitionLevel = 1
+                            Name = "Prohibited by an Independent Schools Tribunal or Secretary of State"
                         },
                         new
                         {
@@ -884,8 +843,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T3",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Prohibition by the Secretary of State - deregistered by GTC Scotland",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition by the Secretary of State - deregistered by GTC Scotland"
                         },
                         new
                         {
@@ -895,8 +853,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T5",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Prohibition by the Secretary of State - refer to GTC Northern Ireland",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition by the Secretary of State - refer to GTC Northern Ireland"
                         },
                         new
                         {
@@ -906,8 +863,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T4",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Prohibition by the Secretary of State - refer to the Education Workforce Council, Wales",
-                            ProhibitionLevel = 1
+                            Name = "Prohibition by the Secretary of State - refer to the Education Workforce Council, Wales"
                         },
                         new
                         {
@@ -917,8 +873,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "G1",
                             InternalOnly = true,
                             IsActive = true,
-                            Name = "A possible matching record was found. Please contact the DBS before employing this person",
-                            ProhibitionLevel = 1
+                            Name = "A possible matching record was found. Please contact the DBS before employing this person"
                         },
                         new
                         {
@@ -927,8 +882,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "B2B",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Restricted by the Secretary of State - Not Permitted to work as teacher",
-                            ProhibitionLevel = 1
+                            Name = "Restricted by the Secretary of State - Not Permitted to work as teacher"
                         },
                         new
                         {
@@ -937,8 +891,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "B2A",
                             InternalOnly = true,
                             IsActive = false,
-                            Name = "Restricted by the Secretary of State - Permitted to work as teacher",
-                            ProhibitionLevel = 1
+                            Name = "Restricted by the Secretary of State - Permitted to work as teacher"
                         },
                         new
                         {
@@ -948,8 +901,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T7",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Section 128 barring direction",
-                            ProhibitionLevel = 4
+                            Name = "Section 128 barring direction"
                         },
                         new
                         {
@@ -959,8 +911,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             DqtSanctionCode = "T6",
                             InternalOnly = false,
                             IsActive = true,
-                            Name = "Secretary of State decision - no prohibition",
-                            ProhibitionLevel = 0
+                            Name = "Secretary of State decision - no prohibition"
                         });
                 });
 
@@ -1631,6 +1582,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             CitizenNames = "Honduran",
                             Name = "Honduras",
                             OfficialName = "The Republic of Honduras"
+                        },
+                        new
+                        {
+                            CountryId = "HK",
+                            CitizenNames = "Hongkonger or Cantonese",
+                            Name = "Hong Kong",
+                            OfficialName = "Hong Kong Special Administrative Region of the People's Republic of China"
                         },
                         new
                         {
@@ -2824,6 +2782,50 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         });
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Email", b =>
+                {
+                    b.Property<Guid>("EmailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("email_id");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("email_address");
+
+                    b.Property<string>("EmailReplyToId")
+                        .HasMaxLength(36)
+                        .HasColumnType("character varying(36)")
+                        .HasColumnName("email_reply_to_id");
+
+                    b.Property<string>("Metadata")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("metadata");
+
+                    b.Property<string>("Personalization")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("personalization");
+
+                    b.Property<DateTime?>("SentOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_on");
+
+                    b.Property<string>("TemplateId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("character varying(36)")
+                        .HasColumnName("template_id");
+
+                    b.HasKey("EmailId")
+                        .HasName("pk_emails");
+
+                    b.ToTable("emails", (string)null);
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EntityChangesJournal", b =>
                 {
                     b.Property<string>("Key")
@@ -3054,11 +3056,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("inserted");
 
-                    b.Property<string>("Key")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("key");
-
                     b.Property<string>("Payload")
                         .IsRequired()
                         .HasColumnType("jsonb")
@@ -3067,6 +3064,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<Guid?>("PersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
+
+                    b.PrimitiveCollection<Guid[]>("PersonIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("person_ids");
 
                     b.Property<bool>("Published")
                         .HasColumnType("boolean")
@@ -3079,20 +3081,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasKey("EventId")
                         .HasName("pk_events");
 
-                    b.HasIndex("Key")
-                        .IsUnique()
-                        .HasDatabaseName("ix_events_key")
-                        .HasFilter("key is not null");
-
-                    b.HasIndex("Payload")
-                        .HasDatabaseName("ix_events_payload");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Payload"), "gin");
-
-                    b.HasIndex("AlertId", "EventName")
-                        .HasDatabaseName("ix_events_alert_id_event_name")
-                        .HasFilter("alert_id is not null");
-
                     b.HasIndex("EventName", "Created")
                         .HasDatabaseName("ix_events_event_name_created")
                         .HasAnnotation("Npgsql:CreatedConcurrently", true);
@@ -3101,9 +3089,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_events_person_id_event_name")
                         .HasFilter("person_id is not null");
 
-                    b.HasIndex("QualificationId", "EventName")
-                        .HasDatabaseName("ix_events_qualification_id_event_name")
-                        .HasFilter("qualification_id is not null");
+                    b.HasIndex("PersonIds", "EventName")
+                        .HasDatabaseName("ix_events_person_ids")
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds", "EventName"), "gin");
 
                     b.ToTable("events", (string)null);
                 });
@@ -3172,6 +3162,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
+                    b.HasIndex("Trn")
+                        .HasDatabaseName("ix_eyts_awarded_emails_job_items_trn");
+
                     b.ToTable("eyts_awarded_emails_job_items", (string)null);
                 });
 
@@ -3182,13 +3175,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("induction_completed_emails_job_id");
 
-                    b.Property<DateTime>("AwardedToUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("awarded_to_utc");
-
                     b.Property<DateTime>("ExecutedUtc")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("executed_utc");
+
+                    b.Property<DateTime>("PassedEndUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("passed_end_utc");
 
                     b.HasKey("InductionCompletedEmailsJobId")
                         .HasName("pk_induction_completed_emails_jobs");
@@ -3238,6 +3231,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_induction_completed_emails_job_items_personalization");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
+
+                    b.HasIndex("Trn")
+                        .HasDatabaseName("ix_induction_completed_emails_job_items_trn");
 
                     b.ToTable("induction_completed_emails_job_items", (string)null);
                 });
@@ -3410,6 +3406,61 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         });
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.InductionStatusInfo", b =>
+                {
+                    b.Property<int>("InductionStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("induction_status");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("InductionStatus")
+                        .HasName("pk_induction_statuses");
+
+                    b.ToTable("induction_statuses", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            InductionStatus = 0,
+                            Name = "none"
+                        },
+                        new
+                        {
+                            InductionStatus = 1,
+                            Name = "required to complete"
+                        },
+                        new
+                        {
+                            InductionStatus = 2,
+                            Name = "exempt"
+                        },
+                        new
+                        {
+                            InductionStatus = 3,
+                            Name = "in progress"
+                        },
+                        new
+                        {
+                            InductionStatus = 4,
+                            Name = "passed"
+                        },
+                        new
+                        {
+                            InductionStatus = 5,
+                            Name = "failed"
+                        },
+                        new
+                        {
+                            InductionStatus = 6,
+                            Name = "failed in Wales"
+                        });
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransaction", b =>
                 {
                     b.Property<long>("IntegrationTransactionId")
@@ -3480,11 +3531,15 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(3000)")
                         .HasColumnName("failure_message");
 
+                    b.Property<bool?>("HasActiveAlert")
+                        .HasColumnType("boolean")
+                        .HasColumnName("has_active_alert");
+
                     b.Property<long?>("IntegrationTransactionId")
                         .HasColumnType("bigint")
                         .HasColumnName("integration_transaction_id");
 
-                    b.Property<Guid>("PersonId")
+                    b.Property<Guid?>("PersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
@@ -3566,6 +3621,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_international_qts_awarded_emails_job_items_personalization");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
+
+                    b.HasIndex("Trn")
+                        .HasDatabaseName("ix_international_qts_awarded_emails_job_items_trn");
 
                     b.ToTable("international_qts_awarded_emails_job_items", (string)null);
                 });
@@ -3731,7 +3789,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("name")
                         .UseCollation("case_insensitive");
 
-                    b.Property<string[]>("Synonyms")
+                    b.PrimitiveCollection<string[]>("Synonyms")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("synonyms")
@@ -3754,6 +3812,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("note_id");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
                     b.Property<string>("ContentHtml")
                         .HasColumnType("text")
                         .HasColumnName("content_html");
@@ -3766,13 +3828,17 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("created_by_dqt_user_name");
 
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_user_id");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
-                    b.Property<string>("FileName")
-                        .HasColumnType("text")
-                        .HasColumnName("file_name");
+                    b.Property<Guid?>("FileId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("file_id");
 
                     b.Property<string>("OriginalFileName")
                         .HasColumnType("text")
@@ -3796,6 +3862,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasKey("NoteId")
                         .HasName("pk_notes");
+
+                    b.HasIndex("PersonId")
+                        .HasDatabaseName("ix_notes_person_id")
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
 
                     b.ToTable("notes", (string)null);
                 });
@@ -3895,6 +3965,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
+                    b.Property<bool>("AllowDetailsUpdatesFromSourceApplication")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allow_details_updates_from_source_application");
+
                     b.Property<DateTime?>("CpdInductionCpdModifiedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cpd_induction_cpd_modified_on");
@@ -3907,6 +3981,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cpd_induction_modified_on");
 
+                    b.Property<bool>("CreatedByTps")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("created_by_tps");
+
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
@@ -3915,9 +3995,17 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("date")
                         .HasColumnName("date_of_birth");
 
+                    b.Property<DateOnly?>("DateOfDeath")
+                        .HasColumnType("date")
+                        .HasColumnName("date_of_death");
+
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_on");
+
+                    b.Property<bool>("DqtAllowTeacherIdentitySignInWithProhibitions")
+                        .HasColumnType("boolean")
+                        .HasColumnName("dqt_allow_teacher_identity_sign_in_with_prohibitions");
 
                     b.Property<Guid?>("DqtContactId")
                         .HasColumnType("uuid")
@@ -3986,6 +4074,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("first_name")
                         .UseCollation("case_insensitive");
 
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer")
+                        .HasColumnName("gender");
+
                     b.Property<bool>("HasEyps")
                         .HasColumnType("boolean")
                         .HasColumnName("has_eyps");
@@ -3998,7 +4090,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("induction_exempt_without_reason");
 
-                    b.Property<Guid[]>("InductionExemptionReasonIds")
+                    b.PrimitiveCollection<Guid[]>("InductionExemptionReasonIds")
                         .IsRequired()
                         .HasColumnType("uuid[]")
                         .HasColumnName("induction_exemption_reason_ids");
@@ -4039,11 +4131,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("middle_name")
                         .UseCollation("case_insensitive");
 
-                    b.Property<string>("MobileNumber")
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)")
-                        .HasColumnName("mobile_number");
-
                     b.Property<string>("NationalInsuranceNumber")
                         .HasMaxLength(9)
                         .HasColumnType("character(9)")
@@ -4062,6 +4149,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("date")
                         .HasColumnName("qts_date");
 
+                    b.Property<Guid?>("SourceApplicationUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_application_user_id");
+
+                    b.Property<string>("SourceTrnRequestId")
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("source_trn_request_id");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer")
                         .HasColumnName("status");
@@ -4075,6 +4170,21 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
+
+                    b.PrimitiveCollection<string[]>("last_names")
+                        .HasColumnType("varchar[]")
+                        .HasColumnName("last_names")
+                        .UseCollation("case_insensitive");
+
+                    b.PrimitiveCollection<string[]>("names")
+                        .HasColumnType("varchar[]")
+                        .HasColumnName("names")
+                        .UseCollation("case_insensitive");
+
+                    b.PrimitiveCollection<string[]>("national_insurance_numbers")
+                        .HasColumnType("varchar[]")
+                        .HasColumnName("national_insurance_numbers")
+                        .UseCollation("case_insensitive");
 
                     b.HasKey("PersonId")
                         .HasName("pk_persons");
@@ -4092,6 +4202,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_persons_trn")
                         .HasFilter("trn is not null");
+
+                    b.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers")
+                        .HasDatabaseName("ix_persons_trn_date_of_birth_email_address_names_last_names_na")
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers"), "GIN");
+                    NpgsqlIndexBuilderExtensions.UseCollation(b.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers"), new[] { "case_insensitive" });
 
                     b.ToTable("persons", (string)null);
                 });
@@ -4129,7 +4246,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
-                    b.Property<string[]>("Tags")
+                    b.PrimitiveCollection<string[]>("Tags")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("tags");
@@ -4153,13 +4270,21 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("previous_name_id");
 
-                    b.Property<DateTime?>("CreatedOn")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_on");
+
+                    b.Property<Guid?>("DqtAuditId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dqt_audit_id");
+
+                    b.PrimitiveCollection<Guid[]>("DqtPreviousNameIds")
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("dqt_previous_name_ids");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -4186,7 +4311,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
-                    b.Property<DateTime?>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
@@ -4197,6 +4322,90 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_previous_names_person_id");
 
                     b.ToTable("previous_names", (string)null);
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Process", b =>
+                {
+                    b.Property<Guid>("ProcessId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("process_id");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<Guid?>("DqtUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dqt_user_id");
+
+                    b.Property<string>("DqtUserName")
+                        .HasColumnType("text")
+                        .HasColumnName("dqt_user_name");
+
+                    b.PrimitiveCollection<HashSet<Guid>>("PersonIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("person_ids");
+
+                    b.Property<int>("ProcessType")
+                        .HasColumnType("integer")
+                        .HasColumnName("process_type");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("ProcessId")
+                        .HasName("pk_processes");
+
+                    b.HasIndex("PersonIds")
+                        .HasDatabaseName("ix_processes_person_ids");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds"), "GIN");
+
+                    b.HasIndex("ProcessType")
+                        .HasDatabaseName("ix_processes_process_type");
+
+                    b.ToTable("processes", (string)null);
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ProcessEvent", b =>
+                {
+                    b.Property<Guid>("ProcessEventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("process_event_id");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("event_name");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.PrimitiveCollection<Guid[]>("PersonIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("person_ids");
+
+                    b.Property<Guid>("ProcessId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("process_id");
+
+                    b.HasKey("ProcessEventId")
+                        .HasName("pk_process_events");
+
+                    b.HasIndex("PersonIds")
+                        .HasDatabaseName("ix_process_events_person_ids");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("PersonIds"), "GIN");
+
+                    b.ToTable("process_events", (string)null);
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.QtsAwardedEmailsJob", b =>
@@ -4263,6 +4472,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
+                    b.HasIndex("Trn")
+                        .HasDatabaseName("ix_qts_awarded_emails_job_items_trn");
+
                     b.ToTable("qts_awarded_emails_job_items", (string)null);
                 });
 
@@ -4304,6 +4516,352 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasDiscriminator<int>("QualificationType");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteMigrationReportItem", b =>
+                {
+                    b.Property<Guid>("RouteMigrationReportItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("route_migration_report_item_id");
+
+                    b.Property<int>("ContactIttRowCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("contact_itt_row_count");
+
+                    b.Property<int>("ContactQtsRowCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("contact_qts_row_count");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<Guid?>("DegreeTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("degree_type_id");
+
+                    b.Property<string>("DegreeTypeName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("degree_type_name");
+
+                    b.Property<string>("DqtAgeRangeFrom")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_age_range_from");
+
+                    b.Property<string>("DqtAgeRangeTo")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_age_range_to");
+
+                    b.Property<string>("DqtEarlyYearsStatusName")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)")
+                        .HasColumnName("dqt_early_years_status_name");
+
+                    b.Property<string>("DqtEarlyYearsStatusValue")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_early_years_status_value");
+
+                    b.Property<DateOnly?>("DqtEytsDate")
+                        .HasColumnType("date")
+                        .HasColumnName("dqt_eyts_date");
+
+                    b.Property<Guid?>("DqtInitialTeacherTrainingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dqt_initial_teacher_training_id");
+
+                    b.Property<string>("DqtIttCountryName")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("dqt_itt_country_name");
+
+                    b.Property<string>("DqtIttCountryValue")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_itt_country_value");
+
+                    b.Property<DateOnly?>("DqtIttProgrammeEndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("dqt_itt_programme_end_date");
+
+                    b.Property<DateOnly?>("DqtIttProgrammeStartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("dqt_itt_programme_start_date");
+
+                    b.Property<string>("DqtIttProgrammeType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("dqt_itt_programme_type");
+
+                    b.Property<Guid?>("DqtIttProviderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dqt_itt_provider_id");
+
+                    b.Property<string>("DqtIttProviderName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("dqt_itt_provider_name");
+
+                    b.Property<string>("DqtIttProviderUkprn")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_itt_provider_ukprn");
+
+                    b.Property<string>("DqtIttQualificationName")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("dqt_itt_qualification_name");
+
+                    b.Property<string>("DqtIttQualificationValue")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_itt_qualification_value");
+
+                    b.Property<string>("DqtIttResult")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("dqt_itt_result");
+
+                    b.Property<string>("DqtIttSlugId")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("dqt_itt_slug_id");
+
+                    b.Property<string>("DqtIttSubject1Name")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("dqt_itt_subject1_name");
+
+                    b.Property<string>("DqtIttSubject1Value")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_itt_subject1_value");
+
+                    b.Property<string>("DqtIttSubject2Name")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("dqt_itt_subject2_name");
+
+                    b.Property<string>("DqtIttSubject2Value")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_itt_subject2_value");
+
+                    b.Property<string>("DqtIttSubject3Name")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("dqt_itt_subject3_name");
+
+                    b.Property<string>("DqtIttSubject3Value")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_itt_subject3_value");
+
+                    b.Property<DateOnly?>("DqtPartialRecognitionDate")
+                        .HasColumnType("date")
+                        .HasColumnName("dqt_partial_recognition_date");
+
+                    b.Property<DateOnly?>("DqtQtlsDate")
+                        .HasColumnType("date")
+                        .HasColumnName("dqt_qtls_date");
+
+                    b.Property<bool?>("DqtQtlsDateHasBeenSet")
+                        .HasColumnType("boolean")
+                        .HasColumnName("dqt_qtls_date_has_been_set");
+
+                    b.Property<DateOnly?>("DqtQtsDate")
+                        .HasColumnType("date")
+                        .HasColumnName("dqt_qts_date");
+
+                    b.Property<Guid?>("DqtQtsRegistrationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dqt_qts_registration_id");
+
+                    b.Property<string>("DqtTeacherStatusName")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)")
+                        .HasColumnName("dqt_teacher_status_name");
+
+                    b.Property<string>("DqtTeacherStatusValue")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("dqt_teacher_status_value");
+
+                    b.Property<bool?>("ExemptFromInduction")
+                        .HasColumnType("boolean")
+                        .HasColumnName("exempt_from_induction");
+
+                    b.Property<bool?>("ExemptFromInductionDueToQtsDate")
+                        .HasColumnType("boolean")
+                        .HasColumnName("exempt_from_induction_due_to_qts_date");
+
+                    b.Property<DateOnly?>("HoldsFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("holds_from");
+
+                    b.PrimitiveCollection<Guid[]>("InductionExemptionReasonIdsMovedFromPerson")
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("induction_exemption_reason_ids_moved_from_person");
+
+                    b.Property<Guid?>("IttQualificationDerivedRouteToProfessionalStatusTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("itt_qualification_derived_route_to_professional_status_type_id");
+
+                    b.Property<string>("IttQualificationDerivedRouteToProfessionalStatusTypeName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("itt_qualification_derived_route_to_professional_status_type_name");
+
+                    b.Property<bool>("Migrated")
+                        .HasColumnType("boolean")
+                        .HasColumnName("migrated");
+
+                    b.PrimitiveCollection<Guid[]>("MultiplePotentialCompatibleIttRecords")
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("multiple_potential_compatible_itt_records");
+
+                    b.Property<string>("NotMigratedReason")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("not_migrated_reason");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("person_id");
+
+                    b.Property<Guid?>("ProgrammeTypeDerivedRouteToProfessionalStatusTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("programme_type_derived_route_to_professional_status_type_id");
+
+                    b.Property<string>("ProgrammeTypeDerivedRouteToProfessionalStatusTypeName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("programme_type_derived_route_to_professional_status_type_name");
+
+                    b.Property<Guid?>("RouteToProfessionalStatusTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("route_to_professional_status_type_id");
+
+                    b.Property<string>("RouteToProfessionalStatusTypeName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("route_to_professional_status_type_name");
+
+                    b.Property<string>("SourceApplicationReference")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("source_application_reference");
+
+                    b.Property<Guid?>("SourceApplicationUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_application_user_id");
+
+                    b.Property<string>("SourceApplicationUserShortName")
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("source_application_user_short_name");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid?>("StatusDerivedRouteToProfessionalStatusTypeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("status_derived_route_to_professional_status_type_id");
+
+                    b.Property<string>("StatusDerivedRouteToProfessionalStatusTypeName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("status_derived_route_to_professional_status_type_name");
+
+                    b.Property<int?>("TrainingAgeSpecialismRangeFrom")
+                        .HasColumnType("integer")
+                        .HasColumnName("training_age_specialism_range_from");
+
+                    b.Property<int?>("TrainingAgeSpecialismRangeTo")
+                        .HasColumnType("integer")
+                        .HasColumnName("training_age_specialism_range_to");
+
+                    b.Property<string>("TrainingAgeSpecialismType")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("training_age_specialism_type");
+
+                    b.Property<string>("TrainingCountryId")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("training_country_id");
+
+                    b.Property<string>("TrainingCountryName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("training_country_name");
+
+                    b.Property<DateOnly?>("TrainingEndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("training_end_date");
+
+                    b.Property<Guid?>("TrainingProviderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("training_provider_id");
+
+                    b.Property<string>("TrainingProviderName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("training_provider_name");
+
+                    b.Property<string>("TrainingProviderUkprn")
+                        .HasMaxLength(8)
+                        .HasColumnType("character(8)")
+                        .HasColumnName("training_provider_ukprn")
+                        .IsFixedLength();
+
+                    b.Property<DateOnly?>("TrainingStartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("training_start_date");
+
+                    b.Property<string>("TrainingSubject1Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("training_subject1_name");
+
+                    b.Property<string>("TrainingSubject1Reference")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("training_subject1_reference");
+
+                    b.Property<string>("TrainingSubject2Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("training_subject2_name");
+
+                    b.Property<string>("TrainingSubject2Reference")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("training_subject2_reference");
+
+                    b.Property<string>("TrainingSubject3Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("training_subject3_name");
+
+                    b.Property<string>("TrainingSubject3Reference")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("training_subject3_reference");
+
+                    b.HasKey("RouteMigrationReportItemId")
+                        .HasName("pk_route_migration_report_items");
+
+                    b.HasIndex("PersonId")
+                        .HasDatabaseName("ix_route_migration_report_items_person_id");
+
+                    b.ToTable("route_migration_report_items", (string)null);
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatusType", b =>
@@ -4383,7 +4941,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
-                            Name = "Apply for QTS",
+                            Name = "Apply for Qualified Teacher Status in England",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
@@ -4399,13 +4957,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "Apprenticeship",
+                            Name = "Postgraduate Teaching Apprenticeship",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4415,13 +4973,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "Assessment Only Route",
+                            Name = "Assessment Only",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4447,7 +5005,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = false,
-                            Name = "Core - Core Programme Type",
+                            Name = "Core",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
@@ -4499,9 +5057,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4515,9 +5073,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4531,9 +5089,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4547,9 +5105,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4563,9 +5121,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4620,7 +5178,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         {
                             RouteToProfessionalStatusTypeId = new Guid("8f5c0431-d006-4eda-9336-16dfc6a26a78"),
                             DegreeTypeRequired = 0,
-                            HoldsFromRequired = 1,
+                            HoldsFromRequired = 2,
                             InductionExemptionRequired = 0,
                             IsActive = false,
                             Name = "EYPS",
@@ -4636,7 +5194,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         {
                             RouteToProfessionalStatusTypeId = new Guid("eba0b7ae-cbce-44d5-a56f-988d69b03001"),
                             DegreeTypeRequired = 0,
-                            HoldsFromRequired = 1,
+                            HoldsFromRequired = 2,
                             InductionExemptionRequired = 2,
                             IsActive = false,
                             Name = "EYPS ITT Migrated",
@@ -4656,7 +5214,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = false,
                             Name = "EYTS ITT Migrated",
-                            ProfessionalStatusType = 2,
+                            ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -4691,9 +5249,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4707,9 +5265,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4751,13 +5309,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "HEI - HEI Programme Type",
+                            Name = "HEI",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4787,9 +5345,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4803,9 +5361,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4960,7 +5518,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
-                            Name = "NI R",
+                            Name = "Northern Irish Recognition",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
@@ -5076,9 +5634,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5092,9 +5650,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5108,9 +5666,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5156,9 +5714,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5172,9 +5730,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5190,7 +5748,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 2,
-                            TrainingProviderRequired = 1,
+                            TrainingProviderRequired = 0,
                             TrainingStartDateRequired = 2,
                             TrainingSubjectsRequired = 0
                         },
@@ -5237,9 +5795,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5253,9 +5811,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5269,9 +5827,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5282,7 +5840,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("a112e691-1694-46a7-8f33-5ec5b845c181"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
-                            Name = "Scotland R",
+                            Name = "Scottish Recognition",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
@@ -5334,9 +5892,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5382,9 +5940,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 1,
+                            TrainingEndDateRequired = 0,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 1,
+                            TrainingStartDateRequired = 0,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5394,7 +5952,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "Welsh R",
+                            Name = "Welsh Recognition",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
@@ -5402,6 +5960,38 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             TrainingProviderRequired = 2,
                             TrainingStartDateRequired = 2,
                             TrainingSubjectsRequired = 0
+                        },
+                        new
+                        {
+                            RouteToProfessionalStatusTypeId = new Guid("11b66de5-4670-4c82-86aa-20e42df723b7"),
+                            DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
+                            InductionExemptionRequired = 2,
+                            IsActive = true,
+                            Name = "Early Years Teacher Degree Apprenticeship",
+                            ProfessionalStatusType = 1,
+                            TrainingAgeSpecialismTypeRequired = 1,
+                            TrainingCountryRequired = 1,
+                            TrainingEndDateRequired = 0,
+                            TrainingProviderRequired = 0,
+                            TrainingStartDateRequired = 0,
+                            TrainingSubjectsRequired = 1
+                        },
+                        new
+                        {
+                            RouteToProfessionalStatusTypeId = new Guid("5d4c01c1-0841-4306-b49c-48ad6499fdc0"),
+                            DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
+                            InductionExemptionRequired = 2,
+                            IsActive = true,
+                            Name = "Teacher Degree Apprenticeship",
+                            ProfessionalStatusType = 0,
+                            TrainingAgeSpecialismTypeRequired = 1,
+                            TrainingCountryRequired = 1,
+                            TrainingEndDateRequired = 0,
+                            TrainingProviderRequired = 0,
+                            TrainingStartDateRequired = 0,
+                            TrainingSubjectsRequired = 1
                         });
                 });
 
@@ -5416,8 +6006,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("data");
+
                     b.Property<string>("OneLoginUserSubject")
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("text")
                         .HasColumnName("one_login_user_subject");
 
                     b.Property<Guid?>("PersonId")
@@ -5444,11 +6039,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
-                    b.Property<JsonDocument>("_data")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("data");
-
                     b.HasKey("SupportTaskReference")
                         .HasName("pk_support_tasks");
 
@@ -5459,6 +6049,61 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_support_tasks_person_id");
 
                     b.ToTable("support_tasks", (string)null);
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.SupportTaskTypeInfo", b =>
+                {
+                    b.Property<int>("SupportTaskType")
+                        .HasColumnType("integer")
+                        .HasColumnName("support_task_type");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("SupportTaskType")
+                        .HasName("pk_support_task_types");
+
+                    b.ToTable("support_task_types", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            SupportTaskType = 3,
+                            Name = "change date of birth request"
+                        },
+                        new
+                        {
+                            SupportTaskType = 2,
+                            Name = "change name request"
+                        },
+                        new
+                        {
+                            SupportTaskType = 1,
+                            Name = "connect GOV.UK One Login user to a teaching record"
+                        },
+                        new
+                        {
+                            SupportTaskType = 6,
+                            Name = "manual checks needed"
+                        },
+                        new
+                        {
+                            SupportTaskType = 7,
+                            Name = "teacher pensions potential duplicate"
+                        },
+                        new
+                        {
+                            SupportTaskType = 4,
+                            Name = "TRN request from API"
+                        },
+                        new
+                        {
+                            SupportTaskType = 5,
+                            Name = "TRN request from NPQ"
+                        });
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TpsCsvExtract", b =>
@@ -16906,7 +17551,1774 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             IsActive = false,
                             Name = "Youth & Community Studies",
                             Reference = "L5206"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("e68cd222-b101-4fcd-b023-f513dc7e11b7"),
+                            IsActive = false,
+                            Name = "Academic Studies In Education",
+                            Reference = "X8830"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("658abc1e-d723-430f-aa72-3d79cc53b9d0"),
+                            IsActive = false,
+                            Name = "Accountancy",
+                            Reference = "N4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8101c1fe-06c7-4fe9-9771-6a0a4457b5d6"),
+                            IsActive = false,
+                            Name = "Accounting",
+                            Reference = "N4001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b1dccac7-ed0c-4e0f-ba2e-6450e0de287e"),
+                            IsActive = false,
+                            Name = "Advanced Study Of Early Years",
+                            Reference = "X900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("7667249e-1128-4d23-8e33-f0ba582b9245"),
+                            IsActive = false,
+                            Name = "Agriculture",
+                            Reference = "D2000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("57b5a78f-71e0-4f85-81c7-0d9e51c4261b"),
+                            IsActive = false,
+                            Name = "American Studies",
+                            Reference = "Q4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("67d5028a-1f6d-4b29-bf13-7db7f01d7f10"),
+                            IsActive = false,
+                            Name = "Ancient History",
+                            Reference = "V1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("2d1a3209-2e2b-45a3-9c15-1da3991075e2"),
+                            IsActive = false,
+                            Name = "Ancient language studies not elsewhere classified",
+                            Reference = "Q490"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("435b8cf2-a928-4462-aeb2-85a8314e4a8b"),
+                            IsActive = false,
+                            Name = "Animal Science",
+                            Reference = "D2200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("11910b21-f4d9-4211-a895-a158e2055d1f"),
+                            IsActive = false,
+                            Name = "Anthropology",
+                            Reference = "L6000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("784f5fc8-c4fd-4b20-9665-a2f5ed98fa5b"),
+                            IsActive = false,
+                            Name = "Applied Art and Design",
+                            Reference = "W990"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3e07d15f-be5c-440c-97dd-665fbca8d92a"),
+                            IsActive = false,
+                            Name = "Applied Biology",
+                            Reference = "C110"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8618d636-62a3-484b-af8e-34b0853a9595"),
+                            IsActive = false,
+                            Name = "Applied Business",
+                            Reference = "N190"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("695d5a9a-3caf-4547-9097-a3e298dd0b00"),
+                            IsActive = false,
+                            Name = "Applied Chemistry",
+                            Reference = "F110"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("13ac0aca-e015-4f48-a6e3-ddba998caa0f"),
+                            IsActive = false,
+                            Name = "Applied ICT",
+                            Reference = "I900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8343aab3-e5bf-468c-8f3b-7cb1a6c92cf7"),
+                            IsActive = false,
+                            Name = "Applied Linguistics",
+                            Reference = "Q1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("268239ce-58a9-4e93-9d1d-6dfe70f597fa"),
+                            IsActive = false,
+                            Name = "Applied Mathematics",
+                            Reference = "G1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("c1e22bb8-533a-4689-8537-0a09b09d0aaa"),
+                            IsActive = false,
+                            Name = "Applied Physics",
+                            Reference = "F310"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9f3ac919-3a14-4616-9117-0bc5d5c90fbc"),
+                            IsActive = false,
+                            Name = "Applied Psychology",
+                            Reference = "C8100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1ef74550-5ca3-4b8d-864e-df3214a6187a"),
+                            IsActive = false,
+                            Name = "Applied Social Science",
+                            Reference = "L5001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("07526651-460a-49e4-be71-23d65e5c6ba1"),
+                            IsActive = false,
+                            Name = "Archaeology",
+                            Reference = "V6000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ce63a226-e135-4e7e-951c-53bffc456ef7"),
+                            IsActive = false,
+                            Name = "Archive Studies",
+                            Reference = "P1600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("eea5b18c-8165-4b32-87d9-ff93755609f6"),
+                            IsActive = false,
+                            Name = "Art",
+                            Reference = "W900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("15e98c51-fb05-4acf-a89f-c7a32ea8d77d"),
+                            IsActive = false,
+                            Name = "Audiology",
+                            Reference = "B6000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("348312fe-b121-42cd-b176-04810fb7b6c5"),
+                            IsActive = false,
+                            Name = "Bacteriology",
+                            Reference = "C5000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b7e5969a-e774-407b-a5b0-c7a26362dfdf"),
+                            IsActive = false,
+                            Name = "Biblical Studies",
+                            Reference = "V8200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("18c68d1b-a6f8-4196-9896-f496e0e9acd1"),
+                            IsActive = false,
+                            Name = "Biochemistry",
+                            Reference = "C7000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("674b877f-875c-4bc4-a246-7f05e04b1d80"),
+                            IsActive = false,
+                            Name = "Biological Chemistry",
+                            Reference = "C7001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("308db47c-7294-4efe-8cf2-9510206234f6"),
+                            IsActive = false,
+                            Name = "Biological sciences (Combined/General Sciences)",
+                            Reference = "C900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("95ec5c7d-dd43-4f7e-9791-ee9daaa0a977"),
+                            IsActive = false,
+                            Name = "Biology",
+                            Reference = "C100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("fd7f7073-488a-4816-a1d4-336928ac62b7"),
+                            IsActive = false,
+                            Name = "Biophysical Science",
+                            Reference = "C6001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("7e1929b3-9a31-4c97-9796-263c5aeb8dff"),
+                            IsActive = false,
+                            Name = "Botany",
+                            Reference = "C2000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6d2e7516-7f58-486e-b879-5f200eaf64f8"),
+                            IsActive = false,
+                            Name = "Brazilian Studies",
+                            Reference = "R6000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("69a562cd-3220-4f2f-bece-e96a51e45032"),
+                            IsActive = false,
+                            Name = "Brewing",
+                            Reference = "J8001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a65eef4e-de3a-481e-8b0c-a2fd20201716"),
+                            IsActive = false,
+                            Name = "British History",
+                            Reference = "V1406"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("308a311e-2adf-4fc4-b776-83e8754bcbba"),
+                            IsActive = false,
+                            Name = "Building Technology",
+                            Reference = "K2100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ce889e64-a01c-4f57-8121-52356fc9e096"),
+                            IsActive = false,
+                            Name = "Business Administration",
+                            Reference = "N1200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("00ac2bfd-091b-49c1-b785-04ca973cf974"),
+                            IsActive = false,
+                            Name = "Business Economics",
+                            Reference = "L1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("4a0e49c9-0e6e-491c-8e3e-daca26954215"),
+                            IsActive = false,
+                            Name = "Business Studies",
+                            Reference = "N100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("03abaddd-e1d2-4d98-ae33-e2872e0cb488"),
+                            IsActive = false,
+                            Name = "Business, Administration and Finance",
+                            Reference = "N990"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("72afa95b-6037-465b-8891-4fa93d58c942"),
+                            IsActive = false,
+                            Name = "Byzantine History",
+                            Reference = "V1003"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("e167c3c7-cd26-42d1-9213-20a01c2e8c26"),
+                            IsActive = false,
+                            Name = "Careers Education",
+                            Reference = "L500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ba535897-21ef-4d3e-9c13-17b23c6ee4eb"),
+                            IsActive = false,
+                            Name = "Caribbean Studies",
+                            Reference = "T9001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("0807d6ed-2237-44fe-ac11-44cd70854c5c"),
+                            IsActive = false,
+                            Name = "Celtic Languages",
+                            Reference = "Q500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("231e041e-6bd2-4291-b231-6bb81c3e378c"),
+                            IsActive = false,
+                            Name = "Celtic Studies",
+                            Reference = "Q5000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("eba938fc-cd46-4032-80f6-682bf0d06c6d"),
+                            IsActive = false,
+                            Name = "Ceramics",
+                            Reference = "J3001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("971a7967-17e4-4807-9efa-57f5c57d36b8"),
+                            IsActive = false,
+                            Name = "Chemical Physics",
+                            Reference = "F3300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("7ab36e59-3c55-47e2-add4-ef1386707491"),
+                            IsActive = false,
+                            Name = "Chemistry",
+                            Reference = "F100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("dad16907-e3ef-455a-a409-4b51f92615f4"),
+                            IsActive = false,
+                            Name = "Chinese",
+                            Reference = "ZZ9002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("11fefa8c-c6bf-469b-afca-6cb9f355010d"),
+                            IsActive = false,
+                            Name = "Cinematics",
+                            Reference = "W5000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("923de12e-cb98-4aa8-9e63-8499ba0e5264"),
+                            IsActive = false,
+                            Name = "Citizenship",
+                            Reference = "L230"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("50432b25-e158-4b8c-aa22-05b423884474"),
+                            IsActive = false,
+                            Name = "Classical Greek Language",
+                            Reference = "Q710"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3e7409e6-d66a-4506-8ad3-ef9e24ba4c08"),
+                            IsActive = false,
+                            Name = "Classical Studies",
+                            Reference = "Z0031"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d47f0c82-af98-47d6-a521-839a0b9b810b"),
+                            IsActive = false,
+                            Name = "Classics",
+                            Reference = "Q800"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("74da0dee-6009-4bdb-b4a8-531c102b2949"),
+                            IsActive = false,
+                            Name = "Clinical Medicine",
+                            Reference = "A3000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9a219104-6cf5-47c0-88b4-94bcbba724c0"),
+                            IsActive = false,
+                            Name = "Combined Studies",
+                            Reference = "Y4101"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("5179e94b-3c9c-4fbb-b2ad-f4f9d67e2d89"),
+                            IsActive = false,
+                            Name = "Combined/General Science",
+                            Reference = "C000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a3f24be9-543c-4a60-8e87-1d2fbf909b7b"),
+                            IsActive = false,
+                            Name = "Combined/General Science",
+                            Reference = "F000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("14ac5701-c761-40e3-98f5-645b8e670bd3"),
+                            IsActive = false,
+                            Name = "Computer Science",
+                            Reference = "I100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a6474c68-6473-4b78-a9fc-96bb2c8531b5"),
+                            IsActive = false,
+                            Name = "Computer Science",
+                            Reference = "G5001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("feee2354-fb8a-442a-ac5d-9bc35582ce64"),
+                            IsActive = false,
+                            Name = "Computing",
+                            Reference = "G5003"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("2c5166c0-156e-4761-becf-ff1e979edd8b"),
+                            IsActive = false,
+                            Name = "Computing Science",
+                            Reference = "G5006"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("fc515e31-5e08-40f6-bf72-3aefbb5419d6"),
+                            IsActive = false,
+                            Name = "Construction and the Built Environment",
+                            Reference = "K290"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("670545e3-63f4-46af-b37d-ddfceb22e7ce"),
+                            IsActive = false,
+                            Name = "Creative and Media",
+                            Reference = "P390"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a1c4a34d-e37f-416e-8238-ebf7c1a4f88f"),
+                            IsActive = false,
+                            Name = "Criminology",
+                            Reference = "L3900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a18c817a-6e6b-46ae-b7e1-4cae51fbefe6"),
+                            IsActive = false,
+                            Name = "Cultural Studies",
+                            Reference = "L6200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("55bec1cf-3528-4bd5-94d4-8953d219c699"),
+                            IsActive = false,
+                            Name = "Dance",
+                            Reference = "W500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("730de735-5303-474d-b79a-93ec566066dd"),
+                            IsActive = false,
+                            Name = "Design and Technology",
+                            Reference = "W200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("e5e63d47-c866-4fd3-b1ef-ff2f3023e11e"),
+                            IsActive = false,
+                            Name = "Design Studies",
+                            Reference = "W2000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d24cd9b5-8134-4877-af1f-177a37bbc030"),
+                            IsActive = false,
+                            Name = "Development Studies",
+                            Reference = "M9200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("90e76e2e-3753-40d8-8f98-b9f886e3d9e0"),
+                            IsActive = false,
+                            Name = "Dietetics",
+                            Reference = "B4001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("da5c71cf-5011-452c-ac9c-e86c407b43f5"),
+                            IsActive = false,
+                            Name = "Divinity",
+                            Reference = "V8002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f797e941-4ac2-466d-b08d-1ebad9b7d178"),
+                            IsActive = false,
+                            Name = "Drama",
+                            Reference = "W400"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b6f2e64a-e6d1-4cb7-ac4d-14a463322f45"),
+                            IsActive = false,
+                            Name = "Drawing",
+                            Reference = "W1007"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("91428fec-6a8f-4bd5-9913-ebe7dff6dc31"),
+                            IsActive = false,
+                            Name = "Dutch",
+                            Reference = "T2200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3d68cafd-9943-4478-b1e5-cf04749df428"),
+                            IsActive = false,
+                            Name = "Early Years",
+                            Reference = "X110"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ed4f50d2-2780-4b13-9e19-28a82f602d31"),
+                            IsActive = false,
+                            Name = "Ecology",
+                            Reference = "C9000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("7934a041-f1f0-4cff-a28b-cc7ffdcb4ddf"),
+                            IsActive = false,
+                            Name = "Economic History",
+                            Reference = "V3000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d3d9d21f-fe99-4110-97e4-e0a8bc66880b"),
+                            IsActive = false,
+                            Name = "Economics",
+                            Reference = "L100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9db68509-e882-4b0e-8e97-a7d09e51d059"),
+                            IsActive = false,
+                            Name = "Educational Psychology",
+                            Reference = "L7500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3297cc84-ef28-459e-a677-98aeab40d6e2"),
+                            IsActive = false,
+                            Name = "Electrical Engineering",
+                            Reference = "H5000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6b621dd5-58fc-4e79-9c2f-a3f245cb17b9"),
+                            IsActive = false,
+                            Name = "Engineering",
+                            Reference = "H900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b79bd83b-1bfb-4bf9-8dc4-a118e1540b04"),
+                            IsActive = false,
+                            Name = "English",
+                            Reference = "Q300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("2e93acd2-bb31-489b-bd81-ae048dd3eeab"),
+                            IsActive = false,
+                            Name = "English As A Second Language",
+                            Reference = "Q3003"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("440351ce-b3c4-4741-806c-f0e90586ffaa"),
+                            IsActive = false,
+                            Name = "English As A Second Or Other Language",
+                            Reference = "Q330"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8f3f9881-03eb-4270-aab7-211b48ff1fe9"),
+                            IsActive = false,
+                            Name = "English History",
+                            Reference = "V1400"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ed4acaa0-8d31-4fd2-ad5f-4d7ae7abbe22"),
+                            IsActive = false,
+                            Name = "English Language",
+                            Reference = "Q3005"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8a52025c-5ad8-4c17-84d9-8f25a98e2007"),
+                            IsActive = false,
+                            Name = "English Literature",
+                            Reference = "Q3001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6350b867-dcd8-44e2-8aa9-5256be04c13f"),
+                            IsActive = false,
+                            Name = "English Studies",
+                            Reference = "Q3006"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("61646813-5e24-451e-9e2b-805de2577d42"),
+                            IsActive = false,
+                            Name = "Environmental and Land-based Studies",
+                            Reference = "F750"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3f8565ba-426e-49f4-948e-b87bdb8e0c95"),
+                            IsActive = false,
+                            Name = "Environmental Biology",
+                            Reference = "C1600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6617e320-3731-4f5b-b94b-da23fdb0a417"),
+                            IsActive = false,
+                            Name = "Environmental Chemistry",
+                            Reference = "F140"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("316e5ff6-2726-4e7e-b24a-3d6e724e463a"),
+                            IsActive = false,
+                            Name = "Environmental Geography",
+                            Reference = "L8003"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ee1d7f99-577b-4bce-9bf4-37e333a0302b"),
+                            IsActive = false,
+                            Name = "Environmental Science",
+                            Reference = "F9000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3e05f006-d481-4af7-98af-17ff4199f0e4"),
+                            IsActive = false,
+                            Name = "Environmental Studies",
+                            Reference = "F9002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("febe507d-ebbd-4b75-a401-442d42c3f54f"),
+                            IsActive = false,
+                            Name = "Ethics",
+                            Reference = "V7603"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("96db8451-abf0-49a6-bd18-24eb0b3731d2"),
+                            IsActive = false,
+                            Name = "European History",
+                            Reference = "V1001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d9a1e6c9-3afd-41cc-807d-ed197d03d3e3"),
+                            IsActive = false,
+                            Name = "European Studies",
+                            Reference = "T2000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d1e609da-a1b6-4c46-8665-3b9352c33734"),
+                            IsActive = false,
+                            Name = "Experimental Psychology",
+                            Reference = "C8001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3568d883-64a0-4bd0-8023-0238447fd402"),
+                            IsActive = false,
+                            Name = "Fashion",
+                            Reference = "J4601"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6cd526c4-5964-41a2-ba47-edfb69c9235f"),
+                            IsActive = false,
+                            Name = "Finance",
+                            Reference = "N3001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("65e0db6e-6a0f-4743-aa2d-8eb15270506f"),
+                            IsActive = false,
+                            Name = "Financial Management",
+                            Reference = "N3000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6177667e-a305-492f-9e56-29d8a612d731"),
+                            IsActive = false,
+                            Name = "Fine Art",
+                            Reference = "W8810"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("75298232-873d-46d4-8073-8e6f44ccdb71"),
+                            IsActive = false,
+                            Name = "Food Science",
+                            Reference = "D4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("753b54c2-2ee5-4140-9f8f-18e7affbddb9"),
+                            IsActive = false,
+                            Name = "Food Technology",
+                            Reference = "D600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d227cd41-132e-4143-a17c-40313d348af3"),
+                            IsActive = false,
+                            Name = "French",
+                            Reference = "R100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d4596df0-10aa-4eb5-9169-daaf7d83c6bd"),
+                            IsActive = false,
+                            Name = "French Literature",
+                            Reference = "R1102"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1f0500fb-526b-499b-bdbf-a528247f1605"),
+                            IsActive = false,
+                            Name = "French Studies",
+                            Reference = "Z0102"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("0238f3f2-df59-477a-970a-23d06ce921e6"),
+                            IsActive = false,
+                            Name = "Games",
+                            Reference = "X2003"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b045b29e-4748-4226-9067-df9bcfa8a4dd"),
+                            IsActive = false,
+                            Name = "General Primary",
+                            Reference = "X120"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("e9847152-9e38-4cfb-ae6e-54635d6e004a"),
+                            IsActive = false,
+                            Name = "General Science",
+                            Reference = "Y1002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6ca63e8f-bcb7-4bfc-8e1f-8e1cbe2395b7"),
+                            IsActive = false,
+                            Name = "General Studies",
+                            Reference = "Y4001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("101e02c6-4634-46ad-89b2-b9a0d3d2d425"),
+                            IsActive = false,
+                            Name = "Genetics",
+                            Reference = "C4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("36885588-cafd-477e-a57d-dd513f378c11"),
+                            IsActive = false,
+                            Name = "Geography",
+                            Reference = "L700"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("27e40a69-cd31-4b59-9734-c86a76195077"),
+                            IsActive = false,
+                            Name = "Geology",
+                            Reference = "F6000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("05168ad9-eedf-43c0-b141-e7ab26cab056"),
+                            IsActive = false,
+                            Name = "German",
+                            Reference = "R200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d63080e2-0473-4b02-aa29-9bf7c93fa9da"),
+                            IsActive = false,
+                            Name = "German Literature",
+                            Reference = "R2101"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("18c42e4a-32ad-4c46-8f47-0d533512cfbe"),
+                            IsActive = false,
+                            Name = "Graphic Design",
+                            Reference = "W2100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f3673e45-c78c-4e1b-856e-9286efff456d"),
+                            IsActive = false,
+                            Name = "Graphics",
+                            Reference = "W210"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("804f589c-ca50-495e-9195-2593f81a1a01"),
+                            IsActive = false,
+                            Name = "Health and Social Care",
+                            Reference = "L510"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("bf7d5681-1bdb-4c77-8c75-9681e835dd5c"),
+                            IsActive = false,
+                            Name = "Health Studies",
+                            Reference = "B9003"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9a60669a-f507-4548-a361-8ef1f898635d"),
+                            IsActive = false,
+                            Name = "History",
+                            Reference = "V100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1a0244d7-7c6e-475f-bea8-dd029c0f6de6"),
+                            IsActive = false,
+                            Name = "History Of Art",
+                            Reference = "V4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("4cb166c6-3467-43dc-b30d-49def64a0f22"),
+                            IsActive = false,
+                            Name = "History Of Music",
+                            Reference = "W3200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("360e84d7-f7b2-49d4-b3c0-a644cb0cd1bd"),
+                            IsActive = false,
+                            Name = "Home Economics",
+                            Reference = "N220"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f329b47b-45ed-460f-8620-3bf30916e7ae"),
+                            IsActive = false,
+                            Name = "Horticulture",
+                            Reference = "D2500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("67c3c91c-1c02-412a-897d-4b31fdef325b"),
+                            IsActive = false,
+                            Name = "Hospitality",
+                            Reference = "N862"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("53ac82df-04a9-4d66-8526-9e91a9130113"),
+                            IsActive = false,
+                            Name = "Human Biology",
+                            Reference = "B1500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("cddccad7-fe95-4f83-b1b5-bc08f9c0c394"),
+                            IsActive = false,
+                            Name = "Human Geography",
+                            Reference = "L8200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("22e1b12a-c0d1-4da9-bf52-bd26f804eda1"),
+                            IsActive = false,
+                            Name = "Human Nutrition",
+                            Reference = "B4004"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("0de7e1fd-d679-4037-b0ec-244bfeb86159"),
+                            IsActive = false,
+                            Name = "Humanities",
+                            Reference = "Z0060"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6d7b6ee6-b092-4caa-8dde-08dfca8c1252"),
+                            IsActive = false,
+                            Name = "Humanities and Restricted Specialisms",
+                            Reference = "Y000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("28d2b3ea-b6cc-4798-a3aa-bbf7deed2986"),
+                            IsActive = false,
+                            Name = "Information and Communications Technology",
+                            Reference = "G500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("88946a0d-f633-4bac-945e-c6cc2c4c45b5"),
+                            IsActive = false,
+                            Name = "Information and Communications Technology",
+                            Reference = "I200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a53281e2-b459-47f8-81ec-4045cb1838e8"),
+                            IsActive = false,
+                            Name = "Information Technology",
+                            Reference = "G5601"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ce959395-4633-4e19-b001-9a475ae67653"),
+                            IsActive = false,
+                            Name = "Inorganic Chemistry",
+                            Reference = "F1901"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("fb2a1c5c-94c5-4695-a4da-1a5adb8d2420"),
+                            IsActive = false,
+                            Name = "Institutional Management",
+                            Reference = "N7000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("54e4ab48-c2e4-43bc-801b-1c663637d6d8"),
+                            IsActive = false,
+                            Name = "Interior Design",
+                            Reference = "W2300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("cc74eb90-5bd1-4f61-8079-1ce19fdc7205"),
+                            IsActive = false,
+                            Name = "International Politics",
+                            Reference = "M1500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("119caf30-8657-4658-b6d3-f9bfa3a7bb40"),
+                            IsActive = false,
+                            Name = "Italian",
+                            Reference = "R300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("e8fa2a9d-39b4-46ec-b0b7-d0b4daa41498"),
+                            IsActive = false,
+                            Name = "Journalism",
+                            Reference = "P4500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("c2b29f64-673a-4f0b-bc34-de35c8b02f27"),
+                            IsActive = false,
+                            Name = "Latin Language",
+                            Reference = "Q610"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("c73984dd-572a-4eb1-91f7-12a6e01b9ba9"),
+                            IsActive = false,
+                            Name = "Law",
+                            Reference = "M200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("bc4b74cf-1262-49d2-9bb0-0d92482eba8b"),
+                            IsActive = false,
+                            Name = "Law",
+                            Reference = "M990"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8c7c72a7-fc62-45a8-a197-e866105008bd"),
+                            IsActive = false,
+                            Name = "Librarianship",
+                            Reference = "P1000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1c199fdc-b262-4e8e-84de-45f999c2e3a5"),
+                            IsActive = false,
+                            Name = "Life Sciences",
+                            Reference = "C9100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("89afb187-1d2b-4d41-9e0b-8e3ed17c2c0c"),
+                            IsActive = false,
+                            Name = "Linguistics",
+                            Reference = "Q1000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("17f32ee4-bf01-4d3b-979e-137d0da56884"),
+                            IsActive = false,
+                            Name = "Management Studies",
+                            Reference = "N1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("010d33db-a216-4c3e-bfb3-8c64f1126491"),
+                            IsActive = false,
+                            Name = "Manufacturing",
+                            Reference = "H700"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f51e3ba8-7844-40c3-bbd5-8d17ddf439f0"),
+                            IsActive = false,
+                            Name = "Manufacturing and Product Design",
+                            Reference = "H790"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f5a66fd5-5488-4462-8eee-6330640703d9"),
+                            IsActive = false,
+                            Name = "Marketing",
+                            Reference = "N5000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("84f721f3-12e2-4c77-93e4-9a5f785a2797"),
+                            IsActive = false,
+                            Name = "Materials",
+                            Reference = "J500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9305a485-bfc2-4c7f-9f24-6186d29b5d93"),
+                            IsActive = false,
+                            Name = "Materials Science",
+                            Reference = "F2000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b397a256-5a83-484e-ac4c-3821eba09c51"),
+                            IsActive = false,
+                            Name = "Mathematics",
+                            Reference = "G100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("c08fc7b8-2f1d-4397-b9d6-4f00715b7328"),
+                            IsActive = false,
+                            Name = "Mechanics",
+                            Reference = "F3007"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("19c96dff-0f10-4790-875e-9955c3a4aa81"),
+                            IsActive = false,
+                            Name = "Media Studies",
+                            Reference = "P300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("68740ca9-570a-4a1a-b494-94988959c3ad"),
+                            IsActive = false,
+                            Name = "Medicine",
+                            Reference = "A3002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("758fa901-b3a6-4010-93de-e5b471b6f0a6"),
+                            IsActive = false,
+                            Name = "Medieval History",
+                            Reference = "V1200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a3a755bc-c46c-4db2-bb5d-3a2f517b5ee7"),
+                            IsActive = false,
+                            Name = "Microbiology",
+                            Reference = "C5001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("86bc6c04-2318-4b56-ba2a-aa66da2a632a"),
+                            IsActive = false,
+                            Name = "Modern History",
+                            Reference = "V1300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("c4c69938-9c5c-46dc-a528-ceb6791011de"),
+                            IsActive = false,
+                            Name = "Modern Languages",
+                            Reference = "T2004"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("477b6d3a-21ff-4bb2-a1a0-2c25e1e6e338"),
+                            IsActive = false,
+                            Name = "Museum Studies",
+                            Reference = "P1500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6cbe0a30-195c-4737-9758-089f283aa65d"),
+                            IsActive = false,
+                            Name = "Music",
+                            Reference = "W300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("c3c4100a-8b46-4112-ada9-61302b436f3b"),
+                            IsActive = false,
+                            Name = "Natural Sciences",
+                            Reference = "Y1600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f5bd64ad-7941-47da-aed7-10470d49670c"),
+                            IsActive = false,
+                            Name = "Needlecraft",
+                            Reference = "W9005"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("357306a9-01e3-49ec-a84c-b988996b7794"),
+                            IsActive = false,
+                            Name = "Nutrition",
+                            Reference = "B4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("44e3757e-64ac-416d-88c0-868857dd617f"),
+                            IsActive = false,
+                            Name = "Offshore Engineering",
+                            Reference = "H3600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ddd0d723-8226-4b3a-81a7-1293474fc3c7"),
+                            IsActive = false,
+                            Name = "Other Modern Language",
+                            Reference = "R900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1a1cec9c-b20e-4a00-ab88-0db2e9955b48"),
+                            IsActive = false,
+                            Name = "Painting",
+                            Reference = "W1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("0328bf23-770a-4103-9645-e5efeb7ae8d8"),
+                            IsActive = false,
+                            Name = "Performing Arts",
+                            Reference = "W310"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3f2dcbb4-42e8-47d4-a5c1-03203be5d20a"),
+                            IsActive = false,
+                            Name = "Pharmaceutical Chemistry",
+                            Reference = "B9400"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ec16d283-cd7c-49e2-a8d0-c82c7b1ec03a"),
+                            IsActive = false,
+                            Name = "Philology",
+                            Reference = "Q1402"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6b80a66e-bbfb-4d8f-9ca7-8f5a1225ea97"),
+                            IsActive = false,
+                            Name = "Philosophy",
+                            Reference = "V7000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d2b10830-695b-48f5-ac2a-51e30f5f0af9"),
+                            IsActive = false,
+                            Name = "Phonetics",
+                            Reference = "Q1300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("443744a3-b0d6-45eb-bc4e-5d94b458936f"),
+                            IsActive = false,
+                            Name = "Photography",
+                            Reference = "W5500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b9b6c9d4-d093-4d6d-9a70-9679d019025e"),
+                            IsActive = false,
+                            Name = "Phse",
+                            Reference = "L390"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("5f85f86f-64fb-4055-8c21-99a3d33797c0"),
+                            IsActive = false,
+                            Name = "Physical Education",
+                            Reference = "C600PE"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d1c608d4-3490-41d3-914f-89deff0aab74"),
+                            IsActive = false,
+                            Name = "Physical Geography",
+                            Reference = "F8400"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("e92a3d96-7b7f-4778-8cf6-9ee96e75e4f8"),
+                            IsActive = false,
+                            Name = "Physical sciences (Combined/General Sciences)",
+                            Reference = "F900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("7b3ca799-036b-4e1f-a517-0748385b607f"),
+                            IsActive = false,
+                            Name = "Physics",
+                            Reference = "F300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6889c95d-53f7-43ab-b410-da4bb85b761b"),
+                            IsActive = false,
+                            Name = "Physics with Maths",
+                            Reference = "F390"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("c88e2d61-af9e-48a3-8d76-0b06bcdb9599"),
+                            IsActive = false,
+                            Name = "Physiology",
+                            Reference = "B1000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("edd3e60e-676c-4967-bbe4-2c0f4b14ed71"),
+                            IsActive = false,
+                            Name = "Politics",
+                            Reference = "M1000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("75d489dd-4f1a-4538-877f-ed79acdf97e0"),
+                            IsActive = false,
+                            Name = "Portuguese",
+                            Reference = "R500"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("47b75dd9-62cd-4fd3-8f74-e6f7d19b6170"),
+                            IsActive = false,
+                            Name = "Primary Foundation",
+                            Reference = "X121"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8e750d7b-7be2-495a-9196-ce1700cd7671"),
+                            IsActive = false,
+                            Name = "Printmaking",
+                            Reference = "W6700"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("af4ac22b-45fc-4940-bdea-720f744b16a0"),
+                            IsActive = false,
+                            Name = "Psycholinguistics",
+                            Reference = "Q1600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ed7ea186-a794-4439-8667-cdf2d00cb2a7"),
+                            IsActive = false,
+                            Name = "Psychology",
+                            Reference = "C800"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("d204118b-41f8-462c-875a-73012272c126"),
+                            IsActive = false,
+                            Name = "Public Services",
+                            Reference = "L430"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("0543a249-172a-4f0f-84c2-97123ca3f529"),
+                            IsActive = false,
+                            Name = "Pure Mathematics",
+                            Reference = "G1200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("95f2bd8b-1d45-463e-aa30-2b0240783a88"),
+                            IsActive = false,
+                            Name = "Recreation & leisure studies",
+                            Reference = "N870"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("a28b3011-a907-4d7d-955b-1ec13937d1a9"),
+                            IsActive = false,
+                            Name = "Rehabilitation Studies",
+                            Reference = "L3404"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("82ee964d-b2f7-4692-a98a-4acf90a6227b"),
+                            IsActive = false,
+                            Name = "Religious Education",
+                            Reference = "V600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b3ed7edc-48ed-4f47-815e-378279adef10"),
+                            IsActive = false,
+                            Name = "Religious Studies",
+                            Reference = "V8000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1dca3d18-2e0a-4584-a3ee-294238acab74"),
+                            IsActive = false,
+                            Name = "Russian",
+                            Reference = "R700"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("5b0cc7b1-4341-4706-9276-08cf8593c58c"),
+                            IsActive = false,
+                            Name = "Sculpture",
+                            Reference = "W1200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("122a7153-b2af-4ba1-9b7c-688c040f6304"),
+                            IsActive = false,
+                            Name = "Social Anthropology",
+                            Reference = "L6001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("fb0e95e8-6c93-4700-a755-1f46b95b1e72"),
+                            IsActive = false,
+                            Name = "Social Policy",
+                            Reference = "L4200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("66fc85d8-15f5-4654-8a02-84f425e7a571"),
+                            IsActive = false,
+                            Name = "Social Psychology",
+                            Reference = "L7400"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("fca2b0af-5ca1-48ee-829b-df31bb53bd5d"),
+                            IsActive = false,
+                            Name = "Social Sciences/Social Studies",
+                            Reference = "L900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("03bb41de-a5d9-43ce-8632-489a34c98762"),
+                            IsActive = false,
+                            Name = "Social Work",
+                            Reference = "L8850"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9a34ba9e-e6b0-4748-aa70-1e28ce3fd0f1"),
+                            IsActive = false,
+                            Name = "Society, Health and Development",
+                            Reference = "L990"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("db15d068-5529-4242-8f85-0c18ecba5c9f"),
+                            IsActive = false,
+                            Name = "Sociology",
+                            Reference = "L3000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f3b3f9f5-2d14-44a0-bd56-b797df3dd77c"),
+                            IsActive = false,
+                            Name = "Spanish",
+                            Reference = "R400"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("18f5ab32-b0a3-4e73-ad69-99cef9a0d2af"),
+                            IsActive = false,
+                            Name = "Special Education Needs",
+                            Reference = "X161"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("035d5c01-9ed4-43ac-be23-37f12d0c094d"),
+                            IsActive = false,
+                            Name = "Sport & exercise science",
+                            Reference = "C600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1d160a84-a129-4a17-9020-f29dbeb0c13c"),
+                            IsActive = false,
+                            Name = "Sport & exercise science not elsewhere classified",
+                            Reference = "C690"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("314f08d0-0ec4-490b-9155-bde3ef22319a"),
+                            IsActive = false,
+                            Name = "Sport and Active Leisure",
+                            Reference = "N890"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1bb69e7b-1632-4d0d-bf38-e0dc522600f6"),
+                            IsActive = false,
+                            Name = "Sports Science",
+                            Reference = "X2009"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("324e2215-43c5-49b3-a7ff-8825a6a56618"),
+                            IsActive = false,
+                            Name = "Sports Studies",
+                            Reference = "X2002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("af689ace-b7b4-450e-b970-718023470056"),
+                            IsActive = false,
+                            Name = "Statistics",
+                            Reference = "G4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("948c9092-ff5d-43f9-ad24-c81de57c9379"),
+                            IsActive = false,
+                            Name = "Textile Design",
+                            Reference = "W2200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9bf0ea21-c8e5-4ed4-b59e-6ca39c9b389b"),
+                            IsActive = false,
+                            Name = "Textiles",
+                            Reference = "J420"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9e195a7b-3d32-44d4-a889-a4ffce932cd2"),
+                            IsActive = false,
+                            Name = "Theatre Studies",
+                            Reference = "W4400"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("22f3c277-60dd-492a-8e89-910793f6b6a1"),
+                            IsActive = false,
+                            Name = "Theology",
+                            Reference = "V8001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("4ab47749-da2a-4a70-935d-7aa72c53f277"),
+                            IsActive = false,
+                            Name = "Theology and Religious Studies",
+                            Reference = "V8880"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b94f26df-8d52-47fa-a978-3a3fca9eaf06"),
+                            IsActive = false,
+                            Name = "Theoretical Physics",
+                            Reference = "F3201"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("bfa75e7f-2552-45ea-bb78-a5ea9c00310e"),
+                            IsActive = false,
+                            Name = "Training teachers - specialist",
+                            Reference = "X160"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("39ea8e94-9ee1-4132-bf0a-97cb171a3c8f"),
+                            IsActive = false,
+                            Name = "Travel and Tourism",
+                            Reference = "N800"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("0523b697-4f5e-4f81-b04d-c2618bc0b218"),
+                            IsActive = false,
+                            Name = "Urban Studies",
+                            Reference = "K4600"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("e2e7be55-7a68-41b0-8957-ff49d8a7bcc3"),
+                            IsActive = false,
+                            Name = "Visual Communication",
+                            Reference = "W1501"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("da17ea40-3fc7-45ea-9e4c-e6d056098294"),
+                            IsActive = false,
+                            Name = "Welsh",
+                            Reference = "Q560"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("10165d35-3e0d-4576-a2f1-b48bc79ac478"),
+                            IsActive = false,
+                            Name = "Welsh As A Second Language",
+                            Reference = "Q520"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("ce7d5f85-8830-4401-bd38-06a14831c799"),
+                            IsActive = false,
+                            Name = "Welsh Literature",
+                            Reference = "Q5203"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("fa645de7-8767-49c5-9fd2-5a393c914755"),
+                            IsActive = false,
+                            Name = "Welsh Studies",
+                            Reference = "Q5204"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("6cf7abc1-1f45-4f7b-a1e0-f34cb047f710"),
+                            IsActive = false,
+                            Name = "Zoology",
+                            Reference = "C3000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("9caa584a-bb89-450d-8d8d-16ba0e84e28e"),
+                            IsActive = true,
+                            Name = "Citizenship",
+                            Reference = "999001"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("649d7736-d301-4c42-873a-b24486fd35d7"),
+                            IsActive = true,
+                            Name = "Physical Education",
+                            Reference = "999002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("f3e91599-2a2e-4f81-b4e0-9098a1ce8ec7"),
+                            IsActive = true,
+                            Name = "Design and technology",
+                            Reference = "999003"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("60ce90cb-9e55-4735-8937-f0a26985b9d3"),
+                            IsActive = false,
+                            Name = "English as a second or other language",
+                            Reference = "999004"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3cdf6ac7-ef7b-4623-b140-4d3bdfd953fb"),
+                            IsActive = false,
+                            Name = "Applied Biology",
+                            Reference = "C1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("55f70db7-0d45-42b2-a4b1-694455afc9e7"),
+                            IsActive = false,
+                            Name = "Emotion and Motivation",
+                            Reference = "C8002"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("1129fa2e-16bd-4ce6-a85e-30c5544571ca"),
+                            IsActive = false,
+                            Name = "Food Technology",
+                            Reference = "D4200"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("5c89579c-a863-4092-a640-f558dc7754fb"),
+                            IsActive = false,
+                            Name = "Applied Chemistry",
+                            Reference = "F1100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("8c273472-006e-4b5c-ba54-8a343526326a"),
+                            IsActive = false,
+                            Name = "Textiles",
+                            Reference = "J4100"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("884424ab-1eeb-450d-a6e0-cf2b69fdb539"),
+                            IsActive = false,
+                            Name = "Media Studies",
+                            Reference = "P4000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("20256fc9-048f-45af-a9bb-cbc3a2653976"),
+                            IsActive = false,
+                            Name = "Portuguese",
+                            Reference = "R5000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("7fac9220-8908-4eab-a244-bc06463da525"),
+                            IsActive = false,
+                            Name = "Gujarati",
+                            Reference = "T5005"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("140251c7-4f16-4578-b09c-8a55e99dd8fa"),
+                            IsActive = false,
+                            Name = "Graphics",
+                            Reference = "W2102"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("3299f015-d343-4da4-bda3-eb52a8a84e31"),
+                            IsActive = false,
+                            Name = "Industrial Design",
+                            Reference = "W2302"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("98348fed-53ce-484f-9146-7ea03aae7b64"),
+                            IsActive = false,
+                            Name = "Performing Arts",
+                            Reference = "W4300"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("78562ea9-d848-45e1-8453-a7c28d2a3684"),
+                            IsActive = false,
+                            Name = "Psychology",
+                            Reference = "Z0058"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("b9eaf229-74de-4bb6-9122-bd6cdf82b2c0"),
+                            IsActive = false,
+                            Name = "Austrian",
+                            Reference = "ZZ9000"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("10d19613-df52-4667-8c8a-f97e90a98af0"),
+                            IsActive = false,
+                            Name = "Dummy Subject",
+                            Reference = "ZZ9999"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("18c1d74e-4b01-4ced-afb7-726b10a2c7fe"),
+                            IsActive = false,
+                            Name = "Creative and Media (Diploma)",
+                            Reference = "P900"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("0e1cfcf8-d7ae-40a9-a09b-61f369648b9e"),
+                            IsActive = false,
+                            Name = "Engineering (Diploma)",
+                            Reference = "H990"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("94e13788-d55d-4d0a-8c7a-ef6b0c94257b"),
+                            IsActive = false,
+                            Name = "Hair and Beauty",
+                            Reference = "B990"
+                        },
+                        new
+                        {
+                            TrainingSubjectId = new Guid("13a673ca-3bc4-4e7e-a8cc-0ca0da648a81"),
+                            IsActive = false,
+                            Name = "Retail Business",
+                            Reference = "N900"
                         });
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRange", b =>
+                {
+                    b.Property<int>("FromTrn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("from_trn");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FromTrn"));
+
+                    b.Property<bool>("IsExhausted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_exhausted");
+
+                    b.Property<int>("NextTrn")
+                        .HasColumnType("integer")
+                        .HasColumnName("next_trn");
+
+                    b.Property<int>("ToTrn")
+                        .HasColumnType("integer")
+                        .HasColumnName("to_trn");
+
+                    b.HasKey("FromTrn")
+                        .HasName("pk_trn_ranges");
+
+                    b.HasIndex("FromTrn")
+                        .HasDatabaseName("ix_trn_ranges_unexhausted_trn_ranges")
+                        .HasFilter("is_exhausted IS FALSE");
+
+                    b.ToTable("trn_ranges", (string)null);
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequest", b =>
@@ -17020,7 +19432,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("middle_name");
 
-                    b.Property<string[]>("Name")
+                    b.PrimitiveCollection<string[]>("Name")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("name");
@@ -17028,6 +19440,30 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<string>("NationalInsuranceNumber")
                         .HasColumnType("text")
                         .HasColumnName("national_insurance_number");
+
+                    b.Property<string>("NpqApplicationId")
+                        .HasColumnType("text")
+                        .HasColumnName("npq_application_id");
+
+                    b.Property<Guid?>("NpqEvidenceFileId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("npq_evidence_file_id");
+
+                    b.Property<string>("NpqEvidenceFileName")
+                        .HasColumnType("text")
+                        .HasColumnName("npq_evidence_file_name");
+
+                    b.Property<string>("NpqName")
+                        .HasColumnType("text")
+                        .HasColumnName("npq_name");
+
+                    b.Property<string>("NpqTrainingProvider")
+                        .HasColumnType("text")
+                        .HasColumnName("npq_training_provider");
+
+                    b.Property<bool?>("NpqWorkingInEducationalSetting")
+                        .HasColumnType("boolean")
+                        .HasColumnName("npq_working_in_educational_setting");
 
                     b.Property<string>("OneLoginUserSubject")
                         .HasMaxLength(255)
@@ -17050,13 +19486,25 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("previous_last_name");
 
+                    b.Property<string>("PreviousMiddleName")
+                        .HasColumnType("text")
+                        .HasColumnName("previous_middle_name");
+
                     b.Property<Guid?>("ResolvedPersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("resolved_person_id");
 
+                    b.Property<int?>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
                     b.Property<string>("TrnToken")
                         .HasColumnType("text")
                         .HasColumnName("trn_token");
+
+                    b.Property<string>("WorkEmailAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("work_email_address");
 
                     b.HasKey("ApplicationUserId", "RequestId")
                         .HasName("pk_trn_request_metadata");
@@ -17124,7 +19572,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("application_user_id");
 
-                    b.Property<List<string>>("CloudEventTypes")
+                    b.PrimitiveCollection<List<string>>("CloudEventTypes")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("cloud_event_types");
@@ -17184,12 +19632,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("delivered");
 
-                    b.Property<List<DateTime>>("DeliveryAttempts")
+                    b.PrimitiveCollection<List<DateTime>>("DeliveryAttempts")
                         .IsRequired()
                         .HasColumnType("timestamp with time zone[]")
                         .HasColumnName("delivery_attempts");
 
-                    b.Property<List<string>>("DeliveryErrors")
+                    b.PrimitiveCollection<List<string>>("DeliveryErrors")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("delivery_errors");
@@ -17224,6 +19672,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("dqt_mq_establishment_id");
 
+                    b.Property<string>("DqtMqEstablishmentValue")
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
+                        .HasColumnName("dqt_mq_establishment_value");
+
                     b.Property<Guid?>("DqtQualificationId")
                         .HasColumnType("uuid")
                         .HasColumnName("dqt_qualification_id");
@@ -17231,6 +19684,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<Guid?>("DqtSpecialismId")
                         .HasColumnType("uuid")
                         .HasColumnName("dqt_specialism_id");
+
+                    b.Property<string>("DqtSpecialismValue")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("dqt_specialism_value");
 
                     b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date")
@@ -17359,14 +19817,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("date")
                         .HasColumnName("training_start_date");
 
-                    b.Property<Guid[]>("TrainingSubjectIds")
+                    b.PrimitiveCollection<Guid[]>("TrainingSubjectIds")
                         .IsRequired()
                         .HasColumnType("uuid[]")
                         .HasColumnName("training_subject_ids");
 
-                    b.HasIndex("SourceApplicationUserId", "SourceApplicationReference")
+                    b.HasIndex("PersonId", "SourceApplicationUserId", "SourceApplicationReference")
                         .IsUnique()
-                        .HasDatabaseName("ix_qualifications_source_application_user_id_source_applicatio")
+                        .HasDatabaseName("ix_qualifications_person_id_source_application_user_id_source_")
                         .HasFilter("source_application_user_id is not null and source_application_reference is not null");
 
                     b.HasDiscriminator().HasValue(1);
@@ -17376,7 +19834,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 {
                     b.HasBaseType("TeachingRecordSystem.Core.DataStore.Postgres.Models.UserBase");
 
-                    b.Property<string[]>("ApiRoles")
+                    b.PrimitiveCollection<string[]>("ApiRoles")
                         .HasColumnType("varchar[]")
                         .HasColumnName("api_roles");
 
@@ -17419,11 +19877,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("one_login_redirect_uri_path");
 
-                    b.Property<List<string>>("PostLogoutRedirectUris")
+                    b.PrimitiveCollection<List<string>>("PostLogoutRedirectUris")
                         .HasColumnType("varchar[]")
                         .HasColumnName("post_logout_redirect_uris");
 
-                    b.Property<List<string>>("RedirectUris")
+                    b.PrimitiveCollection<List<string>>("RedirectUris")
                         .HasColumnType("varchar[]")
                         .HasColumnName("redirect_uris");
 
@@ -17443,6 +19901,16 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasFilter("one_login_authentication_scheme_name is not null");
 
                     b.HasDiscriminator().HasValue(2);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("0f18f1ec-a102-4023-843f-1cadef3e6e14"),
+                            Active = true,
+                            Name = "NPQ",
+                            UserType = 0,
+                            IsOidcClient = false
+                        });
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser", b =>
@@ -17485,10 +19953,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("role");
-
-                    b.Property<string[]>("Roles")
-                        .HasColumnType("varchar[]")
-                        .HasColumnName("roles");
 
                     b.HasIndex("AzureAdUserId")
                         .IsUnique()
@@ -17613,8 +20077,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_integration_transaction_records_persons_person_id");
 
                     b.Navigation("IntegrationTransaction");
@@ -17636,12 +20098,19 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Note", b =>
                 {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .HasConstraintName("fk_notes_users_created_by_user_id");
+
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_notes_persons_person_id");
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", b =>
@@ -17661,10 +20130,22 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", b =>
                 {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.InductionStatusInfo", null)
+                        .WithMany()
+                        .HasForeignKey("InductionStatus")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_persons_induction_statuses_induction_status");
+
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "MergedWithPerson")
                         .WithMany()
                         .HasForeignKey("MergedWithPersonId")
                         .HasConstraintName("fk_persons_persons_merged_with_person_id");
+
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata", null)
+                        .WithMany()
+                        .HasForeignKey("SourceApplicationUserId", "SourceTrnRequestId")
+                        .HasConstraintName("fk_persons_trn_request_metadata_source_application_user_id_sou");
 
                     b.Navigation("MergedWithPerson");
                 });
@@ -17679,6 +20160,24 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasConstraintName("fk_previous_names_person");
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Process", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_processes_users_user_id");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ProcessEvent", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Process", null)
+                        .WithMany("Events")
+                        .HasForeignKey("ProcessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_process_events_process_process_id");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.QtsAwardedEmailsJobItem", b =>
@@ -17717,20 +20216,24 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.SupportTask", b =>
                 {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", null)
-                        .WithMany()
-                        .HasForeignKey("OneLoginUserSubject")
-                        .HasConstraintName("fk_support_tasks_one_login_user");
-
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .HasConstraintName("fk_support_tasks_person");
+
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.SupportTaskTypeInfo", null)
+                        .WithMany()
+                        .HasForeignKey("SupportTaskType")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_support_tasks_support_task_types_support_task_type");
 
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata", "TrnRequestMetadata")
                         .WithMany()
                         .HasForeignKey("TrnRequestApplicationUserId", "TrnRequestId")
                         .HasConstraintName("fk_support_tasks_trn_request_metadata_trn_request_application_");
+
+                    b.Navigation("Person");
 
                     b.Navigation("TrnRequestMetadata");
                 });
@@ -17806,7 +20309,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                 .HasForeignKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId")
                                 .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_application_user_");
 
-                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedRecord", "MatchedRecords", b2 =>
+                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedPerson", "MatchedPersons", b2 =>
                                 {
                                     b2.Property<Guid>("TrnRequestMatchesTrnRequestMetadataApplicationUserId")
                                         .HasColumnType("uuid");
@@ -17814,14 +20317,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                     b2.Property<string>("TrnRequestMatchesTrnRequestMetadataRequestId")
                                         .HasColumnType("character varying(100)");
 
-                                    b2.Property<int>("Id")
+                                    b2.Property<int>("__synthesizedOrdinal")
                                         .ValueGeneratedOnAdd()
                                         .HasColumnType("integer");
 
                                     b2.Property<Guid>("PersonId")
                                         .HasColumnType("uuid");
 
-                                    b2.HasKey("TrnRequestMatchesTrnRequestMetadataApplicationUserId", "TrnRequestMatchesTrnRequestMetadataRequestId", "Id");
+                                    b2.HasKey("TrnRequestMatchesTrnRequestMetadataApplicationUserId", "TrnRequestMatchesTrnRequestMetadataRequestId", "__synthesizedOrdinal");
 
                                     b2.ToTable("trn_request_metadata");
 
@@ -17832,7 +20335,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                         .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_trn_request_matches");
                                 });
 
-                            b1.Navigation("MatchedRecords");
+                            b1.Navigation("MatchedPersons");
                         });
 
                     b.Navigation("ApplicationUser");
@@ -17956,6 +20459,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("PreviousNames");
 
                     b.Navigation("Qualifications");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Process", b =>
+                {
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.QtsAwardedEmailsJob", b =>
