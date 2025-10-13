@@ -571,8 +571,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(actualInductionUpdatedEvent.Induction.ExemptionReasonIds, journeyInstance.State.ExemptionReasonIds!);
             Assert.Equal(actualInductionUpdatedEvent.ChangeReason, journeyInstance.State.ChangeReason!.GetDisplayName());
             Assert.Equal(actualInductionUpdatedEvent.ChangeReasonDetail, journeyInstance.State.ChangeReasonDetail);
-            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile!.FileId, journeyInstance.State.EvidenceFileId!.Value);
-            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile.Name, journeyInstance.State.EvidenceFileName);
+            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile!.FileId, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
+            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile.Name, journeyInstance.State.Evidence.UploadedEvidenceFile.FileName);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

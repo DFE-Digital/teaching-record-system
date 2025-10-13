@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
@@ -11,17 +11,14 @@ public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    IFileService fileService)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    EvidenceUploadManager evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     public DeactivateReasonOption? DeactivateReason { get; set; }
     public string? DeactivateReasonDetail { get; set; }
     public ReactivateReasonOption? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    public string? UploadedEvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public string BackLink => LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance!.InstanceId);
     public string ChangeReasonLink => LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance!.InstanceId, fromCheckAnswers: true);
@@ -31,11 +28,8 @@ public class CheckAnswersModel(
         await base.OnPageHandlerExecutingAsync(context);
 
         var state = JourneyInstance!.State;
-        if (state.DeactivateReason is null && state.ReactivateReason is null ||
-            state.DeactivateReason == DeactivateReasonOption.AnotherReason && state.DeactivateReasonDetail is null ||
-            state.ReactivateReason == ReactivateReasonOption.AnotherReason && state.ReactivateReasonDetail is null ||
-            state.UploadEvidence is null ||
-            state.UploadEvidence == true && state.EvidenceFileId is null)
+
+        if (!state.IsComplete)
         {
             context.Result = Redirect(LinkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance.InstanceId));
             return;
@@ -45,11 +39,7 @@ public class CheckAnswersModel(
         DeactivateReasonDetail = state.DeactivateReasonDetail;
         ReactivateReason = state.ReactivateReason;
         ReactivateReasonDetail = state.ReactivateReasonDetail;
-        EvidenceFileId = state.EvidenceFileId;
-        EvidenceFileName = state.EvidenceFileName;
-        UploadedEvidenceFileUrl = state.EvidenceFileId is not null ?
-            await FileService.GetFileUrlAsync(state.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
-            null;
+        EvidenceFile = state.Evidence.UploadedEvidenceFile;
     }
 
     public void OnGet()
@@ -68,13 +58,7 @@ public class CheckAnswersModel(
             TargetStatus == PersonStatus.Deactivated
                 ? DeactivateReasonDetail
                 : ReactivateReasonDetail,
-            EvidenceFileId is Guid fileId
-                    ? new EventModels.File()
-                    {
-                        FileId = fileId,
-                        Name = EvidenceFileName!
-                    }
-                    : null,
+            EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             now,
             out var @event);

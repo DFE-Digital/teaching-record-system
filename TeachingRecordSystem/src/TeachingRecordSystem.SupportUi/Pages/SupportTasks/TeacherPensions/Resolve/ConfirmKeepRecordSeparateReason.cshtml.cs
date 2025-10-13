@@ -3,11 +3,16 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class ConfirmKeepRecordSeparateReasonModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class ConfirmKeepRecordSeparateReasonModel(
+    TrsDbContext dbContext,
+    TrsLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController,
+    IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? Reason { get; set; }
     public KeepingRecordSeparateReason? KeepSeparateReason { get; set; }
@@ -93,6 +98,7 @@ public class ConfirmKeepRecordSeparateReasonModel(TrsDbContext dbContext, TrsLin
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
 
         return Redirect(linkGenerator.TeacherPensions());

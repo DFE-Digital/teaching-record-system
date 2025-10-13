@@ -53,7 +53,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithCompletedDate(Clock.Today)
                 .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
                 .WithChangeReasonDetailSelections(false)
-                .WithEvidence(false)
+                .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
 
@@ -341,7 +341,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithCompletedDate(completedDate)
                 .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
                 .WithChangeReasonDetailSelections(false)
-                .WithEvidence(false)
+                .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
 
@@ -387,7 +387,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithCompletedDate(completedDate)
                 .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
                 .WithChangeReasonDetailSelections(false)
-                .WithEvidence(false)
+                .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
 

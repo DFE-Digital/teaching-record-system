@@ -1,14 +1,13 @@
 using System.ComponentModel.DataAnnotations;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
 [Journey(JourneyNames.ReopenAlert), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
     public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
 
@@ -38,32 +37,22 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to upload evidence?")]
-    [Required(ErrorMessage = "Select yes if you want to upload evidence")]
-    public bool? UploadEvidence { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
-    [BindProperty]
-    [EvidenceFile]
-    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
-    public IFormFile? EvidenceFile { get; set; }
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    {
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-    public Guid? EvidenceFileId { get; set; }
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+    }
 
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    public string? UploadedEvidenceFileUrl { get; set; }
-
-    public async Task OnGetAsync()
+    public void OnGet()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
-        HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
-        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
-        UploadEvidence = JourneyInstance?.State.UploadEvidence;
-        UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
-            null;
+        HasAdditionalReasonDetail = JourneyInstance.State.HasAdditionalReasonDetail;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        Evidence = JourneyInstance.State.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -73,44 +62,11 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
 
-        if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
-        {
-            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
-        }
+        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
 
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
-        }
-
-        if (UploadEvidence == true)
-        {
-            if (EvidenceFile is not null)
-            {
-                if (EvidenceFileId is not null)
-                {
-                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
-                }
-
-                using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
-                await JourneyInstance!.UpdateStateAsync(state =>
-                {
-                    state.EvidenceFileId = evidenceFileId;
-                    state.EvidenceFileName = EvidenceFile.FileName;
-                    state.EvidenceFileSizeDescription = EvidenceFile.Length.Bytes().Humanize();
-                });
-            }
-        }
-        else if (EvidenceFileId is not null)
-        {
-            await fileService.DeleteFileAsync(EvidenceFileId.Value);
-            await JourneyInstance!.UpdateStateAsync(state =>
-            {
-                state.EvidenceFileId = null;
-                state.EvidenceFileName = null;
-                state.EvidenceFileSizeDescription = null;
-            });
         }
 
         await JourneyInstance!.UpdateStateAsync(state =>
@@ -118,7 +74,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
             state.ChangeReason = ChangeReason;
             state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.ChangeReasonDetail = ChangeReasonDetail;
-            state.UploadEvidence = UploadEvidence;
+            state.Evidence = Evidence;
         });
 
         return Redirect(linkGenerator.AlertReopenCheckAnswers(AlertId, JourneyInstance!.InstanceId));
@@ -128,16 +84,5 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.AlertDetail(AlertId));
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
     }
 }

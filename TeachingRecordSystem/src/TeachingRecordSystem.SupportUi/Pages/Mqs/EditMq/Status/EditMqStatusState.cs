@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
@@ -26,13 +27,7 @@ public class EditMqStatusState : IRegisterJourney
 
     public string? ChangeReasonDetail { get; set; }
 
-    public bool? UploadEvidence { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
     public bool IsEndDateChange => EndDate != CurrentEndDate;
@@ -44,8 +39,7 @@ public class EditMqStatusState : IRegisterJourney
     public bool IsComplete => Status.HasValue &&
         (Status != MandatoryQualificationStatus.Passed || Status == MandatoryQualificationStatus.Passed && EndDate.HasValue) &&
         (StatusChangeReason.HasValue || EndDateChangeReason.HasValue) &&
-        UploadEvidence.HasValue &&
-        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
+        Evidence.IsComplete;
 
     public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)
     {

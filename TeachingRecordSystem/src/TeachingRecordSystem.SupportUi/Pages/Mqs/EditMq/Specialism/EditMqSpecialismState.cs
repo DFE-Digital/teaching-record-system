@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
@@ -21,20 +22,13 @@ public class EditMqSpecialismState : IRegisterJourney
 
     public string? ChangeReasonDetail { get; set; }
 
-    public bool? UploadEvidence { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(Specialism), nameof(ChangeReason), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    [MemberNotNullWhen(true, nameof(Specialism), nameof(ChangeReason))]
     public bool IsComplete => Specialism is not null &&
         ChangeReason.HasValue &&
-        UploadEvidence.HasValue &&
-        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
+        Evidence.IsComplete;
 
     public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)
     {

@@ -44,7 +44,7 @@ public class EditRouteState : IRegisterJourney
             AddRoutePage.Route => true,
             AddRoutePage.Status => true,
             AddRoutePage.StartAndEndDate =>
-                TrainingStartDate != null ||
+                TrainingStartDate != null &&
                 TrainingEndDate != null,
             AddRoutePage.HoldsFrom =>
                 HoldsFrom != null,
@@ -57,17 +57,14 @@ public class EditRouteState : IRegisterJourney
             AddRoutePage.Country =>
                 TrainingCountryId != null,
             AddRoutePage.AgeRangeSpecialism =>
-                TrainingAgeSpecialismType != null ||
-                TrainingAgeSpecialismRangeFrom != null ||
-                TrainingAgeSpecialismRangeTo != null,
+                TrainingAgeSpecialismType is TrainingAgeSpecialismType type &&
+                (type != Core.Models.TrainingAgeSpecialismType.Range ||
+                (TrainingAgeSpecialismRangeFrom != null && TrainingAgeSpecialismRangeTo != null)),
             AddRoutePage.SubjectSpecialisms =>
                 TrainingSubjectIds.Length != 0,
             AddRoutePage.ChangeReason =>
-                ChangeReason != null ||
-                ChangeReasonDetail.ChangeReasonDetail != null ||
-                ChangeReasonDetail.HasAdditionalReasonDetail != null ||
-                ChangeReasonDetail.UploadEvidence != null ||
-                ChangeReasonDetail.EvidenceFileId != null,
+                ChangeReason != null &&
+                ChangeReasonDetail.IsComplete,
             AddRoutePage.CheckYourAnswers => false,
             _ => throw new ArgumentOutOfRangeException(nameof(page))
         };

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -29,22 +30,16 @@ public class AddAlertState : IRegisterJourney
 
     public string? AddReasonDetail { get; set; }
 
-    public bool? UploadEvidence { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(AlertTypeId), nameof(Details), nameof(StartDate), nameof(UploadEvidence))]
+    [MemberNotNullWhen(true, nameof(AlertTypeId), nameof(Details), nameof(StartDate))]
     public bool IsComplete =>
         AlertTypeId.HasValue &&
         AddLink.HasValue &&
         StartDate.HasValue &&
         AddReason.HasValue &&
-        HasAdditionalReasonDetail.HasValue &&
-        UploadEvidence.HasValue &&
-        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
+        HasAdditionalReasonDetail is bool hasDetail &&
+        (!hasDetail || AddReasonDetail is not null) &&
+        Evidence.IsComplete;
 }

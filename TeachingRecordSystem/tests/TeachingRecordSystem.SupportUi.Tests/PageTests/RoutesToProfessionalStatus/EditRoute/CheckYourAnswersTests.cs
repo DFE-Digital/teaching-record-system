@@ -508,8 +508,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(journeyInstance.State.IsExemptFromInduction, actualUpdatedEvent.RouteToProfessionalStatus.ExemptFromInduction);
             Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), actualUpdatedEvent.ChangeReason);
             Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, actualUpdatedEvent.ChangeReasonDetail);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, actualUpdatedEvent.EvidenceFile?.FileId);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, actualUpdatedEvent.EvidenceFile?.Name);
+            Assert.Null(actualUpdatedEvent.EvidenceFile);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -674,11 +673,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         editRouteState.ChangeReasonDetail = new ChangeReasonDetailsState
         {
             HasAdditionalReasonDetail = false,
-            ChangeReasonDetail = null,
-            UploadEvidence = false,
-            EvidenceFileId = null,
-            EvidenceFileName = null,
-            EvidenceFileSizeDescription = null
+            ChangeReasonDetail = null
         };
 
         return CreateJourneyInstanceAsync(qualification.QualificationId, editRouteState);

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     IClock clock) : PageModel
 {
     public JourneyInstance<EditAlertLinkState>? JourneyInstance { get; set; }
@@ -37,50 +37,9 @@ public class CheckAnswersModel(
 
     public string? ChangeReasonDetail { get; set; }
 
-    public string? EvidenceFileName { get; set; }
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    public string? UploadedEvidenceFileUrl { get; set; }
-
-    public async Task<IActionResult> OnPostAsync()
-    {
-        var alert = HttpContext.GetCurrentAlertFeature().Alert;
-
-        alert.Update(
-            a => a.ExternalLink = NewLink,
-            ChangeReason.GetDisplayName(),
-            ChangeReasonDetail,
-            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId
-                ? new EventModels.File()
-                {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
-                }
-                : null,
-            User.GetUserId(),
-            clock.UtcNow,
-            out var updatedEvent);
-
-        if (updatedEvent is not null)
-        {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        }
-
-        await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Alert changed");
-
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
@@ -99,11 +58,38 @@ public class CheckAnswersModel(
         CurrentLinkUri = TrsUriHelper.TryCreateWebsiteUri(CurrentLink, out var currentLinkUri) ? currentLinkUri : null;
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+    }
 
-        await next();
+    public async Task<IActionResult> OnPostAsync()
+    {
+        var alert = HttpContext.GetCurrentAlertFeature().Alert;
+
+        alert.Update(
+            a => a.ExternalLink = NewLink,
+            ChangeReason.GetDisplayName(),
+            ChangeReasonDetail,
+            evidenceFile: EvidenceFile?.ToEventModel(),
+            User.GetUserId(),
+            clock.UtcNow,
+            out var updatedEvent);
+
+        if (updatedEvent is not null)
+        {
+            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        }
+
+        await JourneyInstance!.CompleteAsync();
+        TempData.SetFlashSuccess("Alert changed");
+
+        return Redirect(linkGenerator.PersonAlerts(PersonId));
+    }
+
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.PersonAlerts(PersonId));
     }
 }

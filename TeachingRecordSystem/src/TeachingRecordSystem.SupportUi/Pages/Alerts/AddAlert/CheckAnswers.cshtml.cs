@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     IClock clock) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
@@ -40,11 +40,30 @@ public class CheckAnswersModel(
 
     public string? AddReasonDetail { get; set; }
 
-    public string? EvidenceFileName { get; set; }
+    [BindProperty]
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
-    public string? EvidenceFileSizeDescription { get; set; }
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    {
+        if (!JourneyInstance!.State.IsComplete)
+        {
+            context.Result = Redirect(linkGenerator.AlertAddReason(PersonId, JourneyInstance.InstanceId));
+            return;
+        }
 
-    public string? UploadedEvidenceFileUrl { get; set; }
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonName = personInfo.Name;
+        AlertTypeId = JourneyInstance.State.AlertTypeId!.Value;
+        AlertTypeName = JourneyInstance.State.AlertTypeName;
+        Details = JourneyInstance.State.Details;
+        Link = JourneyInstance.State.Link;
+        LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;
+        StartDate = JourneyInstance.State.StartDate!.Value;
+        AddReason = JourneyInstance.State.AddReason!.Value;
+        AddReasonDetail = JourneyInstance.State.AddReasonDetail;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+    }
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -59,13 +78,7 @@ public class CheckAnswersModel(
             endDate: null,
             AddReason.GetDisplayName(),
             AddReasonDetail,
-            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId
-                ? new EventModels.File()
-                {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
-                }
-                : null,
+            evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             clock.UtcNow,
             out var createdEvent);
@@ -82,34 +95,8 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.AlertAddReason(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-
-        PersonName = personInfo.Name;
-        AlertTypeId = JourneyInstance!.State.AlertTypeId!.Value;
-        AlertTypeName = JourneyInstance!.State.AlertTypeName;
-        Details = JourneyInstance!.State.Details;
-        Link = JourneyInstance!.State.Link;
-        LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;
-        StartDate = JourneyInstance!.State.StartDate!.Value;
-        AddReason = JourneyInstance!.State.AddReason!.Value;
-        AddReasonDetail = JourneyInstance!.State.AddReasonDetail;
-        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
-
-        await next();
     }
 }

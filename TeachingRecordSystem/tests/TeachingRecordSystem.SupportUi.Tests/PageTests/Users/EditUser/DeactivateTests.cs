@@ -390,10 +390,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("EvidenceFileId"));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue("EvidenceFileName"));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue("EvidenceFileSizeDescription"));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("UploadedEvidenceFile.FileId"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue("UploadedEvidenceFile.FileName"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue("UploadedEvidenceFile.FileSizeDescription"));
     }
 
     [Test]
@@ -412,10 +411,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasMoreInformation", false },
                 { "UploadEvidence", true },
-                { "EvidenceFileId", evidenceFileId },
-                { "EvidenceFileName", "testfile.jpg" },
-                { "EvidenceFileSizeDescription", "3 KB" },
-                { "UploadedEvidenceFileUrl", "http://test.com/file" }
+                { "UploadedEvidenceFile.FileId", evidenceFileId },
+                { "UploadedEvidenceFile.FileName", "testfile.jpg" },
+                { "UploadedEvidenceFile.FileSizeDescription", "3 KB" }
             }
         };
 
@@ -430,12 +428,11 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
-        Assert.Equal("http://test.com/file", link.Href);
+        Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("EvidenceFileId"));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue("EvidenceFileName"));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue("EvidenceFileSizeDescription"));
-        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("UploadedEvidenceFile.FileId"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue("UploadedEvidenceFile.FileName"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue("UploadedEvidenceFile.FileSizeDescription"));
     }
 
     [Test]
@@ -454,8 +451,10 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasMoreInformation", false },
                 { "UploadEvidence", true },
+                { "UploadedEvidenceFile.FileId", evidenceFileId },
+                { "UploadedEvidenceFile.FileName", "validfile.png" },
+                { "UploadedEvidenceFile.FileSizeDescription", "5MB" },
                 { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" },
-                { "EvidenceFileId", evidenceFileId }
             }
         };
 
@@ -484,7 +483,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasMoreInformation", false },
                 { "UploadEvidence", false },
-                { "EvidenceFileId", evidenceFileId }
+                { "UploadedEvidenceFile.FileId", evidenceFileId },
+                { "UploadedEvidenceFile.FileName", "validfile.png" },
+                { "UploadedEvidenceFile.FileSizeDescription", "5MB" }
             }
         };
 
@@ -531,7 +532,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new MultipartFormDataContentBuilder
             {
-                { "EvidenceFileId", evidenceFileId }
+                { "UploadedEvidenceFile.FileId", evidenceFileId },
+                { "UploadedEvidenceFile.FileName", "validfile.png" },
+                { "UploadedEvidenceFile.FileSizeDescription", "5MB" }
             }
         };
 
@@ -655,7 +658,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
                 { "UploadEvidence", true },
-                { "EvidenceFileId", evidenceFileId }
+                { "UploadedEvidenceFile.FileId", evidenceFileId },
+                { "UploadedEvidenceFile.FileName", "validfile.png" },
+                { "UploadedEvidenceFile.FileSizeDescription", "5MB" }
             }
         };
 

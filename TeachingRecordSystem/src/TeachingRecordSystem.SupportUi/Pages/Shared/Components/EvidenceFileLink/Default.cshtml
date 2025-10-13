@@ -4,7 +4,7 @@
 
 @if (Model is not null)
 {
-    <a href="@Model.PreviewUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.FileName} (opens in new tab)")</a>
+    <a href="@Model.PreviewUrl" data-testid="uploaded-evidence-file-link" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.FileName} (opens in new tab)")</a>
 }
 else
 {

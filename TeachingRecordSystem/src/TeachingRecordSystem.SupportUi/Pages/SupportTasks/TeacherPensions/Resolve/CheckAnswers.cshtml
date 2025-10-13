@@ -48,17 +48,12 @@
                         <govuk-summary-list-row-key>NI number</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    @if (Model.EvidenceFileId is not null)
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>
-                                <p class="govuk-body">
-                                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
-                                </p>
-                            </govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>
+                            <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>
             <div class="govuk-button-group">

@@ -2,11 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
 [Journey(JourneyNames.CloseAlert), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(
+    TrsLinkGenerator linkGenerator,
+    EvidenceUploadManager evidenceController,
+    IClock clock) : PageModel
 {
     public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
 
@@ -60,6 +64,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));
     }

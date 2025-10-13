@@ -2,11 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
-public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
+public class LinkModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
@@ -58,6 +59,7 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));
     }

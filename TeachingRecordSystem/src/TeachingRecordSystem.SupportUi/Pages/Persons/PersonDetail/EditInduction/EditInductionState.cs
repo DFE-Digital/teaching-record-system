@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -20,10 +21,7 @@ public class EditInductionState : IRegisterJourney
     public InductionChangeReasonOption? ChangeReason { get; set; }
     public bool? HasAdditionalReasonDetail { get; set; }
     public string? ChangeReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public bool Initialized { get; set; }
 
@@ -35,8 +33,7 @@ public class EditInductionState : IRegisterJourney
         (!InductionStatus.RequiresExemptionReasons() || (ExemptionReasonIds != null && ExemptionReasonIds.Length != 0)) &&
         ChangeReason.HasValue &&
         HasAdditionalReasonDetail.HasValue &&
-        UploadEvidence.HasValue &&
-        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
+        Evidence.IsComplete;
 
     public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId, InductionJourneyPage startPage)
     {

@@ -61,10 +61,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = deletionReasonDetail,
-                UploadEvidence = uploadEvidence,
-                EvidenceFileId = uploadEvidence ? Guid.NewGuid() : null,
-                EvidenceFileName = uploadEvidence ? "test.pdf" : null,
-                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
+                Evidence = new()
+                {
+                    UploadEvidence = uploadEvidence,
+                    UploadedEvidenceFile = uploadEvidence ? new()
+                    {
+                        FileId = Guid.NewGuid(),
+                        FileName = "test.pdf",
+                        FileSizeDescription = "1MB"
+                    } : null
+                }
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualification.QualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -83,7 +89,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(status is not null ? status.Value.ToString() : "None", deletionSummary.GetElementByTestId("status")!.TrimmedText());
         Assert.Equal(startDate is not null ? startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("start-date")!.TrimmedText());
         Assert.Equal(endDate is not null ? endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("end-date")!.TrimmedText());
-        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
             Assert.NotNull(uploadedEvidenceLink);
@@ -151,10 +157,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = deletionReasonDetail,
-                UploadEvidence = true,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName,
-                EvidenceFileSizeDescription = "1MB"
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = evidenceFileName,
+                        FileSizeDescription = "1MB"
+                    }
+                }
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -224,7 +236,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 DeletionReason = MqDeletionReasonOption.ProviderRequest,
                 DeletionReasonDetail = "Some details about the deletion reason",
-                UploadEvidence = false
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                }
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -278,10 +293,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = deletionReasonDetail,
-                UploadEvidence = true,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName,
-                EvidenceFileSizeDescription = "1MB"
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = evidenceFileName,
+                        FileSizeDescription = "1MB"
+                    }
+                }
             });
 
         var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");

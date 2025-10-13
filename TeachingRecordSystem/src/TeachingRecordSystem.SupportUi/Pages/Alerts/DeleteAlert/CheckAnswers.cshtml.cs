@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     IClock clock) : PageModel
 {
     public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
@@ -36,45 +36,9 @@ public class CheckAnswersModel(
 
     public string? DeleteReasonDetail { get; set; }
 
-    public string? EvidenceFileName { get; set; }
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    public string? UploadedEvidenceFileUrl { get; set; }
-
-    public async Task<IActionResult> OnPostAsync()
-    {
-        var alert = HttpContext.GetCurrentAlertFeature().Alert;
-
-        alert.Delete(
-            DeleteReasonDetail,
-            JourneyInstance!.State.EvidenceFileId is Guid fileId
-                ? new EventModels.File()
-                {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
-                }
-                : null,
-            User.GetUserId(),
-            clock.UtcNow,
-            out var deletedEvent);
-
-        await dbContext.AddEventAndBroadcastAsync(deletedEvent);
-        await dbContext.SaveChangesAsync();
-
-        await JourneyInstance!.CompleteAsync();
-        TempData.SetFlashSuccess("Alert deleted");
-
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.AlertDetail(AlertId));
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
@@ -94,11 +58,33 @@ public class CheckAnswersModel(
         StartDate = alertInfo.Alert.StartDate;
         EndDate = alertInfo.Alert.EndDate;
         DeleteReasonDetail = JourneyInstance.State.DeleteReasonDetail;
-        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+    }
 
-        await next();
+    public async Task<IActionResult> OnPostAsync()
+    {
+        var alert = HttpContext.GetCurrentAlertFeature().Alert;
+
+        alert.Delete(
+            DeleteReasonDetail,
+            EvidenceFile?.ToEventModel(),
+            User.GetUserId(),
+            clock.UtcNow,
+            out var deletedEvent);
+
+        await dbContext.AddEventAndBroadcastAsync(deletedEvent);
+        await dbContext.SaveChangesAsync();
+
+        await JourneyInstance!.CompleteAsync();
+        TempData.SetFlashSuccess("Alert deleted");
+
+        return Redirect(linkGenerator.PersonAlerts(PersonId));
+    }
+
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.AlertDetail(AlertId));
     }
 }

@@ -70,14 +70,7 @@
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="evidence">
-                        @if (Model.UploadedEvidenceFileUrl is not null)
-                        {
-                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
-                        }
-                        else
-                        {
-                            <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
-                        }
+                        <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertEditLinkReason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>

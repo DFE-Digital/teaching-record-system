@@ -1,3 +1,5 @@
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 public class SetStatusState : IRegisterJourney
@@ -12,12 +14,14 @@ public class SetStatusState : IRegisterJourney
     public string? DeactivateReasonDetail { get; set; }
     public ReactivateReasonOption? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public bool Initialized { get; set; }
+
+    public bool IsComplete => (DeactivateReason is not null || ReactivateReason is not null) &&
+            (DeactivateReason != DeactivateReasonOption.AnotherReason || DeactivateReasonDetail is not null) &&
+            (ReactivateReason != ReactivateReasonOption.AnotherReason || ReactivateReasonDetail is not null) &&
+            Evidence.IsComplete;
 
     public void EnsureInitialized()
     {

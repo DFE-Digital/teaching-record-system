@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
@@ -15,20 +16,13 @@ public class DeleteAlertState : IRegisterJourney
 
     public string? DeleteReasonDetail { get; set; }
 
-    public bool? UploadEvidence { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(HasAdditionalReasonDetail), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    [MemberNotNullWhen(true, nameof(HasAdditionalReasonDetail))]
     public bool IsComplete =>
-        HasAdditionalReasonDetail.HasValue &&
-        (!HasAdditionalReasonDetail.Value || (HasAdditionalReasonDetail.Value && !string.IsNullOrWhiteSpace(DeleteReasonDetail))) &&
-        UploadEvidence.HasValue &&
-        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
+        HasAdditionalReasonDetail is bool hasDetail &&
+        (!hasDetail || DeleteReasonDetail is not null) &&
+        Evidence.IsComplete;
 
 }

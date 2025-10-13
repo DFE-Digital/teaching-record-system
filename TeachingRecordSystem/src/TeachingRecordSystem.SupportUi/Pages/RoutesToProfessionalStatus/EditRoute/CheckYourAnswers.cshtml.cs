@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -13,7 +13,7 @@ public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     IClock clock) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
@@ -25,7 +25,6 @@ public class CheckYourAnswersModel(
 
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
-    public string? UploadedEvidenceFileUrl { get; set; }
 
     public string BackLink => linkGenerator.RouteEditChangeReason(QualificationId, JourneyInstance!.InstanceId);
 
@@ -33,6 +32,62 @@ public class CheckYourAnswersModel(
     public Guid QualificationId { get; set; }
 
     public string PageCaption => $"Edit route - {PersonName}";
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        var status = JourneyInstance!.State.Status;
+
+        var pagesInOrder = Enum.GetValues<AddRoutePage>()
+            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
+            .OrderBy(p => p);
+
+        foreach (var page in pagesInOrder)
+        {
+            var pageRequired = page.FieldRequirementForPage(route, status);
+
+            if (pageRequired == FieldRequirement.Mandatory &&
+                !JourneyInstance!.State.IsComplete(page) &&
+                // if the route has an implicit exemption, don't show the induction exemption page
+                (page != AddRoutePage.InductionExemption ||
+                 route.InductionExemptionReason is null ||
+                 !route.InductionExemptionReason.RouteImplicitExemption))
+            {
+                context.Result = Redirect(linkGenerator.RouteEditPage(page, QualificationId, JourneyInstance.InstanceId, fromCheckAnswers: true));
+                return;
+            }
+        }
+
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonName = personInfo.Name;
+        PersonId = personInfo.PersonId;
+
+        ChangeReason = JourneyInstance.State.ChangeReason;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        var hasImplicitExemption = route.InductionExemptionReason?.RouteImplicitExemption ?? false;
+        RouteDetail = new RouteDetailViewModel
+        {
+            RouteToProfessionalStatusType = route,
+            Status = JourneyInstance.State.Status,
+            HoldsFrom = JourneyInstance.State.HoldsFrom,
+            TrainingStartDate = JourneyInstance.State.TrainingStartDate,
+            TrainingEndDate = JourneyInstance.State.TrainingEndDate,
+            TrainingSubjectIds = JourneyInstance.State.TrainingSubjectIds,
+            TrainingAgeSpecialismType = JourneyInstance.State.TrainingAgeSpecialismType,
+            TrainingAgeSpecialismRangeFrom = JourneyInstance.State.TrainingAgeSpecialismRangeFrom,
+            TrainingAgeSpecialismRangeTo = JourneyInstance.State.TrainingAgeSpecialismRangeTo,
+            TrainingCountryId = JourneyInstance.State.TrainingCountryId,
+            TrainingProviderId = JourneyInstance.State.TrainingProviderId,
+            QualificationId = QualificationId,
+            DegreeTypeId = JourneyInstance.State.DegreeTypeId,
+            HasImplicitExemption = hasImplicitExemption,
+            IsExemptFromInduction = JourneyInstance.State.IsExemptFromInduction,
+            FromCheckAnswers = true,
+            JourneyInstanceId = JourneyInstance.InstanceId
+        };
+
+        await next();
+    }
 
     public async Task OnGetAsync()
     {
@@ -68,13 +123,7 @@ public class CheckYourAnswersModel(
             },
             changeReason: ChangeReason?.GetDisplayName(),
             ChangeReasonDetail.ChangeReasonDetail,
-            evidenceFile: JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId is Guid fileId ?
-                new EventModels.File()
-                {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.ChangeReasonDetail.EvidenceFileName!
-                } :
-                null,
+            evidenceFile: ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
             User.GetUserId(),
             clock.UtcNow,
             out var updatedEvent);
@@ -94,66 +143,8 @@ public class CheckYourAnswersModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        var status = JourneyInstance!.State.Status;
-
-        var pagesInOrder = Enum.GetValues<AddRoutePage>()
-            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
-            .OrderBy(p => p);
-
-        foreach (var page in pagesInOrder)
-        {
-            var pageRequired = page.FieldRequirementForPage(route, status);
-
-            if (pageRequired == FieldRequirement.Mandatory &&
-                !JourneyInstance!.State.IsComplete(page) &&
-                // if the route has an implicit exemption, don't show the induction exemption page
-                (page != AddRoutePage.InductionExemption ||
-                 route.InductionExemptionReason is null ||
-                 !route.InductionExemptionReason.RouteImplicitExemption))
-            {
-                context.Result = Redirect(linkGenerator.RouteEditPage(page, QualificationId, JourneyInstance.InstanceId, fromCheckAnswers: true));
-                return;
-            }
-        }
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
-        var hasImplicitExemption = route.InductionExemptionReason?.RouteImplicitExemption ?? false;
-        RouteDetail = new RouteDetailViewModel
-        {
-            RouteToProfessionalStatusType = route,
-            Status = JourneyInstance!.State.Status,
-            HoldsFrom = JourneyInstance!.State.HoldsFrom,
-            TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
-            TrainingEndDate = JourneyInstance!.State.TrainingEndDate,
-            TrainingSubjectIds = JourneyInstance!.State.TrainingSubjectIds,
-            TrainingAgeSpecialismType = JourneyInstance!.State.TrainingAgeSpecialismType,
-            TrainingAgeSpecialismRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom,
-            TrainingAgeSpecialismRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
-            TrainingCountryId = JourneyInstance!.State.TrainingCountryId,
-            TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
-            QualificationId = QualificationId,
-            DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
-            HasImplicitExemption = hasImplicitExemption,
-            IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction,
-            FromCheckAnswers = true,
-            JourneyInstanceId = JourneyInstance.InstanceId
-        };
-
-        UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
-        await next();
     }
 }
