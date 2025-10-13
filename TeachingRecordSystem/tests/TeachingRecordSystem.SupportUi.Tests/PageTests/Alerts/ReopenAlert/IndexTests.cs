@@ -99,7 +99,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
 
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
         Assert.NotNull(uploadedEvidenceLink);
-        Assert.Equal($"{journeyInstance.State.Evidence.UploadedEvidenceFile.FileName} ({journeyInstance.State.Evidence.UploadedEvidenceFile.FileSizeDescription})", uploadedEvidenceLink!.TrimmedText());
+        Assert.Equal($"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} ({journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription})", uploadedEvidenceLink!.TrimmedText());
 
         void AssertCheckedRadioOption(string name, string expectedCheckedValue)
         {
@@ -342,9 +342,9 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
-        Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile.FileName);
-        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile.FileId);
-        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile.FileSizeDescription);
+        Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
+        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
     [Test]

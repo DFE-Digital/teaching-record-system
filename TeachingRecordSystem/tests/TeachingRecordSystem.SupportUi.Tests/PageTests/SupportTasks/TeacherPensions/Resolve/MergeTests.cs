@@ -372,8 +372,8 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(PersonAttributeSource.TrnRequest, journeyInstance.State.GenderSource);
         Assert.Equal(mergeComments, journeyInstance.State.MergeComments);
         Assert.Equal(true, journeyInstance.State.Evidence.UploadEvidence);
-        Assert.Equal(evidenceFile, journeyInstance.State.Evidence.UploadedEvidenceFile.FileName);
-        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile.FileId);
+        Assert.Equal(evidenceFile, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
     }
 
     private static MultipartFormDataContentBuilder CreatePostContent(

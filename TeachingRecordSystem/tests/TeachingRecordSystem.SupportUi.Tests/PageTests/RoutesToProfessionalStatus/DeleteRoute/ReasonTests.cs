@@ -273,7 +273,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.ChangeReasonDetail.Evidence.UploadEvidence);
-        Assert.Equal(evidenceFileName, journeyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile.FileName);
+        Assert.Equal(evidenceFileName, journeyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile!.FileName);
     }
 
     [Test]

@@ -95,7 +95,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : LinkTestBase(hostFixtu
         Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : $"{alert.ExternalLink} (opens in new tab)", doc.GetSummaryListValueForKey("Current link"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
         Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Test]

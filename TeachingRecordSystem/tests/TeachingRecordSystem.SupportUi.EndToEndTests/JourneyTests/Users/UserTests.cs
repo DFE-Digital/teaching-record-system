@@ -87,7 +87,7 @@ public class UserTests : TestBase
 
         await page.SetCheckedAsync("legend:has-text('Reason for deactivating user') + .govuk-radios label:has-text('They no longer need access')", true);
         await page.SetCheckedAsync("legend:has-text('Do you have more information?') + .govuk-radios label:has-text('No')", true);
-        await page.SetCheckedAsync("legend:has-text('Do you have evidence to upload?') + .govuk-radios label:has-text('No')", true);
+        await page.SetCheckedAsync("legend:has-text('Do you want to upload evidence?') + .govuk-radios label:has-text('No')", true);
 
         await page.ClickButtonAsync("Continue");
 
