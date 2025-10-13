@@ -1,3 +1,5 @@
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
 public class MergePersonState : IRegisterJourney
@@ -22,10 +24,7 @@ public class MergePersonState : IRegisterJourney
     public PersonAttributeSource? EmailAddressSource { get; set; }
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
     public PersonAttributeSource? GenderSource { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
     public string? Comments { get; set; }
 
     public async Task EnsureInitializedAsync(Guid personAId, Func<Task<string?>> getPersonATrn)

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Events.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -11,9 +11,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     IClock clock)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     public string BackLink => GetPageLink(MergePersonJourneyPage.Merge);
     public string ChangePrimaryPersonLink => GetPageLink(MergePersonJourneyPage.Matches, fromCheckAnswers: true);
@@ -27,10 +27,7 @@ public class CheckAnswersModel(
     public string? NationalInsuranceNumber { get; set; }
     public Gender? Gender { get; set; }
     public string? Trn { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    public string? EvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
     public string? Comments { get; set; }
 
     private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
@@ -54,8 +51,7 @@ public class CheckAnswersModel(
         }
 
         if (state.PersonAttributeSourcesSet is false ||
-            state.UploadEvidence is not bool uploadEvidence ||
-            uploadEvidence && state.EvidenceFileId is null)
+            !state.Evidence.IsComplete)
         {
             context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Merge));
             return;
@@ -76,11 +72,7 @@ public class CheckAnswersModel(
         NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
         Gender = state.GenderSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.Gender : secondaryPerson.Gender;
         Trn = primaryPerson.Trn;
-        EvidenceFileId = state.EvidenceFileId;
-        EvidenceFileName = state.EvidenceFileName;
-        EvidenceFileUrl = state.EvidenceFileId is not null ?
-            await FileService.GetFileUrlAsync(state.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
-            null;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
         Comments = state.Comments;
     }
 
@@ -148,13 +140,7 @@ public class CheckAnswersModel(
             SecondaryPersonStatus = secondaryPerson.Status,
             PersonAttributes = newPrimaryPersonAttributes,
             OldPersonAttributes = primaryPersonAttributes,
-            EvidenceFile = EvidenceFileId is Guid nameFileId
-                ? new EventModels.File()
-                {
-                    FileId = nameFileId,
-                    Name = EvidenceFileName!
-                }
-                : null,
+            EvidenceFile = EvidenceFile?.ToEventModel(),
             Comments = Comments,
             Changes = changes,
             EventId = Guid.NewGuid(),

@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
@@ -15,10 +16,7 @@ public class MergePersonPostRequestContentBuilder : PostRequestContentBuilder
     public PersonAttributeSource? GenderSource { get; set; }
     public bool? UploadEvidence { get; set; }
     public (HttpContent, string)? EvidenceFile { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    public string? EvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
     public string? Comments { get; set; }
 
     public MergePersonPostRequestContentBuilder WithOtherTrn(string? otherTrn)
@@ -82,13 +80,15 @@ public class MergePersonPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public MergePersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? otherDetailsChangeEvidenceFileName, string? otherDetailsChangeEvidenceFileSizeDescription, string? otherDetailsChangeUploadedEvidenceFileUrl)
+    public MergePersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
         UploadEvidence = uploadEvidence;
-        EvidenceFileId = evidenceFileId;
-        EvidenceFileName = otherDetailsChangeEvidenceFileName;
-        EvidenceFileSizeDescription = otherDetailsChangeEvidenceFileSizeDescription;
-        EvidenceFileUrl = otherDetailsChangeUploadedEvidenceFileUrl;
+        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        {
+            FileId = id,
+            FileName = evidenceFileName ?? "filename.jpg",
+            FileSizeDescription = evidenceFileSizeDescription ?? "5 MB"
+        };
         return this;
     }
 

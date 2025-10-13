@@ -19,7 +19,6 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
     public (HttpContent, string)? EvidenceFile { get; set; }
     public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
-
     public AddPersonPostRequestContentBuilder WithFirstName(string? firstName)
     {
         FirstName = firstName;
