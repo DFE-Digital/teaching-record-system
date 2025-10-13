@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.Azure;
@@ -48,6 +49,12 @@ public static class Extensions
             services.AddAzureClients(clientBuilder =>
             {
                 clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
+            });
+
+            services.AddKeyedSingleton<BlobServiceClient>("sftpstorage", (sp, key) =>
+            {
+                var connStr = configuration.GetValue<string>("SftpStorageConnectionString");
+                return new BlobServiceClient(connStr);
             });
         }
 

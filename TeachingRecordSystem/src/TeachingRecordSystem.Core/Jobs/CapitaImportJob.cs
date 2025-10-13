@@ -6,6 +6,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -16,12 +17,12 @@ using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
+public class CapitaImportJob([FromKeyedServices("sftpstorage")] BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 4 * * *";
-    public const string StorageContainer = "dqt-integrations";
-    public const string PICKUP_FOLDER = "capita/pickup";
-    private const string ProcessedFolder = "capita/processed";
+    public const string StorageContainer = "capita-integrations";
+    public const string PICKUP_FOLDER = "pickup";
+    private const string ProcessedFolder = "processed";
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {

@@ -1,11 +1,12 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
-public class EwcWalesImportJob(BlobServiceClient blobServiceClient, InductionImporter inductionImporter, QtsImporter qtsImporter, ILogger<EwcWalesImportJob> logger)
+public class EwcWalesImportJob([FromKeyedServices("sftp")] BlobServiceClient blobServiceClient, InductionImporter inductionImporter, QtsImporter qtsImporter, ILogger<EwcWalesImportJob> logger)
 {
     private const string ProcessedFolder = "ewc/processed";
     private const string PickupFolder = "ewc/pickup";

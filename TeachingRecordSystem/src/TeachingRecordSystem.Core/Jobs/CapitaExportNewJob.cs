@@ -3,17 +3,18 @@ using System.Text;
 using Azure.Storage.Blobs;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 
-public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<CapitaExportNewJob> logger, TrsDbContext dbContext, IClock clock)
+public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] BlobServiceClient blobServiceClient, ILogger<CapitaExportNewJob> logger, TrsDbContext dbContext, IClock clock)
 {
     public const string JobSchedule = "0 3 * * *";
     public const string LastRunDateKey = "LastRunDate";
-    public const string StorageContainer = "dqt-integrations";
-    public const string EXPORTS_FOLDER = "capita/exports";
+    public const string StorageContainer = "capita-integrations";
+    public const string ExportsFolder = "exports";
 
     public async Task<long> ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -170,7 +171,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
         var containerClient = blobServiceClient!.GetBlobContainerClient(StorageContainer);
         await containerClient.CreateIfNotExistsAsync();
 
-        var targetFileName = $"{EXPORTS_FOLDER}/{fileName}";
+        var targetFileName = $"{ExportsFolder}/{fileName}";
 
         // Get the blob client for the target file
         var blobClient = containerClient.GetBlobClient(targetFileName);
