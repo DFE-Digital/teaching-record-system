@@ -29,7 +29,37 @@ public static partial class Commands
             {
                 using var dbContext = TrsDbContext.Create(connectionString, commandTimeout: (int)TimeSpan.FromMinutes(10).TotalSeconds);
 
-                await dbContext.GetService<IMigrator>().MigrateAsync(targetMigration);
+                // Ensure we've got squashed migration recorded
+                var migrationsAssembly = dbContext.Database.GetService<IMigrationsAssembly>();
+                var initialMigration = migrationsAssembly.Migrations.OrderBy(k => k.Key).First();
+                var pendingMigrations = (await dbContext.Database.GetPendingMigrationsAsync()).ToArray();
+                var appliedMigrations = (await dbContext.Database.GetAppliedMigrationsAsync()).ToArray();
+
+                if (appliedMigrations.Length != 0 && pendingMigrations.Contains(initialMigration.Key))
+                {
+                    using var txn = await dbContext.Database.BeginTransactionAsync();
+                    var historyRepository = dbContext.GetService<IHistoryRepository>();
+                    await using var @lock = await historyRepository.AcquireDatabaseLockAsync();
+
+                    // Add the squashed migration to the history table
+                    var insertScript = historyRepository.GetInsertScript(new HistoryRow(initialMigration.Key, ProductInfo.GetVersion()));
+                    await dbContext.Database.ExecuteSqlRawAsync(insertScript);
+
+                    // Remove all migrations that don't exist any more (i.e. have been squashed)
+                    foreach (var appliedMigration in appliedMigrations)
+                    {
+                        if (!migrationsAssembly.Migrations.ContainsKey(appliedMigration))
+                        {
+                            var deleteScript = historyRepository.GetDeleteScript(appliedMigration);
+                            await dbContext.Database.ExecuteSqlRawAsync(deleteScript);
+                        }
+                    }
+
+                    await txn.CommitAsync();
+                }
+
+                var migrator = dbContext.GetService<IMigrator>();
+                await migrator.MigrateAsync(targetMigration);
 
                 // Ensure the user has the replication permission
                 var user = new NpgsqlConnectionStringBuilder(connectionString).Username;

@@ -3004,6 +3004,216 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_establishment_la_code_establishment_number");
 
                     b.ToTable("establishments", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            EstablishmentId = new Guid("ede07733-97db-4e38-bff1-f3bd73b08986"),
+                            EstablishmentName = "Archdiocese of Birmingham",
+                            EstablishmentNumber = "0750",
+                            EstablishmentSourceId = 2,
+                            LaCode = "330"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("b6c401ad-2cdc-407e-9fb5-9a524caeab60"),
+                            EstablishmentName = "A.R.T.S. Education",
+                            EstablishmentNumber = "6006",
+                            EstablishmentSourceId = 2,
+                            LaCode = "340"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("571c41ae-a33a-4ac5-a2b2-467ea5c7c5c4"),
+                            EstablishmentName = "Workers Educational Association",
+                            EstablishmentNumber = "0751",
+                            EstablishmentSourceId = 2,
+                            LaCode = "383"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("1b1fa51d-7131-4720-b4d0-74d378aa0137"),
+                            EstablishmentName = "The Peoples Learning Trust",
+                            EstablishmentNumber = "1576",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("a4900bec-839f-43ee-8bca-ef79fc6fe233"),
+                            EstablishmentName = "Fern Academy Trust",
+                            EstablishmentNumber = "1587",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("a5d97ce7-0913-41df-ad36-bbe38ac5ab4b"),
+                            EstablishmentName = "Ascendance Partnership Trust",
+                            EstablishmentNumber = "1589",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("3dd6c9f6-a738-4a78-ad2d-fab4e8104184"),
+                            EstablishmentName = "Bedfordshire",
+                            EstablishmentNumber = "0000",
+                            EstablishmentSourceId = 2,
+                            LaCode = "820"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("58352ea6-ce6d-4225-a221-2b6a080f5a9a"),
+                            EstablishmentName = "Dorset",
+                            EstablishmentNumber = "0000",
+                            EstablishmentSourceId = 2,
+                            LaCode = "835"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("a37d12cf-f155-4dbf-88a0-1d30ab10c561"),
+                            EstablishmentName = "Kristian Thomas Company",
+                            EstablishmentNumber = "9097",
+                            EstablishmentSourceId = 2,
+                            LaCode = "855"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("d00cb67f-5da9-4430-a9a1-047490fc4df0"),
+                            EstablishmentName = "Cheshire",
+                            EstablishmentNumber = "0000",
+                            EstablishmentSourceId = 2,
+                            LaCode = "875"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("854d9780-b0cd-4459-a49d-df9a9502b33f"),
+                            EstablishmentName = "Essex Local Authority",
+                            EstablishmentNumber = "4452",
+                            EstablishmentSourceId = 2,
+                            LaCode = "915"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("e9490ca5-a696-451a-9038-33e4b5d32885"),
+                            EstablishmentName = "Places Leisure",
+                            EstablishmentNumber = "9097",
+                            EstablishmentSourceId = 2,
+                            LaCode = "936"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("2bd072d8-6214-4a77-b9b4-e8d77d96a030"),
+                            EstablishmentName = "Multi-Academy Trusts",
+                            EstablishmentNumber = "0000",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("2b9b1c3e-8057-4a68-8250-2699368e2e98"),
+                            EstablishmentName = "The Collective Community Trust",
+                            EstablishmentNumber = "1570",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("cb7ef0ee-41ce-4c2d-87dc-91aa968ca76c"),
+                            EstablishmentName = "Synergy Education Trust Limited",
+                            EstablishmentNumber = "1572",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("7310b62f-454a-4d2c-8183-124acd71fd7a"),
+                            EstablishmentName = "Mosaic Partnership Trust Ltd",
+                            EstablishmentNumber = "1573",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("1653f9ce-7a0b-4ca7-9ab1-4a2128dec8a5"),
+                            EstablishmentName = "Newcastle Diocesan Education Board",
+                            EstablishmentNumber = "0758",
+                            EstablishmentSourceId = 2,
+                            LaCode = "391"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("983195b9-dc5b-4f00-bf50-d44b7c87305d"),
+                            EstablishmentName = "Benedict Catholic Academy Trust",
+                            EstablishmentNumber = "1571",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("207144ef-ac5a-49a1-832c-5cdbc636d69a"),
+                            EstablishmentName = "Mersey View Learning Trust",
+                            EstablishmentNumber = "1578",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("e8939604-4570-4a56-9b8e-f53bf285e59c"),
+                            EstablishmentName = "Pennine Alliance Learning Trust",
+                            EstablishmentNumber = "1591",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("95a0d99b-0d4a-42a2-9528-816f5aa3b93a"),
+                            EstablishmentName = "Ambition Community Trust",
+                            EstablishmentNumber = "1592",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("d7bb70f1-a29a-43ee-a896-f9cbb5ac9d45"),
+                            EstablishmentName = "Heritage Multi Academy Trust",
+                            EstablishmentNumber = "1599",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("96c02ad6-fc23-48a0-8e68-f45b49d4f695"),
+                            EstablishmentName = "Poole Local Authority",
+                            EstablishmentNumber = "0000",
+                            EstablishmentSourceId = 2,
+                            LaCode = "836"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("a0f3a003-45ab-4009-8385-5358c4b16108"),
+                            EstablishmentName = "Aurora Rowan School",
+                            EstablishmentNumber = "6019",
+                            EstablishmentSourceId = 2,
+                            LaCode = "870"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("1c93bba7-afd2-4299-8d78-4b61197dd359"),
+                            EstablishmentName = "Maintained school under Essex local authority",
+                            EstablishmentNumber = "2460",
+                            EstablishmentSourceId = 2,
+                            LaCode = "915"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("7c8a6d4d-e19f-4c08-a314-348f1e159d27"),
+                            EstablishmentName = "Maintained school under Northamptonshire local authority",
+                            EstablishmentNumber = "4091",
+                            EstablishmentSourceId = 2,
+                            LaCode = "928"
+                        });
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EstablishmentSource", b =>
@@ -3026,6 +3236,18 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_establishment_sources");
 
                     b.ToTable("establishment_sources", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            EstablishmentSourceId = 1,
+                            Name = "GIAS"
+                        },
+                        new
+                        {
+                            EstablishmentSourceId = 2,
+                            Name = "TPS"
+                        });
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Event", b =>
@@ -6551,6 +6773,608 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_tps_establishment_types");
 
                     b.ToTable("tps_establishment_types", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            TpsEstablishmentTypeId = 1,
+                            Description = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)",
+                            EstablishmentRangeFrom = "0001",
+                            EstablishmentRangeTo = "0099",
+                            ShortDescription = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 2,
+                            Description = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)",
+                            EstablishmentRangeFrom = "0200",
+                            EstablishmentRangeTo = "0399",
+                            ShortDescription = "Homes set up under the Children and Young Persons Act (e.g. Community Homes)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 3,
+                            Description = "Training and occupation centres and other DSS establishments (except day nurseries)",
+                            EstablishmentRangeFrom = "0400",
+                            EstablishmentRangeTo = "0524",
+                            ShortDescription = "Training and occupation centres and other DSS establishments (except day nurseries)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 4,
+                            Description = "Special Hospitals provided under Part VII of the Mental Health Act 1959",
+                            EstablishmentRangeFrom = "0525",
+                            EstablishmentRangeTo = "0549",
+                            ShortDescription = "Special Hospitals provided under Part VII of the Mental Health Act 1959"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 5,
+                            Description = "Teachers' Superannuation (Army Civilian Lecturer) Scheme 1951 Schools or schools formerly under that Scheme",
+                            EstablishmentRangeFrom = "0550",
+                            EstablishmentRangeTo = "0574",
+                            ShortDescription = "Teachers' Superannuation (Army Civilian Lecturer) Scheme 1951 Schools or schools formerly under that Scheme"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 6,
+                            Description = "Education Forum",
+                            EstablishmentRangeFrom = "0575",
+                            EstablishmentRangeTo = "0599",
+                            ShortDescription = "Education Forum"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 7,
+                            Description = "CAY",
+                            EstablishmentRangeFrom = "0600",
+                            EstablishmentRangeTo = "0600",
+                            ShortDescription = "CAY"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 8,
+                            Description = "PAY",
+                            EstablishmentRangeFrom = "0601",
+                            EstablishmentRangeTo = "0601",
+                            ShortDescription = "PAY"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 9,
+                            Description = "DSS day nurseries",
+                            EstablishmentRangeFrom = "0625",
+                            EstablishmentRangeTo = "0625",
+                            ShortDescription = "DSS day nurseries"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 10,
+                            Description = "Schools and institutions controlled by other government departments",
+                            EstablishmentRangeFrom = "0626",
+                            EstablishmentRangeTo = "0674",
+                            ShortDescription = "Schools and institutions controlled by other government departments"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 11,
+                            Description = "Employment under voluntary youth organisations",
+                            EstablishmentRangeFrom = "0675",
+                            EstablishmentRangeTo = "0750",
+                            ShortDescription = "Employment under voluntary youth organisations"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 12,
+                            Description = "Employment under voluntary youth organisations",
+                            EstablishmentRangeFrom = "0100",
+                            EstablishmentRangeTo = "0199",
+                            ShortDescription = "Employment under voluntary youth organisations"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 13,
+                            Description = "Employment under adult and miscellaneous organisations",
+                            EstablishmentRangeFrom = "0751",
+                            EstablishmentRangeTo = "0939",
+                            ShortDescription = "Employment under adult and miscellaneous organisations"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 14,
+                            Description = "Playing for Success Centres",
+                            EstablishmentRangeFrom = "0940",
+                            EstablishmentRangeTo = "0949",
+                            ShortDescription = "Playing for Success Centres"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 15,
+                            Description = "LA nursery schools",
+                            EstablishmentRangeFrom = "1000",
+                            EstablishmentRangeTo = "1099",
+                            ShortDescription = "LA nursery schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 16,
+                            Description = "Pupil referral units",
+                            EstablishmentRangeFrom = "1100",
+                            EstablishmentRangeTo = "1150",
+                            ShortDescription = "Pupil referral units"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 75,
+                            Description = "LA nursery schools",
+                            EstablishmentRangeFrom = "1151",
+                            EstablishmentRangeTo = "1799",
+                            ShortDescription = "LA nursery schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 17,
+                            Description = "Direct-grant nursery schools",
+                            EstablishmentRangeFrom = "1800",
+                            EstablishmentRangeTo = "1899",
+                            ShortDescription = "Direct-grant nursery schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 18,
+                            Description = "Independent nursery education establishment recognised as efficient",
+                            EstablishmentRangeFrom = "1900",
+                            EstablishmentRangeTo = "1999",
+                            ShortDescription = "Independent nursery education establishment recognised as efficient"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 19,
+                            Description = "Maintained primary schools and schools which have converted to academies",
+                            EstablishmentRangeFrom = "2000",
+                            EstablishmentRangeTo = "3999",
+                            ShortDescription = "Maintained primary schools and schools which have converted to academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 20,
+                            Description = "Maintained secondary schools and schools which have converted to academies",
+                            EstablishmentRangeFrom = "4000",
+                            EstablishmentRangeTo = "4999",
+                            ShortDescription = "Maintained secondary schools and schools which have converted to academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 21,
+                            Description = "Direct-grant schools (recorded up to October 1980)",
+                            EstablishmentRangeFrom = "5000",
+                            EstablishmentRangeTo = "5099",
+                            ShortDescription = "Direct-grant schools (recorded up to October 1980)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 22,
+                            Description = "Practical instruction centres (not all such centres have been allocated individual numbers but where a number has already been allocated its use is continued. All new centres are numbered 5199)",
+                            EstablishmentRangeFrom = "5100",
+                            EstablishmentRangeTo = "5198",
+                            ShortDescription = "Practical instruction centres"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 23,
+                            Description = "Grant-maintained primary/middle deemed primary schools and schools which have converted to academies",
+                            EstablishmentRangeFrom = "5200",
+                            EstablishmentRangeTo = "5299",
+                            ShortDescription = "Grant-maintained primary/middle deemed primary schools and schools which have converted to academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 24,
+                            Description = "Camps, holiday classes etc.",
+                            EstablishmentRangeFrom = "5300",
+                            EstablishmentRangeTo = "5399",
+                            ShortDescription = "Camps, holiday classes etc."
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 25,
+                            Description = "Grant-maintained secondary/middle deemed secondary schools and schools which have converted to academies",
+                            EstablishmentRangeFrom = "5400",
+                            EstablishmentRangeTo = "5499",
+                            ShortDescription = "Grant-maintained secondary/middle deemed secondary schools and schools which have converted to academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 26,
+                            Description = "Immigrant centres",
+                            EstablishmentRangeFrom = "5500",
+                            EstablishmentRangeTo = "5548",
+                            ShortDescription = "Immigrant centres"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 27,
+                            Description = "Grant-maintained primary, middle and secondary schools (overflow) schools which have converted to academies",
+                            EstablishmentRangeFrom = "5601",
+                            EstablishmentRangeTo = "5899",
+                            ShortDescription = "Grant-maintained primary, middle and secondary schools (overflow) schools which have converted to academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 28,
+                            Description = "Grant-maintained schools (formally Independent) schools which have converted to academies",
+                            EstablishmentRangeFrom = "5900",
+                            EstablishmentRangeTo = "5949",
+                            ShortDescription = "Grant-maintained schools (formally Independent) schools which have converted to academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 29,
+                            Description = "Grant-maintained special schools and schools which have converted to academies",
+                            EstablishmentRangeFrom = "5950",
+                            EstablishmentRangeTo = "5999",
+                            ShortDescription = "Grant-maintained special schools and schools which have converted to academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 30,
+                            Description = "Independent schools",
+                            EstablishmentRangeFrom = "6000",
+                            EstablishmentRangeTo = "6899",
+                            ShortDescription = "Independent schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 31,
+                            Description = "City technology colleges",
+                            EstablishmentRangeFrom = "6900",
+                            EstablishmentRangeTo = "6904",
+                            ShortDescription = "City technology colleges"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 32,
+                            Description = "City Academies",
+                            EstablishmentRangeFrom = "6905",
+                            EstablishmentRangeTo = "6924",
+                            ShortDescription = "City Academies"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 33,
+                            Description = "Special schools (except as below)",
+                            EstablishmentRangeFrom = "7000",
+                            EstablishmentRangeTo = "7749",
+                            ShortDescription = "Special schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 34,
+                            Description = "Special schools for nursery age children",
+                            EstablishmentRangeFrom = "7750",
+                            EstablishmentRangeTo = "7798",
+                            ShortDescription = "Special schools for nursery age children"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 35,
+                            Description = "Boarding homes for handicapped pupils",
+                            EstablishmentRangeFrom = "7800",
+                            EstablishmentRangeTo = "7899",
+                            ShortDescription = "Boarding homes for handicapped pupils"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 36,
+                            Description = "Establishments for further education and training of disabled persons",
+                            EstablishmentRangeFrom = "7900",
+                            EstablishmentRangeTo = "7999",
+                            ShortDescription = "Establishments for further education and training of disabled persons"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 37,
+                            Description = "Maintained and assisted major FE establishments (not included below)",
+                            EstablishmentRangeFrom = "8000",
+                            EstablishmentRangeTo = "8149",
+                            ShortDescription = "Maintained and assisted major FE establishments"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 38,
+                            Description = "Maintained and assisted art establishments",
+                            EstablishmentRangeFrom = "8150",
+                            EstablishmentRangeTo = "8199",
+                            ShortDescription = "Maintained and assisted art establishments"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 39,
+                            Description = "Direct-grant major FE establishments",
+                            EstablishmentRangeFrom = "8200",
+                            EstablishmentRangeTo = "8219",
+                            ShortDescription = "Direct-grant major FE establishments"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 40,
+                            Description = "Independent (Efficient-Rules 16) FE establishments",
+                            EstablishmentRangeFrom = "8220",
+                            EstablishmentRangeTo = "8269",
+                            ShortDescription = "Independent (Efficient-Rules 16) FE establishments"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 41,
+                            Description = "National colleges",
+                            EstablishmentRangeFrom = "8270",
+                            EstablishmentRangeTo = "8284",
+                            ShortDescription = "National colleges"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 42,
+                            Description = "LA farm institutes",
+                            EstablishmentRangeFrom = "8300",
+                            EstablishmentRangeTo = "8349",
+                            ShortDescription = "LA farm institutes"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 43,
+                            Description = "LA agricultural centres",
+                            EstablishmentRangeFrom = "8350",
+                            EstablishmentRangeTo = "8389",
+                            ShortDescription = "LA agricultural centres"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 44,
+                            Description = "Direct-grant and independent agricultural establishments",
+                            EstablishmentRangeFrom = "8390",
+                            EstablishmentRangeTo = "8399",
+                            ShortDescription = "Direct-grant and independent agricultural establishments"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 45,
+                            Description = "LA youth welfare",
+                            EstablishmentRangeFrom = "8400",
+                            EstablishmentRangeTo = "8499",
+                            ShortDescription = "LA youth welfare"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 46,
+                            Description = "LA adult welfare",
+                            EstablishmentRangeFrom = "8500",
+                            EstablishmentRangeTo = "8599",
+                            ShortDescription = "LA adult welfare"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 47,
+                            Description = "Sixth form colleges",
+                            EstablishmentRangeFrom = "8600",
+                            EstablishmentRangeTo = "8699",
+                            ShortDescription = "Sixth form colleges"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 48,
+                            Description = "Polytechnics/New Style Universities",
+                            EstablishmentRangeFrom = "8700",
+                            EstablishmentRangeTo = "8898",
+                            ShortDescription = "Polytechnics/New Style Universities"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 49,
+                            Description = "LA colleges of education",
+                            EstablishmentRangeFrom = "9300",
+                            EstablishmentRangeTo = "9599",
+                            ShortDescription = "LA colleges of education"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 50,
+                            Description = "Voluntary colleges of education",
+                            EstablishmentRangeFrom = "9600",
+                            EstablishmentRangeTo = "9899",
+                            ShortDescription = "Voluntary colleges of education"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 51,
+                            Description = "Teacher /organiser (employed primarily as a teacher)",
+                            EstablishmentRangeFrom = "0950",
+                            EstablishmentRangeTo = "0950",
+                            ShortDescription = "Teacher /organiser (employed primarily as a teacher)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 52,
+                            Description = "Divided service between Primary and Secondary Schools",
+                            EstablishmentRangeFrom = "0951",
+                            EstablishmentRangeTo = "0951",
+                            ShortDescription = "Divided service between Primary and Secondary Schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 53,
+                            Description = "Divided service between Further Education and P & S Schools",
+                            EstablishmentRangeFrom = "0952",
+                            EstablishmentRangeTo = "0952",
+                            ShortDescription = "Divided service between Further Education and P & S Schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 54,
+                            Description = "Adult Miscellaneous Organisation",
+                            EstablishmentRangeFrom = "0954",
+                            EstablishmentRangeTo = "0954",
+                            ShortDescription = "Adult Miscellaneous Organisation"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 55,
+                            Description = "Divided service between Special Schools",
+                            EstablishmentRangeFrom = "7799",
+                            EstablishmentRangeTo = "7799",
+                            ShortDescription = "Divided service between Special Schools"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 56,
+                            Description = "Divided service between FE establishments",
+                            EstablishmentRangeFrom = "8999",
+                            EstablishmentRangeTo = "8999",
+                            ShortDescription = "Divided service between FE establishments"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 57,
+                            Description = "Adult Miscellaneous Organisation (not allocated an Estab No) - ie teacher paid under FE document, employed providing FE or Adult Education (eg Community College)",
+                            EstablishmentRangeFrom = "0953",
+                            EstablishmentRangeTo = "0953",
+                            ShortDescription = "Adult Miscellaneous Organisation (not allocated an Estab No)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 58,
+                            Description = "Teacher employed by Ministry of Defence (UK based)",
+                            EstablishmentRangeFrom = "0955",
+                            EstablishmentRangeTo = "0955",
+                            ShortDescription = "Teacher employed by Ministry of Defence (UK based)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 59,
+                            Description = "Unattached regular engagement in Primary Schools - ie Permanent 'supply' teacher under contract",
+                            EstablishmentRangeFrom = "0960",
+                            EstablishmentRangeTo = "0960",
+                            ShortDescription = "Unattached regular engagement in Primary Schools - ie Permanent 'supply' teacher under contract"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 60,
+                            Description = "Unattached regular engagement in Secondary or P & S - ie Permanent 'supply' teacher under contract",
+                            EstablishmentRangeFrom = "0961",
+                            EstablishmentRangeTo = "0961",
+                            ShortDescription = "Unattached regular engagement in Secondary or P & S - ie Permanent 'supply' teacher under contract"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 61,
+                            Description = "Visiting Teacher Primary - peripatetic teacher (eg specialist subject teacher visiting different schools)",
+                            EstablishmentRangeFrom = "0962",
+                            EstablishmentRangeTo = "0962",
+                            ShortDescription = "Visiting Teacher Primary - peripatetic teacher (eg specialist subject teacher visiting different schools)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 62,
+                            Description = "Visiting Teacher Secondary or P & S - peripatetic teacher (eg specialist subject teacher visiting different schools)",
+                            EstablishmentRangeFrom = "0963",
+                            EstablishmentRangeTo = "0963",
+                            ShortDescription = "Visiting Teacher Secondary or P & S - peripatetic teacher (eg specialist subject teacher visiting different schools)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 63,
+                            Description = "P & S teaching under Section 56 of Education Act 1944 - ie teaching other than at a school (eg at home or in a hospital, or teachers in penal establishments)",
+                            EstablishmentRangeFrom = "0964",
+                            EstablishmentRangeTo = "0964",
+                            ShortDescription = "P & S teaching under Section 56 of Education Act 1944 - ie teaching other than at a school"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 64,
+                            Description = "Peripatetic support wholly for SEN or disabled not in a special school.",
+                            EstablishmentRangeFrom = "0965",
+                            EstablishmentRangeTo = "0965",
+                            ShortDescription = "Peripatetic support wholly for SEN or disabled not in a special school."
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 65,
+                            Description = "School supply teacher - whose contract is terminable without notice. Teacher who is employed temporarily in place of a regularly employed teacher. Teacher has made a part-time election.",
+                            EstablishmentRangeFrom = "0966",
+                            EstablishmentRangeTo = "0966",
+                            ShortDescription = "School supply teacher - whose contract is terminable without notice"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 66,
+                            Description = "Full-time Organiser - employment involves the performance of duties in connection with the provision of education or service ancillary to education (accepted in TPS only if previously accepted under 1967 Teachers' Pension Regulations)",
+                            EstablishmentRangeFrom = "0970",
+                            EstablishmentRangeTo = "0971",
+                            ShortDescription = "Full-time Organiser"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 67,
+                            Description = "Full and Part-Time Youth and Community Worker",
+                            EstablishmentRangeFrom = "0972",
+                            EstablishmentRangeTo = "0972",
+                            ShortDescription = "Full and Part-Time Youth and Community Worker"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 68,
+                            Description = "Service as a teacher in Practical Instruction Centres - providing P & S education (previously allocated individual numbers in range 5100-5199)(not schools - unattached units). (Service other than as a teacher would have to be considered by the Department)",
+                            EstablishmentRangeFrom = "5199",
+                            EstablishmentRangeTo = "5199",
+                            ShortDescription = "Service as a teacher in Practical Instruction Centres - providing P & S education"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 69,
+                            Description = "Service as a teacher in Remedial Centres and Support Units - providing P & S education (not schools - unattached units). (Service other than as a teacher would have to be considered by the Department",
+                            EstablishmentRangeFrom = "5549",
+                            EstablishmentRangeTo = "5549",
+                            ShortDescription = "Service as a teacher in Remedial Centres and Support Units - providing P & S education (not schools - unattached units)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 70,
+                            Description = "Service as a teacher in any other P & S Centre (ie not PI or Remedial)(eg Assessment Centres outdoor pursuit centres, Teacher Centres [if paid P & S]). Service other than as a teacher would have to be considered by Teachers' Pensions)",
+                            EstablishmentRangeFrom = "5599",
+                            EstablishmentRangeTo = "5599",
+                            ShortDescription = "Service as a teacher in any other P & S Centre (ie not PI or Remedial)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 71,
+                            Description = "Service in Intermediate Treatment Centres - providing P & S education (not schools - unattached units)",
+                            EstablishmentRangeFrom = "5600",
+                            EstablishmentRangeTo = "5600",
+                            ShortDescription = "Service in Intermediate Treatment Centres - providing P & S education (not schools - unattached units)"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 72,
+                            Description = "Function Provider within a LEA",
+                            EstablishmentRangeFrom = "9099",
+                            EstablishmentRangeTo = "9099",
+                            ShortDescription = "Function Provider within a LEA"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 73,
+                            Description = "Adult Education Service (residential adult education estabs have numbers allocated in range 8290-8294). Teacher Centres if paid on FE Scales, Adult Literacy Scheme staff (LA)",
+                            EstablishmentRangeFrom = "8899",
+                            EstablishmentRangeTo = "8899",
+                            ShortDescription = "Adult Education Service"
+                        },
+                        new
+                        {
+                            TpsEstablishmentTypeId = 74,
+                            Description = "Service of any other kind (eg full-time educational officers in penal estabs Job Creation Schemes). Normally this code will not be used where a teacher is in receipt of a mandatory Burnham salary",
+                            EstablishmentRangeFrom = "0999",
+                            EstablishmentRangeTo = "0999",
+                            ShortDescription = "Service of any other kind (eg full-time educational officers in penal estabs Job Creation Schemes)"
+                        });
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrainingProvider", b =>
