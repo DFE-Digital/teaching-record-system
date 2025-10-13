@@ -501,8 +501,8 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.Evidence.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile.FileName);
-        Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile.FileSizeDescription);
+        Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
     [Test]
