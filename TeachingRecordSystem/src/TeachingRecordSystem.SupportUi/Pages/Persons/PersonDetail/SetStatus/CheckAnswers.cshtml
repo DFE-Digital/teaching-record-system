@@ -3,8 +3,8 @@
 @{
     Layout = "_Layout";
     ViewBag.Title = Model.TargetStatus == PersonStatus.Deactivated
-        ? "Check details and deactivate record"
-        : "Check details and reactivate record";
+        ? "Check details before deactivating record"
+        : "Check details before reactivating record";
     var caption = Model.TargetStatus == PersonStatus.Deactivated
         ? $"Deactivate record - {Model.PersonName}"
         : $"Reactivate record - {Model.PersonName}";
@@ -29,14 +29,14 @@
                     @if (Model.TargetStatus == PersonStatus.Deactivated)
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason for deactivating record</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>@Model.DeactivateReason?.GetDisplayName()</govuk-summary-list-row-value>
                             <govuk-summary-list-row-actions>
                                 <govuk-summary-list-row-action data-testid="change-deactivate-reason-link" href=@Model.ChangeReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
                                 @if (Model.DeactivateReasonDetail is not null)
                                 {
@@ -55,14 +55,14 @@
                     else
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason for reactivating record</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>@Model.ReactivateReason?.GetDisplayName()</govuk-summary-list-row-value>
                             <govuk-summary-list-row-actions>
                                 <govuk-summary-list-row-action data-testid="change-reactivate-reason-link" href=@Model.ChangeReasonLink visually-hidden-text="reason">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
                                 @if (Model.ReactivateReasonDetail is not null)
                                 {
@@ -79,7 +79,7 @@
                         </govuk-summary-list-row>
                     }
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence uploaded</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
                             <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                         </govuk-summary-list-row-value>
