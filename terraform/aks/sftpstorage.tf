@@ -24,7 +24,8 @@ resource "azurerm_storage_account" "sftp_storage" {
   }
   lifecycle {
     ignore_changes = [
-      tags
+      tags,
+      network_rules
     ]
   }
 }
