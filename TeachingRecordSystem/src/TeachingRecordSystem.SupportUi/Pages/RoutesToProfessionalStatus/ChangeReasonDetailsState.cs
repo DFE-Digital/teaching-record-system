@@ -1,3 +1,5 @@
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
 public class ChangeReasonDetailsState
@@ -6,12 +8,10 @@ public class ChangeReasonDetailsState
 
     public string? ChangeReasonDetail { get; set; }
 
-    public bool? UploadEvidence { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
-    public bool IsComplete => UploadEvidence == false || UploadEvidence == true && !string.IsNullOrWhiteSpace(EvidenceFileName);
+    public bool IsComplete =>
+        ChangeReasonDetail != null ||
+        HasAdditionalReasonDetail != null ||
+        Evidence.IsComplete;
 }

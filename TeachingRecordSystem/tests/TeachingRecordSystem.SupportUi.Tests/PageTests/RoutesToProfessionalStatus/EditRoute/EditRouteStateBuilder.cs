@@ -209,11 +209,8 @@ public class EditRouteStateBuilder()
             ChangeReasonDetail = new ChangeReasonDetailsState
             {
                 ChangeReasonDetail = _changeReasonDetail.ChangeReasonDetail,
-                EvidenceFileId = _changeReasonDetail.EvidenceFileId,
-                EvidenceFileName = _changeReasonDetail.EvidenceFileName,
-                EvidenceFileSizeDescription = _changeReasonDetail.EvidenceFileSizeDescription,
                 HasAdditionalReasonDetail = _changeReasonDetail.HasAdditionalReasonDetail,
-                UploadEvidence = _changeReasonDetail.UploadEvidence
+                Evidence = _changeReasonDetail.Evidence
             },
             EditStatusState = _editRouteStatusState
         };

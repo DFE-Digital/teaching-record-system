@@ -1,14 +1,13 @@
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 
 public class ChangeReasonStateBuilder
 {
     private string? _changeReasonDetail;
-    private bool? _uploadEvidence;
-    private Guid? _evidenceFileId;
-    private string? _evidenceFileName;
-    private string? _evidenceFileSizeDescription;
+    private EvidenceUploadModel _evidence { get; set; } = new();
+
     private bool? _hasAdditionalReasonDetail;
 
     public ChangeReasonStateBuilder WithChangeReasonDetail(string detail)
@@ -21,18 +20,21 @@ public class ChangeReasonStateBuilder
     {
         _hasAdditionalReasonDetail = true;
         _changeReasonDetail = "Some free text reason detail";
-        _uploadEvidence = false;
+        _evidence.UploadEvidence = false;
         return this;
     }
 
     public ChangeReasonStateBuilder WithFileUploadChoice(bool uploadFile)
     {
-        _uploadEvidence = uploadFile;
+        _evidence.UploadEvidence = uploadFile;
         if (uploadFile)
         {
-            _evidenceFileId = Guid.NewGuid();
-            _evidenceFileName = "evidence.jpeg";
-            _evidenceFileSizeDescription = "5MB";
+            _evidence.UploadedEvidenceFile = new()
+            {
+                FileId = Guid.NewGuid(),
+                FileName = "evidence.jpeg",
+                FileSizeDescription = "5MB"
+            };
         }
         return this;
     }
@@ -43,10 +45,7 @@ public class ChangeReasonStateBuilder
         {
             ChangeReasonDetail = _changeReasonDetail,
             HasAdditionalReasonDetail = _hasAdditionalReasonDetail,
-            UploadEvidence = _uploadEvidence,
-            EvidenceFileId = _evidenceFileId,
-            EvidenceFileName = _evidenceFileName,
-            EvidenceFileSizeDescription = _evidenceFileSizeDescription
+            Evidence = _evidence
         };
     }
 }

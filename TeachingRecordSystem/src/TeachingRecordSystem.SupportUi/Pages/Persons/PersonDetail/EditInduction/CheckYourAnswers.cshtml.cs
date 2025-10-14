@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -12,8 +12,8 @@ public class CheckYourAnswersModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IClock clock,
-    IFileService fileService)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    EvidenceUploadManager evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     public InductionStatus InductionStatus { get; set; }
 
@@ -42,11 +42,7 @@ public class CheckYourAnswersModel(
 
     public string? ChangeReasonDetail { get; set; }
 
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    public string? UploadedEvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public bool ShowStatusChangeLink => JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.Status;
 
@@ -58,6 +54,25 @@ public class CheckYourAnswersModel(
     public bool ShowExemptionReasonsChangeLink => InductionStatus == InductionStatus.Exempt;
 
     public string BackLink => GetPageLink(InductionJourneyPage.ChangeReasons);
+
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    {
+        await base.OnPageHandlerExecutingAsync(context);
+
+        if (!JourneyInstance!.State.IsComplete)
+        {
+            context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
+            return;
+        }
+
+        ExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
+        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        InductionStatus = JourneyInstance.State.InductionStatus;
+        StartDate = JourneyInstance.State.StartDate;
+        CompletedDate = JourneyInstance.State.CompletedDate;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+    }
 
     public void OnGet()
     {
@@ -83,13 +98,7 @@ public class CheckYourAnswersModel(
             JourneyInstance!.State.ExemptionReasonIds ?? [],
             ChangeReason.GetDisplayName(),
             ChangeReasonDetail,
-            JourneyInstance!.State.EvidenceFileId is Guid fileId
-                ? new EventModels.File()
-                {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
-                }
-                : null,
+            EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             clock.UtcNow,
             out var updatedEvent);
@@ -105,27 +114,5 @@ public class CheckYourAnswersModel(
         TempData.SetFlashSuccess("Induction details have been updated");
 
         return Redirect(LinkGenerator.PersonInduction(PersonId));
-    }
-
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
-    {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
-            return;
-        }
-
-        ExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        ChangeReason = JourneyInstance!.State.ChangeReason!.Value;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
-        InductionStatus = JourneyInstance!.State.InductionStatus;
-        StartDate = JourneyInstance!.State.StartDate;
-        CompletedDate = JourneyInstance!.State.CompletedDate;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await FileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
     }
 }

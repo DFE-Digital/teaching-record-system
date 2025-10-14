@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
@@ -223,10 +224,9 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileId)));
-        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
 
         Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TrimmedText());
     }
@@ -294,7 +294,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MergeModel.EvidenceFile), "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceUploadModel.EvidenceFile), "Select a file");
     }
 
     [Test]
@@ -323,7 +323,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MergeModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceUploadModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -361,10 +361,9 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileId)));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -386,7 +385,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
-                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -401,12 +400,11 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
-        Assert.Equal("http://test.com/file", link.Href);
+        Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileId)));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileName)));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileSizeDescription)));
-        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(MergeModel.EvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -429,7 +427,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         {
             Content = new MergePersonPostRequestContentBuilder()
                 .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
-                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -461,7 +459,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
-                .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -502,9 +500,9 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.EvidenceFileName);
-        Assert.Equal("1.2 KB", journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.True(journeyInstance.State.Evidence.UploadEvidence);
+        Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
     [Test]

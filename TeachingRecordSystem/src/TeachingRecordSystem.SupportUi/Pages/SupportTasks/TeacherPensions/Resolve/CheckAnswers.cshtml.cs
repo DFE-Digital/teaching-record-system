@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
 
@@ -16,7 +16,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     TrnRequestService trnRequestService,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? SourceApplicationUserName { get; set; }
@@ -43,13 +43,55 @@ public class CheckAnswersModel(
 
     public string? MergeComments { get; set; }
 
-    public string? EvidenceFileName { get; set; }
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
-    public string? EvidenceFileSizeDescription { get; set; }
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var supportTask = GetSupportTask();
+        var requestData = supportTask.TrnRequestMetadata!;
+        var state = JourneyInstance!.State;
 
-    public string? UploadedEvidenceFileUrl { get; set; }
+        if (state.PersonId is not Guid personId)
+        {
+            context.Result = Redirect(linkGenerator.TeacherPensionsMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            return;
+        }
 
-    public Guid? EvidenceFileId { get; set; }
+        if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
+        {
+            context.Result = Redirect(linkGenerator.TeacherPensionsMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+            return;
+        }
+        Debug.Assert(state.PersonId is not null);
+
+        var selectedPerson = await DbContext.Persons
+            .Where(p => p.PersonId == state.PersonId)
+            .Select(p => new
+            {
+                p.FirstName,
+                p.MiddleName,
+                p.LastName,
+                p.DateOfBirth,
+                p.EmailAddress,
+                p.NationalInsuranceNumber,
+                p.Gender,
+                p.Trn
+            })
+            .SingleAsync();
+
+        FirstName = state.FirstNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.FirstName : requestData.FirstName;
+        MiddleName = state.MiddleNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.MiddleName : requestData.MiddleName;
+        LastName = state.LastNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.LastName : requestData.LastName;
+        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.ExistingRecord ? selectedPerson.DateOfBirth : requestData.DateOfBirth;
+        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.ExistingRecord ? selectedPerson.NationalInsuranceNumber : requestData.NationalInsuranceNumber;
+        Gender = state.GenderSource == PersonAttributeSource.ExistingRecord ? selectedPerson.Gender : requestData.Gender;
+        Trn = selectedPerson.Trn; //trn cannot be changed, it'll always be the existing trn that is kept
+
+        MergeComments = state.MergeComments;
+        PotentialDuplicate = requestData.PotentialDuplicate;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+        await base.OnPageHandlerExecutionAsync(context, next);
+    }
 
     public void OnGet()
     {
@@ -118,9 +160,9 @@ public class CheckAnswersModel(
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
             RaisedBy = User.GetUserId(),
-            EvidenceFileId = state.EvidenceFileId,
-            EvidenceFileName = state.EvidenceFileName,
-            EvidenceFileSizeDescription = state.EvidenceFileSizeDescription,
+            EvidenceFileId = state.Evidence.UploadedEvidenceFile?.FileId,
+            EvidenceFileName = state.Evidence.UploadedEvidenceFile?.FileName,
+            EvidenceFileSizeDescription = state.Evidence.UploadedEvidenceFile?.FileSizeDescription,
             SecondaryPersonTrn = teacherPensionPerson.Trn
         };
 
@@ -147,61 +189,9 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
 
         return Redirect(linkGenerator.TeacherPensions());
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var supportTask = GetSupportTask();
-        var requestData = supportTask.TrnRequestMetadata!;
-        var state = JourneyInstance!.State;
-
-        if (state.PersonId is not Guid personId)
-        {
-            context.Result = Redirect(linkGenerator.TeacherPensionsMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
-
-        if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
-        {
-            context.Result = Redirect(linkGenerator.TeacherPensionsMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
-            return;
-        }
-        Debug.Assert(state.PersonId is not null);
-
-        var selectedPerson = await DbContext.Persons
-            .Where(p => p.PersonId == state.PersonId)
-            .Select(p => new
-            {
-                p.FirstName,
-                p.MiddleName,
-                p.LastName,
-                p.DateOfBirth,
-                p.EmailAddress,
-                p.NationalInsuranceNumber,
-                p.Gender,
-                p.Trn
-            })
-            .SingleAsync();
-
-        FirstName = state.FirstNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.FirstName : requestData.FirstName;
-        MiddleName = state.MiddleNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.MiddleName : requestData.MiddleName;
-        LastName = state.LastNameSource == PersonAttributeSource.ExistingRecord ? selectedPerson.LastName : requestData.LastName;
-        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.ExistingRecord ? selectedPerson.DateOfBirth : requestData.DateOfBirth;
-        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.ExistingRecord ? selectedPerson.NationalInsuranceNumber : requestData.NationalInsuranceNumber;
-        Gender = state.GenderSource == PersonAttributeSource.ExistingRecord ? selectedPerson.Gender : requestData.Gender;
-        Trn = selectedPerson.Trn; //trn cannot be changed, it'll always be the existing trn that is kept
-
-        MergeComments = state.MergeComments;
-        PotentialDuplicate = requestData.PotentialDuplicate;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
-        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

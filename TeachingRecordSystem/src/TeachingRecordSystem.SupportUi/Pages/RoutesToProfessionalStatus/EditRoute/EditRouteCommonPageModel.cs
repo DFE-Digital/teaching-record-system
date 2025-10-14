@@ -2,10 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-public abstract class EditRouteCommonPageModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+public abstract class EditRouteCommonPageModel(
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
     : PageModel
 {
     protected TrsLinkGenerator LinkGenerator => linkGenerator;
@@ -32,6 +36,7 @@ public abstract class EditRouteCommonPageModel(TrsLinkGenerator linkGenerator, R
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
@@ -23,21 +24,14 @@ public class EditAlertStartDateState : IRegisterJourney
 
     public string? ChangeReasonDetail { get; set; }
 
-    public bool? UploadEvidence { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(StartDate), nameof(ChangeReason), nameof(HasAdditionalReasonDetail), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    [MemberNotNullWhen(true, nameof(StartDate), nameof(ChangeReason), nameof(HasAdditionalReasonDetail))]
     public bool IsComplete => StartDate is not null && StartDate != CurrentStartDate &&
         ChangeReason.HasValue &&
         HasAdditionalReasonDetail.HasValue &&
-        UploadEvidence.HasValue &&
-        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
+        Evidence.IsComplete;
 
     public void EnsureInitialized(CurrentAlertFeature alertInfo)
     {

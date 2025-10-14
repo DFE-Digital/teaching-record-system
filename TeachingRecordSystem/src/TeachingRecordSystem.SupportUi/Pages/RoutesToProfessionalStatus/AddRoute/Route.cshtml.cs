@@ -2,12 +2,16 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRouteCommonPageModel(AddRoutePage.Route, linkGenerator, referenceDataCache)
+public class RouteModel(
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
+    : AddRouteCommonPageModel(AddRoutePage.Route, linkGenerator, referenceDataCache, evidenceController)
 {
     public override AddRoutePage? NextPage => AddRoutePage.Status;
     public override AddRoutePage? PreviousPage => null;

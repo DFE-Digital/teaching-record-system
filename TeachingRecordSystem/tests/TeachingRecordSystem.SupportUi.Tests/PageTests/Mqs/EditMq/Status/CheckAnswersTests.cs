@@ -93,10 +93,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 StatusChangeReason = statusChangeReason,
                 EndDateChangeReason = endDateChangeReason,
                 ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = uploadEvidence,
-                EvidenceFileId = uploadEvidence ? Guid.NewGuid() : null,
-                EvidenceFileName = uploadEvidence ? "test.pdf" : null,
-                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
+                Evidence = new()
+                {
+                    UploadEvidence = uploadEvidence,
+                    UploadedEvidenceFile = uploadEvidence ? new()
+                    {
+                        FileId = Guid.NewGuid(),
+                        FileName = "test.pdf",
+                        FileSizeDescription = "1MB"
+                    } : null
+                }
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -134,7 +140,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.Equal(changeReason, changeSummary.GetElementByTestId("change-reason")!.TrimmedText());
         Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
-        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
+        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-file-link");
         if (uploadEvidence)
         {
             Assert.NotNull(uploadedEvidenceLink);
@@ -232,8 +238,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventObserver.Clear();
 
-        Guid? evidenceFileId = uploadEvidence ? Guid.NewGuid() : null;
-        string? evidenceFileName = uploadEvidence ? "test.pdf" : null;
+        Guid evidenceFileId = Guid.NewGuid();
+        string evidenceFileName = "test.pdf";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
@@ -247,10 +253,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 StatusChangeReason = statusChangeReason,
                 EndDateChangeReason = endDateChangeReason,
                 ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = uploadEvidence,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName,
-                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
+                Evidence = new()
+                {
+                    UploadEvidence = uploadEvidence,
+                    UploadedEvidenceFile = uploadEvidence ? new()
+                    {
+                        FileId = evidenceFileId,
+                        FileName = evidenceFileName,
+                        FileSizeDescription = "1MB"
+                    } : null
+                }
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -320,8 +332,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EvidenceFile = uploadEvidence ?
                     new EventModels.File
                     {
-                        FileId = evidenceFileId!.Value,
-                        Name = evidenceFileName!
+                        FileId = evidenceFileId,
+                        Name = evidenceFileName
                     } :
                     null,
                 Changes = changes
@@ -351,7 +363,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus,
                 CurrentEndDate = oldEndDate,
-                UploadEvidence = false,
+                Evidence = new()
+                {
+                    UploadEvidence = false,
+                },
                 StatusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus
             });
 
@@ -403,7 +418,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus,
                 CurrentEndDate = oldEndDate,
-                UploadEvidence = false,
+                Evidence = new()
+                {
+                    UploadEvidence = false
+                },
                 StatusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus
             });
 

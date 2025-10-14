@@ -29,7 +29,7 @@
 
             <govuk-radios for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional data-testid="additional-detail">
@@ -42,29 +42,7 @@
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <govuk-radios for="UploadEvidence" data-testid="upload-evidence-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
-                    <govuk-radios-item value="@true">
-                        Yes
-                        <govuk-radios-item-conditional>
-                            @if (Model.EvidenceFileId is not null)
-                            {
-                                <span class="govuk-caption-m">Currently uploaded file</span>
-                                <p class="govuk-body">
-                                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
-                                </p>
-                            }
-                            <govuk-file-upload for="EvidenceFile" input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
-                                <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
-                            </govuk-file-upload>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@false">
-                        No
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
-            </govuk-radios>
+            <vc:upload-evidence evidence="@Model.Evidence" />
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>

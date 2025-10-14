@@ -1,15 +1,14 @@
 using System.ComponentModel.DataAnnotations;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.ResolveTeacherPensionsPotentialDuplicateState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFileService fileService) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? PersonName { get; set; }
 
@@ -28,10 +27,6 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFile
     public PersonAttribute<string?>? NationalInsuranceNumber { get; set; }
 
     public PersonAttribute<Gender?>? Gender { get; set; }
-
-    [BindProperty]
-    [Display(Name = "Upload evidence")]
-    public bool? UploadEvidence { get; set; }
 
     [BindProperty]
     [Display(Name = "Date of birth")]
@@ -65,125 +60,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFile
     public string? MergeComments { get; set; }
 
     [BindProperty]
-    [EvidenceFile]
-    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
-    public IFormFile? EvidenceFile { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    public string? UploadedEvidenceFileUrl { get; set; }
-
-    public async Task OnGetAsync()
-    {
-        DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
-        NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
-        GenderSource = JourneyInstance!.State.GenderSource;
-        MergeComments = JourneyInstance!.State.MergeComments;
-        FirstNameSource = JourneyInstance!.State.FirstNameSource;
-        LastNameSource = JourneyInstance!.State.LastNameSource;
-        TRNSource = JourneyInstance!.State.TRNSource;
-        UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, UiDefaults.FileUrlExpiry) :
-            null;
-        UploadEvidence = JourneyInstance?.State.UploadEvidence;
-    }
-
-    public async Task<IActionResult> OnPostAsync()
-    {
-        if (UploadEvidence is null)
-        {
-            ModelState.AddModelError(nameof(UploadEvidence), "Select upload evidence");
-        }
-
-        if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
-        {
-            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
-        }
-
-        if (DateOfBirth!.Different && DateOfBirthSource is null)
-        {
-            ModelState.AddModelError(nameof(DateOfBirthSource), "Select a date of birth");
-        }
-
-        if (NationalInsuranceNumber!.Different && NationalInsuranceNumberSource is null)
-        {
-            ModelState.AddModelError(nameof(NationalInsuranceNumberSource), "Select a National Insurance number");
-        }
-
-        if (FirstName!.Different && FirstNameSource is null)
-        {
-            ModelState.AddModelError(nameof(FirstNameSource), "Select a First name");
-        }
-
-        if (LastName!.Different && LastNameSource is null)
-        {
-            ModelState.AddModelError(nameof(LastNameSource), "Select a Last name");
-        }
-
-        if (Gender!.Different && GenderSource is null)
-        {
-            ModelState.AddModelError(nameof(GenderSource), "Select a gender");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        if (UploadEvidence == true)
-        {
-            if (EvidenceFile is not null)
-            {
-                if (EvidenceFileId is not null)
-                {
-                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
-                }
-
-                using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
-                await JourneyInstance!.UpdateStateAsync(state =>
-                {
-                    state.EvidenceFileId = evidenceFileId;
-                    state.EvidenceFileName = EvidenceFile.FileName;
-                    state.EvidenceFileSizeDescription = EvidenceFile.Length.Bytes().Humanize();
-                });
-            }
-        }
-        else if (EvidenceFileId is not null)
-        {
-            await fileService.DeleteFileAsync(EvidenceFileId.Value);
-            await JourneyInstance!.UpdateStateAsync(state =>
-            {
-                state.EvidenceFileId = null;
-                state.EvidenceFileName = null;
-                state.EvidenceFileSizeDescription = null;
-            });
-        }
-
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.DateOfBirthSource = DateOfBirthSource;
-            state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
-            state.GenderSource = GenderSource;
-            state.PersonAttributeSourcesSet = true;
-            state.MergeComments = MergeComments;
-            state.FirstNameSource = FirstNameSource;
-            state.LastNameSource = LastNameSource;
-            state.UploadEvidence = UploadEvidence;
-        });
-
-        return Redirect(linkGenerator.TeacherPensionsCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.TeacherPensions());
-    }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
@@ -245,11 +122,75 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFile
 
         PersonName = StringHelper.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 
-        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-
         await base.OnPageHandlerExecutionAsync(context, next);
+    }
+
+    public void OnGet()
+    {
+        DateOfBirthSource = JourneyInstance!.State.DateOfBirthSource;
+        NationalInsuranceNumberSource = JourneyInstance!.State.NationalInsuranceNumberSource;
+        GenderSource = JourneyInstance!.State.GenderSource;
+        MergeComments = JourneyInstance!.State.MergeComments;
+        FirstNameSource = JourneyInstance!.State.FirstNameSource;
+        LastNameSource = JourneyInstance!.State.LastNameSource;
+        TRNSource = JourneyInstance!.State.TRNSource;
+        Evidence = JourneyInstance!.State.Evidence;
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+
+        if (DateOfBirth!.Different && DateOfBirthSource is null)
+        {
+            ModelState.AddModelError(nameof(DateOfBirthSource), "Select a date of birth");
+        }
+
+        if (NationalInsuranceNumber!.Different && NationalInsuranceNumberSource is null)
+        {
+            ModelState.AddModelError(nameof(NationalInsuranceNumberSource), "Select a National Insurance number");
+        }
+
+        if (FirstName!.Different && FirstNameSource is null)
+        {
+            ModelState.AddModelError(nameof(FirstNameSource), "Select a First name");
+        }
+
+        if (LastName!.Different && LastNameSource is null)
+        {
+            ModelState.AddModelError(nameof(LastNameSource), "Select a Last name");
+        }
+
+        if (Gender!.Different && GenderSource is null)
+        {
+            ModelState.AddModelError(nameof(GenderSource), "Select a gender");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.DateOfBirthSource = DateOfBirthSource;
+            state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+            state.GenderSource = GenderSource;
+            state.PersonAttributeSourcesSet = true;
+            state.MergeComments = MergeComments;
+            state.FirstNameSource = FirstNameSource;
+            state.LastNameSource = LastNameSource;
+            state.Evidence = Evidence;
+        });
+
+        return Redirect(linkGenerator.TeacherPensionsCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+    }
+
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.TeacherPensions());
     }
 
 #pragma warning disable CA1711

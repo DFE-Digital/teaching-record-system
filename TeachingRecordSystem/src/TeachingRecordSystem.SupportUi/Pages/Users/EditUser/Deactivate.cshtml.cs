@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
@@ -14,7 +13,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class DeactivateModel(
     TrsLinkGenerator linkGenerator,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     TrsDbContext dbContext,
     IClock clock) : PageModel
 {
@@ -42,26 +41,20 @@ public class DeactivateModel(
     public string? MoreInformationDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you have evidence to upload?")]
-    [Required(ErrorMessage = "Select yes if you want to upload evidence")]
-    public bool? UploadEvidence { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
-    [BindProperty]
-    [EvidenceFile]
-    [FileSize(UiDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {UiDefaults.MaxFileUploadSizeErrorMessage}")]
-    public IFormFile? EvidenceFile { get; set; }
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
 
-    [BindProperty]
-    public Guid? EvidenceFileId { get; set; }
+        if (_user is null)
+        {
+            context.Result = NotFound();
+            return;
+        }
 
-    [BindProperty]
-    public string? EvidenceFileName { get; set; }
-
-    [BindProperty]
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    [BindProperty]
-    public string? UploadedEvidenceFileUrl { get; set; }
+        await next();
+    }
 
     public void OnGet()
     {
@@ -90,34 +83,7 @@ public class DeactivateModel(
             ModelState.AddModelError(nameof(MoreInformationDetail), "Enter more details");
         }
 
-        if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
-        {
-            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
-        }
-
-        // Delete any previously uploaded file if they're uploading a new one,
-        // or choosing not to upload evidence (check for UploadEvidence != true because if
-        // UploadEvidence somehow got set to null we still want to delete the file)
-        if (EvidenceFileId.HasValue && (EvidenceFile is not null || UploadEvidence != true))
-        {
-            await fileService.DeleteFileAsync(EvidenceFileId.Value);
-        }
-
-        // Upload the file even if the rest of the form is invalid
-        // otherwise the user will have to re-upload every time they re-submit
-        if (UploadEvidence == true)
-        {
-            // Upload the file and set the display fields
-            if (EvidenceFile is not null)
-            {
-                using var stream = EvidenceFile.OpenReadStream();
-                var fileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
-                EvidenceFileName = EvidenceFile?.FileName;
-                EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-                UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(fileId, UiDefaults.FileUrlExpiry);
-                EvidenceFileId = fileId;
-            }
-        }
+        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
 
         if (!ModelState.IsValid)
         {
@@ -134,7 +100,7 @@ public class DeactivateModel(
             CreatedUtc = clock.UtcNow,
             DeactivatedReason = HasAdditionalReason is true ? AdditionalReasonDetail : null,
             DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
-            EvidenceFileId = EvidenceFileId
+            EvidenceFileId = Evidence.UploadedEvidenceFile?.FileId
         });
 
         await dbContext.SaveChangesAsync();
@@ -143,28 +109,9 @@ public class DeactivateModel(
         return Redirect(linkGenerator.Users());
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
-
-        if (_user is null)
-        {
-            context.Result = NotFound();
-            return;
-        }
-
-        await next();
-    }
-
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        // If the user cancels after having uploaded a file but before submitting,
-        // we want to delete the file to clean up after ourselves.
-        if (EvidenceFileId.HasValue)
-        {
-            await fileService.DeleteFileAsync(EvidenceFileId.Value);
-        }
-
+        await evidenceController.DeleteUploadedFileAsync(Evidence.UploadedEvidenceFile);
         return Redirect(linkGenerator.EditUser(UserId));
     }
 }

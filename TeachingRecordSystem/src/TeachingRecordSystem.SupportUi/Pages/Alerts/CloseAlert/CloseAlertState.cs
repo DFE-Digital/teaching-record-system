@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
@@ -19,20 +20,13 @@ public class CloseAlertState : IRegisterJourney
 
     public string? ChangeReasonDetail { get; set; }
 
-    public bool? UploadEvidence { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(EndDate), nameof(ChangeReason), nameof(HasAdditionalReasonDetail), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    [MemberNotNullWhen(true, nameof(EndDate), nameof(ChangeReason), nameof(HasAdditionalReasonDetail))]
     public bool IsComplete => EndDate is not null &&
         ChangeReason.HasValue &&
-        HasAdditionalReasonDetail.HasValue &&
-        (!HasAdditionalReasonDetail.Value || (HasAdditionalReasonDetail.Value && !string.IsNullOrWhiteSpace(ChangeReasonDetail))) &&
-        UploadEvidence.HasValue &&
-        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
+        HasAdditionalReasonDetail is bool hasDetail &&
+        (!hasDetail || ChangeReasonDetail is not null) &&
+        Evidence.IsComplete;
 }

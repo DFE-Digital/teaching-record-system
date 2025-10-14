@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
@@ -13,10 +14,7 @@ public class EditInductionPostRequestContentBuilder : PostRequestContentBuilder
     public string? ChangeReasonDetail { get; set; }
     public bool? UploadEvidence { get; set; }
     public (HttpContent, string)? EvidenceFile { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    public string? UploadedEvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
     public EditInductionPostRequestContentBuilder WithStartDate(DateOnly date)
     {
@@ -55,33 +53,22 @@ public class EditInductionPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    //public EditInductionPostRequestContentBuilder WithNoFileUploadSelection()
-    //{
-    //    UploadEvidence = false;
-    //    return this;
-    //}
-
-    //public EditInductionPostRequestContentBuilder WithFileUploadSelection(HttpContent binaryFileContent, string filename)
-    //{
-    //    UploadEvidence = true;
-    //    EvidenceFile = (binaryFileContent, filename);
-    //    return this;
-    //}
-
-    public EditInductionPostRequestContentBuilder WithEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
+    public EditInductionPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
         UploadEvidence = uploadEvidence;
         EvidenceFile = evidenceFile;
         return this;
     }
 
-    public EditInductionPostRequestContentBuilder WithEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription, string? uploadedEvidenceFileUrl)
+    public EditInductionPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
         UploadEvidence = uploadEvidence;
-        EvidenceFileId = evidenceFileId;
-        EvidenceFileName = evidenceFileName;
-        EvidenceFileSizeDescription = evidenceFileSizeDescription;
-        UploadedEvidenceFileUrl = uploadedEvidenceFileUrl;
+        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        {
+            FileId = id,
+            FileName = evidenceFileName ?? "filename.jpg",
+            FileSizeDescription = evidenceFileSizeDescription ?? "5 MB"
+        };
         return this;
     }
 }

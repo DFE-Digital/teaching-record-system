@@ -43,14 +43,13 @@
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="evidence">
+                        <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
             </govuk-summary-list>
-
-            @if (Model.UploadedEvidenceFileUrl is not null)
-            {
-                <p class="govuk-body">
-                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
-                </p>
-            }            
 
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit">Delete qualification</govuk-button>

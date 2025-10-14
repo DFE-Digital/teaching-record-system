@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
@@ -8,10 +9,7 @@ public class SetStatusStateBuilder
     public string? DeactivateReasonDetail { get; set; }
     public ReactivateReasonOption? ReactivateReason { get; set; }
     public string? ReactivateReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     private bool Initialized { get; set; }
 
@@ -36,14 +34,17 @@ public class SetStatusStateBuilder
         return this;
     }
 
-    public SetStatusStateBuilder WithUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
+    public SetStatusStateBuilder WithUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = null, string? evidenceFileSizeDescription = null)
     {
-        UploadEvidence = uploadEvidence;
-        if (evidenceFileId.HasValue)
+        Evidence.UploadEvidence = uploadEvidence;
+        if (uploadEvidence)
         {
-            EvidenceFileId = evidenceFileId;
-            EvidenceFileName = evidenceFileName;
-            EvidenceFileSizeDescription = evidenceFileSizeDescription;
+            Evidence.UploadedEvidenceFile = new()
+            {
+                FileId = evidenceFileId ?? Guid.NewGuid(),
+                FileName = evidenceFileName ?? "evidence.jpeg",
+                FileSizeDescription = evidenceFileSizeDescription ?? "5MB"
+            };
         }
         return this;
     }
@@ -56,11 +57,7 @@ public class SetStatusStateBuilder
             DeactivateReasonDetail = DeactivateReasonDetail,
             ReactivateReason = ReactivateReason,
             ReactivateReasonDetail = ReactivateReasonDetail,
-            UploadEvidence = UploadEvidence,
-            EvidenceFileId = EvidenceFileId,
-            EvidenceFileName = EvidenceFileName,
-            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
-
+            Evidence = Evidence,
             Initialized = Initialized
         };
     }

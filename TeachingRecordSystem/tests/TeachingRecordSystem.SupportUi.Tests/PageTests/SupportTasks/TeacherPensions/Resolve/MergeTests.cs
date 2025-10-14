@@ -208,7 +208,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -310,7 +310,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(PersonAttributeSource.ExistingRecord, journeyInstance.State.NationalInsuranceNumberSource);
         Assert.Equal(PersonAttributeSource.ExistingRecord, journeyInstance.State.GenderSource);
         Assert.Equal(mergeComments, journeyInstance.State.MergeComments);
-        Assert.Equal(false, journeyInstance.State.UploadEvidence);
+        Assert.Equal(false, journeyInstance.State.Evidence.UploadEvidence);
     }
 
     [Test]
@@ -371,9 +371,9 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(PersonAttributeSource.TrnRequest, journeyInstance.State.NationalInsuranceNumberSource);
         Assert.Equal(PersonAttributeSource.TrnRequest, journeyInstance.State.GenderSource);
         Assert.Equal(mergeComments, journeyInstance.State.MergeComments);
-        Assert.Equal(true, journeyInstance.State.UploadEvidence);
-        Assert.Equal(evidenceFile, journeyInstance.State.EvidenceFileName);
-        Assert.NotNull(journeyInstance.State.EvidenceFileId);
+        Assert.Equal(true, journeyInstance.State.Evidence.UploadEvidence);
+        Assert.Equal(evidenceFile, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
     }
 
     private static MultipartFormDataContentBuilder CreatePostContent(

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -11,8 +11,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 public class EnterTrnModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    EvidenceUploadManager evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     public string? ThisTrn { get; set; }
 

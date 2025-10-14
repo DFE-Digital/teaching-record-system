@@ -1,10 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
+public abstract class AddRouteCommonPageModel(
+    AddRoutePage currentPage,
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
     : PageModel
 {
     public AddRoutePage CurrentPage => currentPage;
@@ -29,8 +34,8 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
     }
 
     protected TrsLinkGenerator LinkGenerator => linkGenerator;
-
     protected ReferenceDataCache ReferenceDataCache => referenceDataCache;
+    protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
 
     public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
 
@@ -58,6 +63,7 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(LinkGenerator.PersonQualifications(PersonId));
     }

@@ -36,14 +36,7 @@
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="evidence">
-                        @if (Model.ChangeReasonDetail.EvidenceFileId is not null)
-                        {
-                            <a href="@Model.GetEvidenceFileUrlAsync()" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.ChangeReasonDetail.EvidenceFileName} (opens in new tab)")</a>
-                        }
-                        else
-                        {
-                            <span use-empty-fallback></span>
-                        }
+                        <vc:evidence-file-link evidence-file="@Model.ChangeReasonDetail.Evidence.UploadedEvidenceFile" />
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"

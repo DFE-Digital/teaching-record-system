@@ -1,10 +1,15 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-public abstract class AddRoutePostStatusPageModel(AddRoutePage currentPage, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRouteCommonPageModel(currentPage, linkGenerator, referenceDataCache)
+public abstract class AddRoutePostStatusPageModel(
+    AddRoutePage currentPage,
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
+    : AddRouteCommonPageModel(currentPage, linkGenerator, referenceDataCache, evidenceController)
 {
     public RouteToProfessionalStatusType RouteType { get; set; } = null!;
 

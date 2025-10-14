@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
@@ -11,11 +11,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService,
+    EvidenceUploadManager evidenceController,
     IClock clock) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
-
     public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -35,13 +33,30 @@ public class CheckAnswersModel(
 
     public string? ChangeReasonDetail { get; set; }
 
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    public string? UploadedEvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? EvidenceFile { get; set; }
 
     public void OnGet() { }
+
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    {
+        if (!JourneyInstance!.State.IsComplete)
+        {
+            context.Result = Redirect(linkGenerator.MqEditProvider(QualificationId, JourneyInstance.InstanceId));
+            return;
+        }
+
+        var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+        CurrentProviderName = qualificationInfo.MandatoryQualification.Provider?.Name;
+        ProviderId = JourneyInstance.State.ProviderId!.Value;
+        ProviderName = MandatoryQualificationProvider.GetById(ProviderId).Name;
+        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
+    }
 
     public async Task<IActionResult> OnPostAsync()
     {
@@ -51,13 +66,7 @@ public class CheckAnswersModel(
             q => q.ProviderId = ProviderId,
             ChangeReason.GetDisplayName(),
             ChangeReasonDetail,
-            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                new EventModels.File()
-                {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
-                } :
-                null,
+            evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
             clock.UtcNow,
             out var updatedEvent);
@@ -76,33 +85,8 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.MqEditProvider(QualificationId, JourneyInstance.InstanceId));
-            return;
-        }
-
-        var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-        CurrentProviderName = qualificationInfo.MandatoryQualification.Provider?.Name;
-        ProviderId = JourneyInstance.State.ProviderId!.Value;
-        ProviderName = MandatoryQualificationProvider.GetById(ProviderId).Name;
-        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
-        UploadedEvidenceFileUrl ??= JourneyInstance.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
-            null;
-
-        await next();
     }
 }

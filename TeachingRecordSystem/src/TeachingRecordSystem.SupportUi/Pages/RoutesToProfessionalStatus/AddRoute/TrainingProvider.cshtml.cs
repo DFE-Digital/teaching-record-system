@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRoutePostStatusPageModel(AddRoutePage.TrainingProvider, linkGenerator, referenceDataCache)
+public class TrainingProviderModel(
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
+    : AddRoutePostStatusPageModel(AddRoutePage.TrainingProvider, linkGenerator, referenceDataCache, evidenceController)
 {
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 

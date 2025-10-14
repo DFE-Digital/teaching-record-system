@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
@@ -10,10 +11,7 @@ public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
     public string? ReactivateReasonDetail { get; set; }
     public bool? UploadEvidence { get; set; }
     public (HttpContent, string)? EvidenceFile { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    public string? UploadedEvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
 
     public SetStatusPostRequestContentBuilder WithDeactivateReason(DeactivateReasonOption deactivateReason, string? detail = null)
     {
@@ -29,20 +27,22 @@ public class SetStatusPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public SetStatusPostRequestContentBuilder WithEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
+    public SetStatusPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
         UploadEvidence = uploadEvidence;
         EvidenceFile = evidenceFile;
         return this;
     }
 
-    public SetStatusPostRequestContentBuilder WithEvidence(bool uploadEvidence, Guid? evidenceFileId, string? otherDetailsEvidenceFileName, string? otherDetailsEvidenceFileSizeDescription, string? otherDetailsUploadedEvidenceFileUrl)
+    public SetStatusPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
         UploadEvidence = uploadEvidence;
-        EvidenceFileId = evidenceFileId;
-        EvidenceFileName = otherDetailsEvidenceFileName;
-        EvidenceFileSizeDescription = otherDetailsEvidenceFileSizeDescription;
-        UploadedEvidenceFileUrl = otherDetailsUploadedEvidenceFileUrl;
+        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        {
+            FileId = id,
+            FileName = evidenceFileName ?? "filename.jpg",
+            FileSizeDescription = evidenceFileSizeDescription ?? "5 MB"
+        };
         return this;
     }
 }

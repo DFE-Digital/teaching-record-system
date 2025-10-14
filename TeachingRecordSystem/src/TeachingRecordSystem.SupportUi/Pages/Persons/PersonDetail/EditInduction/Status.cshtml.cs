@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -12,8 +12,8 @@ public class StatusModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    IFileService fileService)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    EvidenceUploadManager evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     private bool _inductionStatusManagedByCpd;
 

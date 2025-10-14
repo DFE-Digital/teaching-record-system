@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -66,6 +67,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
 
         return Redirect(linkGenerator.TeacherPensions());

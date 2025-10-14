@@ -3,20 +3,20 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    IFileService fileService) : PageModel
+    EvidenceUploadManager evidenceController) : PageModel
 {
     public JourneyInstance<SetStatusState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
     protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
-    protected IFileService FileService { get; } = fileService;
+    protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
     protected Person? Person { get; set; }
 
     [FromRoute]
@@ -83,11 +83,7 @@ public abstract class CommonJourneyPage(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        if (JourneyInstance!.State.EvidenceFileId.HasValue)
-        {
-            await FileService.DeleteFileAsync(JourneyInstance!.State.EvidenceFileId.Value);
-        }
-
+        await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(LinkGenerator.PersonDetail(PersonId));
     }

@@ -117,7 +117,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(changeReason)
                 .WithChangeReasonDetailSelections(true, changeReasonDetails)
-                .WithEvidence(false)
+                .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
 
@@ -198,7 +198,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(changeReason)
                 .WithChangeReasonDetailSelections(false)
-                .WithEvidence(true)
+                .WithUploadEvidence(true)
                 .BuildMultipartFormData()
         };
 
@@ -226,7 +226,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(InductionChangeReasonOption.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
-                .WithEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .BuildMultipartFormData()
         };
 
@@ -244,10 +244,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("EvidenceFileId"));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue("EvidenceFileName"));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue("EvidenceFileSizeDescription"));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("UploadedEvidenceFile.FileId"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue("UploadedEvidenceFile.FileName"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue("UploadedEvidenceFile.FileSizeDescription"));
     }
 
     [Test]
@@ -268,7 +267,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(InductionChangeReasonOption.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
-                .WithEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -283,12 +282,11 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
-        Assert.Equal("http://test.com/file", link.Href);
+        Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("EvidenceFileId"));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue("EvidenceFileName"));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue("EvidenceFileSizeDescription"));
-        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue("UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("UploadedEvidenceFile.FileId"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue("UploadedEvidenceFile.FileName"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue("UploadedEvidenceFile.FileSizeDescription"));
     }
 
     [Test]
@@ -309,8 +307,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(InductionChangeReasonOption.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
-                .WithEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
-                .WithEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB")
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
                 .BuildMultipartFormData()
         };
 
@@ -341,7 +339,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(InductionChangeReasonOption.AnotherReason)
                 .WithChangeReasonDetailSelections(true, "")
-                .WithEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB")
                 .BuildMultipartFormData()
         };
 
@@ -374,7 +372,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(changeReason)
                 .WithChangeReasonDetailSelections(false)
-                .WithEvidence(true, (CreateEvidenceFileBinaryContent(), evidenceFileName))
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), evidenceFileName))
                 .BuildMultipartFormData()
         };
 
@@ -383,8 +381,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.UploadEvidence);
-        Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
+        Assert.True(journeyInstance.State.Evidence.UploadEvidence);
+        Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
     }
 
     [Test]
@@ -408,7 +406,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(changeReason)
                 .WithChangeReasonDetailSelections(true, changeReasonDetails)
-                .WithEvidence(true, (CreateEvidenceFileBinaryContent(), evidenceFileName))
+                .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), evidenceFileName))
                 .BuildMultipartFormData()
         };
 
@@ -437,7 +435,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new EditInductionPostRequestContentBuilder()
                 .WithChangeReason(InductionChangeReasonOption.NewInformation)
                 .WithChangeReasonDetailSelections(false, "A description about why the change typed into the box")
-                .WithEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
                 .BuildMultipartFormData()
         };
 
@@ -453,10 +451,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(InductionChangeReasonOption.NewInformation, journeyInstance.State.ChangeReason);
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
-        Assert.False(journeyInstance.State.UploadEvidence);
-        Assert.Null(journeyInstance.State.EvidenceFileId);
-        Assert.Null(journeyInstance.State.EvidenceFileName);
-        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.False(journeyInstance.State.Evidence.UploadEvidence);
+        Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditInductionState> journeyInstance) =>

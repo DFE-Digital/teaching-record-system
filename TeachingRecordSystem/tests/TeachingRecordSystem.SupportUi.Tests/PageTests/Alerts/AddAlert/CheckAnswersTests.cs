@@ -82,7 +82,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         Assert.Equal(journeyInstance.State.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
         Assert.Equal(journeyInstance.State.AddReason!.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for adding"));
         Assert.Equal(populateOptional ? journeyInstance.State.AddReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Test]
@@ -164,12 +164,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
                 },
                 AddReason = journeyInstance.State.AddReason!.GetDisplayName(),
                 AddReasonDetail = populateOptional ? journeyInstance.State.AddReasonDetail : null,
-                EvidenceFile = populateOptional ? new()
-                {
-                    FileId = journeyInstance.State.EvidenceFileId!.Value,
-                    Name = journeyInstance.State.EvidenceFileName!
-                }
-                : null
+                EvidenceFile = populateOptional
+                    ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel()
+                    : null
             };
 
             Assert.Equivalent(expectedAlertCreatedEvent, actualAlertCreatedEvent);

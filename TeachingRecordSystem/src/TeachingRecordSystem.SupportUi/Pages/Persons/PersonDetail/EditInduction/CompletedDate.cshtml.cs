@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -11,8 +11,8 @@ public class CompletedDateModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    IFileService fileService)
-    : CommonJourneyPage(dbContext, linkGenerator, fileService)
+    EvidenceUploadManager evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Completed date")]

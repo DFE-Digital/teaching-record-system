@@ -95,7 +95,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Current details"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
         Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Test]
@@ -219,12 +219,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
                 },
                 ChangeReason = journeyInstance.State.ChangeReason!.GetDisplayName(),
                 ChangeReasonDetail = populateOptional ? journeyInstance.State.ChangeReasonDetail : null,
-                EvidenceFile = populateOptional ? new()
-                {
-                    FileId = journeyInstance.State.EvidenceFileId!.Value,
-                    Name = journeyInstance.State.EvidenceFileName!
-                }
-                : null,
+                EvidenceFile = populateOptional
+                    ? journeyInstance.State.Evidence.UploadedEvidenceFile?.ToEventModel()
+                    : null,
                 Changes = AlertUpdatedEventChanges.Details
             };
 

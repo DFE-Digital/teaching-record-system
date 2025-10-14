@@ -229,8 +229,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
             Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), deletedEvent.DeletionReason);
             Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, deletedEvent.DeletionReasonDetail);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, deletedEvent.EvidenceFile?.FileId);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, deletedEvent.EvidenceFile?.Name);
+            Assert.Null(deletedEvent.EvidenceFile);
             Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.None, deletedEvent.Changes);
         });
 

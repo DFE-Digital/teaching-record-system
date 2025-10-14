@@ -488,6 +488,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
             .WithValidChangeReasonOption()
+            .WithChangeReasonDetail("test", false)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -533,6 +534,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithInductionExemption(true)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
             .WithValidChangeReasonOption()
+            .WithChangeReasonDetail("test", false)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -575,6 +577,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithHoldsStatusFields(Clock)
             .WithTrainingCountryId(country.CountryId)
             .WithValidChangeReasonOption()
+            .WithChangeReasonDetail("test", false)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -669,7 +672,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
-                    UploadEvidence = false
+                    Evidence = new()
+                    {
+                        UploadEvidence = false
+                    }
                 }
             },
             ProfessionalStatusType.EarlyYearsTeacherStatus => new()
@@ -692,7 +698,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
-                    UploadEvidence = false
+                    Evidence = new()
+                    {
+                        UploadEvidence = false
+                    }
                 }
             },
             ProfessionalStatusType.EarlyYearsProfessionalStatus => new()
@@ -715,7 +724,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
-                    UploadEvidence = false
+                    Evidence = new()
+                    {
+                        UploadEvidence = false
+                    }
                 }
             },
             ProfessionalStatusType.PartialQualifiedTeacherStatus => new()
@@ -738,7 +750,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 ChangeReasonDetail = new ChangeReasonDetailsState
                 {
                     HasAdditionalReasonDetail = false,
-                    UploadEvidence = false
+                    Evidence = new()
+                    {
+                        UploadEvidence = false
+                    }
                 }
             },
             _ => throw new NotImplementedException()

@@ -50,10 +50,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = "My deletion reason detail",
-                UploadEvidence = true,
-                EvidenceFileId = Guid.NewGuid(),
-                EvidenceFileName = "MyEvidenceFile.png",
-                EvidenceFileSizeDescription = "1MB"
+                Evidence = new()
+                {
+                    UploadEvidence = true,
+                    UploadedEvidenceFile = new()
+                    {
+                        FileId = Guid.NewGuid(),
+                        FileName = "MyEvidenceFile.png",
+                        FileSizeDescription = "1MB"
+                    }
+                }
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -72,7 +78,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var selectedUploadEvidence = uploadEvidenceRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedUploadEvidence);
         Assert.Equal("True", selectedUploadEvidence.GetAttribute("value"));
-        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
         Assert.NotNull(uploadedEvidenceLink);
     }
 

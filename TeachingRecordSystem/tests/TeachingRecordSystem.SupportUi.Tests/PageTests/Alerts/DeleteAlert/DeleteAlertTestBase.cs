@@ -13,10 +13,16 @@ public class DeleteAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture
         {
             HasAdditionalReasonDetail = populateOptional ? true : false,
             DeleteReasonDetail = populateOptional ? "More details" : null,
-            UploadEvidence = populateOptional ? true : false,
-            EvidenceFileId = populateOptional ? Guid.NewGuid() : null,
-            EvidenceFileName = populateOptional ? "evidence.jpeg" : null,
-            EvidenceFileSizeDescription = populateOptional ? "5MB" : null
+            Evidence = new()
+            {
+                UploadEvidence = populateOptional ? true : false,
+                UploadedEvidenceFile = populateOptional ? new()
+                {
+                    FileId = Guid.NewGuid(),
+                    FileName = "evidence.jpeg",
+                    FileSizeDescription = "5MB"
+                } : null
+            }
         });
 
     protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>

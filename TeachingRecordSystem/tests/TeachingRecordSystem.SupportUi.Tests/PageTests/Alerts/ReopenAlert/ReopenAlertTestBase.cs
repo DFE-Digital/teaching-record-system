@@ -14,10 +14,16 @@ public abstract class ReopenAlertTestBase(HostFixture hostFixture) : TestBase(ho
             ChangeReason = ReopenAlertReasonOption.ClosedInError,
             HasAdditionalReasonDetail = populateOptional ? true : false,
             ChangeReasonDetail = populateOptional ? "More details" : null,
-            UploadEvidence = populateOptional ? true : false,
-            EvidenceFileId = populateOptional ? Guid.NewGuid() : null,
-            EvidenceFileName = populateOptional ? "evidence.jpeg" : null,
-            EvidenceFileSizeDescription = populateOptional ? "5MB" : null
+            Evidence = new()
+            {
+                UploadEvidence = populateOptional ? true : false,
+                UploadedEvidenceFile = populateOptional ? new()
+                {
+                    FileId = Guid.NewGuid(),
+                    FileName = "evidence.jpeg",
+                    FileSizeDescription = "5MB"
+                } : null
+            }
         });
 
     protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>

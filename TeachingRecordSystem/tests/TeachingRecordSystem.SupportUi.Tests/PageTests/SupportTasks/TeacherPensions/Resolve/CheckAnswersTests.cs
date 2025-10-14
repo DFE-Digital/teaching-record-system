@@ -60,8 +60,16 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
             PersonId = duplicatePerson1.PersonId,
             PersonAttributeSourcesSet = true,
-            EvidenceFileId = Guid.NewGuid(),
-            EvidenceFileName = evidenceFileName
+            Evidence = new()
+            {
+                UploadEvidence = true,
+                UploadedEvidenceFile = new()
+                {
+                    FileId = Guid.NewGuid(),
+                    FileName = evidenceFileName,
+                    FileSizeDescription = "5MB"
+                }
+            }
         };
 
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
@@ -184,7 +192,10 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
             NationalInsuranceNumberSource = ResolveTeacherPensionsPotentialDuplicateState.PersonAttributeSource.TrnRequest,
             PersonId = duplicatePerson1.PersonId,
             PersonAttributeSourcesSet = true,
-            UploadEvidence = false,
+            Evidence = new()
+            {
+                UploadEvidence = false
+            },
             MergeComments = mergeComments
         };
 

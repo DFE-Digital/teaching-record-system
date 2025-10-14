@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
@@ -69,10 +70,9 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileId)));
-        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ReasonModel.UploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("evidence.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -144,7 +144,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(false);
+            .WithUploadEvidence(false);
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -205,7 +205,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         {
             await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReactivateReason), "Select a reason");
         }
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.UploadEvidence), "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceUploadModel.UploadEvidence), "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -222,7 +222,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true);
+            .WithUploadEvidence(true);
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -266,7 +266,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true);
+            .WithUploadEvidence(true);
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -286,7 +286,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.EvidenceFile), "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceUploadModel.EvidenceFile), "Select a file");
     }
 
     [Test]
@@ -303,7 +303,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"));
+            .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"));
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -324,7 +324,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EvidenceUploadModel.EvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -341,7 +341,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"));
+            .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"));
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -371,10 +371,9 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileId)));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileName)));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal(expectedFileUrl, doc.GetHiddenInputValue(nameof(ReasonModel.UploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -393,7 +392,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var evidenceFileId = Guid.NewGuid();
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file");
+            .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB");
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -420,12 +419,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
-        Assert.Equal("http://test.com/file", link.Href);
+        Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileId)));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileName)));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue(nameof(ReasonModel.EvidenceFileSizeDescription)));
-        Assert.Equal("http://test.com/file", doc.GetHiddenInputValue(nameof(ReasonModel.UploadedEvidenceFileUrl)));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileId)}"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileName)}"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
     [Test]
@@ -444,8 +442,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var evidenceFileId = Guid.NewGuid();
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
-            .WithEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file");
+            .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+            .WithUploadEvidence(true, evidenceFileId, "testfile.jpg", "3 KB");
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -486,7 +484,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var evidenceFileId = Guid.NewGuid();
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file");
+            .WithUploadEvidence(false, evidenceFileId, "testfile.jpg", "3 KB");
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -525,7 +523,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"));
+            .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"));
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -548,9 +546,9 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.EvidenceFileName);
-        Assert.Equal("1.2 KB", journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.True(journeyInstance.State.Evidence.UploadEvidence);
+        Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
     [Test]
@@ -567,7 +565,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"));
+            .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"));
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -607,7 +605,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
                 .Build());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
-            .WithEvidence(false, (CreateEvidenceFileBinaryContent(), "unneccessary-evidence.pdf"));
+            .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "unneccessary-evidence.pdf"));
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -642,10 +640,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
             Assert.Equal(ReactivateReasonOption.DeactivatedByMistake, journeyInstance.State.ReactivateReason);
             Assert.Null(journeyInstance.State.ReactivateReasonDetail);
         }
-        Assert.False(journeyInstance.State.UploadEvidence);
-        Assert.Null(journeyInstance.State.EvidenceFileId);
-        Assert.Null(journeyInstance.State.EvidenceFileName);
-        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.False(journeyInstance.State.Evidence.UploadEvidence);
+        Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, PersonStatus targetStatus, JourneyInstance<SetStatusState> journeyInstance) =>

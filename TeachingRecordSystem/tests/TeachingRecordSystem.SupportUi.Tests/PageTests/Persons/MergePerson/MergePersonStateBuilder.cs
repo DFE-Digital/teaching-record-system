@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
@@ -18,10 +19,8 @@ public class MergePersonStateBuilder
     private PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
     private PersonAttributeSource? GenderSource { get; set; }
     private bool PersonAttributeSourcesSet { get; set; }
-    private bool? UploadEvidence { get; set; }
-    private Guid? EvidenceFileId { get; set; }
-    private string? EvidenceFileName { get; set; }
-    private string? EvidenceFileSizeDescription { get; set; }
+    public bool? UploadEvidence { get; set; }
+    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
     private string? Comments { get; set; }
 
     public MergePersonStateBuilder WithInitializedState(TestData.CreatePersonResult personA)
@@ -96,11 +95,14 @@ public class MergePersonStateBuilder
     public MergePersonStateBuilder WithUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
     {
         UploadEvidence = uploadEvidence;
-        if (evidenceFileId.HasValue)
+        if (evidenceFileId is Guid id)
         {
-            EvidenceFileId = evidenceFileId;
-            EvidenceFileName = evidenceFileName;
-            EvidenceFileSizeDescription = evidenceFileSizeDescription;
+            UploadedEvidenceFile = new()
+            {
+                FileId = id,
+                FileName = evidenceFileName ?? "evidence.jpeg",
+                FileSizeDescription = evidenceFileSizeDescription ?? "5MB"
+            };
         }
         return this;
     }
@@ -130,11 +132,11 @@ public class MergePersonStateBuilder
             EmailAddressSource = EmailAddressSource,
             NationalInsuranceNumberSource = NationalInsuranceNumberSource,
             GenderSource = GenderSource,
-
-            UploadEvidence = UploadEvidence,
-            EvidenceFileId = EvidenceFileId,
-            EvidenceFileName = EvidenceFileName,
-            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
+            Evidence = new()
+            {
+                UploadEvidence = UploadEvidence,
+                UploadedEvidenceFile = UploadedEvidenceFile,
+            },
             Comments = Comments
         };
     }

@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
@@ -12,10 +13,7 @@ public class EditInductionStateBuilder
     private InductionChangeReasonOption? ChangeReason { get; set; }
     private bool? HasAdditionalReasonDetail { get; set; }
     private string? AdditionalReasonDetail { get; set; }
-    private bool? FileUpload { get; set; }
-    private string? EvidenceFileSizeDescription { get; set; }
-    private Guid? EvidenceFileId { get; set; }
-    private string? EvidenceFileName { get; set; }
+    private EvidenceUploadModel Evidence { get; set; } = new();
     private InductionJourneyPage? JourneyStartPage { get; set; }
     private bool Initialized { get; set; }
 
@@ -71,12 +69,15 @@ public class EditInductionStateBuilder
 
     public EditInductionStateBuilder WithFileUploadChoice(bool uploadFile, Guid? evidenceFileId = null)
     {
-        FileUpload = uploadFile;
+        Evidence.UploadEvidence = uploadFile;
         if (uploadFile)
         {
-            EvidenceFileId = evidenceFileId ?? Guid.NewGuid();
-            EvidenceFileName = "evidence.jpeg";
-            EvidenceFileSizeDescription = "5MB";
+            Evidence.UploadedEvidenceFile = new()
+            {
+                FileId = evidenceFileId ?? Guid.NewGuid(),
+                FileName = "evidence.jpeg",
+                FileSizeDescription = "5MB"
+            };
         }
         return this;
     }
@@ -93,11 +94,8 @@ public class EditInductionStateBuilder
             ChangeReason = ChangeReason,
             HasAdditionalReasonDetail = HasAdditionalReasonDetail,
             ChangeReasonDetail = AdditionalReasonDetail,
-            UploadEvidence = FileUpload,
             JourneyStartPage = JourneyStartPage,
-            EvidenceFileId = EvidenceFileId,
-            EvidenceFileName = EvidenceFileName,
-            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
+            Evidence = Evidence,
             Initialized = Initialized
         };
     }

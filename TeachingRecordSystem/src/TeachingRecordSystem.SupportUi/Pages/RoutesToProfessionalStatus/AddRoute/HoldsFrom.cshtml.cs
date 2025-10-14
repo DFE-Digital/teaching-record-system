@@ -1,10 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache)
+public class HoldsFromModel(
+    IClock clock,
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
+    : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache, evidenceController)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "The date they first held this professional status")]

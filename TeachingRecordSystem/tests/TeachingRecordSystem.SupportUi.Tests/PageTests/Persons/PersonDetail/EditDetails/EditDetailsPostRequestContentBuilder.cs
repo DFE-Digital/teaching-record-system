@@ -87,14 +87,14 @@ public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
         return this;
     }
 
-    public EditDetailsPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? otherDetailsChangeEvidenceFileName, string? otherDetailsChangeEvidenceFileSizeDescription)
+    public EditDetailsPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
         UploadEvidence = uploadEvidence;
         UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
         {
             FileId = id,
-            FileName = otherDetailsChangeEvidenceFileName ?? "filename.jpg",
-            FileSizeDescription = otherDetailsChangeEvidenceFileSizeDescription ?? "5 MB"
+            FileName = evidenceFileName ?? "filename.jpg",
+            FileSizeDescription = evidenceFileSizeDescription ?? "5 MB"
         };
         return this;
     }

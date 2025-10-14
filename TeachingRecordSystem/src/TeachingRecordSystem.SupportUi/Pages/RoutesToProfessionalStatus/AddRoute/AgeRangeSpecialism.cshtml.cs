@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache)
+public class AgeRangeSpecialismModel(
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
+    : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache, evidenceController)
 {
     [BindProperty]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
@@ -28,14 +29,7 @@ public class ResolveTeacherPensionsPotentialDuplicateState : IRegisterJourney
     public PersonAttributeSource? TRNSource { get; set; }
     public KeepingRecordSeparateReason? KeepSeparateReason { get; set; }
     public Guid? TeachersPensionPersonId { get; set; }
-    public bool? UploadEvidence { get; set; }
-
-    public Guid? EvidenceFileId { get; set; }
-
-    public string? EvidenceFileName { get; set; }
-
-    public string? EvidenceFileSizeDescription { get; set; }
-
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public enum PersonAttributeSource
     {

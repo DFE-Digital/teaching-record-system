@@ -1,11 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    : AddRoutePostStatusPageModel(AddRoutePage.StartAndEndDate, linkGenerator, referenceDataCache)
+public class StartAndEndDateModel(
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    EvidenceUploadManager evidenceController)
+    : AddRoutePostStatusPageModel(AddRoutePage.StartAndEndDate, linkGenerator, referenceDataCache, evidenceController)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]

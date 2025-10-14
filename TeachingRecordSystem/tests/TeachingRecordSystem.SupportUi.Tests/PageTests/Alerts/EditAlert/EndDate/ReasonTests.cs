@@ -98,9 +98,9 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         Assert.Equal(journeyInstance.State.ChangeReasonDetail, doc.GetElementsByName("ChangeReasonDetail")[0].TrimmedText());
         AssertCheckedRadioOption("UploadEvidence", bool.TrueString);
 
-        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
         Assert.NotNull(uploadedEvidenceLink);
-        Assert.Equal($"{journeyInstance.State.EvidenceFileName} ({journeyInstance.State.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TrimmedText());
+        Assert.Equal($"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} ({journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription})", uploadedEvidenceLink!.TrimmedText());
 
         void AssertCheckedRadioOption(string name, string expectedCheckedValue)
         {
@@ -304,9 +304,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.True(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Equal(reasonDetail, journeyInstance.State.ChangeReasonDetail);
-        Assert.Null(journeyInstance.State.EvidenceFileName);
-        Assert.Null(journeyInstance.State.EvidenceFileId);
-        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
     [Test]
@@ -340,9 +338,9 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
-        Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
-        Assert.NotNull(journeyInstance.State.EvidenceFileId);
-        Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
+        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
     [Test]
