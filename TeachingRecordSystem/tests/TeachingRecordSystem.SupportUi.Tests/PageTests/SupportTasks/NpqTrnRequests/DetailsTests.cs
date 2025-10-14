@@ -32,7 +32,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         doc.AssertRowContentMatches("NPQ application ID", metadata.NpqApplicationId);
         doc.AssertRowContentMatches("NPQ name", metadata.NpqName);
         doc.AssertRowContentMatches("NPQ training provider", metadata.NpqTrainingProvider);
-        doc.AssertRowContentMatches("Evidence", $"{metadata.NpqEvidenceFileName} (opens in a new tab)");
+        doc.AssertRowContentMatches("Evidence", $"{metadata.NpqEvidenceFileName} (opens in new tab)");
     }
 
     [Test]

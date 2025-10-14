@@ -7,8 +7,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class AgeRangeSpecialismModel(
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
     [BindProperty]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();

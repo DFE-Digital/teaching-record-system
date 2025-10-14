@@ -11,9 +11,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController,
+    EvidenceUploadManager evidenceUploadManager,
     IClock clock)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public string BackLink => GetPageLink(MergePersonJourneyPage.Merge);
     public string ChangePrimaryPersonLink => GetPageLink(MergePersonJourneyPage.Matches, fromCheckAnswers: true);

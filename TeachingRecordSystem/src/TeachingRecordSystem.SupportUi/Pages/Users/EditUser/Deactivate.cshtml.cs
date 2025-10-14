@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class DeactivateModel(
     TrsLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController,
+    EvidenceUploadManager evidenceUploadManager,
     TrsDbContext dbContext,
     IClock clock) : PageModel
 {
@@ -83,7 +83,7 @@ public class DeactivateModel(
             ModelState.AddModelError(nameof(MoreInformationDetail), "Enter more details");
         }
 
-        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
 
         if (!ModelState.IsValid)
         {
@@ -111,7 +111,7 @@ public class DeactivateModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(Evidence.UploadedEvidenceFile);
         return Redirect(linkGenerator.EditUser(UserId));
     }
 }

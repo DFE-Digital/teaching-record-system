@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController,
+    EvidenceUploadManager evidenceUploadManager,
     IClock clock) : PageModel
 {
     public JourneyInstance<EditAlertStartDateState>? JourneyInstance { get; set; }
@@ -82,7 +82,7 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));
     }

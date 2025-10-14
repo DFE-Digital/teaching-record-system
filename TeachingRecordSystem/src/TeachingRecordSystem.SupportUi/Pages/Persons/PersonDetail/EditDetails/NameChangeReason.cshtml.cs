@@ -10,8 +10,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 public class NameChangeReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]

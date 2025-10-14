@@ -10,8 +10,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 public class MergeModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public string BackLink => GetPageLink(FromCheckAnswers ? MergePersonJourneyPage.CheckAnswers : MergePersonJourneyPage.Matches);
 

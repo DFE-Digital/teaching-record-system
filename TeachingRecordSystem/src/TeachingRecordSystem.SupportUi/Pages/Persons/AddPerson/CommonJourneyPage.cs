@@ -9,13 +9,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController) : PageModel
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddPersonState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
     protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
-    protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
+    protected EvidenceUploadManager EvidenceController { get; } = evidenceUploadManager;
 
     [FromQuery]
     public bool FromCheckAnswers { get; set; }

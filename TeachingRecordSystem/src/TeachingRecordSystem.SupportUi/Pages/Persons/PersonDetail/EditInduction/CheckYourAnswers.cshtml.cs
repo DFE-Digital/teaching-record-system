@@ -12,8 +12,8 @@ public class CheckYourAnswersModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IClock clock,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public InductionStatus InductionStatus { get; set; }
 
