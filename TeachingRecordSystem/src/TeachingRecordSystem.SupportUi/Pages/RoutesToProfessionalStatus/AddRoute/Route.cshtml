@@ -47,7 +47,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteAddRoute(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Route(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <govuk-select for="RouteId" label-class="govuk-label--m">
@@ -93,7 +93,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddRouteCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.RouteCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

@@ -6,7 +6,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.AddNote(Model.PersonId)" method="post">
+        <form action="@LinkGenerator.Persons.PersonDetail.AddNote(Model.PersonId)" method="post">
             <govuk-textarea for="Text" data-testid="text">
                 <govuk-textarea-label class="govuk-label--l" is-page-heading="true">@ViewBag.Title</govuk-textarea-label>
             </govuk-textarea>
@@ -17,7 +17,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button-link href="@LinkGenerator.PersonNotes(Model.PersonId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button-link>
+                <govuk-button-link href="@LinkGenerator.Persons.PersonDetail.Notes(Model.PersonId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button-link>
             </div>
         </form>
     </div>

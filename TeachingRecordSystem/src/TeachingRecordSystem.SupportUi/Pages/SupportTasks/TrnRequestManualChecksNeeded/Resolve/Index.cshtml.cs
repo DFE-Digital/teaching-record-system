@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded.Resolve;
 
-public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     [FromRoute]
     public string? SupportTaskReference { get; set; }
@@ -51,10 +51,10 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
 
         if (ChecksCompleted == false)
         {
-            return Redirect(linkGenerator.TrnRequestManualChecksNeeded());
+            return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index());
         }
 
-        return Redirect(linkGenerator.ResolveTrnRequestManualChecksNeededConfirm(SupportTaskReference!));
+        return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Confirm(SupportTaskReference!));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

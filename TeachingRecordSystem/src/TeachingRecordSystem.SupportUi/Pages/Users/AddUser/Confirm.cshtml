@@ -7,12 +7,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.AddUser()" />
+    <govuk-back-link href="@LinkGenerator.Users.AddUser.Index()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="@LinkGenerator.AddUserConfirm(Model.UserId!)" method="post">
+        <form action="@LinkGenerator.Users.AddUser.Confirm(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true" />
@@ -79,7 +79,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Add user</govuk-button>
-                <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users()>Cancel and return to users</govuk-button-link>
+                <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users.Index()>Cancel and return to users</govuk-button-link>
             </div>
         </form>
     </div>

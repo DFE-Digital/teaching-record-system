@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -15,5 +15,5 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     [FromQuery]
     public bool FromInductions { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId, FromInductions));
+    public IActionResult OnGet() => Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId, FromInductions));
 }

@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 public abstract class AddRouteCommonPageModel(
     AddRoutePage currentPage,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
     : PageModel
@@ -22,18 +22,19 @@ public abstract class AddRouteCommonPageModel(
         get
         {
             var previousPage = PreviousPage ??
-                               (FromCheckAnswers ?? false ? AddRoutePage.CheckYourAnswers : AddRoutePage.Route);
+                               (FromCheckAnswers ?? false ? AddRoutePage.CheckAnswers : AddRoutePage.Route);
 
             return (currentPage, FromCheckAnswers) switch
             {
-                (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
-                (AddRoutePage.Route, _) => LinkGenerator.PersonQualifications(PersonId),
-                _ => LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers)
+                (_, true) => LinkGenerator.RoutesToProfessionalStatus.AddRoute.CheckAnswers(PersonId, JourneyInstance!.InstanceId),
+                (AddRoutePage.Route, _) => LinkGenerator.Persons.PersonDetail.Qualifications(PersonId),
+                _ => LinkGenerator.RoutesToProfessionalStatus.AddRoute.AddRoutePage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers)
             };
         }
     }
 
-    protected TrsLinkGenerator LinkGenerator => linkGenerator;
+    protected SupportUiLinkGenerator LinkGenerator => linkGenerator;
+
     protected ReferenceDataCache ReferenceDataCache => referenceDataCache;
     protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
 
@@ -53,9 +54,9 @@ public abstract class AddRouteCommonPageModel(
     {
         IActionResult nextPage = Redirect((currentPage, FromCheckAnswers) switch
         {
-            (AddRoutePage.CheckYourAnswers, _) => LinkGenerator.PersonQualifications(PersonId),
-            (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
-            _ => LinkGenerator.RouteAddPage(NextPage ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers)
+            (AddRoutePage.CheckAnswers, _) => LinkGenerator.Persons.PersonDetail.Qualifications(PersonId),
+            (_, true) => LinkGenerator.RoutesToProfessionalStatus.AddRoute.CheckAnswers(PersonId, JourneyInstance!.InstanceId),
+            _ => LinkGenerator.RoutesToProfessionalStatus.AddRoute.AddRoutePage(NextPage ?? AddRoutePage.CheckAnswers, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers)
         });
 
         return Task.FromResult(nextPage);
@@ -65,7 +66,7 @@ public abstract class AddRouteCommonPageModel(
     {
         await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(LinkGenerator.PersonQualifications(PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

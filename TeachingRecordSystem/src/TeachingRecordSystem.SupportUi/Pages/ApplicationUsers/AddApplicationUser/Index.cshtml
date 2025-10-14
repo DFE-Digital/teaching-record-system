@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.ApplicationUsers()" />
+    <govuk-back-link href="@LinkGenerator.ApplicationUsers.Index()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.AddApplicationUser()" method="post">
+        <form action="@LinkGenerator.ApplicationUsers.AddApplicationUser.Index()" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Name" label-class="govuk-label--m" />

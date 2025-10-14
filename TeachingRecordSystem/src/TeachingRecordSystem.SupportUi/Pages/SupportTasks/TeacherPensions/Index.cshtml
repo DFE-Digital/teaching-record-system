@@ -17,22 +17,22 @@
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                         sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.Name ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.Name, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeacherPensionsSortOptions.Name, direction))">
                         Name
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.CreatedOn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.CreatedOn, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeacherPensionsSortOptions.CreatedOn, direction))">
                         Date created
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.Filename ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.Filename, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeacherPensionsSortOptions.Filename, direction))">
                         File name
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == TeacherPensionsSortOptions.InterfaceId ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.TeacherPensions(TeacherPensionsSortOptions.InterfaceId, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeacherPensionsSortOptions.InterfaceId, direction))">
                         Interface ID
                     </th>
                 </tr>
@@ -50,7 +50,7 @@
                     {
                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                             <td scope="row" class="govuk-table__cell" data-testid="name">
-                                <a href="@LinkGenerator.TeacherPensionsResolve(result.SupportTaskReference)" class="govuk-link">
+                                <a href="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
                                     @result.Name
                                 </a>
                             </td>

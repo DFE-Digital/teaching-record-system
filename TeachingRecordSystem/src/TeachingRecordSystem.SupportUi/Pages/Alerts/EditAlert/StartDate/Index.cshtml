@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertEditStartDateCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.PersonAlerts(Model.PersonId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.EditAlert.StartDate.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Persons.PersonDetail.Alerts(Model.PersonId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.AlertEditStartDate(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.Alerts.EditAlert.StartDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
 
             <govuk-date-input for="StartDate">
@@ -22,7 +22,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.AlertEditStartDateCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Alerts.EditAlert.StartDate.Cancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ConnectOneLoginUser;
 
-public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMatchingService, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public const string NoneOfTheAboveTrnSentinel = "0000000";
 
@@ -54,7 +54,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
             }
         }
 
-        return Redirect(linkGenerator.ConnectOneLoginUserSupportTaskConnect(SupportTaskReference!, trn));
+        return Redirect(linkGenerator.SupportTasks.ConnectOneLoginUser.Connect(SupportTaskReference!, trn));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

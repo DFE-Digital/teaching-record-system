@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class DetailModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
@@ -16,7 +16,7 @@ public class DetailModel(
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
 
-    public string BackLink => FromInductions ? linkGenerator.PersonInduction(PersonId) : linkGenerator.PersonQualifications(PersonId);
+    public string BackLink => FromInductions ? linkGenerator.Persons.PersonDetail.Induction(PersonId) : linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -38,7 +38,7 @@ public class DetailModel(
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

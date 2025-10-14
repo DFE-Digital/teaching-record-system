@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.PersonAlerts(Model.Alert.PersonId)">Back to record</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Alerts(Model.Alert.PersonId)">Back to record</govuk-back-link>
 }
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
@@ -47,8 +47,8 @@
         @if (Model.CanEdit)
         {
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action href="@LinkGenerator.AlertReopen(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Remove</govuk-summary-list-row-action>
-                <govuk-summary-list-row-action href="@LinkGenerator.AlertEditEndDate(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.ReopenAlert.Index(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Remove</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.EndDate.Index(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         }
     </govuk-summary-list-row>

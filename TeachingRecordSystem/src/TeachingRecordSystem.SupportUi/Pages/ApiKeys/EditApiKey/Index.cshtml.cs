@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.EditApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     private ApiKey? _apiKey;
 
@@ -54,7 +54,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, 
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("API key expired");
-        return Redirect(linkGenerator.EditApplicationUser(ApplicationUserId));
+        return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(ApplicationUserId));
     }
 
     public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

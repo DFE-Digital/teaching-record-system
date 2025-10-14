@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertDeleteCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : Model.EndDate is null ? LinkGenerator.PersonAlerts(Model.PersonId) : LinkGenerator.AlertDetail(Model.AlertId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.DeleteAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : Model.EndDate is null ? LinkGenerator.Persons.PersonDetail.Alerts(Model.PersonId) : LinkGenerator.Alerts.AlertDetail(Model.AlertId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Delete an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
@@ -33,7 +33,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.AlertDeleteCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Alerts.DeleteAlert.Cancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

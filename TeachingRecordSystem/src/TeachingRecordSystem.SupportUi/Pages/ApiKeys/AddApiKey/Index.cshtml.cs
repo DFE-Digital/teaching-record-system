@@ -11,7 +11,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApiKeys.AddApiKey;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsDbContext dbContext, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     [FromQuery]
     public Guid ApplicationUserId { get; set; }
@@ -68,7 +68,7 @@ public class IndexModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerator l
         }
 
         TempData.SetFlashSuccess("API key added");
-        return Redirect(linkGenerator.EditApplicationUser(ApplicationUserId));
+        return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(ApplicationUserId));
     }
 
     public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class CheckYourAnswersModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController,
@@ -26,7 +26,7 @@ public class CheckYourAnswersModel(
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
-    public string BackLink => linkGenerator.RouteEditChangeReason(QualificationId, JourneyInstance!.InstanceId);
+    public string BackLink => linkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(QualificationId, JourneyInstance!.InstanceId);
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -39,7 +39,7 @@ public class CheckYourAnswersModel(
         var status = JourneyInstance!.State.Status;
 
         var pagesInOrder = Enum.GetValues<AddRoutePage>()
-            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
+            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckAnswers])
             .OrderBy(p => p);
 
         foreach (var page in pagesInOrder)
@@ -53,7 +53,7 @@ public class CheckYourAnswersModel(
                  route.InductionExemptionReason is null ||
                  !route.InductionExemptionReason.RouteImplicitExemption))
             {
-                context.Result = Redirect(linkGenerator.RouteEditPage(page, QualificationId, JourneyInstance.InstanceId, fromCheckAnswers: true));
+                context.Result = Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.EditRoutePage(page, QualificationId, JourneyInstance.InstanceId, fromCheckAnswers: true));
                 return;
             }
         }
@@ -138,13 +138,13 @@ public class CheckYourAnswersModel(
 
         TempData.SetFlashSuccess("Route to professional status updated");
 
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

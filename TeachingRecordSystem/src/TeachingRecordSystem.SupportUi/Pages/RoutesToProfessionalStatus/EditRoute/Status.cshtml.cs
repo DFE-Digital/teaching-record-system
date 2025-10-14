@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class StatusModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
 {
     public string? PersonName { get; set; }
@@ -81,16 +81,16 @@ public class StatusModel(
         }
 
         return Redirect(CompletingRoute ?
-            linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
             FromCheckAnswers ?
-                linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+                linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
+                linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -106,8 +106,8 @@ public class StatusModel(
 
     public string BackLink =>
          FromCheckAnswers ?
-            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+            linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
 
     private bool CompletingRoute => Status is RouteToProfessionalStatusStatus.Holds && (JourneyInstance!.State.CurrentStatus is not RouteToProfessionalStatusStatus.Holds);
 

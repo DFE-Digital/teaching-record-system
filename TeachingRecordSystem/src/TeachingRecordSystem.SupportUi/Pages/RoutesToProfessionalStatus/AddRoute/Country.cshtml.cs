@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class CountryModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager)
     : AddRoutePostStatusPageModel(AddRoutePage.Country, linkGenerator, referenceDataCache, evidenceUploadManager)

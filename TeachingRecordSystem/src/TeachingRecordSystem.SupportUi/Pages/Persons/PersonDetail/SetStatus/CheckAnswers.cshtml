@@ -19,7 +19,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="@LinkGenerator.PersonSetStatusCheckAnswers(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" method="post" data-testid="submit-form">
+        <form action="@LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswers(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="set-status-caption">@caption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
@@ -92,7 +92,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">@confirmButtonText</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.PersonSetStatusCancel(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswersCancel(Model.PersonId, Model.TargetStatus, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
             </div>
         </form>
     </div>

@@ -8,7 +8,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)" data-testid="induction-backlink">Back to record</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(person.PersonId)" data-testid="induction-backlink">Back to record</govuk-back-link>
 }
 
 @if (!string.IsNullOrEmpty(Model.StatusWarningMessage))
@@ -27,7 +27,7 @@
                 @if (Model.CanWrite)
                 {
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action data-testid="change-induction-status" href="@LinkGenerator.PersonInductionEditStatus(person.PersonId, journeyInstanceId: null)" visually-hidden-text="status">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action data-testid="change-induction-status" href="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(person.PersonId, journeyInstanceId: null)" visually-hidden-text="status">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 }
             </govuk-summary-list-row>
@@ -50,7 +50,7 @@
                     @if (Model.CanWrite)
                     {
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.PersonInductionEditExemptionReason(person.PersonId, journeyInstanceId: null)" visually-hidden-text="exemption reason">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(person.PersonId, journeyInstanceId: null)" visually-hidden-text="exemption reason">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     }
                 </govuk-summary-list-row>
@@ -64,7 +64,7 @@
                     @if (Model.CanWrite)
                     {
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.PersonInductionEditStartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     }
                 </govuk-summary-list-row>
@@ -78,7 +78,7 @@
                     @if (Model.CanWrite)
                     {
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.PersonInductionEditCompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="completed date">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="completed date">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     }
                 </govuk-summary-list-row>
@@ -94,7 +94,7 @@
                         @if (Model.CanWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action data-testid="change-induction-exempted-route" href="@LinkGenerator.RouteEdit(exemptedRoute.QualificationId, fromInductions: true)" visually-hidden-text="induction exemption reason">Change</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action data-testid="change-induction-exempted-route" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Index(exemptedRoute.QualificationId, fromInductions: true)" visually-hidden-text="induction exemption reason">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>

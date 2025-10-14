@@ -7,13 +7,13 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class CheckYourAnswersModel(
-    TrsLinkGenerator linkGenerator,
+public class CheckAnswersModel(
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock)
-    : AddRoutePostStatusPageModel(AddRoutePage.CheckYourAnswers, linkGenerator, referenceDataCache, evidenceUploadManager)
+    : AddRoutePostStatusPageModel(AddRoutePage.CheckAnswers, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
@@ -25,7 +25,7 @@ public class CheckYourAnswersModel(
         await base.OnPageHandlerExecutingAsync(context);
 
         var pagesInOrder = Enum.GetValues<AddRoutePage>()
-            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckYourAnswers])
+            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckAnswers])
             .OrderBy(p => p);
 
         foreach (var page in pagesInOrder)
@@ -39,7 +39,7 @@ public class CheckYourAnswersModel(
                  RouteType.InductionExemptionReason is null ||
                  !RouteType.InductionExemptionReason.RouteImplicitExemption))
             {
-                context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true));
+                context.Result = Redirect(LinkGenerator.RoutesToProfessionalStatus.AddRoute.AddRoutePage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true));
                 return;
             }
         }

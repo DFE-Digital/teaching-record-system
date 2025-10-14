@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
-        <form action="@LinkGenerator.AlertEditStartDateCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.Alerts.EditAlert.StartDate.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
@@ -19,7 +19,7 @@
                     <govuk-summary-list-row-key>New start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.NewStartDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDate(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.StartDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -30,7 +30,7 @@
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -46,7 +46,7 @@
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -55,14 +55,14 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.StartDate.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>
-                <govuk-button formaction="@LinkGenerator.AlertEditStartDateCheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Alerts.EditAlert.StartDate.CheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

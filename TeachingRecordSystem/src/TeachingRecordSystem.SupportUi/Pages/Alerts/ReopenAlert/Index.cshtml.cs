@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
 [Journey(JourneyNames.ReopenAlert), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
 
@@ -77,12 +77,12 @@ public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager ev
             state.Evidence = Evidence;
         });
 
-        return Redirect(linkGenerator.AlertReopenCheckAnswers(AlertId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.Alerts.ReopenAlert.CheckAnswers(AlertId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.AlertDetail(AlertId));
+        return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
     }
 }

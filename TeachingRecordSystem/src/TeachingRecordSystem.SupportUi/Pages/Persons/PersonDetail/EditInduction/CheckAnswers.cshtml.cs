@@ -7,8 +7,8 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
-public class CheckYourAnswersModel(
-    TrsLinkGenerator linkGenerator,
+public class CheckAnswersModel(
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IClock clock,
@@ -83,10 +83,10 @@ public class CheckYourAnswersModel(
         if (JourneyInstance!.State.StartDate > JourneyInstance!.State.CompletedDate)
         {
             return Redirect(
-                LinkGenerator.PersonInductionEditCompletedDate(
+                LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(
                     PersonId,
                     JourneyInstance!.InstanceId,
-                    fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers));
+                    fromCheckAnswers: JourneyFromCheckAnswersPage.CheckAnswers));
         }
 
         var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
@@ -113,6 +113,6 @@ public class CheckYourAnswersModel(
 
         TempData.SetFlashSuccess("Induction details have been updated");
 
-        return Redirect(LinkGenerator.PersonInduction(PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Induction(PersonId));
     }
 }

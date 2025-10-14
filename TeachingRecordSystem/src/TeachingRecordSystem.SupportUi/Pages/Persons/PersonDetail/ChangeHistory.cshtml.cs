@@ -14,7 +14,7 @@ public class ChangeHistoryModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IAuthorizationService authorizationService,
-    TrsLinkGenerator linkGenerator) : PageModel
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private const int PageSize = 10;
 
@@ -148,7 +148,7 @@ public class ChangeHistoryModel(
         // If an 'out of bounds' page was requested, redirect to the first page
         if (TimelineItems.Length == 0 && PageNumber > 1)
         {
-            return Redirect(linkGenerator.PersonChangeHistory(PersonId, pageNumber: 1));
+            return Redirect(linkGenerator.Persons.PersonDetail.ChangeHistory(PersonId, pageNumber: 1));
         }
 
         var totalPages = (int)Math.Ceiling(allResults.Length / (decimal)PageSize);

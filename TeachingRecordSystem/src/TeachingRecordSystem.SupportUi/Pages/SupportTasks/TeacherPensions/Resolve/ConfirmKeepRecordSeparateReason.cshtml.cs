@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
 public class ConfirmKeepRecordSeparateReasonModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController,
     IClock clock) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
@@ -80,7 +80,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
             "The records were not merged.");
 
         await JourneyInstance!.CompleteAsync();
-        return Redirect(linkGenerator.TeacherPensions());
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 
     public string GetReason()
@@ -101,7 +101,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.TeacherPensions());
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -109,7 +109,7 @@ public class ConfirmKeepRecordSeparateReasonModel(
         if (JourneyInstance!.State.KeepSeparateReason is null ||
             JourneyInstance!.State.KeepSeparateReason == KeepingRecordSeparateReason.AnotherReason && string.IsNullOrEmpty(JourneyInstance!.State.Reason))
         {
-            context.Result = Redirect(linkGenerator.TeacherPensions());
+            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
             return;
         }
         await base.OnPageHandlerExecutionAsync(context, next);

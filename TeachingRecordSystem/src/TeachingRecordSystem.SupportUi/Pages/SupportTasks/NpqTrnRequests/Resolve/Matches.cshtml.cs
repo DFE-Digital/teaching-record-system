@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
-public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
+public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -60,15 +60,15 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
 
         return Redirect(
             PersonId == ResolveNpqTrnRequestState.CreateNewRecordPersonIdSentinel ?
-                linkGenerator.NpqTrnRequestMergeCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
-                linkGenerator.NpqTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+                linkGenerator.SupportTasks.NpqTrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
+                linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

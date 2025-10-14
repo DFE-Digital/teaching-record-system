@@ -13,7 +13,7 @@
         <span class="govuk-caption-l">Support tasks</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form action="@LinkGenerator.ApiTrnRequests()" method="get" asp-antiforgery="false">
+        <form action="@LinkGenerator.SupportTasks.ApiTrnRequests.Index()" method="get" asp-antiforgery="false">
             <govuk-input for="Search" label-class="govuk-label--s" />
             @* TODO move this inside input when GFA library is updated *@
             <govuk-button type="submit">Search</govuk-button>
@@ -25,22 +25,22 @@
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                         sort-direction="@(Model.SortBy == ApiTrnRequestsSortByOption.Name ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.Name, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.ApiTrnRequests.Index(search: Model.Search, ApiTrnRequestsSortByOption.Name, direction))">
                         Name
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == ApiTrnRequestsSortByOption.Email ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.Email, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.ApiTrnRequests.Index(search: Model.Search, ApiTrnRequestsSortByOption.Email, direction))">
                         Email
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == ApiTrnRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.RequestedOn, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.ApiTrnRequests.Index(search: Model.Search, ApiTrnRequestsSortByOption.RequestedOn, direction))">
                         Requested on
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == ApiTrnRequestsSortByOption.Source ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.Source, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.ApiTrnRequests.Index(search: Model.Search, ApiTrnRequestsSortByOption.Source, direction))">
                         Source
                     </th>
                 </tr>
@@ -58,7 +58,7 @@
                     {
                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                             <th scope="row" class="govuk-table__header" data-testid="name">
-                                <a href="@LinkGenerator.ApiTrnRequestResolve(result.SupportTaskReference)" class="govuk-link">
+                                <a href="@LinkGenerator.SupportTasks.ApiTrnRequests.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
                                     @result.FirstName @result.MiddleName @result.LastName
                                 </a>
                             </th>

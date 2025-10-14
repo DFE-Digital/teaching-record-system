@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.IntegrationTransactionDetail(Model.IntegrationTransactionId)" />
+    <govuk-back-link href="@LinkGenerator.SupportTasks.IntegrationTransactions.Detail(Model.IntegrationTransactionId)" />
 }
 
 <div class="govuk-grid-row">
@@ -62,7 +62,7 @@
     }
 
     <div class="govuk-grid-column-full">
-        <govuk-back-link href="@LinkGenerator.IntegrationTransactionDetail(Model.IntegrationTransactionId)">
+        <govuk-back-link href="@LinkGenerator.SupportTasks.IntegrationTransactions.Detail(Model.IntegrationTransactionId)">
             Back to file details
         </govuk-back-link>
     </div>

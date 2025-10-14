@@ -8,7 +8,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.R
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? PersonName { get; set; }
 
@@ -71,13 +71,13 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, Evide
 
         if (state.PersonId is not Guid personId)
         {
-            context.Result = Redirect(linkGenerator.TeacherPensionsMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 
         if (state.PersonId == CreateNewRecordPersonIdSentinel)
         {
-            context.Result = Redirect(linkGenerator.TeacherPensionsCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
         var personAttributes = await GetPersonAttributesAsync(personId);
@@ -183,14 +183,14 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, Evide
             state.Evidence = Evidence;
         });
 
-        return Redirect(linkGenerator.TeacherPensionsCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.TeacherPensions());
+        return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }
 
 #pragma warning disable CA1711

@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 public class PersonalDetailsModel(
     TrsDbContext dbContext,
     IClock clock,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {

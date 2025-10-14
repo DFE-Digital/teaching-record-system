@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 public class IndexModel(
     TrsDbContext dbContext,
     IClock clock,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {

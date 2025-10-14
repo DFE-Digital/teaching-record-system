@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 [Journey(JourneyNames.EditAlertStartDate), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock) : PageModel
 {
@@ -59,15 +59,15 @@ public class IndexModel(
         await JourneyInstance!.UpdateStateAsync(state => state.StartDate = StartDate);
 
         return Redirect(FromCheckAnswers
-            ? linkGenerator.AlertEditStartDateCheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.AlertEditStartDateReason(AlertId, JourneyInstance!.InstanceId));
+            ? linkGenerator.Alerts.EditAlert.StartDate.CheckAnswers(AlertId, JourneyInstance.InstanceId)
+            : linkGenerator.Alerts.EditAlert.StartDate.Reason(AlertId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

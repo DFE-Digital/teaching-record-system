@@ -7,6 +7,6 @@ namespace TeachingRecordSystem.SupportUi.Pages;
 [AllowAnonymous]
 public class SignedOutModel : PageModel
 {
-    public IActionResult OnGet([FromServices] TrsLinkGenerator linkGenerator) =>
+    public IActionResult OnGet([FromServices] SupportUiLinkGenerator linkGenerator) =>
         User.Identity?.IsAuthenticated == true ? Redirect(linkGenerator.Index()) : Page();
 }

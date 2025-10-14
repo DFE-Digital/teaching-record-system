@@ -79,23 +79,23 @@
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header"
                             sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.IntegrationTransactionRecordId ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.IntegrationTransactionRecordId,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Detail(IntegrationTransactionRecordSortByOption.IntegrationTransactionRecordId,  direction, pageNumber: null, Model.IntegrationTransactionId))">
                             ID
                         </th>
 
                         <th scope="col" class="govuk-table__header"
                             sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.Name ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.Name,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Detail(IntegrationTransactionRecordSortByOption.Name,  direction, pageNumber: null, Model.IntegrationTransactionId))">
                             Person
                         </th>
                         <th scope="col" class="govuk-table__header"
                             sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.Duplicate ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.Duplicate,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Detail(IntegrationTransactionRecordSortByOption.Duplicate,  direction, pageNumber: null, Model.IntegrationTransactionId))">
                             Duplicate
                         </th>
                         <th scope="col" class="govuk-table__header"
                             sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.Status ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.Status,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Detail(IntegrationTransactionRecordSortByOption.Status,  direction, pageNumber: null, Model.IntegrationTransactionId))">
                             Status
                         </th>
                     </tr>

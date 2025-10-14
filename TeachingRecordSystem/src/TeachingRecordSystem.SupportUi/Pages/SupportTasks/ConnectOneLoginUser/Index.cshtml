@@ -4,7 +4,7 @@
     ViewBag.Title = "Unable to connect GOV.UK One Login user to a teaching record";
 }
 
-<form action="@LinkGenerator.ConnectOneLoginUserSupportTask(Model.SupportTaskReference!)" method="post">
+<form action="@LinkGenerator.SupportTasks.ConnectOneLoginUser.Index(Model.SupportTaskReference!)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <h1 class="govuk-heading-l">

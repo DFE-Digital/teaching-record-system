@@ -77,7 +77,7 @@ public static class PageDriver
             AddRoutePage.AgeRangeSpecialism => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement()),
             AddRoutePage.SubjectSpecialisms => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement()),
             AddRoutePage.ChangeReason => FieldRequirement.Mandatory,
-            AddRoutePage.CheckYourAnswers => FieldRequirement.Mandatory,
+            AddRoutePage.CheckAnswers => FieldRequirement.Mandatory,
             _ => throw new ArgumentOutOfRangeException(nameof(page))
         };
     }

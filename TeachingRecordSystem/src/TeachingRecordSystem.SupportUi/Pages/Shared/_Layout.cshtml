@@ -75,7 +75,7 @@
                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
                 {
                     <govuk-service-navigation-nav-item
-                        href="@LinkGenerator.Users()"
+                        href="@LinkGenerator.Users.Index()"
                         current="@(Context.Request.Path == "/users")"
                         active="@(Context.Request.Path.StartsWithSegments("/users"))">
                         Add and manage users
@@ -85,7 +85,7 @@
                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AdminOnly)).Succeeded)
                 {
                     <govuk-service-navigation-nav-item
-                        href="@LinkGenerator.ApplicationUsers()"
+                        href="@LinkGenerator.ApplicationUsers.Index()"
                         current="@(Context.Request.Path == "/application-users")"
                         active="@(Context.Request.Path.StartsWithSegments("/application-users") || Context.Request.Path.StartsWithSegments("/api-keys"))">
                         Application users

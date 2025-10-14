@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 [Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class OtherDetailsChangeReasonModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)

@@ -1,5 +1,5 @@
 @page "/routes/{qualificationId}/delete/check-answers/{handler?}"
-@model CheckYourAnswersModel
+@model CheckAnswersModel
 @{
     ViewBag.Title = "Check details before deleting route";
 }
@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteDeleteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Delete route - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <partial name="_RouteDetail" model="@Model.RouteDetail" />
@@ -21,7 +21,7 @@
                     <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <govuk-summary-list-row-action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
                                                        visually-hidden-text="reason">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
@@ -29,7 +29,7 @@
                     <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback="true">@Model.ChangeReasonDetail.ChangeReasonDetail</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <govuk-summary-list-row-action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
                                                        visually-hidden-text="change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
@@ -39,7 +39,7 @@
                         <vc:evidence-file-link evidence-file="@Model.ChangeReasonDetail.Evidence.UploadedEvidenceFile" />
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RouteDeleteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <govuk-summary-list-row-action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
                                                        visually-hidden-text="change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
 
@@ -47,7 +47,7 @@
             </govuk-summary-list>
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit" data-testid="confirm-button">Delete route</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteDeleteCheckYourAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

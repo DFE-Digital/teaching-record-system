@@ -29,7 +29,7 @@
                         TRN @match.Trn
                     </govuk-summary-card-title>
                     <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator.PersonDetail(match.PersonId)" target="_blank">
+                        <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
                             View record (opens in a new tab)
                         </govuk-summary-card-action>
                     </govuk-summary-card-actions>
@@ -84,7 +84,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Alerts</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value><a href="@LinkGenerator.PersonAlerts(match.PersonId)" target="_blank" class="govuk-link">(@match.ActiveAlertCount) open alert@(match.ActiveAlertCount == 1 ? "" : "s") (opens in a new tab)</a></govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value><a href="@LinkGenerator.Persons.PersonDetail.Alerts(match.PersonId)" target="_blank" class="govuk-link">(@match.ActiveAlertCount) open alert@(match.ActiveAlertCount == 1 ? "" : "s") (opens in a new tab)</a></govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                     </govuk-summary-list>

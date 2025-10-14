@@ -42,12 +42,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RouteEditCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteEditDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteEditTrainingSubjects(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingSubjects(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="SubjectId1" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">
@@ -82,7 +82,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditTrainingSubjectsCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingSubjectsCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

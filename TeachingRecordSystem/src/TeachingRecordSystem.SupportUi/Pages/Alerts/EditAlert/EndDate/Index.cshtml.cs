@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
 [Journey(JourneyNames.EditAlertEndDate), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController, IClock clock) : PageModel
+public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController, IClock clock) : PageModel
 {
     public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }
 
@@ -62,15 +62,15 @@ public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager ev
         await JourneyInstance!.UpdateStateAsync(state => state.EndDate = EndDate);
 
         return Redirect(FromCheckAnswers
-            ? linkGenerator.AlertEditEndDateCheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.AlertEditEndDateReason(AlertId, JourneyInstance!.InstanceId));
+            ? linkGenerator.Alerts.EditAlert.EndDate.CheckAnswers(AlertId, JourneyInstance.InstanceId)
+            : linkGenerator.Alerts.EditAlert.EndDate.Reason(AlertId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.AlertDetail(AlertId));
+        return Redirect(linkGenerator.Alerts.EditAlert.Details.Index(AlertId, JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

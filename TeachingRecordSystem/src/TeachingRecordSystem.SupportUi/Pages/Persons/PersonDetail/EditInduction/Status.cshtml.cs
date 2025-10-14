@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StatusModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
     EvidenceUploadManager evidenceController)
@@ -59,11 +59,11 @@ public class StatusModel(
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
             {
                 return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
-            return LinkGenerator.PersonInduction(PersonId);
+            return LinkGenerator.Persons.PersonDetail.Induction(PersonId);
         }
     }
 

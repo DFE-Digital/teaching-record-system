@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequestManualChecksNeeded.Resolve;
 
-public class Confirm(TrsDbContext dbContext, IClock clock, TrsLinkGenerator linkGenerator) : PageModel
+public class Confirm(TrsDbContext dbContext, IClock clock, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     [FromRoute]
     public string? SupportTaskReference { get; set; }
@@ -26,6 +26,6 @@ public class Confirm(TrsDbContext dbContext, IClock clock, TrsLinkGenerator link
 
         TempData.SetFlashSuccess($"TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} completed");
 
-        return Redirect(linkGenerator.TrnRequestManualChecksNeeded());
+        return Redirect(linkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index());
     }
 }

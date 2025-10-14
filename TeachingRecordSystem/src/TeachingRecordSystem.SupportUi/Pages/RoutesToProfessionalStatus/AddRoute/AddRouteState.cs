@@ -56,7 +56,7 @@ public class AddRouteState : IRegisterJourney
             AddRoutePage.ChangeReason =>
                 ChangeReason != null &&
                 ChangeReasonDetail.IsComplete,
-            AddRoutePage.CheckYourAnswers => false,
+            AddRoutePage.CheckAnswers => false,
             _ => throw new ArgumentOutOfRangeException(nameof(page))
         };
     }

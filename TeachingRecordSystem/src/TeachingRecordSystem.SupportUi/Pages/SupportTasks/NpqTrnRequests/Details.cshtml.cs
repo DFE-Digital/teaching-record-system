@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
-public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
+public class DetailsModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public string PersonName => string.Join(" ", SupportTask!.TrnRequestMetadata!.Name);
 
@@ -42,18 +42,18 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
         if (CreateRecord)
         {
             return (SupportTask!.TrnRequestMetadata!.PotentialDuplicate ?? false) ?
-               Redirect(linkGenerator.NpqTrnRequestResolve(SupportTaskReference)) :
-               Redirect(linkGenerator.NpqTrnRequestNoMatches(SupportTaskReference));
+               Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Index(SupportTaskReference)) :
+               Redirect(linkGenerator.SupportTasks.NpqTrnRequests.NoMatches.Index(SupportTaskReference));
         }
         else
         {
-            return Redirect(linkGenerator.NpqTrnRequestReject(SupportTaskReference));
+            return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Reject.Index(SupportTaskReference));
         }
     }
 
     public IActionResult OnPostCancel()
     {
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

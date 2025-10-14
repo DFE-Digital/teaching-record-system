@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
-public class StartDateModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager, IClock clock) : PageModel
+public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager, IClock clock) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
@@ -48,22 +48,22 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, EvidenceUploadManage
         });
 
         return Redirect(FromCheckAnswers
-            ? linkGenerator.AlertAddCheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.AlertAddReason(PersonId, JourneyInstance.InstanceId));
+            ? linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId)
+            : linkGenerator.Alerts.AddAlert.Reason(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (JourneyInstance!.State.AddLink is null)
         {
-            context.Result = Redirect(linkGenerator.AlertAddLink(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Link(PersonId, JourneyInstance.InstanceId));
             return;
         }
 

@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
 public class StartAndEndDateModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceController)
@@ -67,13 +67,13 @@ public class StartAndEndDateModel(
         return Redirect(JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage() :
             FromCheckAnswers ?
-                LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+                LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
+                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
     }
 
     private string NextCompletingRoutePage()
     {
-        return LinkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
+        return LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(QualificationId, JourneyInstance!.InstanceId);
     }
 }
 

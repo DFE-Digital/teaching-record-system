@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 [Journey(JourneyNames.MergePerson), RequireJourneyInstance]
 public class MatchesModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager)
     : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {

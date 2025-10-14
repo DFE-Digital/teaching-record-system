@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class CheckAnswersModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -48,20 +48,20 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification added");
 
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonDetail(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.MqAddProvider(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Mqs.AddMq.Provider(PersonId, JourneyInstance.InstanceId));
             return;
         }
 

@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
 [Journey(JourneyNames.EditAlertDetails), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
     public const int DetailsMaxLength = 4000;
 
@@ -54,15 +54,15 @@ public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager ev
         });
 
         return Redirect(FromCheckAnswers
-            ? linkGenerator.AlertEditDetailsCheckAnswers(AlertId, JourneyInstance.InstanceId)
-            : linkGenerator.AlertEditDetailsReason(AlertId, JourneyInstance.InstanceId));
+            ? linkGenerator.Alerts.EditAlert.Details.CheckAnswers(AlertId, JourneyInstance.InstanceId)
+            : linkGenerator.Alerts.EditAlert.Details.Reason(AlertId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

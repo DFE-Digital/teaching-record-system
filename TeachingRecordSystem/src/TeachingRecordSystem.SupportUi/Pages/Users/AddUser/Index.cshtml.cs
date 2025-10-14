@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 public class IndexModel(
     TrsDbContext dbContext,
     IAadUserService userService,
-    TrsLinkGenerator trsLinkGenerator) : PageModel
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     [Display(Name = "Email address")]
     [Required(ErrorMessage = "Enter an email address")]
@@ -47,9 +47,9 @@ public class IndexModel(
         var existingUser = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == user.UserId);
         if (existingUser is not null)
         {
-            return Redirect(trsLinkGenerator.EditUser(existingUser.UserId));
+            return Redirect(linkGenerator.Users.EditUser.Index(existingUser.UserId));
         }
 
-        return Redirect(trsLinkGenerator.AddUserConfirm(user.UserId));
+        return Redirect(linkGenerator.Users.AddUser.Confirm(user.UserId));
     }
 }

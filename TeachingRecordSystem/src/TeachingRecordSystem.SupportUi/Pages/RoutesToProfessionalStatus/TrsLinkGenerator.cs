@@ -159,7 +159,7 @@ public partial class TrsLinkGenerator
             AddRoutePage.AgeRangeSpecialism => RouteAddAgeRangeSpecialism(personId, journeyInstanceId, fromCheckAnswers),
             AddRoutePage.SubjectSpecialisms => RouteAddSubjectSpecialisms(personId, journeyInstanceId, fromCheckAnswers),
             AddRoutePage.ChangeReason => RouteAddChangeReason(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.CheckYourAnswers => RouteAddCheckYourAnswers(personId, journeyInstanceId),
+            AddRoutePage.CheckAnswers => RouteAddCheckYourAnswers(personId, journeyInstanceId),
             _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
         };
 
@@ -176,7 +176,7 @@ public partial class TrsLinkGenerator
             AddRoutePage.AgeRangeSpecialism => RouteEditAgeRangeSpecialism(personId, journeyInstanceId, fromCheckAnswers),
             AddRoutePage.SubjectSpecialisms => RouteEditSubjectSpecialisms(personId, journeyInstanceId, fromCheckAnswers),
             AddRoutePage.ChangeReason => RouteEditChangeReason(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.CheckYourAnswers => RouteEditCheckYourAnswers(personId, journeyInstanceId),
+            AddRoutePage.CheckAnswers => RouteEditCheckYourAnswers(personId, journeyInstanceId),
             AddRoutePage.Route => throw new NotImplementedException(),
             _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
         };

@@ -8,7 +8,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)">Back to record</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
 }
 
 @if (Model.TimelineItems!.Length == 0)
@@ -35,15 +35,15 @@ else
         <govuk-pagination>
             @if (Model.GotPreviousPage)
             {
-                <govuk-pagination-previous href="@LinkGenerator.PersonChangeHistory(Model.PersonId, Model.PageNumber - 1)" />
+                <govuk-pagination-previous href="@LinkGenerator.Persons.PersonDetail.ChangeHistory(Model.PersonId, Model.PageNumber - 1)" />
             }
             @foreach (var page in Model.PaginationPages!)
             {
-                <govuk-pagination-item href="@LinkGenerator.PersonChangeHistory(Model.PersonId, page)" current="false">@(page)</govuk-pagination-item>
+                <govuk-pagination-item href="@LinkGenerator.Persons.PersonDetail.ChangeHistory(Model.PersonId, page)" current="false">@(page)</govuk-pagination-item>
             }
             @if (Model.GotNextPage)
             {
-                <govuk-pagination-next href="@LinkGenerator.PersonChangeHistory(Model.PersonId, Model.PageNumber + 1)" />
+                <govuk-pagination-next href="@LinkGenerator.Persons.PersonDetail.ChangeHistory(Model.PersonId, Model.PageNumber + 1)" />
             }
         </govuk-pagination>
     }

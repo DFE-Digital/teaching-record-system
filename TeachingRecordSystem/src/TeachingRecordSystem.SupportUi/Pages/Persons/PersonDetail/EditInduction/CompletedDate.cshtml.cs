@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class CompletedDateModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
     EvidenceUploadManager evidenceUploadManager)
@@ -24,7 +24,7 @@ public class CompletedDateModel(
     {
         get
         {
-            if (FromCheckAnswers is JourneyFromCheckYourAnswersPage.CheckYourAnswers or JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate)
+            if (FromCheckAnswers is JourneyFromCheckAnswersPage.CheckAnswers or JourneyFromCheckAnswersPage.CheckAnswersToStartDate)
             {
                 return InductionJourneyPage.CheckAnswers;
             }
@@ -36,16 +36,16 @@ public class CompletedDateModel(
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
             {
                 return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswersToStartDate)
             {
-                return GetPageLink(InductionJourneyPage.StartDate, JourneyFromCheckYourAnswersPage.CheckYourAnswers);
+                return GetPageLink(InductionJourneyPage.StartDate, JourneyFromCheckAnswersPage.CheckAnswers);
             }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.CompletedDate
-                ? LinkGenerator.PersonInduction(PersonId)
+                ? LinkGenerator.Persons.PersonDetail.Induction(PersonId)
                 : GetPageLink(InductionJourneyPage.StartDate);
         }
     }

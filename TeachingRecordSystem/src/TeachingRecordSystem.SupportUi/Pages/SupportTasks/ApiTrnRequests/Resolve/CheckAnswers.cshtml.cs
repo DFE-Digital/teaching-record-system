@@ -16,7 +16,7 @@ public class CheckAnswers(
     TrsDbContext dbContext,
     TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     IClock clock) :
     ResolveApiTrnRequestPageModel(dbContext)
 {
@@ -179,16 +179,16 @@ public class CheckAnswers(
 
         TempData.SetFlashSuccess(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.PersonDetail(requestData.ResolvedPersonId!.Value)));
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(requestData.ResolvedPersonId!.Value)));
 
-        return Redirect(linkGenerator.ApiTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.ApiTrnRequests.Index());
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.ApiTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.ApiTrnRequests.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -198,13 +198,13 @@ public class CheckAnswers(
 
         if (state.PersonId is not Guid personId)
         {
-            context.Result = Redirect(linkGenerator.ApiTrnRequestMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.ApiTrnRequests.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 
         if (personId != CreateNewRecordPersonIdSentinel && !state.PersonAttributeSourcesSet)
         {
-            context.Result = Redirect(linkGenerator.ApiTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.ApiTrnRequests.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 

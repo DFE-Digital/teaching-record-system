@@ -8,8 +8,8 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 [Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class CheckYourAnswersModel(
-    TrsLinkGenerator linkGenerator,
+public class CheckAnswersModel(
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController,
@@ -25,7 +25,7 @@ public class CheckYourAnswersModel(
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
-    public string BackLink => linkGenerator.RouteDeleteChangeReason(QualificationId, JourneyInstance!.InstanceId);
+    public string BackLink => linkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(QualificationId, JourneyInstance!.InstanceId);
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -34,7 +34,7 @@ public class CheckYourAnswersModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.RouteDeleteChangeReason(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -97,13 +97,13 @@ public class CheckYourAnswersModel(
 
         TempData.SetFlashSuccess("Route to professional status deleted");
 
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

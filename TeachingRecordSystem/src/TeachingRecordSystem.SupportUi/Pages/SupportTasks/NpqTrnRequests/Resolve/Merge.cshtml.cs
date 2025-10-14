@@ -7,7 +7,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Re
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
-public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
+public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public string? PersonName { get; set; }
 
@@ -88,13 +88,13 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
             state.Comments = Comments;
         });
 
-        return Redirect(linkGenerator.NpqTrnRequestMergeCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -104,13 +104,13 @@ public class MergeModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         if (state.PersonId is not Guid personId)
         {
-            context.Result = Redirect(linkGenerator.NpqTrnRequestMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.Matches(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 
         if (state.PersonId == CreateNewRecordPersonIdSentinel)
         {
-            context.Result = Redirect(linkGenerator.NpqTrnRequestMergeCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
         var personAttributes = await GetPersonAttributesAsync(personId);

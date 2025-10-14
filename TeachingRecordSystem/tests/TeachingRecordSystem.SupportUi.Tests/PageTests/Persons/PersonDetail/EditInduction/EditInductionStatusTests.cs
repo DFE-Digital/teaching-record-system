@@ -207,7 +207,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 .WithInitializedState(currentInductionStatus, InductionJourneyPage.Status)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?fromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?fromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

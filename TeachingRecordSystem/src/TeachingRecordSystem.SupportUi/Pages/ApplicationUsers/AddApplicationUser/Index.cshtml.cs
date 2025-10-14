@@ -10,7 +10,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.AddApplicationUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     [BindProperty]
     [Display(Name = "Name")]
@@ -63,6 +63,6 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, 
         }
 
         TempData.SetFlashSuccess("Application user added");
-        return Redirect(linkGenerator.EditApplicationUser(newUser.UserId));
+        return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(newUser.UserId));
     }
 }

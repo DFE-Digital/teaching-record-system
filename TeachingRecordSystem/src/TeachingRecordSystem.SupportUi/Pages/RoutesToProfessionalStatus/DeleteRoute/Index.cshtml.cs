@@ -5,12 +5,12 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 [Journey(JourneyNames.DeleteRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<DeleteRouteState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.RouteDeleteChangeReason(QualificationId, JourneyInstance!.InstanceId));
+    public IActionResult OnGet() => Redirect(linkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(QualificationId, JourneyInstance!.InstanceId));
 }

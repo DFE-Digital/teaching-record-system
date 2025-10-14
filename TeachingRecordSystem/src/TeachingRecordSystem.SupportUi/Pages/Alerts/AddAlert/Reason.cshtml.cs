@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
-public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
+public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
@@ -41,7 +41,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager e
     {
         if (JourneyInstance!.State.StartDate is null)
         {
-            context.Result = Redirect(linkGenerator.AlertAddStartDate(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.AddAlert.StartDate(PersonId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -80,13 +80,13 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager e
             state.Evidence = Evidence;
         });
 
-        return Redirect(linkGenerator.AlertAddCheckAnswers(PersonId, JourneyInstance.InstanceId));
+        return Redirect(linkGenerator.Alerts.AddAlert.CheckAnswers(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 }

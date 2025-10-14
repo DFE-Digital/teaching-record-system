@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 [Journey(JourneyNames.SetStatus), ActivatesJourney, RequireJourneyInstance]
 [AllowDeactivatedPerson]
-public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<SetStatusState>? JourneyInstance { get; set; }
 
@@ -15,5 +15,5 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     [FromRoute]
     public PersonStatus TargetStatus { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.PersonSetStatusChangeReason(PersonId, TargetStatus, JourneyInstance!.InstanceId));
+    public IActionResult OnGet() => Redirect(linkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance!.InstanceId));
 }

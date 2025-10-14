@@ -8,12 +8,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class StatusModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
     : AddRouteCommonPageModel(AddRoutePage.Status, linkGenerator, referenceDataCache, evidenceController)
 {
-    public override AddRoutePage? NextPage => PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
+    public override AddRoutePage? NextPage => PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckAnswers;
     public override AddRoutePage? PreviousPage => AddRoutePage.Route;
 
     public RouteToProfessionalStatusType Route { get; set; } = null!;

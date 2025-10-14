@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqDelete(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Mqs.DeleteMq.Index(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqDeleteCheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.Mqs.DeleteMq.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Delete mandatory qualification - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
@@ -53,7 +53,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit">Delete qualification</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqDeleteCheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Mqs.DeleteMq.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

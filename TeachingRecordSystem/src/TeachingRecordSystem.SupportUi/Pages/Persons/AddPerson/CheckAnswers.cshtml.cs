@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 [Journey(JourneyNames.AddPerson), RequireJourneyInstance]
 public class CheckAnswersModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
     ITrnGenerator trnGenerator,
@@ -99,9 +99,9 @@ public class CheckAnswersModel(
         await JourneyInstance!.CompleteAsync();
 
         TempData.SetFlashSuccess($"Record created for {Name}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.PersonDetail(person.PersonId))
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(person.PersonId))
             );
 
-        return Redirect(LinkGenerator.PersonDetail(person.PersonId));
+        return Redirect(LinkGenerator.Persons.PersonDetail.Index(person.PersonId));
     }
 }

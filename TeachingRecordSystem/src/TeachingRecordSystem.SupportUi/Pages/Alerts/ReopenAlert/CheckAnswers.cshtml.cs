@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 [Journey(JourneyNames.ReopenAlert), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager,
     IClock clock) : PageModel
 {
@@ -45,7 +45,7 @@ public class CheckAnswersModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.AlertReopen(AlertId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.ReopenAlert.Index(AlertId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -86,13 +86,13 @@ public class CheckAnswersModel(
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert re-opened");
 
-        return Redirect(linkGenerator.PersonAlerts(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.AlertDetail(AlertId));
+        return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
     }
 }

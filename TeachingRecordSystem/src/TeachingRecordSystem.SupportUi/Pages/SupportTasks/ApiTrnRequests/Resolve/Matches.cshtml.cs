@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
-public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveApiTrnRequestPageModel(dbContext)
+public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator) : ResolveApiTrnRequestPageModel(dbContext)
 {
     [FromRoute]
     public string? SupportTaskReference { get; set; }
@@ -64,15 +64,15 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
 
         return Redirect(
             PersonId == ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel ?
-                linkGenerator.ApiTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
-                linkGenerator.ApiTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+                linkGenerator.SupportTasks.ApiTrnRequests.Resolve.CheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
+                linkGenerator.SupportTasks.ApiTrnRequests.Resolve.Merge(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
 
-        return Redirect(linkGenerator.ApiTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.ApiTrnRequests.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

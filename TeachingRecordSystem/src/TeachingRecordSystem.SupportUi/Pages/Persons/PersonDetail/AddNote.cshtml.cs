@@ -11,7 +11,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 [Authorize(Policy = AuthorizationPolicies.PersonDataEdit)]
-public class AddNote(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFileService fileService, IClock clock) : PageModel
+public class AddNote(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, IFileService fileService, IClock clock) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -72,7 +72,7 @@ public class AddNote(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFi
 
         await dbContext.SaveChangesAsync();
 
-        return Redirect(linkGenerator.PersonNotes(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Notes(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

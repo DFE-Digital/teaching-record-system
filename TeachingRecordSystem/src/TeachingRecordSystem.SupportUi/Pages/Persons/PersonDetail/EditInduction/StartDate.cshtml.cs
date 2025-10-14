@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StartDateModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
     EvidenceUploadManager evidenceController)
@@ -29,11 +29,11 @@ public class StartDateModel(
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
             {
                 if (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate)
                 {
-                    return GetPageLink(InductionJourneyPage.CompletedDate, JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate);
+                    return GetPageLink(InductionJourneyPage.CompletedDate, JourneyFromCheckAnswersPage.CheckAnswersToStartDate);
                 }
                 return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
@@ -47,12 +47,12 @@ public class StartDateModel(
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
             {
                 return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.StartDate
-            ? LinkGenerator.PersonInduction(PersonId)
+            ? LinkGenerator.Persons.PersonDetail.Induction(PersonId)
             : GetPageLink(InductionJourneyPage.Status);
         }
     }

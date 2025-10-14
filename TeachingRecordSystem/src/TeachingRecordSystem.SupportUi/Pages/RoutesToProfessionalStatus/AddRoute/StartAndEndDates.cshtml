@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteAddStartAndEndDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.StartAndEndDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-fieldset>
                 <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
@@ -34,7 +34,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddStartAndEndDateCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.StartAndEndDateCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

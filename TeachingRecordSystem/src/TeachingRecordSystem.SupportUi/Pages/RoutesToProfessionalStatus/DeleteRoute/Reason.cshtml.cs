@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 [Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class ReasonModel(TrsLinkGenerator linkGenerator,
+public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController) : PageModel
 {
     public string? PersonName { get; set; }
@@ -39,11 +39,11 @@ public class ReasonModel(TrsLinkGenerator linkGenerator,
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    public string NextPage => linkGenerator.RouteDeleteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
+    public string NextPage => linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId);
 
     public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.RouteDeleteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.PersonQualifications(PersonId);
+        ? linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId)
+        : linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
@@ -92,6 +92,6 @@ public class ReasonModel(TrsLinkGenerator linkGenerator,
     {
         await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 }

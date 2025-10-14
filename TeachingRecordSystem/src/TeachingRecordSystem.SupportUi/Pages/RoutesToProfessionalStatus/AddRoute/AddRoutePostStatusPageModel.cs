@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 public abstract class AddRoutePostStatusPageModel(
     AddRoutePage currentPage,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
     : AddRouteCommonPageModel(currentPage, linkGenerator, referenceDataCache, evidenceController)

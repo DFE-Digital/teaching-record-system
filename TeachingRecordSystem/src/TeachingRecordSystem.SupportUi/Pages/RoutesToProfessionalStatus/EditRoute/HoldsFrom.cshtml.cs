@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
 public class HoldsFromModel(
     IClock clock,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceUploadManager)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceUploadManager)
@@ -47,8 +47,8 @@ public class HoldsFromModel(
         var nextPage = JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage :
             FromCheckAnswers ?
-                LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+                LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
+                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
 
         if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
         {
@@ -83,10 +83,10 @@ public class HoldsFromModel(
     }
 
     public string BackLink => FromCheckAnswers ?
-            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
-                LinkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
-                LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Status(QualificationId, JourneyInstance!.InstanceId) :
+                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
 
 
     private bool IsLastCompletingRoutePage()
@@ -112,6 +112,6 @@ public class HoldsFromModel(
 
     private string NextCompletingRoutePage =>
         IsLastCompletingRoutePage() ?
-            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId) :
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.InductionExemption(QualificationId, JourneyInstance!.InstanceId);
 }

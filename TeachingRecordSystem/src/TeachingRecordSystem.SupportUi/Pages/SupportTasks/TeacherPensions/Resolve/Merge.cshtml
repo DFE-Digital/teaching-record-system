@@ -7,7 +7,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers? LinkGenerator.TeacherPensionsCheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) : LinkGenerator.TeacherPensionsMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@(Model.FromCheckAnswers? LinkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) : LinkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId))" />
 }
 
 @functions {
@@ -35,7 +35,7 @@
     }
 #pragma warning restore CS1998
 }
-<form action="@LinkGenerator.TeacherPensionsMerge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+<form action="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Merge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <span class="govuk-caption-l">Support tasks</span>
     <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Select the details to keep in merged record</h1>
 
@@ -116,7 +116,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator.TeacherPensionsMergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.MergeCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" data-testid="cancel-button">Cancel</govuk-button>
             </div>
         </div>
     </div>

@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
 public class DegreeTypeModel(
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController)
     : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceController)
@@ -43,8 +43,8 @@ public class DegreeTypeModel(
         await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
 
         return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
+            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)

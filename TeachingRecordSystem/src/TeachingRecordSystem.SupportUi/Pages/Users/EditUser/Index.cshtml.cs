@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 public class IndexModel(
     TrsDbContext dbContext,
     IClock clock,
-    TrsLinkGenerator linkGenerator) : PageModel
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private Core.DataStore.Postgres.Models.User? _user;
 
@@ -100,7 +100,7 @@ public class IndexModel(
             TempData.SetFlashSuccess($"{Name} has been updated.");
         }
 
-        return Redirect(linkGenerator.Users());
+        return Redirect(linkGenerator.Users.Index());
     }
 
     public async Task<IActionResult> OnPostActivateAsync()
@@ -129,7 +129,7 @@ public class IndexModel(
         await dbContext.SaveChangesAsync();
         TempData.SetFlashSuccess($"{_user.Name}\u2019s account has been reactivated");
 
-        return Redirect(linkGenerator.Users());
+        return Redirect(linkGenerator.Users.Index());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

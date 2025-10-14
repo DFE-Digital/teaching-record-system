@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action=@LinkGenerator.PersonCreateCreateReason(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
+        <form action=@LinkGenerator.Persons.AddPerson.Reason(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
             <span class="govuk-caption-l" data-testid="create-reason-caption">Create a record</span>
             <govuk-radios for="Reason" data-testid="create-reason-options">
                 <govuk-radios-fieldset>
@@ -39,7 +39,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.PersonCreateCancel(Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.Persons.AddPerson.ReasonCancel(Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
             </div>
         </form>
     </div>

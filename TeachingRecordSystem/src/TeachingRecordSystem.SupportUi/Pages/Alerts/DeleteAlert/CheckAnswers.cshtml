@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
-        <form action="@LinkGenerator.AlertDeleteCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.Alerts.DeleteAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Delete an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
@@ -57,7 +57,7 @@
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -66,7 +66,7 @@
                         <vc:evidence-file-link evidence-file="@Model.EvidenceFile" />
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>
@@ -77,7 +77,7 @@
             </div>            
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit">Delete alert</govuk-button>
-                <govuk-button formaction="@LinkGenerator.AlertDeleteCheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Alerts.DeleteAlert.CheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>                                
         </form>
     </div>

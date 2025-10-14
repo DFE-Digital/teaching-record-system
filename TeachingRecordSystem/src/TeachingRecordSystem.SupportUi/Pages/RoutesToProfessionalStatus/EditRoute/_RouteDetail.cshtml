@@ -9,7 +9,7 @@
         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
         <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-status-link" href="@LinkGenerator.RouteEditStatus(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="status">Change</govuk-summary-list-row-action>
+            <govuk-summary-list-row-action data-testid="edit-status-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Status(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="status">Change</govuk-summary-list-row-action>
         </govuk-summary-list-row-actions>
     </govuk-summary-list-row>
 
@@ -19,7 +19,7 @@
             <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="edit-start-date-link" href="@LinkGenerator.RouteEditStartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-start-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -30,7 +30,7 @@
             <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="edit-end-date-link" href="@LinkGenerator.RouteEditStartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-end-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -41,7 +41,7 @@
             <govuk-summary-list-row-key>Held since</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="edit-holds-from-link" href="@LinkGenerator.RouteEditHoldsFrom(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="held since">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-holds-from-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="held since">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -54,7 +54,7 @@
             @if (!Model.HasImplicitExemption.HasValue || Model.HasImplicitExemption.HasValue && !Model.HasImplicitExemption.Value)
             {
                 <govuk-summary-list-row-actions>
-                    <govuk-summary-list-row-action data-testid="edit-induction-exemption-link" href="@LinkGenerator.RouteEditInductionExemption(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="induction exemption">Change</govuk-summary-list-row-action>
+                    <govuk-summary-list-row-action data-testid="edit-induction-exemption-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.InductionExemption(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="induction exemption">Change</govuk-summary-list-row-action>
                 </govuk-summary-list-row-actions>
             }
         </govuk-summary-list-row>
@@ -66,7 +66,7 @@
             <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingProvider</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="edit-training-provider-link" href="@LinkGenerator.RouteEditTrainingProvider(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training provider">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-training-provider-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingProvider(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training provider">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -77,7 +77,7 @@
             <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.DegreeType</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="edit-degree-type-link" href="@LinkGenerator.RouteEditDegreeType(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-degree-type-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.DegreeType(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -88,7 +88,7 @@
             <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="edit-country-link" href="@LinkGenerator.RouteEditTrainingCountry(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training country">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-country-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingCountry(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training country">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -101,14 +101,14 @@
             {
                 <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismRange</govuk-summary-list-row-value>
                 <govuk-summary-list-row-actions>
-                    <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+                    <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
                 </govuk-summary-list-row-actions>
             }
             else
             {
                 <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
                 <govuk-summary-list-row-actions>
-                    <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+                    <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
                 </govuk-summary-list-row-actions>
             }
         </govuk-summary-list-row>
@@ -134,7 +134,7 @@
                 }
             </govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="edit-subjects-link" href="@LinkGenerator.RouteEditTrainingSubjects(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-subjects-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingSubjects(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }

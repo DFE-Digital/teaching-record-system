@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Rejec
 [Journey(JourneyNames.RejectNpqTrnRequest), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
-    TrsLinkGenerator linkGenerator,
+    SupportUiLinkGenerator linkGenerator,
     IClock clock) : PageModel
 {
     public string? SourceApplicationUserName { get; set; }
@@ -62,13 +62,13 @@ public class CheckAnswersModel(
             $"TRN request for {PersonName} rejected");
 
         await JourneyInstance!.CompleteAsync();
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.NpqTrnRequests());
+        return Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Index());
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -80,7 +80,7 @@ public class CheckAnswersModel(
         RejectionReason = JourneyInstance!.State.RejectionReason;
         if (!RejectionReason.HasValue)
         {
-            Redirect(linkGenerator.NpqTrnRequestRejectionReason(supportTask.SupportTaskReference, JourneyInstance!.InstanceId));
+            Redirect(linkGenerator.SupportTasks.NpqTrnRequests.Reject.Reason(supportTask.SupportTaskReference, JourneyInstance!.InstanceId));
         }
 
         return next();
