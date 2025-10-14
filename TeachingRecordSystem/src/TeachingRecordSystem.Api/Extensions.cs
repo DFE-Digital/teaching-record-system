@@ -13,13 +13,13 @@ using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 using TeachingRecordSystem.Api.Infrastructure.RateLimiting;
-using TeachingRecordSystem.Api.Infrastructure.Redis;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Webhooks;
+using TeachingRecordSystem.WebCommon.Infrastructure.Redis;
 
 namespace TeachingRecordSystem.Api;
 

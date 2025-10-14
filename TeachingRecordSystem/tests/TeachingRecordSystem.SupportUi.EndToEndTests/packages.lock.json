@@ -2389,9 +2389,11 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
+          "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.1, )",
           "Hangfire.AspNetCore": "[1.8.21, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[9.0.9, )",
+          "Microsoft.Extensions.Caching.StackExchangeRedis": "[9.0.9, )",
           "Sentry.AspNetCore": "[5.14.0, )",
           "Serilog.AspNetCore": "[9.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",

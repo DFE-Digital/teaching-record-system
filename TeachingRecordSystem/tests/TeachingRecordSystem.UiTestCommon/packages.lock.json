@@ -686,6 +686,14 @@
         "resolved": "7.1.0",
         "contentHash": "oUyYoePaFlsC0yw4H/33EfGWeuHd2mEbPZkxKCsMmIrAYRaDwSpGISTiktGhXt1/zEV6CVEAevaWRIOdKgTnKg=="
       },
+      "Pipelines.Sockets.Unofficial": {
+        "type": "Transitive",
+        "resolved": "2.2.8",
+        "contentHash": "zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
+        "dependencies": {
+          "System.IO.Pipelines": "5.0.1"
+        }
+      },
       "prometheus-net": {
         "type": "Transitive",
         "resolved": "8.2.1",
@@ -827,6 +835,15 @@
         "type": "Transitive",
         "resolved": "1.1.6",
         "contentHash": "aLJu7Q0mVk0e9QwjJLEh70tXQ0Url8fHITrHXwqF+eq7N20jGMOhkmTXUUjpPim+rCm0I4fARcVBRzJPSipN+w=="
+      },
+      "StackExchange.Redis": {
+        "type": "Transitive",
+        "resolved": "2.7.27",
+        "contentHash": "Uqc2OQHglqj9/FfGQ6RkKFkZfHySfZlfmbCl+hc+u2I/IqunfelQ7QJi7ZhvAJxUtu80pildVX6NPLdDaUffOw==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "Pipelines.Sockets.Unofficial": "2.2.8"
+        }
       },
       "StructuredFieldValues": {
         "type": "Transitive",
@@ -1993,9 +2010,11 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
+          "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.1, )",
           "Hangfire.AspNetCore": "[1.8.21, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[9.0.9, )",
+          "Microsoft.Extensions.Caching.StackExchangeRedis": "[9.0.9, )",
           "Sentry.AspNetCore": "[5.14.0, )",
           "Serilog.AspNetCore": "[9.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
@@ -2019,6 +2038,16 @@
         "dependencies": {
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.11",
           "Npgsql": "8.0.3"
+        }
+      },
+      "AspNetCore.HealthChecks.Redis": {
+        "type": "CentralTransitive",
+        "requested": "[9.0.0, )",
+        "resolved": "9.0.0",
+        "contentHash": "yNH0h8GLRbAf+PU5HNVLZ5hNeyq9mDVmRKO9xuZsme/znUYoBJlQvI0gq45gaZNlLncCHkMhR4o90MuT+gxxPw==",
+        "dependencies": {
+          "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.11",
+          "StackExchange.Redis": "2.7.4"
         }
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
@@ -2265,6 +2294,18 @@
           "Microsoft.Extensions.Logging": "8.0.1",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.3",
           "Microsoft.Extensions.Options": "8.0.2"
+        }
+      },
+      "Microsoft.Extensions.Caching.StackExchangeRedis": {
+        "type": "CentralTransitive",
+        "requested": "[9.0.9, )",
+        "resolved": "9.0.9",
+        "contentHash": "1xfeN4YV8LMEPirDEj1JfQUKAlZRu4cl/FUJYzGZwgWr69/AAg4cM1ohL9k9jcj+krgrlqBWw9GXk/Fo79UwGQ==",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "StackExchange.Redis": "2.7.27"
         }
       },
       "Microsoft.Extensions.Configuration.Abstractions": {
