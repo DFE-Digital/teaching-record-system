@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Text;
-using Azure.Storage.Blobs;
+using Azure.Storage.Files.DataLake;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 
-public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] BlobServiceClient blobServiceClient, ILogger<CapitaExportNewJob> logger, TrsDbContext dbContext, IClock clock)
+public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportNewJob> logger, TrsDbContext dbContext, IClock clock)
 {
     public const string JobSchedule = "0 3 * * *";
     public const string LastRunDateKey = "LastRunDate";
@@ -165,20 +165,38 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] BlobServiceCl
         return integrationJob.IntegrationTransactionId;
     }
 
-    public async Task UploadFileAsync(Stream fileContentStream, string fileName)
+    public async Task UploadFileAsync(Stream fileContentStream, string fileName, CancellationToken cancellationToken = default)
     {
-        // Get the container client
-        var containerClient = blobServiceClient!.GetBlobContainerClient(StorageContainer);
-        await containerClient.CreateIfNotExistsAsync();
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
+        await fileSystemClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        var targetFileName = $"{ExportsFolder}/{fileName}";
+        // Build the full path under the exports folder
+        var targetPath = $"{ExportsFolder}/{fileName}";
+        var fileClient = fileSystemClient.GetFileClient(targetPath);
 
-        // Get the blob client for the target file
-        var blobClient = containerClient.GetBlobClient(targetFileName);
+        await fileClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
 
-        // Upload the stream
-        await blobClient.UploadAsync(fileContentStream, overwrite: true);
+        await fileClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+
+        Stream uploadStream = fileContentStream;
+        if (!fileContentStream.CanSeek)
+        {
+            var memory = new MemoryStream();
+            await fileContentStream.CopyToAsync(memory, cancellationToken);
+            memory.Position = 0;
+            uploadStream = memory;
+        }
+
+        await fileClient.AppendAsync(uploadStream, offset: 0, cancellationToken: cancellationToken);
+        await fileClient.FlushAsync(uploadStream.Length, cancellationToken: cancellationToken);
+
+        // Dispose temporary memory stream if we created one
+        if (uploadStream != fileContentStream)
+        {
+            await uploadStream.DisposeAsync();
+        }
     }
+
 
     public string GetFileName(IClock now)
     {

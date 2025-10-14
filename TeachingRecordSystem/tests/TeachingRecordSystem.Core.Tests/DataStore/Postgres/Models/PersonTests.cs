@@ -288,7 +288,7 @@ public class PersonTests
             currentStatus,
             startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2024, 10, 1) : null,
-            exemptionReasonIds: currentStatus is InductionStatus.Exempt?
+            exemptionReasonIds: currentStatus is InductionStatus.Exempt ?
                 [InductionExemptionReason.QtlsId] :
                 Array.Empty<Guid>(),
             changeReason: null,

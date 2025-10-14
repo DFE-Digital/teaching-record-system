@@ -1,9 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Files.DataLake;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,14 +13,16 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
+
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class CapitaImportJob([FromKeyedServices("sftpstorage")] BlobServiceClient blobServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
+public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaImportJob> logger, TrsDbContext dbContext, IClock clock, IPersonMatchingService personMatchingService, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 4 * * *";
     public const string StorageContainer = "capita-integrations";
-    public const string PICKUP_FOLDER = "pickup";
-    private const string ProcessedFolder = "processed";
+    public const string PickupFolder = "pickup";
+    private const string ProcessedFolder = "capita/processed";
+    public const string ArchivedContainer = "archived-integration-transactions";
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -39,29 +39,30 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] BlobServiceClien
 
     public async Task ArchiveFileAsync(string fileName, CancellationToken cancellationToken)
     {
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageContainer);
-        var sourceBlobClient = blobContainerClient.GetBlobClient(fileName);
-        var fileNameParts = fileName.Split("/");
-        var fileNameWithoutFolder = $"{DateTime.Now.ToString("ddMMyyyyHHmm")}-{fileNameParts.Last()}";
-        var targetFileName = $"{ProcessedFolder}/{fileNameWithoutFolder}";
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
+        var arhivedFileSystemClient = dataLakeServiceClient.GetFileSystemClient(ArchivedContainer);
+        var sourceFile = fileSystemClient.GetFileClient(fileName);
 
-        // Acquire a lease to prevent another client modifying the source blob
-        var lease = sourceBlobClient.GetBlobLeaseClient();
-        await lease.AcquireAsync(TimeSpan.FromSeconds(60), cancellationToken: cancellationToken);
+        var fileNameParts = fileName.Split('/');
+        var fileNameWithoutFolder = $"{DateTime.UtcNow:ddMMyyyyHHmm}-{fileNameParts.Last()}";
+        var targetPath = $"{ProcessedFolder}/{fileNameWithoutFolder}";
+        var targetFile = arhivedFileSystemClient.GetFileClient(targetPath);
 
-        var targetBlobClient = blobContainerClient.GetBlobClient(targetFileName);
-        var copyOperation = await targetBlobClient.StartCopyFromUriAsync(sourceBlobClient.Uri, cancellationToken: cancellationToken);
-        await copyOperation.WaitForCompletionAsync();
+        await targetFile.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        // Release the lease
-        var sourceProperties = await sourceBlobClient.GetPropertiesAsync(cancellationToken: cancellationToken);
-        if (sourceProperties.Value.LeaseState == LeaseState.Leased)
-        {
-            await lease.ReleaseAsync(cancellationToken: cancellationToken);
-        }
+        // Read the source file
+        var readResponse = await sourceFile.ReadAsync(cancellationToken: cancellationToken);
+        await using var sourceStream = readResponse.Value.Content;
 
-        // Now remove the original blob
-        await sourceBlobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
+        await using var memory = new MemoryStream();
+        await sourceStream.CopyToAsync(memory, cancellationToken);
+        memory.Position = 0;
+
+        await targetFile.AppendAsync(memory, offset: 0, cancellationToken: cancellationToken);
+        await targetFile.FlushAsync(memory.Length, cancellationToken: cancellationToken);
+
+        // Delete the original file
+        await sourceFile.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
     static string[] GetNonEmptyValues(params string?[] values)
@@ -411,27 +412,28 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] BlobServiceClien
 
     public async Task<Stream> GetDownloadStreamAsync(string fileName)
     {
-        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(StorageContainer);
-        BlobClient blobClient = containerClient.GetBlobClient($"{fileName}");
-        var streamingResult = await blobClient.DownloadStreamingAsync();
-        return streamingResult.Value.Content;
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
+        var fileClient = fileSystemClient.GetFileClient(fileName);
+
+        var readResponse = await fileClient.ReadAsync();
+        return readResponse.Value.Content; // Stream, must be disposed by caller
     }
+
 
     private async Task<string[]> GetImportFilesAsync(CancellationToken cancellationToken)
     {
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageContainer);
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
         var fileNames = new List<string>();
-        var resultSegment = blobContainerClient.GetBlobsByHierarchyAsync(prefix: PICKUP_FOLDER, delimiter: "", cancellationToken: cancellationToken).AsPages();
-        await foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
+
+        await foreach (var pathItem in fileSystemClient.GetPathsAsync($"{PickupFolder}/", recursive: false, cancellationToken: cancellationToken))
         {
-            foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
+            // Only add files, skip directories
+            if (pathItem.IsDirectory == false)
             {
-                if (blobhierarchyItem.IsBlob)
-                {
-                    fileNames.Add(blobhierarchyItem.Blob.Name);
-                }
+                fileNames.Add(pathItem.Name);
             }
         }
+
         return fileNames.ToArray();
     }
 }

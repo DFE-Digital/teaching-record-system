@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text;
-using Azure.Storage.Blobs;
+using Azure.Storage.Files.DataLake;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 
-public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] BlobServiceClient blobServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, IClock clock, IOptions<CapitaTpsUserOption> capitaUser)
+public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, IClock clock, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 3 * * *";
     public const string LastRunDateKey = "LastRunDate";
@@ -142,20 +142,29 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] BlobService
         return integrationJob.IntegrationTransactionId;
     }
 
-    public async Task UploadFileAsync(Stream fileContentStream, string fileName)
+    public async Task UploadFileAsync(Stream fileContentStream, string fileName, CancellationToken cancellationToken = default)
     {
-        // Get the container client
-        var containerClient = blobServiceClient!.GetBlobContainerClient(StorageContainer);
-        await containerClient.CreateIfNotExistsAsync();
+        // Get the filesystem (container) client
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
+        await fileSystemClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        var targetFileName = $"{ExportsFolder}/{fileName}";
+        // Build the target file path (within "exports" folder)
+        var targetPath = $"{ExportsFolder}/{fileName}";
+        var fileClient = fileSystemClient.GetFileClient(targetPath);
 
-        // Get the blob client for the target file
-        var blobClient = containerClient.GetBlobClient(targetFileName);
+        // Create or overwrite the file (must exist before append)
+        await fileClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        // Upload the stream
-        await blobClient.UploadAsync(fileContentStream, overwrite: true);
+        // Copy the stream into a seekable buffer so DFS can calculate length
+        await using var memory = new MemoryStream();
+        await fileContentStream.CopyToAsync(memory, cancellationToken);
+        memory.Position = 0;
+
+        // Upload the data (append + flush)
+        await fileClient.AppendAsync(memory, offset: 0, cancellationToken: cancellationToken);
+        await fileClient.FlushAsync(memory.Length, cancellationToken: cancellationToken);
     }
+
 
     public string GetFileName(IClock now)
     {
