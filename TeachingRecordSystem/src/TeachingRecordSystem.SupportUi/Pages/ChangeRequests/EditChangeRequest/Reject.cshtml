@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.ChangeRequests.EditChangeRequest.Index(Model.SupportTaskReference)" />
+    <govuk-back-link href="@LinkGenerator.ChangeRequests.EditChangeRequest.Index(Model.SupportTaskReference)" />
 }
 
 <span class="govuk-caption-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Change of Name" : "Change of Date of Birth") - @Model.PersonName</span>
@@ -14,7 +14,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator2.ChangeRequests.EditChangeRequest.Reject(Model.SupportTaskReference)" method="post">
+        <form action="@LinkGenerator.ChangeRequests.EditChangeRequest.Reject(Model.SupportTaskReference)" method="post">
             <govuk-radios for="RejectionReasonChoice">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>

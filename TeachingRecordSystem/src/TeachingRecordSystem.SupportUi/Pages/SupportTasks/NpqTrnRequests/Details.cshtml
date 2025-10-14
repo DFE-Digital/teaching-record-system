@@ -5,10 +5,10 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.SupportTasks.NpqTrnRequests.Index()" />
+    <govuk-back-link href="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" />
 }
 
-<form action="@LinkGenerator2.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference)" method="post">
+<form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
@@ -65,7 +65,7 @@
             </govuk-radios>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator2.SupportTasks.NpqTrnRequests.DetailsCancel(Model.SupportTaskReference)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.SupportTasks.NpqTrnRequests.DetailsCancel(Model.SupportTaskReference)" class="govuk-button--secondary" type="submit">Cancel</govuk-button>
             </div>
         </div>
     </div>

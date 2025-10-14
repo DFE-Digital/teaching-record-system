@@ -11,7 +11,7 @@
     <div class="trs-support-tasks__filters">
         @if (Model.SupportTaskCategories!.Length > 0)
         {
-            <form action="@LinkGenerator2.SupportTasks.Index()" method="get" asp-antiforgery="false">
+            <form action="@LinkGenerator.SupportTasks.Index()" method="get" asp-antiforgery="false">
                 <govuk-checkboxes for="Categories" name="category" class="govuk-checkboxes--small govuk-!-margin-bottom-2">
                     <govuk-checkboxes-fieldset>
                         <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">Filter by category</govuk-checkboxes-fieldset-legend>
@@ -28,7 +28,7 @@
             </form>
         }
 
-        <form action="@LinkGenerator2.SupportTasks.Index()" method="get" asp-antiforgery="false">
+        <form action="@LinkGenerator.SupportTasks.Index()" method="get" asp-antiforgery="false">
             <govuk-input for="Reference" name="reference" class="govuk-!-margin-bottom-0">
                 <govuk-input-label class="govuk-label--s">Search by reference</govuk-input-label>
             </govuk-input>
@@ -49,7 +49,7 @@
             }
             else
             {
-                <a href="@LinkGenerator2.SupportTasks.Index(Model.Categories, sortBy: IndexModel.SortByOption.DateRequested, reference: Model.Reference, filtersApplied: true)" class="govuk-link">Date requested</a>
+                <a href="@LinkGenerator.SupportTasks.Index(Model.Categories, sortBy: IndexModel.SortByOption.DateRequested, reference: Model.Reference, filtersApplied: true)" class="govuk-link">Date requested</a>
             }
             &#65372;
             @if (Model.SortBy == IndexModel.SortByOption.Type)
@@ -58,7 +58,7 @@
             }
             else
             {
-                <a href="@LinkGenerator2.SupportTasks.Index(Model.Categories, sortBy: IndexModel.SortByOption.Type, reference: Model.Reference, filtersApplied: true)" class="govuk-link">Type</a>
+                <a href="@LinkGenerator.SupportTasks.Index(Model.Categories, sortBy: IndexModel.SortByOption.Type, reference: Model.Reference, filtersApplied: true)" class="govuk-link">Type</a>
             }
         </div>
 
@@ -76,7 +76,7 @@
                     @foreach (var result in Model.Results)
                     {
                         <tr class="govuk-table__row" data-reference="@result.Reference">
-                            <td class="govuk-table__cell"><a href="@LinkGenerator2.SupportTaskDetail(result.Reference, result.Type)" class="govuk-link">@result.Reference</a></td>
+                            <td class="govuk-table__cell"><a href="@LinkGenerator.SupportTaskDetail(result.Reference, result.Type)" class="govuk-link">@result.Reference</a></td>
                             <td class="govuk-table__cell">@result.TypeTitle</td>
                             <td class="govuk-table__cell">@($"{result.RequestedOn.ToString(UiDefaults.DateOnlyDisplayFormat)} at {result.RequestedOn:h:mmtt}")</td>
                         </tr>

@@ -4,7 +4,7 @@
     ViewBag.Title = "Check details";
 }
 
-<form action="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReason(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+<form action="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReason(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
@@ -18,7 +18,7 @@
                     <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.GetReason()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)"
+                        <govuk-summary-list-row-action href="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)"
                             visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
@@ -32,7 +32,7 @@
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReasonCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.ConfirmKeepRecordSeparateReasonCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

@@ -11,7 +11,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
 }
 
 <h2 class="govuk-heading-m">Notes</h2>
@@ -29,7 +29,7 @@ else
 {
     if (Model.CanAddNotes)
     {
-        <govuk-button-link href="@LinkGenerator2.Persons.PersonDetail.AddNote(person.PersonId)" data-testid="add-note-button">Add a note</govuk-button-link>
+        <govuk-button-link href="@LinkGenerator.Persons.PersonDetail.AddNote(person.PersonId)" data-testid="add-note-button">Add a note</govuk-button-link>
     }
 
     @if (Model.Notes!.Count == 0)

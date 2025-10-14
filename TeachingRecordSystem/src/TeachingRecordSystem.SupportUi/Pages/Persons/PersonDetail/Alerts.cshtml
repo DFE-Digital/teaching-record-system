@@ -8,7 +8,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
 }
 
 <div>
@@ -40,7 +40,7 @@
                 @if (canWrite)
                 {
                     <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator2.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</govuk-summary-card-action>
+                        <govuk-summary-card-action href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</govuk-summary-card-action>
                     </govuk-summary-card-actions>
                 }
                 <govuk-summary-list>
@@ -59,7 +59,7 @@
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator2.Alerts.EditAlert.Details.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="details">Change</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="details">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>
@@ -78,7 +78,7 @@
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator2.Alerts.EditAlert.Link.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="link">Change</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Link.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="link">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>
@@ -88,7 +88,7 @@
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator2.Alerts.EditAlert.StartDate.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.StartDate.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>
@@ -98,7 +98,7 @@
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="@LinkGenerator2.Alerts.CloseAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Add</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action href="@LinkGenerator.Alerts.CloseAlert.Index(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Add</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>
@@ -109,7 +109,7 @@
 
     @if (Model.CanAddAlert)
     {
-        <govuk-button-link href="@LinkGenerator2.Alerts.AddAlert.Index(person.PersonId, journeyInstanceId: null)" class="govuk-!-margin-bottom-0" data-testid="AddAnAlertBtn">Add an alert</govuk-button-link>
+        <govuk-button-link href="@LinkGenerator.Alerts.AddAlert.Index(person.PersonId, journeyInstanceId: null)" class="govuk-!-margin-bottom-0" data-testid="AddAnAlertBtn">Add an alert</govuk-button-link>
     }
 </div>
 
@@ -137,13 +137,13 @@
                 @foreach (var (alert, externalLinkUri, canWrite) in Model.ClosedAlerts!)
                 {
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell"><a href="@LinkGenerator2.Alerts.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType!.Name</a></td>
+                        <td class="govuk-table__cell"><a href="@LinkGenerator.Alerts.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType!.Name</a></td>
                         <td class="govuk-table__cell">@alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell">@alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell">
                             @if (canWrite)
                             {
-                                <a href="@LinkGenerator2.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a>
+                                <a href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId, journeyInstanceId: null)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a>
                             }
                         </td>
                     </tr>

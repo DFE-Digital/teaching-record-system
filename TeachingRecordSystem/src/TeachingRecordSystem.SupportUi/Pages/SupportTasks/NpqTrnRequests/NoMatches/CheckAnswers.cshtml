@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "Check details before creating record";
 
-    var backLink = LinkGenerator2.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference!);
+    var backLink = LinkGenerator.SupportTasks.NpqTrnRequests.Details(Model.SupportTaskReference!);
     var confirmButtonLabel = "Confirm and create record";
 }
 
@@ -11,7 +11,7 @@
     <govuk-back-link href="@backLink" />  
 }
 
-<form action="@LinkGenerator2.SupportTasks.NpqTrnRequests.NoMatches.CheckAnswers(Model.SupportTaskReference!)" method="post">
+<form action="@LinkGenerator.SupportTasks.NpqTrnRequests.NoMatches.CheckAnswers(Model.SupportTaskReference!)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
@@ -54,7 +54,7 @@
             </govuk-summary-card>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="submit">@confirmButtonLabel</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator2.SupportTasks.NpqTrnRequests.NoMatches.CheckAnswersCancel(Model.SupportTaskReference!)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.NpqTrnRequests.NoMatches.CheckAnswersCancel(Model.SupportTaskReference!)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

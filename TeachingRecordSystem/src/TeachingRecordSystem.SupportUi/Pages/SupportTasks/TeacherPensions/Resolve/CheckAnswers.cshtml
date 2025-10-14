@@ -2,15 +2,15 @@
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.CheckAnswersModel
 @{
     ViewBag.Title = "Check details before merging records";
-    var changeLink = LinkGenerator2.SupportTasks.TeacherPensions.Resolve.Matches(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true);
+    var changeLink = LinkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true);
     var confirmButtonLabel = "Confirm and merge records";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.Merge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Merge(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" />
 }
 
-<form action="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
+<form action="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
@@ -58,7 +58,7 @@
             </govuk-summary-card>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="submit">@confirmButtonLabel</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.CheckAnswersCancel(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, false)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswersCancel(Model.SupportTaskReference, Model.JourneyInstance!.InstanceId, false)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

@@ -15,8 +15,8 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <partial name="_RouteDetail" model="@Model.RouteDetail" />
             <div class="govuk-button-group">
-                <govuk-button-link data-testid="continue-button" href="@LinkGenerator2.RoutesToProfessionalStatus.EditRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Continue</govuk-button-link>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator2.RoutesToProfessionalStatus.EditRoute.DetailCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button-link data-testid="continue-button" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Continue</govuk-button-link>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.DetailCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

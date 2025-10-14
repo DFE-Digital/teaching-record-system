@@ -23,36 +23,36 @@
         <nav class="moj-sub-navigation" aria-label="Sub navigation">
             <ul class="moj-sub-navigation__list">
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.General ? "page" : null)" href="@LinkGenerator2.Persons.PersonDetail.Index(personId)">General</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.Persons.PersonDetail.Index(personId)">General</a>
                 </li>
 
                 @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataView)).Succeeded)
                 {
                     <li class="moj-sub-navigation__item">
-                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator2.Persons.PersonDetail.Qualifications(personId)">Routes and qualifications</a>
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.Persons.PersonDetail.Qualifications(personId)">Routes and qualifications</a>
                     </li>
                 }
 
                 @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataView)).Succeeded)
                 {
                     <li class="moj-sub-navigation__item" data-testid="induction-tab">
-                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Induction ? "page" : null)" href="@LinkGenerator2.Persons.PersonDetail.Induction(personId)">Induction</a>
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Induction ? "page" : null)" href="@LinkGenerator.Persons.PersonDetail.Induction(personId)">Induction</a>
                     </li>
                 }
 
                 @if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AlertsView)).Succeeded)
                 {
                     <li class="moj-sub-navigation__item">
-                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator2.Persons.PersonDetail.Alerts(personId)">Alerts</a>
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.Persons.PersonDetail.Alerts(personId)">Alerts</a>
                     </li>
                 }
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.ChangeHistory ? "page" : null)" href="@LinkGenerator2.Persons.PersonDetail.ChangeHistory(personId)">Change history</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.ChangeHistory ? "page" : null)" href="@LinkGenerator.Persons.PersonDetail.ChangeHistory(personId)">Change history</a>
                 </li>
 
                 <li class="moj-sub-navigation__item" data-testid="notes-tab">
-                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Notes ? "page" : null)" href="@LinkGenerator2.Persons.PersonDetail.Notes(personId)">Notes</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Notes ? "page" : null)" href="@LinkGenerator.Persons.PersonDetail.Notes(personId)">Notes</a>
                 </li>
             </ul>
         </nav>

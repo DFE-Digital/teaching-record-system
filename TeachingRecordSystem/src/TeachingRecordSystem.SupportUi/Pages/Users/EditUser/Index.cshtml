@@ -6,12 +6,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Users.Index()" />
+    <govuk-back-link href="@LinkGenerator.Users.Index()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="@LinkGenerator2.Users.EditUser.Index(Model.UserId)" method="post">
+        <form action="@LinkGenerator.Users.EditUser.Index(Model.UserId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true" />
@@ -80,15 +80,15 @@
             {
                 <div class="govuk-button-group">
                     <govuk-button type="submit">Save changes</govuk-button>
-                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator2.Users.EditUser.Deactivate(Model.UserId)>Deactivate user</govuk-button-link>
-                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator2.Users.Index()>Cancel and return to users</govuk-button-link>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users.EditUser.Deactivate(Model.UserId)>Deactivate user</govuk-button-link>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users.Index()>Cancel and return to users</govuk-button-link>
                 </div>
             }
             else
             {
                 <div class="govuk-button-group">
                     <govuk-button type="submit" asp-page-handler="activate">Reactivate user</govuk-button>
-                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator2.Users.Index()>Cancel and return to users</govuk-button-link>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users.Index()>Cancel and return to users</govuk-button-link>
                 </div>
             }
 

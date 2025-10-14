@@ -4,7 +4,7 @@
     ViewBag.Title = "Unable to connect GOV.UK One Login user to a teaching record";
 }
 
-<form action="@LinkGenerator2.SupportTasks.ConnectOneLoginUser.Index(Model.SupportTaskReference!)" method="post">
+<form action="@LinkGenerator.SupportTasks.ConnectOneLoginUser.Index(Model.SupportTaskReference!)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <h1 class="govuk-heading-l">
@@ -72,7 +72,7 @@
                 async Task RenderConnectToTrnOption()
                 {
                     <p class="govuk-body">
-                        <a href="@LinkGenerator2.Index()" target="_blank" rel="noreferrer" class="govuk-link">Find a record (opens in a new tab)</a>
+                        <a href="@LinkGenerator.Index()" target="_blank" rel="noreferrer" class="govuk-link">Find a record (opens in a new tab)</a>
                     </p>
 
                     <govuk-input for="TrnOverride" input-class="govuk-input--width-10" label-class="govuk-label--s">

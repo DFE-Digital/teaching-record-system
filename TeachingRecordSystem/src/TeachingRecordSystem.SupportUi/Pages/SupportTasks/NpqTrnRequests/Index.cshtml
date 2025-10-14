@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Index()" />
+    <govuk-back-link href="@LinkGenerator.Index()" />
 }
 
 <div class="govuk-grid-row">
@@ -13,7 +13,7 @@
         <span class="govuk-caption-l">Support tasks</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form action="@LinkGenerator2.SupportTasks.NpqTrnRequests.Index()" method="get" asp-antiforgery="false">
+        <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" method="get" asp-antiforgery="false">
             <govuk-input for="Search" label-class="govuk-label--s" autocomplete="off" />
             @* TODO move this inside input when GFA library is updated *@
             <govuk-button type="submit">Search</govuk-button>
@@ -25,22 +25,22 @@
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                     sort-direction="@(Model.SortBy == SortByOption.Name ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator2.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Name, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Name, direction))">
                         Name
                     </th>
                     <th scope="col" class="govuk-table__header"
                     sort-direction="@(Model.SortBy == SortByOption.Email ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator2.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Email, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Email, direction))">
                         Email
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-150"
                     sort-direction="@(Model.SortBy == SortByOption.RequestedOn ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator2.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.RequestedOn, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.RequestedOn, direction))">
                         Requested on
                     </th>
                     <th scope="col" class="govuk-table__header trs-!-width-150"
                     sort-direction="@(Model.SortBy == SortByOption.PotentialDuplicate ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator2.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.PotentialDuplicate, direction))">
+                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.PotentialDuplicate, direction))">
                         Potential duplicate
                     </th>
                 </tr>
@@ -61,7 +61,7 @@
                         var tagClass = result.PotentialDuplicate.HasValue ? (result.PotentialDuplicate.Value ? "govuk-tag--red" : "govuk-tag--green") : null;
                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                             <th scope="row" class="govuk-table__header" data-testid="name">
-                                <a href="@LinkGenerator2.SupportTasks.NpqTrnRequests.Details(result.SupportTaskReference)" class="govuk-link">
+                                <a href="@LinkGenerator.SupportTasks.NpqTrnRequests.Details(result.SupportTaskReference)" class="govuk-link">
                                     @result.FirstName @result.MiddleName @result.LastName
                                 </a>
                             </th>

@@ -47,7 +47,7 @@ public class CheckAnswersModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.Alerts.AddAlert.Reason(PersonId, JourneyInstance.InstanceId));
             return;
         }
 

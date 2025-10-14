@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Mqs.EditMq.StartDate.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.Mqs.EditMq.StartDate.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
@@ -13,7 +13,7 @@
         <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
         <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
-        <form action="@LinkGenerator2.Mqs.EditMq.StartDate.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.Mqs.EditMq.StartDate.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-summary-list data-testid="change-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Current start date</govuk-summary-list-row-key>
@@ -41,7 +41,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>
-                <govuk-button formaction="@LinkGenerator2.Mqs.EditMq.StartDate.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Mqs.EditMq.StartDate.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

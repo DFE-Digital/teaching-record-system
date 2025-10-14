@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Index()" />
+    <govuk-back-link href="@LinkGenerator.Index()" />
 }
 
 <div class="govuk-grid-row">
@@ -22,42 +22,42 @@
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.IntegrationTransactionId ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.IntegrationTransactionId, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.IntegrationTransactionId, direction))">
                         ID
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.InterfaceType ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.InterfaceType, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.InterfaceType, direction))">
                         Interface
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.CreatedOn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.CreatedOn, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.CreatedOn, direction))">
                         Date and time
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.ImportStatus ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.ImportStatus, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.ImportStatus, direction))">
                         Import status
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Total ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Total, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Total, direction))">
                         Total
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Successes ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Successes, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Successes, direction))">
                         Successes
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Failures ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Failures, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Failures, direction))">
                         Failures
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Duplicates ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator2.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Duplicates, direction))">
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Duplicates, direction))">
                         Duplicates
                     </th>
                 </tr>

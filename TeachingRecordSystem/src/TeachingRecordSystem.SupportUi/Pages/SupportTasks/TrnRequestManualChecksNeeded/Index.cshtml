@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Index()" />
+    <govuk-back-link href="@LinkGenerator.Index()" />
 }
 
 <div class="govuk-grid-row">
@@ -48,7 +48,7 @@
 
                         <div class="govuk-button-group">
                             <govuk-button type="submit">Apply filters</govuk-button>
-                            <a class="govuk-link govuk-link--no-visited-state" href="@LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Index()">Clear filters</a>
+                            <a class="govuk-link govuk-link--no-visited-state" href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index()">Clear filters</a>
                         </div>
                     </filter-options>
                 </filter>
@@ -60,22 +60,22 @@
                         <tr class="govuk-table__row">
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                                 sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.Name ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.Name, direction))">
+                                link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.Name, direction))">
                                 Name
                             </th>
                             <th scope="col" class="govuk-table__header"
                                 sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.DateCreated ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.DateCreated, direction))">
+                                link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.DateCreated, direction))">
                                 Date created
                             </th>
                             <th scope="col" class="govuk-table__header trs-!-width-150"
                                 sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.DateOfBirth ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.DateOfBirth, direction))">
+                                link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.DateOfBirth, direction))">
                                 Date of birth
                             </th>
                             <th scope="col" class="govuk-table__header trs-!-width-150"
                                 sort-direction="@(Model.SortBy == TrnRequestManualChecksNeededSortByOption.Source ? Model.SortDirection : null)"
-                                link-template="@(direction => LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.Source, direction))">
+                                link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksNeededSortByOption.Source, direction))">
                                 Source
                             </th>
                         </tr>
@@ -93,7 +93,7 @@
                             {
                                 <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                                     <th scope="row" class="govuk-table__header" data-testid="name">
-                                        <a href="@LinkGenerator2.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
+                                        <a href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
                                             @result.FirstName @result.MiddleName @result.LastName
                                         </a>
                                     </th>

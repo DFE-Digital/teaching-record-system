@@ -6,12 +6,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator2.Persons.PersonDetail.Qualifications(Model.PersonId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Qualifications(Model.PersonId)">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator2.Mqs.EditMq.Status.Index(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.Mqs.EditMq.Status.Index(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change mandatory qualification - @Model.PersonName</span>
 
             <govuk-radios for="Status" data-testid="result-options">
@@ -49,7 +49,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator2.Mqs.EditMq.Status.Cancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.Mqs.EditMq.Status.Cancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

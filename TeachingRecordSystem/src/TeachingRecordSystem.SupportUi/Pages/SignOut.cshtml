@@ -7,7 +7,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator2.SignOut()" method="post">
+        <form action="@LinkGenerator.SignOut()" method="post">
             <govuk-button type="submit">Sign out</govuk-button>
         </form>
         <script asp-add-nonce="true">document.forms[0].submit();</script>

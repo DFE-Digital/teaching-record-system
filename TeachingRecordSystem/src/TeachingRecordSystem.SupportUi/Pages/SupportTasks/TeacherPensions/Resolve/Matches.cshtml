@@ -8,10 +8,10 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers ?  LinkGenerator2.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :  LinkGenerator2.SupportTasks.TeacherPensions.Index())" />
+    <govuk-back-link href="@(Model.FromCheckAnswers ?  LinkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId) :  LinkGenerator.SupportTasks.TeacherPensions.Index())" />
 }
 
-<form action="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
+<form action="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <span class="govuk-caption-l">Support tasks</span>
@@ -30,7 +30,7 @@
                     Teachers&rsquo; Pensions record
                 </govuk-summary-card-title>
                 <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@LinkGenerator2.Persons.PersonDetail.Index(Model.SupportTask!.PersonId!.Value)" target="_blank">
+                    <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(Model.SupportTask!.PersonId!.Value)" target="_blank">
                         View record
                     </govuk-summary-card-action>
                 </govuk-summary-card-actions>
@@ -80,7 +80,7 @@
                         Record @match.Identifier
                     </govuk-summary-card-title>
                     <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator2.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
+                        <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
                             View record
                         </govuk-summary-card-action>
                     </govuk-summary-card-actions>
@@ -158,7 +158,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" formaction="@LinkGenerator2.SupportTasks.TeacherPensions.Resolve.MatchesCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" formaction="@LinkGenerator.SupportTasks.TeacherPensions.Resolve.MatchesCancel(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>
     </div>

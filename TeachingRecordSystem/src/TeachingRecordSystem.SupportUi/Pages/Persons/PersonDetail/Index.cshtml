@@ -16,7 +16,7 @@
     <govuk-notification-banner data-testid="open-alert-notification">
         <p class="govuk-notification-banner__heading">
             Alert on record.
-            <a class="govuk-notification-banner__link" href="@LinkGenerator2.Persons.PersonDetail.Alerts(Model.PersonId)">View alerts</a>
+            <a class="govuk-notification-banner__link" href="@LinkGenerator.Persons.PersonDetail.Alerts(Model.PersonId)">View alerts</a>
         </p>
     </govuk-notification-banner>
 }
@@ -101,7 +101,7 @@
     {
         <govuk-button-link
             data-testid="set-status-button"
-            href="@LinkGenerator2.Persons.PersonDetail.SetStatus.Index(Model.PersonId, Model.Person.IsActive ? PersonStatus.Deactivated : PersonStatus.Active)"
+            href="@LinkGenerator.Persons.PersonDetail.SetStatus.Index(Model.PersonId, Model.Person.IsActive ? PersonStatus.Deactivated : PersonStatus.Active)"
             class="govuk-button--secondary">
             @(Model.Person.IsActive ? "Deactivate" : "Reactivate") record
         </govuk-button-link>
@@ -109,6 +109,6 @@
 
     @if (Model.CanMerge)
     {
-        <govuk-button-link data-testid="merge-button" href="@LinkGenerator2.Persons.MergePerson.Index(Model.PersonId)" class="govuk-button--secondary">Merge with another record</govuk-button-link>
+        <govuk-button-link data-testid="merge-button" href="@LinkGenerator.Persons.MergePerson.Index(Model.PersonId)" class="govuk-button--secondary">Merge with another record</govuk-button-link>
     }
 </div>
