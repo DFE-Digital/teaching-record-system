@@ -52,13 +52,9 @@ public static class Extensions
                 clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
             });
 
-
-
             services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>
             {
                 var connStr = configuration.GetValue<string>("SftpStorageConnectionString");
-
-                // Parse the connection string
                 var matchAccountName = System.Text.RegularExpressions.Regex.Match(connStr, @"AccountName=([^;]+)");
                 var matchAccountKey = System.Text.RegularExpressions.Regex.Match(connStr, @"AccountKey=([^;]+)");
 

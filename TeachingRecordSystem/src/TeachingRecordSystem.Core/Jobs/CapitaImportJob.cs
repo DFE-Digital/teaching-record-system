@@ -414,11 +414,9 @@ public class CapitaImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceC
     {
         var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
         var fileClient = fileSystemClient.GetFileClient(fileName);
-
         var readResponse = await fileClient.ReadAsync();
         return readResponse.Value.Content; // Stream, must be disposed by caller
     }
-
 
     private async Task<string[]> GetImportFilesAsync(CancellationToken cancellationToken)
     {

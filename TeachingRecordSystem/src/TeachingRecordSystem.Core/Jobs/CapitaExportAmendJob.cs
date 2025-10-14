@@ -144,27 +144,18 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
 
     public async Task UploadFileAsync(Stream fileContentStream, string fileName, CancellationToken cancellationToken = default)
     {
-        // Get the filesystem (container) client
         var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
         await fileSystemClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-
-        // Build the target file path (within "exports" folder)
         var targetPath = $"{ExportsFolder}/{fileName}";
         var fileClient = fileSystemClient.GetFileClient(targetPath);
-
-        // Create or overwrite the file (must exist before append)
         await fileClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        // Copy the stream into a seekable buffer so DFS can calculate length
         await using var memory = new MemoryStream();
         await fileContentStream.CopyToAsync(memory, cancellationToken);
         memory.Position = 0;
-
-        // Upload the data (append + flush)
         await fileClient.AppendAsync(memory, offset: 0, cancellationToken: cancellationToken);
         await fileClient.FlushAsync(memory.Length, cancellationToken: cancellationToken);
     }
-
 
     public string GetFileName(IClock now)
     {

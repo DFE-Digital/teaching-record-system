@@ -33,17 +33,17 @@ public static class Extensions
             {
                 var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
 
-                //var professionalStatusEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendProfessionalStatusEmailsOptions>>().Value;
-                //recurringJobManager.AddOrUpdate<BatchSendProfessionalStatusEmailsJob>(
-                //    nameof(BatchSendProfessionalStatusEmailsJob),
-                //    job => job.ExecuteAsync(CancellationToken.None),
-                //    professionalStatusEmailJobOptions.JobSchedule);
+                var professionalStatusEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendProfessionalStatusEmailsOptions>>().Value;
+                recurringJobManager.AddOrUpdate<BatchSendProfessionalStatusEmailsJob>(
+                    nameof(BatchSendProfessionalStatusEmailsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    professionalStatusEmailJobOptions.JobSchedule);
 
-                //var inductionEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendInductionCompletedEmailsJobOptions>>().Value;
-                //recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
-                //    nameof(BatchSendInductionCompletedEmailsJob),
-                //    job => job.ExecuteAsync(CancellationToken.None),
-                //    inductionEmailJobOptions.JobSchedule);
+                var inductionEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendInductionCompletedEmailsJobOptions>>().Value;
+                recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
+                    nameof(BatchSendInductionCompletedEmailsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    inductionEmailJobOptions.JobSchedule);
 
                 return Task.CompletedTask;
             });

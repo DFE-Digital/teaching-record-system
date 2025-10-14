@@ -167,10 +167,10 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
 
     public async Task UploadFileAsync(Stream fileContentStream, string fileName, CancellationToken cancellationToken = default)
     {
+        // Get the container client
         var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
         await fileSystemClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        // Build the full path under the exports folder
         var targetPath = $"{ExportsFolder}/{fileName}";
         var fileClient = fileSystemClient.GetFileClient(targetPath);
 
@@ -196,7 +196,6 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
             await uploadStream.DisposeAsync();
         }
     }
-
 
     public string GetFileName(IClock now)
     {
