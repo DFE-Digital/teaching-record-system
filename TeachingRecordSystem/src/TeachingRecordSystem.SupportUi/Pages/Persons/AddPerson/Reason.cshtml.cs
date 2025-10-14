@@ -10,8 +10,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 public class ReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]

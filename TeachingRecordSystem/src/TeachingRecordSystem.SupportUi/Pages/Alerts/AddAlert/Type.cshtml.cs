@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 public class TypeModel(
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController,
+    EvidenceUploadManager evidenceUploadManager,
     IAuthorizationService authorizationService) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
@@ -63,7 +63,7 @@ public class TypeModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));
     }

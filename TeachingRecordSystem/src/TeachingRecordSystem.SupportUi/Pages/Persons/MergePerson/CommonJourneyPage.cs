@@ -11,13 +11,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 public abstract class CommonJourneyPage(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController) : PageModel
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<MergePersonState>? JourneyInstance { get; set; }
 
     protected TrsDbContext DbContext { get; } = dbContext;
     protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
-    protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
+    protected EvidenceUploadManager EvidenceController { get; } = evidenceUploadManager;
 
     [FromRoute]
     public Guid PersonId { get; set; }

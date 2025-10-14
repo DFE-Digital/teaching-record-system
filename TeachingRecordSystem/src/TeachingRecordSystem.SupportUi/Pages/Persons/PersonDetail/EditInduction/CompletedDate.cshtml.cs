@@ -11,8 +11,8 @@ public class CompletedDateModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IClock clock,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Completed date")]

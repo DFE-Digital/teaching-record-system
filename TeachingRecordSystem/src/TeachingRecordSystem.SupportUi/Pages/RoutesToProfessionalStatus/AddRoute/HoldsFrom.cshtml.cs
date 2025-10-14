@@ -8,8 +8,8 @@ public class HoldsFromModel(
     IClock clock,
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "The date they first held this professional status")]

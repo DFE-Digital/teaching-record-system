@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests;
 
-public class DetailsModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
+public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public string PersonName => string.Join(" ", SupportTask!.TrnRequestMetadata!.Name);
 
@@ -19,9 +19,7 @@ public class DetailsModel(TrsLinkGenerator linkGenerator, IFileService fileServi
     public string? NpqName { get; set; }
     public string? NpqTrainingProvider { get; set; }
 
-    public Guid? NpqEvidenceFileId { get; set; }
-    public string? NpqEvidenceFileName { get; set; }
-    public string? NpqEvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? NpqEvidenceFile { get; set; }
 
     [FromRoute]
     public required string SupportTaskReference { get; init; }
@@ -62,17 +60,14 @@ public class DetailsModel(TrsLinkGenerator linkGenerator, IFileService fileServi
     {
         var supportTaskFeature = context.HttpContext.GetCurrentSupportTaskFeature();
         SupportTask = supportTaskFeature.SupportTask;
+        var metadata = SupportTask!.TrnRequestMetadata;
 
-        NpqWorkingInEducationalSetting = SupportTask!.TrnRequestMetadata?.NpqWorkingInEducationalSetting;
-        NpqApplicationId = SupportTask.TrnRequestMetadata?.NpqApplicationId;
-        NpqName = SupportTask.TrnRequestMetadata?.NpqName;
-        NpqTrainingProvider = SupportTask.TrnRequestMetadata?.NpqTrainingProvider;
-        NpqEvidenceFileId = SupportTask.TrnRequestMetadata?.NpqEvidenceFileId;
-        NpqEvidenceFileName = SupportTask.TrnRequestMetadata?.NpqEvidenceFileName;
-
-        NpqEvidenceFileUrl = NpqEvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
+        NpqWorkingInEducationalSetting = metadata?.NpqWorkingInEducationalSetting;
+        NpqApplicationId = metadata?.NpqApplicationId;
+        NpqName = metadata?.NpqName;
+        NpqTrainingProvider = metadata?.NpqTrainingProvider;
+        NpqEvidenceFile = (metadata?.NpqEvidenceFileId, metadata?.NpqEvidenceFileName) is (Guid fileId, string fileName)
+            ? new(fileId, fileName) : null;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

@@ -60,14 +60,7 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="evidence">
-                            @if (Model.NpqEvidenceFileId is not null)
-                            {
-                                <a href="@Model.NpqEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="evidence-link">@($"{Model.NpqEvidenceFileName} (opens in a new tab)")</a>
-                            }
-                            else
-                            {
-                                <span use-empty-fallback></span>
-                            }
+                            <vc:evidence-file-link evidence-file="@Model.NpqEvidenceFile" />
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>

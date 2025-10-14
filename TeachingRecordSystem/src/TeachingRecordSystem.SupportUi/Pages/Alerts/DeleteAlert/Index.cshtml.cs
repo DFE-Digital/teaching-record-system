@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 [Journey(JourneyNames.DeleteAlert), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
 
@@ -63,7 +63,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager ev
             ModelState.AddModelError(nameof(DeleteReasonDetail), "Enter additional detail");
         }
 
-        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
 
         if (!ModelState.IsValid)
         {
@@ -82,7 +82,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager ev
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.AlertDetail(AlertId));
     }

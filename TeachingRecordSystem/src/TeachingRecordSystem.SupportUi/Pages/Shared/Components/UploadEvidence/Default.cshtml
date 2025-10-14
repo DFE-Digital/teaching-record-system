@@ -10,9 +10,14 @@
             <govuk-radios-item-conditional>
                 @if (Model.UploadedEvidenceFile is not null)
                 {
+                    var linkText = Model.UploadedEvidenceFile.FileName;
+                    if (Model.UploadedEvidenceFile.FileSizeDescription is string size)
+                    {
+                        linkText += $" ({size})";
+                    }
                     <span class="govuk-caption-m">Currently uploaded file</span>
                     <p class="govuk-body">
-                        <a href="@Model.UploadedEvidenceFile.PreviewUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-file-link">@($"{Model.UploadedEvidenceFile.FileName} ({Model.UploadedEvidenceFile.FileSizeDescription})")</a>
+                        <a href="@Model.UploadedEvidenceFile.PreviewUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-file-link">@linkText</a>
                     </p>
                     <input type="hidden" asp-for="UploadedEvidenceFile.FileId" />
                     <input type="hidden" asp-for="UploadedEvidenceFile.FileName" />

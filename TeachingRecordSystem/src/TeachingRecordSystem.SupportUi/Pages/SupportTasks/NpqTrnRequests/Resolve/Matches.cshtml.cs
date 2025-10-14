@@ -3,22 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveNpqTrnRequest), RequireJourneyInstance]
-public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IFileService fileService) : ResolveNpqTrnRequestPageModel(dbContext)
+public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveNpqTrnRequestPageModel(dbContext)
 {
     public TrnRequestMetadata? RequestData { get; set; }
 
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
-    public Guid? NpqEvidenceFileId { get; set; }
-    public string? NpqEvidenceFileName { get; set; }
-    public string? NpqEvidenceFileUrl { get; set; }
+    public UploadedEvidenceFile? NpqEvidenceFile { get; set; }
 
     public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
@@ -115,12 +114,8 @@ public class MatchesModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator
             })
             .ToArray();
 
-        NpqEvidenceFileId = RequestData.NpqEvidenceFileId;
-        NpqEvidenceFileName = RequestData.NpqEvidenceFileName;
-
-        NpqEvidenceFileUrl = NpqEvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(NpqEvidenceFileId!.Value, UiDefaults.FileUrlExpiry) :
-            null;
+        NpqEvidenceFile = (RequestData?.NpqEvidenceFileId, RequestData?.NpqEvidenceFileName) is (Guid fileId, string fileName)
+            ? new(fileId, fileName) : null;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

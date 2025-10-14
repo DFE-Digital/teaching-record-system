@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
 [Journey(JourneyNames.ReopenAlert), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
 
@@ -62,7 +62,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, EvidenceUploadManager ev
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
 
-        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
 
         if (!ModelState.IsValid)
         {

@@ -11,9 +11,9 @@ public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController,
+    EvidenceUploadManager evidenceUploadManager,
     IClock clock)
-    : AddRoutePostStatusPageModel(AddRoutePage.CheckYourAnswers, linkGenerator, referenceDataCache, evidenceController)
+    : AddRoutePostStatusPageModel(AddRoutePage.CheckYourAnswers, linkGenerator, referenceDataCache, evidenceUploadManager)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
 

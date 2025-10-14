@@ -1,4 +1,3 @@
-using Humanizer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TeachingRecordSystem.Core.Services.Files;
 
@@ -28,12 +27,7 @@ public class EvidenceUploadManager(IFileService fileService)
         {
             using var stream = evidence.EvidenceFile.OpenReadStream();
             var fileId = await fileService!.UploadFileAsync(stream, evidence.EvidenceFile.ContentType);
-            evidence.UploadedEvidenceFile = new()
-            {
-                FileId = fileId,
-                FileName = uploadedFile.FileName,
-                FileSizeDescription = uploadedFile.Length.Bytes().Humanize()
-            };
+            evidence.UploadedEvidenceFile = new(fileId, uploadedFile.FileName, uploadedFile.Length);
             evidence.EvidenceFile = null;
         }
     }

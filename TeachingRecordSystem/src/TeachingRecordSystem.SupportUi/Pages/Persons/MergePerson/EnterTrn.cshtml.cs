@@ -11,8 +11,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 public class EnterTrnModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EvidenceUploadManager evidenceUploadManager)
+    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
 {
     public string? ThisTrn { get; set; }
 
