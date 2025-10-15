@@ -165,9 +165,8 @@ public class TrsDataSyncHelper(
             }
         }
 
-        var audits = await GetAuditRecordsFromAuditRepositoryAsync(
+        var audits = await GetAuditRecordsAsync(
             Contact.EntityLogicalName,
-            Contact.PrimaryIdAttribute,
             latestEntities.Select(e => e.Id),
             cancellationToken);
 
