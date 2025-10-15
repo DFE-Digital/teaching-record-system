@@ -1,5 +1,3 @@
-using TeachingRecordSystem.SupportUi.Pages;
-
 namespace TeachingRecordSystem.SupportUi;
 
 public static class ValidationExtensions
