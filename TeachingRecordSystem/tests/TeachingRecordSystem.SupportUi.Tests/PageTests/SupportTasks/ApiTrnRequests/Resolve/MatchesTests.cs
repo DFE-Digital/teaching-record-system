@@ -67,8 +67,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueForKey("Last name"));
         Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueForKey("Email"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueForKey("Email address"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueForKey("NI number"));
         Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueForKey("Gender"));
     }
 
@@ -104,8 +104,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(firstMatch.MiddleName, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(firstMatch.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
         Assert.Equal(firstMatch.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(firstMatch.EmailAddress, firstMatchDetails.GetSummaryListValueForKey("Email"));
-        Assert.Equal(firstMatch.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(firstMatch.EmailAddress, firstMatchDetails.GetSummaryListValueForKey("Email address"));
+        Assert.Equal(firstMatch.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueForKey("NI number"));
         Assert.Equal(firstMatch.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
     }
 
@@ -280,15 +280,15 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Email"));
+        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Email address"));
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("NI number"));
         Assert.Equal("Not provided", firstMatchDetails.GetSummaryListValueForKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight("Middle name", false);
-        AssertMatchRowHasExpectedHighlight("National Insurance number", false);
+        AssertMatchRowHasExpectedHighlight("NI number", false);
         AssertMatchRowHasExpectedHighlight("Gender", false);
-        AssertMatchRowHasExpectedHighlight("Email", false);
+        AssertMatchRowHasExpectedHighlight("Email address", false);
 
         void AssertMatchRowHasExpectedHighlight(string summaryListKey, bool expectHighlight)
         {
@@ -414,8 +414,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         AssertMatchRowHasExpectedHighlight("Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
         AssertMatchRowHasExpectedHighlight("Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
         AssertMatchRowHasExpectedHighlight("Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
-        AssertMatchRowHasExpectedHighlight("Email", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
-        AssertMatchRowHasExpectedHighlight("National Insurance number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+        AssertMatchRowHasExpectedHighlight("Email address", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
+        AssertMatchRowHasExpectedHighlight("NI number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
         AssertMatchRowHasExpectedHighlight("Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
 
         void AssertMatchRowHasExpectedHighlight(string summaryListKey, bool expectHighlight)

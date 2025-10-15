@@ -10,10 +10,14 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
         <span class="govuk-caption-l">Support tasks</span>
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    </div>
+</div>
 
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full-from-desktop">
         @if (Model.CannotMergeReason is not null)
         {
             <govuk-warning-text icon-fallback-text="Warning" data-testid="warning-text">
@@ -21,10 +25,10 @@
             </govuk-warning-text>
         }
 
-        <div class="trs-potential-duplicates">
+        <div class="trs-potential-duplicates trs-potential-duplicates--side-by-side">
             @foreach (var (match, i) in Model.PotentialDuplicates!.Select((match, i) => (match, i)))
             {
-                <govuk-summary-card data-testid="person-@match.Identifier.ToString().ToLower()" class="trs-potential-duplicates--item">
+                <govuk-summary-card data-testid="person-@match.Identifier.ToString().ToLower()" class="trs-potential-duplicates__item">
                     <govuk-summary-card-title>
                         TRN @match.Trn
                     </govuk-summary-card-title>

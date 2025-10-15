@@ -346,13 +346,13 @@
   }
 }
 
-.trs-potential-duplicates {
+.trs-potential-duplicates.trs-potential-duplicates--side-by-side {
   @include govuk-media-query($from: desktop) {
     display: flex;
     flex-flow: wrap;
   }
 
-  .trs-potential-duplicates--item {
+  .trs-potential-duplicates__item {
     @include govuk-media-query($from: desktop) {
       box-sizing: border-box;
       flex: 0 0 calc(50% - 15px);
