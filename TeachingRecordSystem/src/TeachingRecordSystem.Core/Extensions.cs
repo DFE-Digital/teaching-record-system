@@ -54,18 +54,15 @@ public static class Extensions
 
             services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>
             {
-                var connStr = configuration.GetValue<string>("SftpStorageConnectionString");
-                var matchAccountName = System.Text.RegularExpressions.Regex.Match(connStr!, @"AccountName=([^;]+)");
-                var matchAccountKey = System.Text.RegularExpressions.Regex.Match(connStr!, @"AccountKey=([^;]+)");
+                var sftpAccountName = configuration.GetValue<string>("SftpStorageConnectionString");
+                var sftpAccessKey = configuration.GetValue<string>("SftpStorageConnectionString");
 
-                if (!matchAccountName.Success || !matchAccountKey.Success)
+
+                if (string.IsNullOrEmpty(sftpAccountName) || string.IsNullOrEmpty(sftpAccessKey))
                     throw new InvalidOperationException("Invalid SFTP Storage connection string configuration.");
 
-                var accountName = matchAccountName.Groups[1].Value;
-                var accountKey = matchAccountKey.Groups[1].Value;
-
-                var dfsUri = new Uri($"https://{accountName}.dfs.core.windows.net");
-                var credential = new StorageSharedKeyCredential(accountName, accountKey);
+                var dfsUri = new Uri($"https://{sftpAccountName}.dfs.core.windows.net");
+                var credential = new StorageSharedKeyCredential(sftpAccountName, sftpAccessKey);
 
                 return new DataLakeServiceClient(dfsUri, credential);
             });
