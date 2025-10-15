@@ -3,8 +3,8 @@ namespace TeachingRecordSystem.Core.Events.Legacy;
 public record PersonDetailsUpdatedEvent : EventBase, IEventWithPersonId, IEventWithPersonAttributes
 {
     public required Guid PersonId { get; init; }
-    public required EventModels.PersonAttributes PersonAttributes { get; init; }
-    public required EventModels.PersonAttributes OldPersonAttributes { get; init; }
+    public required EventModels.PersonDetails PersonAttributes { get; init; }
+    public required EventModels.PersonDetails OldPersonAttributes { get; init; }
     public required string? NameChangeReason { get; init; }
     public required EventModels.File? NameChangeEvidenceFile { get; init; }
     public required string? DetailsChangeReason { get; init; }

@@ -40,7 +40,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             Name = "other-evidence.jpg"
         };
 
-        var details = new EventModels.PersonAttributes
+        var details = new EventModels.PersonDetails
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -108,7 +108,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
 
         var createReason = AddPersonReasonOption.AnotherReason.GetDisplayName();
 
-        var details = new EventModels.PersonAttributes
+        var details = new EventModels.PersonDetails
         {
             FirstName = firstName,
             MiddleName = middleName,

@@ -8,8 +8,8 @@ public record NpqTrnRequestSupportTaskResolvedEvent : SupportTaskUpdatedEvent, I
     public required EventModels.TrnRequestMetadata RequestData { get; init; }
     public required NpqTrnRequestResolvedReason ChangeReason { get; set; }
     public required NpqTrnRequestSupportTaskResolvedEventChanges Changes { get; init; }
-    public required EventModels.PersonAttributes PersonAttributes { get; init; }
-    public required EventModels.PersonAttributes? OldPersonAttributes { get; init; }
+    public required EventModels.PersonDetails PersonAttributes { get; init; }
+    public required EventModels.PersonDetails? OldPersonAttributes { get; init; }
     public required string? Comments { get; init; }
 }
 
