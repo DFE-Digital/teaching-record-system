@@ -10,7 +10,7 @@
 <h2 class="govuk-heading-m">@ViewBag.Title</h2>
 
 <div class="govuk-!-margin-bottom-6">
-    <form action="@LinkGenerator.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
+    <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
         <div class="moj-search trs-search govuk-!-margin-bottom-4">
             <govuk-input name="Search" input-class="moj-search__input" data-testid="search-input" type="search">
                 <govuk-input-label class="moj-search__label">
