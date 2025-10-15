@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
+using System.Text.Json;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,22 +15,17 @@ using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Files;
+using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
-#pragma warning disable CS9113 // Parameter is unread.
 public class TrsDataSyncHelper(
     NpgsqlDataSource trsDbDataSource,
     [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
-    ReferenceDataCache referenceDataCache,
     IClock clock,
     IAuditRepository auditRepository,
-    ILogger<TrsDataSyncHelper> logger,
-    IFileService fileService,
-    IConfiguration configuration)
-#pragma warning restore CS9113 // Parameter is unread.
+    ILogger<TrsDataSyncHelper> logger)
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -140,6 +136,383 @@ public class TrsDataSyncHelper(
         }
     }
 
+    public async Task SyncPersonAuditsAsync(IReadOnlyCollection<Guid> contactIds, CancellationToken cancellationToken)
+    {
+        await using var dbContext = TrsDbContext.Create(trsDbDataSource, commandTimeout: 0);
+
+        var attributeNames = GetModelTypeSyncInfoForPerson().AttributeNames
+            .Concat([Contact.Fields.MasterId, Contact.Fields.dfeta_MergedWith])
+            .ToArray();
+
+        Contact[] latestEntities;
+
+        while (true)
+        {
+            try
+            {
+                latestEntities = await GetEntitiesAsync<Contact>(
+                    Contact.EntityLogicalName,
+                    Contact.PrimaryIdAttribute,
+                    contactIds,
+                    attributeNames,
+                    activeOnly: false,
+                    cancellationToken);
+                break;
+            }
+            catch (Exception ex) when (ex.IsCrmRateLimitException(out var retryAfter))
+            {
+                await Task.Delay(retryAfter, cancellationToken);
+            }
+        }
+
+        var audits = await GetAuditRecordsFromAuditRepositoryAsync(
+            Contact.EntityLogicalName,
+            Contact.PrimaryIdAttribute,
+            latestEntities.Select(e => e.Id),
+            cancellationToken);
+
+        var processes = new List<(Process, IEvent)>();
+
+        foreach (var id in contactIds)
+        {
+            var latest = latestEntities.SingleOrDefault(e => e.Id == id);
+            if (latest is null)
+            {
+                // TRS-created person
+                continue;
+            }
+
+            var contactAudits = audits[id].AuditDetails;
+
+            var versions = GetEntityVersions(latest, contactAudits, attributeNames.Except([Contact.PrimaryIdAttribute]).ToArray());
+
+            processes.Add(contactAudits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
+                MapCreatedEvent(versions.First()) :
+                MapImportedEvent(versions.First()));
+
+            foreach (var (thisVersion, previousVersion) in versions.Skip(1).Zip(versions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+            {
+                var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
+
+                if (mappedEvent.HasValue)
+                {
+                    processes.Add(mappedEvent.Value);
+                }
+            }
+        }
+
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        await using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+        await SyncProcessesAsync();
+        await SyncEventsAsync();
+
+        await txn.CommitAsync();
+
+        async Task SyncProcessesAsync()
+        {
+            using (var createTempTableCommand = connection.CreateCommand())
+            {
+                createTempTableCommand.CommandText =
+                    """
+                    create temp table temp_processes (like processes including defaults);
+                    """;
+                createTempTableCommand.Transaction = txn;
+                await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+            }
+
+            using var writer = await connection.BeginBinaryImportAsync(
+                """
+                copy temp_processes (process_id, process_type, created, user_id, dqt_user_id, dqt_user_name, person_ids) from stdin (format binary);
+                """,
+                cancellationToken);
+
+            foreach (var (process, _) in processes)
+            {
+                writer.StartRow();
+                writer.WriteValueOrNull(process.ProcessId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull((int)process.ProcessType, NpgsqlDbType.Integer);
+                writer.WriteValueOrNull(process.Created, NpgsqlDbType.TimestampTz);
+                writer.WriteValueOrNull(process.UserId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(process.DqtUserId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(process.DqtUserName, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(process.PersonIds.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Uuid);
+            }
+
+            await writer.CompleteAsync(cancellationToken);
+            await writer.CloseAsync(cancellationToken);
+
+            using (var mergeCommand = connection.CreateCommand())
+            {
+                mergeCommand.CommandText =
+                    """
+                    insert into processes as t (process_id, process_type, created, user_id, dqt_user_id, dqt_user_name, person_ids)
+                    select process_id, process_type, created, user_id, dqt_user_id, dqt_user_name, person_ids from temp_processes
+                    on conflict (process_id) do update
+                    set
+                        process_type = excluded.process_type,
+                        created = excluded.created,
+                        user_id = excluded.user_id,
+                        dqt_user_id = excluded.dqt_user_id,
+                        dqt_user_name = excluded.dqt_user_name,
+                        person_ids = excluded.person_ids;
+                    """;
+                mergeCommand.Transaction = txn;
+                mergeCommand.CommandTimeout = 0;
+                await mergeCommand.ExecuteNonQueryAsync(cancellationToken);
+            }
+        }
+
+        async Task SyncEventsAsync()
+        {
+            using (var createTempTableCommand = connection.CreateCommand())
+            {
+                createTempTableCommand.CommandText =
+                    """
+                    create temp table temp_events (like process_events including defaults);
+                    """;
+                createTempTableCommand.Transaction = txn;
+                await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+            }
+
+            using var writer = await connection.BeginBinaryImportAsync(
+                """
+                copy temp_events (process_event_id, process_id, event_name, payload, person_ids) from stdin (format binary);
+                """,
+                cancellationToken);
+
+            foreach (var (process, @event) in processes)
+            {
+                writer.StartRow();
+                writer.WriteValueOrNull(@event.EventId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(process.ProcessId, NpgsqlDbType.Uuid);
+                writer.WriteValueOrNull(@event.GetType().Name, NpgsqlDbType.Varchar);
+                writer.WriteValueOrNull(JsonSerializer.Serialize(@event, typeof(IEvent), IEvent.SerializerOptions), NpgsqlDbType.Jsonb);
+                writer.WriteValueOrNull(process.PersonIds.ToArray(), NpgsqlDbType.Array | NpgsqlDbType.Uuid);
+            }
+
+            await writer.CompleteAsync(cancellationToken);
+            await writer.CloseAsync(cancellationToken);
+
+            using (var mergeCommand = connection.CreateCommand())
+            {
+                mergeCommand.CommandText =
+                    """
+                    insert into process_events as t (process_event_id, process_id, event_name, payload, person_ids)
+                    select process_event_id, process_id, event_name, payload, person_ids from temp_events
+                    on conflict (process_event_id) do update
+                    set
+                        process_id = excluded.process_id,
+                        event_name = excluded.event_name,
+                        payload = excluded.payload,
+                        person_ids = excluded.person_ids;
+                    """;
+                mergeCommand.Transaction = txn;
+                mergeCommand.CommandTimeout = 0;
+                await mergeCommand.ExecuteNonQueryAsync(cancellationToken);
+            }
+        }
+
+        (Process, IEvent) MapCreatedEvent(EntityVersionInfo<Contact> snapshot)
+        {
+            var action = new Process
+            {
+                ProcessId = snapshot.Id,
+                ProcessType = ProcessType.PersonCreatingInDqt,
+                Created = snapshot.Timestamp,
+                UserId = null,
+                DqtUserId = snapshot.UserId,
+                DqtUserName = snapshot.UserName,
+                PersonIds = [snapshot.Entity.Id]
+            };
+
+            var @event = new PersonCreatedEvent
+            {
+                EventId = snapshot.Id,
+                PersonId = snapshot.Entity.Id,
+                FirstName = snapshot.Entity.FirstName,
+                MiddleName = snapshot.Entity.MiddleName,
+                LastName = snapshot.Entity.LastName,
+                DateOfBirth = snapshot.Entity.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                EmailAddress = snapshot.Entity.EMailAddress1,
+                NationalInsuranceNumber = snapshot.Entity.dfeta_NINumber,
+                Gender = snapshot.Entity.GenderCode?.ToGender(),
+                CreateReason = null,
+                CreateReasonDetail = null,
+                EvidenceFile = null,
+                TrnRequestMetadata = null
+            };
+
+            return (action, @event);
+        }
+
+        (Process, IEvent) MapImportedEvent(EntityVersionInfo<Contact> snapshot)
+        {
+            var action = new Process
+            {
+                ProcessId = snapshot.Id,
+                ProcessType = ProcessType.PersonImportingIntoDqt,
+                Created = snapshot.Timestamp,
+                UserId = null,
+                DqtUserId = snapshot.UserId,
+                DqtUserName = snapshot.UserName,
+                PersonIds = [snapshot.Entity.Id]
+            };
+
+            var @event = new PersonImportedIntoDqtEvent
+            {
+                EventId = snapshot.Id,
+                PersonId = snapshot.Entity.Id,
+                Trn = snapshot.Entity.dfeta_TRN,
+                FirstName = snapshot.Entity.FirstName,
+                MiddleName = snapshot.Entity.MiddleName,
+                LastName = snapshot.Entity.LastName,
+                DateOfBirth = snapshot.Entity.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                EmailAddress = snapshot.Entity.EMailAddress1,
+                NationalInsuranceNumber = snapshot.Entity.dfeta_NINumber,
+                Gender = snapshot.Entity.GenderCode?.ToGender(),
+                DateOfDeath = snapshot.Entity.dfeta_DateofDeath.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                QtsDate = snapshot.Entity.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                EytsDate = snapshot.Entity.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                InductionStatus = MapInductionStatus(snapshot.Entity.dfeta_InductionStatus),
+                DqtInductionStatus = snapshot.Entity.dfeta_InductionStatus?.GetMetadata().Name
+            };
+
+            return (action, @event);
+        }
+
+        (Process, IEvent)? MapUpdatedEvent(EntityVersionInfo<Contact> snapshot, EntityVersionInfo<Contact> previous)
+        {
+            if (snapshot.ChangedAttributes.Contains(Contact.Fields.StateCode))
+            {
+                var nonStateAttributes = snapshot.ChangedAttributes
+                    .Where(a => a is not (Contact.Fields.StateCode or Contact.Fields.StatusCode))
+                    .ToArray();
+
+                if (nonStateAttributes.Except([Contact.Fields.MasterId]).Any())
+                {
+                    throw new InvalidOperationException(
+                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                }
+
+                if (snapshot.Entity.StateCode == ContactState.Inactive)
+                {
+                    var mergedWithContactId = snapshot.Entity.MasterId?.Id ?? snapshot.Entity.dfeta_MergedWith?.Id;
+
+                    return (
+                        new Process
+                        {
+                            ProcessId = snapshot.Id,
+                            ProcessType = ProcessType.PersonDeactivatingInDqt,
+                            Created = snapshot.Timestamp,
+                            UserId = null,
+                            DqtUserId = snapshot.UserId,
+                            DqtUserName = snapshot.UserName,
+                            PersonIds = [snapshot.Entity.Id]
+                        },
+                        new PersonDeactivatedEvent { EventId = snapshot.Id, PersonId = snapshot.Entity.Id, MergedWithPersonId = mergedWithContactId });
+                }
+                else
+                {
+                    return (
+                        new Process
+                        {
+                            ProcessId = snapshot.Id,
+                            ProcessType = ProcessType.PersonReactivatingInDqt,
+                            Created = snapshot.Timestamp,
+                            UserId = null,
+                            DqtUserId = snapshot.UserId,
+                            DqtUserName = snapshot.UserName,
+                            PersonIds = [snapshot.Entity.Id]
+                        },
+                        new PersonReactivatedEvent { EventId = snapshot.Id, PersonId = snapshot.Entity.Id });
+                }
+            }
+
+            var changes = PersonUpdatedInDqtEventChanges.None |
+                (snapshot.Entity.dfeta_TRN != previous.Entity.dfeta_TRN ? PersonUpdatedInDqtEventChanges.Trn : 0) |
+                (snapshot.Entity.FirstName != previous.Entity.FirstName ? PersonUpdatedInDqtEventChanges.FirstName : 0) |
+                (snapshot.Entity.MiddleName != previous.Entity.MiddleName ? PersonUpdatedInDqtEventChanges.MiddleName : 0) |
+                (snapshot.Entity.LastName != previous.Entity.LastName ? PersonUpdatedInDqtEventChanges.LastName : 0) |
+                (snapshot.Entity.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != previous.Entity.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)
+                    ? PersonUpdatedInDqtEventChanges.DateOfBirth
+                    : 0) |
+                (snapshot.Entity.EMailAddress1 != previous.Entity.EMailAddress1 ? PersonUpdatedInDqtEventChanges.EmailAddress : 0) |
+                (snapshot.Entity.dfeta_NINumber != previous.Entity.dfeta_NINumber ? PersonUpdatedInDqtEventChanges.NationalInsuranceNumber : 0) |
+                (snapshot.Entity.GenderCode.ToGender() != previous.Entity.GenderCode.ToGender() ? PersonUpdatedInDqtEventChanges.Gender : 0) |
+                (snapshot.Entity.dfeta_DateofDeath.ToDateOnlyWithDqtBstFix(isLocalTime: true) !=
+                    previous.Entity.dfeta_DateofDeath.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                        ? PersonUpdatedInDqtEventChanges.DateOfDeath
+                        : 0) |
+                (snapshot.Entity.dfeta_QTSDate != previous.Entity.dfeta_QTSDate ? PersonUpdatedInDqtEventChanges.QtsDate : 0) |
+                (snapshot.Entity.dfeta_EYTSDate != previous.Entity.dfeta_EYTSDate ? PersonUpdatedInDqtEventChanges.EytsDate : 0) |
+                (snapshot.Entity.dfeta_qtlsdate != previous.Entity.dfeta_qtlsdate ? PersonUpdatedInDqtEventChanges.QtlsDate : 0) |
+                (MapQtlsStatus(snapshot.Entity) != MapQtlsStatus(previous.Entity) ? PersonUpdatedInDqtEventChanges.QtlsStatus : 0) |
+                (MapInductionStatus(snapshot.Entity.dfeta_InductionStatus) != MapInductionStatus(previous.Entity.dfeta_InductionStatus)
+                    ? PersonUpdatedInDqtEventChanges.InductionStatus
+                    : 0) |
+                (snapshot.Entity.dfeta_InductionStatus != previous.Entity.dfeta_InductionStatus ? PersonUpdatedInDqtEventChanges.DqtInductionStatus : 0);
+
+            if (changes is PersonUpdatedInDqtEventChanges.None)
+            {
+                return null;
+            }
+
+            return (
+                new Process
+                {
+                    ProcessId = snapshot.Id,
+                    ProcessType = ProcessType.PersonUpdatingInDqt,
+                    Created = snapshot.Timestamp,
+                    UserId = null,
+                    DqtUserId = snapshot.UserId,
+                    DqtUserName = snapshot.UserName,
+                    PersonIds = [snapshot.Entity.Id]
+                },
+                new PersonUpdatedInDqtEvent
+                {
+                    EventId = snapshot.Id,
+                    PersonId = snapshot.Entity.Id,
+                    Changes = changes,
+                    Trn = snapshot.Entity.dfeta_TRN,
+                    FirstName = snapshot.Entity.FirstName,
+                    MiddleName = snapshot.Entity.MiddleName,
+                    LastName = snapshot.Entity.LastName,
+                    DateOfBirth = snapshot.Entity.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                    EmailAddress = snapshot.Entity.EMailAddress1,
+                    NationalInsuranceNumber = snapshot.Entity.dfeta_NINumber,
+                    Gender = snapshot.Entity.GenderCode?.ToGender(),
+                    DateOfDeath = snapshot.Entity.dfeta_DateofDeath.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    QtsDate = snapshot.Entity.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    EytsDate = snapshot.Entity.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    QtlsDate = snapshot.Entity.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                    QtlsStatus = MapQtlsStatus(snapshot.Entity),
+                    InductionStatus = MapInductionStatus(snapshot.Entity.dfeta_InductionStatus),
+                    DqtInductionStatus = snapshot.Entity.dfeta_InductionStatus?.GetMetadata().Name
+                });
+        }
+
+        QtlsStatus MapQtlsStatus(Contact contact) =>
+            contact.dfeta_qtlsdate is not null ? QtlsStatus.Active :
+            contact.dfeta_QtlsDateHasBeenSet == true ? QtlsStatus.Expired :
+            QtlsStatus.None;
+
+        InductionStatus MapInductionStatus(dfeta_InductionStatus? status) => status switch
+        {
+            dfeta_InductionStatus.Exempt => InductionStatus.Exempt,
+            dfeta_InductionStatus.Fail => InductionStatus.Failed,
+            dfeta_InductionStatus.FailedinWales => InductionStatus.FailedInWales,
+            dfeta_InductionStatus.InductionExtended => InductionStatus.InProgress,
+            dfeta_InductionStatus.InProgress => InductionStatus.InProgress,
+            dfeta_InductionStatus.NotYetCompleted => InductionStatus.InProgress,
+            dfeta_InductionStatus.Pass => InductionStatus.Passed,
+            dfeta_InductionStatus.PassedinWales => InductionStatus.Exempt,
+            dfeta_InductionStatus.RequiredtoComplete => InductionStatus.RequiredToComplete,
+            null => InductionStatus.None,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
+    }
+
     public Task SyncRecordsAsync(string modelType, IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
     {
         if (entities.Count == 0)
@@ -201,7 +574,7 @@ public class TrsDataSyncHelper(
 
     private async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(
         IReadOnlyCollection<PersonInfo> persons,
-        IReadOnlyCollection<EventBase> events,
+        IReadOnlyCollection<LegacyEvents.EventBase> events,
         bool ignoreInvalid,
         bool dryRun,
         CancellationToken cancellationToken = default)
@@ -288,7 +661,7 @@ public class TrsDataSyncHelper(
             }
 
             var personsExceptFailedOne = persons.Where(e => e.Trn != trn).ToArray();
-            var eventsExceptFailedOne = events.Where(e => e is not IEventWithPersonId || ((IEventWithPersonId)e).PersonId != personsExceptFailedOne[0].PersonId).ToArray();
+            var eventsExceptFailedOne = events.Where(e => e is not LegacyEvents.IEventWithPersonId || ((LegacyEvents.IEventWithPersonId)e).PersonId != personsExceptFailedOne[0].PersonId).ToArray();
 
             // Be extra sure we've actually removed a record (otherwise we'll go in an endless loop and stack overflow)
             if (!(personsExceptFailedOne.Length < persons.Count))
@@ -713,13 +1086,17 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_NINumber,
             Contact.Fields.MobilePhone,
             Contact.Fields.GenderCode,
-            Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_MergedWith,
             Contact.Fields.dfeta_CapitaTRNChangedOn,
             Contact.Fields.dfeta_TrnRequestID,
             Contact.Fields.dfeta_AllowPiiUpdatesFromRegister,
             Contact.Fields.dfeta_AllowIDSignInWithProhibitions,
-            Contact.Fields.dfeta_DateofDeath
+            Contact.Fields.dfeta_DateofDeath,
+            Contact.Fields.dfeta_QTSDate,
+            Contact.Fields.dfeta_EYTSDate,
+            Contact.Fields.dfeta_qtlsdate,
+            Contact.Fields.dfeta_QtlsDateHasBeenSet,
+            Contact.Fields.dfeta_InductionStatus
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -768,12 +1145,12 @@ public class TrsDataSyncHelper(
         };
     }
 
-    private (List<PersonInfo> Persons, List<EventBase> Events) MapPersonsAndAudits(
+    private (List<PersonInfo> Persons, List<LegacyEvents.EventBase> Events) MapPersonsAndAudits(
         IReadOnlyCollection<Contact> contacts,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid)
     {
-        var events = new List<EventBase>();
+        var events = new List<LegacyEvents.EventBase>();
         var persons = MapPersons(contacts);
 
         return (persons, events);
@@ -812,7 +1189,7 @@ public class TrsDataSyncHelper(
         .ToList();
 
     private async Task BulkSaveEventsAsync(
-        IReadOnlyCollection<EventBase> events,
+        IReadOnlyCollection<LegacyEvents.EventBase> events,
         string tempTableSuffix,
         bool dryRun,
         CancellationToken cancellationToken)

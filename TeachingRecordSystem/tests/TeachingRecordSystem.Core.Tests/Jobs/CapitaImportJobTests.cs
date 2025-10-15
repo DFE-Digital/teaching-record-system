@@ -104,7 +104,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Contains(trnRequest.Matches?.MatchedPersons!, p => p.PersonId == existingPerson.PersonId);
 
         var createdEvent = await dbContext.Events
-            .SingleAsync(e => e.EventName == nameof(PersonCreatedEvent) && e.PersonId == person.PersonId);
+            .SingleAsync(e => e.EventName == nameof(LegacyEvents.PersonCreatedEvent) && e.PersonId == person.PersonId);
         Assert.NotNull(createdEvent);
     }
 
@@ -255,7 +255,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.NotNull(trnRequest);
         Assert.True(trnRequest.PotentialDuplicate);
         var createdEvent = await dbContext.Events
-            .SingleAsync(e => e.EventName == nameof(PersonCreatedEvent) && e.PersonId == person.PersonId);
+            .SingleAsync(e => e.EventName == nameof(LegacyEvents.PersonCreatedEvent) && e.PersonId == person.PersonId);
         Assert.NotNull(createdEvent);
     }
 

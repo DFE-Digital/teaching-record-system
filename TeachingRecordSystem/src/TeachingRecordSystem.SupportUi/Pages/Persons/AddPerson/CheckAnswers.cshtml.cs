@@ -79,7 +79,7 @@ public class CheckAnswersModel(
             Gender,
             now);
 
-        var createdEvent = new PersonCreatedEvent
+        var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,

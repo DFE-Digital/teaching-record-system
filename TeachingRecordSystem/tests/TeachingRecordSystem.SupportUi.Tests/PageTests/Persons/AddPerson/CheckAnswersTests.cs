@@ -220,7 +220,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<PersonCreatedEvent>(e);
+            var actualEvent = Assert.IsType<LegacyEvents.PersonCreatedEvent>(e);
 
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(personId, actualEvent.PersonId);

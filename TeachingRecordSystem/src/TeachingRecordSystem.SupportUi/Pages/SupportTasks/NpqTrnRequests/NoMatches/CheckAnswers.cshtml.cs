@@ -91,7 +91,7 @@ public class CheckAnswersModel(
             RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
             ChangeReason = NpqTrnRequestResolvedReason.RecordCreated,
             Changes = 0,
-            PersonAttributes = EventModels.PersonAttributes.FromModel(person),
+            PersonAttributes = EventModels.PersonDetails.FromModel(person),
             OldPersonAttributes = null,
             SupportTask = EventModels.SupportTask.FromModel(supportTask),
             OldSupportTask = oldSupportTaskEventModel,

@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.Events.Models;
 
-public record PersonAttributes
+public record PersonDetails
 {
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
@@ -12,7 +12,7 @@ public record PersonAttributes
     public required string? NationalInsuranceNumber { get; set; }
     public required Gender? Gender { get; set; }
 
-    public static PersonAttributes FromModel(Person person) => new()
+    public static PersonDetails FromModel(Person person) => new()
     {
         FirstName = person.FirstName,
         MiddleName = person.MiddleName,

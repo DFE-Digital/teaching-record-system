@@ -140,7 +140,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                     {
                         //create person if incoming record is not known in trs
                         var (newPerson, personAttributes) = Person.Create(row.TRN!, row.GetFirstName()!, row.GetMiddleName()!, row.LastName!, row.GetDateOfBirth(), null, ni, (Gender?)row.Gender, clock.UtcNow, createdByTps: true);
-                        var createdEvent = new PersonCreatedEvent
+                        var createdEvent = new LegacyEvents.PersonCreatedEvent
                         {
                             EventId = Guid.NewGuid(),
                             CreatedUtc = now,

@@ -71,7 +71,7 @@ public abstract class CommonJourneyPage(
     }
 
     protected IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeMatches(
-        PersonAttributes recordToMatchAgainst,
+        PersonDetails recordToMatchAgainst,
         string firstName,
         string middleName,
         string lastName,
@@ -142,7 +142,7 @@ public abstract class CommonJourneyPage(
                 Status = p.Status,
                 InductionStatus = p.InductionStatus,
                 ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen && a.DeletedOn == null),
-                Attributes = new PersonAttributes
+                Attributes = new PersonDetails
                 {
                     FirstName = p.FirstName,
                     MiddleName = p.MiddleName,

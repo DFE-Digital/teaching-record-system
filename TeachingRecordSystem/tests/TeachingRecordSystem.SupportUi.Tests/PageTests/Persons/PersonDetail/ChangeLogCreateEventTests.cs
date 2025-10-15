@@ -41,7 +41,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             Name = "other-evidence.jpg"
         };
 
-        var details = new EventModels.PersonAttributes
+        var details = new EventModels.PersonDetails
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -52,7 +52,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             Gender = gender
         };
 
-        var createdEvent = new PersonCreatedEvent
+        var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -109,7 +109,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
 
         var createReason = AddPersonReasonOption.AnotherReason.GetDisplayName();
 
-        var details = new EventModels.PersonAttributes
+        var details = new EventModels.PersonDetails
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -120,7 +120,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             Gender = null
         };
 
-        var createdEvent = new PersonCreatedEvent
+        var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
