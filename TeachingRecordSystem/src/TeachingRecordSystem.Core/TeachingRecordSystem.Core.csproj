@@ -246,6 +246,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0089_InductionStatusesCreated.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0090_AlterRouteToProfessionalTypeHoldsFromColumn.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0091_InsertRouteToProfessionalTypeData.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0092_Processes.sql" />
   </ItemGroup>
 
   <ItemGroup>
