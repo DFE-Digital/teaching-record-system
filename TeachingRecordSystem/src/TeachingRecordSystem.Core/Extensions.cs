@@ -1,3 +1,5 @@
+using Azure.Storage;
+using Azure.Storage.Files.DataLake;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.Azure;
@@ -49,6 +51,22 @@ public static class Extensions
             services.AddAzureClients(clientBuilder =>
             {
                 clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
+            });
+
+            services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>
+            {
+                var sftpAccountName = configuration.GetValue<string>("SftpStorageName");
+                var sftpAccessKey = configuration.GetValue<string>("SftpStorageAccessKey");
+
+                if (string.IsNullOrEmpty(sftpAccountName) || string.IsNullOrEmpty(sftpAccessKey))
+                {
+                    throw new InvalidOperationException("Invalid SFTP Storage connection string configuration.");
+                }
+
+                var dfsUri = new Uri($"https://{sftpAccountName}.dfs.core.windows.net");
+                var credential = new StorageSharedKeyCredential(sftpAccountName, sftpAccessKey);
+
+                return new DataLakeServiceClient(dfsUri, credential);
             });
         }
 

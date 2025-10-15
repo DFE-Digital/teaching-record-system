@@ -2187,6 +2187,7 @@
         "dependencies": {
           "AngleSharp": "[1.1.2, )",
           "Azure.Storage.Blobs": "[12.25.0, )",
+          "Azure.Storage.Files.DataLake": "[12.16.0, )",
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[30.1.0, )",
@@ -2311,6 +2312,17 @@
           "Azure.Storage.Blobs": "12.24.1",
           "Microsoft.AspNetCore.DataProtection": "8.0.16",
           "Microsoft.Bcl.AsyncInterfaces": "8.0.0"
+        }
+      },
+      "Azure.Storage.Files.DataLake": {
+        "type": "CentralTransitive",
+        "requested": "[12.16.0, )",
+        "resolved": "12.16.0",
+        "contentHash": "D+mkKzL5diWWqGX4pDNeHOIYfv91H15BJSfSLeBCjV3mHFAhykxYDWXOTVJ0ThobJ3yI2R4SahjbVmdgd0vlyg==",
+        "dependencies": {
+          "Azure.Storage.Blobs": "12.18.0",
+          "Azure.Storage.Common": "12.17.0",
+          "System.Text.Json": "4.7.2"
         }
       },
       "Castle.Core": {
