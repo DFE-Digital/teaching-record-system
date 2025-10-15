@@ -55,8 +55,8 @@ public static class Extensions
             services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>
             {
                 var connStr = configuration.GetValue<string>("SftpStorageConnectionString");
-                var matchAccountName = System.Text.RegularExpressions.Regex.Match(connStr, @"AccountName=([^;]+)");
-                var matchAccountKey = System.Text.RegularExpressions.Regex.Match(connStr, @"AccountKey=([^;]+)");
+                var matchAccountName = System.Text.RegularExpressions.Regex.Match(connStr!, @"AccountName=([^;]+)");
+                var matchAccountKey = System.Text.RegularExpressions.Regex.Match(connStr!, @"AccountKey=([^;]+)");
 
                 if (!matchAccountName.Success || !matchAccountKey.Success)
                     throw new InvalidOperationException("Invalid SFTP Storage connection string configuration.");
