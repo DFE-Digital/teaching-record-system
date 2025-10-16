@@ -136,6 +136,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<TrnRange> TrnRanges => Set<TrnRange>();
 
+    public DbSet<Process> Processes => Set<Process>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
