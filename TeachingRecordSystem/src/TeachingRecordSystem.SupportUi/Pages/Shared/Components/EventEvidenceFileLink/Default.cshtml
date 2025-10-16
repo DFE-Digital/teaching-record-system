@@ -1,0 +1,12 @@
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence
+
+@model UploadedEvidenceFile
+
+@if (Model is not null)
+{
+    <a href="@Model.PreviewUrl" data-testid="uploaded-evidence-link" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.FileName} (opens in new tab)")</a>
+}
+else
+{
+    <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+}

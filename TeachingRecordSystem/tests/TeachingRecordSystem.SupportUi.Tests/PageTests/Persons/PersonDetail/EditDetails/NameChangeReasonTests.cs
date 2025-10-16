@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
@@ -72,7 +73,9 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var reasonChoice = EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership;
         var evidenceFileId = Guid.NewGuid();
-        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        var urlEncoder = UrlEncoder.Default;
+        var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
+        var expectedFileUrl = $"http://localhost/files/evidence.jpg?fileUrl={expectedBlobStorageFileUrl}";
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithFirstName("Alfred")
@@ -277,7 +280,9 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
-        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        var urlEncoder = UrlEncoder.Default;
+        var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
+        var expectedFileUrl = $"http://localhost/files/validfile.png?fileUrl={expectedBlobStorageFileUrl}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
@@ -320,7 +325,9 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         var doc = await AssertEx.HtmlResponseAsync(response, 400);
 
-        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        var urlEncoder = UrlEncoder.Default;
+        var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
+        var expectedFileUrl = $"http://localhost/files/testfile.jpg?fileUrl={expectedBlobStorageFileUrl}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());

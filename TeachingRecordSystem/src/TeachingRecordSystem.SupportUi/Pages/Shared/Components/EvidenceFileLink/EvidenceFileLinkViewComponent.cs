@@ -4,13 +4,16 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared.Components.EvidenceFileLink;
 
-public class EvidenceFileLinkViewComponent(IFileService fileService) : ViewComponent
+public class EvidenceFileLinkViewComponent(
+    IFileService fileService,
+    SupportUiLinkGenerator linkGenerator) : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync(UploadedEvidenceFile? evidenceFile)
     {
         if (evidenceFile is UploadedEvidenceFile file)
         {
-            file.PreviewUrl = await fileService.GetFileUrlAsync(file.FileId, UiDefaults.FileUrlExpiry);
+            var fileUrl = await fileService.GetFileUrlAsync(file.FileId, UiDefaults.FileUrlExpiry);
+            file.PreviewUrl = linkGenerator.Files.File(file.FileName, fileUrl);
         }
 
         return View(evidenceFile);

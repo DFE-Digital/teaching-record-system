@@ -1,6 +1,7 @@
 using Hangfire;
 using Joonasw.AspNetCore.SecurityHeaders;
 using TeachingRecordSystem.SupportUi;
+using TeachingRecordSystem.SupportUi.Endpoints;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
@@ -79,6 +80,9 @@ if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
 {
     app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.AdminOnly, "/_hangfire");
 }
+
+
+app.MapFiles();
 
 app.Run();
 
