@@ -56,7 +56,7 @@ public class SyncAllDqtContactAuditsJob(
             await trsDataSyncHelper.SyncAuditAsync(
                 Contact.EntityLogicalName,
                 result.Entities.Select(e => e.Id),
-                skipIfExists: true,
+                skipIfExists: false,
                 cancellationToken);
 
             if (fetched > 0 && fetched % 50000 == 0)
