@@ -17,10 +17,7 @@ public class ColoredTagHelper : TagHelper
         "govuk-tag--blue",
         "govuk-tag--light-blue",
         "govuk-tag--purple",
-        "govuk-tag--pink",
-        "govuk-tag--red",
-        "govuk-tag--orange",
-        "govuk-tag--yellow"
+        "govuk-tag--pink"
     ];
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
