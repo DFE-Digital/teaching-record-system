@@ -16,6 +16,7 @@ public class ProcessEventMapping : IEntityTypeConfiguration<ProcessEvent>
                 v => JsonSerializer.Serialize(v, typeof(IEvent), IEvent.SerializerOptions),
                 v => JsonSerializer.Deserialize<IEvent>(v, IEvent.SerializerOptions)!);
         builder.HasOne<Process>().WithMany(a => a.Events).HasForeignKey(ae => ae.ProcessId);
-        builder.HasIndex(e => e.PersonIds).HasMethod("GIN");
+        builder.HasIndex(e => new { e.PersonIds, e.EventName }).HasMethod("GIN").IsCreatedConcurrently();
+        builder.HasIndex(e => e.ProcessId).IsCreatedConcurrently();
     }
 }
