@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -12,7 +13,7 @@ public static class HtmlHelperExtensions
             return HtmlString.Empty;
         }
 
-        var htmlContent = text.Trim().Replace("\r", "").Replace("\n", "<br>");
+        var htmlContent = HtmlEncoder.Default.Encode(text).Replace("&#xD;&#xA;", "<br>");
         return new HtmlString(htmlContent);
     }
 }
