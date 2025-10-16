@@ -149,14 +149,7 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
-                            @if (evidenceFileUrl is not null)
-                            {
-                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{createdEvent.EvidenceFile!.Name} (opens in new tab)")</a>
-                            }
-                            else
-                            {
-                                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
-                            }
+                            <vc:event-evidence-file-link evidence-file="@createdEvent.EvidenceFile" />
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
