@@ -128,6 +128,13 @@ public class ChangeHistoryModel(
                     e.person_ids @> ARRAY[{PersonId}]
                     AND e.event_name = any ({eventTypes})
 
+                    -- only tps resolved duplicate events that are merges and not where the imported record has been kept
+                    AND
+                    (
+                        e.event_name <> {nameof(TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)}
+                        OR (e.payload->> 'ChangeReason')::int != {TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept}
+                    )
+
                     -- Only return alerts that have an alert type (or DQT sanction code) that the user is authorized to Read
                     AND (
                         NOT (e.event_name = any({alertEventTypes}))
