@@ -132,16 +132,16 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", status.GetTitle());
-        doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-        doc.AssertRowContentMatches("Degree type", degreeType.Name);
-        doc.AssertRowContentMatches("Country of training", country.Name);
-        doc.AssertRowContentMatches("Age range", "Foundation stage");
-        doc.AssertRowContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
+        doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
+        doc.AssertSummaryListRowValueContentMatches("Status", status.GetTitle());
+        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Training provider", trainingProvider.Name);
+        doc.AssertSummaryListRowValueContentMatches("Degree type", degreeType.Name);
+        doc.AssertSummaryListRowValueContentMatches("Country of training", country.Name);
+        doc.AssertSummaryListRowValueContentMatches("Age range", "Foundation stage");
+        doc.AssertSummaryListRowValueContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
     [Test]
@@ -175,9 +175,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Reason", deleteRouteState.ChangeReason!.GetDisplayName()!);
-        doc.AssertRowContentMatches("More details", deleteRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
-        doc.AssertRowContentMatches("Evidence", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Reason", deleteRouteState.ChangeReason!.GetDisplayName()!);
+        doc.AssertSummaryListRowValueContentMatches("More details", deleteRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
+        doc.AssertSummaryListRowValueContentMatches("Evidence", "Not provided");
     }
 
     [Test]

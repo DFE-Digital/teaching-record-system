@@ -83,7 +83,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private async Task<SupportTask> CreateSupportTaskAsync(SupportTaskStatus status = SupportTaskStatus.Open)
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmail(TestData.GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmailAddress(TestData.GenerateUniqueEmail()).WithAlert().WithQts().WithEyts());
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 

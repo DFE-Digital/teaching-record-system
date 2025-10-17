@@ -88,7 +88,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithEmail(bool hasEmail = true)
+        public CreatePersonBuilder WithEmailAddress(bool hasEmail = true)
         {
             _hasEmail = hasEmail;
 
@@ -100,7 +100,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithEmail(string? email)
+        public CreatePersonBuilder WithEmailAddress(string? email)
         {
             _hasEmail = email != null;
             _email = email;
@@ -617,7 +617,7 @@ public partial class TestData
                 StatedFirstName = statedFirstName,
                 StatedMiddleName = statedMiddleName,
                 StatedLastName = lastName,
-                Email = contact.EMailAddress1,
+                EmailAddress = contact.EMailAddress1,
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 Gender = contact.GenderCode.ToGender(),
                 QtsDate = person.QtsDate,
@@ -1075,7 +1075,7 @@ public partial class TestData
         public required string StatedFirstName { get; init; }
         public required string StatedMiddleName { get; init; }
         public required string StatedLastName { get; init; }
-        public required string? Email { get; init; }
+        public required string? EmailAddress { get; init; }
         public required Gender? Gender { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required DateOnly? QtsDate { get; init; }

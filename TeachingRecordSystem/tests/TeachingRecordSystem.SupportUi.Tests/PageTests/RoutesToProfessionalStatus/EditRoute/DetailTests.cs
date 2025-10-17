@@ -131,21 +131,21 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", status.GetDisplayName()!);
-        doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
+        doc.AssertSummaryListRowValueContentMatches("Status", status.GetDisplayName()!);
+        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertChangeLinkExists("Start date");
-        doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertChangeLinkExists("End date");
-        doc.AssertRowContentMatches("Held since", awardDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Induction exemption", "Not provided");
-        doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
+        doc.AssertSummaryListRowValueContentMatches("Held since", awardDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Induction exemption", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Training provider", trainingProvider.Name);
         doc.AssertChangeLinkExists("Training provider");
-        doc.AssertRowContentMatches("Degree type", degreeType.Name);
+        doc.AssertSummaryListRowValueContentMatches("Degree type", degreeType.Name);
         doc.AssertChangeLinkExists("Degree type");
-        doc.AssertRowContentMatches("Country of training", country.Name);
-        doc.AssertRowContentMatches("Age range", ageRange.GetDisplayName()!);
-        doc.AssertRowContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
+        doc.AssertSummaryListRowValueContentMatches("Country of training", country.Name);
+        doc.AssertSummaryListRowValueContentMatches("Age range", ageRange.GetDisplayName()!);
+        doc.AssertSummaryListRowValueContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
     [Test]
@@ -179,15 +179,15 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", status.Title);
-        doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Training provider", "Not provided");
-        doc.AssertRowContentMatches("Degree type", "Not provided");
-        doc.AssertRowContentMatches("Country of training", "Not provided");
-        doc.AssertRowContentMatches("Age range", "Not provided");
-        doc.AssertRowContentMatches("Subjects", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
+        doc.AssertSummaryListRowValueContentMatches("Status", status.Title);
+        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Training provider", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Degree type", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Country of training", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Age range", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Subjects", "Not provided");
     }
 
     [Test]
@@ -272,7 +272,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Induction exemption", expectedContent);
+        doc.AssertSummaryListRowValueContentMatches("Induction exemption", expectedContent);
         doc.AssertChangeLinkExists("Induction exemption");
     }
 
@@ -320,7 +320,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Induction exemption", "Yes");
+        doc.AssertSummaryListRowValueContentMatches("Induction exemption", "Yes");
         doc.AssertNoChangeLink("Induction exemption");
     }
 

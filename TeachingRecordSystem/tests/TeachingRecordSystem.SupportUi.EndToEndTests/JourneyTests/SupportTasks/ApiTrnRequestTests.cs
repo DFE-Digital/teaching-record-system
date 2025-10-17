@@ -53,7 +53,7 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithMiddleName(TestData.GenerateChangedMiddleName(match.MiddleName))
                 .WithLastName(match.LastName)
                 .WithDateOfBirth(match.DateOfBirth)
-                .WithEmailAddress(match.Email)
+                .WithEmailAddress(match.EmailAddress)
                 .WithNationalInsuranceNumber(match.NationalInsuranceNumber)
                 .WithGender(match.Gender));
 

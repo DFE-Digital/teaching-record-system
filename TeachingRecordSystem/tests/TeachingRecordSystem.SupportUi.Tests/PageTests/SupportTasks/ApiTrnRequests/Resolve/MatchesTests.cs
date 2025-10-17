@@ -253,7 +253,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithEmail(null)
+            .WithEmailAddress(null)
             .WithNationalInsuranceNumber(false)
             .WithGender(false)
             .WithMiddleName(""));
@@ -386,7 +386,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
                         : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(
                     matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
-                        ? matchedPerson.Email
+                        ? matchedPerson.EmailAddress
                         : TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(
                     matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)

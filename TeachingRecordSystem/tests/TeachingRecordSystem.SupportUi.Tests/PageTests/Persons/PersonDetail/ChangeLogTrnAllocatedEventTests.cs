@@ -43,6 +43,6 @@ public class ChangeLogTrnAllocatedEventTests(HostFixture hostFixture) : TestBase
         Assert.Equal($"By {SystemUser.SystemUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
-        doc.AssertRow("Trn", v => Assert.Equal(trn, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Trn", v => Assert.Equal(trn, v.TrimmedText()));
     }
 }

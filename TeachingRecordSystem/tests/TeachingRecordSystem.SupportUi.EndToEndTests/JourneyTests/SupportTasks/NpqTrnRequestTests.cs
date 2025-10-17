@@ -59,12 +59,12 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Set up two records to merge with, where one has no conflicting info, one does have known conflicting info
         var matchedPerson1 = await TestData.CreatePersonAsync(p =>
         {
-            p.WithEmail(TestData.GenerateUniqueEmail());
+            p.WithEmailAddress(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });
         var matchedPerson2 = await TestData.CreatePersonAsync(p =>
         {
-            p.WithEmail(TestData.GenerateUniqueEmail());
+            p.WithEmailAddress(TestData.GenerateUniqueEmail());
             p.WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber());
         });
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
@@ -74,7 +74,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
                 t.WithMatchedPersons(matchedPerson1.PersonId, matchedPerson2.PersonId);
                 t.WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber);
                 t.WithDateOfBirth(matchedPerson1.DateOfBirth);
-                t.WithEmailAddress(matchedPerson1.Email!);
+                t.WithEmailAddress(matchedPerson1.EmailAddress!);
             });
         var requestData = supportTask.TrnRequestMetadata!;
         var supportTaskReference = supportTask.SupportTaskReference;

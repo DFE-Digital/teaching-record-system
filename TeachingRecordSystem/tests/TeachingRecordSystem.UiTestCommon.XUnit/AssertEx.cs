@@ -95,29 +95,64 @@ public static partial class AssertEx
         HtmlDocumentHasSummaryError(doc, expectedMessage);
     }
 
-    public static void AssertRowContentMatches(this IElement doc, string keyContent, string? expected)
+    public static void AssertSummaryListRowValueContentMatches(this IElement doc, string keyContent, string? expected)
     {
-        doc.AssertRow(keyContent, el => Assert.Equal(expected, el.TrimmedText()));
+        doc.AssertSummaryListRowValue(keyContent, el => Assert.Equal(expected, el.TrimmedText()));
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, string? expected)
+    public static void AssertSummaryListRowValueContentMatches(this IHtmlDocument doc, string keyContent, string? expected)
     {
-        doc.Body!.AssertRowContentMatches(keyContent, expected);
+        doc.Body!.AssertSummaryListRowValueContentMatches(keyContent, expected);
     }
 
-    public static void AssertRowContentContains(this IElement doc, string keyContent, string expected)
+    public static void AssertSummaryListRowContentContains(this IElement doc, string keyContent, string expected)
     {
-        doc.AssertRow(keyContent, el => Assert.Contains(expected, el.TrimmedText()));
+        doc.AssertSummaryListRowValue(keyContent, el => Assert.Contains(expected, el.TrimmedText()));
     }
 
-    public static void AssertRowContentContains(this IHtmlDocument doc, string keyContent, string expected)
+    public static void AssertSummaryListRowContentContains(this IHtmlDocument doc, string keyContent, string expected)
     {
-        doc.Body!.AssertRowContentContains(keyContent, expected);
+        doc.Body!.AssertSummaryListRowContentContains(keyContent, expected);
     }
 
-    public static void AssertRowContentMatches(this IElement doc, string keyContent, IEnumerable<string> expected)
+    public static void AssertSummaryListRowValueContentMatches(this IElement doc, string keyContent, IEnumerable<string> expected)
     {
-        doc.AssertRow(keyContent, el =>
+        doc.AssertSummaryListRowValue(keyContent, el =>
+        {
+            var values = el.QuerySelectorAll("li").Select(d => d.TrimmedText()).ToArray();
+            Assert.NotEmpty(values);
+            Assert.Equal(expected, values);
+        });
+    }
+
+    public static void AssertSummaryListRowValueContentMatches(this IHtmlDocument doc, string keyContent, IEnumerable<string> expected)
+    {
+        doc.Body!.AssertSummaryListRowValueContentMatches(keyContent, expected);
+    }
+
+    public static void AssertSummaryListRowValueContentMatches(this IElement doc, string containerTestId, string keyContent, string? expected)
+    {
+        doc.AssertSummaryListRowValue(containerTestId, keyContent, el => Assert.Equal(expected, el.TrimmedText()));
+    }
+
+    public static void AssertSummaryListRowValueContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, string? expected)
+    {
+        doc.Body!.AssertSummaryListRowValueContentMatches(containerTestId, keyContent, expected);
+    }
+
+    public static void AssertSummaryListRowContentContains(this IElement doc, string containerTestId, string keyContent, string expected)
+    {
+        doc.AssertSummaryListRowValue(containerTestId, keyContent, el => Assert.Contains(expected, el.TrimmedText()));
+    }
+
+    public static void AssertSummaryListRowContentContains(this IHtmlDocument doc, string containerTestId, string keyContent, string expected)
+    {
+        doc.Body!.AssertSummaryListRowContentContains(containerTestId, keyContent, expected);
+    }
+
+    public static void AssertSummaryListRowValueContentMatches(this IElement doc, string containerTestId, string keyContent, IEnumerable<string> expected)
+    {
+        doc.AssertSummaryListRowValue(containerTestId, keyContent, el =>
         {
             var values = el.QuerySelectorAll("li").Select(d => d.TrimmedText());
             Assert.NotEmpty(values);
@@ -125,144 +160,109 @@ public static partial class AssertEx
         });
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, IEnumerable<string> expected)
+    public static void AssertSummaryListRowValueContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, IEnumerable<string> expected)
     {
-        doc.Body!.AssertRowContentMatches(keyContent, expected);
+        doc.Body!.AssertSummaryListRowValueContentMatches(containerTestId, keyContent, expected);
     }
 
-    public static void AssertRowContentMatches(this IElement doc, string containerTestId, string keyContent, string? expected)
+    public static void AssertSummaryListRowValue(this IElement doc, string keyContent, Action<IElement> valueAssertion)
     {
-        doc.AssertRow(containerTestId, keyContent, el => Assert.Equal(expected, el.TrimmedText()));
+        doc.AssertSummaryListRowValueCore(null, keyContent, valueAssertion);
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, string? expected)
+    public static void AssertSummaryListRowValue(this IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
     {
-        doc.Body!.AssertRowContentMatches(containerTestId, keyContent, expected);
+        doc.Body!.AssertSummaryListRowValue(keyContent, valueAssertion);
     }
 
-    public static void AssertRowContentContains(this IElement doc, string containerTestId, string keyContent, string expected)
+    public static void AssertSummaryListRowValue(this IElement doc, string containerTestId, string keyContent, Action<IElement> valueAssertion)
     {
-        doc.AssertRow(containerTestId, keyContent, el => Assert.Contains(expected, el.TrimmedText()));
+        doc.AssertSummaryListRowValueCore(containerTestId, keyContent, valueAssertion);
     }
 
-    public static void AssertRowContentContains(this IHtmlDocument doc, string containerTestId, string keyContent, string expected)
+    public static void AssertSummaryListRowValue(this IHtmlDocument doc, string containerTestId, string keyContent, Action<IElement> valueAssertion)
     {
-        doc.Body!.AssertRowContentContains(containerTestId, keyContent, expected);
+        doc.Body!.AssertSummaryListRowValue(containerTestId, keyContent, valueAssertion);
     }
 
-    public static void AssertRowContentMatches(this IElement doc, string containerTestId, string keyContent, IEnumerable<string> expected)
+    public static void AssertSummaryListRowValue<T>(this IElement doc, string keyContent, Action<T> valueAssertion)
     {
-        doc.AssertRow(containerTestId, keyContent, el =>
-        {
-            var values = el.QuerySelectorAll("li").Select(d => d.TrimmedText());
-            Assert.NotEmpty(values);
-            Assert.Equal(expected, values);
-        });
+        doc.AssertSummaryListRowValueCore(null, keyContent, valueAssertion);
     }
 
-    public static void AssertRowContentMatches(this IHtmlDocument doc, string containerTestId, string keyContent, IEnumerable<string> expected)
+    public static void AssertSummaryListRowValue<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
     {
-        doc.Body!.AssertRowContentMatches(containerTestId, keyContent, expected);
+        doc.Body!.AssertSummaryListRowValue(keyContent, valueAssertion);
     }
 
-    public static void AssertRow(this IElement doc, string keyContent, Action<IElement> valueAssertion)
+    public static void AssertSummaryListRowValue<T>(this IElement doc, string containerTestId, string keyContent, Action<T> valueAssertion)
     {
-        doc.AssertRowCore(null, keyContent, valueAssertion);
+        doc.AssertSummaryListRowValueCore(containerTestId, keyContent, valueAssertion);
     }
 
-    public static void AssertRow(this IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
+    public static void AssertSummaryListRowValue<T>(this IHtmlDocument doc, string containerTestId, string keyContent, Action<T> valueAssertion)
     {
-        doc.Body!.AssertRow(keyContent, valueAssertion);
+        doc.Body!.AssertSummaryListRowValue(containerTestId, keyContent, valueAssertion);
     }
 
-    public static void AssertRow(this IElement doc, string containerTestId, string keyContent, Action<IElement> valueAssertion)
+    public static void AssertSummaryListRowValue(this IElement doc, string keyContent, params Action<IElement>[] valueAssertions)
     {
-        doc.AssertRowCore(containerTestId, keyContent, valueAssertion);
+        doc.AssertSummaryListRowValuesCore(null, keyContent, valueAssertions);
     }
 
-    public static void AssertRow(this IHtmlDocument doc, string containerTestId, string keyContent, Action<IElement> valueAssertion)
+    public static void AssertSummaryListRowValues(this IHtmlDocument doc, string keyContent, params Action<IElement>[] valueAssertions)
     {
-        doc.Body!.AssertRow(containerTestId, keyContent, valueAssertion);
+        doc.Body!.AssertSummaryListRowValue(keyContent, valueAssertions);
     }
 
-    public static void AssertRow<T>(this IElement doc, string keyContent, Action<T> valueAssertion)
+    public static void AssertSummaryListRowValues(this IElement doc, string containerTestId, string keyContent, params Action<IElement>[] valueAssertions)
     {
-        doc.AssertRowCore(null, keyContent, valueAssertion);
+        doc.AssertSummaryListRowValuesCore(containerTestId, keyContent, valueAssertions);
     }
 
-    public static void AssertRow<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
+    public static void AssertSummaryListRowValues(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<IElement>[] valueAssertions)
     {
-        doc.Body!.AssertRow(keyContent, valueAssertion);
+        doc.Body!.AssertSummaryListRowValues(containerTestId, keyContent, valueAssertions);
     }
 
-    public static void AssertRow<T>(this IElement doc, string containerTestId, string keyContent, Action<T> valueAssertion)
+    public static void AssertSummaryListRowValues<T>(this IElement doc, string keyContent, params Action<T>[] valueAssertions)
     {
-        doc.AssertRowCore(containerTestId, keyContent, valueAssertion);
+        doc.AssertSummaryListRowValuesCore(null, keyContent, valueAssertions);
     }
 
-    public static void AssertRow<T>(this IHtmlDocument doc, string containerTestId, string keyContent, Action<T> valueAssertion)
+    public static void AssertSummaryListRowValues<T>(this IHtmlDocument doc, string keyContent, params Action<T>[] valueAssertions)
     {
-        doc.Body!.AssertRow(containerTestId, keyContent, valueAssertion);
+        doc.Body!.AssertSummaryListRowValues(keyContent, valueAssertions);
     }
 
-    public static void AssertRows(this IElement doc, string keyContent, params Action<IElement>[] valueAssertions)
+    public static void AssertSummaryListRowValues<T>(this IElement doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
     {
-        doc.AssertRowsCore(null, keyContent, valueAssertions);
+        doc.AssertSummaryListRowValuesCore(containerTestId, keyContent, valueAssertions);
     }
 
-    public static void AssertRows(this IHtmlDocument doc, string keyContent, params Action<IElement>[] valueAssertions)
+    public static void AssertSummaryListRowValues<T>(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
     {
-        doc.Body!.AssertRows(keyContent, valueAssertions);
+        doc.Body!.AssertSummaryListRowValues(containerTestId, keyContent, valueAssertions);
     }
 
-    public static void AssertRows(this IElement doc, string containerTestId, string keyContent, params Action<IElement>[] valueAssertions)
+    public static void AssertSummaryListRowDoesNotExist(this IElement doc, string keyContent)
     {
-        doc.AssertRowsCore(containerTestId, keyContent, valueAssertions);
+        doc.AssertSummaryListRowDoesNotExistCore(null, keyContent);
     }
 
-    public static void AssertRows(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<IElement>[] valueAssertions)
+    public static void AssertSummaryListRowDoesNotExist(this IHtmlDocument doc, string keyContent)
     {
-        doc.Body!.AssertRows(containerTestId, keyContent, valueAssertions);
+        doc.Body!.AssertSummaryListRowDoesNotExist(keyContent);
     }
 
-    public static void AssertRows<T>(this IElement doc, string keyContent, params Action<T>[] valueAssertions)
+    public static void AssertSummaryListRowDoesNotExist(this IElement doc, string containerTestId, string keyContent)
     {
-        doc.AssertRowsCore(null, keyContent, valueAssertions);
+        doc.AssertSummaryListRowDoesNotExistCore(containerTestId, keyContent);
     }
 
-    public static void AssertRows<T>(this IHtmlDocument doc, string keyContent, params Action<T>[] valueAssertions)
+    public static void AssertSummaryListRowDoesNotExist(this IHtmlDocument doc, string containerTestId, string keyContent)
     {
-        doc.Body!.AssertRows(keyContent, valueAssertions);
-    }
-
-    public static void AssertRows<T>(this IElement doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
-    {
-        doc.AssertRowsCore(containerTestId, keyContent, valueAssertions);
-    }
-
-    public static void AssertRows<T>(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
-    {
-        doc.Body!.AssertRows(containerTestId, keyContent, valueAssertions);
-    }
-
-    public static void AssertRowDoesNotExist(this IElement doc, string keyContent)
-    {
-        doc.AssertRowDoesNotExistCore(null, keyContent);
-    }
-
-    public static void AssertRowDoesNotExist(this IHtmlDocument doc, string keyContent)
-    {
-        doc.Body!.AssertRowDoesNotExist(keyContent);
-    }
-
-    public static void AssertRowDoesNotExist(this IElement doc, string containerTestId, string keyContent)
-    {
-        doc.AssertRowDoesNotExistCore(containerTestId, keyContent);
-    }
-
-    public static void AssertRowDoesNotExist(this IHtmlDocument doc, string containerTestId, string keyContent)
-    {
-        doc.Body!.AssertRowDoesNotExist(containerTestId, keyContent);
+        doc.Body!.AssertSummaryListRowDoesNotExist(containerTestId, keyContent);
     }
 
     public static void AssertMatchRowHasExpectedHighlight(this IElement doc, string detailsId, string summaryListKey, bool expectHighlight)
@@ -329,28 +329,42 @@ public static partial class AssertEx
         fileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
     }
 
-    private static void AssertRowCore<T>(this IElement doc, string? containerTestId, string keyContent, Action<T> valueAssertion)
+    public static void AssertSummaryListHasRows(this IElement element, params (string Key, string? Value)[] expectedKeysAndValues)
+    {
+        var rows = element.GetElementsByClassName("govuk-summary-list__row");
+
+        Assert.Collection(rows, expectedKeysAndValues.Select(kv => (Action<IElement>)(row =>
+        {
+            var keyElement = row.GetElementsByClassName("govuk-summary-list__key").Single();
+            Assert.Equal(kv.Key, keyElement.TrimmedText());
+
+            var valueElement = row.GetElementsByClassName("govuk-summary-list__value").Single();
+            Assert.Equal(kv.Value, valueElement.TrimmedText());
+        })).ToArray());
+    }
+
+    private static void AssertSummaryListRowValueCore<T>(this IElement doc, string? containerTestId, string keyContent, Action<T> valueAssertion)
     {
         IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
         Assert.NotNull(container);
 
         var label = container.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
-        AssertRowValueCore(label, valueAssertion);
+        AssertSummaryListRowValueCore(label, valueAssertion);
     }
 
-    private static void AssertRowsCore<T>(this IElement doc, string? containerTestId, string keyContent, params Action<T>[] valueAssertions)
+    private static void AssertSummaryListRowValuesCore<T>(this IElement doc, string? containerTestId, string keyContent, params Action<T>[] valueAssertions)
     {
         IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
         Assert.NotNull(container);
 
         var labels = container.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == keyContent);
         Assert.Collection(labels, valueAssertions
-                .AsEnumerable()
-                .Select<Action<T>, Action<IElement>>(assertion => (label => AssertRowValueCore(label, assertion)))
-                .ToArray());
+            .AsEnumerable()
+            .Select<Action<T>, Action<IElement>>(assertion => (label => AssertSummaryListRowValueCore(label, assertion)))
+            .ToArray());
     }
 
-    private static void AssertRowValueCore<T>(IElement? label, Action<T> valueAssertion)
+    private static void AssertSummaryListRowValueCore<T>(IElement? label, Action<T> valueAssertion)
     {
         Assert.NotNull(label);
         var element = label.NextElementSibling;
@@ -359,7 +373,7 @@ public static partial class AssertEx
         valueAssertion(value);
     }
 
-    private static void AssertRowDoesNotExistCore(this IElement doc, string? containerTestId, string keyContent)
+    private static void AssertSummaryListRowDoesNotExistCore(this IElement doc, string? containerTestId, string keyContent)
     {
         IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
         Assert.NotNull(container);

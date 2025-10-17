@@ -101,7 +101,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("some@email-address.com")
+            .WithEmailAddress("some@email-address.com")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Other));
 
@@ -109,7 +109,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -167,7 +167,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("some@email-address.com")
+            .WithEmailAddress("some@email-address.com")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Male));
 
@@ -175,7 +175,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -237,7 +237,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("some@email-address.com")
+            .WithEmailAddress("some@email-address.com")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Other));
 
@@ -245,7 +245,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -352,7 +352,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("some@email-address.com")
+            .WithEmailAddress("some@email-address.com")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Other));
 
@@ -360,7 +360,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
@@ -532,7 +532,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("some@email-address.com")
+            .WithEmailAddress("some@email-address.com")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Female));
 
@@ -540,7 +540,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Other : person.Gender;
 
@@ -609,7 +609,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("some@email-address.com")
+            .WithEmailAddress("some@email-address.com")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Female));
 
@@ -617,7 +617,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var originalMiddleName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
         var originalLastName = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var originalDateOfBirth = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
-        var originalEmailAddress = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
+        var originalEmailAddress = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
         var originalNationalInsuranceNumber = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var originalGender = originalChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
 
@@ -625,7 +625,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newMiddleName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "Thee" : person.MiddleName;
         var newLastName = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Stallion" : person.LastName;
         var newDateOfBirth = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("2 Mar 1981") : person.DateOfBirth;
-        var newEmailAddress = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.Email;
+        var newEmailAddress = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email-address.com" : person.EmailAddress;
         var newNationalInsuranceNumber = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "XY987654A" : person.NationalInsuranceNumber;
         var newGender = newChanges.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Male : person.Gender;
 

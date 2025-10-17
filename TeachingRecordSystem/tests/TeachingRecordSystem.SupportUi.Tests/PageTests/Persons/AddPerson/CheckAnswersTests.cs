@@ -63,11 +63,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
-        doc.AssertRow("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
-        doc.AssertRow("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
-        doc.AssertRow("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
-        doc.AssertRow("Gender", v => Assert.Equal("Other", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Other", v.TrimmedText()));
     }
 
     [Test]
@@ -91,10 +91,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
-        doc.AssertRow("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRow("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Test]
@@ -119,10 +119,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason for creating record", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason for creating record", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertRow("Evidence", v =>
+        doc.AssertSummaryListRowValue("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
@@ -152,9 +152,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason for creating record", v => Assert.Equal("They were awarded a mandatory qualification", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRows("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason for creating record", v => Assert.Equal("They were awarded a mandatory qualification", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValues("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Test]
@@ -220,7 +220,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualEvent = Assert.IsType<PersonCreatedEvent>(e);
+            var actualEvent = Assert.IsType<LegacyEvents.PersonCreatedEvent>(e);
 
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(personId, actualEvent.PersonId);

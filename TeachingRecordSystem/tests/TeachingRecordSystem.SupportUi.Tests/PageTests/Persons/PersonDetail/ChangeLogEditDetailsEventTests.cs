@@ -146,66 +146,66 @@ public class ChangeLogEditDetailsEventTests(HostFixture hostFixture) : TestBase(
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
-            doc.AssertRow("details", "Name", v => Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", v.TrimmedText()));
-            doc.AssertRow("previous-details", "Name", v => Assert.Equal($"{oldFirstName} {oldMiddleName} {oldLastName}", v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Name", v => Assert.Equal($"{oldFirstName} {oldMiddleName} {oldLastName}", v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Name");
-            doc.AssertRowDoesNotExist("previous-details", "Name");
+            doc.AssertSummaryListRowDoesNotExist("details", "Name");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Name");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
         {
-            doc.AssertRow("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertRow("previous-details", "Date of birth", v => Assert.Equal(oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Date of birth");
-            doc.AssertRowDoesNotExist("previous-details", "Date of birth");
+            doc.AssertSummaryListRowDoesNotExist("details", "Date of birth");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Date of birth");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
         {
-            doc.AssertRow("details", "Email address", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, v.TrimmedText()));
-            doc.AssertRow("previous-details", "Email address", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Email address");
-            doc.AssertRowDoesNotExist("previous-details", "Email address");
+            doc.AssertSummaryListRowDoesNotExist("details", "Email address");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Email address");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
         {
-            doc.AssertRow("details", "National Insurance number", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : nationalInsuranceNumber, v.TrimmedText()));
-            doc.AssertRow("previous-details", "National Insurance number", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldNationalInsuranceNumber, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : nationalInsuranceNumber, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldNationalInsuranceNumber, v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "National Insurance number");
-            doc.AssertRowDoesNotExist("previous-details", "National Insurance number");
+            doc.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
         {
-            doc.AssertRow("details", "Gender", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : gender.GetDisplayName(), v.TrimmedText()));
-            doc.AssertRow("previous-details", "Gender", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldGender.GetDisplayName(), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : gender.GetDisplayName(), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldGender.GetDisplayName(), v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Gender");
-            doc.AssertRowDoesNotExist("previous-details", "Gender");
+            doc.AssertSummaryListRowDoesNotExist("details", "Gender");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Gender");
         }
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
-            doc.AssertRow("change-reason", "Name change", v => Assert.Equal(nameChangeReason, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("change-reason", "Name change", v => Assert.Equal(nameChangeReason, v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("change-reason", "Name change");
+            doc.AssertSummaryListRowDoesNotExist("change-reason", "Name change");
         }
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
@@ -214,13 +214,13 @@ public class ChangeLogEditDetailsEventTests(HostFixture hostFixture) : TestBase(
                 ? "Other personal details change"
                 : "Personal details change";
 
-            doc.AssertRow("change-reason", keyContent, v => Assert.Equal(detailsChangeReason, v.TrimmedText()));
-            doc.AssertRow("change-reason", "Reason details", v => Assert.Equal(detailsChangeReasonDetail, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("change-reason", keyContent, v => Assert.Equal(detailsChangeReason, v.TrimmedText()));
+            doc.AssertSummaryListRowValue("change-reason", "Reason details", v => Assert.Equal(detailsChangeReasonDetail, v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("change-reason", "Personal details change");
-            doc.AssertRowDoesNotExist("change-reason", "Other personal details change");
+            doc.AssertSummaryListRowDoesNotExist("change-reason", "Personal details change");
+            doc.AssertSummaryListRowDoesNotExist("change-reason", "Other personal details change");
         }
 
         var assertions = new List<Action<IElement>>();
@@ -233,6 +233,6 @@ public class ChangeLogEditDetailsEventTests(HostFixture hostFixture) : TestBase(
             assertions.Add(v => Assert.Equal($"{detailsChangeEvidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
         }
 
-        doc.AssertRows("change-reason", "Evidence", assertions.ToArray());
+        doc.AssertSummaryListRowValues("change-reason", "Evidence", assertions.ToArray());
     }
 }

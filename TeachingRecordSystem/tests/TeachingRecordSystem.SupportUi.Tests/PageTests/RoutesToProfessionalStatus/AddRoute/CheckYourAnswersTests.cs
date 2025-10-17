@@ -248,16 +248,16 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", status.GetTitle());
-        doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-        doc.AssertRowContentMatches("Degree type", degreeType.Name);
-        doc.AssertRowContentMatches("Country of training", country.Name);
-        doc.AssertRowContentMatches("Age range", "Foundation stage");
-        doc.AssertRowContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
+        doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
+        doc.AssertSummaryListRowValueContentMatches("Status", status.GetTitle());
+        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Training provider", trainingProvider.Name);
+        doc.AssertSummaryListRowValueContentMatches("Degree type", degreeType.Name);
+        doc.AssertSummaryListRowValueContentMatches("Country of training", country.Name);
+        doc.AssertSummaryListRowValueContentMatches("Age range", "Foundation stage");
+        doc.AssertSummaryListRowValueContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
     [Test]
@@ -302,8 +302,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Held since", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Induction exemption", "Yes");
+        doc.AssertSummaryListRowValueContentMatches("Held since", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Induction exemption", "Yes");
     }
 
     [Test]
@@ -343,13 +343,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", "In training");
-        doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-        doc.AssertRowContentMatches("Age range", "Not provided");
-        doc.AssertRowContentMatches("Subjects", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
+        doc.AssertSummaryListRowValueContentMatches("Status", "In training");
+        doc.AssertSummaryListRowValueContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Training provider", trainingProvider.Name);
+        doc.AssertSummaryListRowValueContentMatches("Age range", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches("Subjects", "Not provided");
     }
 
     [Test]

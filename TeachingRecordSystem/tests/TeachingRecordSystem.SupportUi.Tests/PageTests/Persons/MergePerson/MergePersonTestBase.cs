@@ -14,7 +14,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
         configurePersonB ??= new Action<CreatePersonBuilder>(p => { });
 
         var personA = await TestData.CreatePersonAsync(p => configurePersonA(p
-            .WithEmail(!useNullValues)
+            .WithEmailAddress(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues)));
 
@@ -29,14 +29,14 @@ public class MergePersonTestBase(HostFixture hostFixture)
             if (useNullValues)
             {
                 p
-                    .WithEmail(false)
+                    .WithEmailAddress(false)
                     .WithNationalInsuranceNumber(false)
                     .WithGender(false);
             }
             else
             {
                 p
-                    .WithEmail(personA.Email)
+                    .WithEmailAddress(personA.EmailAddress)
                     .WithNationalInsuranceNumber(personA.NationalInsuranceNumber!)
                     .WithGender(personA.Gender!.Value);
             }
@@ -51,7 +51,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
         bool useNullValues = false)
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithEmail(!useNullValues)
+            .WithEmailAddress(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues));
 
@@ -60,7 +60,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
             .WithMiddleName(TestData.GenerateChangedMiddleName(personA.MiddleName))
             .WithLastName(TestData.GenerateChangedLastName(personA.LastName))
             .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(personA.DateOfBirth))
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(personA.NationalInsuranceNumber ?? ""))
             .WithGender(TestData.GenerateChangedGender(personA.Gender ?? Gender.Other)));
 
@@ -72,7 +72,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
         bool useNullValues = false)
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithEmail(!useNullValues)
+            .WithEmailAddress(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues));
 
@@ -99,7 +99,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
             if (useNullValues)
             {
                 p
-                    .WithEmail(differentAttribute != PersonMatchedAttribute.EmailAddress
+                    .WithEmailAddress(differentAttribute != PersonMatchedAttribute.EmailAddress
                         ? false
                         : true)
                     .WithNationalInsuranceNumber(differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber
@@ -112,8 +112,8 @@ public class MergePersonTestBase(HostFixture hostFixture)
             else
             {
                 p
-                    .WithEmail(differentAttribute != PersonMatchedAttribute.EmailAddress
-                        ? personA.Email
+                    .WithEmailAddress(differentAttribute != PersonMatchedAttribute.EmailAddress
+                        ? personA.EmailAddress
                         : TestData.GenerateUniqueEmail())
                     .WithNationalInsuranceNumber(differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber
                         ? personA.NationalInsuranceNumber!
@@ -132,7 +132,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
         bool useNullValues = false)
     {
         var personA = await TestData.CreatePersonAsync(p => p
-            .WithEmail(!useNullValues)
+            .WithEmailAddress(!useNullValues)
             .WithNationalInsuranceNumber(!useNullValues)
             .WithGender(!useNullValues));
 
@@ -159,7 +159,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
             if (useNullValues)
             {
                 p
-                    .WithEmail(matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
+                    .WithEmailAddress(matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
                         ? false
                         : true)
                     .WithNationalInsuranceNumber(matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
@@ -172,8 +172,8 @@ public class MergePersonTestBase(HostFixture hostFixture)
             else
             {
                 p
-                    .WithEmail(matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
-                        ? personA.Email
+                    .WithEmailAddress(matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
+                        ? personA.EmailAddress
                         : TestData.GenerateUniqueEmail())
                     .WithNationalInsuranceNumber(matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
                         ? personA.NationalInsuranceNumber!

@@ -125,7 +125,7 @@ public class CreateTrnRequestHandler(
             var createPersonResult = trnRequestService.CreatePersonFromTrnRequest(trnRequestMetadata, trn, now);
             dbContext.Persons.Add(createPersonResult.Person);
 
-            var personCreatedEvent = new PersonCreatedEvent
+            var personCreatedEvent = new LegacyEvents.PersonCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,

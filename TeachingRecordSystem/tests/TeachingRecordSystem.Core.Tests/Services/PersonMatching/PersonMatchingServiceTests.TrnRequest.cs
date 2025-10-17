@@ -25,7 +25,7 @@ public partial class PersonMatchingServiceTests
                 .WithMiddleName(middleName)
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
-                .WithEmail(emailAddress));
+                .WithEmailAddress(emailAddress));
 
             var requestData = new TrnRequestMetadata()
             {
@@ -87,14 +87,14 @@ public partial class PersonMatchingServiceTests
                 await dbContext.SaveChangesAsync();
             }
 
-            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(personFirstName).WithEmail(TestData.GenerateUniqueEmail()));
+            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(personFirstName).WithEmailAddress(TestData.GenerateUniqueEmail()));
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
             var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
 
             var emailAddress = emailAddressOption switch
             {
-                EmailAddressArgumentOption.Matches => person.Email!,
+                EmailAddressArgumentOption.Matches => person.EmailAddress!,
                 _ => TestData.GenerateUniqueEmail()
             };
 
@@ -186,7 +186,7 @@ public partial class PersonMatchingServiceTests
                 .WithFirstName(firstName)
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
-                .WithEmail(emailAddress));
+                .WithEmailAddress(emailAddress));
 
             // Person matching on first name, middle name and last name
             var person3 = await TestData.CreatePersonAsync(p => p

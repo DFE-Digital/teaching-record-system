@@ -52,7 +52,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             Gender = gender
         };
 
-        var createdEvent = new PersonCreatedEvent
+        var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -84,15 +84,15 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
-        doc.AssertRow("details", "Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TrimmedText()));
-        doc.AssertRow("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-        doc.AssertRow("details", "Email address", v => Assert.Equal(emailAddress, v.TrimmedText()));
-        doc.AssertRow("details", "National Insurance number", v => Assert.Equal(nationalInsuranceNumber, v.TrimmedText()));
-        doc.AssertRow("details", "Gender", v => Assert.Equal(gender.GetDisplayName(), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(emailAddress, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(nationalInsuranceNumber, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(gender.GetDisplayName(), v.TrimmedText()));
 
-        doc.AssertRow("create-reason", "Reason", v => Assert.Equal(createReason, v.TrimmedText()));
-        doc.AssertRow("create-reason", "Reason details", v => Assert.Equal(createReasonDetail, v.TrimmedText()));
-        doc.AssertRow("create-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("create-reason", "Reason", v => Assert.Equal(createReason, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("create-reason", "Reason details", v => Assert.Equal(createReasonDetail, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("create-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             Gender = null
         };
 
-        var createdEvent = new PersonCreatedEvent
+        var createdEvent = new LegacyEvents.PersonCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -150,12 +150,12 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
         var item = doc.GetElementByTestId("timeline-item-created-event");
         Assert.NotNull(item);
 
-        doc.AssertRowDoesNotExist("details", "Email address");
-        doc.AssertRowDoesNotExist("details", "Mobile number");
-        doc.AssertRowDoesNotExist("details", "National Insurance number");
-        doc.AssertRowDoesNotExist("details", "Gender");
+        doc.AssertSummaryListRowDoesNotExist("details", "Email address");
+        doc.AssertSummaryListRowDoesNotExist("details", "Mobile number");
+        doc.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
+        doc.AssertSummaryListRowDoesNotExist("details", "Gender");
 
-        doc.AssertRow("create-reason", "Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRow("create-reason", "Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("create-reason", "Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("create-reason", "Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 }

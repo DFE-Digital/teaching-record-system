@@ -13,7 +13,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Jan 2001"))
-            .WithEmail("an@email.com")
+            .WithEmailAddress("an@email.com")
             .WithNationalInsuranceNumber("AB123456D")
             .WithGender(Gender.Female));
 
@@ -22,7 +22,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             .WithMiddleName("The")
             .WithLastName("Pink")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 2002"))
-            .WithEmail("another@email.com")
+            .WithEmailAddress("another@email.com")
             .WithNationalInsuranceNumber("AB987654D")
             .WithGender(Gender.Other));
 
@@ -41,23 +41,23 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("person-a", "First name", v => Assert.Equal("Alfred", v.TrimmedText()));
-        doc.AssertRow("person-a", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
-        doc.AssertRow("person-a", "Last name", v => Assert.Equal("Great", v.TrimmedText()));
-        doc.AssertRow("person-a", "Date of birth", v => Assert.Equal("1 January 2001", v.TrimmedText()));
-        doc.AssertRow("person-a", "Email", v => Assert.Equal("an@email.com", v.TrimmedText()));
-        doc.AssertRow("person-a", "National Insurance number", v => Assert.Equal("AB123456D", v.TrimmedText()));
-        doc.AssertRow("person-a", "Gender", v => Assert.Equal("Female", v.TrimmedText()));
-        doc.AssertRow("person-a", "TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "First name", v => Assert.Equal("Alfred", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "Last name", v => Assert.Equal("Great", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "Date of birth", v => Assert.Equal("1 January 2001", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "Email", v => Assert.Equal("an@email.com", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "National Insurance number", v => Assert.Equal("AB123456D", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "Gender", v => Assert.Equal("Female", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-a", "TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
 
-        doc.AssertRow("person-b", "First name", v => Assert.Equal("Lily", v.TrimmedText()));
-        doc.AssertRow("person-b", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
-        doc.AssertRow("person-b", "Last name", v => Assert.Equal("Pink", v.TrimmedText()));
-        doc.AssertRow("person-b", "Date of birth", v => Assert.Equal("1 February 2002", v.TrimmedText()));
-        doc.AssertRow("person-b", "Email", v => Assert.Equal("another@email.com", v.TrimmedText()));
-        doc.AssertRow("person-b", "National Insurance number", v => Assert.Equal("AB987654D", v.TrimmedText()));
-        doc.AssertRow("person-b", "Gender", v => Assert.Equal("Other", v.TrimmedText()));
-        doc.AssertRow("person-b", "TRN", v => Assert.Equal(personB.Trn, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "First name", v => Assert.Equal("Lily", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "Last name", v => Assert.Equal("Pink", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "Date of birth", v => Assert.Equal("1 February 2002", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "Email", v => Assert.Equal("another@email.com", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "National Insurance number", v => Assert.Equal("AB987654D", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "Gender", v => Assert.Equal("Other", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("person-b", "TRN", v => Assert.Equal(personB.Trn, v.TrimmedText()));
     }
 
     [Test]
@@ -86,14 +86,14 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("person-a", "Alerts", v =>
+        doc.AssertSummaryListRowValue("person-a", "Alerts", v =>
         {
             var a = v.QuerySelector("a") as IHtmlAnchorElement;
             Assert.NotNull(a);
             Assert.Equal("(1) open alert (opens in a new tab)", a.TrimmedText());
             Assert.Contains($"/persons/{personA.PersonId}/alerts", a.Href);
         });
-        doc.AssertRow("person-b", "Alerts", v =>
+        doc.AssertSummaryListRowValue("person-b", "Alerts", v =>
         {
             var a = v.QuerySelector("a") as IHtmlAnchorElement;
             Assert.NotNull(a);

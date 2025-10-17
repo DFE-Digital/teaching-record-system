@@ -387,7 +387,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var email = TestData.GenerateUniqueEmail();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithEmail(email)
+            .WithEmailAddress(email)
             .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true));
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(email: Option.Some((string?)email));

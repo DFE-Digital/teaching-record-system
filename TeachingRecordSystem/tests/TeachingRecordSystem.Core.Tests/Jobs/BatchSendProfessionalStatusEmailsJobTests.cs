@@ -18,7 +18,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
-            .WithEmail(TestData.GenerateUniqueEmail()));
+            .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
@@ -34,7 +34,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         // Assert
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
-        Assert.Equal(person.Email, email.EmailAddress);
+        Assert.Equal(person.EmailAddress, email.EmailAddress);
         Assert.Equal(EmailTemplateIds.QtsAwardedEmailConfirmation, email.TemplateId);
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
@@ -56,7 +56,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, holdsFrom: Clock.Today)
-            .WithEmail(TestData.GenerateUniqueEmail()));
+            .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
@@ -72,7 +72,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         // Assert
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
-        Assert.Equal(person.Email, email.EmailAddress);
+        Assert.Equal(person.EmailAddress, email.EmailAddress);
         Assert.Equal(EmailTemplateIds.InternationalQtsAwardedEmailConfirmation, email.TemplateId);
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
@@ -94,7 +94,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, holdsFrom: Clock.Today)
-            .WithEmail(TestData.GenerateUniqueEmail()));
+            .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
@@ -110,7 +110,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         // Assert
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
-        Assert.Equal(person.Email, email.EmailAddress);
+        Assert.Equal(person.EmailAddress, email.EmailAddress);
         Assert.Equal(EmailTemplateIds.EytsAwardedEmailConfirmation, email.TemplateId);
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
@@ -132,7 +132,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
-            .WithEmail(TestData.GenerateUniqueEmail()));
+            .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
@@ -164,7 +164,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         // Assert
         var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
         Assert.NotNull(email);
-        Assert.Equal(person.Email, email.EmailAddress);
+        Assert.Equal(person.EmailAddress, email.EmailAddress);
         Assert.Equal(EmailTemplateIds.QtlsLapsed, email.TemplateId);
 
         backgroundJobScheduler

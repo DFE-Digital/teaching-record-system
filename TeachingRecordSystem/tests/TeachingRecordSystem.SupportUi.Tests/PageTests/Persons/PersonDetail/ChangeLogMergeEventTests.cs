@@ -123,61 +123,61 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
 
         if (changes.HasAnyFlag(PersonsMergedEventChanges.NameChange))
         {
-            doc.AssertRow("details", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
-            doc.AssertRow("previous-details", "Name", v => Assert.Equal($"{_oldFirstName} {_oldMiddleName} {_oldLastName}", v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Name", v => Assert.Equal($"{_oldFirstName} {_oldMiddleName} {_oldLastName}", v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Name");
-            doc.AssertRowDoesNotExist("previous-details", "Name");
+            doc.AssertSummaryListRowDoesNotExist("details", "Name");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Name");
         }
 
         if (changes.HasFlag(PersonsMergedEventChanges.DateOfBirth))
         {
-            doc.AssertRow("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            doc.AssertRow("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
-            doc.AssertRowDoesNotExist("details", "Date of birth");
-            doc.AssertRowDoesNotExist("previous-details", "Date of birth");
+            doc.AssertSummaryListRowDoesNotExist("details", "Date of birth");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Date of birth");
         }
 
         if (changes.HasFlag(PersonsMergedEventChanges.EmailAddress))
         {
-            item.AssertRow("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertRow("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "Email address");
-            item.AssertRowDoesNotExist("previous-details", "Email address");
+            item.AssertSummaryListRowDoesNotExist("details", "Email address");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "Email address");
         }
 
         if (changes.HasFlag(PersonsMergedEventChanges.NationalInsuranceNumber))
         {
-            item.AssertRow("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertRow("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "National Insurance number");
-            item.AssertRowDoesNotExist("previous-details", "National Insurance number");
+            item.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
         }
 
         if (changes.HasFlag(PersonsMergedEventChanges.Gender))
         {
-            item.AssertRow("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertRow("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "Gender");
-            item.AssertRowDoesNotExist("previous-details", "Gender");
+            item.AssertSummaryListRowDoesNotExist("details", "Gender");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "Gender");
         }
 
-        doc.AssertRow("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
-        doc.AssertRow("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
     [Test]
@@ -215,8 +215,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal($"By {_createdByUser!.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
-        doc.AssertRow("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
-        doc.AssertRow("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
     [Test]

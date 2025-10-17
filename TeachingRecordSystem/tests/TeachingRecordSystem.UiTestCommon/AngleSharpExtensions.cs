@@ -13,11 +13,7 @@ public static class AngleSharpExtensions
     }
 
     public static IReadOnlyList<IElement> GetAllElementsByTestId(this IElement element, params string[] testIds) =>
-        //element.QuerySelectorAll(string.Join(',', testIds.Select(testId => $"*[data-testid='{testId}']"))).ToList();
         testIds.SelectMany(testId => element.QuerySelectorAll($"*[data-testid='{testId}']")).ToList();
-
-    public static IElement? GetElementByTestId(this IElement element, string testId) =>
-        element.GetAllElementsByTestId(testId).SingleOrDefault();
 
     public static IReadOnlyList<IElement> GetAllElementsByTestId(this IHtmlDocument doc, params string[] testIds) =>
         doc.Body!.GetAllElementsByTestId(testIds);
@@ -37,6 +33,15 @@ public static class AngleSharpExtensions
 
         return null;
     }
+
+    public static IElement? GetElementByDataAttribute(this IElement element, string attributeName, string attributeValue) =>
+        element.QuerySelector($"[{attributeName}='{attributeValue}']");
+
+    public static IElement? GetElementByDataAttribute(this IHtmlDocument doc, string attributeName, string attributeValue) =>
+        doc.Body!.GetElementByDataAttribute(attributeName, attributeValue);
+
+    public static IElement? GetElementByTestId(this IElement element, string testId) =>
+        element.GetAllElementsByTestId(testId).SingleOrDefault();
 
     public static IElement? GetElementByTestId(this IHtmlDocument doc, string testId) =>
         doc.Body!.GetElementByTestId(testId);

@@ -96,11 +96,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
-        doc.AssertRow("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
-        doc.AssertRow("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
-        doc.AssertRow("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
-        doc.AssertRow("Gender", v => Assert.Equal("Male", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Male", v.TrimmedText()));
     }
 
     [Test]
@@ -130,10 +130,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
-        doc.AssertRow("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRow("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRow("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Test]
@@ -161,19 +161,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertRows("Evidence uploaded", v =>
+        doc.AssertSummaryListRowValues("Evidence uploaded", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
 
-        doc.AssertRowDoesNotExist("Personal details change");
-        doc.AssertRowDoesNotExist("Other personal details change");
-        doc.AssertRowDoesNotExist("Reason details");
-        doc.AssertRowDoesNotExist("Evidence");
+        doc.AssertSummaryListRowDoesNotExist("Personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason details");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
     [Test]
@@ -201,19 +201,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason for personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason for personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertRow("Evidence uploaded", v =>
+        doc.AssertSummaryListRowValue("Evidence uploaded", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
 
-        doc.AssertRowDoesNotExist("Reason for name change");
-        doc.AssertRowDoesNotExist("Other personal details change");
-        doc.AssertRowDoesNotExist("Evidence");
+        doc.AssertSummaryListRowDoesNotExist("Reason for name change");
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
     [Test]
@@ -244,11 +244,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
-        doc.AssertRow("Other personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Other personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertRows("Evidence", v =>
+        doc.AssertSummaryListRowValues("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("name-evidence.pdf (opens in new tab)", link.TrimmedText());
@@ -260,7 +260,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(expectedFileUrl, link.Href);
         });
 
-        doc.AssertRowDoesNotExist("Reason for personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason for personal details change");
     }
 
     [Test]
@@ -288,13 +288,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
-        doc.AssertRows("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertSummaryListRowValues("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
 
-        doc.AssertRowDoesNotExist("Other personal details change");
-        doc.AssertRowDoesNotExist("Reason for personal details change");
-        doc.AssertRowDoesNotExist("Reason details");
-        doc.AssertRowDoesNotExist("Evidence");
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason for personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason details");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
     [Test]
@@ -322,13 +322,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason for personal details change", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
-        doc.AssertRow("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRows("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason for personal details change", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValues("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
 
-        doc.AssertRowDoesNotExist("Other personal details change");
-        doc.AssertRowDoesNotExist("Reason for name change");
-        doc.AssertRowDoesNotExist("Evidence");
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason for name change");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
     [Test]
@@ -348,7 +348,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("test@test.com")
+            .WithEmailAddress("test@test.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 
@@ -356,7 +356,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;
         var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Person" : person.LastName;
         var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.Email;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.EmailAddress;
         var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
         var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 

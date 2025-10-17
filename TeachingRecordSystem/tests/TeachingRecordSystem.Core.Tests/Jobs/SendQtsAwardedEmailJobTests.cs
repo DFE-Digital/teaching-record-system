@@ -24,7 +24,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
                     BaseAddress = "https://aytq.com"
                 });
 
-            var person = await TestData.CreatePersonAsync(p => p.WithEmail(TestData.GenerateUniqueEmail()));
+            var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress(TestData.GenerateUniqueEmail()));
 
             var templateId = Guid.NewGuid().ToString();
 
@@ -32,7 +32,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
             {
                 EmailId = Guid.NewGuid(),
                 TemplateId = templateId,
-                EmailAddress = person.Email!,
+                EmailAddress = person.EmailAddress!,
                 Personalization = new Dictionary<string, string>
                 {
                     ["first name"] = person.FirstName,
@@ -47,7 +47,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
 
             var tokenResponse = new CreateTrnTokenResponse
             {
-                Email = person.Email!,
+                Email = person.EmailAddress!,
                 Trn = person.Trn!,
                 TrnToken = "ThisIsMyTrnToken",
                 ExpiresUtc = Clock.UtcNow.AddDays(60)
@@ -71,7 +71,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
             // Assert
             notificationSender
                 .Verify(
-                    n => n.SendEmailAsync(It.IsAny<string>(), It.Is<string>(s => s == person.Email),
+                    n => n.SendEmailAsync(It.IsAny<string>(), It.Is<string>(s => s == person.EmailAddress),
                         It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
 
             Assert.Equal(Clock.UtcNow, email.SentOn);
