@@ -2,10 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
@@ -144,7 +147,15 @@ public class ChangeHistoryModel(
                 """)
             .ToListAsync();
 
-        var allResults = eventsWithUser.Select(MapTimelineEvent).ToArray();
+        var processes = await dbContext.Processes
+            .Where(p => p.PersonIds.Contains(PersonId))
+            .Include(p => p.User)
+            .Include(p => p.Events).AsSplitQuery()
+            .ToListAsync();
+
+        var allResults = eventsWithUser.Select(MapTimelineEvent)
+            .Concat(processes.Select(MapTimelineProcess))
+            .ToArray();
 
         TimelineItems = allResults
             .OrderByDescending(i => i.Timestamp)
@@ -186,6 +197,13 @@ public class ChangeHistoryModel(
         var timelineItemType = typeof(TimelineItem<>).MakeGenericType(timelineEventType);
         return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, PersonId, timelineEvent.Event.CreatedUtc.ToGmt(), timelineEvent)!;
     }
+
+    private TimelineItem MapTimelineProcess(Process process) =>
+        new TimelineItem<TimelineProcess>(
+            TimelineItemType.Process,
+            PersonId,
+            process.Created.ToGmt(),
+            new TimelineProcess(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }));
 
     /// <summary>
     /// Flattened out record to allow Event, TRS User and DQT User to be returned in a single SQL query

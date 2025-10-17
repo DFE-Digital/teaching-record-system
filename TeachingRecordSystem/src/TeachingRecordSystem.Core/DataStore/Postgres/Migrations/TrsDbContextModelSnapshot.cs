@@ -4562,7 +4562,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("dqt_user_name");
 
-                    b.PrimitiveCollection<HashSet<Guid>>("PersonIds")
+                    b.PrimitiveCollection<List<Guid>>("PersonIds")
                         .IsRequired()
                         .HasColumnType("uuid[]")
                         .HasColumnName("person_ids");
@@ -20990,10 +20990,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Process", b =>
                 {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.User", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.UserBase", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_processes_users_user_id");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ProcessEvent", b =>

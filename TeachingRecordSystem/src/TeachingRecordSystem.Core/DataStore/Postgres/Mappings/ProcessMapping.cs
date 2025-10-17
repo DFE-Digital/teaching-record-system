@@ -8,7 +8,7 @@ public class ProcessMapping : IEntityTypeConfiguration<Process>
     public void Configure(EntityTypeBuilder<Process> builder)
     {
         builder.ToTable("processes");
-        builder.HasOne<User>().WithMany().HasForeignKey(p => p.UserId);
+        builder.HasOne(p => p.User).WithMany().HasForeignKey(p => p.UserId);
         builder.HasIndex(a => a.ProcessType);
         builder.HasIndex(a => a.PersonIds).HasMethod("GIN");
     }

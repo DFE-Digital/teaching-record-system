@@ -14,5 +14,6 @@ public record TimelineItem<TModel>(TimelineItemType ItemType, Guid PersonId, Dat
 
 public enum TimelineItemType
 {
-    Event
+    Event,
+    Process
 }

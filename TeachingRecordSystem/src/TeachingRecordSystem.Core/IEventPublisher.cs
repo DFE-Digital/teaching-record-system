@@ -18,7 +18,7 @@ public class EventPublisher(TrsDbContext dbContext) : IEventPublisher
             dbContext.Set<Process>().Add(processContext.Process);
         }
 
-        @event.PersonIds.ForEach(e => processContext.Process.PersonIds.Add(e));
+        @event.PersonIds.Except(processContext.Process.PersonIds).ForEach(e => processContext.Process.PersonIds.Add(e));
 
         var processEvent = new ProcessEvent
         {

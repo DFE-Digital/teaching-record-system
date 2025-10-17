@@ -1,5 +1,6 @@
 @page "/persons/{personId}/change-history"
 @using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events
+@using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeHistoryModel
 @{
     Layout = "Layout";
@@ -23,6 +24,7 @@ else
             var viewName = timelineItem.ItemType switch
             {
                 TimelineItemType.Event => $"./Timeline/Events/{((TimelineEvent)timelineItem.ItemModel).Event.GetEventName()}.cshtml",
+                TimelineItemType.Process => $"./Timeline/Processes/{((TimelineProcess)timelineItem.ItemModel).Process.ProcessType.ToString()}.cshtml",
                 _ => $"./Timeline/{timelineItem.ItemType}.cshtml"
             };
 
