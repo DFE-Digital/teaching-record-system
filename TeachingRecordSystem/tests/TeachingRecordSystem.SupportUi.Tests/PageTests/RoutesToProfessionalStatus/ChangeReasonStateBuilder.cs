@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class ChangeReasonStateBuilder
 {
     private string? _changeReasonDetail;
-    private EvidenceUploadModel _evidence { get; set; } = new();
+    private readonly EvidenceUploadModel _evidence = new();
 
     private bool? _hasAdditionalReasonDetail;
 
