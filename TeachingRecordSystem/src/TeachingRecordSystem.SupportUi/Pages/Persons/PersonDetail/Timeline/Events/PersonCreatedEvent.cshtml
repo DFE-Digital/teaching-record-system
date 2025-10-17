@@ -3,8 +3,8 @@
 @inject IFileService FileService
 @model TimelineItem<TimelineEvent<TeachingRecordSystem.Core.Events.Legacy.PersonCreatedEvent>>
 @{
-    var updatedEvent = Model.ItemModel.Event;
-    var details = updatedEvent.PersonAttributes;
+    var createdEvent = Model.ItemModel.Event;
+    var details = createdEvent.PersonAttributes;
     var name = StringHelper.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
     var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
         ? parsedEmail.ToDisplayString()
@@ -12,8 +12,8 @@
     var nino = NationalInsuranceNumber.TryParse(details.NationalInsuranceNumber, out var parsedNino)
         ? parsedNino.ToDisplayString()
         : details.NationalInsuranceNumber;
-    var evidenceFileUrl = updatedEvent.EvidenceFile is not null
-        ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15))
+    var evidenceFileUrl = createdEvent.EvidenceFile is not null
+        ? await FileService.GetFileUrlAsync(createdEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15))
         : null;
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-created-event">
@@ -65,14 +65,14 @@
                 <govuk-summary-list>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.CreateReason</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value use-empty-fallback>@createdEvent.CreateReason</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @if (updatedEvent.CreateReasonDetail is not null)
+                                @if (createdEvent.CreateReasonDetail is not null)
                                 {
-                                    <multi-line-text text="@updatedEvent.CreateReasonDetail" />
+                                    <multi-line-text text="@createdEvent.CreateReasonDetail" />
                                 }
                                 else
                                 {
@@ -83,14 +83,7 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @if (evidenceFileUrl is not null)
-                                {
-                                    <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
+                            <vc:event-evidence-file-link evidence-file="@createdEvent.EvidenceFile" />
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                 </govuk-summary-list>

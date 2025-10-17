@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
@@ -41,7 +42,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var reasonChoice = AddPersonReasonOption.AnotherReason;
         var reasonDetail = "A description about why the change typed into the box";
         var evidenceFileId = Guid.NewGuid();
-        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        var urlEncoder = UrlEncoder.Default;
+        var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
+        var expectedFileUrl = $"http://localhost/files/evidence.jpg?fileUrl={expectedBlobStorageFileUrl}";
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             new AddPersonStateBuilder()
