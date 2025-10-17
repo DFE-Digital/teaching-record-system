@@ -1,21 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text;
-using Azure.Storage.Blobs;
+using Azure.Storage.Files.DataLake;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 
-public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, IClock clock, IOptions<CapitaTpsUserOption> capitaUser)
+public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, ILogger<CapitaExportAmendJob> logger, TrsDbContext dbContext, IClock clock, IOptions<CapitaTpsUserOption> capitaUser)
 {
     public const string JobSchedule = "0 3 * * *";
     public const string LastRunDateKey = "LastRunDate";
-    public const string StorageContainer = "dqt-integrations";
-    public const string EXPORTS_FOLDER = "capita/exports";
+    public const string StorageContainer = "capita-integrations";
+    public const string ExportsFolder = "exports";
 
     public async Task<long> ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -141,19 +142,19 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
         return integrationJob.IntegrationTransactionId;
     }
 
-    public async Task UploadFileAsync(Stream fileContentStream, string fileName)
+    public async Task UploadFileAsync(Stream fileContentStream, string fileName, CancellationToken cancellationToken = default)
     {
-        // Get the container client
-        var containerClient = blobServiceClient!.GetBlobContainerClient(StorageContainer);
-        await containerClient.CreateIfNotExistsAsync();
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
+        await fileSystemClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        var targetPath = $"{ExportsFolder}/{fileName}";
+        var fileClient = fileSystemClient.GetFileClient(targetPath);
+        await fileClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        var targetFileName = $"{EXPORTS_FOLDER}/{fileName}";
-
-        // Get the blob client for the target file
-        var blobClient = containerClient.GetBlobClient(targetFileName);
-
-        // Upload the stream
-        await blobClient.UploadAsync(fileContentStream, overwrite: true);
+        await using var memory = new MemoryStream();
+        await fileContentStream.CopyToAsync(memory, cancellationToken);
+        memory.Position = 0;
+        await fileClient.AppendAsync(memory, offset: 0, cancellationToken: cancellationToken);
+        await fileClient.FlushAsync(memory.Length, cancellationToken: cancellationToken);
     }
 
     public string GetFileName(IClock now)
@@ -330,4 +331,3 @@ public class CapitaTpsUserOption
     [Required]
     public required Guid CapitaTpsUserId { get; set; }
 }
-

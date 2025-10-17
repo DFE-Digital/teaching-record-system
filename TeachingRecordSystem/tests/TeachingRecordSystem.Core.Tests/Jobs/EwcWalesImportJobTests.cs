@@ -1,5 +1,7 @@
 using System.Text;
-using Azure.Storage.Blobs;
+using Azure;
+using Azure.Storage.Files.DataLake;
+using Azure.Storage.Files.DataLake.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
@@ -78,11 +80,29 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         DbFixture = dbFixture;
         Clock = new();
 
-        var blobServiceClient = new Mock<BlobServiceClient>();
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
+
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
+
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
         var qtsImporter = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
         var inductionImporter = ActivatorUtilities.CreateInstance<InductionImporter>(provider, Clock);
         Logger = new Mock<ILogger<EwcWalesImportJob>>();
-        Job = ActivatorUtilities.CreateInstance<EwcWalesImportJob>(provider, blobServiceClient.Object, qtsImporter, inductionImporter, Logger.Object);
+        Job = ActivatorUtilities.CreateInstance<EwcWalesImportJob>(provider, dataLakeServiceClientMock.Object, qtsImporter, inductionImporter, Logger.Object);
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
             referenceDataCache,
