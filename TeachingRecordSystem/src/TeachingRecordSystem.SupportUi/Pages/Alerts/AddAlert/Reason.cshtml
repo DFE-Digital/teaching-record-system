@@ -16,7 +16,9 @@
 
             <govuk-radios for="AddReason">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                        Select a reason
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@AddAlertReasonOption.RoutineNotificationFromStakeholder">
                         @AddAlertReasonOption.RoutineNotificationFromStakeholder.GetDisplayName()
                     </govuk-radios-item>
@@ -31,11 +33,15 @@
 
             <govuk-radios for="HasAdditionalReasonDetail">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                        Do you want to add more information about why you’re adding this alert?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count for="AddReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count for="AddReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows">
+                                <govuk-character-count-label>Add additional detail</govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

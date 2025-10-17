@@ -22,7 +22,6 @@ public class DetailsModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMa
     public string? AlertTypeName { get; set; }
 
     [BindProperty]
-    [Display(Description = "For example, include any restrictions it places on a teacher.")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Details {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? Details { get; set; }
 
