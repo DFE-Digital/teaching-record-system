@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
