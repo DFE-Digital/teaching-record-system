@@ -1,6 +1,6 @@
 @model TimelineItem<TimelineProcess>
 @{
-    var @event = Model.ItemModel.GetEvent<PersonCreatedEvent>();
+    var @event = Model.ItemModel.GetEvent<PersonImportedIntoDqtEvent>();
     var name = StringHelper.JoinNonEmpty(' ', @event.FirstName, @event.MiddleName, @event.LastName);
 }
 
@@ -14,6 +14,13 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list class="govuk-!-margin-bottom-0">
+            @if (@event.Trn is string trn)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@trn</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
             @if (!string.IsNullOrEmpty(name))
             {
                 <govuk-summary-list-row>
@@ -47,6 +54,41 @@
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@gender.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (@event.DateOfDeath is DateOnly dateOfDeath)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of death</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@dateOfDeath.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (@event.QtsDate is DateOnly qtsDate)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>QTS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@qtsDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (@event.EytsDate is DateOnly eytsDate)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>EYTS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@eytsDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (@event.InductionStatus is InductionStatus inductionStatus)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@inductionStatus.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (@event.DqtInductionStatus is string dqtInductionStatus)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT induction status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@dqtInductionStatus</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>
