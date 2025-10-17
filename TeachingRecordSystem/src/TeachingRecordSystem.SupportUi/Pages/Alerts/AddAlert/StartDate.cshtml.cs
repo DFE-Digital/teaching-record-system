@@ -20,7 +20,6 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator, EvidenceUpload
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "Start date")]
     [Required(ErrorMessage = "Enter a start date")]
     public DateOnly? StartDate { get; set; }
 
