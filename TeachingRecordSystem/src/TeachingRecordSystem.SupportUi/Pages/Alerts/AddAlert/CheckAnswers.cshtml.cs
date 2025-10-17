@@ -80,7 +80,7 @@ public class CheckAnswersModel(
             AddReasonDetail,
             evidenceFile: EvidenceFile?.ToEventModel(),
             User.GetUserId(),
-            clock.UtcNow,
+            now,
             out var createdEvent);
 
         dbContext.Alerts.Add(alert);

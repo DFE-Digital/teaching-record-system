@@ -15,7 +15,9 @@
 
             <govuk-radios for="AddLink">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l">
+                        Do you want to add a link to a panel outcome?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-hint>
                         <a href="https://www.gov.uk/search/all?parent=&keywords=panel+outcome+misconduct&level_one_taxon=&manual=&organisations%5B%5D=teaching-regulation-agency&organisations%5B%5D=national-college-for-teaching-and-leadership&public_timestamp%5Bfrom%5D=&public_timestamp%5Bto%5D=&order=updated-newest" class="govuk-link" target="_blank" rel="noopener noreferrer">Panel outcomes (opens in a new tab)</a>
                         include details about the allegation, the panel’s decision and reasons for it. The link will only be seen internally.
@@ -23,7 +25,9 @@
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-input for="Link" />
+                            <govuk-input for="Link">
+                                <govuk-input-label>Enter link to panel outcome</govuk-input-label>
+                            </govuk-input>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

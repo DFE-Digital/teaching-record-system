@@ -20,17 +20,14 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Select a reason")]
     [Required(ErrorMessage = "Select a reason")]
     public AddAlertReasonOption? AddReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to add more information about why you’re adding this alert?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you’re adding this alert")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add additional detail")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? AddReasonDetail { get; set; }
 

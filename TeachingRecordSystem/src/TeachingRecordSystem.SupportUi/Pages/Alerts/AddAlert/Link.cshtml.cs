@@ -20,12 +20,10 @@ public class LinkModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManag
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to add a link to a panel outcome?")]
     [Required(ErrorMessage = "Select yes if you want to add a link to a panel outcome")]
     public bool? AddLink { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter link to panel outcome")]
     public string? Link { get; set; }
 
     public void OnGet()
