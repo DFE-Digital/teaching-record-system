@@ -11,7 +11,7 @@ public abstract class NightlyEmailJobTestBase(NightlyEmailJobFixture fixture) : 
 
     public TestableClock Clock => Fixture.Clock;
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    public Task InitializeAsync() => Fixture.DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask InitializeAsync() => await Fixture.DbFixture.DbHelper.ClearDataAsync();
 }

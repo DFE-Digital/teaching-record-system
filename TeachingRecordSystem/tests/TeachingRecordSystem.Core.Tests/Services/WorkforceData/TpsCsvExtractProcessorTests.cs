@@ -507,9 +507,9 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         Assert.Equal(employerEmailAddress, updatedTpsEmployment.EmployerEmailAddress);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
 
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask DisposeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
     private DbFixture DbFixture { get; }
 

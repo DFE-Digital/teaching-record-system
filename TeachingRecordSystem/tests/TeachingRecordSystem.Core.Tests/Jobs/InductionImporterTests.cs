@@ -30,9 +30,9 @@ public class InductionImporterTests : IAsyncLifetime
 
     private TestableClock Clock { get; }
 
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
+    async ValueTask IAsyncLifetime.InitializeAsync() => await DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     public InductionImporter Importer { get; }
 

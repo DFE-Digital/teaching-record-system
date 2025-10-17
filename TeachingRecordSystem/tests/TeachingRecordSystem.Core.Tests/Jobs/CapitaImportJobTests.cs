@@ -1466,9 +1466,9 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(TrnRequestMatchResultOutcome.NoMatches, results.Outcome);
     }
 
-    public async Task InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
 public class CapitaImportJobFixture : IAsyncLifetime
@@ -1528,9 +1528,9 @@ public class CapitaImportJobFixture : IAsyncLifetime
 
     public Mock<ILogger<CapitaImportJob>> Logger { get; }
 
-    async Task IAsyncLifetime.InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
+    async ValueTask IAsyncLifetime.InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     public CapitaImportJob Job { get; }
 

@@ -11,7 +11,7 @@ using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
-public abstract class TestBase
+public abstract class TestBase : IAsyncLifetime
 {
     private readonly TestScopedServices _testServices;
 
@@ -36,6 +36,14 @@ public abstract class TestBase
     public HttpClient HttpClient { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    public async ValueTask InitializeAsync() => await InitializeAsyncCore();
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+    protected virtual async Task InitializeAsyncCore() => await DisposeAsyncCore();
+
+    protected virtual Task DisposeAsyncCore() => Task.CompletedTask;
 
     public async Task<JourneyInstance<SignInJourneyState>> CreateJourneyInstanceAsync(SignInJourneyState state)
     {

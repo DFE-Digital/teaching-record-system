@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using TeachingRecordSystem.AuthorizeAccess.Tests;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Files;
@@ -13,15 +14,14 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
 public class HostFixture : WebApplicationFactory<Program>
 {
-    private readonly IConfiguration _configuration;
-
-    public HostFixture(IConfiguration configuration)
+    public HostFixture()
     {
-        _configuration = configuration;
         _ = base.Services;  // Start the host
     }
 
@@ -29,9 +29,11 @@ public class HostFixture : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Tests");
 
-        // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
-        // i.e. Program.cs and that has a dependency on IConfiguration
-        builder.UseConfiguration(_configuration);
+        var testConfiguration = new ConfigurationBuilder()
+            .AddUserSecrets<HostFixture>(optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+        builder.UseConfiguration(testConfiguration);
 
         builder.ConfigureServices((context, services) =>
         {
