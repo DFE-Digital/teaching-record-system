@@ -147,7 +147,11 @@ public class ChangeHistoryModel(
                 """)
             .ToListAsync();
 
-        var processTypesToQuery = new[] { ProcessType.PersonCreatingInDqt };
+        var processTypesToQuery = new[]
+        {
+            ProcessType.PersonCreatingInDqt,
+            ProcessType.PersonImportingIntoDqt
+        };
 
         var processes = await dbContext.Processes
             .Where(p => p.PersonIds.Contains(PersonId) && processTypesToQuery.Contains(p.ProcessType))
