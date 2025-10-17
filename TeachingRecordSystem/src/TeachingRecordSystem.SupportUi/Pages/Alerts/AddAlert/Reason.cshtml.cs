@@ -9,6 +9,24 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
+    private static readonly InlineValidator<ReasonModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.AddReason)
+            .NotNull().WithMessage("Select a reason"),
+        v => v.RuleFor(m => m.HasAdditionalReasonDetail)
+            .NotNull().WithMessage("Select yes if you want to add more information about why you’re adding this alert"),
+        v => v.RuleFor(m => m.AddReasonDetail)
+            .NotNull().WithMessage("Enter additional detail")
+            .MaximumLength(4000).WithMessage("Additional detail must be 4000 characters or less")
+            .When(m => m.HasAdditionalReasonDetail == true),
+        v => v.RuleFor(m => m.UploadEvidence)
+            .NotNull().WithMessage("Select yes if you want to upload evidence"),
+        v => v.RuleFor(m => m.EvidenceFile)
+            .NotNull().WithMessage("Select a file")
+            .EvidenceFile()
+            .When(m => m.UploadEvidence == true && m.EvidenceFileId is null)
+    };
+
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -21,17 +39,15 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     [BindProperty]
     [Display(Name = "Select a reason")]
-    [Required(ErrorMessage = "Select a reason")]
     public AddAlertReasonOption? AddReason { get; set; }
 
     [BindProperty]
     [Display(Name = "Do you want to add more information about why you’re adding this alert?")]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re adding this alert")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
-    [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? AddReasonDetail { get; set; }
 
     [BindProperty]
@@ -60,17 +76,8 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HasAdditionalReasonDetail == true && AddReasonDetail is null)
-        {
-            ModelState.AddModelError(nameof(AddReasonDetail), "Enter additional detail");
-        }
-
-        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
+        ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

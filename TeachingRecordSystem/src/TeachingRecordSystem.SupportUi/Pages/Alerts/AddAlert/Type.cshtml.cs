@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -16,6 +17,11 @@ public class TypeModel(
     EvidenceUploadManager evidenceUploadManager,
     IAuthorizationService authorizationService) : PageModel
 {
+    private static readonly InlineValidator<TypeModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.AlertTypeId).AlertType(requiredMessage: "Select an alert type")
+    };
+
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -28,7 +34,6 @@ public class TypeModel(
 
     [BindProperty]
     [Display(Name = "Select an alert type")]
-    [Required(ErrorMessage = "Select an alert type")]
     public Guid? AlertTypeId { get; set; }
 
     public AlertCategoryInfo[]? Categories { get; set; }
@@ -42,10 +47,7 @@ public class TypeModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _validator.ValidateAndThrowAsync(this);
 
         var selectedType = AlertTypes!.Single(t => t.AlertTypeId == AlertTypeId);
 
