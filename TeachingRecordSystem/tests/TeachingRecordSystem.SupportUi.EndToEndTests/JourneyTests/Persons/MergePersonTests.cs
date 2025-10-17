@@ -8,7 +8,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_PersonsMatchOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
@@ -16,7 +16,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithMiddleName(person1.MiddleName)
             .WithLastName(person1.LastName)
             .WithDateOfBirth(person1.DateOfBirth)
-            .WithEmail(person1.Email)
+            .WithEmailAddress(person1.EmailAddress)
             .WithNationalInsuranceNumber(person1.NationalInsuranceNumber!));
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -51,11 +51,11 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_PersonsDifferOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -80,7 +80,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person2.MiddleName);
         await page.ClickRadioByLabelAsync(person2.LastName);
         await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person2.Email!);
+        await page.ClickRadioByLabelAsync(person2.EmailAddress!);
         await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -90,7 +90,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(person2.MiddleName, "Middle name");
         await page.AssertContentEqualsAsync(person2.LastName, "Last name");
         await page.AssertContentEqualsAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEqualsAsync(person2.Email!, "Email");
+        await page.AssertContentEqualsAsync(person2.EmailAddress!, "Email");
         await page.AssertContentEqualsAsync(person2.NationalInsuranceNumber!, "National Insurance number");
         await page.ClickButtonAsync("Confirm and update primary record");
 
@@ -104,11 +104,11 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_NavigateBack()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -133,7 +133,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person2.MiddleName);
         await page.ClickRadioByLabelAsync(person2.LastName);
         await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person2.Email!);
+        await page.ClickRadioByLabelAsync(person2.EmailAddress!);
         await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -143,7 +143,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(person2.MiddleName, "Middle name");
         await page.AssertContentEqualsAsync(person2.LastName, "Last name");
         await page.AssertContentEqualsAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEqualsAsync(person2.Email!, "Email");
+        await page.AssertContentEqualsAsync(person2.EmailAddress!, "Email");
         await page.AssertContentEqualsAsync(person2.NationalInsuranceNumber!, "National Insurance number");
         await page.ClickBackLinkAsync();
 
@@ -163,11 +163,11 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_CYA_ChangePrimaryPerson_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -192,7 +192,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person2.MiddleName);
         await page.ClickRadioByLabelAsync(person2.LastName);
         await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person2.Email!);
+        await page.ClickRadioByLabelAsync(person2.EmailAddress!);
         await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -222,11 +222,11 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_CYA_ChangeDetails_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -251,7 +251,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person2.MiddleName);
         await page.ClickRadioByLabelAsync(person2.LastName);
         await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person2.Email!);
+        await page.ClickRadioByLabelAsync(person2.EmailAddress!);
         await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -281,11 +281,11 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_CYA_ChangePrimaryPerson_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -308,7 +308,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person2.MiddleName);
         await page.ClickRadioByLabelAsync(person2.LastName);
         await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person2.Email!);
+        await page.ClickRadioByLabelAsync(person2.EmailAddress!);
         await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -318,7 +318,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(person2.MiddleName, "Middle name");
         await page.AssertContentEqualsAsync(person2.LastName, "Last name");
         await page.AssertContentEqualsAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEqualsAsync(person2.Email!, "Email");
+        await page.AssertContentEqualsAsync(person2.EmailAddress!, "Email");
         await page.AssertContentEqualsAsync(person2.NationalInsuranceNumber!, "National Insurance number");
         await page.ClickLinkForElementWithTestIdAsync("change-primary-person-link");
 
@@ -332,7 +332,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(person2.MiddleName, "Middle name");
         await page.AssertContentEqualsAsync(person2.LastName, "Last name");
         await page.AssertContentEqualsAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEqualsAsync(person2.Email!, "Email");
+        await page.AssertContentEqualsAsync(person2.EmailAddress!, "Email");
         await page.AssertContentEqualsAsync(person2.NationalInsuranceNumber!, "National Insurance number");
         await page.ClickBackLinkAsync();
 
@@ -351,11 +351,11 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task MergePerson_CYA_ChangeDetails_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         var person2 = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber()));
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -378,7 +378,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person2.MiddleName);
         await page.ClickRadioByLabelAsync(person2.LastName);
         await page.ClickRadioByLabelAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person2.Email!);
+        await page.ClickRadioByLabelAsync(person2.EmailAddress!);
         await page.ClickRadioByLabelAsync(person2.NationalInsuranceNumber!);
         await page.SelectUploadEvidenceAsync(false);
         await page.ClickContinueButtonAsync();
@@ -388,7 +388,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(person2.MiddleName, "Middle name");
         await page.AssertContentEqualsAsync(person2.LastName, "Last name");
         await page.AssertContentEqualsAsync(person2.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEqualsAsync(person2.Email!, "Email");
+        await page.AssertContentEqualsAsync(person2.EmailAddress!, "Email");
         await page.AssertContentEqualsAsync(person2.NationalInsuranceNumber!, "National Insurance number");
         await page.ClickLinkForElementWithTestIdAsync("change-details-link");
 
@@ -397,7 +397,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickRadioByLabelAsync(person1.MiddleName);
         await page.ClickRadioByLabelAsync(person1.LastName);
         await page.ClickRadioByLabelAsync(person1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        await page.ClickRadioByLabelAsync(person1.Email!);
+        await page.ClickRadioByLabelAsync(person1.EmailAddress!);
         await page.ClickRadioByLabelAsync(person1.NationalInsuranceNumber!);
         await page.ClickContinueButtonAsync();
 
@@ -406,7 +406,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertContentEqualsAsync(person1.MiddleName, "Middle name");
         await page.AssertContentEqualsAsync(person1.LastName, "Last name");
         await page.AssertContentEqualsAsync(person1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), "Date of birth");
-        await page.AssertContentEqualsAsync(person1.Email!, "Email");
+        await page.AssertContentEqualsAsync(person1.EmailAddress!, "Email");
         await page.AssertContentEqualsAsync(person1.NationalInsuranceNumber!, "National Insurance number");
         await page.ClickBackLinkAsync();
 

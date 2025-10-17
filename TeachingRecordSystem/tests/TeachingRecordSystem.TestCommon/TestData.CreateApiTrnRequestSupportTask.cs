@@ -200,7 +200,7 @@ public partial class TestData
                                 .WithMiddleName(middleName ?? string.Empty)
                                 .WithLastName(lastName)
                                 .WithDateOfBirth(dateOfBirth)
-                                .WithEmail(emailAddress);
+                                .WithEmailAddress(emailAddress);
 
                             if (gender is not null)
                             {

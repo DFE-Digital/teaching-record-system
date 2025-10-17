@@ -37,7 +37,7 @@ public class CreateTrnRequestTests : OperationTestBase
             .WithLastName(command.LastName)
             .WithDateOfBirth(command.DateOfBirth)
             .WithNationalInsuranceNumber(command.NationalInsuranceNumber!)
-            .WithEmail(command.EmailAddresses.First())
+            .WithEmailAddress(command.EmailAddresses.First())
             .WithTrnRequest(applicationUserId, command.RequestId));
 
         // Act
@@ -117,7 +117,7 @@ public class CreateTrnRequestTests : OperationTestBase
             .WithMiddleName(matchedFields.Contains(MatchedField.MiddleName) ? middleName : TestData.GenerateChangedMiddleName(middleName))
             .WithLastName(matchedFields.Contains(MatchedField.LastName) ? lastName : TestData.GenerateChangedLastName(lastName))
             .WithDateOfBirth(matchedFields.Contains(MatchedField.DateOfBirth) ? dateOfBirth : TestData.GenerateChangedDateOfBirth(dateOfBirth))
-            .WithEmail(matchedFields.Contains(MatchedField.EmailAddress) ? emailAddress : TestData.GenerateUniqueEmail())
+            .WithEmailAddress(matchedFields.Contains(MatchedField.EmailAddress) ? emailAddress : TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(matchedFields.Contains(MatchedField.TrsNationalInsuranceNumber)
                 ? nino
                 : TestData.GenerateChangedNationalInsuranceNumber(nino)));
@@ -246,7 +246,7 @@ public class CreateTrnRequestTests : OperationTestBase
         // Arrange
         var emailAddress = TestData.GenerateUniqueEmail();
 
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmail(emailAddress));
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEmailAddress(emailAddress));
 
         var command = CreateCommand() with
         {

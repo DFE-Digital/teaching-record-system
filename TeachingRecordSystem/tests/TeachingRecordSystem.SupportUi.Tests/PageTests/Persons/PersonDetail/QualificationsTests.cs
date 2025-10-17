@@ -175,17 +175,17 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
 
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Training provider", trainingProvider.Name);
-        doc.AssertRowContentContains($"professionalstatus-{qualificationid}", "Degree type", degreeType.Name);
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Age range", ageRange.GetDisplayName());
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "TESTREFERENCE");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Training provider", trainingProvider.Name);
+        doc.AssertSummaryListRowContentContains($"professionalstatus-{qualificationid}", "Degree type", degreeType.Name);
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Age range", ageRange.GetDisplayName());
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "TESTREFERENCE");
     }
 
     [Test]
@@ -216,17 +216,17 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
 
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Held since");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Training provider", "Not provided");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Degree type", "Not provided");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Age range", "Not provided");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Subjects", "Not provided");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Start date", startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "End date", endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Held since");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Training provider", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Degree type", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Age range", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Subjects", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
     }
 
     [Test]
@@ -253,17 +253,17 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
 
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Start date");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "End date");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Held since");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Training provider");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Degree type");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Age range");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Subjects");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Start date");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "End date");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Held since");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Induction exemption");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Training provider");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Degree type");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Age range");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Subjects");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
     }
 
     [Test]
@@ -293,17 +293,17 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
 
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Start date");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "End date");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFromDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Induction exemption", "Yes");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Training provider");
-        doc.AssertRowDoesNotExist($"professionalstatus-{qualificationid}", "Degree type");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Age range", "Not provided");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Subjects", "Not provided");
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Route", route.Name);
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Start date");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "End date");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Held since", holdsFromDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Induction exemption", "Yes");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Training provider");
+        doc.AssertSummaryListRowDoesNotExist($"professionalstatus-{qualificationid}", "Degree type");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Country of training", country.Name);
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Age range", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Subjects", "Not provided");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Source application reference", "Not provided");
     }
 
     [Test]
@@ -338,7 +338,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
 
-        doc.AssertRowContentMatches($"professionalstatus-{qualificationid}", "Age range", $"From {ageFrom} to {ageTo}");
+        doc.AssertSummaryListRowValueContentMatches($"professionalstatus-{qualificationid}", "Age range", $"From {ageFrom} to {ageTo}");
     }
 
     [Test]

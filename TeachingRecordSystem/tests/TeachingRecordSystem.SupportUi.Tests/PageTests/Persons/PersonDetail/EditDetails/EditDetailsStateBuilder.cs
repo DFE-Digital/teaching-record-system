@@ -40,7 +40,7 @@ public class EditDetailsStateBuilder
         MiddleName = person.MiddleName;
         LastName = person.LastName;
         DateOfBirth = person.DateOfBirth;
-        EmailAddress = person.Email;
+        EmailAddress = person.EmailAddress;
         NationalInsuranceNumber = person.NationalInsuranceNumber;
         Gender = person.Gender;
 
@@ -48,7 +48,7 @@ public class EditDetailsStateBuilder
         OriginalMiddleName = person.MiddleName;
         OriginalLastName = person.LastName;
         OriginalDateOfBirth = person.DateOfBirth;
-        OriginalEmailAddress = person.Email;
+        OriginalEmailAddress = person.EmailAddress;
         OriginalNationalInsuranceNumber = person.NationalInsuranceNumber;
         OriginalGender = person.Gender;
 

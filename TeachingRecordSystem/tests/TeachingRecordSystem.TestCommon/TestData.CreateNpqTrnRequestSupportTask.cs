@@ -207,7 +207,7 @@ public partial class TestData
                                 .WithMiddleName(middleName)
                                 .WithLastName(lastName)
                                 .WithDateOfBirth(dateOfBirth)
-                                .WithEmail(emailAddress);
+                                .WithEmailAddress(emailAddress);
 
                             if (nationalInsuranceNumber is not null)
                             {

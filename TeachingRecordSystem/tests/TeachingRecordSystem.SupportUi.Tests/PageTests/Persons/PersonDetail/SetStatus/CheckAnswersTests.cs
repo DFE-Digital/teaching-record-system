@@ -49,10 +49,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertRow("More details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("More details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertRow("Evidence", v =>
+        doc.AssertSummaryListRowValue("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
@@ -94,14 +94,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            doc.AssertRow("Reason", v => Assert.Equal("The record holder died", v.TrimmedText()));
+            doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("The record holder died", v.TrimmedText()));
         }
         else
         {
-            doc.AssertRow("Reason", v => Assert.Equal("The record was deactivated by mistake", v.TrimmedText()));
+            doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("The record was deactivated by mistake", v.TrimmedText()));
         }
-        doc.AssertRow("More details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertRows("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValue("More details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListRowValues("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Test]

@@ -29,7 +29,7 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
 
         var inductionCompletee1 = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithEmail(TestData.GenerateUniqueEmail()));
+            .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         await Fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
@@ -69,7 +69,7 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
             i => i.PersonId == inductionCompletee1.PersonId));
         Assert.NotNull(jobItem);
         Assert.Equal(inductionCompletee1.Trn, jobItem.Trn);
-        Assert.Equal(inductionCompletee1.Email, jobItem.EmailAddress);
+        Assert.Equal(inductionCompletee1.EmailAddress, jobItem.EmailAddress);
         Assert.Equal(inductionCompletee1.FirstName, jobItem.Personalization["first name"]);
         Assert.Equal(inductionCompletee1.LastName, jobItem.Personalization["last name"]);
 

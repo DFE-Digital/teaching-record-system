@@ -28,7 +28,7 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber()
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithGender());
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(
@@ -41,7 +41,7 @@ public abstract class NpqTrnRequestTestBase(HostFixture hostFixture) : TestBase(
                         : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(
                     differentAttribute != PersonMatchedAttribute.EmailAddress
-                        ? matchedPerson.Email!
+                        ? matchedPerson.EmailAddress!
                         : TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(
                     differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber

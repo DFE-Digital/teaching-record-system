@@ -37,15 +37,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRow("TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
-        doc.AssertRow("Evidence", v =>
+        doc.AssertSummaryListRowValue("TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Evidence", v =>
         {
             var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal($"{evidenceFileName} (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
-        doc.AssertRow("Comments", v => Assert.Equal(comments, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Comments", v => Assert.Equal(comments, v.TrimmedText()));
     }
 
     [Test]
@@ -293,7 +293,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             PersonMatchedAttribute.EmailAddress,
             "EmailAddress",
             "Email address",
-            p => p.Email,
+            p => p.EmailAddress,
             p => p.EmailAddress,
             p => p.EmailAddress
         ),

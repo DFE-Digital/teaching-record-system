@@ -42,7 +42,7 @@ public class ProcessContext
         {
             ProcessId = Guid.NewGuid(),
             ProcessType = processType,
-            Created = now,
+            CreatedOn = now,
             UserId = raisedBy.UserId,
             DqtUserId = raisedBy.DqtUserId,
             DqtUserName = raisedBy.DqtUserName,

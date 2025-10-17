@@ -67,7 +67,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("test@test.com")
+            .WithEmailAddress("test@test.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Female));
 
@@ -111,7 +111,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithEmail("invalid")
+            .WithEmailAddress("invalid")
             .WithNationalInsuranceNumber("invalid"));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person));
@@ -675,7 +675,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("test@test.com")
+            .WithEmailAddress("test@test.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Male));
 
@@ -715,7 +715,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("test@test.com")
+            .WithEmailAddress("test@test.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.NotAvailable));
 
@@ -758,7 +758,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("test@test.com")
+            .WithEmailAddress("test@test.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Male));
 
@@ -801,7 +801,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("test@test.com")
+            .WithEmailAddress("test@test.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Male));
 
@@ -885,7 +885,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("original@email.com")
+            .WithEmailAddress("original@email.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Female));
 
@@ -954,7 +954,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : TestBase(hostFixtur
             .WithMiddleName("The")
             .WithLastName("Great")
             .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-            .WithEmail("original@email.com")
+            .WithEmailAddress("original@email.com")
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 

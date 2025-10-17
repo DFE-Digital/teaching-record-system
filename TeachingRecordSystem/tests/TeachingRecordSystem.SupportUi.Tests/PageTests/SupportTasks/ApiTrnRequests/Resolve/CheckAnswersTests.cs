@@ -688,7 +688,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             "Email address",
             [Contact.Fields.EMailAddress1],
             d => d.EmailAddress,
-            p => p.Email
+            p => p.EmailAddress
         ),
         new(
             PersonMatchedAttribute.NationalInsuranceNumber,

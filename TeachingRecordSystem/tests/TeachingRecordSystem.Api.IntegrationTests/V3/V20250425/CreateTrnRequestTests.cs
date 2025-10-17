@@ -188,7 +188,7 @@ public class CreateTrnRequestTests : TestBase
             .WithMiddleName(middleName)
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithEmail(email)
+            .WithEmailAddress(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
 
         await WithDbContextAsync(async dbContext =>
@@ -246,7 +246,7 @@ public class CreateTrnRequestTests : TestBase
             .WithMiddleName(middleName)
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithEmail(email)
+            .WithEmailAddress(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
             .WithTrnRequest(ApplicationUserId, requestId));
 
@@ -293,7 +293,7 @@ public class CreateTrnRequestTests : TestBase
             .WithMiddleName(middleName)
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithEmail(email)
+            .WithEmailAddress(email)
             .WithNationalInsuranceNumber());
 
         await WithDbContextAsync(async dbContext =>

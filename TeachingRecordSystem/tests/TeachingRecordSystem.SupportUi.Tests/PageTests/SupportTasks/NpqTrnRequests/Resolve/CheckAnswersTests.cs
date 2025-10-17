@@ -466,7 +466,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             AssertPersonAttributesMatch(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
 
             var dateOfBirth = attribute == PersonMatchedAttribute.DateOfBirth ? requestData.DateOfBirth : matchedPerson.DateOfBirth;
-            var emailAddress = attribute == PersonMatchedAttribute.EmailAddress ? requestData.EmailAddress : matchedPerson.Email;
+            var emailAddress = attribute == PersonMatchedAttribute.EmailAddress ? requestData.EmailAddress : matchedPerson.EmailAddress;
             var nationalInsuranceNumber = attribute == PersonMatchedAttribute.NationalInsuranceNumber ? requestData.NationalInsuranceNumber : matchedPerson.NationalInsuranceNumber;
             var gender = attribute == PersonMatchedAttribute.Gender ? requestData.Gender : matchedPerson.Gender;
 
@@ -544,7 +544,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             var updatedPersonRecord = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == matchedPerson.PersonId);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.DateOfBirth ? supportTask.TrnRequestMetadata!.DateOfBirth : matchedPerson.DateOfBirth, updatedPersonRecord.DateOfBirth);
-            Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress : matchedPerson.Email, updatedPersonRecord.EmailAddress);
+            Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress : matchedPerson.EmailAddress, updatedPersonRecord.EmailAddress);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? supportTask.TrnRequestMetadata!.NationalInsuranceNumber : matchedPerson.NationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
             Assert.Equal(attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.Gender ? supportTask.TrnRequestMetadata!.Gender : matchedPerson.Gender, updatedPersonRecord.Gender);
         });
@@ -600,7 +600,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
                 MiddleName = matchedPerson.MiddleName,
                 LastName = matchedPerson.LastName,
                 DateOfBirth = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.DateOfBirth ? supportTask.TrnRequestMetadata!.DateOfBirth! : matchedPerson.DateOfBirth,
-                EmailAddress = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress! : matchedPerson.Email,
+                EmailAddress = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.EmailAddress ? supportTask.TrnRequestMetadata!.EmailAddress! : matchedPerson.EmailAddress,
                 NationalInsuranceNumber = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.NationalInsuranceNumber ? supportTask.TrnRequestMetadata!.NationalInsuranceNumber! : matchedPerson.NationalInsuranceNumber,
                 Gender = attributeSourcedFromRequestData.Attribute is PersonMatchedAttribute.Gender ? supportTask.TrnRequestMetadata!.Gender : matchedPerson.Gender
             });
@@ -815,7 +815,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             "EmailAddress",
             "Email address",
             d => d.EmailAddress,
-            p => p.Email
+            p => p.EmailAddress
         ),
         new(
             PersonMatchedAttribute.NationalInsuranceNumber,

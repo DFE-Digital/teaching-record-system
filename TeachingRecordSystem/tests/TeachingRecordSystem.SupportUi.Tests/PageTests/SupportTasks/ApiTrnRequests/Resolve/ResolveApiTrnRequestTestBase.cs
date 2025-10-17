@@ -33,7 +33,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
             p
 
                 .WithNationalInsuranceNumber()
-                .WithEmail(TestData.GenerateUniqueEmail())
+                .WithEmailAddress(TestData.GenerateUniqueEmail())
                 .WithGender(TestData.GenerateGender());
 
             if (matchedPersonHasFlags)
@@ -64,7 +64,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
                         : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(
                     differentAttribute != PersonMatchedAttribute.EmailAddress
-                        ? matchedPerson.Email
+                        ? matchedPerson.EmailAddress
                         : TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(
                     differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber

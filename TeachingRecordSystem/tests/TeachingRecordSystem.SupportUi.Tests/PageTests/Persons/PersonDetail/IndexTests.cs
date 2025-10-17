@@ -34,7 +34,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
 
-            .WithEmail((string?)email)
+            .WithEmailAddress((string?)email)
             .WithNationalInsuranceNumber()
             .WithGender());
 
@@ -62,7 +62,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
-        Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email address"));
+        Assert.Equal(createPersonResult.EmailAddress, doc.GetSummaryListValueForKey("Email address"));
         Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueForKey("Gender"));
     }
 
@@ -80,7 +80,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var createPersonResult = await TestData.CreatePersonAsync(b => b
-            .WithEmail((string?)email)
+            .WithEmailAddress((string?)email)
             .WithNationalInsuranceNumber()
             .WithGender());
 
@@ -109,7 +109,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueForKey("Gender"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
-        Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email address"));
+        Assert.Equal(createPersonResult.EmailAddress, doc.GetSummaryListValueForKey("Email address"));
     }
 
     [Test]
@@ -583,12 +583,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (expectPersonToBeMarkedAsDeactivated)
         {
             Assert.Equal("Lily The Pink (deactivated)", pageTitle.TrimmedText());
-            doc.AssertRowContentMatches("Status", "DEACTIVATED");
+            doc.AssertSummaryListRowValueContentMatches("Status", "DEACTIVATED");
         }
         else
         {
             Assert.Equal("Lily The Pink", pageTitle.TrimmedText());
-            doc.AssertRowContentMatches("Status", "ACTIVE");
+            doc.AssertSummaryListRowValueContentMatches("Status", "ACTIVE");
         }
     }
 

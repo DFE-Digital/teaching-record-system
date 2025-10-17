@@ -26,13 +26,13 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
         // Assert
         var doc = await response.GetDocumentAsync();
-        doc.AssertRowContentMatches("Name", $"{metadata.FirstName} {metadata.MiddleName} {metadata.LastName}");
-        doc.AssertRowContentMatches("Date of birth", metadata.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Working in school or educational setting", metadata.NpqWorkingInEducationalSetting.HasValue ? metadata.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : UiDefaults.EmptyDisplayContent);
-        doc.AssertRowContentMatches("NPQ application ID", metadata.NpqApplicationId);
-        doc.AssertRowContentMatches("NPQ name", metadata.NpqName);
-        doc.AssertRowContentMatches("NPQ training provider", metadata.NpqTrainingProvider);
-        doc.AssertRowContentMatches("Evidence", $"{metadata.NpqEvidenceFileName} (opens in new tab)");
+        doc.AssertSummaryListRowValueContentMatches("Name", $"{metadata.FirstName} {metadata.MiddleName} {metadata.LastName}");
+        doc.AssertSummaryListRowValueContentMatches("Date of birth", metadata.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertSummaryListRowValueContentMatches("Working in school or educational setting", metadata.NpqWorkingInEducationalSetting.HasValue ? metadata.NpqWorkingInEducationalSetting.Value ? "Yes" : "No" : UiDefaults.EmptyDisplayContent);
+        doc.AssertSummaryListRowValueContentMatches("NPQ application ID", metadata.NpqApplicationId);
+        doc.AssertSummaryListRowValueContentMatches("NPQ name", metadata.NpqName);
+        doc.AssertSummaryListRowValueContentMatches("NPQ training provider", metadata.NpqTrainingProvider);
+        doc.AssertSummaryListRowValueContentMatches("Evidence", $"{metadata.NpqEvidenceFileName} (opens in new tab)");
     }
 
     [Test]

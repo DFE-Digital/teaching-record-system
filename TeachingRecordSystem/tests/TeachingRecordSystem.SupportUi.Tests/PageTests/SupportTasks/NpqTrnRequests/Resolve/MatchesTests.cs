@@ -118,7 +118,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithEmail(TestData.GenerateUniqueEmail())
+            .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber()
             .WithGender(TestData.GenerateGender()));
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure => configure.WithMatchedPersons(matchedPerson.PersonId));
@@ -140,7 +140,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(matchedPerson.MiddleName, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
         Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(matchedPerson.Email, firstMatchDetails.GetSummaryListValueForKey("Email address"));
+        Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueForKey("Email address"));
         Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueForKey("NI number"));
         Assert.Equal(matchedPerson.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
     }
@@ -278,7 +278,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithEmail("something+test@education.gov.uk"));
+            .WithEmailAddress("something+test@education.gov.uk"));
 
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, configure =>
         {
@@ -301,7 +301,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.Email, firstMatchDetails.GetSummaryListValueForKey("Email address"));
+        Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueForKey("Email address"));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Email address", true);
     }
 
@@ -310,7 +310,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert().WithEmail());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert().WithEmailAddress());
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
         var journeyInstance = await CreateJourneyInstance(supportTask);
@@ -335,7 +335,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithQts().WithEmail());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithQts().WithEmailAddress());
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
         var journeyInstance = await CreateJourneyInstance(supportTask);
@@ -360,7 +360,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts().WithEmail());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts().WithEmailAddress());
         var supportTask = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
 
         var journeyInstance = await CreateJourneyInstance(supportTask);
@@ -483,7 +483,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                         : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
                 .WithEmailAddress(
                     matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
-                        ? matchedPerson.Email!
+                        ? matchedPerson.EmailAddress!
                         : TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(
                     matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)

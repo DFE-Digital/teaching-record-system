@@ -72,7 +72,7 @@ public class ChangeHistoryModel(
             nameof(DqtContactInductionStatusChangedEvent),
             nameof(PersonInductionUpdatedEvent),
             nameof(PersonDetailsUpdatedEvent),
-            nameof(PersonCreatedEvent),
+            nameof(LegacyEvents.PersonCreatedEvent),
             nameof(RouteToProfessionalStatusCreatedEvent),
             nameof(RouteToProfessionalStatusUpdatedEvent),
             nameof(RouteToProfessionalStatusDeletedEvent),
@@ -147,8 +147,10 @@ public class ChangeHistoryModel(
                 """)
             .ToListAsync();
 
+        var processTypesToQuery = new[] { ProcessType.PersonCreatingInDqt };
+
         var processes = await dbContext.Processes
-            .Where(p => p.PersonIds.Contains(PersonId))
+            .Where(p => p.PersonIds.Contains(PersonId) && processTypesToQuery.Contains(p.ProcessType))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
             .ToListAsync();
@@ -202,7 +204,7 @@ public class ChangeHistoryModel(
         new TimelineItem<TimelineProcess>(
             TimelineItemType.Process,
             PersonId,
-            process.Created.ToGmt(),
+            process.CreatedOn.ToGmt(),
             new TimelineProcess(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }));
 
     /// <summary>

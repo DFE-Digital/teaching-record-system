@@ -66,7 +66,7 @@ public class GetTrnRequestTests : OperationTestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrnRequest(applicationUserId, requestId)
-            .WithEmail(TestData.GenerateUniqueEmail()));
+            .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         var command = new GetTrnRequestCommand(requestId);
 

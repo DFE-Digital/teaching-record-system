@@ -187,7 +187,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithEmail(email)
+                .WithEmailAddress(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject, email: email);
@@ -229,7 +229,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithEmail(email)
+                .WithEmailAddress(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
@@ -305,7 +305,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var trnRequestId = Guid.NewGuid().ToString();
             var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
             var person = await TestData.CreatePersonAsync(p => p
-                .WithEmail(email)
+                .WithEmailAddress(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: false));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);

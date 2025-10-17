@@ -107,72 +107,72 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture host
 
         if (changes.HasAnyFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNameChange))
         {
-            item.AssertRow("details", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
-            item.AssertRow("previous-details", "Name", v => Assert.Equal($"{_oldFirstName} {_oldMiddleName} {_oldLastName}", v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Name", v => Assert.Equal($"{_oldFirstName} {_oldMiddleName} {_oldLastName}", v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "Name");
-            item.AssertRowDoesNotExist("previous-details", "Name");
+            item.AssertSummaryListRowDoesNotExist("details", "Name");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "Name");
         }
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth))
         {
-            item.AssertRow("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
-            item.AssertRow("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "Date of birth");
-            item.AssertRowDoesNotExist("previous-details", "Date of birth");
+            item.AssertSummaryListRowDoesNotExist("details", "Date of birth");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "Date of birth");
         }
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress))
         {
-            item.AssertRow("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertRow("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "Email address");
-            item.AssertRowDoesNotExist("previous-details", "Email address");
+            item.AssertSummaryListRowDoesNotExist("details", "Email address");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "Email address");
         }
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber))
         {
-            item.AssertRow("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertRow("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "National Insurance number");
-            item.AssertRowDoesNotExist("previous-details", "National Insurance number");
+            item.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
         }
 
         if (changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender))
         {
-            item.AssertRow("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-            item.AssertRow("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+            item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         }
         else
         {
-            item.AssertRowDoesNotExist("details", "Gender");
-            item.AssertRowDoesNotExist("previous-details", "Gender");
+            item.AssertSummaryListRowDoesNotExist("details", "Gender");
+            item.AssertSummaryListRowDoesNotExist("previous-details", "Gender");
         }
 
-        item.AssertRow("change-reason", "Reason", v => Assert.Equal("Identified as same person during task resolution", v.TrimmedText()));
-        item.AssertRow("change-reason", "Comments", v => Assert.Equal("Some comments", v.TrimmedText()));
+        item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal("Identified as same person during task resolution", v.TrimmedText()));
+        item.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal("Some comments", v.TrimmedText()));
 
-        item.AssertRow("request-data", "Source", v => Assert.Equal("AfQTS", v.TrimmedText()));
-        item.AssertRow("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
-        item.AssertRow("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(UiDefaults.DateTimeDisplayFormat), v.TrimmedText()));
-        item.AssertRow("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
-        item.AssertRow("request-data", "Previous name", v => Assert.Equal("Jim Smith", v.TrimmedText()));
-        item.AssertRow("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat) ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertRow("request-data", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertRow("request-data", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertRow("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertRow("request-data", "Address", v => Assert.Equal("<p class=\"govuk-body\">1 Test Place<br>Test Street<br>Testborough<br>Testington<br>TE57 1NG<br>Testland</p>", v.InnerHtml.Trim()));
+        item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("AfQTS", v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(Clock.UtcNow.ToString(UiDefaults.DateTimeDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Previous name", v => Assert.Equal("Jim Smith", v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(UiDefaults.DateOnlyDisplayFormat) ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Address", v => Assert.Equal("<p class=\"govuk-body\">1 Test Place<br>Test Street<br>Testborough<br>Testington<br>TE57 1NG<br>Testland</p>", v.InnerHtml.Trim()));
     }
 
     [Test]
@@ -202,7 +202,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture host
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
         Assert.Equal("Record updated from TRN request of unknown source", title.TrimmedText());
-        item.AssertRow("request-data", "Source", v => Assert.Equal("Not provided", v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     private async Task CreateEvent(Guid createdByUserId, Guid personId, Guid applicationUserId,
