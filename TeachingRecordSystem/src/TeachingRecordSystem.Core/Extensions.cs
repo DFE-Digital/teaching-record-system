@@ -54,8 +54,8 @@ public static class Extensions
 
             services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>
             {
-                var sftpAccountName = configuration.GetValue<string>("SftpStorageConnectionString");
-                var sftpAccessKey = configuration.GetValue<string>("SftpStorageConnectionString");
+                var sftpAccountName = configuration.GetValue<string>("SftpStorageName");
+                var sftpAccessKey = configuration.GetValue<string>("SftpStorageAccessKey");
 
 
                 if (string.IsNullOrEmpty(sftpAccountName) || string.IsNullOrEmpty(sftpAccessKey))
