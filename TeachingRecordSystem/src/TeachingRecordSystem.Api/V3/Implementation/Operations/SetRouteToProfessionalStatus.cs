@@ -66,7 +66,9 @@ public class SetRouteToProfessionalStatusHandler(
         new("12A742C3-1CD4-43B7-A2FA-1000BD4CC373"),
         new("97E1811B-D46C-483E-AEC3-4A2DD51A55FE"),
         new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8"),
-        new("20F67E38-F117-4B42-BBFC-5812AA717B94")
+        new("20F67E38-F117-4B42-BBFC-5812AA717B94"),
+        new("11B66DE5-4670-4C82-86AA-20E42DF723B7"),
+        new("5D4C01C1-0841-4306-B49C-48AD6499FDC0")
     ];
 
     public async Task<ApiResult<SetRouteToProfessionalStatusResult>> ExecuteAsync(SetRouteToProfessionalStatusCommand command)
