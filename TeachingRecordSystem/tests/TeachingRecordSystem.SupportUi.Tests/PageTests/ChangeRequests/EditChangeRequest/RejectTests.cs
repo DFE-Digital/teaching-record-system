@@ -177,7 +177,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .SingleOrDefaultAsync();
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
-                Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation, email.TemplateId);
+                Assert.Equal(EmailTemplateIds.NewGetAnIdentityChangeOfNameRejectedEmailConfirmation, email.TemplateId);
             }
             else
             {
@@ -188,7 +188,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .SingleOrDefaultAsync();
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
-                Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation, email.TemplateId);
+                Assert.Equal(EmailTemplateIds.NewGetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation, email.TemplateId);
             }
         });
 

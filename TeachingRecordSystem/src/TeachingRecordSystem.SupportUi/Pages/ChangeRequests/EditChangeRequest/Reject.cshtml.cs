@@ -121,7 +121,7 @@ public class RejectModel(
                 };
 
                 emailAddress = string.IsNullOrEmpty(changeNameRequestData!.EmailAddress) ? Person!.EmailAddress : changeNameRequestData.EmailAddress;
-                emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation;
+                emailTemplateId = EmailTemplateIds.NewGetAnIdentityChangeOfNameRejectedEmailConfirmation;
             }
             else if (ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
             {
@@ -143,7 +143,7 @@ public class RejectModel(
                 };
 
                 emailAddress = string.IsNullOrEmpty(changeDateOfBirthRequestData!.EmailAddress) ? Person!.EmailAddress : changeDateOfBirthRequestData.EmailAddress;
-                emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation;
+                emailTemplateId = EmailTemplateIds.NewGetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation;
             }
 
             await dbContext.AddEventAndBroadcastAsync(rejectedEvent);
@@ -155,7 +155,11 @@ public class RejectModel(
                     EmailId = Guid.NewGuid(),
                     TemplateId = emailTemplateId,
                     EmailAddress = emailAddress!,
-                    Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, Person!.FirstName } }
+                    Personalization = new Dictionary<string, string>
+                    {
+                        [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = Person!.FirstName,
+                        [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = RejectionReasonChoice.GetDescription()!
+                    }
                 };
 
                 dbContext.Emails.Add(email);
@@ -199,13 +203,13 @@ public class RejectModel(
 
     public enum CaseRejectionReasonOption
     {
-        [Display(Name = "Request and proof don’t match")]
+        [Display(Name = "Request and proof don’t match", Description = "This is because the proof you provided did not match your request.")]
         RequestAndProofDontMatch,
-        [Display(Name = "Wrong type of document")]
+        [Display(Name = "Wrong type of document", Description = "This is because you provided the wrong type of document.")]
         WrongTypeOfDocument,
-        [Display(Name = "Image quality")]
+        [Display(Name = "Image quality", Description = "This is because the image you provided was not clear enough.")]
         ImageQuality,
-        [Display(Name = "Change no longer required")]
+        [Display(Name = "Change no longer required", Description = "This is because the change is no longer required.")]
         ChangeNoLongerRequired
     }
 }

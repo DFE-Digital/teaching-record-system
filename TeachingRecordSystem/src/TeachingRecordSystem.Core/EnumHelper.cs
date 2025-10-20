@@ -75,6 +75,16 @@ public static class EnumHelper
         return displayAttribute is null ? enumValue.ToString() : displayAttribute.GetName();
     }
 
+    public static string? GetDescription(this Enum enumValue)
+    {
+        var displayAttribute = enumValue.GetType()
+            .GetMember(enumValue.ToString())
+            .Single()
+            .GetCustomAttribute<DisplayAttribute>();
+
+        return displayAttribute is null ? enumValue.ToString() : displayAttribute.GetDescription();
+    }
+
     public static IReadOnlyCollection<TEnum> SplitFlags<TEnum>(this TEnum input)
         where TEnum : struct, Enum
     {
