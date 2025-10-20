@@ -90,14 +90,7 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @if (nameChangeEvidenceFileUrl is not null)
-                                {
-                                    <a href="@nameChangeEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{updatedEvent.NameChangeEvidenceFile!.Name} (opens in new tab)")</a>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
+                                <vc:event-evidence-file-link evidence-file="@updatedEvent.NameChangeEvidenceFile" />
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
@@ -123,14 +116,7 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @if (detailsChangeEvidenceFileUrl is not null)
-                                {
-                                    <a href="@detailsChangeEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{updatedEvent.DetailsChangeEvidenceFile!.Name} (opens in new tab)")</a>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
+                                <vc:event-evidence-file-link evidence-file="@updatedEvent.DetailsChangeEvidenceFile" />
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }

@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
@@ -51,7 +52,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
         doc.AssertSummaryListRowValue("More details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
-        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        var urlEncoder = UrlEncoder.Default;
+        var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
+        var expectedFileUrl = $"http://localhost/files/evidence.pdf?fileUrl={expectedBlobStorageFileUrl}";
         doc.AssertSummaryListRowValue("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));

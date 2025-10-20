@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
@@ -120,7 +121,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         doc.AssertSummaryListRowValue("Reason for creating record", v => Assert.Equal("Another reason", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
-        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        var urlEncoder = UrlEncoder.Default;
+        var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
+        var expectedFileUrl = $"http://localhost/files/evidence.pdf?fileUrl={expectedBlobStorageFileUrl}";
         doc.AssertSummaryListRowValue("Evidence", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));

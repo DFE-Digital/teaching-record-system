@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.Endpoints;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Pages.ApiKeys;
 using TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
@@ -45,4 +46,5 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
     public RoutesToProfessionalStatusLinkGenerator RoutesToProfessionalStatus => new(linkGenerator);
     public SupportTasksLinkGenerator SupportTasks => new(linkGenerator);
     public UsersLinkGenerator Users => new(linkGenerator);
+    public FilesLinkGenerator Files => new(linkGenerator);
 }

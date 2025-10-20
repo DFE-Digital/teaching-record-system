@@ -37,7 +37,9 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="evidence"><a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a></govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="evidence">
+                                    <vc:event-evidence-file-link evidence-file="@updatedEvent.EvidenceFile" />
+                                </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                     </govuk-summary-list>

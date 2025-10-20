@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
@@ -40,7 +41,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         doc.AssertSummaryListRowValue("TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Evidence", v =>
         {
-            var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+            var urlEncoder = UrlEncoder.Default;
+            var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
+            var expectedFileUrl = $"http://localhost/files/evidence.jpg?fileUrl={expectedBlobStorageFileUrl}";
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal($"{evidenceFileName} (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
