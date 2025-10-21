@@ -23,7 +23,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public TestableClock Clock => fixture.Clock;
     public ILoggerFactory LoggerFactory => fixture.LoggerFactory;
     public Mock<IFileService> FileService => fixture.FileServiceMock;
-    public ILogger<DeletePersonAndChildRecordsWithoutATrnJob> TestOutputLogger { get; } = new TestOutputLogger(outputHelper);
+    public ILogger<DeletePersonAndChildRecordsWithoutATrnJob> TestOutputLogger { get; } = new TestOutputLogger<DeletePersonAndChildRecordsWithoutATrnJob>(outputHelper);
 
     public async Task InitializeAsync()
     {
@@ -1105,11 +1105,14 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         dbContext.ApplicationUsers
             .Select(u => u.UserId)
             .ToArrayAsync());
+
+    public record CsvRow(Guid PersonId);
+    public record UploadedFile(string FileName, string Contents, string? ContentType);
 }
 
 public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
 {
-    private readonly List<UploadedFile> _uploadedFiles = [];
+    private readonly List<DeletePersonAndChildRecordsWithoutATrnJobTests.UploadedFile> _uploadedFiles = [];
 
     public DeletePersonAndChildRecordsWithoutATrnJobFixture(
         DbFixture dbFixture,
@@ -1151,34 +1154,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
-
         FileServiceMock.Invocations.Clear();
     }
 
     public async Task DisposeAsync() => await DbContext.DisposeAsync();
 
-    public UploadedFile? GetLastUploadedFile() => _uploadedFiles.LastOrDefault();
+    public DeletePersonAndChildRecordsWithoutATrnJobTests.UploadedFile? GetLastUploadedFile() => _uploadedFiles.LastOrDefault();
 }
-
-public class TestOutputLogger(ITestOutputHelper outputHelper) : ILogger<DeletePersonAndChildRecordsWithoutATrnJob>
-{
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => new Scope();
-
-    public bool IsEnabled(LogLevel logLevel) => true;
-
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-    {
-        outputHelper.WriteLine($"{logLevel}: {formatter(state, exception)}");
-    }
-
-    public sealed class Scope : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
-}
-
-public record UploadedFile(string FileName, string Contents, string? ContentType);
-
-public record CsvRow(Guid PersonId);

@@ -55,10 +55,7 @@ public class CreateTrnRequestHandler(
             CreatedOn = now,
             IdentityVerified = command.IdentityVerified,
             OneLoginUserSubject = command.OneLoginUserSubject,
-            Name = GetNonEmptyValues(
-                command.FirstName,
-                command.MiddleName,
-                command.LastName),
+            Name = new[] { command.FirstName, command.MiddleName, command.LastName }.GetNonEmptyValues(),
             FirstName = command.FirstName,
             MiddleName = command.MiddleName,
             LastName = command.LastName,
@@ -187,20 +184,5 @@ public class CreateTrnRequestHandler(
             PotentialDuplicate = trnRequestMetadata.PotentialDuplicate!.Value,
             AccessYourTeachingQualificationsLink = status is TrnRequestStatus.Completed ? aytqLink : null
         };
-
-        static string[] GetNonEmptyValues(params string?[] values)
-        {
-            var result = new List<string>(values.Length);
-
-            foreach (var value in values)
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    result.Add(value);
-                }
-            }
-
-            return result.ToArray();
-        }
     }
 }
