@@ -136,7 +136,7 @@ public class RejectModel(
                     RequestData = changeDateOfBirthRequestData!,
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
-                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
+                    RejectionReason = RejectionReasonChoice!.Value.EmailReason(),
                     EventId = Guid.NewGuid(),
                     CreatedUtc = clock.UtcNow,
                     RaisedBy = User.GetUserId()
@@ -158,7 +158,7 @@ public class RejectModel(
                     Personalization = new Dictionary<string, string>
                     {
                         [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = Person!.FirstName,
-                        [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = RejectionReasonChoice.GetDescription()!
+                        [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = RejectionReasonChoice!.Value.EmailReason()
                     }
                 };
 
@@ -203,13 +203,13 @@ public class RejectModel(
 
     public enum CaseRejectionReasonOption
     {
-        [Display(Name = "Request and proof don’t match", Description = "This is because the proof you provided did not match your request.")]
+        [Display(Name = "Request and proof don’t match")]
         RequestAndProofDontMatch,
-        [Display(Name = "Wrong type of document", Description = "This is because you provided the wrong type of document.")]
+        [Display(Name = "Wrong type of document")]
         WrongTypeOfDocument,
-        [Display(Name = "Image quality", Description = "This is because the image you provided was not clear enough.")]
+        [Display(Name = "Image quality")]
         ImageQuality,
-        [Display(Name = "Change no longer required", Description = "This is because the change is no longer required.")]
+        [Display(Name = "Change no longer required")]
         ChangeNoLongerRequired
     }
 }
