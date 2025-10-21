@@ -1,3 +1,5 @@
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TrnRequestManualChecksNeeded.Resolve;
@@ -46,6 +48,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal("an alert, QTS and EYTS", doc.GetElementByTestId("flags-description")?.TextContent);
         var trnRequestMetadata = supportTask.TrnRequestMetadata!;
+        var cardActions = doc.QuerySelectorAll<IHtmlAnchorElement>(".govuk-summary-card__actions>*");
+        Assert.Single(cardActions);
         Assert.Equal(trnRequestMetadata.FirstName, doc.GetSummaryListValueForKey("First name"));
         Assert.Equal(trnRequestMetadata.MiddleName, doc.GetSummaryListValueForKey("Middle name"));
         Assert.Equal(trnRequestMetadata.LastName, doc.GetSummaryListValueForKey("Last name"));
