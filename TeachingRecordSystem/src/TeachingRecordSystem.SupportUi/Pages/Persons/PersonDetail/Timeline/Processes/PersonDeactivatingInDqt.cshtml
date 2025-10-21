@@ -1,0 +1,11 @@
+@model TimelineItem<TimelineProcess>
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Record deactivated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span>By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+    </p>
+</div>

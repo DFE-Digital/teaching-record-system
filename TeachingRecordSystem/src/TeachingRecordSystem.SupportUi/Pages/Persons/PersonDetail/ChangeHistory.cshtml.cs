@@ -151,7 +151,9 @@ public class ChangeHistoryModel(
         {
             ProcessType.PersonCreatingInDqt,
             ProcessType.PersonImportingIntoDqt,
-            ProcessType.PersonUpdatingInDqt
+            ProcessType.PersonUpdatingInDqt,
+            ProcessType.PersonDeactivatingInDqt,
+            ProcessType.PersonReactivatingInDqt
         };
 
         var processes = await dbContext.Processes

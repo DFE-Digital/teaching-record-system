@@ -180,6 +180,74 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             ("Induction status", person.Person.InductionStatus.GetDisplayName()),
             ("DQT induction status", person.Person.InductionStatus.ToDqtInductionStatus(out _)));
     }
+
+    [Test]
+    public async Task Get_WithPersonDeactivatingInDqtProcess_RendersExpectedEntry()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var @event = new PersonDeactivatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MergedWithPersonId = null
+        };
+
+        var user = SystemUser.Instance;
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonDeactivatingInDqt, user.UserId, @event);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "Record deactivated",
+            user.Name,
+            process.CreatedOn);
+    }
+
+    [Test]
+    public async Task Get_WithPersonReactivatingInDqtProcess_RendersExpectedEntry()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var @event = new PersonReactivatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId
+        };
+
+        var user = SystemUser.Instance;
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonReactivatingInDqt, user.UserId, @event);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "Record reactivated",
+            user.Name,
+            process.CreatedOn);
+    }
 }
 
 file static class Extensions
@@ -205,9 +273,16 @@ file static class Extensions
         var expectedDateBlock = $"By {expectedUserName} on {expectedTimestamp:d MMMMM yyyy 'at' h:mm tt}";
         Assert.Equal(expectedDateBlock, date?.TrimmedText().ReplaceNewLines(), ignoreAllWhiteSpace: true);
 
-        var description = changeHistoryItem.GetElementsByClassName("moj-timeline__description").SingleOrDefault()?.FirstElementChild;
-        Assert.NotNull(description);
-        description.AssertSummaryListHasRows(
-            expectedSummaryListRows.Select(e => e with { Value = e.Value ?? UiDefaults.EmptyDisplayContent }).ToArray());
+        if (expectedSummaryListRows.Length > 0)
+        {
+            var description = changeHistoryItem.GetElementsByClassName("moj-timeline__description").SingleOrDefault()?.FirstElementChild;
+            if (description is null)
+            {
+                throw new XunitException("Element with class=\"moj-timeline__description\" not found.");
+            }
+
+            description.AssertSummaryListHasRows(
+                expectedSummaryListRows.Select(e => e with { Value = e.Value ?? UiDefaults.EmptyDisplayContent }).ToArray());
+        }
     }
 }
