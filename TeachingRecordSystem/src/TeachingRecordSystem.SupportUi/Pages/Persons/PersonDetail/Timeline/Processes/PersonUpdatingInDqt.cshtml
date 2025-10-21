@@ -1,0 +1,110 @@
+@model TimelineItem<TimelineProcess>
+@{
+    var updatedEvent = Model.ItemModel.GetEvent<PersonUpdatedInDqtEvent>();
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Record updated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span>By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list class="govuk-!-margin-bottom-0">
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.Trn))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.Trn</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasAnyFlag(PersonUpdatedInDqtEventChanges.FirstName | PersonUpdatedInDqtEventChanges.MiddleName | PersonUpdatedInDqtEventChanges.LastName))
+            {
+                var name = StringHelper.JoinNonEmpty(' ', updatedEvent.FirstName, updatedEvent.MiddleName, updatedEvent.LastName);
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DateOfBirth))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EmailAddress))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.EmailAddress</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.NationalInsuranceNumber))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.NationalInsuranceNumber</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.Gender))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@updatedEvent.Gender?.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DateOfDeath))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of death</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtsDate))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>QTS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.EytsDate))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>EYTS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsDate))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>QTLS held since</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.QtlsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.QtlsStatus))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Qualified teacher learning and skills status (QTLS)</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.QtlsStatus.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.InductionStatus))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.InductionStatus?.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonUpdatedInDqtEventChanges.DqtInductionStatus))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT induction status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.DqtInductionStatus</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+        </govuk-summary-list>
+    </div>
+</div>

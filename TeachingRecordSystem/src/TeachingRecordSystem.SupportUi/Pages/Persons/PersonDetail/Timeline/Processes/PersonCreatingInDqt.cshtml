@@ -1,7 +1,7 @@
 @model TimelineItem<TimelineProcess>
 @{
-    var @event = Model.ItemModel.GetEvent<PersonCreatedEvent>();
-    var name = StringHelper.JoinNonEmpty(' ', @event.FirstName, @event.MiddleName, @event.LastName);
+    var createdEvent = Model.ItemModel.GetEvent<PersonCreatedEvent>();
+    var name = StringHelper.JoinNonEmpty(' ', createdEvent.FirstName, createdEvent.MiddleName, createdEvent.LastName);
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">
@@ -21,28 +21,28 @@
                     <govuk-summary-list-row-value>@name</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (@event.DateOfBirth is DateOnly dateOfBirth)
+            @if (createdEvent.DateOfBirth is DateOnly dateOfBirth)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (@event.EmailAddress is string emailAddress)
+            @if (createdEvent.EmailAddress is string emailAddress)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@emailAddress</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (@event.NationalInsuranceNumber is string nationalInsuranceNumber)
+            @if (createdEvent.NationalInsuranceNumber is string nationalInsuranceNumber)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@nationalInsuranceNumber</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (@event.Gender is Gender gender)
+            @if (createdEvent.Gender is Gender gender)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
