@@ -136,7 +136,7 @@ public class RejectModel(
                     RequestData = changeDateOfBirthRequestData!,
                     SupportTask = EventModels.SupportTask.FromModel(SupportTask!),
                     OldSupportTask = oldSupportTask,
-                    RejectionReason = RejectionReasonChoice!.Value.EmailReason(),
+                    RejectionReason = RejectionReasonChoice.Value.GetDisplayName()!,
                     EventId = Guid.NewGuid(),
                     CreatedUtc = clock.UtcNow,
                     RaisedBy = User.GetUserId()
@@ -158,7 +158,7 @@ public class RejectModel(
                     Personalization = new Dictionary<string, string>
                     {
                         [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = Person!.FirstName,
-                        [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = RejectionReasonChoice!.Value.EmailReason()
+                        [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = RejectionReasonChoice.Value.EmailReason()
                     }
                 };
 

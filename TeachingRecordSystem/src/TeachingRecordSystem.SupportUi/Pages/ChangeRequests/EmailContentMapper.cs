@@ -2,7 +2,7 @@ using static TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeReque
 
 namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests;
 
-public static class EmailContentGenerator
+public static class EmailContentMapper
 {
     public static string EmailReason(this CaseRejectionReasonOption reason) => reason switch
     {
