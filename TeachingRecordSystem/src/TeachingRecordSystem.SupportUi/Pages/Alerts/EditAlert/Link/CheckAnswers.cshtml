@@ -56,7 +56,7 @@
                     <govuk-summary-list-row-value>
                         @if (Model.ChangeReasonDetail is not null)
                         {
-                            <multi-line-text text="@Model.ChangeReasonDetail" />
+                            @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
                         }
                         else
                         {

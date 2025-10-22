@@ -72,7 +72,7 @@
                             <govuk-summary-list-row-value>
                                 @if (createdEvent.CreateReasonDetail is not null)
                                 {
-                                    <multi-line-text text="@createdEvent.CreateReasonDetail" />
+                                    @Html.ConvertNewlinesToLineBreaks(createdEvent.CreateReasonDetail)
                                 }
                                 else
                                 {

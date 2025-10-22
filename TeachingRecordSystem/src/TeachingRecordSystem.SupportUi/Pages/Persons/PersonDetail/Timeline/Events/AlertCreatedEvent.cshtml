@@ -54,25 +54,18 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (createdEvent.AddReasonDetail is not null)
-                            {
-                                <multi-line-text text="@createdEvent.AddReasonDetail" data-testid="reason-detail" />
-                            }
-                            else
-                            {
-                                <span use-empty-fallback data-testid="reason-detail"></span>
-                            }
+                        <govuk-summary-list-row-value data-testid="reason-detail" use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(createdEvent.AddReasonDetail)
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
-                            <vc:event-evidence-file-link evidence-file="@createdEvent.EvidenceFile" />                            
+                            <vc:event-evidence-file-link evidence-file="@createdEvent.EvidenceFile" />
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-details-text>
-        </govuk-details>        
+        </govuk-details>
     </div>
 </div>

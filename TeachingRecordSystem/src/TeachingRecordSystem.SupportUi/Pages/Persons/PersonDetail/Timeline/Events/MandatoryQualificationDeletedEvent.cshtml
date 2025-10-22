@@ -27,7 +27,9 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>More detail</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="deletion-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(deletedEvent.DeletionReasonDetail) ? deletedEvent.DeletionReasonDetail : "None")" /></govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="deletion-reason-detail">
+                            @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(deletedEvent.DeletionReasonDetail) ? deletedEvent.DeletionReasonDetail : "None")
+                        </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     @if (evidenceFileUrl is not null)
                     {

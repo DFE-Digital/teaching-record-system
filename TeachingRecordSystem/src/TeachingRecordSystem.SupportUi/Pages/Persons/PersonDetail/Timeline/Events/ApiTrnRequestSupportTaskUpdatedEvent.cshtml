@@ -19,13 +19,6 @@
     var oldName = oldAttributes != null
         ? StringHelper.JoinNonEmpty(' ', oldAttributes.FirstName, oldAttributes.MiddleName, oldAttributes.LastName)
         : null;
-    var requestDataAddress = StringHelper.JoinNonEmpty('\n',
-        requestData.AddressLine1,
-        requestData.AddressLine2,
-        requestData.AddressLine3,
-        requestData.City,
-        requestData.Postcode,
-        requestData.Country);
     var requestDataName = StringHelper.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName);
     var requestDataPreviousName = StringHelper.JoinNonEmpty(' ', requestData.PreviousFirstName, requestData.PreviousLastName);
 
@@ -117,28 +110,14 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (!string.IsNullOrWhiteSpace(requestDataName))
-                            {
-                                <multi-line-text text="@requestDataName" />
-                            }
-                            else
-                            {
-                                <span use-empty-fallback></span>
-                            }
+                        <govuk-summary-list-row-value use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(requestDataName)
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Previous name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (!string.IsNullOrWhiteSpace(requestDataPreviousName))
-                            {
-                                <multi-line-text text="@requestDataPreviousName" />
-                            }
-                            else
-                            {
-                                <span use-empty-fallback></span>
-                            }
+                        <govuk-summary-list-row-value use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(requestDataPreviousName)
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
@@ -156,19 +135,6 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@requestData.Gender?.GetDisplayName()</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Address</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (!string.IsNullOrWhiteSpace(requestDataAddress))
-                            {
-                                <multi-line-text text="@requestDataAddress" />
-                            }
-                            else
-                            {
-                                <span use-empty-fallback></span>
-                            }
-                        </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-details-text>

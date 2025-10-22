@@ -5,12 +5,12 @@
     <govuk-pagination>
         @if (Model.ShowPreviousPage)
         {
-            <govuk-pagination-previous href="@Html.Raw(@Model.GetPageLink(Model.PreviousPage))" />
+            <govuk-pagination-previous href="@Html.Raw(Model.GetPageLink(Model.PreviousPage))" />
         }
 
         @if (Model.ShowFirstPage)
         {
-            <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.FirstPage))">@Model.FirstPage</govuk-pagination-item>
+            <govuk-pagination-item href="@Html.Raw(Model.GetPageLink(Model.FirstPage))">@Model.FirstPage</govuk-pagination-item>
             if (Model.ShowFirstPageEllipsis)
             {
                 <govuk-pagination-ellipsis />
@@ -19,14 +19,14 @@
 
         @if (Model.ShowPreviousPage)
         {
-            <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.PreviousPage))">@Model.PreviousPage</govuk-pagination-item>
+            <govuk-pagination-item href="@Html.Raw(Model.GetPageLink(Model.PreviousPage))">@Model.PreviousPage</govuk-pagination-item>
         }
 
-        <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.CurrentPage))" current=@true>@Model.CurrentPage</govuk-pagination-item>
+        <govuk-pagination-item href="@Html.Raw(Model.GetPageLink(Model.CurrentPage))" current=@true>@Model.CurrentPage</govuk-pagination-item>
 
         @if (Model.ShowNextPage)
         {
-            <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.NextPage))">@Model.NextPage</govuk-pagination-item>
+            <govuk-pagination-item href="@Html.Raw(Model.GetPageLink(Model.NextPage))">@Model.NextPage</govuk-pagination-item>
         }
 
         @if (Model.ShowLastPage)
@@ -35,12 +35,12 @@
             {
                 <govuk-pagination-ellipsis />
             }
-            <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.LastPage))">@Model.LastPage</govuk-pagination-item>
+            <govuk-pagination-item href="@Html.Raw(Model.GetPageLink(Model.LastPage))">@Model.LastPage</govuk-pagination-item>
         }
 
         @if (Model.ShowNextPage)
         {
-            <govuk-pagination-next href="@Html.Raw(@Model.GetPageLink(Model.NextPage))" />
+            <govuk-pagination-next href="@Html.Raw(Model.GetPageLink(Model.NextPage))" />
         }
     </govuk-pagination>
 }

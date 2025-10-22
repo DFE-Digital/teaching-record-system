@@ -19,28 +19,28 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>
-            @if (@induction.InductionStatus.HasValue)
+            @if (induction.InductionStatus.HasValue)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="induction-status">@induction.InductionStatus.ValueOrDefault()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (@induction.InductionExemptionReason.HasValue)
+            @if (induction.InductionExemptionReason.HasValue)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="exemption-reason">@induction.InductionExemptionReason.ValueOrDefault()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (@induction.StartDate.HasValue)
+            @if (induction.StartDate.HasValue)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="start-date">@induction.StartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (@induction.CompletionDate.HasValue)
+            @if (induction.CompletionDate.HasValue)
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>

@@ -40,7 +40,7 @@
                             <govuk-summary-list-row-value>
                                 @if (Model.DeactivateReasonDetail is not null)
                                 {
-                                    <multi-line-text text="@Model.DeactivateReasonDetail" />
+                                    @Html.ConvertNewlinesToLineBreaks(Model.DeactivateReasonDetail)
                                 }
                                 else
                                 {
@@ -66,7 +66,7 @@
                             <govuk-summary-list-row-value>
                                 @if (Model.ReactivateReasonDetail is not null)
                                 {
-                                    <multi-line-text text="@Model.ReactivateReasonDetail" />
+                                    @Html.ConvertNewlinesToLineBreaks(Model.ReactivateReasonDetail)
                                 }
                                 else
                                 {

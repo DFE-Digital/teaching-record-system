@@ -31,7 +31,9 @@
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>More detail</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="change-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(updatedEvent.ChangeReasonDetail) ? updatedEvent.ChangeReasonDetail : "None")" /></govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value data-testid="change-reason-detail">
+                                @Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(updatedEvent.ChangeReasonDetail) ? updatedEvent.ChangeReasonDetail : "None")
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         @if (evidenceFileUrl is not null)
                         {
@@ -49,7 +51,7 @@
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
-                <govuk-summary-list>                
+                <govuk-summary-list>
                 @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Provider))
                 {
                     <govuk-summary-list-row>

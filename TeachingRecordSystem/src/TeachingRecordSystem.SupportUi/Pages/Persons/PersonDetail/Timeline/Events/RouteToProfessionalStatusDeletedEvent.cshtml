@@ -38,15 +38,8 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (deletedEvent.DeletionReasonDetail is not null)
-                            {
-                                <multi-line-text text="@deletedEvent.DeletionReasonDetail" data-testid="reason-detail" />
-                            }
-                            else
-                            {
-                                <span data-testid="reason-detail" use-empty-fallback></span>
-                            }
+                        <govuk-summary-list-row-value use-empty-fallback data-testid="reason-detail">
+                            @Html.ConvertNewlinesToLineBreaks(deletedEvent.DeletionReasonDetail)
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>

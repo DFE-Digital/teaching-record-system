@@ -29,7 +29,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>More details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="change-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="change-reason-detail">@Html.ConvertNewlinesToLineBreaks(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>

@@ -144,7 +144,7 @@
                         <govuk-summary-list-row-value>
                             @if (!string.IsNullOrWhiteSpace(requestDataName))
                             {
-                                <multi-line-text text="@requestDataName" />
+                                @Html.ConvertNewlinesToLineBreaks(requestDataName)
                             }
                             else
                             {

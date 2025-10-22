@@ -172,7 +172,6 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture host
         item.AssertSummaryListRowValue("request-data", "Email address", v => Assert.Equal(newEmail ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "National Insurance number", v => Assert.Equal(newNino ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Address", v => Assert.Equal("<p class=\"govuk-body\">1 Test Place<br>Test Street<br>Testborough<br>Testington<br>TE57 1NG<br>Testland</p>", v.InnerHtml.Trim()));
     }
 
     [Test]

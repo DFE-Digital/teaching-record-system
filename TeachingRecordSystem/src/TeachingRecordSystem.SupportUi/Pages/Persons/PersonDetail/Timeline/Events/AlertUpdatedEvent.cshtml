@@ -41,7 +41,7 @@
             else
             {
                 heading = "end date changed";
-            }            
+            }
         }
         else if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
         {
@@ -90,15 +90,8 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
-                        @if (alert.Details is not null)
-                        {
-                            <multi-line-text text="@alert.Details" data-testid="details" />
-                        }
-                        else
-                        {
-                            <span use-empty-fallback data-testid="details"></span>
-                        }
+                    <govuk-summary-list-row-value use-empty-fallback data-testid="details">
+                        @Html.ConvertNewlinesToLineBreaks(alert.Details)
                     </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
@@ -155,15 +148,8 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (updatedEvent.ChangeReasonDetail is not null)
-                            {
-                                <multi-line-text text="@updatedEvent.ChangeReasonDetail" data-testid="reason-detail" />
-                            }
-                            else
-                            {
-                                <span use-empty-fallback data-testid="reason-detail"></span>
-                            }
+                        <govuk-summary-list-row-value data-testid="reason-detail" use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(updatedEvent.ChangeReasonDetail)
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
@@ -194,15 +180,8 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value>
-                                    @if (oldAlert.Details is not null)
-                                    {
-                                        <multi-line-text text="@oldAlert.Details" data-testid="old-details" />
-                                    }
-                                    else
-                                    {
-                                        <span use-empty-fallback data-testid="old-details"></span>
-                                    }
+                                <govuk-summary-list-row-value use-empty-fallback data-testid="old-details">
+                                    @Html.ConvertNewlinesToLineBreaks(oldAlert.Details)
                                 </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
@@ -210,7 +189,7 @@
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
                         {
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>External link</govuk-summary-list-row-key>                                
+                                <govuk-summary-list-row-key>External link</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value>
                                     @if (oldAlert.ExternalLink is not null)
                                     {
@@ -254,6 +233,6 @@
                     </govuk-summary-list>
                 </govuk-details-text>
             </govuk-details>
-        }        
+        }
     </div>
 </div>

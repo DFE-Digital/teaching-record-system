@@ -21,7 +21,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" data-testid="details" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="details">@Html.ConvertNewlinesToLineBreaks(Model.Details)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
@@ -46,15 +46,8 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for deleting alert</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
-                        @if (Model.DeleteReasonDetail is not null)
-                        {
-                            <multi-line-text text="@Model.DeleteReasonDetail" />
-                        }
-                        else
-                        {
-                            <span use-empty-fallback></span>
-                        }
+                    <govuk-summary-list-row-value use-empty-fallback>
+                        @Html.ConvertNewlinesToLineBreaks(Model.DeleteReasonDetail)
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
@@ -74,11 +67,11 @@
             <h2 class="govuk-heading-m">Are you sure you want to delete this alert?</h2>
             <div class="govuk-body">
                 <span class="govuk-caption-m">Deleting this alert will permanently remove it from the database</span>
-            </div>            
+            </div>
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit">Delete alert</govuk-button>
                 <govuk-button formaction="@LinkGenerator.Alerts.DeleteAlert.CheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
-            </div>                                
+            </div>
         </form>
     </div>
 </div>

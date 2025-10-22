@@ -58,7 +58,7 @@
                     <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
                 }
             </govuk-select>
-            @if (@Model.ArchivedRouteId is not null)
+            @if (Model.ArchivedRouteId is not null)
             {
                 <govuk-details open="true">
                     <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>

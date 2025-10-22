@@ -21,7 +21,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" data-testid="details" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-test-id="details">@Html.ConvertNewlinesToLineBreaks(Model.Details)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
@@ -59,7 +59,7 @@
                     <govuk-summary-list-row-value>
                         @if (Model.ChangeReasonDetail is not null)
                         {
-                            <multi-line-text text="@Model.ChangeReasonDetail" />
+                            @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
                         }
                         else
                         {
