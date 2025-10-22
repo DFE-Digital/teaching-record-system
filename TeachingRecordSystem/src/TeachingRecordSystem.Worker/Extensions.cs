@@ -14,6 +14,7 @@ using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.GetAnIdentity;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PublishApi;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 
@@ -48,6 +49,15 @@ public static class Extensions
             };
 
             services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+
+            services.AddSingleton<TrsDataSyncHelper>();
+        }
+
+        if (configuration.GetValue<string>("TrsSyncService:CrmConnectionString") is string dataSyncCrmConnectionString)
+        {
+            var dataSyncCrmServiceClient = new ServiceClient(dataSyncCrmConnectionString);
+            services.AddNamedServiceClient(TrsDataSyncHelper.CrmClientName, ServiceLifetime.Transient, _ => dataSyncCrmServiceClient);
+            services.AddSingleton<IAuditRepository, BlobStorageAuditRepository>();
         }
 
         if (!environment.IsTests() && !environment.IsEndToEndTests())
