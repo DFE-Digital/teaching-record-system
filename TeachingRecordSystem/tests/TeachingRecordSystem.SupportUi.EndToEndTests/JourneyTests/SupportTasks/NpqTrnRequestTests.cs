@@ -26,7 +26,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesPageAsync(supportTaskReference);
-        await page.ClickRadioByLabelAsync($"I want to create a new record from the {applicationUser.Name} request");
+        await page.ClickRadioByLabelAsync($"Create a new record");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesCheckYourAnswersPageAsync(supportTaskReference);
@@ -91,7 +91,7 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMatchesPageAsync(supportTaskReference);
-        await page.ClickRadioByLabelAsync($"Record A"); // the record with no conflicting info
+        await page.ClickRadioByLabelAsync($"Merge it with Record A"); // the record with no conflicting info
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMergePageAsync(supportTaskReference);
