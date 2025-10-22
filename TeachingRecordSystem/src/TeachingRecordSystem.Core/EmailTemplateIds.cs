@@ -9,10 +9,8 @@ public static class EmailTemplateIds
     public const string InductionCompletedEmailConfirmation = "8029faa8-8409-4423-a717-c142dfd2ba86";
     public const string GetAnIdentityChangeOfDateOfBirthSubmittedEmailConfirmation = "6b734de9-0ff4-4f06-beeb-b10199aeae63";
     public const string GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation = "95977d42-7bdd-4c9b-938c-76d934618694";
-    public const string GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation = "abe622ac-79b0-40b3-a29d-94f359a0f03e";
     public const string GetAnIdentityChangeOfNameSubmittedEmailConfirmation = "c20e4147-a6b9-46cd-a940-c9d6392eee50";
     public const string GetAnIdentityChangeOfNameApprovedEmailConfirmation = "cf4b00de-8a2e-4e9c-a913-23725e7a2334";
-    public const string GetAnIdentityChangeOfNameRejectedEmailConfirmation = "bc790721-11c7-42e0-8f88-41ea96296602";
-    public const string NewGetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation = "7db03f12-e4f8-418f-a46f-09c46426458a";
-    public const string NewGetAnIdentityChangeOfNameRejectedEmailConfirmation = "0461b297-b032-45d8-8ed5-ba75ec0467a9";
+    public const string GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation = "7db03f12-e4f8-418f-a46f-09c46426458a";
+    public const string GetAnIdentityChangeOfNameRejectedEmailConfirmation = "0461b297-b032-45d8-8ed5-ba75ec0467a9";
 }
