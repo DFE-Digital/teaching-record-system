@@ -155,7 +155,11 @@ public class RejectModel(
                     EmailId = Guid.NewGuid(),
                     TemplateId = emailTemplateId,
                     EmailAddress = emailAddress!,
-                    Personalization = new Dictionary<string, string>() { { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, Person!.FirstName } }
+                    Personalization = new Dictionary<string, string>
+                    {
+                        [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = Person!.FirstName,
+                        [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = RejectionReasonChoice.Value.EmailReason()
+                    }
                 };
 
                 dbContext.Emails.Add(email);
