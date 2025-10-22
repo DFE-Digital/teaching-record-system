@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.EditAlert.EndDate.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.EditAlert.EndDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Alerts.EditAlert.EndDate.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.EditAlert.EndDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -15,27 +15,28 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-radios for="ChangeReason" data-testid="change-reason-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
-                    <govuk-radios-item value="@AlertChangeEndDateReasonOption.IncorrectEndDate">
-                        @AlertChangeEndDateReasonOption.IncorrectEndDate.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@AlertChangeEndDateReasonOption.ChangeOfEndDate">
-                        @AlertChangeEndDateReasonOption.ChangeOfEndDate.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@AlertChangeEndDateReasonOption.AnotherReason">
-                        @AlertChangeEndDateReasonOption.AnotherReason.GetDisplayName()
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-item value="@AlertChangeEndDateReasonOption.IncorrectEndDate">
+                    @AlertChangeEndDateReasonOption.IncorrectEndDate.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@AlertChangeEndDateReasonOption.ChangeOfEndDate">
+                    @AlertChangeEndDateReasonOption.ChangeOfEndDate.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@AlertChangeEndDateReasonOption.AnotherReason">
+                    @AlertChangeEndDateReasonOption.AnotherReason.GetDisplayName()
+                </govuk-radios-item>
             </govuk-radios>
 
             <govuk-radios for="HasAdditionalReasonDetail">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                        Do you want to provide more information?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows">
+                                <govuk-character-count-label>Add additional detail</govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

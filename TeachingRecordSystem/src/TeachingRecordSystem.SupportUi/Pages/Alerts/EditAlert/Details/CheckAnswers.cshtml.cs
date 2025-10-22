@@ -27,7 +27,7 @@ public class CheckAnswersModel(
 
     public string? NewDetails { get; set; }
 
-    public string? CurrentDetails { get; set; }
+    public string? PreviousDetails { get; set; }
 
     public AlertChangeDetailsReasonOption ChangeReason { get; set; }
 
@@ -49,7 +49,7 @@ public class CheckAnswersModel(
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         NewDetails = JourneyInstance!.State.Details;
-        CurrentDetails = alertInfo.Alert.Details;
+        PreviousDetails = alertInfo.Alert.Details;
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;

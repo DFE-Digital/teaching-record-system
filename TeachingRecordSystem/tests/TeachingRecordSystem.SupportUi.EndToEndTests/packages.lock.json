@@ -2332,7 +2332,7 @@
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "DartSassBuilder": "[1.1.0, )",
           "FluentValidation.AspNetCore": "[11.3.0, )",
-          "GovUk.Frontend.AspNetCore": "[3.4.0, )",
+          "GovUk.Frontend.AspNetCore": "[3.4.1, )",
           "Humanizer.Core": "[2.14.1, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[5.0.0, )",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[9.0.10, )",
@@ -2548,9 +2548,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[3.4.0, )",
-        "resolved": "3.4.0",
-        "contentHash": "pQ93g3Iha1R2bDhmHpcqDRJFyTPEKduDeRWY2WafrVT1UrqjBPhmYSyoGS4ZFk7epJLhGG8dy0QaL/zwxMAggA==",
+        "requested": "[3.4.1, )",
+        "resolved": "3.4.1",
+        "contentHash": "zwD+dxTXUN6Joa3ZML6BmakJ6Wx/knJNd28/lem1ks8bZ/c93g+go7arjZ/duZW+ikEZWeDy3BNva31J/PYbbA==",
         "dependencies": {
           "Fluid.Core": "[2.15.0, 3.0.0)",
           "Microsoft.Extensions.FileProviders.Embedded": "8.0.21",

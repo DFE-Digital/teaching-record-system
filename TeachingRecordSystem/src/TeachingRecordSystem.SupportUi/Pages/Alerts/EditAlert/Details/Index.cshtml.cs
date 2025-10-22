@@ -25,7 +25,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     [BindProperty]
     [Required(ErrorMessage = "Enter details")]
-    [Display(Description = "For example, include any restrictions it places on a teacher.")]
+    [Display(Description = "")]
     [MaxLength(DetailsMaxLength, ErrorMessage = "Details must be 4000 characters or less")]
     public string? Details { get; set; }
 

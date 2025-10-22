@@ -30,9 +30,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[3.4.0, )",
-        "resolved": "3.4.0",
-        "contentHash": "pQ93g3Iha1R2bDhmHpcqDRJFyTPEKduDeRWY2WafrVT1UrqjBPhmYSyoGS4ZFk7epJLhGG8dy0QaL/zwxMAggA==",
+        "requested": "[3.4.1, )",
+        "resolved": "3.4.1",
+        "contentHash": "zwD+dxTXUN6Joa3ZML6BmakJ6Wx/knJNd28/lem1ks8bZ/c93g+go7arjZ/duZW+ikEZWeDy3BNva31J/PYbbA==",
         "dependencies": {
           "Fluid.Core": "[2.15.0, 3.0.0)",
           "Microsoft.Extensions.FileProviders.Embedded": "8.0.21",

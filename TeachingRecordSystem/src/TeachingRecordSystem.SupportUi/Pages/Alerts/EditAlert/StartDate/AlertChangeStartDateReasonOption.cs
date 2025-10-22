@@ -4,9 +4,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 public enum AlertChangeStartDateReasonOption
 {
-    [Display(Name = "Incorrect start date")]
+    [Display(Name = "The start date was incorrect")]
     IncorrectStartDate,
-    [Display(Name = "Change of start date")]
+    [Display(Name = "The start date has changed")]
     ChangeOfStartDate,
     [Display(Name = "Another reason")]
     AnotherReason

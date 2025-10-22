@@ -4,17 +4,20 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.CloseAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Persons.PersonDetail.Alerts(Model.PersonId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Alerts.CloseAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Persons.PersonDetail.Alerts(Model.PersonId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Alerts.CloseAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <span class="govuk-caption-l">Close an alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Close alert -@Model.PersonName</span>
 
-            <govuk-date-input for="EndDate">
+            <govuk-date-input for="EndDate" error-message-prefix="Alert end date">
                 <govuk-date-input-fieldset>
-                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
+                        Enter an alert end date
+                    </govuk-date-input-fieldset-legend>
+                    <govuk-date-input-hint>For example 31 3 2024</govuk-date-input-hint>
                 </govuk-date-input-fieldset>
             </govuk-date-input>
 

@@ -1,7 +1,7 @@
 @page "/alerts/add/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details and add alert";
+    ViewBag.Title = "Check details before adding alert";
 }
 
 @section BeforeContent {
@@ -34,7 +34,7 @@
                     <govuk-summary-list-row-value>
                         @if (Model.Link is not null)
                         {
-                                <a href="@Model.LinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.Link} (opens in new tab)")</a>
+                            <a href="@Model.LinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.Link} (opens in new tab)")</a>
                         }
                         else
                         {

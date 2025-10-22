@@ -4,9 +4,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
 public enum AlertChangeLinkReasonOption
 {
-    [Display(Name = "Incorrect link")]
+    [Display(Name = "The link was incorrect")]
     IncorrectLink,
-    [Display(Name = "Change of link")]
+    [Display(Name = "The link was changed")]
     ChangeOfLink,
     [Display(Name = "Another reason")]
     AnotherReason

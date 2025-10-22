@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,10 +24,9 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public bool? AddLink { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter link to panel outcome")]
     public string? Link { get; set; }
 
-    public string? CurrentLink { get; set; }
+    public string? PreviousLink { get; set; }
 
     public void OnGet()
     {
@@ -40,7 +38,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     {
         if (AddLink is null)
         {
-            if (string.IsNullOrEmpty(CurrentLink))
+            if (string.IsNullOrEmpty(PreviousLink))
             {
                 ModelState.AddModelError(nameof(AddLink), "Select yes if you want to add a link to a panel outcome");
             }
@@ -55,7 +53,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
             {
                 ModelState.AddModelError(nameof(Link), "Enter a valid URL");
             }
-            else if (Link == CurrentLink)
+            else if (Link == PreviousLink)
             {
                 ModelState.AddModelError(nameof(Link), "Enter a different link");
             }
@@ -72,7 +70,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
             state.Link = AddLink == true ? Link : null;
         });
 
-        if (string.IsNullOrEmpty(CurrentLink) && AddLink == false)
+        if (string.IsNullOrEmpty(PreviousLink) && AddLink == false)
         {
             return await OnPostCancelAsync();
         }
@@ -98,6 +96,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        CurrentLink = alertInfo.Alert.ExternalLink;
+        PreviousLink = alertInfo.Alert.ExternalLink;
     }
 }
