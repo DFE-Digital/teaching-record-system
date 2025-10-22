@@ -1,9 +1,12 @@
 using System.ServiceModel;
+using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -12,11 +15,40 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public class SyncAllDqtContactAuditsJob(
     [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+    IDbContextFactory<TrsDbContext> dbContextFactory,
     TrsDataSyncHelper trsDataSyncHelper,
     ILogger<SyncAllDqtContactAuditsJob> logger)
 {
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(PerformContext context, CancellationToken cancellationToken)
     {
+        var jobId = context.BackgroundJob.Id;
+        var jobName = $"{nameof(SyncAllDqtContactAuditsJob)}-{jobId}";
+
+        JobMetadata? jobMetadata;
+        var initialPageNumber = 1;
+        string? initialPagingCookie = null;
+
+        await using (var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken))
+        {
+            jobMetadata = await dbContext.JobMetadata.SingleOrDefaultAsync(j => j.JobName == jobName, cancellationToken: cancellationToken);
+
+            if (jobMetadata?.Metadata.GetValueOrDefault(MetadataKeys.PageNumber) is string pageNumberMetadata)
+            {
+                initialPageNumber = int.Parse(pageNumberMetadata);
+            }
+            if (jobMetadata?.Metadata.GetValueOrDefault(MetadataKeys.PagingCoookie) is string pagingCookieMetadata)
+            {
+                initialPagingCookie = pagingCookieMetadata;
+            }
+
+            if (jobMetadata is null)
+            {
+                jobMetadata = new JobMetadata { JobName = jobName, Metadata = new() };
+                dbContext.JobMetadata.Add(jobMetadata);
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         const int pageSize = 1000;
 
         var query = new QueryExpression(Contact.EntityLogicalName)
@@ -30,7 +62,8 @@ public class SyncAllDqtContactAuditsJob(
             PageInfo = new PagingInfo()
             {
                 Count = pageSize,
-                PageNumber = 1
+                PageNumber = initialPageNumber,
+                PagingCookie = initialPagingCookie
             }
         };
 
@@ -68,13 +101,34 @@ public class SyncAllDqtContactAuditsJob(
             {
                 query.PageInfo.PageNumber++;
                 query.PageInfo.PagingCookie = result.PagingCookie;
+
+                await using (var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken))
+                {
+                    dbContext.Attach(jobMetadata);
+
+                    jobMetadata.Metadata[MetadataKeys.PageNumber] = query.PageInfo.PageNumber.ToString();
+                    jobMetadata.Metadata[MetadataKeys.PagingCoookie] = result.PagingCookie;
+
+                    await dbContext.SaveChangesAsync(cancellationToken);
+                }
             }
             else
             {
+                await using (var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken))
+                {
+                    await dbContext.JobMetadata.Where(j => j.JobName == jobName).ExecuteDeleteAsync();
+                }
+
                 break;
             }
         }
 
         logger.LogWarning("Synced {Count} contact audit records.", fetched);
+    }
+
+    private static class MetadataKeys
+    {
+        public const string PageNumber = nameof(PageNumber);
+        public const string PagingCoookie = nameof(PagingCoookie);
     }
 }

@@ -178,7 +178,7 @@ public static class Extensions
 
             recurringJobManager.AddOrUpdate<SyncAllDqtContactAuditsJob>(
                 nameof(SyncAllDqtContactAuditsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
+                job => job.ExecuteAsync(/*performContext: */null!, CancellationToken.None),
                 Cron.Never);
 
             recurringJobManager.AddOrUpdate<SyncAllDqtInductionAuditsJob>(
