@@ -146,12 +146,13 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
                 var firstName = inputRow.FirstName!.Trim();
                 var middleName = inputRow.MiddleName?.Trim();
                 var lastName = inputRow.LastName!.Trim();
+                var applicationUserId = ApplicationUser.NpqApplicationUserGuid;
+                var requestId = Guid.NewGuid().ToString();
 
                 var trnRequestMetadata = new TrnRequestMetadata
                 {
-                    // Is this correct?
-                    ApplicationUserId = ApplicationUser.NpqApplicationUserGuid,
-                    RequestId = Guid.NewGuid().ToString(),
+                    ApplicationUserId = applicationUserId,
+                    RequestId = requestId,
                     CreatedOn = now,
                     IdentityVerified = null,
                     OneLoginUserSubject = null,
@@ -183,19 +184,12 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
                             email,
                             nino,
                             gender,
-                            now);
+                            now,
+                            sourceTrnRequest: (applicationUserId, requestId));
 
                         dbContext.Persons.Add(person.Person);
 
-                        // Do we need both these events?
-                        dbContext.AddEventWithoutBroadcast(new TrnAllocatedEvent
-                        {
-                            EventId = Guid.NewGuid(),
-                            CreatedUtc = clock.UtcNow,
-                            PersonId = person.Person.PersonId,
-                            RaisedBy = SystemUser.SystemUserId,
-                            Trn = newTrn
-                        });
+                        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
 
                         dbContext.AddEventWithoutBroadcast(new PersonCreatedEvent
                         {
@@ -207,7 +201,8 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
                             CreateReason = null,
                             CreateReasonDetail = null,
                             EvidenceFile = null,
-                            TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata)
+                            TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata),
+
                         });
 
                         var emailId = Guid.NewGuid();

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
@@ -467,7 +468,9 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
 
             """, file.Content, ignoreLineEndingDifferences: true);
 
-        var person = await DbContext.Persons.SingleAsync(p => p.Trn == TrnGenerator.LastGeneratedTrn.ToString());
+        var person = await DbContext.Persons
+            .SingleAsync(p => p.Trn == TrnGenerator.LastGeneratedTrn.ToString());
+
         Assert.Equal("Bob", person.FirstName);
         Assert.Equal("Middle", person.MiddleName);
         Assert.Equal("Jones", person.LastName);
@@ -475,10 +478,25 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         Assert.Equal("bob.jones@email.com", person.EmailAddress);
         Assert.Equal("AB123456D", person.NationalInsuranceNumber);
         Assert.Equal(Gender.Male, person.Gender);
+        Assert.Equal(ApplicationUser.NpqApplicationUserGuid, person.SourceApplicationUserId);
 
-        var events = await DbContext.Events.Where(e => e.PersonId == person.PersonId).ToArrayAsync();
+        var metadata = await DbContext.TrnRequestMetadata
+            .SingleAsync(m => m.ApplicationUserId == ApplicationUser.NpqApplicationUserGuid && m.RequestId == person.SourceTrnRequestId);
+
+        Assert.Equal("Bob", metadata.FirstName);
+        Assert.Equal("Middle", metadata.MiddleName);
+        Assert.Equal("Jones", metadata.LastName);
+        Assert.Equivalent(new[] { "Bob", "Middle", "Jones" }, metadata.Name);
+        Assert.Equal(DateOnly.Parse("02/02/2002"), metadata.DateOfBirth);
+        Assert.Equal("bob.jones@email.com", metadata.EmailAddress);
+        Assert.Equal("AB123456D", metadata.NationalInsuranceNumber);
+        Assert.Equal(Gender.Male, metadata.Gender);
+
+        var events = await DbContext.Events
+            .Where(e => e.PersonId == person.PersonId).ToArrayAsync();
         var payloads = events.Select(e => e.ToEventBase());
         var personCreatedEvent = payloads.OfType<TeachingRecordSystem.Core.Events.Legacy.PersonCreatedEvent>().FirstOrDefault();
+
         Assert.NotNull(personCreatedEvent);
         Assert.Equal("Bob", personCreatedEvent.PersonAttributes.FirstName);
         Assert.Equal("Middle", personCreatedEvent.PersonAttributes.MiddleName);
@@ -487,10 +505,6 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         Assert.Equal("bob.jones@email.com", personCreatedEvent.PersonAttributes.EmailAddress);
         Assert.Equal("AB123456D", personCreatedEvent.PersonAttributes.NationalInsuranceNumber);
         Assert.Equal(Gender.Male, personCreatedEvent.PersonAttributes.Gender);
-
-        var trnAllocatedEvent = payloads.OfType<TeachingRecordSystem.Core.Events.Legacy.TrnAllocatedEvent>().FirstOrDefault();
-        Assert.NotNull(trnAllocatedEvent);
-        Assert.Equal(person.Trn, trnAllocatedEvent.Trn);
 
         var email = await DbContext.Emails.SingleAsync(e => e.EmailAddress == "bob.jones@email.com");
         Assert.NotNull(email);
