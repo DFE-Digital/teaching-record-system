@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.Files;
 using Xunit.Abstractions;
 using static TeachingRecordSystem.TestCommon.TestData;
 
@@ -22,12 +21,13 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public TestData TestData => fixture.TestData;
     public TestableClock Clock => fixture.Clock;
     public ILoggerFactory LoggerFactory => fixture.LoggerFactory;
-    public Mock<IFileService> FileService => fixture.FileServiceMock;
+    public TestFileStorageService FileStorageService => fixture.FileStorageService;
     public ILogger<DeletePersonAndChildRecordsWithoutATrnJob> TestOutputLogger { get; } = new TestOutputLogger<DeletePersonAndChildRecordsWithoutATrnJob>(outputHelper);
 
     public async Task InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
+        FileStorageService.Clear();
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -85,12 +85,15 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         await job.ExecuteAsync(true, CancellationToken.None);
 
         // Assert
-        var file = fixture.GetLastUploadedFile();
+        var file = FileStorageService.GetLastUploadedFile();
+
+        // Assert
         Assert.NotNull(file);
+        Assert.Equal(DeletePersonAndChildRecordsWithoutATrnJob.ContainerName, file.ContainerName);
+        Assert.StartsWith($"{DeletePersonAndChildRecordsWithoutATrnJob.OutputFolderName}/{DeletePersonAndChildRecordsWithoutATrnJob.OutputFileNamePrefix}", file.FileName, StringComparison.InvariantCultureIgnoreCase);
 
-        Assert.StartsWith("deletepersonandchildrecordswithoutatrn", file.FileName);
-
-        var deleted = ReadAsCsvRows(file.Contents);
+        Assert.NotNull(file.Content);
+        var deleted = ReadAsCsvRows(file.Content);
         Assert.Equivalent(personsWithNoTrn.Select(p => new CsvRow(p)), deleted);
     }
 
@@ -107,12 +110,15 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         await job.ExecuteAsync(false, CancellationToken.None);
 
         // Assert
-        var file = fixture.GetLastUploadedFile();
+        var file = FileStorageService.GetLastUploadedFile();
+
+        // Assert
         Assert.NotNull(file);
+        Assert.Equal(DeletePersonAndChildRecordsWithoutATrnJob.ContainerName, file.ContainerName);
+        Assert.StartsWith($"{DeletePersonAndChildRecordsWithoutATrnJob.OutputFolderName}/{DeletePersonAndChildRecordsWithoutATrnJob.OutputFileNamePrefix}", file.FileName, StringComparison.InvariantCultureIgnoreCase);
 
-        Assert.StartsWith("deletepersonandchildrecordswithoutatrn", file.FileName);
-
-        var deleted = ReadAsCsvRows(file.Contents);
+        Assert.NotNull(file.Content);
+        var deleted = ReadAsCsvRows(file.Content);
         Assert.Equivalent(personsWithNoTrn.Select(p => new CsvRow(p)), deleted);
     }
 
@@ -185,6 +191,50 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     }
 
     [Fact]
+    public async Task Execute_WhenPersonsReferencedByTrnRequestMetadataViaResolvedPersonId_AndOtherPersonReferencesTrnRequestMetadataViaSourceTrnRequestId_DeletesSupportTasksRequestsAndRequestMetadataForPersonsWithNoTrn()
+    {
+        // Arrange
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTasksForPersonsWithNoTrn, requestIdsForPersonsWithNoTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(personsWithNoTrn, applicationUser.UserId);
+        var (supportTasksForPersonsWithTrn, requestIdsForPersonsWithTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAsync(personsWithTrn, applicationUser.UserId);
+
+        var (otherPersonsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(6, sourceRequestIds: requestIdsForPersonsWithNoTrn.Concat(requestIdsForPersonsWithTrn));
+        var (otherPersonsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(6, sourceRequestIds: requestIdsForPersonsWithNoTrn.Concat(requestIdsForPersonsWithTrn));
+
+        Assert.NotEmpty(await GetTrnRequestsAsync());
+        Assert.NotEmpty(await GetTrnRequestMetadataAsync());
+
+        var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
+
+        // Act
+        await job.ExecuteAsync(false, CancellationToken.None);
+
+        // Assert
+        var personsAfterDelete = await GetPersonsAsync();
+        var supportTasksAfterDelete = await GetSupportTasksAsync();
+        var trnRequestsAfterDelete = await GetTrnRequestsAsync();
+        var trnRequestMetaDataAfterDelete = await GetTrnRequestMetadataAsync();
+
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(otherPersonsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(supportTasksForPersonsWithNoTrn, supportTasksAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestsAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestMetaDataAfterDelete);
+
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(otherPersonsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonsWithTrn, supportTasksAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestsAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestMetaDataAfterDelete);
+
+        Assert.Contains(applicationUser.UserId, await GetApplicationUsersAsync());
+    }
+
+    [Fact]
     public async Task Execute_WhenPersonsReferencedByTrnRequestMetadataViaResolvedPersonIdAndPersonId_DeletesSupportTasksRequestsAndRequestMetadataForPersonsWithNoTrn()
     {
         // Arrange
@@ -198,6 +248,54 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         var (supportTasksForPersonsWithNoTrn, requestIdsForPersonsWithNoTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAndPersonIdAsync(personsWithNoTrn.Zip(olusForPersonsWithNoTrn), applicationUser.UserId);
         var (supportTasksForPersonsWithTrn, requestIdsForPersonsWithTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAndPersonIdAsync(personsWithTrn.Zip(olusForPersonsWithTrn), applicationUser.UserId);
+
+        Assert.NotEmpty(await GetTrnRequestsAsync());
+        Assert.NotEmpty(await GetTrnRequestMetadataAsync());
+
+        var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
+
+        // Act
+        await job.ExecuteAsync(false, CancellationToken.None);
+
+        // Assert
+        var personsAfterDelete = await GetPersonsAsync();
+        var supportTasksAfterDelete = await GetSupportTasksAsync();
+        var trnRequestsAfterDelete = await GetTrnRequestsAsync();
+        var trnRequestMetaDataAfterDelete = await GetTrnRequestMetadataAsync();
+        var olusAfterDelete = await GetOneLoginUsersAsync();
+
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(supportTasksForPersonsWithNoTrn, supportTasksAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestsAfterDelete);
+        AssertEx.DoesNotContainAny(requestIdsForPersonsWithNoTrn, trnRequestMetaDataAfterDelete);
+        AssertEx.ContainsAll(olusForPersonsWithNoTrn, olusAfterDelete);
+
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonsWithTrn, supportTasksAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestsAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestMetaDataAfterDelete);
+        AssertEx.ContainsAll(olusForPersonsWithTrn, olusAfterDelete);
+
+        Assert.Contains(applicationUser.UserId, await GetApplicationUsersAsync());
+    }
+
+    [Fact]
+    public async Task Execute_WhenPersonsReferencedByTrnRequestMetadataViaResolvedPersonIdAndPersonId_AndOtherPersonReferencesTrnRequestMetadataViaSourceTrnRequestId_DeletesSupportTasksRequestsAndRequestMetadataForPersonsWithNoTrn()
+    {
+        // Arrange
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var olusForPersonsWithNoTrn = await CreateOneLoginUsersAsync(personsWithNoTrn, applicationUser.UserId);
+        var olusForPersonsWithTrn = await CreateOneLoginUsersAsync(personsWithTrn, applicationUser.UserId);
+
+        var (supportTasksForPersonsWithNoTrn, requestIdsForPersonsWithNoTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAndPersonIdAsync(personsWithNoTrn.Zip(olusForPersonsWithNoTrn), applicationUser.UserId);
+        var (supportTasksForPersonsWithTrn, requestIdsForPersonsWithTrn) = await CreateSupportTasksReferencingPersonViaResolvedPersonIdAndPersonIdAsync(personsWithTrn.Zip(olusForPersonsWithTrn), applicationUser.UserId);
+
+        var (otherPersonsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(6, sourceRequestIds: requestIdsForPersonsWithNoTrn.Concat(requestIdsForPersonsWithTrn));
+        var (otherPersonsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(6, sourceRequestIds: requestIdsForPersonsWithNoTrn.Concat(requestIdsForPersonsWithTrn));
 
         Assert.NotEmpty(await GetTrnRequestsAsync());
         Assert.NotEmpty(await GetTrnRequestMetadataAsync());
@@ -261,6 +359,45 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         AssertEx.ContainsAll(supportTasksForPersonWithTrn, supportTasksAfterDelete);
         AssertEx.ContainsAll(requestIdsForPersonWithTrn, trnRequestsAfterDelete);
         AssertEx.ContainsAll(requestIdsForPersonWithTrn, trnRequestMetaDataAfterDelete);
+
+        Assert.Contains(applicationUser.UserId, await GetApplicationUsersAsync());
+    }
+
+    [Fact]
+    public async Task Execute_WhenPersonsReferencedByTrnRequestMetadataViaMatchedPersons_AndOtherPersonReferencesTrnRequestMetadataViaSourceTrnRequestId_DoesNotDeleteSupportTaskOrMetadataForPersonsWithNoTrn()
+    {
+        // Arrange
+        var (personsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3);
+        var (personsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3);
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTasksForPersonsWithNoTrn, requestIdsForPersonsWithNoTrn) = await CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(personsWithNoTrn, applicationUser.UserId);
+        var (supportTasksForPersonWithTrn, requestIdsForPersonsWithTrn) = await CreateSupportTasksReferencingPersonViaMatchedPersonsAsync(personsWithTrn, applicationUser.UserId);
+
+        var (otherPersonsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(6, sourceRequestIds: requestIdsForPersonsWithNoTrn.Concat(requestIdsForPersonsWithTrn));
+        var (otherPersonsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(6, sourceRequestIds: requestIdsForPersonsWithNoTrn.Concat(requestIdsForPersonsWithTrn));
+
+        var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
+
+        // Act
+        await job.ExecuteAsync(false, CancellationToken.None);
+
+        // Assert
+        var personsAfterDelete = await GetPersonsAsync();
+        var supportTasksAfterDelete = await GetSupportTasksAsync();
+        var trnRequestsAfterDelete = await GetTrnRequestsAsync();
+        var trnRequestMetaDataAfterDelete = await GetTrnRequestMetadataAsync();
+
+        AssertEx.DoesNotContainAny(personsWithNoTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonsWithNoTrn, supportTasksAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithNoTrn, trnRequestsAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithNoTrn, trnRequestMetaDataAfterDelete);
+
+        AssertEx.ContainsAll(personsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(supportTasksForPersonWithTrn, supportTasksAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestsAfterDelete);
+        AssertEx.ContainsAll(requestIdsForPersonsWithTrn, trnRequestMetaDataAfterDelete);
 
         Assert.Contains(applicationUser.UserId, await GetApplicationUsersAsync());
     }
@@ -570,7 +707,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         new DeletePersonAndChildRecordsWithoutATrnJob(
             CreateJobOptions(batchSize),
             DbContext,
-            FileService.Object,
+            FileStorageService,
             Clock,
             TestOutputLogger);
 
@@ -590,8 +727,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         return csv.GetRecords<CsvRow>().ToList();
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null)
     {
+        sourceRequestIds ??= Enumerable.Repeat<string?>(null, count);
+
         List<Person> persons = [];
 
         for (var i = 0; i < count; i++)
@@ -602,12 +741,16 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            foreach (var p in persons)
+            foreach (var (p, sourceRequestId) in persons.Zip(sourceRequestIds))
             {
                 dbContext.Attach(p);
                 if (mergedWithPersonId is Guid id)
                 {
                     p.MergedWithPersonId = id;
+                }
+                if (sourceRequestId is string requestId)
+                {
+                    p.SourceTrnRequestId = requestId;
                 }
             }
 
@@ -622,8 +765,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         );
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null)
     {
+        sourceRequestIds ??= Enumerable.Repeat<string?>(null, count);
+
         List<Person> persons = [];
 
         for (var i = 0; i < count; i++)
@@ -634,7 +779,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            foreach (var p in persons)
+            foreach (var (p, sourceRequestId) in persons.Zip(sourceRequestIds))
             {
                 dbContext.Attach(p);
                 p.Trn = null;
@@ -642,6 +787,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
                 if (mergedWithPersonId is Guid id)
                 {
                     p.MergedWithPersonId = id;
+                }
+                if (sourceRequestId is string requestId)
+                {
+                    p.SourceTrnRequestId = requestId;
                 }
             }
 
@@ -1107,13 +1256,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             .ToArrayAsync());
 
     public record CsvRow(Guid PersonId);
-    public record UploadedFile(string FileName, string Contents, string? ContentType);
 }
 
 public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
 {
-    private readonly List<DeletePersonAndChildRecordsWithoutATrnJobTests.UploadedFile> _uploadedFiles = [];
-
     public DeletePersonAndChildRecordsWithoutATrnJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
@@ -1131,33 +1277,20 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
             trnGenerator);
 
         DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
-
-        FileServiceMock.Setup(mock => mock.UploadFileAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string?>()))
-            .Callback(async (string fileName, Stream stream, string? contentType) =>
-            {
-                using (stream)
-                using (var sr = new StreamReader(stream))
-                {
-                    var file = await sr.ReadToEndAsync();
-                    _uploadedFiles.Add(new(fileName, file, contentType));
-                }
-            });
     }
 
     public TestableClock Clock { get; }
     public DbFixture DbFixture { get; }
     public ILoggerFactory LoggerFactory { get; }
     public TestData TestData { get; }
-    public Mock<IFileService> FileServiceMock { get; } = new Mock<IFileService>();
+    public TestFileStorageService FileStorageService { get; } = new();
     public TrsDbContext DbContext { get; }
 
     public async Task InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
-        FileServiceMock.Invocations.Clear();
+        FileStorageService.Clear();
     }
 
     public async Task DisposeAsync() => await DbContext.DisposeAsync();
-
-    public DeletePersonAndChildRecordsWithoutATrnJobTests.UploadedFile? GetLastUploadedFile() => _uploadedFiles.LastOrDefault();
 }
