@@ -69,4 +69,19 @@ public static class EnumerableExtensions
             yield return r;
         }
     }
+
+    public static string[] GetNonEmptyValues(this string?[] values)
+    {
+        var result = new List<string>(values.Length);
+
+        foreach (var value in values)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                result.Add(value);
+            }
+        }
+
+        return result.ToArray();
+    }
 }

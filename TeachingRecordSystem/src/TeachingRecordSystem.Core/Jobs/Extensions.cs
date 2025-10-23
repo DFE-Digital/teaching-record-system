@@ -293,6 +293,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<AllocateTrnsToOverseasNpqApplicantsJob>(
+                nameof(AllocateTrnsToOverseasNpqApplicantsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             return Task.CompletedTask;
         });
 

@@ -62,20 +62,6 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         await sourceBlobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
     }
 
-    static string[] GetNonEmptyValues(params string?[] values)
-    {
-        var result = new List<string>(values.Length);
-
-        foreach (var value in values)
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                result.Add(value);
-            }
-        }
-
-        return result.ToArray();
-    }
     public async Task<long> ImportAsync(StreamReader reader, string fileName)
     {
         await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
@@ -175,10 +161,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                                 CreatedOn = now,
                                 IdentityVerified = null,
                                 OneLoginUserSubject = null,
-                                Name = GetNonEmptyValues(
-                                    newPerson.FirstName,
-                                    newPerson.MiddleName,
-                                    newPerson.LastName),
+                                Name = new[] { newPerson.FirstName, newPerson.MiddleName, newPerson.LastName }.GetNonEmptyValues(),
                                 FirstName = newPerson.FirstName,
                                 MiddleName = newPerson.MiddleName,
                                 LastName = newPerson.LastName,
