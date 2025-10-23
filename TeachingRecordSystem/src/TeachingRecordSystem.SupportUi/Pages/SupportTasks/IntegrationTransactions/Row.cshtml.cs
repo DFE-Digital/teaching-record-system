@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions;
 
@@ -13,6 +14,10 @@ public class RowModel(TrsDbContext context) : PageModel
     public long IntegrationTransactionRecordId { get; set; }
 
     public DetailRow? Row { get; set; }
+
+    public Person? Person { get; set; }
+
+    public string? PersonName => Person is not null ? StringHelper.JoinNonEmpty(' ', Person.FirstName, Person.MiddleName, Person.LastName) : null;
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -30,6 +35,7 @@ public class RowModel(TrsDbContext context) : PageModel
         }
 
         Row = new DetailRow(IntegrationTransactionRecordId, integrationTransaction.ImportStatus, record.Status, record.RowData, record.FailureMessage, integrationTransaction.InterfaceType, record.Duplicate);
+        Person = record.Person;
 
         return Page();
     }
