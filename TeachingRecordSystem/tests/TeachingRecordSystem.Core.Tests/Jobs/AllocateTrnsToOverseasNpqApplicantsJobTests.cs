@@ -69,7 +69,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             $"""
             {OutputCsvHeaders}
             
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             $"""
             {OutputCsvHeaders}
             
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             $"""
             {OutputCsvHeaders}
 
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,,,,,,Validation errors,Email Address is required,,
             ,,,,,,,,,Validation errors,"First Name is required,Last Name is required,Date of Birth is required,Email Address is required",,
 
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -197,7 +197,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             ,,,,,,,,,Validation errors,"First Name is required,Last Name is required,Date of Birth is required,Email Address is required",,
             ,,,,,,,,,Validation errors,"First Name is required,Last Name is required,Date of Birth is required,Email Address is required",,
 
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -236,7 +236,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,1 Jan 2001,jim.smith@email.com,,,,,Validation errors,Date of Birth is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim.smith@email.com,,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
             
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@.com,,,,,Validation errors,Email Address is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim@email.com,,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
             
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -310,7 +310,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email.com,AB123456C,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 1},
             Jim,,Smith,01/01/2001,jim@email.com,AB 12 34 56 C,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
             
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -349,7 +349,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email.com,,,Female,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 1},
             Jim,,Smith,01/01/2001,jim@email.com,,,Other,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
             
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -381,7 +381,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             {OutputCsvHeaders}
             Jim,,Smith,01/01/2001,jim.smith@email.com,,,,Y,TRN not allocated due to potential duplicates,,,{person1.Trn}
 
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -433,7 +433,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             {OutputCsvHeaders}
             Jim,,Smith,01/01/2001,jim.smith@email.com,AB123456D,,,Y,TRN not allocated due to potential duplicates,,,"{person1.Trn},{person2.Trn},{person4.Trn}"
 
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     [Fact]
@@ -465,7 +465,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             {OutputCsvHeaders}
             Bob,Middle,Jones,02/02/2002,bob.jones@email.com,AB123456D,British,Male,Y,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
 
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
 
         var person = await DbContext.Persons.SingleAsync(p => p.Trn == TrnGenerator.LastGeneratedTrn.ToString());
         Assert.Equal("Bob", person.FirstName);
@@ -548,7 +548,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,,01/01/2001,jim.smith@email.com,,,,,Validation errors,Last Name is required,,
             Jim,,Smith,01/01/2001,jim.smith@email.com,AB123456D,,,,TRN not allocated due to potential duplicates,,,"{person1.Trn},{person2.Trn}"
 
-            """, file.Content);
+            """, file.Content, ignoreLineEndingDifferences: true);
     }
 
     private AllocateTrnsToOverseasNpqApplicantsJob CreateAllocateTrnsToOverseasNpqApplicantsJob() =>
