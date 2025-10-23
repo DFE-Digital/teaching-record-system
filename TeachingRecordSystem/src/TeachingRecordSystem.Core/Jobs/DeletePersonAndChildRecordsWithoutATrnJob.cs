@@ -52,39 +52,41 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
 
             var deletedPersonIdsInBatch = await ExecuteSqlAsync<Guid>(
             $"""
-                -- Delete support tasks referencing person via person_id (and accompanying requests/metadata)
+                -- Store request ids that are going to be deleted
 
-                CREATE TEMP TABLE support_task_trn_request_ids AS
+                CREATE TEMP TABLE trn_request_ids_to_delete AS
                 SELECT trn_request_id FROM support_tasks
                 WHERE person_id = ANY ({personIds});
+
+                INSERT INTO trn_request_ids_to_delete
+                SELECT request_id FROM trn_request_metadata
+                WHERE resolved_person_id = ANY ({personIds});
+            
+                -- Clear references to person via merged_with_person_id
+            
+                UPDATE persons
+                SET merged_with_person_id = NULL
+                WHERE merged_with_person_id = ANY ({personIds});
+            
+                -- Clear references to trn_request_metadata of requests to be deleted from person via source_trn_request_id 
+            
+                UPDATE persons
+                SET source_trn_request_id = NULL
+                WHERE source_trn_request_id IN (SELECT trn_request_id FROM trn_request_ids_to_delete);
+
+                -- Delete support tasks referencing person (and accompanying requests/metadata)
 
                 DELETE FROM support_tasks
                 WHERE person_id = ANY ({personIds});
             
-                DELETE FROM trn_request_metadata
-                WHERE request_id IN (SELECT trn_request_id FROM support_task_trn_request_ids);
-
-                DELETE FROM trn_requests AS r
-                USING trn_request_metadata AS m
-                WHERE r.request_id = m.request_id
-                AND r.request_id IN (SELECT trn_request_id FROM support_task_trn_request_ids);
-
-                DROP TABLE support_task_trn_request_ids;
-
-                -- Delete requests/metadata referencing person via resolved_person_id (and accompanying support tasks)
-
-                DELETE FROM support_tasks AS s
-                USING trn_request_metadata AS m
-                WHERE s.trn_request_application_user_id = m.application_user_id AND s.trn_request_id = m.request_id
-                AND m.resolved_person_id = ANY ({personIds});
-
-                DELETE FROM trn_requests AS r
-                USING trn_request_metadata AS m
-                WHERE r.request_id = m.request_id
-                AND m.resolved_person_id = ANY ({personIds});
+                DELETE FROM support_tasks
+                WHERE trn_request_id IN (SELECT trn_request_id FROM trn_request_ids_to_delete);
 
                 DELETE FROM trn_request_metadata
-                WHERE resolved_person_id = ANY ({personIds});
+                WHERE request_id IN (SELECT trn_request_id FROM trn_request_ids_to_delete);
+
+                DELETE FROM trn_requests
+                WHERE request_id IN (SELECT trn_request_id FROM trn_request_ids_to_delete);
 
                 -- Delete integration_transaction_records referencing person
             
@@ -97,17 +99,15 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
                 SET person_id = NULL
                 WHERE person_id = ANY ({personIds});
 
-                -- Clear references to person via merged_with_person_id
-            
-                UPDATE persons
-                SET merged_with_person_id = NULL
-                WHERE merged_with_person_id = ANY ({personIds});
-
                 -- Delete person
 
                 DELETE FROM persons
                 WHERE person_id = ANY ({personIds})
                 RETURNING person_id;
+
+                -- Drop temp table
+
+                DROP TABLE trn_request_ids_to_delete;
             """, cancellationToken);
 
             deletedPersonIds.AddRange(deletedPersonIdsInBatch);
