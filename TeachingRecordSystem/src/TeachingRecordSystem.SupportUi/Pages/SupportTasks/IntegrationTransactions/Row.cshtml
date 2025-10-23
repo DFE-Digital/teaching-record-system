@@ -2,7 +2,7 @@
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions.RowModel;
 @{
-    ViewBag.Title = "Row Details";
+    ViewBag.Title = "Row details";
 }
 
 @section BeforeContent {
@@ -12,22 +12,42 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <span class="govuk-caption-l">@Model.Row!.InterfaceType.GetDisplayName()</span>
-        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Row Details</h1>
+        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Row information</h1>
     </div>
 
-    <div class="govuk-grid-column-full govuk-!-padding-bottom-4 govuk-body-m">
-        <div>
-            <span>Row ID:</span>
-            <span class="govuk-!-font-weight-bold" data-testid="integration-transaction-record-id">
-                @Model.Row.IntegrationTransactionRecordId
-            </span>
-        </div>
-        <div>
-            <span>Status:</span>
-            <span class="govuk-!-font-weight-bold" data-testid="integration-transaction-record-status">
-                @Model.Row!.Status.GetDisplayName()
-            </span>
-        </div>
+    <div class="govuk-grid-column-two-thirds-from-desktop govuk-!-padding-bottom-4 govuk-body-m">
+        <govuk-summary-card>
+            <govuk-summary-card-title>Row details information</govuk-summary-card-title>
+            @if (Model.Person != null)
+            {
+                <govuk-summary-card-actions>
+                    <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(Model.Person!.PersonId)" target="_blank">View record (opens in new tab)</govuk-summary-card-action>
+                </govuk-summary-card-actions>
+            }
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Row ID</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.Row.IntegrationTransactionRecordId</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>@Model.Row!.Status.GetDisplayName()</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            @if (Model.Person != null)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Person</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.PersonName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Linked record</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        <a href="@LinkGenerator.Persons.PersonDetail.Index(Model.Person!.PersonId)" target="_blank" rel="noopener noreferrer">@Model.Person.Trn</a>
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            </govuk-summary-list>
+        </govuk-summary-card>
     </div>
 
     @if (Model.Row.Status == IntegrationTransactionRecordStatus.Failure)

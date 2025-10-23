@@ -49,12 +49,8 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         response.EnsureSuccessStatusCode();
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var transactionId = doc.GetElementByTestId("integration-transaction-record-id");
-        var recordStatus = doc.GetElementByTestId("integration-transaction-record-status");
-        Assert.NotNull(transactionId);
-        Assert.NotNull(recordStatus);
-        Assert.Contains(rowStatus.GetDisplayName()!, recordStatus.TextContent);
-        Assert.Contains(itr1.IntegrationTransactionRecordId.ToString(), transactionId.TextContent);
+        doc.AssertSummaryListRowValue("Row ID", v => Assert.Equal(itr1.IntegrationTransactionRecordId.ToString(), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Status", v => Assert.Equal(rowStatus.GetDisplayName(), v.TrimmedText()));
     }
 
     [Test]
