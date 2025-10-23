@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using TeachingRecordSystem.Core.Services.Files;
 using Xunit.Abstractions;
 using static TeachingRecordSystem.TestCommon.TestData;
 
@@ -22,12 +21,13 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public TestData TestData => fixture.TestData;
     public TestableClock Clock => fixture.Clock;
     public ILoggerFactory LoggerFactory => fixture.LoggerFactory;
-    public Mock<IFileService> FileService => fixture.FileServiceMock;
+    public TestFileStorageService FileStorageService => fixture.FileStorageService;
     public ILogger<DeletePersonAndChildRecordsWithoutATrnJob> TestOutputLogger { get; } = new TestOutputLogger<DeletePersonAndChildRecordsWithoutATrnJob>(outputHelper);
 
     public async Task InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
+        FileStorageService.Clear();
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -85,12 +85,15 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         await job.ExecuteAsync(true, CancellationToken.None);
 
         // Assert
-        var file = fixture.GetLastUploadedFile();
+        var file = FileStorageService.GetLastUploadedFile();
+
+        // Assert
         Assert.NotNull(file);
+        Assert.Equal(DeletePersonAndChildRecordsWithoutATrnJob.ContainerName, file.ContainerName);
+        Assert.StartsWith($"{DeletePersonAndChildRecordsWithoutATrnJob.OutputFolderName}/{DeletePersonAndChildRecordsWithoutATrnJob.OutputFileNamePrefix}", file.FileName, StringComparison.InvariantCultureIgnoreCase);
 
-        Assert.StartsWith("deletepersonandchildrecordswithoutatrn", file.FileName);
-
-        var deleted = ReadAsCsvRows(file.Contents);
+        Assert.NotNull(file.Content);
+        var deleted = ReadAsCsvRows(file.Content);
         Assert.Equivalent(personsWithNoTrn.Select(p => new CsvRow(p)), deleted);
     }
 
@@ -107,12 +110,15 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         await job.ExecuteAsync(false, CancellationToken.None);
 
         // Assert
-        var file = fixture.GetLastUploadedFile();
+        var file = FileStorageService.GetLastUploadedFile();
+
+        // Assert
         Assert.NotNull(file);
+        Assert.Equal(DeletePersonAndChildRecordsWithoutATrnJob.ContainerName, file.ContainerName);
+        Assert.StartsWith($"{DeletePersonAndChildRecordsWithoutATrnJob.OutputFolderName}/{DeletePersonAndChildRecordsWithoutATrnJob.OutputFileNamePrefix}", file.FileName, StringComparison.InvariantCultureIgnoreCase);
 
-        Assert.StartsWith("deletepersonandchildrecordswithoutatrn", file.FileName);
-
-        var deleted = ReadAsCsvRows(file.Contents);
+        Assert.NotNull(file.Content);
+        var deleted = ReadAsCsvRows(file.Content);
         Assert.Equivalent(personsWithNoTrn.Select(p => new CsvRow(p)), deleted);
     }
 
@@ -701,7 +707,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         new DeletePersonAndChildRecordsWithoutATrnJob(
             CreateJobOptions(batchSize),
             DbContext,
-            FileService.Object,
+            FileStorageService,
             Clock,
             TestOutputLogger);
 
@@ -1250,13 +1256,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             .ToArrayAsync());
 
     public record CsvRow(Guid PersonId);
-    public record UploadedFile(string FileName, string Contents, string? ContentType);
 }
 
 public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
 {
-    private readonly List<DeletePersonAndChildRecordsWithoutATrnJobTests.UploadedFile> _uploadedFiles = [];
-
     public DeletePersonAndChildRecordsWithoutATrnJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
@@ -1274,33 +1277,20 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
             trnGenerator);
 
         DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
-
-        FileServiceMock.Setup(mock => mock.UploadFileAsync(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string?>()))
-            .Callback(async (string fileName, Stream stream, string? contentType) =>
-            {
-                using (stream)
-                using (var sr = new StreamReader(stream))
-                {
-                    var file = await sr.ReadToEndAsync();
-                    _uploadedFiles.Add(new(fileName, file, contentType));
-                }
-            });
     }
 
     public TestableClock Clock { get; }
     public DbFixture DbFixture { get; }
     public ILoggerFactory LoggerFactory { get; }
     public TestData TestData { get; }
-    public Mock<IFileService> FileServiceMock { get; } = new Mock<IFileService>();
+    public TestFileStorageService FileStorageService { get; } = new();
     public TrsDbContext DbContext { get; }
 
     public async Task InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
-        FileServiceMock.Invocations.Clear();
+        FileStorageService.Clear();
     }
 
     public async Task DisposeAsync() => await DbContext.DisposeAsync();
-
-    public DeletePersonAndChildRecordsWithoutATrnJobTests.UploadedFile? GetLastUploadedFile() => _uploadedFiles.LastOrDefault();
 }

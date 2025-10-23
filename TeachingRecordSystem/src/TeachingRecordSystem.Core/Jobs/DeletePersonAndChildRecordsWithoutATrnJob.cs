@@ -1,3 +1,5 @@
+using System.Globalization;
+using CsvHelper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -8,10 +10,14 @@ namespace TeachingRecordSystem.Core.Jobs;
 public class DeletePersonAndChildRecordsWithoutATrnJob(
     IOptions<DeletePersonAndChildRecordsWithoutATrnOptions> jobOptionsAccessor,
     TrsDbContext dbContext,
-    IFileService fileService,
+    IImportFileStorageService fileStorageService,
     IClock clock,
     ILogger<DeletePersonAndChildRecordsWithoutATrnJob> logger)
 {
+    public const string ContainerName = "delete-person-and-child-records-without-a-trn";
+    public const string OutputFolderName = "output";
+    public const string OutputFileNamePrefix = "delete-person-and-child-records-without-a-trn-";
+
     private readonly DeletePersonAndChildRecordsWithoutATrnOptions _options = jobOptionsAccessor.Value;
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
@@ -118,14 +124,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
             }
         }
 
-        using var stream = new MemoryStream();
+        using var stream = await fileStorageService.WriteFileAsync(ContainerName, $"{OutputFolderName}/{OutputFileNamePrefix}{clock.UtcNow:yyyyMMddHHmmss}.csv", cancellationToken);
         using var writer = new StreamWriter(stream);
-        using var csv = new CsvHelper.CsvWriter(writer, System.Globalization.CultureInfo.InvariantCulture);
+        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
         await csv.WriteRecordsAsync(deletedPersonIds.Select(p => new { PersonId = p }), cancellationToken);
         await writer.FlushAsync();
-        stream.Position = 0;
-
-        await fileService.UploadFileAsync($"deletepersonandchildrecordswithoutatrn{clock.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv");
 
         if (!dryRun)
         {
