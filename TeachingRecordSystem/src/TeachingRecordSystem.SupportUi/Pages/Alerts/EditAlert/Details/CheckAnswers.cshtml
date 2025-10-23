@@ -17,22 +17,15 @@
             <govuk-summary-list data-testid="change-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>New details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value><multi-line-text text="@Model.NewDetails" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@Html.ConvertNewlinesToLineBreaks(Model.NewDetails)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Current details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
-                        @if (!string.IsNullOrEmpty(Model.CurrentDetails))
-                        {
-                            <multi-line-text text="@Model.CurrentDetails" />
-                        }
-                        else
-                        {
-                            <span use-empty-fallback></span>
-                        }
+                    <govuk-summary-list-row-value use-empty-fallback>
+                        @Html.ConvertNewlinesToLineBreaks(Model.CurrentDetails)
                     </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -44,15 +37,8 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
-                        @if (Model.ChangeReasonDetail is not null)
-                        {
-                            <multi-line-text text="@Model.ChangeReasonDetail" />
-                        }
-                        else
-                        {
-                            <span use-empty-fallback></span>
-                        }
+                    <govuk-summary-list-row-value use-empty-fallback>
+                        @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.EditAlert.Details.Reason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>

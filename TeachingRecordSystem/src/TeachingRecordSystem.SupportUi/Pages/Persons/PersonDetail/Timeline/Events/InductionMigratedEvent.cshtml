@@ -53,7 +53,7 @@
                         <govuk-summary-list-row-key>DQT induction status</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="dqt-induction-status">@migratedEvent.DqtInductionStatus</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    @if (@dqtInduction?.InductionExemptionReason.HasValue == true)
+                    @if (dqtInduction?.InductionExemptionReason.HasValue == true)
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>DQT induction exemption reason</govuk-summary-list-row-key>

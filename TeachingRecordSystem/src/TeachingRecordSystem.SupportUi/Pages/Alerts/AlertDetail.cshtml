@@ -16,7 +16,7 @@
         <govuk-summary-list-row-value>
             @if (Model.Alert.Details is not null)
             {
-                <multi-line-text text="@Model.Alert.Details" />
+                @Html.ConvertNewlinesToLineBreaks(Model.Alert.Details)
             }
             else
             {
@@ -61,7 +61,7 @@
         <govuk-summary-list-row-value>
             @if (Model.ChangeReasonDetail is not null)
             {
-                <multi-line-text text="@Model.ChangeReasonDetail" />
+                @Html.ConvertNewlinesToLineBreaks(Model.ChangeReasonDetail)
             }
             else
             {

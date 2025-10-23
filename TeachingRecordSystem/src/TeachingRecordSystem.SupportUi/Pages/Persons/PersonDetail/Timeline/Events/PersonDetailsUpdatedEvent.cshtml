@@ -105,7 +105,7 @@
                             <govuk-summary-list-row-value>
                                 @if (updatedEvent.DetailsChangeReasonDetail is not null)
                                 {
-                                    <multi-line-text text="@updatedEvent.DetailsChangeReasonDetail" />
+                                    @Html.ConvertNewlinesToLineBreaks(updatedEvent.DetailsChangeReasonDetail)
                                 }
                                 else
                                 {

@@ -1,7 +1,7 @@
 @page "/mqs/{qualificationId}/status/reason/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.ReasonModel
 @{
-    ViewBag.Title = (@Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)
+    ViewBag.Title = (Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)
         ? ViewBag.Title = Html.DisplayNameFor(m => m.EndDateChangeReason)
         : ViewBag.Title = Html.DisplayNameFor(m => m.StatusChangeReason);
 }

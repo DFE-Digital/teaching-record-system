@@ -24,7 +24,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Html.ConvertNewlinesToLineBreaks(Model.Details)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Details(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
@@ -64,7 +64,7 @@
                     <govuk-summary-list-row-value>
                         @if (Model.AddReasonDetail is not null)
                         {
-                            <multi-line-text text="@Model.AddReasonDetail" />
+                            @Html.ConvertNewlinesToLineBreaks(Model.AddReasonDetail)
                         }
                         else
                         {

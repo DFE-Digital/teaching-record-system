@@ -49,7 +49,7 @@
                         <govuk-summary-list-row-value>
                             @if (alert.Details is not null)
                             {
-                                <multi-line-text text="@alert.Details" />
+                                @Html.ConvertNewlinesToLineBreaks(alert.Details)
                             }
                             else
                             {

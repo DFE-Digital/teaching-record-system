@@ -71,7 +71,7 @@
                         <govuk-summary-list-row-value>
                             @if (Model.ReasonDetail is not null)
                             {
-                                <multi-line-text text="@Model.ReasonDetail" />
+                                @Html.ConvertNewlinesToLineBreaks(Model.ReasonDetail)
                             }
                             else
                             {
