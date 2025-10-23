@@ -64,7 +64,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         // Assert
         Assert.NotNull(file);
         Assert.Equal(AllocateTrnsToOverseasNpqApplicantsJob.ContainerName, file.ContainerName);
-        Assert.StartsWith($"{AllocateTrnsToOverseasNpqApplicantsJob.OutputFolderName}/{AllocateTrnsToOverseasNpqApplicantsJob.OutputFileNamePrefix}", file.FileName);
+        Assert.StartsWith($"{AllocateTrnsToOverseasNpqApplicantsJob.OutputFolderName}/{AllocateTrnsToOverseasNpqApplicantsJob.OutputFileNamePrefix}", file.FileName, StringComparison.InvariantCultureIgnoreCase);
         Assert.Equal(
             $"""
             {OutputCsvHeaders}
@@ -574,7 +574,7 @@ public class TestFileStorageService : IImportFileStorageService
     public Task<string[]> GetFileNamesAsync(string containerName, string folderName, CancellationToken cancellationToken)
     {
         var fileNames = _uploadedFiles
-            .Where(f => f.ContainerName == containerName && f.FileName.StartsWith(folderName))
+            .Where(f => f.ContainerName == containerName && f.FileName.StartsWith(folderName, StringComparison.InvariantCultureIgnoreCase))
             .Select(f => f.FileName)
             .ToArray();
 
