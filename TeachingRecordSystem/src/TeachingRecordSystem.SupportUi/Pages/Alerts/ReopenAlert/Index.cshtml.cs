@@ -22,30 +22,19 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Select a reason")]
     [Required(ErrorMessage = "Select a reason")]
     public ReopenAlertReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to add more information about why you’re removing the end date?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you’re removing the end date")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add additional detail")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-    }
 
     public void OnGet()
     {
@@ -84,5 +73,13 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
+    }
+
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    {
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
     }
 }

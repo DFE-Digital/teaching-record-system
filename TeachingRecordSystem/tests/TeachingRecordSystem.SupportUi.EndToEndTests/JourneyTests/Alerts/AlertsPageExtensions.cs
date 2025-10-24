@@ -23,7 +23,7 @@ public static class AlertsPageExtensions
         page.GotoAsync($"/alerts/{alertId}/close");
 
     public static Task GoToReopenAlertPageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/re-open");
+        page.GotoAsync($"/alerts/{alertId}/reopen");
 
     public static Task GoToDeleteAlertPageAsync(this IPage page, Guid alertId) =>
         page.GotoAsync($"/alerts/{alertId}/delete");
@@ -110,10 +110,10 @@ public static class AlertsPageExtensions
         page.WaitForUrlPathAsync($"/alerts/{alertId}/close/check-answers");
 
     public static Task AssertOnReopenAlertPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/re-open");
+        page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen");
 
     public static Task AssertOnReopenAlertCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/re-open/check-answers");
+        page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen/check-answers");
 
     public static Task AssertOnDeleteAlertPageAsync(this IPage page, Guid alertId) =>
         page.WaitForUrlPathAsync($"/alerts/{alertId}/delete");

@@ -9,7 +9,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Alerts.AddAlert.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
@@ -52,15 +52,20 @@
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <h2 class="govuk-heading-l">Why are you adding this alert?</h2>
+
+            <govuk-summary-list>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for adding</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.AddReason.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.AddAlert.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for adding">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
                         @if (Model.AddReasonDetail is not null)
                         {
@@ -88,7 +93,7 @@
             </govuk-summary-list>
 
             <div class="govuk-button-group">
-                <govuk-button type="submit">Add alert</govuk-button>
+                <govuk-button type="submit">Confirm and add alert</govuk-button>
                 <govuk-button formaction="@LinkGenerator.Alerts.AddAlert.CheckAnswersCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>

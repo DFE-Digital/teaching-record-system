@@ -19,7 +19,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -35,7 +35,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -51,7 +51,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -67,14 +67,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/re-open", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/reopen", response.Headers.Location?.OriginalString);
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithClosedAlert(populateOptional);
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -112,7 +112,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -128,7 +128,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -144,7 +144,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -160,14 +160,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/re-open", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/reopen", response.Headers.Location?.OriginalString);
     }
 
     [Test]
@@ -179,7 +179,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
 
         EventObserver.Clear();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -245,7 +245,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -272,7 +272,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         });
         var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
-        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

@@ -80,7 +80,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddAlertCheckAnswersPageAsync();
 
-        await page.ClickButtonAsync("Add alert");
+        await page.ClickButtonAsync("Confirm and add alert");
 
         await page.AssertOnPersonAlertsPageAsync(personId);
 
@@ -132,7 +132,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertDetailsCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickButtonAsync("Confirm and update alert");
 
         await page.AssertOnPersonAlertsPageAsync(personId);
 
@@ -183,7 +183,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertStartDateCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickButtonAsync("Confirm and update alert");
 
         await page.AssertOnPersonAlertsPageAsync(personId);
 
@@ -235,7 +235,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertEndDateCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickButtonAsync("Confirm and update alert");
 
         await page.AssertOnPersonAlertsPageAsync(personId);
 
@@ -298,7 +298,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertLinkCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButtonAsync();
+        await page.ClickButtonAsync("Confirm and update alert");
 
         await page.AssertOnPersonAlertsPageAsync(personId);
 
@@ -376,8 +376,8 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnReopenAlertPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
-        await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re removing the end date?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
@@ -394,7 +394,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnReopenAlertCheckAnswersPageAsync(alertId);
 
-        await page.ClickButtonAsync("Confirm and re-open alert");
+        await page.ClickButtonAsync("Confirm and reopen alert");
 
         await page.AssertOnPersonAlertsPageAsync(personId);
 
@@ -439,7 +439,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnDeleteAlertCheckAnswersPageAsync(alertId);
 
-        await page.ClickButtonAsync("Delete alert");
+        await page.ClickButtonAsync("Confirm and delete alert");
 
         await page.AssertOnPersonAlertsPageAsync(personId);
 

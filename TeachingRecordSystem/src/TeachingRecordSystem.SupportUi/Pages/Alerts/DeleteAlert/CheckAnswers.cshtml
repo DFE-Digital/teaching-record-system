@@ -1,7 +1,7 @@
 @page "/alerts/{alertId}/delete/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details and delete alert";
+    ViewBag.Title = "Check details before deleting alert";
 }
 
 @section BeforeContent {
@@ -9,7 +9,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Alerts.DeleteAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Delete alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
@@ -44,15 +44,20 @@
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@Model.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <h2 class="govuk-heading-m">Why are you deleting this alert?</h2>
+
+            <govuk-summary-list>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for deleting alert</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.DeleteReason.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>
                         @Html.ConvertNewlinesToLineBreaks(Model.DeleteReasonDetail)
                     </govuk-summary-list-row-value>
@@ -73,10 +78,10 @@
 
             <h2 class="govuk-heading-m">Are you sure you want to delete this alert?</h2>
             <div class="govuk-body">
-                <span class="govuk-caption-m">Deleting this alert will permanently remove it from the database</span>
+                <span class="govuk-caption-m">Deleting this alert will permanently remove it from the system</span>
             </div>
             <div class="govuk-button-group">
-                <govuk-button class="govuk-button--warning" type="submit">Delete alert</govuk-button>
+                <govuk-button class="govuk-button--warning" type="submit">Confirm and delete alert</govuk-button>
                 <govuk-button formaction="@LinkGenerator.Alerts.DeleteAlert.CheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
