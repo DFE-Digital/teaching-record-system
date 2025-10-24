@@ -2,6 +2,7 @@ using Microsoft.Playwright;
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
@@ -61,7 +62,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddAlertReasonPageAsync();
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -408,6 +409,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
+        var reason = DeleteAlertReasonOption.AnotherReason;
         var deleteReasonDetails = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
         var evidenceFileMimeType = "image/jpeg";
@@ -419,8 +421,9 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnDeleteAlertPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Do you want to add why you are deleting this alert?')").Locator("label:text-is('Yes')").CheckAsync();
-        await page.FillAsync("label:text-is('Add additional detail')", deleteReasonDetails);
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Enter details')", deleteReasonDetails);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
             .GetByLabel("Upload a file")

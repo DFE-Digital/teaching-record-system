@@ -15,20 +15,15 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-radios for="AddReason">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                        Select a reason
-                    </govuk-radios-fieldset-legend>
-                    <govuk-radios-item value="@AddAlertReasonOption.RoutineNotificationFromStakeholder">
-                        @AddAlertReasonOption.RoutineNotificationFromStakeholder.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder">
-                        @AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@AddAlertReasonOption.AnotherReason">
-                        @AddAlertReasonOption.AnotherReason.GetDisplayName()
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-item value="@AddAlertReasonOption.RoutineNotificationFromStakeholder">
+                    @AddAlertReasonOption.RoutineNotificationFromStakeholder.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder">
+                    @AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@AddAlertReasonOption.AnotherReason">
+                    @AddAlertReasonOption.AnotherReason.GetDisplayName()
+                </govuk-radios-item>
             </govuk-radios>
 
             <govuk-radios for="HasAdditionalReasonDetail">

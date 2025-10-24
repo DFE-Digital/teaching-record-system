@@ -26,31 +26,23 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public DateOnly? EndDate { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to add why you are deleting this alert?")]
-    [Required(ErrorMessage = "Select yes if you want to add why you are deleting this alert")]
+    [Required(ErrorMessage = "Select a reason")]
+    public DeleteAlertReasonOption? DeleteReason { get; set; }
+
+    [BindProperty]
+    [Required(ErrorMessage = "Select yes if you want to add more information")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add additional detail")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? DeleteReasonDetail { get; set; }
 
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        var alertInfo = context.HttpContext.GetCurrentAlertFeature();
-
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-        AlertTypeName = alertInfo.Alert.AlertType!.Name;
-        EndDate = alertInfo.Alert.EndDate;
-    }
-
     public void OnGet()
     {
+        DeleteReason = JourneyInstance!.State.DeleteReason;
         HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         DeleteReasonDetail = JourneyInstance!.State.DeleteReasonDetail;
         Evidence = JourneyInstance!.State.Evidence;
@@ -72,6 +64,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
+            state.DeleteReason = DeleteReason;
             state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.DeleteReasonDetail = DeleteReasonDetail;
             state.Evidence = Evidence;
@@ -85,5 +78,16 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(EndDate is null ? linkGenerator.Persons.PersonDetail.Alerts(PersonId) : linkGenerator.Alerts.AlertDetail(AlertId));
+    }
+
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    {
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        var alertInfo = context.HttpContext.GetCurrentAlertFeature();
+
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+        AlertTypeName = alertInfo.Alert.AlertType!.Name;
+        EndDate = alertInfo.Alert.EndDate;
     }
 }

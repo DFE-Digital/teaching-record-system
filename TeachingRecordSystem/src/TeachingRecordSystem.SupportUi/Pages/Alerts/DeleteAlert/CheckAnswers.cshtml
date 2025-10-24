@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
         <form action="@LinkGenerator.Alerts.DeleteAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Delete an alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Delete alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list>
@@ -46,6 +46,13 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for deleting alert</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.DeleteReason.GetDisplayName()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value use-empty-fallback>
                         @Html.ConvertNewlinesToLineBreaks(Model.DeleteReasonDetail)
                     </govuk-summary-list-row-value>
