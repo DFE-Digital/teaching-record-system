@@ -11,6 +11,7 @@ public class DeleteAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture
     protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
         CreateJourneyInstanceAsync(alert.AlertId, new DeleteAlertState
         {
+            DeleteReason = DeleteAlertReasonOption.AnotherReason,
             HasAdditionalReasonDetail = populateOptional ? true : false,
             DeleteReasonDetail = populateOptional ? "More details" : null,
             Evidence = new()

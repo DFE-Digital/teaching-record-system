@@ -34,6 +34,8 @@ public class CheckAnswersModel(
 
     public DateOnly? EndDate { get; set; }
 
+    public DeleteAlertReasonOption DeleteReason { get; set; }
+
     public string? DeleteReasonDetail { get; set; }
 
     public UploadedEvidenceFile? EvidenceFile { get; set; }
@@ -57,6 +59,7 @@ public class CheckAnswersModel(
         LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;
         StartDate = alertInfo.Alert.StartDate;
         EndDate = alertInfo.Alert.EndDate;
+        DeleteReason = JourneyInstance.State.DeleteReason!.Value;
         DeleteReasonDetail = JourneyInstance.State.DeleteReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
     }

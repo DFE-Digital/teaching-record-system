@@ -12,6 +12,8 @@ public class DeleteAlertState : IRegisterJourney
         requestDataKeys: ["alertId"],
         appendUniqueKey: true);
 
+    public DeleteAlertReasonOption? DeleteReason { get; set; }
+
     public bool? HasAdditionalReasonDetail { get; set; }
 
     public string? DeleteReasonDetail { get; set; }
@@ -21,6 +23,7 @@ public class DeleteAlertState : IRegisterJourney
     [JsonIgnore]
     [MemberNotNullWhen(true, nameof(HasAdditionalReasonDetail))]
     public bool IsComplete =>
+        DeleteReason is not null &&
         HasAdditionalReasonDetail is bool hasDetail &&
         (!hasDetail || DeleteReasonDetail is not null) &&
         Evidence.IsComplete;

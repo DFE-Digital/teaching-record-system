@@ -1,7 +1,7 @@
 @page "/alerts/{alertId}/delete/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert.IndexModel
 @{
-    ViewBag.Title = $"Delete {Model.AlertTypeName} alert";
+    ViewBag.Title = "Why are you deleting this alert?";
 }
 
 @section BeforeContent {
@@ -11,16 +11,30 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Alerts.DeleteAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Delete an alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Delete alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+            <p class="govuk-body"><strong>Alert type:</strong> @Model.AlertTypeName</p>
+
+            <govuk-radios for="DeleteReason">
+                <govuk-radios-item value="@DeleteAlertReasonOption.AddedInError">
+                    @DeleteAlertReasonOption.AddedInError.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@DeleteAlertReasonOption.AnotherReason">
+                    @DeleteAlertReasonOption.AnotherReason.GetDisplayName()
+                </govuk-radios-item>
+            </govuk-radios>
 
             <govuk-radios for="HasAdditionalReasonDetail">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                        Do you want to provide more information?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count for="DeleteReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count for="DeleteReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows">
+                                <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

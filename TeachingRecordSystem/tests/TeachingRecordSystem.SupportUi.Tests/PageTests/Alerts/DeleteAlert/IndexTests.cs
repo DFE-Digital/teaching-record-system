@@ -1,3 +1,5 @@
+using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
 public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture)
@@ -133,6 +135,25 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
     }
 
     [Test]
+    public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError()
+    {
+        // Arrange
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(changeReason: null, hasAdditionalReasonDetail: false, uploadEvidence: false)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReason", "Select a reason");
+    }
+
+    [Test]
     [Arguments(true)]
     [Arguments(false)]
     public async Task Post_NoHasAdditionalReasonDetailIsSelected_ReturnsError(bool isOpenAlert)
@@ -151,7 +172,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add why you are deleting this alert");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information");
     }
 
     [Test]
@@ -235,12 +256,14 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
+        var deleteReason = DeleteAlertReasonOption.AddedInError;
         var hasAdditionalReasonDetail = true;
         var reasonDetail = "More details";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
+                deleteReason,
                 hasAdditionalReasonDetail: hasAdditionalReasonDetail,
                 deleteReasonDetail: reasonDetail,
                 uploadEvidence: false)
@@ -268,12 +291,14 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
+        var deleteReason = DeleteAlertReasonOption.AddedInError;
         var hasAdditionalReasonDetail = false;
         var evidenceFileName = "evidence.pdf";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
+                deleteReason,
                 hasAdditionalReasonDetail: hasAdditionalReasonDetail,
                 uploadEvidence: true,
                 evidenceFile: (CreateEvidenceFileBinaryContent(), evidenceFileName))
@@ -352,12 +377,18 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
             uploadEvidence: false);
 
     private static MultipartFormDataContentBuilder CreatePostContent(
+        DeleteAlertReasonOption? changeReason = null,
         bool? hasAdditionalReasonDetail = null,
         string? deleteReasonDetail = null,
         bool? uploadEvidence = null,
         (HttpContent Content, string FileName)? evidenceFile = null)
     {
         var builder = new MultipartFormDataContentBuilder();
+
+        if (changeReason is not null)
+        {
+            builder.Add("DeleteReason", changeReason);
+        }
 
         if (hasAdditionalReasonDetail is not null)
         {
