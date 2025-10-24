@@ -20,7 +20,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -36,7 +36,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -52,7 +52,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -68,7 +68,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -84,7 +84,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -118,7 +118,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreateMinimumValidPostContent()
         };
@@ -137,7 +137,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreateMinimumValidPostContent()
         };
@@ -156,7 +156,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithOpenAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreateMinimumValidPostContent()
         };
@@ -175,7 +175,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(changeReason: null, hasAdditionalReasonDetail: false, uploadEvidence: false)
         };
@@ -194,7 +194,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: ReopenAlertReasonOption.ClosedInError,
@@ -215,7 +215,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: ReopenAlertReasonOption.ClosedInError,
@@ -238,7 +238,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: ReopenAlertReasonOption.AnotherReason,
@@ -261,7 +261,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: ReopenAlertReasonOption.AnotherReason,
@@ -288,7 +288,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var hasAdditionalReasonDetail = true;
         var reasonDetail = "More details";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: reason,
@@ -302,7 +302,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
@@ -322,7 +322,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var hasAdditionalReasonDetail = false;
         var evidenceFileName = "evidence.pdf";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = CreatePostContent(
                 changeReason: reason,
@@ -336,7 +336,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/reopen/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
@@ -354,7 +354,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/reopen/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -381,7 +381,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         });
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/alerts/{alert.AlertId}/reopen?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

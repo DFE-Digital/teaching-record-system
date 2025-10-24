@@ -1,15 +1,15 @@
-@page "/alerts/{alertId}/re-open/check-answers/{handler?}"
+@page "/alerts/{alertId}/reopen/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details and confirm change";
+    ViewBag.Title = "Check details before reopening alert";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Alerts.ReopenAlert.Index(Model.PersonId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.Alerts.ReopenAlert.Index(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Alerts.ReopenAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change closed alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
@@ -40,6 +40,11 @@
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <h2 class="govuk-heading-m">Why are you removing the end date?</h2>
+
+            <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
@@ -74,9 +79,9 @@
                 </govuk-summary-list-row>
             </govuk-summary-list>
 
-            <h2 class="govuk-heading-m">Are you sure you want to re-open this alert?</h2>
+            <h2 class="govuk-heading-m">Are you sure you want to reopen this alert?</h2>
             <div class="govuk-button-group">
-                <govuk-button type="submit">Confirm and re-open alert</govuk-button>
+                <govuk-button type="submit">Confirm and reopen alert</govuk-button>
                 <govuk-button formaction="@LinkGenerator.Alerts.ReopenAlert.CheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>

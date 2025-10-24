@@ -168,7 +168,8 @@ public sealed class HostFixture : IAsyncDisposable
             browserOptions.SlowMo = 250;
         }
 
-        _browser = await _playwright.Chromium.LaunchAsync(browserOptions);
+        var browserType = OperatingSystem.IsMacOS() ? _playwright.Webkit : _playwright.Chromium;
+        _browser = await browserType.LaunchAsync(browserOptions);
 
         _initialized = true;
     }

@@ -1,11 +1,11 @@
-@page "/alerts/{alertId}/re-open/{handler?}"
+@page "/alerts/{alertId}/reopen/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert.IndexModel
 @{
     ViewBag.Title = "Why are you removing the end date?";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.ReopenAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AlertDetail(Model.AlertId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Alerts.ReopenAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AlertDetail(Model.AlertId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -15,24 +15,25 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-radios for="ChangeReason" data-testid="change-reason-options">
-                <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
-                    <govuk-radios-item value="@ReopenAlertReasonOption.ClosedInError">
-                        @ReopenAlertReasonOption.ClosedInError.GetDisplayName()
-                    </govuk-radios-item>
-                    <govuk-radios-item value="@ReopenAlertReasonOption.AnotherReason">
-                        @ReopenAlertReasonOption.AnotherReason.GetDisplayName()
-                    </govuk-radios-item>
-                </govuk-radios-fieldset>
+                <govuk-radios-item value="@ReopenAlertReasonOption.ClosedInError">
+                    @ReopenAlertReasonOption.ClosedInError.GetDisplayName()
+                </govuk-radios-item>
+                <govuk-radios-item value="@ReopenAlertReasonOption.AnotherReason">
+                    @ReopenAlertReasonOption.AnotherReason.GetDisplayName()
+                </govuk-radios-item>
             </govuk-radios>
 
             <govuk-radios for="HasAdditionalReasonDetail">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                        Do you want to provide more information?
+                    </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows" />
+                            <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaMinimumRows">
+                                <govuk-character-count-label>Add additional detail</govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

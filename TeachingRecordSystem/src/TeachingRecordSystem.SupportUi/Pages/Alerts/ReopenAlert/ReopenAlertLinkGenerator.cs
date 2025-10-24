@@ -13,5 +13,4 @@ public class ReopenAlertLinkGenerator(LinkGenerator linkGenerator)
 
     public string CheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         linkGenerator.GetRequiredPathByPage("/Alerts/ReopenAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
-
 }
