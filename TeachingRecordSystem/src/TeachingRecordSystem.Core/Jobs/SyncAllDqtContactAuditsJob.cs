@@ -1,4 +1,5 @@
 using System.ServiceModel;
+using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
+[AutomaticRetry(Attempts = 100)]
 public class SyncAllDqtContactAuditsJob(
     [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     IDbContextFactory<TrsDbContext> dbContextFactory,
