@@ -50,7 +50,7 @@ jobs:
         run: npx -p @dbml/cli sql2dbml trs.dump --postgres -o trs.dbml
 
       - name: Publish dbml file
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: trs.dbml
           path: trs.dbml
