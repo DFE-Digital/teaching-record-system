@@ -30,10 +30,10 @@ public partial class EwcWalesImportJobTests
         var reader = new StreamReader(stream);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+        var integrationTransactionId = await WithJob(job => job.ImportAsync("IND", reader));
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var contact = await dbContext.Persons.Include(x => x.Qualifications).SingleAsync(x => x.PersonId == person.PersonId);
             var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).FirstAsync(x => x.IntegrationTransactionId == integrationTransactionId);
@@ -83,10 +83,10 @@ public partial class EwcWalesImportJobTests
         var reader = new StreamReader(stream);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+        var integrationTransactionId = await WithJob(job => job.ImportAsync("IND", reader));
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var contact = await dbContext.Persons.Include(x => x.Qualifications).SingleAsync(x => x.PersonId == person.PersonId);
             var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).FirstAsync(x => x.IntegrationTransactionId == integrationTransactionId);
@@ -132,10 +132,10 @@ public partial class EwcWalesImportJobTests
         var reader = new StreamReader(stream);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+        var integrationTransactionId = await WithJob(job => job.ImportAsync("IND", reader));
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var contact = await dbContext.Persons.Include(x => x.Qualifications).SingleAsync(x => x.PersonId == person.PersonId);
             var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).FirstAsync(x => x.IntegrationTransactionId == integrationTransactionId);
@@ -176,10 +176,10 @@ public partial class EwcWalesImportJobTests
         var reader = new StreamReader(stream);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+        var integrationTransactionId = await WithJob(job => job.ImportAsync("IND", reader));
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var contact = await dbContext.Persons.Include(x => x.Qualifications).SingleAsync(x => x.PersonId == person.PersonId);
             var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).SingleAsync(x => x.IntegrationTransactionId == integrationTransactionId);
@@ -224,10 +224,10 @@ public partial class EwcWalesImportJobTests
         var reader = new StreamReader(stream);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+        var integrationTransactionId = await WithJob(job => job.ImportAsync("IND", reader));
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var contact = await dbContext.Persons.Include(x => x.Qualifications).SingleAsync(x => x.PersonId == person.PersonId);
             var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).FirstAsync(x => x.IntegrationTransactionId == integrationTransactionId);
@@ -267,10 +267,10 @@ public partial class EwcWalesImportJobTests
         var reader = new StreamReader(stream);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+        var integrationTransactionId = await WithJob(job => job.ImportAsync("IND", reader));
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).FirstOrDefaultAsync(x => x.IntegrationTransactionId == integrationTransactionId);
             Assert.NotNull(it);
@@ -314,10 +314,10 @@ public partial class EwcWalesImportJobTests
         var reader = new StreamReader(stream);
 
         // Act
-        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+        var integrationTransactionId = await WithJob(job => job.ImportAsync("IND", reader));
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 var contact = await dbContext.Persons.Include(x => x.Qualifications).SingleAsync(x => x.PersonId == person.PersonId);
                 var it = await dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).FirstAsync(x => x.IntegrationTransactionId == integrationTransactionId);

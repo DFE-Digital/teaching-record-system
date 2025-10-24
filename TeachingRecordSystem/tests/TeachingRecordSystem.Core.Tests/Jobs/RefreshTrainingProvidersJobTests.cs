@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.PublishApi;
@@ -5,13 +6,25 @@ using TeachingRecordSystem.Core.Services.PublishApi;
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [Collection(nameof(DisableParallelization))]
-public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
+public class RefreshTrainingProvidersJobTests(CoreFixture fixture) : IAsyncLifetime
 {
+    private IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
+
+    async ValueTask IAsyncLifetime.InitializeAsync()
+    {
+        await fixture.DbHelper.ClearDataAsync();
+
+        // training_providers is excluded from the reset done by ClearDataAsync so we need to it ourselves
+        await DbContextFactory.WithDbContextAsync(dbContext => dbContext.TrainingProviders.ExecuteDeleteAsync());
+    }
+
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
     [Fact]
     public async Task RefreshTrainingProvidersJob_WhenCalledForNewUkprn_AddsNewTrainingProvider()
     {
         // Arrange
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = fixture.DbContextFactory;
         var publishApiClient = new Mock<IPublishApiClient>();
         var provider1Name = "Test Training Provider 1";
         var provider1Ukprn = "12345678";
@@ -47,7 +60,7 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == provider1Ukprn || p.Ukprn == provider2Ukprn).OrderBy(p => p.Ukprn).ToListAsync();
             Assert.Collection(trainingProvidersActual,
@@ -70,7 +83,6 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
     public async Task RefreshTrainingProvidersJob_WhenCalledForExistingUkprn_UpdatesTrainingProvider()
     {
         // Arrange
-        var dbContextFactory = dbFixture.GetDbContextFactory();
         var publishApiClient = new Mock<IPublishApiClient>();
         var existingProvider = new TrainingProvider
         {
@@ -80,7 +92,7 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
             IsActive = false
         };
 
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             dbContext.TrainingProviders.Add(existingProvider);
             await dbContext.SaveChangesAsync();
@@ -103,13 +115,13 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
             .Setup(x => x.GetAccreditedProvidersAsync())
             .ReturnsAsync(providersExpected);
 
-        var job = new RefreshTrainingProvidersJob(publishApiClient.Object, dbContextFactory);
+        var job = new RefreshTrainingProvidersJob(publishApiClient.Object, DbContextFactory);
 
         // Act
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == existingProvider.Ukprn).ToListAsync();
             Assert.Single(trainingProvidersActual);
@@ -122,7 +134,6 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
     public async Task RefreshTrainingProvidersJob_WhenCalledForWithExistingUkprnMissing_DeactivatesTrainingProvider()
     {
         // Arrange
-        var dbContextFactory = dbFixture.GetDbContextFactory();
         var publishApiClient = new Mock<IPublishApiClient>();
         var newProviderName = "New Training Provider";
         var newProviderUkprn = "76543210";
@@ -135,7 +146,7 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
             IsActive = true
         };
 
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             dbContext.TrainingProviders.Add(existingProvider);
             await dbContext.SaveChangesAsync();
@@ -157,13 +168,13 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
             .Setup(x => x.GetAccreditedProvidersAsync())
             .ReturnsAsync(providersExpected);
 
-        var job = new RefreshTrainingProvidersJob(publishApiClient.Object, dbContextFactory);
+        var job = new RefreshTrainingProvidersJob(publishApiClient.Object, DbContextFactory);
 
         // Act
         await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == existingProvider.Ukprn || p.Ukprn == newProviderUkprn).OrderBy(p => p.Ukprn).ToListAsync();
             Assert.Collection(trainingProvidersActual,

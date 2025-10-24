@@ -1,28 +1,18 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Gias;
 
-public class EstablishmentRefresherTests
+public class EstablishmentRefresherTests(CoreFixture fixture)
 {
-    public EstablishmentRefresherTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
+    private IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
-    }
+    private TestData TestData => fixture.TestData;
 
     [Fact]
     public Task RefreshEstablishments_WhenCalledforNewUrn_AddsNewEstablishments() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
@@ -142,7 +132,7 @@ public class EstablishmentRefresherTests
 
     [Fact]
     public Task RefreshEstablishments_WhenCalledForExistingUrn_UpdatesEstablishment() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
@@ -239,10 +229,4 @@ public class EstablishmentRefresherTests
             Assert.Equal(updatedEstablishment.County, establishmentActual.County);
             Assert.Equal(updatedEstablishment.Postcode, establishmentActual.Postcode);
         });
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private TestableClock Clock { get; }
 }

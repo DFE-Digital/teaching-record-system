@@ -1,40 +1,26 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Tests.Services.PersonMatching;
 
 [Collection(nameof(DisableParallelization))]
-public partial class PersonMatchingServiceTests : IAsyncLifetime
+public partial class PersonMatchingServiceTests(CoreFixture fixture) : IAsyncLifetime
 {
-    public PersonMatchingServiceTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
+    private TestableClock Clock => fixture.Clock;
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
-    }
+    private IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
-    private DbFixture DbFixture { get; }
+    private TestData TestData => fixture.TestData;
 
-    private TestData TestData { get; }
+    public async ValueTask InitializeAsync() => await fixture.DbHelper.ClearDataAsync();
 
-    private TestableClock Clock { get; }
-
-    public Task InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
-
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public Task GetMatchedAttributesAsync_ReturnsExpectedResults(bool usePersonNino) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();

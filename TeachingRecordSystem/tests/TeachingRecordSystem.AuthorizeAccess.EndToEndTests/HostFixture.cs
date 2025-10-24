@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using OpenIddict.Server.AspNetCore;
+using TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
@@ -15,9 +16,11 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
-public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable, IStartupTask
+public sealed class HostFixture : IAsyncLifetime
 {
     public const string BaseUrl = "http://localhost:55649";
     public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
@@ -64,7 +67,11 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
             BaseUrl,
             builder =>
             {
-                builder.UseConfiguration(configuration);
+                var testConfiguration = new ConfigurationBuilder()
+                    .AddUserSecrets<HostFixture>(optional: true)
+                    .AddEnvironmentVariables()
+                    .Build();
+                builder.UseConfiguration(testConfiguration);
 
                 builder.ConfigureServices((context, services) =>
                 {
@@ -142,7 +149,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
         await dbContext.SaveChangesAsync();
     }
 
-    async Task IStartupTask.ExecuteAsync()
+    public async ValueTask InitializeAsync()
     {
         _host = CreateHost();
 
@@ -169,7 +176,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
         await AddTestAppToApplicationUsers();
     }
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (_disposed)
         {

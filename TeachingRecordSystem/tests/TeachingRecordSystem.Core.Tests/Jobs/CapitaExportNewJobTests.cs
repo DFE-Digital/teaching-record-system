@@ -21,8 +21,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
 
     private CapitaExportNewJob Job => Fixture.Job;
 
-    private const int EXPECTED_ROW_LENGTH = 86;
-
+    private const int ExpectedRowLength = 86;
 
     [Fact]
     public async Task GetNewPersons_CreatedAfterLastRunDate_ReturnsExpectedRecords()
@@ -151,7 +150,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{"1018Z981"}";
         Assert.NotNull(rowString);
         Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Theory]
@@ -203,7 +202,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{"1018Z981"}";
         Assert.NotNull(rowString);
         Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Theory]
@@ -238,7 +237,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{"1018Z981"}";
         Assert.NotNull(rowString);
         Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Fact]
@@ -270,7 +269,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{"1018Z981"}";
         Assert.NotNull(rowString);
         Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Fact]
@@ -304,7 +303,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{"1018Z981"}";
         Assert.NotNull(rowString);
         Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Fact]
@@ -338,7 +337,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{"1018Z981"}";
         Assert.NotNull(rowString);
         Assert.Equal(expectedRowString, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Theory]
@@ -386,7 +385,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{new string(' ', 7)}" +
             $"{"2018Z981"}";
         Assert.Equal(expectedRow, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Fact]
@@ -432,7 +431,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{new string(' ', 7)}" +
             $"{"2018Z981"}";
         Assert.Equal(expectedRow, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Fact]
@@ -477,7 +476,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{new string(' ', 7)}" +
             $"{"2018Z981"}";
         Assert.Equal(expectedRow, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Fact]
@@ -564,7 +563,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             $"{new string(' ', 7)}" +
             $"{"2018Z981"}";
         Assert.Equal(expectedRow, rowString);
-        Assert.Equal(EXPECTED_ROW_LENGTH, rowString.Length);
+        Assert.Equal(ExpectedRowLength, rowString.Length);
     }
 
     [Fact]
@@ -626,7 +625,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             Assert.Equal(person1.PersonId, record.PersonId);
             Assert.Null(record.Duplicate);
             Assert.NotNull(record.RowData);
-            Assert.Equal(EXPECTED_ROW_LENGTH, record.RowData!.Length);
+            Assert.Equal(ExpectedRowLength, record.RowData!.Length);
             Assert.Equal(expectedRowContent, record.RowData);
             Assert.Equal(IntegrationTransactionRecordStatus.Success, record.Status);
 
@@ -915,13 +914,13 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         record.FailureMessage == null &&
         record.Duplicate == null &&
         record.RowData != null &&
-        record.RowData.Length == EXPECTED_ROW_LENGTH &&
+        record.RowData.Length == ExpectedRowLength &&
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
-    public async Task InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
 public class CapitaExportNewJobFixture
@@ -965,7 +964,7 @@ public class CapitaExportNewJobFixture
 
         Job = ActivatorUtilities.CreateInstance<CapitaExportNewJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock);
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);

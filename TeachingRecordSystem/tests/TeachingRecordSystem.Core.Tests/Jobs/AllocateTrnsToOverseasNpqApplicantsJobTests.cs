@@ -1,8 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -14,22 +16,28 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
     public const string InputCsvHeaders = "First Name (Required),Middle Name (Optional but preferable),Surname/Last Name (Required),Date of Birth (Required),PERSONAL Email Address (Required),NI Number (Optional but preferable),Nationality (Optional but preferable),Gender (Optional but preferable),Has the Participant started their NPQ or is confirmed to start in November 2025 (Y/N) Please Note -  This needs to be a yes for all applicants when this completed  list is returned (Required),TRN";
     public const string OutputCsvHeaders = "First Name (Required),Middle Name (Optional but preferable),Surname/Last Name (Required),Date of Birth (Required),PERSONAL Email Address (Required),NI Number (Optional but preferable),Nationality (Optional but preferable),Gender (Optional but preferable),Has the Participant started their NPQ or is confirmed to start in November 2025 (Y/N) Please Note -  This needs to be a yes for all applicants when this completed  list is returned (Required),Result,Errors,Allocated TRN,Potential duplicate TRNs";
 
-    public TrsDbContext DbContext => fixture.DbContext;
-    public DbFixture DbFixture => fixture.DbFixture;
-    public TestData TestData => fixture.TestData;
-    public TestableClock Clock => fixture.Clock;
-    public TestFileStorageService FileStorageService => fixture.FileStorageService;
-    public Mock<IBackgroundJobScheduler> BackgroundJobScheduler => fixture.BackgroundJobSchedulerMock;
-    public FakeTrnGenerator TrnGenerator => fixture.TrnGenerator;
+    private TrsDbContext DbContext => fixture.DbContext;
 
-    public async Task InitializeAsync()
+    private DbHelper DbHelper => fixture.DbHelper;
+
+    private TestData TestData => fixture.TestData;
+
+    private TestableClock Clock => fixture.Clock;
+
+    private TestFileStorageService FileStorageService => fixture.FileStorageService;
+
+    private Mock<IBackgroundJobScheduler> BackgroundJobScheduler => fixture.BackgroundJobSchedulerMock;
+
+    private FakeTrnGenerator TrnGenerator => fixture.TrnGenerator;
+
+    public async ValueTask InitializeAsync()
     {
-        await DbFixture.DbHelper.ClearDataAsync();
+        await DbHelper.ClearDataAsync();
         FileStorageService.Clear();
         BackgroundJobScheduler.Reset();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task Execute_WhenInputFileDoesNotExist_OutputFileIsNotProduced()
@@ -52,7 +60,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         FileStorageService.WriteFile(AllocateTrnsToOverseasNpqApplicantsJob.ContainerName, $"{AllocateTrnsToOverseasNpqApplicantsJob.PendingFolderName}/import.csv",
             $"""
             {InputCsvHeaders}
-            
+
             """);
 
         var job = CreateAllocateTrnsToOverseasNpqApplicantsJob();
@@ -68,7 +76,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         Assert.Equal(
             $"""
             {OutputCsvHeaders}
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -79,7 +87,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         FileStorageService.WriteFile(AllocateTrnsToOverseasNpqApplicantsJob.ContainerName, $"{AllocateTrnsToOverseasNpqApplicantsJob.PendingFolderName}/import.csv",
             $"""
             {InputCsvHeaders}
-            
+
             """);
 
         var job = CreateAllocateTrnsToOverseasNpqApplicantsJob();
@@ -93,7 +101,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         Assert.Equal(
             $"""
             {OutputCsvHeaders}
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -235,7 +243,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,12/31/2001,jim.smith@email.com,,,,,Validation errors,Date of Birth is in an incorrect format,,
             Jim,,Smith,1 Jan 2001,jim.smith@email.com,,,,,Validation errors,Date of Birth is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim.smith@email.com,,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -272,7 +280,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email,,,,,Validation errors,Email Address is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim@.com,,,,,Validation errors,Email Address is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim@email.com,,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -309,7 +317,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email.com,QV123456E,,,,Validation errors,NI Number is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim@email.com,AB123456C,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 1},
             Jim,,Smith,01/01/2001,jim@email.com,AB 12 34 56 C,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -348,7 +356,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email.com,,,Male,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 2},
             Jim,,Smith,01/01/2001,jim@email.com,,,Female,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 1},
             Jim,,Smith,01/01/2001,jim@email.com,,,Other,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -574,42 +582,47 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Clock);
 }
 
-public class AllocateTrnsToOverseasNpqApplicantsJobFixture : IAsyncLifetime
+public class AllocateTrnsToOverseasNpqApplicantsJobFixture : IDisposable
 {
-    public AllocateTrnsToOverseasNpqApplicantsJobFixture(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory)
+    public AllocateTrnsToOverseasNpqApplicantsJobFixture()
     {
-        DbFixture = dbFixture;
-        LoggerFactory = loggerFactory;
-        Clock = new();
+        var services = new ServiceCollection();
+        CoreFixture.AddCoreServices(services);
+        services.AddSingleton(new TestableClock());
+        services.AddSingleton<IClock>(sp => sp.GetRequiredService<TestableClock>());
+        services.AddSingleton<ReferenceDataCache>();
+        services.AddSingleton<TestData>();
+        services.AddLogging();
+        services.AddSingleton<TestFileStorageService>();
+        services.AddSingleton<IImportFileStorageService>(sp => sp.GetRequiredService<TestFileStorageService>());
+        services.AddTransient<PersonMatchingService>();
+        services.AddSingleton<IBackgroundJobScheduler>(Mock.Of<IBackgroundJobScheduler>());
+        Services = services.BuildServiceProvider();
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
-
-        DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
-        TrnGenerator = trnGenerator;
+        DbContext = DbContextFactory.CreateDbContext();
     }
 
-    public TestableClock Clock { get; }
-    public DbFixture DbFixture { get; }
-    public ILoggerFactory LoggerFactory { get; }
-    public TestData TestData { get; }
-    public FakeTrnGenerator TrnGenerator { get; }
-    public TestFileStorageService FileStorageService { get; } = new();
+    public TestableClock Clock => Services.GetRequiredService<TestableClock>();
+
+    public IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+
+    public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+
+    public ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
+
+    public TestData TestData => Services.GetRequiredService<TestData>();
+
+    public TestFileStorageService FileStorageService => Services.GetRequiredService<TestFileStorageService>();
+
     public TrsDbContext DbContext { get; }
-    public PersonMatchingService PersonMatchingService => new PersonMatchingService(DbContext);
-    public Mock<IBackgroundJobScheduler> BackgroundJobSchedulerMock { get; } = new Mock<IBackgroundJobScheduler>();
 
-    public async Task InitializeAsync()
-    {
-        await DbFixture.DbHelper.ClearDataAsync();
-    }
+    public PersonMatchingService PersonMatchingService => Services.GetRequiredService<PersonMatchingService>();
 
-    public async Task DisposeAsync() => await DbContext.DisposeAsync();
+    public Mock<IBackgroundJobScheduler> BackgroundJobSchedulerMock => Mock.Get(Services.GetRequiredService<IBackgroundJobScheduler>());
+
+    public FakeTrnGenerator TrnGenerator => Services.GetRequiredService<FakeTrnGenerator>();
+
+    public IServiceProvider Services { get; }
+
+    void IDisposable.Dispose() => (Services as IDisposable)?.Dispose();
 }

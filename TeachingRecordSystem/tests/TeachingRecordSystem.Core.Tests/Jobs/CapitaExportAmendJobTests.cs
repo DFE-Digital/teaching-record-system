@@ -18,7 +18,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
 
     private TestData TestData => Fixture.TestData;
 
-    private const int EXPECTED_ROW_LENGTH = 86;
+    private const int ExpectedRowLength = 86;
 
     [Fact]
     public async Task Execute_WithNoChanges_ReturnsExpectedCounts()
@@ -475,7 +475,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
                           $"{new string(' ', 9)}" +
                           $"{new string(' ', 44)}" +
                           $"1211ZE1*";
-        Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+        Assert.Equal(ExpectedRowLength, row.Length);
         Assert.Equal(expectedRow, row);
     }
 
@@ -548,7 +548,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
                           $"{new string(' ', 9)}" +
                           $"{new string(' ', 44)}" +
                           $"1211ZE1*";
-        Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+        Assert.Equal(ExpectedRowLength, row.Length);
         Assert.Equal(expectedRow, row);
     }
 
@@ -623,7 +623,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
                           $"{new string(' ', 9)}" +
                           $"{new string(' ', 44)}" +
                           $"1211ZE1*";
-        Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+        Assert.Equal(ExpectedRowLength, row.Length);
         Assert.Equal(expectedRow, row);
     }
 
@@ -700,7 +700,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
                               $"{person.NationalInsuranceNumber}" +
                               $"{new string(' ', 44)}" +
                               $" 321ZE2*";
-            Assert.Equal(EXPECTED_ROW_LENGTH, row.Length);
+            Assert.Equal(ExpectedRowLength, row.Length);
             Assert.Equal(expectedRow, row);
         });
     }
@@ -797,16 +797,16 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         record.FailureMessage == null &&
         record.Duplicate == null &&
         record.RowData != null &&
-        record.RowData.Length == EXPECTED_ROW_LENGTH &&
+        record.RowData.Length == ExpectedRowLength &&
         record.RowData == expectedRowData &&
         record.Status == IntegrationTransactionRecordStatus.Success;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await DbFixture.DbHelper.ClearDataAsync();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
 public class CapitaExportAmendJobFixture
@@ -822,7 +822,7 @@ public class CapitaExportAmendJobFixture
         Logger = new Mock<ILogger<CapitaExportAmendJob>>();
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);

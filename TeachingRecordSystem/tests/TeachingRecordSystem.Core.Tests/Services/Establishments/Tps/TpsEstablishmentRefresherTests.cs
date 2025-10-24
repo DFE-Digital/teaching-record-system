@@ -1,4 +1,5 @@
 using System.Text;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Establishments.Tps;
 using TeachingRecordSystem.Core.Services.WorkforceData;
@@ -6,7 +7,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData;
 namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Tps;
 
 [Collection(nameof(DisableParallelization))]
-public class TpsEstablishmentRefresherTests : IAsyncLifetime
+public class TpsEstablishmentRefresherTests(CoreFixture fixture) : IAsyncLifetime
 {
     private const string KnownGiasLaCodeHackney = "204";
     private const string KnownGiasLaNameHackney = "Hackney";
@@ -22,20 +23,11 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
     private const string KnownTpsEstablishmentTypeShortDescription = "Full and Part-Time Youth and Community Worker";
     private const string KnownTpsEstablishmentNumberOutsideTpsEstablishmentTypeRange = "0000";
 
-    public TpsEstablishmentRefresherTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
+    private IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
-    }
+    private DbHelper DbHelper => fixture.DbHelper;
+
+    private TestData TestData => fixture.TestData;
 
     public static TheoryData<TpsEstablishmentFileImportTestScenarioData> GetImportFileTestScenarioData()
     {
@@ -242,7 +234,6 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = DbFixture.GetDbContextFactory();
         var clock = new TestableClock();
         var tpsCsvExtractId = Guid.NewGuid();
         var filename = "establishments/test.csv";
@@ -258,11 +249,11 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         // Act
         var refresher = new TpsEstablishmentRefresher(
             tpsExtractStorageService,
-            dbContextFactory);
+            DbContextFactory);
         await refresher.ImportFileAsync(filename, CancellationToken.None);
 
         // Assert
-        using var dbContext = dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         var establishment = dbContext.TpsEstablishments.FirstOrDefault();
         if (scenarioData.IsExpectedToBeImported)
         {
@@ -288,11 +279,10 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = DbFixture.GetDbContextFactory();
         var giasEstablishmentHackney = await TestData.CreateEstablishmentAsync(localAuthorityCode: KnownGiasLaCodeHackney, localAuthorityName: KnownGiasLaNameHackney, establishmentNumber: KnownGiasEstablishmentNumberHackney, establishmentName: KnownGiasEstablishmentNameHackney);
         var giasEstablishmentCityOfLondon = await TestData.CreateEstablishmentAsync(localAuthorityCode: KnownGiasLaCodeCityOfLondon, localAuthorityName: KnownGiasLaNameCityOfLondon, establishmentNumber: KnownGiasEstablishmentNumberCityOfLondon, establishmentName: KnownGiasEstablishmentNameCityOfLondon);
 
-        using var dbContext = dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
         foreach (var tpsEstablishment in scenarioData.TpsEstablishments)
         {
             await dbContext.TpsEstablishments.AddAsync(tpsEstablishment);
@@ -302,7 +292,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         // Act
         var refresher = new TpsEstablishmentRefresher(
             tpsExtractStorageService,
-            dbContextFactory);
+            DbContextFactory);
         await refresher.RefreshEstablishmentsAsync(CancellationToken.None);
 
         // Assert
@@ -321,15 +311,9 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         }
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
 
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private TestableClock Clock { get; }
+    public async ValueTask DisposeAsync() => await DbHelper.ClearDataAsync();
 }
 
 public class TpsEstablishmentFileImportTestScenarioData

@@ -4,17 +4,17 @@ using TeachingRecordSystem.Core.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class DeleteStaleJourneyStatesJobTests(DbFixture dbFixture) : IAsyncLifetime
+public class DeleteStaleJourneyStatesJobTests(CoreFixture fixture) : IAsyncLifetime
 {
     private TrsDbContext _trsContext = null!;
 
     public TestableClock Clock { get; } = new();
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        _trsContext = await dbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        _trsContext = await fixture.DbHelper.DbContextFactory.CreateDbContextAsync();
     }
 
     [Fact]

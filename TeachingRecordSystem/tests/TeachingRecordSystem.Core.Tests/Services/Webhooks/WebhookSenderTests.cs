@@ -12,6 +12,9 @@ using NSign.Providers;
 using NSign.Signatures;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Webhooks;
+using TeachingRecordSystem.Core.Tests.Services.Webhooks;
+
+[assembly: AssemblyFixture(typeof(WebhookReceiver))]
 
 namespace TeachingRecordSystem.Core.Tests.Services.Webhooks;
 

@@ -229,6 +229,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
                         var trns = await dbContext.Persons
                             .Where(p => personMatchingResult.PotentialMatchesPersonIds.Contains(p.PersonId))
                             .Select(p => p.Trn)
+                            .OrderBy(trn => trn)
                             .ToArrayAsync();
 
                         outputRow.PotentialDuplicateTrns = string.Join(",", trns);

@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
-using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Tests.ApiSchema;
+
+[assembly: AssemblyFixture(typeof(EventMapperFixture))]
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema;
 
@@ -7,7 +10,7 @@ public abstract class EventMapperTestBase(EventMapperFixture fixture)
 {
     public TestableClock Clock => fixture.Clock;
 
-    public DbFixture DbFixture => fixture.DbFixture;
+    public IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
     public ReferenceDataCache ReferenceDataCache => fixture.ReferenceDataCache;
 
@@ -21,35 +24,26 @@ public abstract class EventMapperTestBase(EventMapperFixture fixture)
     }
 }
 
-public class EventMapperFixture
+public class EventMapperFixture : IDisposable
 {
-    public EventMapperFixture(
-        DbFixture dbFixture,
-        FakeTrnGenerator trnGenerator,
-        IServiceProvider serviceProvider)
+    public EventMapperFixture()
     {
-        Clock = new TestableClock();
-        DbFixture = dbFixture;
-        ReferenceDataCache = new ReferenceDataCache(dbFixture.GetDbContextFactory());
-
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            ReferenceDataCache,
-            Clock,
-            trnGenerator);
-
-        Services = serviceProvider;
+        var services = new ServiceCollection();
+        CoreFixture.AddCoreServices(services);
+        services.AddSingleton<PersonInfoCache>();
+        services.AddMemoryCache();
+        Services = services.BuildServiceProvider();
     }
 
-    public TestableClock Clock { get; }
+    public TestableClock Clock => Services.GetRequiredService<TestableClock>();
 
-    public DbFixture DbFixture { get; }
+    public IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    public ReferenceDataCache ReferenceDataCache { get; set; }
+    public ReferenceDataCache ReferenceDataCache => Services.GetRequiredService<ReferenceDataCache>();
 
-    public TestData TestData { get; }
+    public TestData TestData => Services.GetRequiredService<TestData>();
 
     public IServiceProvider Services { get; }
 
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
+    void IDisposable.Dispose() => (Services as IDisposable)?.Dispose();
 }

@@ -9,16 +9,11 @@ using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class SendInductionCompletedEmailJobTests : NightlyEmailJobTestBase
+public class SendInductionCompletedEmailJobTests(CoreFixture fixture) : NightlyEmailJobTestBase(fixture)
 {
-    public SendInductionCompletedEmailJobTests(NightlyEmailJobFixture dbFixture)
-        : base(dbFixture)
-    {
-    }
-
     [Fact]
     public Task Execute_WhenCalled_GetsTrnTokenSendsEmailAddsEventAndUpdatesDatabase() =>
-        Fixture.DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var utcNow = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);

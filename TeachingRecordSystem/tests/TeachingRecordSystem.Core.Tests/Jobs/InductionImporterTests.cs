@@ -1,57 +1,40 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [Collection(nameof(DisableParallelization))]
-public class InductionImporterTests : IAsyncLifetime
+public class InductionimporterTests(InductionimporterFixture fixture) : IClassFixture<InductionimporterFixture>, IAsyncLifetime
 {
-    public InductionImporterTests(
-      DbFixture dbFixture,
-      ReferenceDataCache referenceDataCache,
-      FakeTrnGenerator trnGenerator,
-      IServiceProvider provider)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
+    private IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
+    private TestData TestData => fixture.TestData;
 
-        Importer = ActivatorUtilities.CreateInstance<InductionImporter>(provider, Clock);
-    }
-    private DbFixture DbFixture { get; }
+    private TestableClock Clock => fixture.Clock;
 
-    private TestData TestData { get; }
+    async ValueTask IAsyncLifetime.InitializeAsync() => await DbContextFactory.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 
-    private TestableClock Clock { get; }
-
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    public InductionImporter Importer { get; }
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
-    public async Task Validate_MissingReferenceNumber_ReturnsError()
+    public Task Validate_MissingReferenceNumber_ReturnsError() => fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow();
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Reference No"));
-    }
+    });
 
     [Fact]
-    public async Task Validate_MissingDateOfBirth_ReturnsError()
+    public Task Validate_MissingDateOfBirth_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -59,17 +42,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = "";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Date of Birth"));
-    }
+    }));
 
     [Fact]
-    public async Task Validate_InvalidDateOfBirth_ReturnsError()
+    public Task Validate_InvalidDateOfBirth_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -77,17 +60,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = "45/11/19990";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Validation Failed: Invalid Date of Birth"));
-    }
+    }));
 
     [Fact]
-    public async Task Validate_MissingStartDate_ReturnsError()
+    public Task Validate_MissingStartDate_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -95,17 +78,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.StartDate = "";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Induction Start date"));
-    }
+    }));
 
     [Fact]
-    public async Task Validate_PassedDateBeforeStartDate_ReturnsError()
+    public Task Validate_PassedDateBeforeStartDate_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -114,18 +97,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = "01/01/2021";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Induction passed date cannot be before start date"));
-    }
-
+    }));
 
     [Fact]
-    public async Task Validate_PassedDateBeforeQtsDate_ReturnsError()
+    public Task Validate_PassedDateBeforeQtsDate_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var awardDate = new DateOnly(2011, 01, 1);
@@ -145,18 +127,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Induction passed date cannot be before Qts Date."));
-    }
-
+    }));
 
     [Fact]
-    public async Task Validate_StartDateBeforeQtsDate_ReturnsError()
+    public Task Validate_StartDateBeforeQtsDate_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var awardDate = new DateOnly(2011, 01, 1);
@@ -178,17 +159,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Induction start date cannot be before qts date"));
-    }
+    }));
 
     [Fact]
-    public async Task Validate_InvalidStartDate_ReturnsError()
+    public Task Validate_InvalidStartDate_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -196,17 +177,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.StartDate = "55/13/20001111";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Validation Failed: Invalid Induction start date"));
-    }
+    }));
 
     [Fact]
-    public async Task Validate_MissinPassedDate_ReturnsError()
+    public Task Validate_MissinPassedDate_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -214,17 +195,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = "";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Missing Induction passed date"));
-    }
+    }));
 
     [Fact]
-    public async Task Validate_InvalidPassedDate_ReturnsError()
+    public Task Validate_InvalidPassedDate_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -232,17 +213,17 @@ public class InductionImporterTests : IAsyncLifetime
             x.PassedDate = "25/13/20001";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Validation Failed: Invalid Induction passed date"));
-    }
+    }));
 
     [Fact]
-    public async Task Validate_ReferenceNumberNotFound_ReturnsError()
+    public Task Validate_ReferenceNumberNotFound_ReturnsError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var row = GetDefaultRow(x =>
@@ -250,21 +231,21 @@ public class InductionImporterTests : IAsyncLifetime
             x.ReferenceNumber = "NONE EXISTENT";
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.ReferenceNumber} was not found."));
-    }
+    }));
 
     [Theory]
     [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.Failed)]
     [InlineData(InductionStatus.InProgress)]
     [InlineData(InductionStatus.FailedInWales)]
-    public async Task Validate_WithCompletedInduction_ReturnsError(InductionStatus inductionStatus)
+    public Task Validate_WithCompletedInduction_ReturnsError(InductionStatus inductionStatus) => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(x =>
@@ -277,19 +258,19 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.ReferenceNumber} completed induction already or is progress."));
-    }
+    }));
 
     [Theory]
     [InlineData("12345")]
     [InlineData("212324")]
-    public async Task Validate_WithoutEndDate_ReturnsNoErrors(string accountNumber)
+    public Task Validate_WithoutEndDate_ReturnsNoErrors(string accountNumber) => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var inductionPeriodStartDate = new DateOnly(2019, 01, 01);
@@ -308,18 +289,18 @@ public class InductionImporterTests : IAsyncLifetime
             x.EmployerCode = accountNumber;
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Empty(errors);
         Assert.Empty(failures);
-    }
+    }));
 
     [Fact]
-    public async Task GetLookupData_TrnDoesNotExist_ReturnsNoMatch()
+    public Task GetLookupData_TrnDoesNotExist_ReturnsNoMatch() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -330,15 +311,15 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(ContactLookupResult.NoMatch, lookups.PersonMatchStatus);
         Assert.Null(lookups.Person);
-    }
+    }));
 
     [Fact]
-    public async Task GetLookupData_WithActiveAlert_ReturnsExpected()
+    public Task GetLookupData_WithActiveAlert_ReturnsExpected() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(x =>
@@ -354,14 +335,14 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Assert
         Assert.True(lookups.HasActiveAlerts);
-    }
+    }));
 
     [Fact]
-    public async Task GetLookupData_ValidTrnWithoutQTS_ReturnsNoAssociatedQTS()
+    public Task GetLookupData_ValidTrnWithoutQTS_ReturnsNoAssociatedQTS() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -373,16 +354,16 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(ContactLookupResult.NoAssociatedQts, lookups.PersonMatchStatus);
         Assert.NotNull(lookups.Person);
         Assert.Equal(person.PersonId, lookups.Person!.PersonId);
-    }
+    }));
 
     [Fact]
-    public async Task GetLookupData_ValidTrnWithQTS_ReturnsTeacherHasQTS()
+    public Task GetLookupData_ValidTrnWithQTS_ReturnsTeacherHasQTS() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(x =>
@@ -397,16 +378,16 @@ public class InductionImporterTests : IAsyncLifetime
         });
 
         // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Assert
         Assert.Equal(ContactLookupResult.TeacherHasQts, lookups.PersonMatchStatus);
         Assert.NotNull(lookups.Person);
         Assert.Equal(person.PersonId, lookups.Person!.PersonId);
-    }
+    }));
 
     [Fact]
-    public async Task Validate_WithQtlsDate_DoesNotReturnError()
+    public Task Validate_WithQtlsDate_DoesNotReturnError() => Task.FromResult(fixture.WithInductionimporter(async importer =>
     {
         // Arrange
         var awardDate = new DateOnly(2011, 01, 1);
@@ -421,14 +402,14 @@ public class InductionImporterTests : IAsyncLifetime
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
-        var lookups = await Importer.GetLookupDataAsync(row);
+        var lookups = await importer.GetLookupDataAsync(row);
 
         // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
+        var (failures, errors) = importer.Validate(row, lookups);
 
         // Assert
         Assert.Empty(errors);
-    }
+    }));
 
     private EwcWalesInductionImportData GetDefaultRow(Func<EwcWalesInductionImportData, EwcWalesInductionImportData>? configurator = null)
     {
@@ -448,4 +429,36 @@ public class InductionImporterTests : IAsyncLifetime
         var configuredRow = configurator != null ? configurator(row) : row;
         return configuredRow;
     }
+}
+
+public class InductionimporterFixture : IDisposable
+{
+    public InductionimporterFixture()
+    {
+        var services = new ServiceCollection();
+        CoreFixture.AddCoreServices(services);
+        services.AddSingleton(new TestableClock());
+        services.AddSingleton<IClock>(sp => sp.GetRequiredService<TestableClock>());
+        services.AddSingleton<ReferenceDataCache>();
+        services.AddSingleton<TestData>();
+        Services = services.BuildServiceProvider();
+    }
+
+    public TestableClock Clock => Services.GetRequiredService<TestableClock>();
+
+    public IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+
+    public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+
+    public IServiceProvider Services { get; }
+
+    public TestData TestData => Services.GetRequiredService<TestData>();
+
+    public Task WithInductionimporter(Func<InductionImporter, Task> action) => DbContextFactory.WithDbContextAsync(async dbContext =>
+    {
+        var inductionimporter = new InductionImporter(new NullLogger<InductionImporter>(), dbContext, Clock);
+        await action(inductionimporter);
+    });
+
+    void IDisposable.Dispose() => (Services as IDisposable)?.Dispose();
 }
