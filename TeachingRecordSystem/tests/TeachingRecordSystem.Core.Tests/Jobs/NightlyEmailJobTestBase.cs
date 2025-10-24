@@ -1,17 +1,17 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
+
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [Collection("NightEmailJobCollection")]
-public abstract class NightlyEmailJobTestBase(NightlyEmailJobFixture fixture) : IAsyncLifetime
+public abstract class NightlyEmailJobTestBase(CoreFixture fixture) : IAsyncLifetime
 {
-    public NightlyEmailJobFixture Fixture { get; } = fixture;
+    public IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
-    public DbFixture DbFixture => Fixture.DbFixture;
+    public TestData TestData => fixture.TestData;
 
-    public TestData TestData => Fixture.TestData;
+    public TestableClock Clock => fixture.Clock;
 
-    public TestableClock Clock => Fixture.Clock;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    public Task InitializeAsync() => Fixture.DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask InitializeAsync() => await fixture.DbHelper.ClearDataAsync();
 }

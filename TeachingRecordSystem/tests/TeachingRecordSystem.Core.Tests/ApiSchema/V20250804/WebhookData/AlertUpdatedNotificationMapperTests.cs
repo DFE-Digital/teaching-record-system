@@ -18,7 +18,7 @@ public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 
@@ -65,7 +65,7 @@ public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 
@@ -103,7 +103,7 @@ public class AlertUpdatedNotificationMapperTests(EventMapperFixture fixture) : E
 
             var alert = person.Alerts.Single();
 
-            var @event = await DbFixture.WithDbContextAsync(async dbContext =>
+            var @event = await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 dbContext.Alerts.Attach(alert);
 

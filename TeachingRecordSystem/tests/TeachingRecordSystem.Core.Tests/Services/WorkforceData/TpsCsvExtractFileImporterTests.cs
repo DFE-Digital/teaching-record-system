@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData;
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
 [Collection(nameof(WorkforceDataTestCollection))]
-public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
+public class TpsCsvExtractFileImporterTests(CoreFixture fixture)
 {
     public static TheoryData<TpsCsvExtractFileImportTestScenarioData> GetImportFileTestScenarioData()
     {
@@ -39,7 +39,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
 
         return
         [
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -64,7 +64,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid TRN
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -89,7 +89,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null National Insurance Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -114,7 +114,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid National Insurance Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -139,7 +139,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Date of Birth
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -164,7 +164,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Date of Birth
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -189,7 +189,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Date of Death
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -214,7 +214,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Date of Death
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -239,7 +239,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Local Authority Code
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -264,7 +264,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Local Authority Code
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -289,7 +289,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Establishment Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -314,7 +314,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Establishment Number
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -339,7 +339,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Employment Start Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -364,7 +364,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Employment Start Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -389,7 +389,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Employment End Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -414,7 +414,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Employment End Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -439,7 +439,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Full or Part Time Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -464,7 +464,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Full or Part Time Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -489,7 +489,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Withdrawl Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -514,7 +514,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Withdrawl Indicator
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -539,7 +539,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Extract Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -564,7 +564,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Extract Date
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -589,7 +589,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Null Gender
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -614,7 +614,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Gender
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -639,7 +639,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Member Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -664,7 +664,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Whitespace in Member Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -689,7 +689,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Invalid Establishment Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -714,7 +714,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             },
             // Whitespace in Establishment Email Address
 
-            new()
+            new TpsCsvExtractFileImportTestScenarioData()
             {
                 Row = new()
                 {
@@ -746,7 +746,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = fixture.DbContextFactory;
         var clock = new TestableClock();
         var tpsCsvExtractId = Guid.NewGuid();
         var filename = "pending/test.csv";
@@ -783,7 +783,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = fixture.DbContextFactory;
         var clock = new TestableClock();
         var tpsCsvExtractId = Guid.NewGuid();
         var tpsCsvExtract = new TpsCsvExtract

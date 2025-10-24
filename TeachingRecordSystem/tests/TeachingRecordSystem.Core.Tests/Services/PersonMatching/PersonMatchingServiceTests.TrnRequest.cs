@@ -8,7 +8,7 @@ public partial class PersonMatchingServiceTests
 {
     [Fact]
     public Task MatchFromTrnRequestAsync_WithOutOfOrderNames_ReturnsMatch() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -64,7 +64,7 @@ public partial class PersonMatchingServiceTests
             DateOfBirthArgumentOption dateOfBirthOption,
             NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
             TrnRequestMatchResultOutcome expectedOutcome) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -164,7 +164,7 @@ public partial class PersonMatchingServiceTests
 
     [Fact]
     public Task GetSuggestedMatchesFromTrnRequestAsync() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var applicationUser = await TestData.CreateApplicationUserAsync();

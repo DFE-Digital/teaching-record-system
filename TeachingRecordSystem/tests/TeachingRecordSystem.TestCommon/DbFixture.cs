@@ -4,17 +4,19 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class DbFixture(DbHelper dbHelper, IServiceProvider services)
+public class DbFixture(IServiceProvider services)
 {
-    public DbHelper DbHelper { get; } = dbHelper;
+    public DbHelper DbHelper => services.GetRequiredService<DbHelper>();
 
-    public NpgsqlDataSource GetDataSource() => services.GetRequiredService<NpgsqlDataSource>();
+    public NpgsqlDataSource DataSource => services.GetRequiredService<NpgsqlDataSource>();
 
-    public IDbContextFactory<TrsDbContext> GetDbContextFactory() => services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+    public IDbContextFactory<TrsDbContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+
+    public IServiceProvider Services => services;
 
     public async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
-        await using var dbContext = await GetDbContextFactory().CreateDbContextAsync();
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 

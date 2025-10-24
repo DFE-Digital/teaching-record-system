@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.IntegrationTests;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -16,19 +17,19 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
 public class HostFixture : WebApplicationFactory<Program>
 {
-    private readonly IConfiguration _configuration;
-
-    public HostFixture(IConfiguration configuration)
+    public HostFixture()
     {
-        _configuration = configuration;
-
         using (var rsa = RSA.Create())
         {
-            JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)), SecurityAlgorithms.RsaSha256);
+            JwtSigningCredentials = new SigningCredentials(
+                new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)),
+                SecurityAlgorithms.RsaSha256);
         }
 
         _ = Services;  // Start the host
@@ -49,9 +50,14 @@ public class HostFixture : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Tests");
 
-        // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
-        // i.e. Program.cs and that has a dependency on IConfiguration
-        builder.UseConfiguration(_configuration);
+        var testConfiguration = new ConfigurationBuilder()
+            .AddUserSecrets<HostFixture>(optional: true)
+            .AddEnvironmentVariables()
+            .AddInMemoryCollection([
+                new KeyValuePair<string, string?>("GetAnIdentityApplicationUserId", GetAnIdentityApplicationUserId.ToString())
+            ])
+            .Build();
+        builder.UseConfiguration(testConfiguration);
 
         builder.ConfigureServices((context, services) =>
         {

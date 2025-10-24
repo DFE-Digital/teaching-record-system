@@ -8,11 +8,11 @@ using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : NightlyEmailJobTestBase(dbFixture)
+public class SendAytqInviteEmailJobTests(CoreFixture fixture) : NightlyEmailJobTestBase(fixture)
 {
     [Fact]
     public Task Execute_WhenCalled_GetsTrnTokenSendsEmailAddsEventAndUpdatesDatabase() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var notificationSender = new Mock<INotificationSender>();

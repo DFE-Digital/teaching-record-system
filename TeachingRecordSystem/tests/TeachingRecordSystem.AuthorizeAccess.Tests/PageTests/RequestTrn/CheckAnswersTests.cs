@@ -6,11 +6,9 @@ using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 
 [Collection(nameof(DisableParallelization))]
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public Task InitializeAsync() => HostFixture.Services.GetRequiredService<DbHelper>().ClearDataAsync();
-
-    public Task DisposeAsync() => Task.CompletedTask;
+    protected override Task InitializeAsyncCore() => HostFixture.Services.GetRequiredService<DbHelper>().ClearDataAsync();
 
     [Fact]
     public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()

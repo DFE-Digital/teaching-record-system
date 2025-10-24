@@ -1,25 +1,17 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
 [Collection(nameof(WorkforceDataTestCollection))]
-public class TpsCsvExtractProcessorTests : IAsyncLifetime
+public class TpsCsvExtractProcessorTests(CoreFixture fixture) : IAsyncLifetime
 {
-    public TpsCsvExtractProcessorTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
+    public IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
-    }
+    public TestData TestData => fixture.TestData;
+
+    public TestableClock Clock => fixture.Clock;
 
     [Fact]
     public async Task ProcessNonMatchingTrns_WhenCalledWithTrnsNotMatchingPersonsInTrs_SetsResultToInvalidTrn()
@@ -507,13 +499,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         Assert.Equal(employerEmailAddress, updatedTpsEmployment.EmployerEmailAddress);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
 
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private TestableClock Clock { get; }
+    public async ValueTask DisposeAsync() => await fixture.DbHelper.ClearDataAsync();
 }

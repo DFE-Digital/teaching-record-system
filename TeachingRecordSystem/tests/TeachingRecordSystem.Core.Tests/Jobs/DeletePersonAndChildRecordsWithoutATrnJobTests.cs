@@ -1,11 +1,12 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Models.SupportTasks;
-using Xunit.Abstractions;
+using TeachingRecordSystem.Core.Services.Files;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -16,21 +17,22 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         ITestOutputHelper outputHelper)
     : IClassFixture<DeletePersonAndChildRecordsWithoutATrnJobFixture>, IAsyncLifetime
 {
-    public TrsDbContext DbContext => fixture.DbContext;
-    public DbFixture DbFixture => fixture.DbFixture;
-    public TestData TestData => fixture.TestData;
-    public TestableClock Clock => fixture.Clock;
-    public ILoggerFactory LoggerFactory => fixture.LoggerFactory;
-    public TestFileStorageService FileStorageService => fixture.FileStorageService;
-    public ILogger<DeletePersonAndChildRecordsWithoutATrnJob> TestOutputLogger { get; } = new TestOutputLogger<DeletePersonAndChildRecordsWithoutATrnJob>(outputHelper);
+    private TrsDbContext DbContext => fixture.DbContext;
+    private IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
+    private DbHelper DbHelper => fixture.DbHelper;
+    private TestData TestData => fixture.TestData;
+    private TestableClock Clock => fixture.Clock;
+    private ILoggerFactory LoggerFactory => fixture.LoggerFactory;
+    private TestFileStorageService FileStorageService => fixture.FileStorageService;
+    private ILogger<DeletePersonAndChildRecordsWithoutATrnJob> TestOutputLogger { get; } = new TestOutputLogger<DeletePersonAndChildRecordsWithoutATrnJob>(outputHelper);
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await DbFixture.DbHelper.ClearDataAsync();
+        await DbHelper.ClearDataAsync();
         FileStorageService.Clear();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task Execute_WithDryRunTrue_DoesNotDeleteAnyPersons()
@@ -727,7 +729,11 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         return csv.GetRecords<CsvRow>().ToList();
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(
+        int count,
+        Action<CreatePersonBuilder>? configure = null,
+        Guid? mergedWithPersonId = null,
+        IEnumerable<string?>? sourceRequestIds = null)
     {
         sourceRequestIds ??= Enumerable.Repeat<string?>(null, count);
 
@@ -739,7 +745,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             persons.Add(person.Person);
         }
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             foreach (var (p, sourceRequestId) in persons.Zip(sourceRequestIds))
             {
@@ -758,14 +764,18 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         });
 
         return (
-            persons.Select(p => p.PersonId),
-            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []),
-            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []),
-            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? [])
+            persons.Select(p => p.PersonId).ToArray(),
+            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []).ToArray(),
+            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []).ToArray(),
+            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? []).ToArray()
         );
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(
+        int count,
+        Action<CreatePersonBuilder>? configure = null,
+        Guid? mergedWithPersonId = null,
+        IEnumerable<string?>? sourceRequestIds = null)
     {
         sourceRequestIds ??= Enumerable.Repeat<string?>(null, count);
 
@@ -777,7 +787,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             persons.Add(person.Person);
         }
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             foreach (var (p, sourceRequestId) in persons.Zip(sourceRequestIds))
             {
@@ -798,10 +808,10 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         });
 
         return (
-            persons.Select(p => p.PersonId),
-            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []),
-            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []),
-            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? [])
+            persons.Select(p => p.PersonId).AsReadOnly(),
+            persons.SelectMany(p => p.Alerts?.Select(a => a.AlertId) ?? []).AsReadOnly(),
+            persons.SelectMany(p => p.PreviousNames?.Select(p => p.PreviousNameId) ?? []).AsReadOnly(),
+            persons.SelectMany(p => p.Qualifications?.Select(q => q.QualificationId) ?? []).AsReadOnly()
         );
     }
 
@@ -838,7 +848,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             var supportTask2 = await TestData.CreateNpqTrnRequestSupportTaskAsync(applicationUserId, t => t
                 .WithCreatedOn(DateTime.Parse("1 Jan 2000")));
 
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(supportTask2);
 
@@ -975,7 +985,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
                 createdOn,
                 out var _);
 
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 dbContext.TrnRequests.AddRange(request1, request2);
                 dbContext.TrnRequestMetadata.AddRange(metadata1, metadata2);
@@ -1015,7 +1025,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         foreach (var personId in personIds)
         {
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 var itr1 = new IntegrationTransactionRecord
                 {
@@ -1058,7 +1068,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         foreach (var personId in personIds)
         {
-            var subject = await DbFixture.WithDbContextAsync(async dbContext =>
+            var subject = await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId, verifiedInfo: (["XXX"], DateOnly.Parse("1 Jan 2000")));
 
@@ -1082,7 +1092,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         foreach (var personId in personIds)
         {
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 var note1 = new Note
                 {
@@ -1125,7 +1135,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
         foreach (var personId in personIds)
         {
-            await DbFixture.WithDbContextAsync(async dbContext =>
+            await DbContextFactory.WithDbContextAsync(async dbContext =>
             {
                 var employment1 = new TpsEmployment()
                 {
@@ -1180,77 +1190,77 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         return ids;
     }
 
-    private async Task<IEnumerable<Guid>> GetPersonsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetPersonsAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.Persons
             .Select(p => p.PersonId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetAlertsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetAlertsAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.Alerts
             .Select(a => a.AlertId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetNotesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetNotesAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.Notes
             .Select(n => n.NoteId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetPreviousNamesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetPreviousNamesAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.PreviousNames
             .Select(p => p.PreviousNameId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetQualificationsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetQualificationsAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.Qualifications
             .Select(p => p.QualificationId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetTpsEmploymentsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetTpsEmploymentsAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.TpsEmployments
             .Select(e => e.TpsEmploymentId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetEstablishmentsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IEnumerable<Guid>> GetEstablishmentsAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.Establishments
             .Select(e => e.EstablishmentId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetAlertTypesAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetAlertTypesAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.AlertTypes
             .Select(a => a.AlertTypeId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetSupportTasksAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetSupportTasksAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.SupportTasks
             .Select(s => s.SupportTaskReference)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetTrnRequestsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetTrnRequestsAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.TrnRequestMetadata
             .Select(m => m.RequestId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetTrnRequestMetadataAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetTrnRequestMetadataAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.TrnRequestMetadata
             .Select(m => m.RequestId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<long>> GetIntegrationTransactionRecordsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<long>> GetIntegrationTransactionRecordsAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.IntegrationTransactionRecords
             .Select(itr => itr.IntegrationTransactionRecordId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<string>> GetOneLoginUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<string>> GetOneLoginUsersAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.OneLoginUsers
             .Select(olu => olu.Subject)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetUsersAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.Users
             .Select(u => u.UserId)
             .ToArrayAsync());
 
-    private async Task<IEnumerable<Guid>> GetApplicationUsersAsync() => await DbFixture.WithDbContextAsync(dbContext =>
+    private async Task<IReadOnlyCollection<Guid>> GetApplicationUsersAsync() => await DbContextFactory.WithDbContextAsync(dbContext =>
         dbContext.ApplicationUsers
             .Select(u => u.UserId)
             .ToArrayAsync());
@@ -1258,39 +1268,39 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     public record CsvRow(Guid PersonId);
 }
 
-public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
+public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IDisposable
 {
-    public DeletePersonAndChildRecordsWithoutATrnJobFixture(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
-        ILoggerFactory loggerFactory)
+    public DeletePersonAndChildRecordsWithoutATrnJobFixture()
     {
-        DbFixture = dbFixture;
-        LoggerFactory = loggerFactory;
-        Clock = new();
+        var services = new ServiceCollection();
+        CoreFixture.AddCoreServices(services);
+        services.AddSingleton(new TestableClock());
+        services.AddSingleton<IClock>(sp => sp.GetRequiredService<TestableClock>());
+        services.AddSingleton<ReferenceDataCache>();
+        services.AddSingleton<TestData>();
+        services.AddLogging();
+        services.AddSingleton<TestFileStorageService>();
+        services.AddSingleton<IImportFileStorageService>(sp => sp.GetRequiredService<TestFileStorageService>());
+        Services = services.BuildServiceProvider();
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
-
-        DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
+        DbContext = DbContextFactory.CreateDbContext();
     }
 
-    public TestableClock Clock { get; }
-    public DbFixture DbFixture { get; }
-    public ILoggerFactory LoggerFactory { get; }
-    public TestData TestData { get; }
-    public TestFileStorageService FileStorageService { get; } = new();
+    public TestableClock Clock => Services.GetRequiredService<TestableClock>();
+
+    public IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+
+    public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+
+    public ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
+
+    public TestData TestData => Services.GetRequiredService<TestData>();
+
+    public TestFileStorageService FileStorageService => Services.GetRequiredService<TestFileStorageService>();
+
     public TrsDbContext DbContext { get; }
 
-    public async Task InitializeAsync()
-    {
-        await DbFixture.DbHelper.ClearDataAsync();
-        FileStorageService.Clear();
-    }
+    public IServiceProvider Services { get; }
 
-    public async Task DisposeAsync() => await DbContext.DisposeAsync();
+    void IDisposable.Dispose() => (Services as IDisposable)?.Dispose();
 }

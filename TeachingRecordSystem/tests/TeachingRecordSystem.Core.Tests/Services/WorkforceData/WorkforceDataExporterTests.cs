@@ -2,28 +2,20 @@ using Google.Apis.Upload;
 using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Options;
 using Parquet.Serialization;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
 [Collection(nameof(WorkforceDataTestCollection))]
-public class WorkforceDataExporterTests : IAsyncLifetime
+public class WorkforceDataExporterTests(CoreFixture fixture) : IAsyncLifetime
 {
-    public WorkforceDataExporterTests(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
-    {
-        DbFixture = dbFixture;
-        Clock = new();
+    public IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            referenceDataCache,
-            Clock,
-            trnGenerator);
-    }
+    public TestData TestData => fixture.TestData;
+
+    public TestableClock Clock => fixture.Clock;
 
     [Fact]
     public async Task Export_WhenCalled_ExportsDataToParquetFileAndUploadsToGcs()
@@ -91,13 +83,7 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         Assert.Equal(personEmployment.UpdatedOn, (DateTime)exportItem[nameof(WorkforceDataExportItem.UpdatedOn)]);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
 
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
-
-    private DbFixture DbFixture { get; }
-
-    private TestData TestData { get; }
-
-    private TestableClock Clock { get; }
+    public async ValueTask DisposeAsync() => await fixture.DbHelper.ClearDataAsync();
 }

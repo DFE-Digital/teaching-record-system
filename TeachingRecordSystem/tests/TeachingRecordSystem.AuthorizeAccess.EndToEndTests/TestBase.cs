@@ -11,6 +11,10 @@ public abstract class TestBase(HostFixture hostFixture)
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
+    public virtual ValueTask InitializeAsync() => ValueTask.CompletedTask;
+
+    public virtual ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
         var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();

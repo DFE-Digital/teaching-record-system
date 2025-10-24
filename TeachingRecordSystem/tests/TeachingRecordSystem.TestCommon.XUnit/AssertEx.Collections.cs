@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.TestCommon;
 public static partial class AssertEx
 #pragma warning restore CA1711
 {
-    public static void ContainsAll<T>(IEnumerable<T> expected, IEnumerable<T> collection)
+    public static void ContainsAll<T>(IEnumerable<T> expected, IReadOnlyCollection<T> collection)
     {
         foreach (var item in expected)
         {
@@ -14,7 +14,7 @@ public static partial class AssertEx
         }
     }
 
-    public static void DoesNotContainAny<T>(IEnumerable<T> expected, IEnumerable<T> collection)
+    public static void DoesNotContainAny<T>(IEnumerable<T> expected, IReadOnlyCollection<T> collection)
     {
         foreach (var item in expected)
         {

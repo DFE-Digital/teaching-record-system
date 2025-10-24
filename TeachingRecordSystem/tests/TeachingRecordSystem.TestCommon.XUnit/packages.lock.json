@@ -8,11 +8,11 @@
         "resolved": "17.12.19",
         "contentHash": "v3IYeedjoktvZ+GqYmLudxZJngmf/YWIxNT2Uy6QMMN19cvw+nkWoip1Gr1RtnFkUo1MPUVMis4C8Kj8d8DpSQ=="
       },
-      "xunit.assert": {
+      "xunit.v3.assert": {
         "type": "Direct",
-        "requested": "[2.9.3, )",
-        "resolved": "2.9.3",
-        "contentHash": "/Kq28fCE7MjOV42YLVRAJzRF0WmEqsmflm0cfpMjGtzQ2lR5mYVj1/i0Y8uDAOLczkL3/jArrwehfMD0YogMAA=="
+        "requested": "[3.1.0, )",
+        "resolved": "3.1.0",
+        "contentHash": "tSNOA4DC5toh9zv8todoQSxp6YBMER2VaH5Ll+FYotqxRei16HLQo7G4KDHNFaqUjnaSGpEcfeYMab+bFI/1kQ=="
       },
       "Apache.Arrow": {
         "type": "Transitive",
@@ -1906,7 +1906,7 @@
           "Respawn": "[6.2.0, )",
           "System.Linq.Async": "[6.0.3, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
-          "xunit.assert": "[2.9.3, )"
+          "xunit.v3.assert": "[3.1.0, )"
         }
       },
       "AngleSharp": {

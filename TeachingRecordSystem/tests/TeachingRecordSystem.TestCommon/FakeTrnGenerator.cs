@@ -6,6 +6,11 @@ public class FakeTrnGenerator : ITrnGenerator
 {
     private int _lastTrn = 4000000;
 
+    public FakeTrnGenerator()
+    {
+        //Debugger.Break();
+    }
+
     public int LastGeneratedTrn => _lastTrn;
 
     public string GenerateTrn() => Interlocked.Increment(ref _lastTrn).ToString();

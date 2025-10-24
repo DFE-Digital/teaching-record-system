@@ -15,7 +15,7 @@ public partial class PersonMatchingServiceTests
             TrnArgumentOption trnOption,
             bool expectMatch,
             IEnumerable<PersonMatchedAttribute>? expectedMatchedAttributes) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();
@@ -96,7 +96,7 @@ public partial class PersonMatchingServiceTests
 
     [Fact]
     public Task MatchOneLoginUserAsync_WithMultipleMatchingResults_ReturnsNull() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();
@@ -122,7 +122,7 @@ public partial class PersonMatchingServiceTests
 
     [Fact]
     public Task MatchOneLoginUserAsync_WithMultipleMatchingNames_ReturnsResult() =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = Guid.NewGuid().ToString();  // Deliberately weird first name to avoid unique constraint violations in NameSynonyms below
@@ -155,7 +155,7 @@ public partial class PersonMatchingServiceTests
     [InlineData(true)]
     [InlineData(false)]
     public Task GetSuggestedOneLoginUserMatchesAsync_ReturnsExpectedResults(bool usePersonNino) =>
-        DbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();

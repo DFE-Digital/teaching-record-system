@@ -6,6 +6,7 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Events.Legacy;
@@ -1466,21 +1467,17 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(TrnRequestMatchResultOutcome.NoMatches, results.Outcome);
     }
 
-    public async Task InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
+    public async ValueTask InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
 public class CapitaImportJobFixture : IAsyncLifetime
 {
-    public CapitaImportJobFixture(
-        DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
-        IServiceProvider provider)
+    public CapitaImportJobFixture()
     {
-        DbFixture = dbFixture;
-        Clock = new();
+        var services = new ServiceCollection();
+        CoreFixture.AddCoreServices(services);
 
         Logger = new Mock<ILogger<CapitaImportJob>>();
 
@@ -1508,19 +1505,21 @@ public class CapitaImportJobFixture : IAsyncLifetime
             .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
-        var matchingService = new PersonMatchingService(dbFixture.GetDbContextFactory().CreateDbContext());
+        var matchingService = new PersonMatchingService(dbFixture.DbContextFactory.CreateDbContext());
         var user = new CapitaTpsUserOption() { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId };
         var option = Options.Create(user);
 
         Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock, matchingService!, option);
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);
     }
 
-    public DbFixture DbFixture { get; }
+    public IDbContextFactory<TrsDbContext> DbContextFactory { get; }
+
+    public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
 
     public TestData TestData { get; }
 
@@ -1528,9 +1527,9 @@ public class CapitaImportJobFixture : IAsyncLifetime
 
     public Mock<ILogger<CapitaImportJob>> Logger { get; }
 
-    async Task IAsyncLifetime.InitializeAsync() => await DbFixture.DbHelper.ClearDataAsync();
+    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.ClearDataAsync();
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     public CapitaImportJob Job { get; }
 

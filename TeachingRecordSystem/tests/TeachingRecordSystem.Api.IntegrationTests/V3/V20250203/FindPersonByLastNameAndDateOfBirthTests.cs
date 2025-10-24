@@ -10,7 +10,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 
-    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
+    protected override Task InitializeAsyncCore() => DbHelper.DeleteAllPersonsAsync();
 
     [Fact]
     public async Task Get_PersonHasNullDqtInductionStatus_ReturnsNoneInductionStatus()

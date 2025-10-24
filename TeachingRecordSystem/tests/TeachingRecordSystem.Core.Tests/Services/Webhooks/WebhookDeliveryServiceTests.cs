@@ -1,13 +1,17 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
-public class WebhookDeliveryServiceTests(DbFixture dbFixture)
+[Collection(nameof(DisableParallelization))]
+public class WebhookDeliveryServiceTests(CoreFixture fixture)
 {
-    public TestableClock Clock { get; } = new TestableClock();
+    private TestableClock Clock => fixture.Clock;
+
+    private IDbContextFactory<TrsDbContext> DbContextFactory => fixture.DbContextFactory;
 
     [Fact]
     public async Task SendMessagesAsync_SendsDueMessageAndUpdatesDb()
@@ -20,7 +24,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            fixture.DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -32,7 +36,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
             It.Is<WebhookMessage>(m => m.WebhookMessageId == message.WebhookMessageId),
             It.IsAny<CancellationToken>()));
 
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             await dbContext.Entry(message).ReloadAsync();
             Assert.Equal(Clock.UtcNow, message.Delivered);
@@ -51,7 +55,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -76,7 +80,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -98,7 +102,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -128,7 +132,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -138,7 +142,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
         // Assert
         senderMock.Verify();
 
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             await dbContext.Entry(message).ReloadAsync();
             Assert.Null(message.Delivered);
@@ -182,7 +186,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -192,7 +196,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
         // Assert
         senderMock.Verify();
 
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             await dbContext.Entry(message).ReloadAsync();
             Assert.Null(message.Delivered);
@@ -203,7 +207,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
     }
 
     private Task<WebhookEndpoint> CreateApplicationUserAndEndpoint() =>
-        dbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var applicationUser = new ApplicationUser()
             {
@@ -231,7 +235,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
         });
 
     private Task CreateDueMessages(WebhookEndpoint endpoint, int count) =>
-        dbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             for (var i = 0; i < count; i++)
             {
@@ -256,7 +260,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
         });
 
     private Task<WebhookMessage> CreateMessage(WebhookEndpoint endpoint, DateTime? timestamp = null, Action<WebhookMessage>? configureMessage = null) =>
-        dbFixture.WithDbContextAsync(async dbContext =>
+        DbContextFactory.WithDbContextAsync(async dbContext =>
         {
             var message = new WebhookMessage()
             {

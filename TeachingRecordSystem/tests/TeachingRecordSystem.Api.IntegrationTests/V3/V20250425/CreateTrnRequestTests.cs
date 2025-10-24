@@ -25,7 +25,7 @@ public class CreateTrnRequestTests : TestBase
             });
     }
 
-    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
+    protected override Task InitializeAsyncCore() => DbHelper.DeleteAllPersonsAsync();
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
     public async Task Post_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
