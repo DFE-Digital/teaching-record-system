@@ -13,9 +13,11 @@
         <form action="@LinkGenerator.Alerts.EditAlert.EndDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Change closed alert - @Model.PersonName</span>
 
-            <govuk-date-input for="EndDate">
+            <govuk-date-input for="EndDate" error-message-prefix="End date">
                 <govuk-date-input-fieldset>
-                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
+                        Enter a new alert end date
+                    </govuk-date-input-fieldset-legend>
                 </govuk-date-input-fieldset>
             </govuk-date-input>
 

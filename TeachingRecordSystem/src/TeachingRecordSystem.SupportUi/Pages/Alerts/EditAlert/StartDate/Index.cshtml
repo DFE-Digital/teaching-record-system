@@ -11,11 +11,13 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Alerts.EditAlert.StartDate.Index(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Edit alert - @Model.PersonName</span>
 
-            <govuk-date-input for="StartDate">
+            <govuk-date-input for="StartDate" error-message-prefix="Start date">
                 <govuk-date-input-fieldset>
-                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
+                        Enter a new alert start date
+                    </govuk-date-input-fieldset-legend>
                     <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
                 </govuk-date-input-fieldset>
             </govuk-date-input>

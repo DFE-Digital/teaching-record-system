@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.AddAlert.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AddAlert.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Alerts.AddAlert.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AddAlert.StartDate(Model.PersonId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -34,7 +34,7 @@
             <govuk-radios for="HasAdditionalReasonDetail">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                        Do you want to add more information about why you’re adding this alert?
+                        Do you want to provide more information?
                     </govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes

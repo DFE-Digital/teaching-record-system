@@ -92,7 +92,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueForKey("New details"));
-        Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Current details"));
+        Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Previous details"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
         Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));

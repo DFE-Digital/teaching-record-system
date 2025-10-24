@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,7 +24,6 @@ public class IndexModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add an end date")]
     public DateOnly? EndDate { get; set; }
 
     public DateOnly? StartDate { get; set; }

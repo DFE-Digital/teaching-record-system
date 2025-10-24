@@ -4,9 +4,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
 public enum AlertChangeEndDateReasonOption
 {
-    [Display(Name = "Incorrect end date")]
+    [Display(Name = "The end date was incorrect")]
     IncorrectEndDate,
-    [Display(Name = "Change of end date")]
+    [Display(Name = "The end date changed")]
     ChangeOfEndDate,
     [Display(Name = "Another reason")]
     AnotherReason

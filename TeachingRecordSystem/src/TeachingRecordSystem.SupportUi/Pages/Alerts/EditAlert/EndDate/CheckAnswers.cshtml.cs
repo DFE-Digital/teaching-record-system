@@ -27,7 +27,7 @@ public class CheckAnswersModel(
 
     public DateOnly? NewEndDate { get; set; }
 
-    public DateOnly? CurrentEndDate { get; set; }
+    public DateOnly? PreviousEndDate { get; set; }
 
     public AlertChangeEndDateReasonOption ChangeReason { get; set; }
 
@@ -49,7 +49,7 @@ public class CheckAnswersModel(
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         NewEndDate = JourneyInstance!.State.EndDate;
-        CurrentEndDate = alertInfo.Alert.EndDate;
+        PreviousEndDate = alertInfo.Alert.EndDate;
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;

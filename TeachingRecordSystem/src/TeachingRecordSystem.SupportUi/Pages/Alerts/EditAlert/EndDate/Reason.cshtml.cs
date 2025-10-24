@@ -9,7 +9,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 [Journey(JourneyNames.EditAlertEndDate), RequireJourneyInstance]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
 {
-    public const int MaxFileSizeMb = 50;
     public const int ChangeReasonDetailMaxLength = 4000;
 
     public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }
@@ -25,17 +24,14 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Select a reason")]
     [Required(ErrorMessage = "Select a reason")]
     public AlertChangeEndDateReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to add more information about why you’re changing the end date?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you’re changing the end date")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Add additional detail")]
     [MaxLength(ChangeReasonDetailMaxLength, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? ChangeReasonDetail { get; set; }
 

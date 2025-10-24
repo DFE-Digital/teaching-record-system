@@ -1,11 +1,11 @@
 @page "/alerts/add/details/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.DetailsModel
 @{
-    ViewBag.Title = $"Enter details about the alert type: {Model.AlertTypeName} (optional)";
+    ViewBag.Title = "Enter details about this alert (optional)";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.AddAlert.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AddAlert.Type(Model.PersonId, Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Alerts.AddAlert.CheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alerts.AddAlert.Type(Model.PersonId, Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
@@ -13,6 +13,7 @@
         <form action="@LinkGenerator.Alerts.AddAlert.Details(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <h2 class="govuk-heading-m">@Model.AlertTypeName</h2>
             <govuk-inset-text>
                 <p>Do not enter details if the alert type is:</p>
                 <ul class="govuk-list govuk-list--bullet">

@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.Alerts.DeleteAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : Model.EndDate is null ? LinkGenerator.Persons.PersonDetail.Alerts(Model.PersonId) : LinkGenerator.Alerts.AlertDetail(Model.AlertId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers ? LinkGenerator.Alerts.DeleteAlert.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : Model.EndDate is null ? LinkGenerator.Persons.PersonDetail.Alerts(Model.PersonId) : LinkGenerator.Alerts.AlertDetail(Model.AlertId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -22,11 +21,9 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "End date")]
-    [Display(Name = "Enter a new end date")]
     public DateOnly? EndDate { get; set; }
 
-    public DateOnly? CurrentEndDate { get; set; }
+    public DateOnly? PreviousEndDate { get; set; }
 
     public DateOnly? StartDate { get; set; }
 
@@ -49,7 +46,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
         {
             ModelState.AddModelError(nameof(EndDate), "End date must be after the start date");
         }
-        else if (EndDate == CurrentEndDate)
+        else if (EndDate == PreviousEndDate)
         {
             ModelState.AddModelError(nameof(EndDate), "Enter a different end date");
         }
@@ -82,7 +79,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        CurrentEndDate = alertInfo.Alert.EndDate;
+        PreviousEndDate = alertInfo.Alert.EndDate;
         StartDate = alertInfo.Alert.StartDate;
     }
 }

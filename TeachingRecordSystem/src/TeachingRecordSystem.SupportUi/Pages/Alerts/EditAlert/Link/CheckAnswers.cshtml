@@ -1,7 +1,7 @@
 @page "/alerts/{alertId}/link/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link.CheckAnswersModel
 @{
-    ViewBag.Title = "Check details and confirm change";
+    ViewBag.Title = "Check details before changing panel outcome link";
 }
 
 @section BeforeContent {
@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
         <form action="@LinkGenerator.Alerts.EditAlert.Link.CheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
-            <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Edit alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
@@ -32,11 +32,11 @@
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Current link</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Previous link</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
-                        @if (Model.CurrentLink is not null)
+                        @if (Model.PreviousLink is not null)
                         {
-                            <a href="@Model.CurrentLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.CurrentLink} (opens in new tab)")</a>
+                            <a href="@Model.PreviousLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.PreviousLink} (opens in new tab)")</a>
                         }
                         else
                         {

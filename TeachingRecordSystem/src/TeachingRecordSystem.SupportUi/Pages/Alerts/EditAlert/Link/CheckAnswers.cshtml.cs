@@ -29,9 +29,9 @@ public class CheckAnswersModel(
 
     public Uri? NewLinkUri { get; set; }
 
-    public string? CurrentLink { get; set; }
+    public string? PreviousLink { get; set; }
 
-    public Uri? CurrentLinkUri { get; set; }
+    public Uri? PreviousLinkUri { get; set; }
 
     public AlertChangeLinkReasonOption ChangeReason { get; set; }
 
@@ -54,8 +54,8 @@ public class CheckAnswersModel(
         PersonName = personInfo.Name;
         NewLink = JourneyInstance!.State.Link;
         NewLinkUri = TrsUriHelper.TryCreateWebsiteUri(NewLink, out var newLinkUri) ? newLinkUri : null;
-        CurrentLink = alertInfo.Alert.ExternalLink;
-        CurrentLinkUri = TrsUriHelper.TryCreateWebsiteUri(CurrentLink, out var currentLinkUri) ? currentLinkUri : null;
+        PreviousLink = alertInfo.Alert.ExternalLink;
+        PreviousLinkUri = TrsUriHelper.TryCreateWebsiteUri(PreviousLink, out var currentLinkUri) ? currentLinkUri : null;
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;

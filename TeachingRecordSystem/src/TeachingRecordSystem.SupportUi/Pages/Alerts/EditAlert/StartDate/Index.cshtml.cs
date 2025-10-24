@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,11 +24,9 @@ public class IndexModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "Start date")]
-    [Display(Name = "Enter a new start date")]
     public DateOnly? StartDate { get; set; }
 
-    public DateOnly? CurrentStartDate { get; set; }
+    public DateOnly? PreviousStartDate { get; set; }
 
     public void OnGet()
     {
@@ -46,7 +43,7 @@ public class IndexModel(
         {
             ModelState.AddModelError(nameof(StartDate), "Start date cannot be in the future");
         }
-        else if (StartDate == CurrentStartDate)
+        else if (StartDate == PreviousStartDate)
         {
             ModelState.AddModelError(nameof(StartDate), "Enter a different start date");
         }
@@ -79,6 +76,6 @@ public class IndexModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        CurrentStartDate = alertInfo.Alert.StartDate;
+        PreviousStartDate = alertInfo.Alert.StartDate;
     }
 }
