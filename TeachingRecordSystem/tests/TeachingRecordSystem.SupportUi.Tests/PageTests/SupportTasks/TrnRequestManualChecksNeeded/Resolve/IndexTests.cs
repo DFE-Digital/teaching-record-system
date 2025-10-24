@@ -50,14 +50,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var trnRequestMetadata = supportTask.TrnRequestMetadata!;
         var cardActions = doc.QuerySelectorAll<IHtmlAnchorElement>(".govuk-summary-card__actions>*");
         Assert.Single(cardActions);
-        Assert.Equal(trnRequestMetadata.FirstName, doc.GetSummaryListValueForKey("First name"));
-        Assert.Equal(trnRequestMetadata.MiddleName, doc.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal(trnRequestMetadata.LastName, doc.GetSummaryListValueForKey("Last name"));
-        Assert.Equal(trnRequestMetadata.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(trnRequestMetadata.EmailAddress, doc.GetSummaryListValueForKey("Email address"));
-        Assert.Equal(trnRequestMetadata.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National insurance number"));
+        Assert.Equal(trnRequestMetadata.FirstName, doc.GetSummaryListValueByKey("First name"));
+        Assert.Equal(trnRequestMetadata.MiddleName, doc.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(trnRequestMetadata.LastName, doc.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(trnRequestMetadata.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(trnRequestMetadata.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
+        Assert.Equal(trnRequestMetadata.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National insurance number"));
         Assert.Collection(
-            doc.GetSummaryListValueForKey("Flags")!.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+            doc.GetSummaryListValueByKey("Flags")!.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
             f => Assert.Equal("1 open alert", f),
             f => Assert.Equal("Holds QTS", f),
             f => Assert.Equal("Holds EYTS", f));

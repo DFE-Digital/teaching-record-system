@@ -62,7 +62,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         // Act
         var response = await HttpClient.SendAsync(request);
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var reason = doc.GetSummaryListValueElementForKey("Reason");
+        var reason = doc.GetSummaryListValueElementByKey("Reason");
         Assert.NotNull(reason);
         Assert.Contains(state.Reason, reason.TextContent);
     }
@@ -106,7 +106,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         // Act
         var response = await HttpClient.SendAsync(request);
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var reason = doc.GetSummaryListValueElementForKey("Reason");
+        var reason = doc.GetSummaryListValueElementByKey("Reason");
         Assert.NotNull(reason);
         Assert.Contains(state.KeepSeparateReason.GetDisplayName()!, reason.TextContent);
     }

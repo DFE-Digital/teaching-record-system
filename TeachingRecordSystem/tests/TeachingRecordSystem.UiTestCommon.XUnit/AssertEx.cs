@@ -268,7 +268,7 @@ public static partial class AssertEx
     public static void AssertMatchRowHasExpectedHighlight(this IElement doc, string detailsId, string summaryListKey, bool expectHighlight)
     {
         var details = doc.GetAllElementsByTestId(detailsId).First();
-        var valueElement = details.GetSummaryListValueElementForKey(summaryListKey);
+        var valueElement = details.GetSummaryListValueElementByKey(summaryListKey);
         Assert.NotNull(valueElement);
         var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
 

@@ -175,7 +175,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetSummaryListValueElementForKey("TRN"));
+        Assert.Null(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
     [Test]
@@ -204,7 +204,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotNull(doc.GetSummaryListValueElementForKey("TRN"));
+        Assert.NotNull(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
     [Test]
@@ -236,7 +236,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(comments, doc.GetSummaryListValueElementForKey("Comments")?.TrimmedText());
+        Assert.Equal(comments, doc.GetSummaryListValueElementByKey("Comments")?.TrimmedText());
     }
 
     [Test]

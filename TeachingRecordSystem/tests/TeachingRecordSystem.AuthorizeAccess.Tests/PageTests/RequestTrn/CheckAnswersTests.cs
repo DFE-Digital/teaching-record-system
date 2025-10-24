@@ -235,20 +235,20 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(state.WorkEmail, doc.GetSummaryListValueForKey("Work email"));
-        Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueForKey("Personal email"));
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.FirstName, state.MiddleName, state.LastName), doc.GetSummaryListValueForKey("Name"));
-        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName), doc.GetSummaryListValueForKey("Previous name"));
-        Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Contains(state.EvidenceFileName!, doc.GetSummaryListValueForKey("Proof of identity"));
+        Assert.Equal(state.WorkEmail, doc.GetSummaryListValueByKey("Work email"));
+        Assert.Equal(state.PersonalEmail, doc.GetSummaryListValueByKey("Personal email"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.FirstName, state.MiddleName, state.LastName), doc.GetSummaryListValueByKey("Name"));
+        Assert.Equal(StringHelper.JoinNonEmpty(' ', state.PreviousFirstName, state.PreviousMiddleName, state.PreviousLastName), doc.GetSummaryListValueByKey("Previous name"));
+        Assert.Equal(state.DateOfBirth?.ToString("d MMMM yyyy"), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Contains(state.EvidenceFileName!, doc.GetSummaryListValueByKey("Proof of identity"));
         if (hasNationalInsuranceNumber)
         {
-            Assert.Equal(state.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
+            Assert.Equal(state.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
         }
         else
         {
-            Assert.Equal("None", doc.GetSummaryListValueForKey("National Insurance number"));
-            var address = doc.GetSummaryListValueForKey("Address");
+            Assert.Equal("None", doc.GetSummaryListValueByKey("National Insurance number"));
+            var address = doc.GetSummaryListValueByKey("Address");
             Assert.Contains(state.AddressLine1!, address);
             Assert.Contains(state.AddressLine2!, address);
             Assert.Contains(state.TownOrCity!, address);
@@ -278,9 +278,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetSummaryListValueForKey("NPQ application ID"));
-        Assert.Equal(npqName, doc.GetSummaryListValueForKey("NPQ"));
-        Assert.Equal(npqTrainingProvider, doc.GetSummaryListValueForKey("NPQ provider"));
+        Assert.Null(doc.GetSummaryListValueByKey("NPQ application ID"));
+        Assert.Equal(npqName, doc.GetSummaryListValueByKey("NPQ"));
+        Assert.Equal(npqTrainingProvider, doc.GetSummaryListValueByKey("NPQ provider"));
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
@@ -300,9 +300,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(state.NpqApplicationId, doc.GetSummaryListValueForKey("NPQ application ID"));
-        Assert.Null(doc.GetSummaryListValueForKey("NPQ"));
-        Assert.Null(doc.GetSummaryListValueForKey("NPQ Provider"));
+        Assert.Equal(state.NpqApplicationId, doc.GetSummaryListValueByKey("NPQ application ID"));
+        Assert.Null(doc.GetSummaryListValueByKey("NPQ"));
+        Assert.Null(doc.GetSummaryListValueByKey("NPQ Provider"));
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
@@ -323,8 +323,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(state.NpqApplicationId, doc.GetSummaryListValueForKey("NPQ application ID"));
-        Assert.Null(doc.GetSummaryListValueForKey("Work email"));
+        Assert.Equal(state.NpqApplicationId, doc.GetSummaryListValueByKey("NPQ application ID"));
+        Assert.Null(doc.GetSummaryListValueByKey("Work email"));
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 

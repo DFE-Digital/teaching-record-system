@@ -78,12 +78,12 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         // Act
         var response = await HttpClient.SendAsync(request);
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var firstName = doc.GetSummaryListValueElementForKey("First name");
-        var lastName = doc.GetSummaryListValueElementForKey("Last name");
-        var niNumber = doc.GetSummaryListValueElementForKey("NI number");
-        var dob = doc.GetSummaryListValueElementForKey("Date of birth");
-        var trn = doc.GetSummaryListValueElementForKey("TRN");
-        var evidenceFile = doc.GetSummaryListValueElementForKey("Evidence");
+        var firstName = doc.GetSummaryListValueElementByKey("First name");
+        var lastName = doc.GetSummaryListValueElementByKey("Last name");
+        var niNumber = doc.GetSummaryListValueElementByKey("NI number");
+        var dob = doc.GetSummaryListValueElementByKey("Date of birth");
+        var trn = doc.GetSummaryListValueElementByKey("TRN");
+        var evidenceFile = doc.GetSummaryListValueElementByKey("Evidence");
 
         // Assert
         Assert.NotNull(firstName);

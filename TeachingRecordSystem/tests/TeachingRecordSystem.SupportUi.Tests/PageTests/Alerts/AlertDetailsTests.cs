@@ -60,9 +60,9 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var h1 = doc.GetElementsByTagName("h1").Single();
         Assert.Equal(alert.AlertType!.Name, h1.TrimmedText());
 
-        Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
-        Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
-        Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("End date"));
+        Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Details"));
+        Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
+        Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("End date"));
     }
 
     [Test]
@@ -143,7 +143,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
+        Assert.Empty(doc.GetSummaryListActionsByKey("End date"));
     }
 
     [Test]
@@ -164,7 +164,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotEmpty(doc.GetSummaryListActionsForKey("End date"));
+        Assert.NotEmpty(doc.GetSummaryListActionsByKey("End date"));
     }
 
     [Test]
@@ -186,7 +186,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
+        Assert.Empty(doc.GetSummaryListActionsByKey("End date"));
     }
 
     [Test]
@@ -208,6 +208,6 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.NotEmpty(doc.GetSummaryListActionsForKey("End date"));
+        Assert.NotEmpty(doc.GetSummaryListActionsByKey("End date"));
     }
 }
