@@ -90,13 +90,13 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueForKey("First name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueForKey("Last name"));
-        Assert.Equal(person.Trn, requestDetails.GetSummaryListValueForKey("TRN"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueForKey("NI number"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueByKey("First name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(person.Trn, requestDetails.GetSummaryListValueByKey("TRN"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueByKey("Gender"));
     }
 
     [Test]
@@ -134,13 +134,13 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(duplicatePerson1.FirstName, firstMatchDetails.GetSummaryListValueForKey("First name"));
-        Assert.Equal(duplicatePerson1.MiddleName, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal(duplicatePerson1.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
-        Assert.Equal(duplicatePerson1.Trn, firstMatchDetails.GetSummaryListValueForKey("TRN"));
-        Assert.Equal(duplicatePerson1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(duplicatePerson1.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueForKey("NI number"));
-        Assert.Equal(duplicatePerson1.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(duplicatePerson1.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
+        Assert.Equal(duplicatePerson1.MiddleName, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(duplicatePerson1.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(duplicatePerson1.Trn, firstMatchDetails.GetSummaryListValueByKey("TRN"));
+        Assert.Equal(duplicatePerson1.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(duplicatePerson1.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(duplicatePerson1.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
     }
 
     [Test]

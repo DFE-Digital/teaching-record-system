@@ -93,13 +93,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(alert.AlertType!.Name, doc.GetSummaryListValueForKey("Alert type"));
-        Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
-        Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
-        Assert.Equal(alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
-        Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(alert.AlertType!.Name, doc.GetSummaryListValueByKey("Alert type"));
+        Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Details"));
+        Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Link"));
+        Assert.Equal(alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("Start date"));
+        Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason for change"));
+        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 
     [Test]

@@ -142,8 +142,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
-        Assert.Equal(trn, doc.GetSummaryListValueForKey("Teacher reference number"));
+        Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(trn, doc.GetSummaryListValueByKey("Teacher reference number"));
     }
 
     [Fact]

@@ -102,14 +102,14 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var requestDetails = doc.GetElementByTestId("request");
         Assert.NotNull(requestDetails);
-        Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueForKey("First name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueForKey("Last name"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueForKey("Email address"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueForKey("NI number"));
-        Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueForKey("Gender"));
-        Assert.Equal($"{supportTask.TrnRequestMetadata!.NpqEvidenceFileName} (opens in new tab)", requestDetails.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.FirstName, requestDetails.GetSummaryListValueByKey("First name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.MiddleName, requestDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.LastName, requestDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), requestDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.EmailAddress, requestDetails.GetSummaryListValueByKey("Email address"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.NationalInsuranceNumber, requestDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(supportTask.TrnRequestMetadata!.Gender?.GetDisplayName(), requestDetails.GetSummaryListValueByKey("Gender"));
+        Assert.Equal($"{supportTask.TrnRequestMetadata!.NpqEvidenceFileName} (opens in new tab)", requestDetails.GetSummaryListValueByKey("Evidence"));
     }
 
     [Test]
@@ -136,13 +136,13 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueForKey("First name"));
-        Assert.Equal(matchedPerson.MiddleName, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
-        Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueForKey("Email address"));
-        Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueForKey("NI number"));
-        Assert.Equal(matchedPerson.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
+        Assert.Equal(matchedPerson.MiddleName, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(matchedPerson.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueByKey("Email address"));
+        Assert.Equal(matchedPerson.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(matchedPerson.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
     }
 
     [Test]
@@ -178,11 +178,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueForKey("First name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("NI number"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", true);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", true);
@@ -222,11 +222,11 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueForKey("First name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Middle name"));
-        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueForKey("Last name"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("NI number"));
-        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(matchedPerson.FirstName, firstMatchDetails.GetSummaryListValueByKey("First name"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Middle name"));
+        Assert.Equal(matchedPerson.LastName, firstMatchDetails.GetSummaryListValueByKey("Last name"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("NI number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, firstMatchDetails.GetSummaryListValueByKey("Gender"));
 
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Middle name", false);
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "NI number", false);
@@ -301,7 +301,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueForKey("Email address"));
+        Assert.Equal(matchedPerson.EmailAddress, firstMatchDetails.GetSummaryListValueByKey("Email address"));
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Email address", true);
     }
 
@@ -326,7 +326,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TrimmedText()) ?? [];
+        var tags = firstMatchDetails.GetSummaryListValueElementByKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TrimmedText()) ?? [];
         Assert.Contains("Alerts", tags);
     }
 
@@ -351,7 +351,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TrimmedText()) ?? [];
+        var tags = firstMatchDetails.GetSummaryListValueElementByKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TrimmedText()) ?? [];
         Assert.Contains("QTS", tags);
     }
 
@@ -376,7 +376,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TrimmedText()) ?? [];
+        var tags = firstMatchDetails.GetSummaryListValueElementByKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TrimmedText()) ?? [];
         Assert.Contains("EYTS", tags);
     }
 
@@ -783,7 +783,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
     private void AssertMatchRowHasExpectedHighlight(IElement matchDetails, string summaryListKey, bool expectHighlight)
     {
-        var valueElement = matchDetails.GetSummaryListValueElementForKey(summaryListKey);
+        var valueElement = matchDetails.GetSummaryListValueElementByKey(summaryListKey);
         Assert.NotNull(valueElement);
         var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
 

@@ -71,7 +71,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(state.RejectionReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason"));
+        Assert.Equal(state.RejectionReason.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
     }
 
     [Test]

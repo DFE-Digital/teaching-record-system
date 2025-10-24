@@ -60,12 +60,12 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (hasExemption)
         {
             var expected = $"{routeWithExemption.InductionExemptionReason?.Name} - {routeWithExemption.Name}";
-            var routeExemptionRowValue = doc.GetSummaryListValueElementForKey("Route induction exemption reason");
+            var routeExemptionRowValue = doc.GetSummaryListValueElementByKey("Route induction exemption reason");
             Assert.Equal(expected, routeExemptionRowValue?.TextContent.Trim());
         }
         else
         {
-            Assert.Null(doc.GetSummaryListValueElementForKey("Route induction exemption reason"));
+            Assert.Null(doc.GetSummaryListValueElementByKey("Route induction exemption reason"));
         }
     }
 
