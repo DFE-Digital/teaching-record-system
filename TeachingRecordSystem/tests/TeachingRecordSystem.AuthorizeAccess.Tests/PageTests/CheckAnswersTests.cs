@@ -298,7 +298,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var data = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
         Assert.True(data.Verified);
         Assert.Equal(oneLoginUser.Subject, data.OneLoginUserSubject);
-        Assert.Equal(oneLoginUser.Email, data.OneLoginUserEmail);
+        Assert.Equal(oneLoginUser.EmailAddress, data.OneLoginUserEmail);
         Assert.Equal(oneLoginUser.VerifiedNames, data.VerifiedNames);
         Assert.Equal(oneLoginUser.VerifiedDatesOfBirth, data.VerifiedDatesOfBirth);
         Assert.Equal(nationalInsuranceNumber, data.StatedNationalInsuranceNumber);
@@ -318,7 +318,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             var eventData = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
             Assert.True(eventData.Verified);
             Assert.Equal(oneLoginUser.Subject, eventData.OneLoginUserSubject);
-            Assert.Equal(oneLoginUser.Email, eventData.OneLoginUserEmail);
+            Assert.Equal(oneLoginUser.EmailAddress, eventData.OneLoginUserEmail);
             Assert.Equal(oneLoginUser.VerifiedNames, eventData.VerifiedNames);
             Assert.Equal(oneLoginUser.VerifiedDatesOfBirth, eventData.VerifiedDatesOfBirth);
             Assert.Equal(nationalInsuranceNumber, eventData.StatedNationalInsuranceNumber);

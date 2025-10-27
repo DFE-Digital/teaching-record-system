@@ -77,7 +77,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(oneLoginUser.Email, doc.GetSummaryListValueByKey("Email address"));
+        Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
     }
 
     [Test]

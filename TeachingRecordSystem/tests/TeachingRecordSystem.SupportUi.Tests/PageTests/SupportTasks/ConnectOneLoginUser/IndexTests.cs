@@ -62,7 +62,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(oneLoginUser.Email, doc.GetSummaryListValueByKey("Email address"));
+        Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal($"{person.FirstName} {person.LastName}", doc.GetSummaryListValueByKey("Name"));
         Assert.Equal(person.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(statedNationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));

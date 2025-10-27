@@ -137,7 +137,7 @@ public abstract class TestBase
         CreateOneLoginAuthenticationTicket(
             vtr,
             user.Subject,
-            user.Email,
+            user.EmailAddress,
             user.VerifiedNames?.First().First(),
             user.VerifiedNames?.First().Last(),
             user.VerifiedDatesOfBirth?.First());

@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 public class OneLoginUser
 {
     public required string Subject { get; init; }
-    public string? Email { get; set; }
+    public string? EmailAddress { get; set; }
     public DateTime? FirstOneLoginSignIn { get; set; }
     public DateTime? LastOneLoginSignIn { get; set; }
     public DateTime? FirstSignIn { get; set; }

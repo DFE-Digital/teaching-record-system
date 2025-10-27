@@ -43,7 +43,7 @@ public partial class TestData
 
             if (hasSignedInBefore)
             {
-                user.Email = email.ValueOr(Faker.Internet.Email());
+                user.EmailAddress = email.ValueOr(Faker.Internet.Email());
                 user.FirstOneLoginSignIn = Clock.UtcNow;
                 user.LastOneLoginSignIn = Clock.UtcNow;
             }
