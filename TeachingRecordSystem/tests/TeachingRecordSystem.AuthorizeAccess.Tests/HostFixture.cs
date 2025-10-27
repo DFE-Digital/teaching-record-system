@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using TeachingRecordSystem.AuthorizeAccess.Tests;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Files;
@@ -13,15 +14,14 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
-public class HostFixture : WebApplicationFactory<Program>
+public class HostFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly IConfiguration _configuration;
-
-    public HostFixture(IConfiguration configuration)
+    public HostFixture()
     {
-        _configuration = configuration;
         _ = base.Services;  // Start the host
     }
 
@@ -31,12 +31,15 @@ public class HostFixture : WebApplicationFactory<Program>
 
         // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
         // i.e. Program.cs and that has a dependency on IConfiguration
-        builder.UseConfiguration(_configuration);
+        var configuration = new ConfigurationBuilder()
+            .AddUserSecrets<HostFixture>(optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+        builder.UseConfiguration(configuration);
 
         builder.ConfigureServices((context, services) =>
         {
             DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
-            services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());
 
             services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
 
@@ -92,6 +95,10 @@ public class HostFixture : WebApplicationFactory<Program>
 
         return base.CreateHost(builder);
     }
+
+    async ValueTask IAsyncLifetime.InitializeAsync() => await Services.GetRequiredService<DbHelper>().InitializeAsync();
+
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     private class RemoveAutoValidateAntiforgeryPageApplicationModelProvider : IPageApplicationModelProvider
     {
