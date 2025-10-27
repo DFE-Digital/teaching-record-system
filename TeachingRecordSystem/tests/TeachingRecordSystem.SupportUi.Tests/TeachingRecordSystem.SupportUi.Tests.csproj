@@ -9,7 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.SupportUi\TeachingRecordSystem.SupportUi.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon.TUnit\TeachingRecordSystem.TestCommon.TUnit.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon.XUnit\TeachingRecordSystem.UiTestCommon.XUnit.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon\TeachingRecordSystem.UiTestCommon.csproj" />
   </ItemGroup>
 
@@ -19,7 +18,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Moq" />
     <PackageReference Include="TUnit" />
-    <PackageReference Include="xunit.assert" />
   </ItemGroup>
 
 </Project>

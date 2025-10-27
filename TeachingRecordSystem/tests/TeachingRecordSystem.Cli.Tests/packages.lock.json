@@ -2008,7 +2008,8 @@
           "Moq": "[4.20.70, )",
           "Respawn": "[6.2.0, )",
           "System.Linq.Async": "[6.0.3, )",
-          "TeachingRecordSystem.Core": "[1.0.0, )"
+          "TeachingRecordSystem.Core": "[1.0.0, )",
+          "xunit.v3.assert": "[3.1.0, )"
         }
       },
       "trscli": {
