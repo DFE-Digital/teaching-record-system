@@ -63,22 +63,21 @@
           "Castle.Core": "5.1.1"
         }
       },
-      "xunit": {
-        "type": "Direct",
-        "requested": "[2.9.3, )",
-        "resolved": "2.9.3",
-        "contentHash": "TlXQBinK35LpOPKHAqbLY4xlEen9TBafjs0V5KnA4wZsoQLQJiirCR4CbIXvOH8NzkW4YeJKP5P/Bnrodm0h9Q==",
-        "dependencies": {
-          "xunit.analyzers": "1.18.0",
-          "xunit.assert": "2.9.3",
-          "xunit.core": "[2.9.3]"
-        }
-      },
       "xunit.analyzers": {
         "type": "Direct",
         "requested": "[1.23.0, )",
         "resolved": "1.23.0",
         "contentHash": "WCkO1FPTWoESLhghoXA881CulRYpve0UrXLsL5aYcLQd9SlD+oADb16NAP+SE5o3w0FM2MzGTklBwY8yUfj0ng=="
+      },
+      "xunit.core": {
+        "type": "Direct",
+        "requested": "[2.9.3, )",
+        "resolved": "2.9.3",
+        "contentHash": "BiAEvqGvyme19wE0wTKdADH+NloYqikiU0mcnmiNyXaF9HyHmE6sr/3DC5vnBkgsWaE6yPyWszKSPSApWdRVeQ==",
+        "dependencies": {
+          "xunit.extensibility.core": "[2.9.3]",
+          "xunit.extensibility.execution": "[2.9.3]"
+        }
       },
       "Xunit.DependencyInjection": {
         "type": "Direct",
@@ -2130,15 +2129,6 @@
         "resolved": "2.0.3",
         "contentHash": "pot1I4YOxlWjIb5jmwvvQNbTrZ3lJQ+jUGkGjWE3hEFM0l5gOnBWS+H3qsex68s5cO52g+44vpGzhAt+42vwKg=="
       },
-      "xunit.core": {
-        "type": "Transitive",
-        "resolved": "2.9.3",
-        "contentHash": "BiAEvqGvyme19wE0wTKdADH+NloYqikiU0mcnmiNyXaF9HyHmE6sr/3DC5vnBkgsWaE6yPyWszKSPSApWdRVeQ==",
-        "dependencies": {
-          "xunit.extensibility.core": "[2.9.3]",
-          "xunit.extensibility.execution": "[2.9.3]"
-        }
-      },
       "xunit.extensibility.core": {
         "type": "Transitive",
         "resolved": "2.9.3",
@@ -2238,14 +2228,8 @@
           "Moq": "[4.20.70, )",
           "Respawn": "[6.2.0, )",
           "System.Linq.Async": "[6.0.3, )",
-          "TeachingRecordSystem.Core": "[1.0.0, )"
-        }
-      },
-      "teachingrecordsystem.testcommon.xunit": {
-        "type": "Project",
-        "dependencies": {
-          "TeachingRecordSystem.TestCommon": "[1.0.0, )",
-          "xunit.assert": "[2.9.3, )"
+          "TeachingRecordSystem.Core": "[1.0.0, )",
+          "xunit.v3.assert": "[3.1.0, )"
         }
       },
       "teachingrecordsystem.webcommon": {
@@ -3035,11 +3019,11 @@
         "resolved": "9.0.5",
         "contentHash": "rnP61ZfloTgPQPe7ecr36loNiGX3g1PocxlKHdY/FUpDSsExKkTxpMAlB4X35wNEPr1X7mkYZuQvW3Lhxmu7KA=="
       },
-      "xunit.assert": {
+      "xunit.v3.assert": {
         "type": "CentralTransitive",
-        "requested": "[2.9.3, )",
-        "resolved": "2.9.3",
-        "contentHash": "/Kq28fCE7MjOV42YLVRAJzRF0WmEqsmflm0cfpMjGtzQ2lR5mYVj1/i0Y8uDAOLczkL3/jArrwehfMD0YogMAA=="
+        "requested": "[3.1.0, )",
+        "resolved": "3.1.0",
+        "contentHash": "tSNOA4DC5toh9zv8todoQSxp6YBMER2VaH5Ll+FYotqxRei16HLQo7G4KDHNFaqUjnaSGpEcfeYMab+bFI/1kQ=="
       }
     }
   }

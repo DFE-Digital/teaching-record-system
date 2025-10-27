@@ -9,11 +9,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
     <PackageReference Include="xunit.analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="xunit.core" />
     <PackageReference Include="Xunit.DependencyInjection" />
     <PackageReference Include="xunit.runner.visualstudio">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.AuthorizeAccess\TeachingRecordSystem.AuthorizeAccess.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon.XUnit\TeachingRecordSystem.UiTestCommon.XUnit.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon\TeachingRecordSystem.UiTestCommon.csproj" />
   </ItemGroup>
 

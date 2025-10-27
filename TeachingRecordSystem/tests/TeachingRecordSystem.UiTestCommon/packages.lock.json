@@ -1989,7 +1989,8 @@
           "Moq": "[4.20.70, )",
           "Respawn": "[6.2.0, )",
           "System.Linq.Async": "[6.0.3, )",
-          "TeachingRecordSystem.Core": "[1.0.0, )"
+          "TeachingRecordSystem.Core": "[1.0.0, )",
+          "xunit.v3.assert": "[3.1.0, )"
         }
       },
       "teachingrecordsystem.webcommon": {
@@ -2740,6 +2741,12 @@
         "requested": "[9.0.10, )",
         "resolved": "9.0.5",
         "contentHash": "rnP61ZfloTgPQPe7ecr36loNiGX3g1PocxlKHdY/FUpDSsExKkTxpMAlB4X35wNEPr1X7mkYZuQvW3Lhxmu7KA=="
+      },
+      "xunit.v3.assert": {
+        "type": "CentralTransitive",
+        "requested": "[3.1.0, )",
+        "resolved": "3.1.0",
+        "contentHash": "tSNOA4DC5toh9zv8todoQSxp6YBMER2VaH5Ll+FYotqxRei16HLQo7G4KDHNFaqUjnaSGpEcfeYMab+bFI/1kQ=="
       }
     }
   }
