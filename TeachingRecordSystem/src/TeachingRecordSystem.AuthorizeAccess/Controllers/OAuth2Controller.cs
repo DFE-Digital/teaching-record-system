@@ -157,7 +157,7 @@ public class OAuth2Controller(
 
         if (User.HasScope(Scopes.Email))
         {
-            claims.Add(ClaimTypes.Email, oneLoginUser.Email!);
+            claims.Add(ClaimTypes.Email, oneLoginUser.EmailAddress!);
         }
 
         if (oneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.OneLogin)

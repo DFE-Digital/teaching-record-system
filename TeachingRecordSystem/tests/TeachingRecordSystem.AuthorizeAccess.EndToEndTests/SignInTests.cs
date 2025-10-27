@@ -345,7 +345,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -368,7 +368,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(subject: Option.Some(subject));
 
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -392,7 +392,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(email: Option.Some((string?)email));
 
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

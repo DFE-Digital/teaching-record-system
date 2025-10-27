@@ -15,13 +15,13 @@ public partial class TestData
         WithDbContextAsync(async dbContext =>
         {
             var user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUserSubject);
-            Debug.Assert(user.Email is not null);
+            Debug.Assert(user.EmailAddress is not null);
 
             var data = new ConnectOneLoginUserData()
             {
                 Verified = user.VerificationRoute is not null,
                 OneLoginUserSubject = user.Subject,
-                OneLoginUserEmail = user.Email!,
+                OneLoginUserEmail = user.EmailAddress!,
                 VerifiedNames = user.VerifiedNames,
                 VerifiedDatesOfBirth = user.VerifiedDatesOfBirth,
                 StatedNationalInsuranceNumber = statedNationalInsuranceNumber,

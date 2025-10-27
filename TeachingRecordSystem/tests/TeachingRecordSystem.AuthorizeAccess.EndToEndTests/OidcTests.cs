@@ -11,7 +11,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!, coreIdentityVc));
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.EmailAddress!, coreIdentityVc));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -26,7 +26,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         var claims = JsonSerializer.Deserialize<Dictionary<string, string>>(await page.GetByLabel("Claims").InputValueAsync()) ?? [];
         Assert.Equal(oneLoginUser.Subject, claims.GetValueOrDefault("sub"));
         Assert.Equal(person.Trn, claims.GetValueOrDefault("trn"));
-        Assert.Equal(oneLoginUser.Email, claims.GetValueOrDefault("email"));
+        Assert.Equal(oneLoginUser.EmailAddress, claims.GetValueOrDefault("email"));
         Assert.NotEmpty(claims.GetValueOrDefault("onelogin_id") ?? "");
         Assert.Equal(expectedVerifiedNames, JsonSerializer.Deserialize<string[][]>(claims.GetValueOrDefault("onelogin_verified_names") ?? "[]"));
         Assert.Equal(expectedVerifiedBirthDates, JsonSerializer.Deserialize<DateOnly[]>(claims.GetValueOrDefault("onelogin_verified_birthdates") ?? "[]"));

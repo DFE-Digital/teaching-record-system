@@ -84,7 +84,7 @@ public class SignInJourneyHelper(
             oneLoginUser = new()
             {
                 Subject = sub,
-                Email = email,
+                EmailAddress = email,
                 FirstOneLoginSignIn = clock.UtcNow,
                 LastOneLoginSignIn = clock.UtcNow
             };
@@ -97,7 +97,7 @@ public class SignInJourneyHelper(
 
             // Email may have changed since the last sign in or we may have never had it (e.g. if we got the user ID over our API).
             // TODO Should we emit an event if it has changed?
-            oneLoginUser.Email = email;
+            oneLoginUser.EmailAddress = email;
 
             if (oneLoginUser.PersonId is not null)
             {
@@ -224,7 +224,7 @@ public class SignInJourneyHelper(
             if (getAnIdentityPerson is null)
             {
                 var identityUser = await idDbContext.Users.SingleOrDefaultAsync(
-                    u => u.EmailAddress == oneLoginUser.Email
+                    u => u.EmailAddress == oneLoginUser.EmailAddress
                         && u.Trn != null
                         && u.IsDeleted == false
                         && (u.TrnVerificationLevel == TrnVerificationLevel.Medium
@@ -334,11 +334,11 @@ public class SignInJourneyHelper(
 
     private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser)
     {
-        Debug.Assert(oneLoginUser.Email is not null);
+        Debug.Assert(oneLoginUser.EmailAddress is not null);
 
         var requestAndResolvedPerson = await dbContext.TrnRequestMetadata
             .Join(dbContext.Persons, r => r.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequestMetadata = m, ResolvedPerson = p })
-            .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject || m.TrnRequestMetadata.EmailAddress == oneLoginUser.Email)
+            .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject || m.TrnRequestMetadata.EmailAddress == oneLoginUser.EmailAddress)
             .ToArrayAsync();
 
         if (requestAndResolvedPerson is not [{ TrnRequestMetadata: var trnRequestMetadata, ResolvedPerson: var resolvedPerson }])

@@ -12,7 +12,7 @@ public class OneLoginUserMapping : IEntityTypeConfiguration<OneLoginUser>
     {
         builder.HasKey(o => o.Subject);
         builder.Property(o => o.Subject).HasMaxLength(255);
-        builder.Property(o => o.Email).HasMaxLength(200);
+        builder.Property(o => o.EmailAddress).HasMaxLength(200);
         builder.HasOne(o => o.Person).WithOne().HasForeignKey<OneLoginUser>(o => o.PersonId);
         builder.Property(o => o.VerifiedNames).HasColumnType("jsonb").HasConversion(
             v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
