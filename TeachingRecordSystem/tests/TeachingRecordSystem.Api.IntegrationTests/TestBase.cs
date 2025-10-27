@@ -13,7 +13,7 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
-public abstract class TestBase : IAsyncLifetime
+public abstract class TestBase
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
     {
@@ -136,8 +136,4 @@ public abstract class TestBase : IAsyncLifetime
             await action(dbContext);
             return 0;
         });
-
-    public virtual Task InitializeAsync() => Task.CompletedTask;
-
-    public virtual Task DisposeAsync() => Task.CompletedTask;
 }

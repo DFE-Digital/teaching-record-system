@@ -1,7 +1,7 @@
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
 [Collection(nameof(DisableParallelization))]
-public class FindPersonByLastNameAndDateOfBirthTests : TestBase
+public class FindPersonByLastNameAndDateOfBirthTests : TestBase, IAsyncLifetime
 {
     public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture)
         : base(hostFixture)
@@ -9,7 +9,9 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 
-    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
+    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();
+
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)

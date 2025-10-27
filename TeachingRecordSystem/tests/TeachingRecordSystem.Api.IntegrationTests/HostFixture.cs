@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.IntegrationTests;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -16,19 +17,19 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
-public class HostFixture : WebApplicationFactory<Program>
+public class HostFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly IConfiguration _configuration;
-
-    public HostFixture(IConfiguration configuration)
+    public HostFixture()
     {
-        _configuration = configuration;
-
         using (var rsa = RSA.Create())
         {
-            JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)), SecurityAlgorithms.RsaSha256);
+            JwtSigningCredentials = new SigningCredentials(
+                new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)),
+                SecurityAlgorithms.RsaSha256);
         }
 
         _ = Services;  // Start the host
@@ -51,12 +52,18 @@ public class HostFixture : WebApplicationFactory<Program>
 
         // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
         // i.e. Program.cs and that has a dependency on IConfiguration
-        builder.UseConfiguration(_configuration);
+        var configuration = new ConfigurationBuilder()
+            .AddUserSecrets<HostFixture>(optional: true)
+            .AddEnvironmentVariables()
+            .AddInMemoryCollection([
+                KeyValuePair.Create("GetAnIdentityApplicationUserId", (string?)GetAnIdentityApplicationUserId.ToString())
+            ])
+            .Build();
+        builder.UseConfiguration(configuration);
 
         builder.ConfigureServices((context, services) =>
         {
             DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
-            services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());
 
             // Replace authentication handlers with mechanisms we can control from tests
             services.Configure<AuthenticationOptions>(options =>
@@ -116,27 +123,6 @@ public class HostFixture : WebApplicationFactory<Program>
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
                 .ConfigurePrimaryHttpMessageHandler(_ => new NotFoundHandler());
 
-            services.AddStartupTask(async sp =>
-            {
-                await using var dbContext = await sp.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
-
-                dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
-                {
-                    UserId = DefaultApplicationUserId,
-                    Name = "Tests",
-                    ApiRoles = ApiRoles.All.ToArray()
-                });
-
-                dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
-                {
-                    UserId = GetAnIdentityApplicationUserId,
-                    Name = "Get an identity",
-                    ApiRoles = [ApiRoles.UpdatePerson]
-                });
-
-                await dbContext.SaveChangesAsync();
-            });
-
             TestScopedServices.ConfigureServices(services);
         });
     }
@@ -147,6 +133,29 @@ public class HostFixture : WebApplicationFactory<Program>
         builder.ConfigureServices(services => services.Configure<TestServerOptions>(o => o.PreserveExecutionContext = true));
 
         return base.CreateHost(builder);
+    }
+
+    async ValueTask IAsyncLifetime.InitializeAsync()
+    {
+        await Services.GetRequiredService<DbHelper>().InitializeAsync();
+
+        await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
+
+        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        {
+            UserId = DefaultApplicationUserId,
+            Name = "Tests",
+            ApiRoles = ApiRoles.All.ToArray()
+        });
+
+        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        {
+            UserId = GetAnIdentityApplicationUserId,
+            Name = "Get an identity",
+            ApiRoles = [ApiRoles.UpdatePerson]
+        });
+
+        await dbContext.SaveChangesAsync();
     }
 
     private class NotFoundHandler : HttpMessageHandler
