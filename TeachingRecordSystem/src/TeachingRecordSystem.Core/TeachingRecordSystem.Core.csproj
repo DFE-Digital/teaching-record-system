@@ -305,6 +305,7 @@
     <PackageReference Include="Polly.Core" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="Serilog.Expressions" />
+    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="Sentry.Serilog" />
     <PackageReference Include="Serilog.Formatting.Compact" />

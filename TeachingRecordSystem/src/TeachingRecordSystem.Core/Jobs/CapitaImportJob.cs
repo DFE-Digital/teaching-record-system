@@ -444,7 +444,7 @@ public class CapitaImportMap : ClassMap<CapitaImportRecord>
         Map(m => m.PreviousLastName).Index(4).Optional();
         Map(m => m.DateOfBirth).Index(5)
             .TypeConverterOption.Format("yyyyMMdd")
-            .TypeConverterOption.NullValues(string.Empty, null);
+            .TypeConverterOption.NullValues(string.Empty);
         Map(m => m.NINumber).Index(6).Optional();
         Map(m => m.DateOfDeath).Index(7).Optional();
     }

@@ -20,13 +20,13 @@
       },
       "Azure.Storage.Files.DataLake": {
         "type": "Direct",
-        "requested": "[12.16.0, )",
-        "resolved": "12.16.0",
-        "contentHash": "D+mkKzL5diWWqGX4pDNeHOIYfv91H15BJSfSLeBCjV3mHFAhykxYDWXOTVJ0ThobJ3yI2R4SahjbVmdgd0vlyg==",
+        "requested": "[12.24.0, )",
+        "resolved": "12.24.0",
+        "contentHash": "b1i4LL10EBXfBb9pOO9Q0C9lo2CvHkcPeLWw26dyOEZO3cNlNejAbAVYDW1Ct3aG8g1unm2/mSs9MTfyC1IZaw==",
         "dependencies": {
-          "Azure.Storage.Blobs": "12.18.0",
-          "Azure.Storage.Common": "12.17.0",
-          "System.Text.Json": "4.7.2"
+          "Azure.Core": "1.47.3",
+          "Azure.Storage.Blobs": "12.26.0",
+          "Azure.Storage.Common": "12.25.0"
         }
       },
       "CloudNative.CloudEvents": {
@@ -542,6 +542,12 @@
         "dependencies": {
           "Serilog": "2.10.0"
         }
+      },
+      "System.Linq.Async": {
+        "type": "Direct",
+        "requested": "[6.0.3, )",
+        "resolved": "6.0.3",
+        "contentHash": "hSHiq2m1ky7zUQgTp+/2h1K3lABIQ+GltRixoclHPg/Sc1vnfeS6g/Uy5moOVZKrZJdQiFPFZd6OobBp3tZcFg=="
       },
       "System.Net.Http.Json": {
         "type": "Direct",
