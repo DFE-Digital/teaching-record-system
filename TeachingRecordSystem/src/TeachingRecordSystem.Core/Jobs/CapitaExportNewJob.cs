@@ -345,7 +345,7 @@ public class CapitaExportNewJob(BlobServiceClient blobServiceClient, ILogger<Cap
 
     public async Task<(DateTime?, JobMetadata?)> GetLastRunDateAsync()
     {
-        var item = await dbContext.JobMetadata
+        var item = await dbContext.JobMetadata.AsNoTracking()
             .FirstOrDefaultAsync(i => i.JobName == nameof(CapitaExportNewJob));
 
         DateTime? lastRunDate = null;

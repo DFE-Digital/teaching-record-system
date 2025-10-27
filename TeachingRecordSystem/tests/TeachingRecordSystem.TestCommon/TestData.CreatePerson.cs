@@ -2,11 +2,8 @@ using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Services.TrnRequests;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -24,7 +21,7 @@ public partial class TestData
 
         var builder = new CreatePersonBuilder(referenceData);
         configure?.Invoke(builder);
-        return await builder.ExecuteAsync(this);
+        return await builder.ExecuteAsync(this, Clock);
     }
 
     public class CreatePersonBuilder
@@ -56,6 +53,7 @@ public partial class TestData
         private QtlsStatus? _qtlsStatus;
         private Guid? _mergedWithPersonId;
         private bool? _createdByTps;
+
 
         internal CreatePersonBuilder(ReferenceData referenceData)
         {
@@ -373,7 +371,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
+        internal async Task<CreatePersonResult> ExecuteAsync(TestData testData, IClock clock)
         {
             var trn = await testData.GenerateTrnAsync();
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
@@ -383,90 +381,61 @@ public partial class TestData
             var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
             var lastName = _lastName ?? testData.GenerateLastName();
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
+            var createdByTps = _createdByTps ?? false;
+            var createdOn = clock.UtcNow;
+            var updatedOn = clock.UtcNow;
+            var personStatus = PersonStatus.Active;
             var gender = _gender ?? testData.GenerateGender();
-
-            var events = new List<EventBase>();
-
-            var contact = new Contact()
-            {
-                Id = PersonId,
-                CreatedOn = DateTime.UtcNow,  // FakeXrmEasy uses DateTime.UtcNow so we need to as well
-                ModifiedOn = DateTime.UtcNow,  // ditto
-                StateCode = ContactState.Active,
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                dfeta_StatedFirstName = statedFirstName,
-                dfeta_StatedMiddleName = statedMiddleName,
-                dfeta_StatedLastName = lastName,
-                BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
-                dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
-                dfeta_TrnToken = _trnToken,
-                dfeta_SlugId = _slugId,
-                dfeta_loginfailedcounter = _loginFailedCounter,
-                dfeta_CapitaTRNChangedOn = _createdByTps == true ? null : DateTime.UtcNow
-            };
-
-            // The conditional is to work around issue in CRM where an explicit `null` TRN breaks a plugin
-            if (trn is not null)
-            {
-                contact.dfeta_TRN = trn;
-            }
-
-            if (_hasEmail ?? false)
-            {
-                contact.EMailAddress1 = _email ?? testData.GenerateUniqueEmail();
-            }
-
-            if (_hasNationalInsuranceNumber ?? false)
-            {
-                contact.dfeta_NINumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
-            }
-
-            if (_hasGender ?? false)
-            {
-                contact.GenderCode = gender.ToContact_GenderCode();
-            }
-
-            if (_qtlsDate is not null)
-            {
-                contact.dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false);
-            }
 
             if (trn is not null && _trnToken is null && _email is not null)
             {
                 _trnToken = Guid.NewGuid().ToString();
             }
 
+            var events = new List<EventBase>();
+            var newPerson = new Person()
+            {
+                PersonId = PersonId,
+                CreatedOn = createdOn,
+                UpdatedOn = updatedOn,
+                Status = personStatus,
+                Trn = trn,
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                EmailAddress = _email,
+                NationalInsuranceNumber = _nationalInsuranceNumber,
+                DqtContactId = PersonId,
+                DqtState = (int)ContactState.Active,
+                DqtCreatedOn = createdOn,
+                DqtModifiedOn = updatedOn,
+                DqtFirstName = firstName,
+                DqtMiddleName = middleName,
+                DqtLastName = lastName,
+                Gender = _gender,
+                CreatedByTps = createdByTps,
+                MergedWithPersonId = _mergedWithPersonId
+            };
+
+            if (_hasNationalInsuranceNumber ?? false)
+            {
+                newPerson.NationalInsuranceNumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
+            }
+
+            if (_hasGender ?? false)
+            {
+                newPerson.Gender = gender;
+            }
+
+            if (_hasEmail ?? false)
+            {
+                newPerson.EmailAddress = _email ?? testData.GenerateUniqueEmail();
+            }
+
             var (mqs, alerts, person, routes, previousNames) = await testData.WithDbContextAsync(async dbContext =>
             {
-                var mappedPersonInfo = TrsDataSyncHelper.MapPersons([contact])[0];
-
-                dbContext.Persons.Add(new Person
-                {
-                    PersonId = mappedPersonInfo.PersonId,
-                    CreatedOn = mappedPersonInfo.CreatedOn,
-                    UpdatedOn = mappedPersonInfo.UpdatedOn,
-                    Status = mappedPersonInfo.Status,
-                    Trn = mappedPersonInfo.Trn,
-                    FirstName = mappedPersonInfo.FirstName,
-                    MiddleName = mappedPersonInfo.MiddleName,
-                    LastName = mappedPersonInfo.LastName,
-                    DateOfBirth = mappedPersonInfo.DateOfBirth,
-                    EmailAddress = mappedPersonInfo.EmailAddress,
-                    NationalInsuranceNumber = mappedPersonInfo.NationalInsuranceNumber,
-                    DqtContactId = mappedPersonInfo.DqtContactId,
-                    DqtState = mappedPersonInfo.DqtState,
-                    DqtCreatedOn = mappedPersonInfo.DqtCreatedOn,
-                    DqtModifiedOn = mappedPersonInfo.DqtModifiedOn,
-                    DqtFirstName = mappedPersonInfo.DqtFirstName,
-                    DqtMiddleName = mappedPersonInfo.DqtMiddleName,
-                    DqtLastName = mappedPersonInfo.DqtLastName,
-                    Gender = mappedPersonInfo.Gender,
-                    CreatedByTps = mappedPersonInfo.CreatedByTps,
-                    MergedWithPersonId = _mergedWithPersonId
-                });
+                dbContext.Persons.Add(newPerson);
 
                 await dbContext.SaveChangesAsync();
 
@@ -492,7 +461,7 @@ public partial class TestData
                     .Include(p => p.Alerts!).AsSplitQuery()
                     .Include(p => p.PreviousNames).AsSplitQuery()
                     .Include(p => p.Qualifications).AsSplitQuery()
-                    .SingleAsync(p => p.PersonId == contact.Id);
+                    .SingleAsync(p => p.PersonId == person.PersonId);
 
                 var personMqs = person.Qualifications!.OfType<MandatoryQualification>().ToArray();
                 var personRoutes = person.Qualifications!.OfType<RouteToProfessionalStatus>().ToArray();
@@ -617,9 +586,9 @@ public partial class TestData
                 StatedFirstName = statedFirstName,
                 StatedMiddleName = statedMiddleName,
                 StatedLastName = lastName,
-                EmailAddress = contact.EMailAddress1,
-                NationalInsuranceNumber = contact.dfeta_NINumber,
-                Gender = contact.GenderCode.ToGender(),
+                EmailAddress = person.EmailAddress,
+                NationalInsuranceNumber = person.NationalInsuranceNumber,
+                Gender = person.Gender,
                 QtsDate = person.QtsDate,
                 EytsDate = person.EytsDate,
                 MandatoryQualifications = mqs,
