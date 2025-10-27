@@ -4,14 +4,11 @@ using TeachingRecordSystem.Api.Properties;
 namespace TeachingRecordSystem.Api.IntegrationTests.V1.Operations;
 
 [Collection(nameof(DisableParallelization))]
-public class GetTeacherTests : TestBase
+public class GetTeacherTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    public GetTeacherTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
+    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();
 
-    public override Task InitializeAsync() => DbHelper.DeleteAllPersonsAsync();
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory]
     [InlineData("123456")]

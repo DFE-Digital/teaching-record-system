@@ -1,14 +1,16 @@
 using System.Reflection;
 using Xunit.Sdk;
+using Xunit.v3;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
 public class RoleNamesData(params string[] except) : DataAttribute
 {
-    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(MethodInfo testMethod, DisposalTracker disposalTracker)
     {
-        var allRoles = new string[] { ApiRoles.UpdateNpq, ApiRoles.UpdatePerson, ApiRoles.GetPerson, ApiRoles.UnlockPerson, ApiRoles.AssignQtls };
-        var roles = allRoles.Except(except);
-        return roles.Select(r => new object[] { new string[] { r } });
+        var roles = ApiRoles.All.Except(except);
+        return new(roles.Select(r => new TheoryDataRow<string[]>([r])).ToArray());
     }
+
+    public override bool SupportsDiscoveryEnumeration() => true;
 }
