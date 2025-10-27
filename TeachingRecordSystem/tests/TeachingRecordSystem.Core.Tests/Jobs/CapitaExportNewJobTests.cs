@@ -41,7 +41,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         };
         dbContext.JobMetadata.Add(jobMetaData);
         await dbContext.SaveChangesAsync();
-        var lastRunDate = DateTime.UtcNow.AddDays(-2);
+        var lastRunDate = Clock.UtcNow.AddDays(-2);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
             x.WithGender(Gender.Male);
@@ -583,7 +583,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             Metadata = new Dictionary<string, string>
                 {
                     {
-                        "LastRunDate", Clock.UtcNow.AddDays(-1).AddHours(-2).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                        "LastRunDate", Clock.UtcNow.AddDays(-2).AddHours(-2).ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                     }
                 }
         };
@@ -932,10 +932,11 @@ public class CapitaExportNewJobFixture
         FakeTrnGenerator trnGenerator,
         IServiceProvider provider,
         ILoggerFactory loggerFactory,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IClock clock)
     {
         DbFixture = dbFixture;
-        Clock = new();
+        Clock = clock;
 
         Logger = new Mock<ILogger<CapitaExportNewJob>>();
 
@@ -975,7 +976,7 @@ public class CapitaExportNewJobFixture
 
     public TestData TestData { get; }
 
-    public TestableClock Clock { get; }
+    public IClock Clock { get; }
 
     public Mock<ILogger<CapitaExportNewJob>> Logger { get; }
 
