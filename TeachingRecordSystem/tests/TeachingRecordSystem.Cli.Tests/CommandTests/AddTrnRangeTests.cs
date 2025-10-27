@@ -1,21 +1,26 @@
 using System.CommandLine;
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-[SharedDependenciesDataSource]
-public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
+public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
 {
-    [Before(Test)]
-    public Task ClearTrnRanges() =>
-        dbFixture.WithDbContextAsync(dbContext => dbContext.TrnRanges.ExecuteDeleteAsync());
+    private IConfiguration Configuration => compositionRoot.Services.GetRequiredService<IConfiguration>();
 
-    [Test]
-    [Arguments(999999)]
-    [Arguments(0)]
-    [Arguments(-1)]
-    [Arguments(10000000)]
-    public async Task InvalidFrom_ReturnsError(int from)
+    private DbFixture DbFixture => compositionRoot.Services.GetRequiredService<DbFixture>();
+
+    async ValueTask IAsyncLifetime.InitializeAsync() =>
+        await DbFixture.WithDbContextAsync(dbContext => dbContext.TrnRanges.ExecuteDeleteAsync());
+
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
+    [InlineData(999999)]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(10000000)]
+    public void InvalidFrom_ReturnsError(int from)
     {
         // Arrange
         var to = 9999999;
@@ -26,15 +31,15 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
 
         // Assert
-        await Assert.That(parseResult.Errors).Contains(e => e.Message == "--from must be between 1000000 and 9999999.");
+        Assert.Contains(parseResult.Errors, e => e.Message == "--from must be between 1000000 and 9999999.");
     }
 
-    [Test]
-    [Arguments(999999)]
-    [Arguments(0)]
-    [Arguments(-1)]
-    [Arguments(10000000)]
-    public async Task InvalidTo_ReturnsError(int to)
+    [Theory]
+    [InlineData(999999)]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(10000000)]
+    public void InvalidTo_ReturnsError(int to)
     {
         // Arrange
         var from = 1000000;
@@ -45,11 +50,11 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
 
         // Assert
-        await Assert.That(parseResult.Errors).Contains(e => e.Message == "--to must be between 1000000 and 9999999.");
+        Assert.Contains(parseResult.Errors, e => e.Message == "--to must be between 1000000 and 9999999.");
     }
 
-    [Test]
-    public async Task ToEqualToFrom_ReturnsError()
+    [Fact]
+    public void ToEqualToFrom_ReturnsError()
     {
         // Arrange
         var from = 2000000;
@@ -61,11 +66,11 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
 
         // Assert
-        await Assert.That(parseResult.Errors).Contains(e => e.Message == "--to must be greater than --from.");
+        Assert.Contains(parseResult.Errors, e => e.Message == "--to must be greater than --from.");
     }
 
-    [Test]
-    public async Task ToLessThanFrom_ReturnsError()
+    [Fact]
+    public void ToLessThanFrom_ReturnsError()
     {
         // Arrange
         var from = 2000000;
@@ -77,11 +82,11 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
 
         // Assert
-        await Assert.That(parseResult.Errors).Contains(e => e.Message == "--to must be greater than --from.");
+        Assert.Contains(parseResult.Errors, e => e.Message == "--to must be greater than --from.");
     }
 
-    [Test]
-    public async Task NextLessThanFrom_ReturnsError()
+    [Fact]
+    public void NextLessThanFrom_ReturnsError()
     {
         // Arrange
         var from = 2000000;
@@ -94,11 +99,11 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}");
 
         // Assert
-        await Assert.That(parseResult.Errors).Contains(e => e.Message == "--next must be between --from and --to.");
+        Assert.Contains(parseResult.Errors, e => e.Message == "--next must be between --from and --to.");
     }
 
-    [Test]
-    public async Task NextGreaterThanTo_ReturnsError()
+    [Fact]
+    public void NextGreaterThanTo_ReturnsError()
     {
         // Arrange
         var from = 2000000;
@@ -111,11 +116,10 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}");
 
         // Assert
-        await Assert.That(parseResult.Errors).Contains(e => e.Message == "--next must be between --from and --to.");
+        Assert.Contains(parseResult.Errors, e => e.Message == "--next must be between --from and --to.");
     }
 
-    [Test]
-    [NotInParallel]
+    [Fact]
     public async Task ValidInvocationWithoutNext_AddsTrnRangeToDb()
     {
         // Arrange
@@ -128,22 +132,20 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var result = await command.InvokeAsync(["add-trn-range", "--from", $"{from}", "--to", $"{to}"]);
 
         // Assert
-        await Assert.That(result).IsEqualTo(0);
+        Assert.Equal(0, result);
 
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var trnRange = await dbContext.TrnRanges.SingleOrDefaultAsync();
-            await Assert.That(trnRange).IsNotNull();
-            using var _ = Assert.Multiple();
-            await Assert.That(trnRange!.FromTrn).IsEqualTo(from);
-            await Assert.That(trnRange.ToTrn).IsEqualTo(to);
-            await Assert.That(trnRange.NextTrn).IsEqualTo(from);
-            await Assert.That(trnRange.IsExhausted).IsFalse();
+            Assert.NotNull(trnRange);
+            Assert.Equal(from, trnRange.FromTrn);
+            Assert.Equal(to, trnRange.ToTrn);
+            Assert.Equal(from, trnRange.NextTrn);
+            Assert.False(trnRange.IsExhausted);
         });
     }
 
-    [Test]
-    [NotInParallel]
+    [Fact]
     public async Task ValidInvocationWithExplicitNext_AddsTrnRangeToDb()
     {
         // Arrange
@@ -157,19 +159,18 @@ public class AddTrnRangeTests(IConfiguration configuration, DbFixture dbFixture)
         var result = await command.InvokeAsync(["add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}"]);
 
         // Assert
-        await Assert.That(result).IsEqualTo(0);
+        Assert.Equal(0, result); ;
 
-        await dbFixture.WithDbContextAsync(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var trnRange = await dbContext.TrnRanges.SingleOrDefaultAsync();
-            await Assert.That(trnRange).IsNotNull();
-            using var _ = Assert.Multiple();
-            await Assert.That(trnRange!.FromTrn).IsEqualTo(from);
-            await Assert.That(trnRange.ToTrn).IsEqualTo(to);
-            await Assert.That(trnRange.NextTrn).IsEqualTo(next);
-            await Assert.That(trnRange.IsExhausted).IsFalse();
+            Assert.NotNull(trnRange);
+            Assert.Equal(from, trnRange.FromTrn);
+            Assert.Equal(to, trnRange.ToTrn);
+            Assert.Equal(next, trnRange.NextTrn);
+            Assert.False(trnRange.IsExhausted);
         });
     }
 
-    private Command GetCommand() => Commands.CreateAddTrnRangeCommand(configuration);
+    private Command GetCommand() => Commands.CreateAddTrnRangeCommand(Configuration);
 }

@@ -13,4 +13,8 @@
     <ProjectReference Include="..\TeachingRecordSystem.UiTestCommon\TeachingRecordSystem.UiTestCommon.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="xunit.assert" />
+  </ItemGroup>
+
 </Project>

@@ -2219,8 +2219,7 @@
           "Moq": "[4.20.70, )",
           "Respawn": "[6.2.0, )",
           "System.Linq.Async": "[6.0.3, )",
-          "TeachingRecordSystem.Core": "[1.0.0, )",
-          "xunit.assert": "[2.9.3, )"
+          "TeachingRecordSystem.Core": "[1.0.0, )"
         }
       },
       "teachingrecordsystem.testcommon.xunit": {
