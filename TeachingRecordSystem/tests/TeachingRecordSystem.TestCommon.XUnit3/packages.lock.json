@@ -2,44 +2,17 @@
   "version": 2,
   "dependencies": {
     "net9.0": {
-      "Faker.Net": {
-        "type": "Direct",
-        "requested": "[2.0.154, )",
-        "resolved": "2.0.154",
-        "contentHash": "pkabhT7wxNR1gkPO6ga77XdeqBblaE8a1oY47eMGGvM7DMZ9S8ARZrKkRWaPUNjGCOqtH3oeQSMuEPxd98ir4w==",
-        "dependencies": {
-          "NETStandard.Library": "2.0.3"
-        }
-      },
       "Microsoft.VisualStudio.Threading.Analyzers": {
         "type": "Direct",
         "requested": "[17.12.19, )",
         "resolved": "17.12.19",
         "contentHash": "v3IYeedjoktvZ+GqYmLudxZJngmf/YWIxNT2Uy6QMMN19cvw+nkWoip1Gr1RtnFkUo1MPUVMis4C8Kj8d8DpSQ=="
       },
-      "Moq": {
+      "xunit.v3.assert": {
         "type": "Direct",
-        "requested": "[4.20.70, )",
-        "resolved": "4.20.70",
-        "contentHash": "4rNnAwdpXJBuxqrOCzCyICXHSImOTRktCgCWXWykuF1qwoIsVvEnR7PjbMk/eLOxWvhmj5Kwt+kDV3RGUYcNwg==",
-        "dependencies": {
-          "Castle.Core": "5.1.1"
-        }
-      },
-      "Respawn": {
-        "type": "Direct",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "Y0PKczNgFJA5gs6C/mQPirG5QbxMxn2J4ZZKTktnGBAyvaFIRF8Hz8tp5A+x1RrzkUx7rLukd/FL28j27sppdw==",
-        "dependencies": {
-          "Microsoft.Data.SqlClient": "4.0.0"
-        }
-      },
-      "System.Linq.Async": {
-        "type": "Direct",
-        "requested": "[6.0.3, )",
-        "resolved": "6.0.3",
-        "contentHash": "hSHiq2m1ky7zUQgTp+/2h1K3lABIQ+GltRixoclHPg/Sc1vnfeS6g/Uy5moOVZKrZJdQiFPFZd6OobBp3tZcFg=="
+        "requested": "[3.1.0, )",
+        "resolved": "3.1.0",
+        "contentHash": "tSNOA4DC5toh9zv8todoQSxp6YBMER2VaH5Ll+FYotqxRei16HLQo7G4KDHNFaqUjnaSGpEcfeYMab+bFI/1kQ=="
       },
       "Apache.Arrow": {
         "type": "Transitive",
@@ -1925,6 +1898,16 @@
           "morelinq": "[4.4.0, )"
         }
       },
+      "teachingrecordsystem.testcommon": {
+        "type": "Project",
+        "dependencies": {
+          "Faker.Net": "[2.0.154, )",
+          "Moq": "[4.20.70, )",
+          "Respawn": "[6.2.0, )",
+          "System.Linq.Async": "[6.0.3, )",
+          "TeachingRecordSystem.Core": "[1.0.0, )"
+        }
+      },
       "AngleSharp": {
         "type": "CentralTransitive",
         "requested": "[1.1.2, )",
@@ -2025,6 +2008,15 @@
         "dependencies": {
           "EntityFrameworkCore.Projectables.Abstractions": "4.0.0",
           "Microsoft.EntityFrameworkCore": "8.0.0"
+        }
+      },
+      "Faker.Net": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.154, )",
+        "resolved": "2.0.154",
+        "contentHash": "pkabhT7wxNR1gkPO6ga77XdeqBblaE8a1oY47eMGGvM7DMZ9S8ARZrKkRWaPUNjGCOqtH3oeQSMuEPxd98ir4w==",
+        "dependencies": {
+          "NETStandard.Library": "2.0.3"
         }
       },
       "FluentValidation": {
@@ -2303,6 +2295,15 @@
           "Microsoft.PowerPlatform.Dataverse.Client": "1.1.0"
         }
       },
+      "Moq": {
+        "type": "CentralTransitive",
+        "requested": "[4.20.70, )",
+        "resolved": "4.20.70",
+        "contentHash": "4rNnAwdpXJBuxqrOCzCyICXHSImOTRktCgCWXWykuF1qwoIsVvEnR7PjbMk/eLOxWvhmj5Kwt+kDV3RGUYcNwg==",
+        "dependencies": {
+          "Castle.Core": "5.1.1"
+        }
+      },
       "morelinq": {
         "type": "CentralTransitive",
         "requested": "[4.4.0, )",
@@ -2393,6 +2394,15 @@
         "requested": "[8.2.1, )",
         "resolved": "8.2.1",
         "contentHash": "/Z3EspfWBdTla4I9IAcQn32/7kB5WS3rSnOYloz8YlVyClu8h7uuYf4pfUvffOYVbxmDX/mFRfxwzqW2Zs96ZA=="
+      },
+      "Respawn": {
+        "type": "CentralTransitive",
+        "requested": "[6.2.0, )",
+        "resolved": "6.2.0",
+        "contentHash": "Y0PKczNgFJA5gs6C/mQPirG5QbxMxn2J4ZZKTktnGBAyvaFIRF8Hz8tp5A+x1RrzkUx7rLukd/FL28j27sppdw==",
+        "dependencies": {
+          "Microsoft.Data.SqlClient": "4.0.0"
+        }
       },
       "Scrutor": {
         "type": "CentralTransitive",
@@ -2486,6 +2496,12 @@
           "Microsoft.IdentityModel.JsonWebTokens": "7.5.0",
           "Microsoft.IdentityModel.Tokens": "7.5.0"
         }
+      },
+      "System.Linq.Async": {
+        "type": "CentralTransitive",
+        "requested": "[6.0.3, )",
+        "resolved": "6.0.3",
+        "contentHash": "hSHiq2m1ky7zUQgTp+/2h1K3lABIQ+GltRixoclHPg/Sc1vnfeS6g/Uy5moOVZKrZJdQiFPFZd6OobBp3tZcFg=="
       },
       "System.Net.Http.Json": {
         "type": "CentralTransitive",
