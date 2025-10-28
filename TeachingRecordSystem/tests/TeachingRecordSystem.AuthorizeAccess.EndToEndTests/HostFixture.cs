@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using OpenIddict.Server.AspNetCore;
+using TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
@@ -15,9 +16,11 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
-public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable, IStartupTask
+public sealed class HostFixture : IAsyncLifetime
 {
     public const string BaseUrl = "http://localhost:55649";
     public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
@@ -64,12 +67,15 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
             BaseUrl,
             builder =>
             {
+                var configuration = new ConfigurationBuilder()
+                    .AddUserSecrets<HostFixture>(optional: true)
+                    .AddEnvironmentVariables()
+                    .Build();
                 builder.UseConfiguration(configuration);
 
                 builder.ConfigureServices((context, services) =>
                 {
                     DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
-                    services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());
 
                     services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
 
@@ -142,7 +148,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
         await dbContext.SaveChangesAsync();
     }
 
-    async Task IStartupTask.ExecuteAsync()
+    async ValueTask IAsyncLifetime.InitializeAsync()
     {
         _host = CreateHost();
 
@@ -165,6 +171,8 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
         _browser = await browserType.LaunchAsync(browserOptions);
 
         _initialized = true;
+
+        await Services.GetRequiredService<DbHelper>().InitializeAsync();
 
         await AddTestAppToApplicationUsers();
     }
