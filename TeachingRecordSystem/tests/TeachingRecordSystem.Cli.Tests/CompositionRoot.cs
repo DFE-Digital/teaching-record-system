@@ -1,4 +1,5 @@
 //using System.Reflection;
+
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Cli.Tests;
 using TeachingRecordSystem.TestCommon;
@@ -32,7 +33,11 @@ public class CompositionRoot : IAsyncLifetime
 
         services
             .AddSingleton<IConfiguration>(configuration)
-            .AddSingleton<DbFixture>();
+            .AddSingleton<DbFixture>()
+            .AddSingleton<TestData>()
+            .AddSingleton<ReferenceDataCache>()
+            .AddSingleton<IClock, TestableClock>()
+            .AddSingleton<FakeTrnGenerator>();
 
         return services.BuildServiceProvider();
     }

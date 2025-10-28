@@ -11,6 +11,7 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
     {
         builder.ToTable("support_tasks");
         builder.HasKey(p => p.SupportTaskReference);
+        builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(SupportTask.DeletedOn)) == null);
         builder.Property(p => p.SupportTaskReference).HasMaxLength(16);
         builder.HasOne(t => t.Person).WithMany().HasForeignKey(p => p.PersonId).HasConstraintName("fk_support_tasks_person");
         builder.HasIndex(t => t.OneLoginUserSubject);

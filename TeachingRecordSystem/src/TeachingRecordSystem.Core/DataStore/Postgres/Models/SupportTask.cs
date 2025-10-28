@@ -12,6 +12,7 @@ public class SupportTask
     public required string SupportTaskReference { get; set; }
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
+    public DateTime? DeletedOn { get; set; }
     public required SupportTaskType SupportTaskType { get; init; }
     public required SupportTaskStatus Status { get; set; }
     public string? OneLoginUserSubject { get; init; }

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Tests.ApiSchema;
 using TeachingRecordSystem.Core.Tests.Jobs;
@@ -25,13 +26,16 @@ public class Startup
                     .AddSingleton<DbFixture>()
                     .AddSingleton<FakeTrnGenerator>()
                     .AddSingleton<ReferenceDataCache>()
+                    .AddSingleton<TestData>()
                     .AddSingleton<WebhookReceiver>()
                     .AddSingleton<PersonInfoCache>()
                     .AddSingleton<EventMapperFixture>()
                     .AddSingleton<NightlyEmailJobFixture>()
                     .AddSingleton<IClock, TestableClock>()
                     .AddSingleton<WebhookMessageFactory>()
-                    .AddSingleton<EventMapperRegistry>();
+                    .AddSingleton<EventMapperRegistry>()
+                    .AddEventPublisher()
+                    .AddSupportTaskService();
             });
 
 
