@@ -19,8 +19,8 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
@@ -93,8 +93,8 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 

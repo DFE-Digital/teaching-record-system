@@ -140,9 +140,9 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatusApprenticeship_DisplaysExpectedContent()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).First();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
         var status = RouteToProfessionalStatusStatus.Holds;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
@@ -310,9 +310,9 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonWithRouteToProfessionalStatus_AgeRangeFromTo_DisplaysExpectedContent()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).First();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
@@ -378,9 +378,9 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var user = await TestData.CreateUserAsync(role: userRole);
         SetCurrentUser(user);
 
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).First();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
@@ -450,9 +450,9 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_PersonStatus_EditLinksShownAsExpected(PersonStatus personStatus, bool canSeeEditLinks)
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).First();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
