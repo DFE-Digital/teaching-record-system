@@ -163,7 +163,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         var result = await parseResult.InvokeAsync();
 
         // Assert
-        Assert.Equal(0, result); ;
+        Assert.Equal(0, result);
 
         await DbFixture.WithDbContextAsync(async dbContext =>
         {

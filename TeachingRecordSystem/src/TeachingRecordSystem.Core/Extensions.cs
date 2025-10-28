@@ -13,6 +13,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -74,7 +75,7 @@ public static class Extensions
         }
 
         services
-            .AddSingleton<IClock, Clock>()
+            .AddClock()
             .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
             .AddDatabase(configuration)
             .AddHangfire(environment)
@@ -86,7 +87,8 @@ public static class Extensions
             .AddNameSynonyms()
             .AddTrnRequestService(configuration)
             .AddPersonMatching()
-            .AddScoped<IEventPublisher, EventPublisher>();
+            .AddEventPublisher()
+            .AddSupportTaskService();
 
         return services;
     }
@@ -108,6 +110,20 @@ public static class Extensions
             optionsLifetime: ServiceLifetime.Singleton);
 
         services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options));
+
+        return services;
+    }
+
+    public static IServiceCollection AddClock(this IServiceCollection services)
+    {
+        services.AddTransient<IClock, Clock>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddEventPublisher(this IServiceCollection services)
+    {
+        services.AddScoped<IEventPublisher, EventPublisher>();
 
         return services;
     }

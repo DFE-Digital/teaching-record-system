@@ -7,5 +7,7 @@ public enum ProcessType
     PersonImportingIntoDqt = 3,
     PersonUpdatingInDqt = 4,
     PersonDeactivatingInDqt = 5,
-    PersonReactivatingInDqt = 6
+    PersonReactivatingInDqt = 6,
+    PersonMergingInDqt = 7,
+    SupportTaskDeleting = 8
 }
