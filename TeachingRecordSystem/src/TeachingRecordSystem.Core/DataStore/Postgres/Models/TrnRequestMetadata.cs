@@ -39,6 +39,12 @@ public class TrnRequestMetadata
     public Guid? NpqEvidenceFileId { get; init; }
     public string? NpqEvidenceFileName { get; init; }
 
+    public void Reset()
+    {
+        ResolvedPersonId = null;
+        Status = TrnRequestStatus.Pending;
+    }
+
     public void SetResolvedPerson(Guid personId, TrnRequestStatus requestStatus = TrnRequestStatus.Completed)
     {
         ResolvedPersonId = personId;

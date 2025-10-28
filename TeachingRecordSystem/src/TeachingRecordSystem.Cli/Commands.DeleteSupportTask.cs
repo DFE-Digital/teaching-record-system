@@ -1,3 +1,4 @@
+using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -39,6 +40,8 @@ public partial class Commands
                     .AddSupportTaskService()
                     .BuildServiceProvider();
 
+                using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
                 using var scope = services.CreateScope();
                 var supportTaskService = scope.ServiceProvider.GetRequiredService<SupportTaskService>();
                 var clock = scope.ServiceProvider.GetRequiredService<IClock>();
@@ -46,6 +49,8 @@ public partial class Commands
                 var processContext = new ProcessContext(ProcessType.SupportTaskDeleting, clock.UtcNow, SystemUser.SystemUserId);
 
                 var result = await supportTaskService.DeleteSupportTaskAsync(new DeleteSupportTaskOptions(supportTaskReference, reason), processContext);
+
+                transaction.Complete();
 
                 if (result is DeleteSupportTaskResult.Ok)
                 {

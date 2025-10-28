@@ -32,7 +32,7 @@ public class SupportTask
         string? trnRequestId,
         EventModels.RaisedByUserInfo createdBy,
         DateTime now,
-        out SupportTaskCreatedEvent createdEvent)
+        out LegacyEvents.SupportTaskCreatedEvent createdEvent)
     {
         var task = new SupportTask
         {
@@ -48,7 +48,7 @@ public class SupportTask
             TrnRequestId = trnRequestId
         };
 
-        createdEvent = new SupportTaskCreatedEvent
+        createdEvent = new LegacyEvents.SupportTaskCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
