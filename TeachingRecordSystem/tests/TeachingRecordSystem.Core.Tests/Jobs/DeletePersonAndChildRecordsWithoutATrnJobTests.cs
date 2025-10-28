@@ -123,6 +123,30 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
     }
 
     [Fact]
+    public async Task Execute_DeletesBothActiveAndInactivePersonsWithNoTrn()
+    {
+        // Arrange
+        var (activePersonsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3, status: PersonStatus.Active);
+        var (inactivePersonsWithNoTrn, _, _, _) = await CreatePersonsWithNoTrnAsync(3, status: PersonStatus.Deactivated);
+        var (activePersonsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3, status: PersonStatus.Active);
+        var (inactivePersonsWithTrn, _, _, _) = await CreatePersonsWithTrnAsync(3, status: PersonStatus.Deactivated);
+
+        var job = CreateDeletePersonAndChildRecordsWithoutATrnJob(batchSize: 1);
+
+        // Act
+        await job.ExecuteAsync(false, CancellationToken.None);
+
+        // Assert
+        var personsAfterDelete = await GetPersonsAsync();
+
+        AssertEx.DoesNotContainAny(activePersonsWithNoTrn, personsAfterDelete);
+        AssertEx.DoesNotContainAny(inactivePersonsWithNoTrn, personsAfterDelete);
+
+        AssertEx.ContainsAll(activePersonsWithTrn, personsAfterDelete);
+        AssertEx.ContainsAll(inactivePersonsWithTrn, personsAfterDelete);
+    }
+
+    [Fact]
     public async Task Execute_WhenPersonsReferencedBySupportTaskViaPersonId_DeletesSupportTasksForPersonsWithNoTrn()
     {
         // Arrange
@@ -727,7 +751,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         return csv.GetRecords<CsvRow>().ToList();
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null, PersonStatus status = PersonStatus.Active)
     {
         sourceRequestIds ??= Enumerable.Repeat<string?>(null, count);
 
@@ -744,6 +768,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             foreach (var (p, sourceRequestId) in persons.Zip(sourceRequestIds))
             {
                 dbContext.Attach(p);
+                p.Status = status;
                 if (mergedWithPersonId is Guid id)
                 {
                     p.MergedWithPersonId = id;
@@ -765,7 +790,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
         );
     }
 
-    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null)
+    private async Task<(IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>, IEnumerable<Guid>)> CreatePersonsWithNoTrnAsync(int count, Action<CreatePersonBuilder>? configure = null, Guid? mergedWithPersonId = null, IEnumerable<string?>? sourceRequestIds = null, PersonStatus status = PersonStatus.Active)
     {
         sourceRequestIds ??= Enumerable.Repeat<string?>(null, count);
 
@@ -782,6 +807,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
             foreach (var (p, sourceRequestId) in persons.Zip(sourceRequestIds))
             {
                 dbContext.Attach(p);
+                p.Status = status;
                 p.Trn = null;
 
                 if (mergedWithPersonId is Guid id)
@@ -1182,6 +1208,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobTests(
 
     private async Task<IEnumerable<Guid>> GetPersonsAsync() => await DbFixture.WithDbContextAsync(dbContext =>
         dbContext.Persons
+            .IgnoreQueryFilters()
             .Select(p => p.PersonId)
             .ToArrayAsync());
 
