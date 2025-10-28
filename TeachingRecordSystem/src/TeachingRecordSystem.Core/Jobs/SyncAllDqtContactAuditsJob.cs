@@ -14,7 +14,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-[AutomaticRetry(Attempts = 100)]
+[AutomaticRetry(Attempts = 100, DelaysInSeconds = [300])]
 public class SyncAllDqtContactAuditsJob(
     [FromKeyedServices(TrsDataSyncHelper.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     IDbContextFactory<TrsDbContext> dbContextFactory,
