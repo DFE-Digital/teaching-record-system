@@ -8,12 +8,12 @@ public partial class Commands
 {
     public static Command CreateDropDqtReportingReplicationSlotCommand(IConfiguration configuration)
     {
-        var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+        var connectionStringOption = new Option<string>("--connection-string") { Required = true };
 
         var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
         if (configuredConnectionString is not null)
         {
-            connectionStringOption.SetDefaultValue(configuredConnectionString);
+            connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
         }
 
         var command = new Command("drop-dqt-reporting-replication-slot", "Drops the logical replication slot for the DQT Reporting Service.")
@@ -21,9 +21,11 @@ public partial class Commands
             connectionStringOption
         };
 
-        command.SetHandler(
-            async (string connectionString) =>
+        command.SetAction(
+            async parseResult =>
             {
+                var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+
                 using var dbContext = TrsDbContext.Create(connectionString, commandTimeout: (int)TimeSpan.FromMinutes(10).TotalSeconds);
 
                 // Ensure the user has the replication permission
@@ -34,8 +36,7 @@ public partial class Commands
 
                 await dbContext.Database.ExecuteSqlRawAsync(
                     $"select pg_drop_replication_slot('{DqtReportingOptions.DefaultTrsDbReplicationSlotName}');");
-            },
-            connectionStringOption);
+            });
 
         return command;
     }

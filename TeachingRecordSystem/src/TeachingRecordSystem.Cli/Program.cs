@@ -16,4 +16,5 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateAddTrnRangeCommand(configuration)
 };
 
-return await rootCommand.InvokeAsync(args);
+var parseResult = rootCommand.Parse(args);
+return await parseResult.InvokeAsync();

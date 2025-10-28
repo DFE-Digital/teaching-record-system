@@ -2015,7 +2015,7 @@
       "trscli": {
         "type": "Project",
         "dependencies": {
-          "System.CommandLine": "[2.0.0-beta4.22272.1, )",
+          "System.CommandLine": "[2.0.0-rc.2.25502.107, )",
           "TeachingRecordSystem.Core": "[1.0.0, )"
         }
       },
@@ -2600,9 +2600,9 @@
       },
       "System.CommandLine": {
         "type": "CentralTransitive",
-        "requested": "[2.0.0-beta4.22272.1, )",
-        "resolved": "2.0.0-beta4.22272.1",
-        "contentHash": "1uqED/q2H0kKoLJ4+hI2iPSBSEdTuhfCYADeJrAqERmiGQ2NNacYKRNEQ+gFbU4glgVyK8rxI+ZOe1onEtr/Pg=="
+        "requested": "[2.0.0-rc.2.25502.107, )",
+        "resolved": "2.0.0-rc.2.25502.107",
+        "contentHash": "l2myq5KMDP78bweagWfubIvINvqW22qHTXGxBNH2mMbBBod6v0LNU4/cc8iU3IrFjeCtRtKgW8mw7vy2q482Fw=="
       },
       "System.IdentityModel.Tokens.Jwt": {
         "type": "CentralTransitive",

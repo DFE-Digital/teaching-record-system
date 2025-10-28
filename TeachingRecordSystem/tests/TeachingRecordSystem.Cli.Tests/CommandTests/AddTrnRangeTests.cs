@@ -28,7 +28,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         var command = GetCommand();
 
         // Act
-        var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}"]);
 
         // Assert
         Assert.Contains(parseResult.Errors, e => e.Message == "--from must be between 1000000 and 9999999.");
@@ -47,7 +47,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         var command = GetCommand();
 
         // Act
-        var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}"]);
 
         // Assert
         Assert.Contains(parseResult.Errors, e => e.Message == "--to must be between 1000000 and 9999999.");
@@ -63,7 +63,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         var command = GetCommand();
 
         // Act
-        var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}"]);
 
         // Assert
         Assert.Contains(parseResult.Errors, e => e.Message == "--to must be greater than --from.");
@@ -79,7 +79,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         var command = GetCommand();
 
         // Act
-        var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}");
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}"]);
 
         // Assert
         Assert.Contains(parseResult.Errors, e => e.Message == "--to must be greater than --from.");
@@ -96,7 +96,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         var command = GetCommand();
 
         // Act
-        var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}");
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}"]);
 
         // Assert
         Assert.Contains(parseResult.Errors, e => e.Message == "--next must be between --from and --to.");
@@ -113,7 +113,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         var command = GetCommand();
 
         // Act
-        var parseResult = command.Parse("add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}");
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}"]);
 
         // Assert
         Assert.Contains(parseResult.Errors, e => e.Message == "--next must be between --from and --to.");
@@ -128,8 +128,10 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
 
         var command = GetCommand();
 
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}"]);
+
         // Act
-        var result = await command.InvokeAsync(["add-trn-range", "--from", $"{from}", "--to", $"{to}"]);
+        var result = await parseResult.InvokeAsync();
 
         // Assert
         Assert.Equal(0, result);
@@ -155,8 +157,10 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
 
         var command = GetCommand();
 
+        var parseResult = command.Parse(["add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}"]);
+
         // Act
-        var result = await command.InvokeAsync(["add-trn-range", "--from", $"{from}", "--to", $"{to}", "--next", $"{next}"]);
+        var result = await parseResult.InvokeAsync();
 
         // Assert
         Assert.Equal(0, result); ;
