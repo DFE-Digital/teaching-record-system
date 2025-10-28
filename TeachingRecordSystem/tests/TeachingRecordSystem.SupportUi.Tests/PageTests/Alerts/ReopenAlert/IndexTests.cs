@@ -95,7 +95,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         AssertCheckedRadioOption("ChangeReason", journeyInstance.State.ChangeReason!.ToString()!);
         AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
         Assert.Equal(journeyInstance.State.ChangeReasonDetail, doc.GetElementsByName("ChangeReasonDetail")[0].TrimmedText());
-        AssertCheckedRadioOption("UploadEvidence", bool.TrueString);
+        AssertCheckedRadioOption("Evidence.UploadEvidence", bool.TrueString);
 
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-file-link");
         Assert.NotNull(uploadedEvidenceLink);
@@ -251,7 +251,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Test]
@@ -274,7 +274,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -403,33 +403,13 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         bool? uploadEvidence = null,
         (HttpContent Content, string FileName)? evidenceFile = null)
     {
-        var builder = new MultipartFormDataContentBuilder();
-
-        if (changeReason is not null)
+        return new MultipartFormDataContentBuilder
         {
-            builder.Add("ChangeReason", changeReason);
-        }
-
-        if (hasAdditionalReasonDetail is not null)
-        {
-            builder.Add("HasAdditionalReasonDetail", hasAdditionalReasonDetail);
-        }
-
-        if (changeReasonDetail is not null)
-        {
-            builder.Add("ChangeReasonDetail", changeReasonDetail);
-        }
-
-        if (uploadEvidence is not null)
-        {
-            builder.Add("UploadEvidence", uploadEvidence);
-        }
-
-        if (evidenceFile is not null)
-        {
-            builder.Add("EvidenceFile", evidenceFile.Value.Content, evidenceFile.Value.FileName);
-        }
-
-        return builder;
+            { "ChangeReason", changeReason },
+            { "HasAdditionalReasonDetail", hasAdditionalReasonDetail },
+            { "ChangeReasonDetail", changeReasonDetail },
+            { "Evidence.UploadEvidence", uploadEvidence },
+            { "Evidence.EvidenceFile", evidenceFile }
+        };
     }
 }

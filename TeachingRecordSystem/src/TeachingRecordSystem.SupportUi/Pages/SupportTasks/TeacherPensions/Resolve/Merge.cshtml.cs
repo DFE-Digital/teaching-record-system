@@ -8,7 +8,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.R
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     public string? PersonName { get; set; }
 
@@ -139,7 +139,7 @@ public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator,
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData);
 
         if (DateOfBirth!.Different && DateOfBirthSource is null)
         {
@@ -188,7 +188,7 @@ public class Merge(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator,
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.SupportTasks.TeacherPensions.Index());
     }

@@ -76,7 +76,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "Text", text },
-                { "File", CreateEvidenceFileBinaryContent(), "Attachment.jpeg" }
+                { "File", (CreateEvidenceFileBinaryContent(), "Attachment.jpeg") }
             }
         };
 

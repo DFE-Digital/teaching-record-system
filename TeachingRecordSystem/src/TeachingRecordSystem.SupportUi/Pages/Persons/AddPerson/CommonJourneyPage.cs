@@ -15,14 +15,14 @@ public abstract class CommonJourneyPage(
 
     protected TrsDbContext DbContext { get; } = dbContext;
     protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
-    protected EvidenceUploadManager EvidenceController { get; } = evidenceUploadManager;
+    protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceUploadManager;
 
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await EvidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(LinkGenerator.Persons.AddPerson.Index());
     }

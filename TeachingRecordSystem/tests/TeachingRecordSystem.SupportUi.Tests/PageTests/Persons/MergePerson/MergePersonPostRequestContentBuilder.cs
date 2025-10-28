@@ -1,5 +1,4 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
@@ -14,9 +13,7 @@ public class MergePersonPostRequestContentBuilder : PostRequestContentBuilder
     public PersonAttributeSource? EmailAddressSource { get; set; }
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
     public PersonAttributeSource? GenderSource { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public (HttpContent, string)? EvidenceFile { get; set; }
-    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
+    public TestEvidenceUploadModel Evidence { get; set; } = new();
     public string? Comments { get; set; }
 
     public MergePersonPostRequestContentBuilder WithOtherTrn(string? otherTrn)
@@ -75,15 +72,15 @@ public class MergePersonPostRequestContentBuilder : PostRequestContentBuilder
 
     public MergePersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
-        UploadEvidence = uploadEvidence;
-        EvidenceFile = evidenceFile;
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.EvidenceFile = evidenceFile;
         return this;
     }
 
     public MergePersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
-        UploadEvidence = uploadEvidence;
-        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
         {
             FileId = id,
             FileName = evidenceFileName ?? "filename.jpg",

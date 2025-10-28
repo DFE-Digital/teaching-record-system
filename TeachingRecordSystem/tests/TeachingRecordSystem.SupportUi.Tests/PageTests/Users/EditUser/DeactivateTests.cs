@@ -56,7 +56,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -80,7 +80,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -106,7 +106,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -132,7 +132,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -158,7 +158,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -183,7 +183,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -211,7 +211,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "HasAdditionalReason", true },
                 { "AdditionalReasonDetail", "" },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -237,7 +237,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "HasAdditionalReason", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -265,7 +265,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", true },
                 { "MoreInformationDetail", "" },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -291,7 +291,8 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "HasAdditionalReason", false },
-                { "HasMoreInformation", false }
+                { "HasMoreInformation", false },
+                { "Evidence.UploadEvidence", "" }
             }
         };
 
@@ -300,7 +301,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -318,7 +319,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", true }
+                { "Evidence.UploadEvidence", true }
             }
         };
 
@@ -327,7 +328,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Test]
@@ -345,8 +346,8 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", true },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(), "invalidfile.cs" }
+                { "Evidence.UploadEvidence", true },
+                { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(), "invalidfile.cs") }
             }
         };
 
@@ -355,7 +356,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -372,8 +373,8 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "HasMoreInformation", false },
-                { "UploadEvidence", true },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" }
+                { "Evidence.UploadEvidence", true },
+                { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png") }
             }
         };
 
@@ -393,9 +394,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("UploadedEvidenceFile.FileId"));
-        Assert.Equal("validfile.png", doc.GetHiddenInputValue("UploadedEvidenceFile.FileName"));
-        Assert.Equal("1.2 KB", doc.GetHiddenInputValue("UploadedEvidenceFile.FileSizeDescription"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileId"));
+        Assert.Equal("validfile.png", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileName"));
+        Assert.Equal("1.2 KB", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileSizeDescription"));
     }
 
     [Test]
@@ -413,10 +414,10 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "HasMoreInformation", false },
-                { "UploadEvidence", true },
-                { "UploadedEvidenceFile.FileId", evidenceFileId },
-                { "UploadedEvidenceFile.FileName", "testfile.jpg" },
-                { "UploadedEvidenceFile.FileSizeDescription", "3 KB" }
+                { "Evidence.UploadEvidence", true },
+                { "Evidence.UploadedEvidenceFile.FileId", evidenceFileId },
+                { "Evidence.UploadedEvidenceFile.FileName", "testfile.jpg" },
+                { "Evidence.UploadedEvidenceFile.FileSizeDescription", "3 KB" }
             }
         };
 
@@ -435,9 +436,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("UploadedEvidenceFile.FileId"));
-        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue("UploadedEvidenceFile.FileName"));
-        Assert.Equal("3 KB", doc.GetHiddenInputValue("UploadedEvidenceFile.FileSizeDescription"));
+        Assert.Equal(evidenceFileId.ToString(), doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileId"));
+        Assert.Equal("testfile.jpg", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileName"));
+        Assert.Equal("3 KB", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileSizeDescription"));
     }
 
     [Test]
@@ -455,11 +456,11 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "HasMoreInformation", false },
-                { "UploadEvidence", true },
-                { "UploadedEvidenceFile.FileId", evidenceFileId },
-                { "UploadedEvidenceFile.FileName", "validfile.png" },
-                { "UploadedEvidenceFile.FileSizeDescription", "5MB" },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" },
+                { "Evidence.UploadEvidence", true },
+                { "Evidence.UploadedEvidenceFile.FileId", evidenceFileId },
+                { "Evidence.UploadedEvidenceFile.FileName", "validfile.png" },
+                { "Evidence.UploadedEvidenceFile.FileSizeDescription", "5MB" },
+                { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png") },
             }
         };
 
@@ -487,10 +488,10 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false },
-                { "UploadedEvidenceFile.FileId", evidenceFileId },
-                { "UploadedEvidenceFile.FileName", "validfile.png" },
-                { "UploadedEvidenceFile.FileSizeDescription", "5MB" }
+                { "Evidence.UploadEvidence", false },
+                { "Evidence.UploadedEvidenceFile.FileId", evidenceFileId },
+                { "Evidence.UploadedEvidenceFile.FileName", "validfile.png" },
+                { "Evidence.UploadedEvidenceFile.FileSizeDescription", "5MB" }
             }
         };
 
@@ -537,9 +538,9 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new MultipartFormDataContentBuilder
             {
-                { "UploadedEvidenceFile.FileId", evidenceFileId },
-                { "UploadedEvidenceFile.FileName", "validfile.png" },
-                { "UploadedEvidenceFile.FileSizeDescription", "5MB" }
+                { "Evidence.UploadedEvidenceFile.FileId", evidenceFileId },
+                { "Evidence.UploadedEvidenceFile.FileName", "validfile.png" },
+                { "Evidence.UploadedEvidenceFile.FileSizeDescription", "5MB" }
             }
         };
 
@@ -567,7 +568,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", false }
+                { "Evidence.UploadEvidence", false }
             }
         };
 
@@ -614,8 +615,8 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "AdditionalReasonDetail", "Some additional reason" },
                 { "HasMoreInformation", true },
                 { "MoreInformationDetail", "Some more information" },
-                { "UploadEvidence", true },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" }
+                { "Evidence.UploadEvidence", true },
+                { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png") }
             }
         };
 
@@ -662,10 +663,10 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 { "HasAdditionalReason", false },
                 { "HasMoreInformation", false },
-                { "UploadEvidence", true },
-                { "UploadedEvidenceFile.FileId", evidenceFileId },
-                { "UploadedEvidenceFile.FileName", "validfile.png" },
-                { "UploadedEvidenceFile.FileSizeDescription", "5MB" }
+                { "Evidence.UploadEvidence", true },
+                { "Evidence.UploadedEvidenceFile.FileId", evidenceFileId },
+                { "Evidence.UploadedEvidenceFile.FileName", "validfile.png" },
+                { "Evidence.UploadedEvidenceFile.FileSizeDescription", "5MB" }
             }
         };
 
@@ -714,8 +715,8 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "AdditionalReasonDetail", "Some additional reason" },
                 { "HasMoreInformation", false },
                 { "MoreInformationDetail", "Some more information" },
-                { "UploadEvidence", false },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png" }
+                { "Evidence.UploadEvidence", false },
+                { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png") }
             }
         };
 

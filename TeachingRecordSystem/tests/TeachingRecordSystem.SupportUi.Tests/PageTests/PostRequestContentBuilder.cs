@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests;
 
 public abstract class PostRequestContentBuilder
 {
@@ -35,6 +35,8 @@ public abstract class PostRequestContentBuilder
 
             if (value is null)
             {
+                yield return new($"{prefix}{property.Name}", "");
+
                 continue;
             }
 
@@ -59,7 +61,7 @@ public abstract class PostRequestContentBuilder
 
             if (value is (HttpContent content, string filename))
             {
-                yield return new PostRequestFileEntry($"{prefix}{property.Name}", content, filename);
+                yield return new PostRequestFileEntry($"{prefix}{property.Name}", (content, filename));
 
                 continue;
             }
@@ -95,11 +97,11 @@ public abstract class PostRequestContentBuilder
         }
     }
 
-    private record PostRequestFileEntry(string Key, HttpContent Content, string Filename) : PostRequestEntry(Key, Filename)
+    private record PostRequestFileEntry(string Key, (HttpContent Content, string Filename) File) : PostRequestEntry(Key, File.Filename)
     {
         public override void Write(MultipartFormDataContentBuilder builder)
         {
-            builder.Add(Key, Content, Filename);
+            builder.Add(Key, File);
         }
     }
 }

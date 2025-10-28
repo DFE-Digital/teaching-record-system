@@ -1,5 +1,4 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
@@ -12,9 +11,7 @@ public class EditInductionPostRequestContentBuilder : PostRequestContentBuilder
     public InductionChangeReasonOption? ChangeReason { get; set; }
     public bool? HasAdditionalReasonDetail { get; set; }
     public string? ChangeReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public (HttpContent, string)? EvidenceFile { get; set; }
-    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
+    public TestEvidenceUploadModel Evidence { get; set; } = new();
 
     public EditInductionPostRequestContentBuilder WithStartDate(DateOnly date)
     {
@@ -55,15 +52,15 @@ public class EditInductionPostRequestContentBuilder : PostRequestContentBuilder
 
     public EditInductionPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
-        UploadEvidence = uploadEvidence;
-        EvidenceFile = evidenceFile;
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.EvidenceFile = evidenceFile;
         return this;
     }
 
     public EditInductionPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
-        UploadEvidence = uploadEvidence;
-        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
         {
             FileId = id,
             FileName = evidenceFileName ?? "filename.jpg",
