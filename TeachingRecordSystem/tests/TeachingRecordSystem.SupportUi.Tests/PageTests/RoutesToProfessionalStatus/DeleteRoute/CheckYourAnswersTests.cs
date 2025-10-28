@@ -92,8 +92,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p

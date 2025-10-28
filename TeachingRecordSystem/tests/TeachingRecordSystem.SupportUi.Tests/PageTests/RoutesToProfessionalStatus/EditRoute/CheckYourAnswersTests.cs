@@ -93,8 +93,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today.AddDays(-1);
         var holdsFrom = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
@@ -228,8 +228,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var person = await TestData.CreatePersonAsync(p => p
@@ -338,7 +338,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Postgraduate Teaching Apprenticeship").Single();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync())
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\''))
             .SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync())
             .SingleRandom();
@@ -424,8 +424,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).First();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;

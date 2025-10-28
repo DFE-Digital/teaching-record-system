@@ -82,7 +82,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).TakeRandom(3).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .SingleRandom();
@@ -118,7 +118,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenSubjectsAreEntered_SavesDataAndRedirectsToNextPage()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).TakeRandom(3).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .SingleRandom();

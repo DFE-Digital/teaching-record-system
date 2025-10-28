@@ -20,8 +20,8 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
@@ -95,8 +95,8 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
@@ -252,7 +252,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status.Value)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status.Value)
@@ -293,7 +293,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)

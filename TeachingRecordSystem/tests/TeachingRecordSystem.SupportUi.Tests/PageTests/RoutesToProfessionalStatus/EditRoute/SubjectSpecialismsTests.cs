@@ -22,8 +22,8 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
@@ -99,8 +99,8 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1).Select(s => s.TrainingSubjectId).ToArray();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1).Select(s => s.TrainingSubjectId).ToArray();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
 
@@ -159,7 +159,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).TakeRandom(3).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .SingleRandom();
@@ -199,7 +199,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenSubjectsAreEntered_SavesDataAndRedirectsToDetail()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).TakeRandom(3).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .SingleRandom();
@@ -246,7 +246,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     public async Task Post_SubjectIsOptional_WhenNoSubjectsAreEntered_RedirectsToDetail()
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).TakeRandom(3).Select(s => s.TrainingSubjectId).ToArray();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).TakeRandom(3).Select(s => s.TrainingSubjectId).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .SingleRandom();

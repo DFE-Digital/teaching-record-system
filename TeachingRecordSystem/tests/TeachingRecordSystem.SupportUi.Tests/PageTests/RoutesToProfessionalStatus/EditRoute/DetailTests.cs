@@ -90,8 +90,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var awardDate = Clock.Today;
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).First();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;

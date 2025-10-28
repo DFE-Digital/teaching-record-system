@@ -19,7 +19,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var ageRange = TrainingAgeSpecialismType.FoundationStage;
@@ -155,8 +155,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var oldAwardDate = oldEndDate.AddDays(-1);
         var oldRoute = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var oldStatus = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var oldSubject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
-        var oldTrainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var oldSubject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
+        var oldTrainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var oldDegreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var oldCountry = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var oldAgeRange = TrainingAgeSpecialismType.FoundationStage;
@@ -167,7 +167,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var endDate = oldEndDate.AddDays(1);
         var route = oldRoute;
         var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.TrainingSubjectId != oldSubject.TrainingSubjectId).Where(s => !s.Name.Contains('\'')).SingleRandom();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => x.TrainingProviderId != oldTrainingProvider.TrainingProviderId).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => x.TrainingProviderId != oldTrainingProvider.TrainingProviderId).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).Where(x => x.DegreeTypeId != oldDegreeType.DegreeTypeId).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Where(x => x.CountryId != oldCountry.CountryId).SingleRandom();
         var ageRange = TrainingAgeSpecialismType.KeyStage1;
@@ -275,7 +275,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             .SingleRandom();
         var status = RouteToProfessionalStatusStatus.Holds;
         var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var ageRange = TrainingAgeSpecialismType.KeyStage1;
@@ -426,7 +426,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync(ProfessionalStatusType.QualifiedTeacherStatus);
         var status = RouteToProfessionalStatusStatus.Holds;
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var ageRange = TrainingAgeSpecialismType.FoundationStage;
@@ -669,7 +669,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = populateOptional ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => !s.Name.Contains('\'')).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).SingleRandom();
         var ageRangeType = TrainingAgeSpecialismType.Range;

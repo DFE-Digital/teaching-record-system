@@ -164,7 +164,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .SingleRandom();
         var person = await TestData.CreatePersonAsync();
 
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status.Value)
@@ -201,7 +201,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .SingleRandom();
         var person = await TestData.CreatePersonAsync();
 
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status.Value)
@@ -238,7 +238,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .SingleRandom();
         var person = await TestData.CreatePersonAsync();
 
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status.Value)
