@@ -9,13 +9,13 @@ public static partial class Commands
 {
     public static Command CreateMigrateDbCommand(IConfiguration configuration)
     {
-        var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
-        var targetMigrationOption = new Option<string>("--target-migration") { IsRequired = false };
+        var connectionStringOption = new Option<string>("--connection-string") { Required = true };
+        var targetMigrationOption = new Option<string>("--target-migration") { Required = false };
 
         var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
         if (configuredConnectionString is not null)
         {
-            connectionStringOption.SetDefaultValue(configuredConnectionString);
+            connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
         }
 
         var migrateDbCommand = new Command("migrate-db", "Migrate the database to the latest version.")
@@ -24,9 +24,12 @@ public static partial class Commands
             targetMigrationOption
         };
 
-        migrateDbCommand.SetHandler(
-            async (string connectionString, string? targetMigration) =>
+        migrateDbCommand.SetAction(
+            async parseResult =>
             {
+                var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+                var targetMigration = parseResult.GetValue(targetMigrationOption);
+
                 using var dbContext = TrsDbContext.Create(connectionString, commandTimeout: (int)TimeSpan.FromMinutes(10).TotalSeconds);
 
                 // Ensure we've got squashed migration recorded
@@ -66,9 +69,7 @@ public static partial class Commands
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
                 await dbContext.Database.ExecuteSqlRawAsync($"alter user {user} with replication");
 #pragma warning restore EF1002 // Risk of vulnerability to SQL injection.
-            },
-            connectionStringOption,
-            targetMigrationOption);
+            });
 
         return migrateDbCommand;
     }

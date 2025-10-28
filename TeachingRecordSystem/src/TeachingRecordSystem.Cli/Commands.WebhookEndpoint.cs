@@ -1,4 +1,3 @@
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Linq.Expressions;
 using System.Text.Json;
@@ -27,20 +26,21 @@ public partial class Commands
                 e.Enabled
             };
 
-        var command = new Command("webhook-endpoint", "Commands for managing webhook endpoints.");
-        command.AddCommand(CreateCreateCommand());
-        command.AddCommand(CreateDeleteCommand());
-        command.AddCommand(CreateGetCommand());
-        command.AddCommand(CreateListCommand());
-        command.AddCommand(CreateUpdateCommand());
-        return command;
+        return new Command("webhook-endpoint", "Commands for managing webhook endpoints.")
+        {
+            CreateCreateCommand(),
+            CreateDeleteCommand(),
+            CreateGetCommand(),
+            CreateListCommand(),
+            CreateUpdateCommand()
+        };
 
         static string ParseApiVersionArgument(ArgumentResult result)
         {
             var apiVersion = NormalizeApiVersion(result.Tokens.SingleOrDefault()?.Value ?? "");
             if (!VersionRegistry.AllV3MinorVersions.Contains(apiVersion))
             {
-                result.ErrorMessage = $"'{apiVersion}' is not a valid API version.";
+                result.AddError($"'{apiVersion}' is not a valid API version.");
             }
             return apiVersion;
         }
@@ -49,20 +49,20 @@ public partial class Commands
 
         Command CreateCreateCommand()
         {
-            var userIdOption = new Option<Guid>("--user-id") { IsRequired = true };
-            var addressOption = new Option<string>("--address") { IsRequired = true };
-            var cloudEventTypesOption = new Option<string[]>("--cloud-event-types") { IsRequired = true, AllowMultipleArgumentsPerToken = true };
-            var apiVersionOption = new Option<string>("--api-version", ParseApiVersionArgument) { IsRequired = true };
-            var enabledOption = new Option<bool>("--enabled") { IsRequired = false };
-            var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+            var userIdOption = new Option<Guid>("--user-id") { Required = true };
+            var addressOption = new Option<string>("--address") { Required = true };
+            var cloudEventTypesOption = new Option<string[]>("--cloud-event-types") { Required = true, AllowMultipleArgumentsPerToken = true };
+            var apiVersionOption = new Option<string>("--api-version") { Required = true, CustomParser = ParseApiVersionArgument };
+            var enabledOption = new Option<bool>("--enabled") { Required = false };
+            var connectionStringOption = new Option<string>("--connection-string") { Required = true };
 
             var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (configuredConnectionString is not null)
             {
-                connectionStringOption.SetDefaultValue(configuredConnectionString);
+                connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
             }
 
-            enabledOption.SetDefaultValue(true);
+            enabledOption.DefaultValueFactory = _ => true;
 
             var command = new Command("create", "Creates a webhook endpoint.")
             {
@@ -74,9 +74,16 @@ public partial class Commands
                 connectionStringOption
             };
 
-            command.SetHandler(
-                async (Guid userId, string address, string[] cloudEventTypes, string apiVersion, bool enable, string connectionString) =>
+            command.SetAction(
+                async parseResult =>
                 {
+                    var userId = parseResult.GetRequiredValue(userIdOption);
+                    var address = parseResult.GetRequiredValue(addressOption);
+                    var cloudEventTypes = parseResult.GetRequiredValue(cloudEventTypesOption);
+                    var apiVersion = parseResult.GetRequiredValue(apiVersionOption);
+                    var enabled = parseResult.GetValue(enabledOption);
+                    var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+
                     await using var dbContext = TrsDbContext.Create(connectionString);
 
                     var webhookEndpointId = Guid.NewGuid();
@@ -89,7 +96,7 @@ public partial class Commands
                         Address = address,
                         ApiVersion = apiVersion,
                         CloudEventTypes = cloudEventTypes.Order().ToList(),
-                        Enabled = enable,
+                        Enabled = enabled,
                         CreatedOn = now,
                         UpdatedOn = now
                     };
@@ -114,26 +121,20 @@ public partial class Commands
 
                     var output = JsonSerializer.Serialize(printableEndpoint, jsonSerializerOptions);
                     Console.WriteLine(output);
-                },
-                userIdOption,
-                addressOption,
-                cloudEventTypesOption,
-                apiVersionOption,
-                enabledOption,
-                connectionStringOption);
+                });
 
             return command;
         }
 
         Command CreateDeleteCommand()
         {
-            var webhookEndpointIdOption = new Option<Guid>(["--webhook-endpoint-id", "--id"]) { IsRequired = true };
-            var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+            var webhookEndpointIdOption = new Option<Guid>("--webhook-endpoint-id", "--id") { Required = true };
+            var connectionStringOption = new Option<string>("--connection-string") { Required = true };
 
             var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (configuredConnectionString is not null)
             {
-                connectionStringOption.SetDefaultValue(configuredConnectionString);
+                connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
             }
 
             var command = new Command("delete", "Deletes a webhook endpoint.")
@@ -142,9 +143,12 @@ public partial class Commands
                 connectionStringOption
             };
 
-            command.SetHandler(
-                async (Guid webhookEndpointId, string connectionString) =>
+            command.SetAction(
+                async parseResult =>
                 {
+                    var webhookEndpointId = parseResult.GetRequiredValue(webhookEndpointIdOption);
+                    var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+
                     await using var dbContext = TrsDbContext.Create(connectionString);
 
                     var endpoint = await dbContext.WebhookEndpoints
@@ -162,22 +166,20 @@ public partial class Commands
                     });
 
                     await dbContext.SaveChangesAsync();
-                },
-                webhookEndpointIdOption,
-                connectionStringOption);
+                });
 
             return command;
         }
 
         Command CreateGetCommand()
         {
-            var webhookEndpointIdOption = new Option<Guid>(["--webhook-endpoint-id", "--id"]) { IsRequired = true };
-            var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+            var webhookEndpointIdOption = new Option<Guid>("--webhook-endpoint-id", "--id") { Required = true };
+            var connectionStringOption = new Option<string>("--connection-string") { Required = true };
 
             var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (configuredConnectionString is not null)
             {
-                connectionStringOption.SetDefaultValue(configuredConnectionString);
+                connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
             }
 
             var command = new Command("get", "Gets a webhook endpoint.")
@@ -186,9 +188,12 @@ public partial class Commands
                 connectionStringOption
             };
 
-            command.SetHandler(
-                async (Guid webhookEndpointId, string connectionString) =>
+            command.SetAction(
+                async parseResult =>
                 {
+                    var webhookEndpointId = parseResult.GetRequiredValue(webhookEndpointIdOption);
+                    var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+
                     await using var dbContext = TrsDbContext.Create(connectionString);
 
                     var endpoint = await dbContext.WebhookEndpoints
@@ -199,21 +204,19 @@ public partial class Commands
 
                     var output = JsonSerializer.Serialize(printableEndpoint, jsonSerializerOptions);
                     Console.WriteLine(output);
-                },
-                webhookEndpointIdOption,
-                connectionStringOption);
+                });
 
             return command;
         }
 
         Command CreateListCommand()
         {
-            var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+            var connectionStringOption = new Option<string>("--connection-string") { Required = true };
 
             var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (configuredConnectionString is not null)
             {
-                connectionStringOption.SetDefaultValue(configuredConnectionString);
+                connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
             }
 
             var command = new Command("list", "Lists the webhook endpoints.")
@@ -221,9 +224,11 @@ public partial class Commands
                 connectionStringOption
             };
 
-            command.SetHandler(
-                async (string connectionString) =>
+            command.SetAction(
+                async parseResult =>
                 {
+                    var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+
                     await using var dbContext = TrsDbContext.Create(connectionString);
 
                     var endpoints = await dbContext.WebhookEndpoints
@@ -234,28 +239,27 @@ public partial class Commands
 
                     var output = JsonSerializer.Serialize(endpoints, jsonSerializerOptions);
                     Console.WriteLine(output);
-                },
-                connectionStringOption);
+                });
 
             return command;
         }
 
         Command CreateUpdateCommand()
         {
-            var webhookEndpointIdOption = new Option<Guid>(["--webhook-endpoint-id", "--id"]) { IsRequired = true };
-            var addressOption = new Option<string>("--address") { IsRequired = false };
-            var cloudEventTypesOption = new Option<string[]>("--cloud-event-types") { IsRequired = false, AllowMultipleArgumentsPerToken = true };
-            var apiVersionOption = new Option<string>("--api-version", ParseApiVersionArgument) { IsRequired = false };
-            var enabledOption = new Option<bool>("--enabled") { IsRequired = false };
-            var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+            var webhookEndpointIdOption = new Option<Guid>("--webhook-endpoint-id", "--id") { Required = true };
+            var addressOption = new Option<string>("--address") { Required = false };
+            var cloudEventTypesOption = new Option<string[]>("--cloud-event-types") { Required = false, AllowMultipleArgumentsPerToken = true };
+            var apiVersionOption = new Option<string>("--api-version") { Required = false, CustomParser = ParseApiVersionArgument };
+            var enabledOption = new Option<bool>("--enabled") { Required = false };
+            var connectionStringOption = new Option<string>("--connection-string") { Required = true };
 
             var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (configuredConnectionString is not null)
             {
-                connectionStringOption.SetDefaultValue(configuredConnectionString);
+                connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
             }
 
-            enabledOption.SetDefaultValue(true);
+            enabledOption.DefaultValueFactory = _ => true;
 
             var command = new Command("update", "Updates a webhook endpoint.")
             {
@@ -267,11 +271,11 @@ public partial class Commands
                 connectionStringOption
             };
 
-            command.SetHandler(
-                async (InvocationContext context) =>
+            command.SetAction(
+                async parseResult =>
                 {
-                    var webhookEndpointId = context.ParseResult.GetValueForOption(webhookEndpointIdOption);
-                    var connectionString = context.ParseResult.GetValueForOption(connectionStringOption)!;
+                    var webhookEndpointId = parseResult.GetRequiredValue(webhookEndpointIdOption);
+                    var connectionString = parseResult.GetRequiredValue(connectionStringOption);
 
                     await using var dbContext = TrsDbContext.Create(connectionString);
 
@@ -281,27 +285,27 @@ public partial class Commands
 
                     var changes = WebhookEndpointUpdatedChanges.None;
 
-                    if (context.ParseResult.HasOption(addressOption))
+                    if (parseResult.GetValue(addressOption) is { } address)
                     {
-                        endpoint.Address = context.ParseResult.GetValueForOption(addressOption)!;
+                        endpoint.Address = address;
                         changes |= WebhookEndpointUpdatedChanges.Address;
                     }
 
-                    if (context.ParseResult.HasOption(cloudEventTypesOption))
+                    if (parseResult.GetValue(cloudEventTypesOption) is { } cloudEventTypes)
                     {
-                        endpoint.CloudEventTypes = context.ParseResult.GetValueForOption(cloudEventTypesOption)!.Order().ToList();
+                        endpoint.CloudEventTypes = cloudEventTypes.Order().ToList();
                         changes |= WebhookEndpointUpdatedChanges.CloudEventTypes;
                     }
 
-                    if (context.ParseResult.HasOption(apiVersionOption))
+                    if (parseResult.GetValue(apiVersionOption) is { } apiVersion)
                     {
-                        endpoint.ApiVersion = context.ParseResult.GetValueForOption(apiVersionOption)!;
+                        endpoint.ApiVersion = apiVersion;
                         changes |= WebhookEndpointUpdatedChanges.ApiVersion;
                     }
 
-                    if (context.ParseResult.HasOption(enabledOption))
+                    if (parseResult.GetValue(enabledOption) is { } enabled)
                     {
-                        endpoint.Enabled = context.ParseResult.GetValueForOption(enabledOption);
+                        endpoint.Enabled = enabled;
                         changes |= WebhookEndpointUpdatedChanges.Enabled;
                     }
 

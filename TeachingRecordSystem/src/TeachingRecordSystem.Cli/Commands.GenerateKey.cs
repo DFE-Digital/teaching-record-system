@@ -8,8 +8,8 @@ public partial class Commands
     {
         var generateKeyCommand = new Command("generate-key", "Generates an RSA key.");
 
-        generateKeyCommand.SetHandler(
-            () =>
+        generateKeyCommand.SetAction(
+            _ =>
             {
                 using var rsa = RSA.Create(keySizeInBits: 2048);
                 Console.WriteLine(rsa.ToXmlString(includePrivateParameters: true));

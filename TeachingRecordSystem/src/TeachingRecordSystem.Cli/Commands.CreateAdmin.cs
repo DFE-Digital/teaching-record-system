@@ -6,14 +6,14 @@ public static partial class Commands
 {
     public static Command CreateCreateAdminCommand(IConfiguration configuration)
     {
-        var emailOption = new Option<string>("--email") { IsRequired = true };
-        var nameOption = new Option<string>("--name") { IsRequired = true };
-        var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+        var emailOption = new Option<string>("--email") { Required = true };
+        var nameOption = new Option<string>("--name") { Required = true };
+        var connectionStringOption = new Option<string>("--connection-string") { Required = true };
 
         var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
         if (configuredConnectionString is not null)
         {
-            connectionStringOption.SetDefaultValue(configuredConnectionString);
+            connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
         }
 
         var command = new Command("create-admin", $"Creates a new user with the {UserRoles.Administrator} role.")
@@ -23,19 +23,23 @@ public static partial class Commands
             connectionStringOption
         };
 
-        command.AddValidator(commandResult =>
+        command.Validators.Add(commandResult =>
         {
-            var email = commandResult.GetValueForOption(emailOption);
+            var email = commandResult.GetRequiredValue(emailOption);
 
-            if (email?.EndsWith("@education.gov.uk", StringComparison.OrdinalIgnoreCase) != true)
+            if (!email.EndsWith("@education.gov.uk", StringComparison.OrdinalIgnoreCase))
             {
-                commandResult.ErrorMessage = "Email address must be an @education.gov.uk address.";
+                commandResult.AddError("Email address must be an @education.gov.uk address.");
             }
         });
 
-        command.SetHandler(
-            async (string email, string name, string connectionString) =>
+        command.SetAction(
+            async parseResult =>
             {
+                var email = parseResult.GetRequiredValue(emailOption);
+                var name = parseResult.GetRequiredValue(nameOption);
+                var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+
                 using var dbContext = TrsDbContext.Create(connectionString);
 
                 dbContext.Users.Add(new()
@@ -48,10 +52,7 @@ public static partial class Commands
                 });
 
                 await dbContext.SaveChangesAsync();
-            },
-            emailOption,
-            nameOption,
-            connectionStringOption);
+            });
 
         return command;
     }

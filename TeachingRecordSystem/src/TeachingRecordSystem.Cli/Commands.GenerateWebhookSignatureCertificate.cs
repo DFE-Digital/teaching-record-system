@@ -9,10 +9,10 @@ public static partial class Commands
     {
         var command = new Command(
             "generate-webhook-signature-certificate",
-            $"Generates a new self-signed certificate and outputs its private key and certificate to key.pem and certificate.pem, respectively.");
+            "Generates a new self-signed certificate and outputs its private key and certificate to key.pem and certificate.pem, respectively.");
 
-        command.SetHandler(
-            () =>
+        command.SetAction(
+            _ =>
             {
                 var key = ECDsa.Create(ECCurve.NamedCurves.nistP384);
                 var certRequest = new CertificateRequest("CN=Teaching Record System", key, HashAlgorithmName.SHA384);
