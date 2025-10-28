@@ -25,6 +25,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJob(
         dbContext.Database.SetCommandTimeout(30);
 
         var personIdsWithNoTrn = await dbContext.Persons
+            .IgnoreQueryFilters()
             .Where(p => p.Trn == null)
             .Select(p => p.PersonId)
             .ToListAsync(cancellationToken);
