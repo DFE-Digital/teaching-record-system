@@ -8,9 +8,9 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 [Collection(nameof(DisableParallelization))]
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    public Task InitializeAsync() => HostFixture.Services.GetRequiredService<DbHelper>().ClearDataAsync();
+    async ValueTask IAsyncLifetime.InitializeAsync() => await HostFixture.Services.GetRequiredService<DbHelper>().ClearDataAsync();
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
