@@ -109,6 +109,7 @@
     <None Remove="Services\DqtReporting\Migrations\0077_TrsIntegrationTranactionFKCorrection.sql" />
     <None Remove="Services\DqtReporting\Migrations\0078_TrsPersonsCreatedByTps.sql" />
     <None Remove="Services\DqtReporting\Migrations\0082_TrsPersonDateOfDeath.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0093_RemoveITRPersonForeignKey.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -247,6 +248,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0090_AlterRouteToProfessionalTypeHoldsFromColumn.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0091_InsertRouteToProfessionalTypeData.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0092_Processes.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0093_RemoveITRPersonForeignKey.sql" />
   </ItemGroup>
 
   <ItemGroup>
