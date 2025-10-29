@@ -12,27 +12,42 @@ using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUse
 
 namespace TeachingRecordSystem.TestCommon;
 
-public sealed class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory) : IDisposable
+public sealed class DbHelper : IDisposable
 {
+    private readonly IServiceProvider _serviceProvider;
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
     private bool _haveResetSchema;
 
-    public IDbContextFactory<TrsDbContext> DbContextFactory { get; } = dbContextFactory;
-
-    public static void ConfigureDbServices(IServiceCollection services, string connectionString)
+    private DbHelper(IServiceProvider serviceProvider)
     {
-        services.AddDatabase(connectionString);
+        _serviceProvider = serviceProvider;
+    }
 
-        services.AddSingleton<DbHelper>();
+    public static DbHelper Instance { get; } = CreateInstance();
+
+    public IDbContextFactory<TrsDbContext> DbContextFactory => _serviceProvider.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+
+    private static DbHelper CreateInstance()
+    {
+        var configuration = TestConfiguration.GetConfiguration();
+
+        var services = new ServiceCollection();
+        services.AddDatabase(configuration.GetPostgresConnectionString());
+        var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+
+        return new DbHelper(serviceProvider);
     }
 
     public async Task InitializeAsync()
     {
-        await EnsureSchemaAsync();
+        var updatedSchema = await EnsureSchemaAsync();
 
-        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-        await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
+        if (updatedSchema)
+        {
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
+        }
     }
 
     public async Task ClearDataAsync()
@@ -50,7 +65,7 @@ public sealed class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory) :
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task EnsureSchemaAsync()
+    public async Task<bool> EnsureSchemaAsync()
     {
         await _schemaLock.WaitAsync();
 
@@ -60,12 +75,15 @@ public sealed class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory) :
             {
                 await ResetSchemaAsync();
                 _haveResetSchema = true;
+                return true;
             }
         }
         finally
         {
             _schemaLock.Release();
         }
+
+        return false;
     }
 
     public async Task ResetSchemaAsync()
@@ -147,5 +165,6 @@ public sealed class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory) :
     public void Dispose()
     {
         _schemaLock.Dispose();
+        (_serviceProvider as IDisposable)?.Dispose();
     }
 }

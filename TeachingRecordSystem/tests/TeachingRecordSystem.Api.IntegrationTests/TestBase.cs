@@ -39,30 +39,32 @@ public abstract class TestBase
         SetCurrentApiClient([]);
     }
 
-    public HostFixture HostFixture { get; }
+    protected HostFixture HostFixture { get; }
 
-    public DbHelper DbHelper => HostFixture.Services.GetRequiredService<DbHelper>();
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    public Guid DefaultApplicationUserId => HostFixture.DefaultApplicationUserId;
+    protected DbHelper DbHelper => HostFixture.Services.GetRequiredService<DbHelper>();
 
-    public Guid ApplicationUserId { get; } = HostFixture.DefaultApplicationUserId;
+    protected Guid DefaultApplicationUserId => HostFixture.DefaultApplicationUserId;
 
-    public TestableClock Clock => _testServices.Clock;
+    protected Guid ApplicationUserId { get; } = HostFixture.DefaultApplicationUserId;
 
-    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
+    protected TestableClock Clock => _testServices.Clock;
 
-    public ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
+    protected Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
 
-    public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+    protected ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
 
-    public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
+    protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
-    public JsonContent CreateJsonContent(object requestBody) =>
+    protected TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
+
+    protected JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: _jsonSerializerOptions);
 
-    public Mock<IFileService> BlobStorageFileService => _testServices.BlobStorageFileServiceMock;
+    protected Mock<IFileService> BlobStorageFileService => _testServices.BlobStorageFileServiceMock;
 
-    public virtual HttpClient GetHttpClient(string? version = null)
+    protected virtual HttpClient GetHttpClient(string? version = null)
     {
         var client = HostFixture.CreateClient(new()
         {
@@ -77,14 +79,14 @@ public abstract class TestBase
         return client;
     }
 
-    public virtual HttpClient GetHttpClientWithApiKey(string? version = null)
+    protected virtual HttpClient GetHttpClientWithApiKey(string? version = null)
     {
         var client = GetHttpClient(version);
         client.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
         return client;
     }
 
-    public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read", string? version = null)
+    protected HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read", string? version = null)
     {
         // The actual access tokens contain many more claims than this but these are the two we care about
         var subject = new ClaimsIdentity([
@@ -116,24 +118,16 @@ public abstract class TestBase
         return httpClient;
     }
 
-    public void SetCurrentApiClient(IEnumerable<string> roles, Guid? applicationUserId = null)
+    protected void SetCurrentApiClient(IEnumerable<string> roles, Guid? applicationUserId = null)
     {
         var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentApiClientProvider>();
         currentUserProvider.CurrentApiUserId = applicationUserId ?? DefaultApplicationUserId;
         currentUserProvider.Roles = roles.ToArray();
     }
 
-    public virtual async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
-    {
-        var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        return await action(dbContext);
-    }
+    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 
-    public virtual Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
-        WithDbContextAsync(async dbContext =>
-        {
-            await action(dbContext);
-            return 0;
-        });
+    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 }

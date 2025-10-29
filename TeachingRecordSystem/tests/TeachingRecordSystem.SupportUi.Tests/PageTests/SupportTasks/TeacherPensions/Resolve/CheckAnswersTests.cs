@@ -209,7 +209,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
             Assert.Equal(person.FirstName, updatedPersonRecord.FirstName);

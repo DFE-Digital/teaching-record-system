@@ -55,7 +55,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
             ModelState.AddModelError(nameof(DeleteReasonDetail), "Enter additional detail");
         }
 
-        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync<IndexModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

@@ -217,7 +217,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status deleted");
 
-        await WithDbContext(async dbContext => Assert.Null(await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
+        await WithDbContextAsync(async dbContext => Assert.Null(await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
 
         var RaisedBy = GetCurrentUserId();
 
@@ -272,7 +272,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
+        var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Null(updatedPerson.QtsDate);
 
         var RaisedByUserId = GetCurrentUserId();
@@ -332,7 +332,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
+        var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Equal(holdsFromLatest, updatedPerson.QtsDate);
 
         EventObserver.AssertEventsSaved(e =>
@@ -359,7 +359,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

@@ -24,16 +24,12 @@ public class CompositionRoot : IAsyncLifetime
     {
         var services = new ServiceCollection();
 
-        var configuration = new ConfigurationBuilder()
-            .AddUserSecrets<CompositionRoot>()
-            .AddEnvironmentVariables()
-            .Build();
-
-        DbHelper.ConfigureDbServices(services, configuration.GetPostgresConnectionString());
+        var configuration = TestConfiguration.GetConfiguration();
 
         services
             .AddSingleton<IConfiguration>(configuration)
-            .AddSingleton<DbFixture>()
+            .AddSingleton(DbHelper.Instance)
+            .AddDatabase(configuration)
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
             .AddSingleton<IClock, TestableClock>()

@@ -120,7 +120,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var applicationUser = await WithDbContext(async dbContext =>
+        var applicationUser = await WithDbContextAsync(async dbContext =>
         {
             var applicationUser = await dbContext.ApplicationUsers.SingleAsync(a => a.Name == name);
             Assert.NotNull(applicationUser);

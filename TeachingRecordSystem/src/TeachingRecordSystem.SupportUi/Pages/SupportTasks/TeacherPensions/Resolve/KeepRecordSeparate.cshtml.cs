@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
 [Journey(JourneyNames.ResolveTpsPotentialDuplicate), RequireJourneyInstance]
-public class KeepRecordSeparate(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
+public class KeepRecordSeparateModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(dbContext)
 {
     [BindProperty]
     public string? Reason { get; set; }

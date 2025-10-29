@@ -318,7 +318,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture host
             Comments = comments
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();

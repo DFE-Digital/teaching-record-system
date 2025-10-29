@@ -85,7 +85,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         var personId = Guid.Parse(linkToPersonRecord.AsSpan("/persons/".Length));
 
         // person record is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == personId);
@@ -99,7 +99,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         });
 
         // support task is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedSupportTask = await dbContext
                 .SupportTasks

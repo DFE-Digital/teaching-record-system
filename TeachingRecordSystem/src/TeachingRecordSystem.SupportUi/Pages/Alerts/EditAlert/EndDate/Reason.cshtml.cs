@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
 [Journey(JourneyNames.EditAlertEndDate), RequireJourneyInstance]
-public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceController) : PageModel
+public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public const int ChangeReasonDetailMaxLength = 4000;
 
@@ -67,7 +67,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
 
-        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {
@@ -87,7 +87,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.Alerts.AlertDetail(AlertId));
     }

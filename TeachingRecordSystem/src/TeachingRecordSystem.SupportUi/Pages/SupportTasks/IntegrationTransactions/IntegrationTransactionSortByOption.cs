@@ -8,6 +8,7 @@ public enum IntegrationTransactionSortByOption
     ImportStatus,
     Total,
     Successes,
+    Warnings,
     Failures,
     Duplicates
 }

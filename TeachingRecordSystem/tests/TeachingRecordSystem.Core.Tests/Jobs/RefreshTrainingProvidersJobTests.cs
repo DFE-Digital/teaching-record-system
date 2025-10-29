@@ -11,7 +11,7 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
     public async Task RefreshTrainingProvidersJob_WhenCalledForNewUkprn_AddsNewTrainingProvider()
     {
         // Arrange
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = dbFixture.DbContextFactory;
         var publishApiClient = new Mock<IPublishApiClient>();
         var provider1Name = "Test Training Provider 1";
         var provider1Ukprn = "12345678";
@@ -70,7 +70,7 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
     public async Task RefreshTrainingProvidersJob_WhenCalledForExistingUkprn_UpdatesTrainingProvider()
     {
         // Arrange
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = dbFixture.DbContextFactory;
         var publishApiClient = new Mock<IPublishApiClient>();
         var existingProvider = new TrainingProvider
         {
@@ -122,7 +122,7 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
     public async Task RefreshTrainingProvidersJob_WhenCalledForWithExistingUkprnMissing_DeactivatesTrainingProvider()
     {
         // Arrange
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = dbFixture.DbContextFactory;
         var publishApiClient = new Mock<IPublishApiClient>();
         var newProviderName = "New Training Provider";
         var newProviderUkprn = "76543210";

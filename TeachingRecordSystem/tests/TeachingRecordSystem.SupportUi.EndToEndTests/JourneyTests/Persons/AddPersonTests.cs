@@ -3,14 +3,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public class AddPersonTests : TestBase
+public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public AddPersonTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
-    [Test]
+    [Fact]
     public async Task AddPerson_Success()
     {
         await using var context = await HostFixture.CreateBrowserContext();
@@ -35,7 +30,7 @@ public class AddPersonTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: "Record created for Alfred The Great");
     }
 
-    [Test]
+    [Fact]
     public async Task AddPerson_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync();
@@ -65,7 +60,7 @@ public class AddPersonTests : TestBase
         await page.AssertNameInputAsync("Alfred", "The", "Great");
     }
 
-    [Test]
+    [Fact]
     public async Task AddPerson_CYA_ChangeDetailsOrReason_ContinuesToCYA()
     {
         var person = await TestData.CreatePersonAsync();
@@ -101,7 +96,7 @@ public class AddPersonTests : TestBase
         await page.AssertOnAddPersonCheckAnswersPageAsync();
     }
 
-    [Test]
+    [Fact]
     public async Task AddPerson_CYA_ChangeDetailsOrReason_NavigatesBackToCYA()
     {
         var person = await TestData.CreatePersonAsync();

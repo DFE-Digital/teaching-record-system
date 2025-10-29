@@ -20,6 +20,17 @@
           "Azure.Storage.Common": "12.24.0"
         }
       },
+      "Azure.Storage.Files.DataLake": {
+        "type": "Direct",
+        "requested": "[12.16.0, )",
+        "resolved": "12.16.0",
+        "contentHash": "D+mkKzL5diWWqGX4pDNeHOIYfv91H15BJSfSLeBCjV3mHFAhykxYDWXOTVJ0ThobJ3yI2R4SahjbVmdgd0vlyg==",
+        "dependencies": {
+          "Azure.Storage.Blobs": "12.18.0",
+          "Azure.Storage.Common": "12.17.0",
+          "System.Text.Json": "4.7.2"
+        }
+      },
       "CloudNative.CloudEvents": {
         "type": "Direct",
         "requested": "[2.8.0, )",

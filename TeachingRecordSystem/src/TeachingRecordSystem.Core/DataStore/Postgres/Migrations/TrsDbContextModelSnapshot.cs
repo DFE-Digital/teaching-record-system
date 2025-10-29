@@ -3722,6 +3722,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("total_count");
 
+                    b.Property<int>("WarningCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("warning_count");
+
                     b.HasKey("IntegrationTransactionId")
                         .HasName("pk_integration_transactions");
 

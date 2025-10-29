@@ -141,7 +141,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .SingleRandom();
         var person = await TestData.CreatePersonAsync();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

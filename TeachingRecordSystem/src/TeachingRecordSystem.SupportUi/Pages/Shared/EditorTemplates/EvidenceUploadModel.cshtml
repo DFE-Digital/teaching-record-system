@@ -1,6 +1,20 @@
 @using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence
+@model TeachingRecordSystem.SupportUi.Pages.Shared.Evidence.EvidenceUploadModel
 
-@model EvidenceUploadModel
+@*
+    Note: This has to be an editor template rather than a view component otherwise the HtmlFieldPrefix is not set and
+    complex object model binding doesn't work properly
+*@
+
+@inject TeachingRecordSystem.Core.Services.Files.IFileService fileService
+@inject SupportUiLinkGenerator linkGenerator
+@{
+    if (Model.UploadedEvidenceFile is UploadedEvidenceFile file)
+    {
+        var fileUrl = await fileService.GetFileUrlAsync(file.FileId, UiDefaults.FileUrlExpiry);
+        file.PreviewUrl = linkGenerator.Files.File(file.FileName, fileUrl);
+    }
+}
 
 <govuk-radios for="UploadEvidence" data-testid="upload-evidence-options">
     <govuk-radios-fieldset>

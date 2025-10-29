@@ -428,7 +428,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal("/support-tasks/npq-trn-requests", response.Headers.Location?.OriginalString);
 
         // person record is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == matchedPerson.PersonId);
@@ -452,7 +452,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         });
 
         // support task is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedSupportTask = await dbContext
                 .SupportTasks
@@ -539,7 +539,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == matchedPerson.PersonId);
@@ -583,7 +583,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         // support task is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedSupportTask = await dbContext
                 .SupportTasks
@@ -654,7 +654,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         var personId = Guid.Parse(linkToPersonRecord.AsSpan("/persons/".Length));
 
         // person record is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons
                 .SingleAsync(p => p.PersonId == personId);
@@ -668,7 +668,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         });
 
         // support task is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedSupportTask = await dbContext
                 .SupportTasks

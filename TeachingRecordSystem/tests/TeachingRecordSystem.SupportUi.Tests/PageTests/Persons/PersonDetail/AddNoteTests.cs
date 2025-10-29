@@ -48,7 +48,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}/notes", response.Headers.Location?.OriginalString);
 
-        var note = await WithDbContext(dbContext => dbContext.Notes.SingleOrDefaultAsync(n => n.PersonId == person.PersonId));
+        var note = await WithDbContextAsync(dbContext => dbContext.Notes.SingleOrDefaultAsync(n => n.PersonId == person.PersonId));
         Assert.NotNull(note);
         Assert.Equal(text, note.Content);
         Assert.Null(note.FileId);
@@ -76,7 +76,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder
             {
                 { "Text", text },
-                { "File", CreateEvidenceFileBinaryContent(), "Attachment.jpeg" }
+                { "File", (CreateEvidenceFileBinaryContent(), "Attachment.jpeg") }
             }
         };
 
@@ -87,7 +87,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}/notes", response.Headers.Location?.OriginalString);
 
-        var note = await WithDbContext(dbContext => dbContext.Notes.SingleOrDefaultAsync(n => n.PersonId == person.PersonId));
+        var note = await WithDbContextAsync(dbContext => dbContext.Notes.SingleOrDefaultAsync(n => n.PersonId == person.PersonId));
         Assert.NotNull(note);
         Assert.Equal(text, note.Content);
         Assert.NotNull(note.FileId);
@@ -109,7 +109,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

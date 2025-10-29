@@ -190,7 +190,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert changed");
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedAlert = await dbContext.Alerts.FirstOrDefaultAsync(a => a.AlertId == alert.AlertId);
             Assert.Equal(journeyInstance.State.EndDate, updatedAlert!.EndDate);
@@ -266,7 +266,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

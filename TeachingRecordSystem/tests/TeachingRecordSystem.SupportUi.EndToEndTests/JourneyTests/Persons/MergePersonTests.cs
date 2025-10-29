@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task MergePerson_PersonsMatchOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -47,7 +47,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerLinksToPersonRecord(person2.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task MergePerson_PersonsDifferOnAllFields()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -100,7 +100,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerLinksToPersonRecord(person1.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task MergePerson_NavigateBack()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -159,7 +159,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task MergePerson_CYA_ChangePrimaryPerson_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -218,7 +218,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task MergePerson_CYA_ChangeDetails_NavigatesBackToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -277,7 +277,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task MergePerson_CYA_ChangePrimaryPerson_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p
@@ -347,7 +347,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnPersonDetailPageAsync(person1.PersonId);
     }
-    [Test]
+    [Fact]
     public async Task MergePerson_CYA_ChangeDetails_ContinuesToCYA()
     {
         var person1 = await TestData.CreatePersonAsync(p => p

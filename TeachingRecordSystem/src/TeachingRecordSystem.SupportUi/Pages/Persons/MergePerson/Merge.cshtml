@@ -117,7 +117,7 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
-            <vc:upload-evidence evidence="@Model.Evidence" expression="Evidence" />
+            @Html.EditorFor(m => m.Evidence)
 
             <govuk-textarea for="Comments" label-class="govuk-label--s" />
 

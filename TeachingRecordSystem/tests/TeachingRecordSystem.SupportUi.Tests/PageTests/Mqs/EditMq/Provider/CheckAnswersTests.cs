@@ -158,7 +158,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
             Assert.Equal(newProvider.MandatoryQualificationProviderId, qualification.ProviderId);
@@ -250,7 +250,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
             Assert.Equal(oldProvider.MandatoryQualificationProviderId, qualification.ProviderId);
@@ -265,7 +265,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

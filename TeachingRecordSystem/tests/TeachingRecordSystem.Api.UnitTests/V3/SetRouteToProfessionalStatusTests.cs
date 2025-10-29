@@ -1,8 +1,6 @@
-using TeachingRecordSystem.Api.V3.Implementation.Operations;
-
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class SetRouteToProfessionalStatusTests : OperationTestBase
+public class SetRouteToProfessionalStatusTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
 {
     //HandleAsync_PersonDoesNotExist_ReturnsError
     //HandleAsync_RouteTypeIsNotPermitted_ReturnsError
@@ -17,9 +15,4 @@ public class SetRouteToProfessionalStatusTests : OperationTestBase
     //HandleAsync_RouteAlreadyExistsAndIsWithdrawn_ReturnsError
     //HandleAsync_ValidRequestForRouteThatAlreadyExists_UpdatesRouteAndReturnsSuccess
     //HandleAsync_ValidRequestForRouteThatDoesNotExist_CreatesRouteAndReturnsSuccess
-
-    private static SetRouteToProfessionalStatusCommand CreateCommand(Action<SetRouteToProfessionalStatusCommand>? configure = null)
-    {
-        throw new NotImplementedException();
-    }
 }

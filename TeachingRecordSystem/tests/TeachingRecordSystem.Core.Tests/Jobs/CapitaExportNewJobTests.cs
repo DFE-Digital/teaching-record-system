@@ -1,12 +1,11 @@
 using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
+using Azure.Storage.Files.DataLake;
+using Azure.Storage.Files.DataLake.Models;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
-using TeachingRecordSystem.Core.Services.Files;
+
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -19,8 +18,6 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
 
     private TestData TestData => Fixture.TestData;
 
-    private CapitaExportNewJob Job => Fixture.Job;
-
     private const int EXPECTED_ROW_LENGTH = 86;
 
 
@@ -29,6 +26,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportNewJob),
@@ -66,6 +64,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportNewJob),
@@ -95,6 +94,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     public async Task GetNewPersons_NoRecordsCreatedAfterLastRunDate_ReturnsExpectedRecords()
     {
         // Arrange
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var lastRunDate = Clock.UtcNow.AddDays(1);
 
         // Act
@@ -108,6 +109,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     public async Task GetNewPersons_CreatedAferLastRunDateWithoutTrn_ReturnsExpectedRecords()
     {
         // Arrange
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var lastRunDate = DateTime.UtcNow.AddDays(-2);
         var person1 = await TestData.CreatePersonAsync();
         var person2 = await TestData.CreatePersonAsync();
@@ -128,6 +131,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
             x.WithGender(gender);
@@ -161,6 +165,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var newLastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
@@ -168,7 +173,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
-        var @nameChangeEvent = new PersonDetailsUpdatedEvent
+        var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddYears(-2),
@@ -183,7 +188,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -213,6 +218,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         Gender gender = Gender.Male;
         var person1 = await TestData.CreatePersonAsync(x =>
         {
@@ -246,6 +252,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
             x.WithGender(Gender.Male);
@@ -278,6 +285,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
             x.WithGender(Gender.Male);
@@ -312,6 +320,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var person1 = await TestData.CreatePersonAsync(x =>
         {
             x.WithGender(Gender.Male);
@@ -348,6 +357,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var newLastName = Faker.Name.Last();
         var originalastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
@@ -357,7 +367,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
-        var @nameChangeEvent = new PersonDetailsUpdatedEvent
+        var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddYears(-2),
@@ -372,7 +382,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -394,6 +404,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var previousNameCreatedOn = Clock.UtcNow.AddHours(-1);
         var newLastName = Faker.Name.Last();
         var originalastName = Faker.Name.Last();
@@ -403,7 +414,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, null, Clock.UtcNow);
-        var @nameChangeEvent = new PersonDetailsUpdatedEvent
+        var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddYears(-2),
@@ -418,7 +429,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -440,6 +451,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var newLastName = new string('x', 60);
         var originalastName = new string('a', 75);
         var person1 = await TestData.CreatePersonAsync(x =>
@@ -448,7 +460,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, newLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
-        var @nameChangeEvent = new PersonDetailsUpdatedEvent
+        var nameChangeEvent = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddYears(-2),
@@ -463,7 +475,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -485,6 +497,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var updateLastName1 = Faker.Name.Last();
         var updateLastName2 = Faker.Name.Last();
         var updateLastName3 = Faker.Name.Last();
@@ -497,7 +510,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
 
         // first marriage
         var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName1, person1.DateOfBirth, null, null, null, Clock.UtcNow.AddYears(-3));
-        var @nameChangeEvent1 = new PersonDetailsUpdatedEvent
+        var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddYears(-3),
@@ -512,11 +525,11 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
 
         // second marriage
         var updateresult2 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName2, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow.AddYears(-1));
-        var @nameChangeEvent2 = new PersonDetailsUpdatedEvent
+        var nameChangeEvent2 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow.AddYears(-2),
@@ -531,11 +544,11 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult2.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent2!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent2);
 
         // third marriage
         var updateresult3 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName3, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow.AddYears(-1));
-        var @nameChangeEvent3 = new PersonDetailsUpdatedEvent
+        var nameChangeEvent3 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -550,7 +563,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult3.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent3!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent3);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -572,6 +585,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         await dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync();
         var expectedTotalRowCount = 1;
         var expectedTotalSuccessCount = 1;
@@ -589,6 +603,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         };
         dbContext.JobMetadata.Add(jobMetaData);
         await dbContext.SaveChangesAsync();
+        dbContext.Entry(jobMetaData).State = EntityState.Detached;
         var originalastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
@@ -656,6 +671,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         dbContext.JobMetadata.Add(jobMetaData);
         var originalastName = Faker.Name.Last();
         await dbContext.SaveChangesAsync();
+        dbContext.Entry(jobMetaData).State = EntityState.Detached;
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
 
         // Act
         var integrationTransactionJobId = await Job.ExecuteAsync(CancellationToken.None);
@@ -694,6 +711,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         };
         dbContext.JobMetadata.Add(jobMetaData);
         await dbContext.SaveChangesAsync();
+        dbContext.Entry(jobMetaData).State = EntityState.Detached;
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var originalastName = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
         {
@@ -702,7 +721,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         });
         var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var updateresult1 = trsPerson.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
-        var @nameChangeEvent1 = new PersonDetailsUpdatedEvent
+        var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -717,7 +736,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult1.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -750,30 +769,26 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
-        var job = new CapitaExportNewJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock);
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
+        var job = new CapitaExportNewJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock);
         var expectedTotalRowCount = 4;
         var expectedTotalSuccessCount = 4;
         var expectedFailureCount = 0;
@@ -790,6 +805,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         };
         dbContext.JobMetadata.Add(jobMetaData);
         await dbContext.SaveChangesAsync();
+        dbContext.Entry(jobMetaData).State = EntityState.Detached;
         var originalastName1 = Faker.Name.Last();
         var updateLastName1 = Faker.Name.Last();
         var person1 = await TestData.CreatePersonAsync(x =>
@@ -807,7 +823,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         var trsPerson1 = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
         var trsPerson2 = await dbContext.Persons.FirstAsync(x => x.PersonId == person2.PersonId);
         var updateresult1 = trsPerson1.UpdateDetails(person1.FirstName, person1.MiddleName, updateLastName1, person1.DateOfBirth, null, null, person1.Gender, Clock.UtcNow);
-        var @nameChangeEvent1 = new PersonDetailsUpdatedEvent
+        var nameChangeEvent1 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -824,7 +840,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         };
 
         var updateresult2 = trsPerson2.UpdateDetails(person2.FirstName, person2.MiddleName, updateLastName2, person2.DateOfBirth, null, null, person2.Gender, Clock.UtcNow);
-        var @nameChangeEvent2 = new PersonDetailsUpdatedEvent
+        var nameChangeEvent2 = new PersonDetailsUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
@@ -839,8 +855,8 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)updateresult2.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent1!);
-        await dbContext.AddEventAndBroadcastAsync(@nameChangeEvent2!);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
+        dbContext.AddEventWithoutBroadcast(nameChangeEvent2);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -898,9 +914,11 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
     }
 
     [Fact]
-    public void GetFileName_ReturnsExpectedFileName()
+    public async Task GetFileName_ReturnsExpectedFileName()
     {
         // Arrange
+        await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
+        var Job = new CapitaExportNewJob(Fixture.DataLakeServiceClient.Object, Fixture.Logger.Object, dbContext, Clock);
         var expectedFileName = $"Reg01_DTR_{Clock.UtcNow.ToString("yyyyMMdd")}_{Clock.UtcNow.ToString("HHmmss")}_New.txt"; ;
 
         // Act
@@ -940,33 +958,28 @@ public class CapitaExportNewJobFixture
 
         Logger = new Mock<ILogger<CapitaExportNewJob>>();
 
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        DataLakeServiceClient = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        DataLakeServiceClient
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
-
-        Job = ActivatorUtilities.CreateInstance<CapitaExportNewJob>(provider, blobServiceClientMock.Object, Logger.Object, Clock);
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            DbFixture.DbHelper.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);
@@ -980,9 +993,5 @@ public class CapitaExportNewJobFixture
 
     public Mock<ILogger<CapitaExportNewJob>> Logger { get; }
 
-    public CapitaExportNewJob Job { get; }
-
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
-
-    public Mock<BlobServiceClient> BlobServiceClient { get; } = new Mock<BlobServiceClient>();
+    public Mock<DataLakeServiceClient> DataLakeServiceClient { get; }
 }

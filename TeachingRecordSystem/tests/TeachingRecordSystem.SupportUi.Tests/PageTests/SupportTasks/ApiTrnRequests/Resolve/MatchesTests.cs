@@ -83,7 +83,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             .WithNationalInsuranceNumber(TestData.GenerateNationalInsuranceNumber())
             .WithGender(TestData.GenerateGender()));
 
-        var firstMatch = await WithDbContext(
+        var firstMatch = await WithDbContextAsync(
             dbContext => dbContext.Persons.SingleAsync(
                 p => p.PersonId == supportTask.TrnRequestMetadata!.Matches!.MatchedPersons.First().PersonId));
 

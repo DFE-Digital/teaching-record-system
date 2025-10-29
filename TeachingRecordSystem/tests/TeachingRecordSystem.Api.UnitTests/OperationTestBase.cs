@@ -10,42 +10,33 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
-public abstract class OperationTestBase
+public abstract class OperationTestBase : IDisposable
 {
-    [SharedDependenciesDataSource]
-    public required IServiceProvider Services { get; init; }
+    private readonly TransactionScope _transactionScope;
 
-    [Before(Test)]
-    public void TestSetup(TestContext context)
+    protected OperationTestBase(OperationTestFixture operationTestFixture)
     {
-        var transactionScope = new TransactionScope(
+        _transactionScope = new TransactionScope(
             TransactionScopeOption.RequiresNew,
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
-        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
 
-        var testScopedServices = TestScopedServices.Reset(Services);
-        testScopedServices.EventObserver.Clear();
+        TestScopedServices.Reset(operationTestFixture.Services);
 
-        context.AddAsyncLocalValues();
+        Services = operationTestFixture.Services;
     }
 
-    [After(Test)]
-    public void TestTeardown(TestContext context)
-    {
-        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
-        {
-            txn.Dispose();
-        }
-    }
+    public virtual void Dispose() => _transactionScope.Dispose();
 
-    protected TestableClock Clock => (TestableClock)Services.GetRequiredService<IClock>();
+    public IServiceProvider Services { get; }
+
+    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
 
     protected ICurrentUserProvider CurrentUserProvider => Services.GetRequiredService<ICurrentUserProvider>();
 
-    protected DbFixture DbFixture => Services.GetRequiredService<DbFixture>();
-
     protected DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     protected TestData TestData => Services.GetRequiredService<TestData>();
 
@@ -77,10 +68,6 @@ public abstract class OperationTestBase
         return error;
     }
 
-    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) => DbFixture.WithDbContextAsync(action);
-
-    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) => DbFixture.WithDbContextAsync(action);
-
     protected async Task<ApiResult<TResult>> ExecuteCommandAsync<TResult>(ICommand<TResult> command)
         where TResult : notnull
     {
@@ -93,4 +80,10 @@ public abstract class OperationTestBase
 
         return result;
     }
+
+    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
+        DbContextFactory.WithDbContextAsync(action);
+
+    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 }

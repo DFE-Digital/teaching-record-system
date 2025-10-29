@@ -161,7 +161,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.True(journeyInstance.Completed);
 
         Guid qualificationId = default;
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleOrDefaultAsync(q => q.PersonId == person.PersonId);
             Assert.NotNull(qualification);
@@ -239,7 +239,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var qualifications = await dbContext.MandatoryQualifications.Where(q => q.PersonId == person.PersonId).ToArrayAsync();
             Assert.Empty(qualifications);
@@ -252,7 +252,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

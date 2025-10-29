@@ -2,11 +2,11 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks
 
 public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task CreateNewRecord()
     {
         // Start with a blank slate of tasks
-        await WithDbContext(dbContext =>
+        await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -33,11 +33,11 @@ public class ApiTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerLinksToPersonRecord();
     }
 
-    [Test]
+    [Fact]
     public async Task UpdateExisting()
     {
         // Start with a blank slate of tasks
-        await WithDbContext(dbContext =>
+        await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
 
         var match = await TestData.CreatePersonAsync();

@@ -270,7 +270,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

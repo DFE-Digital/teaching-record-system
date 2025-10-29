@@ -64,7 +64,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             TrnRequestMetadata = null
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(createdEvent);
             await dbContext.SaveChangesAsync();
@@ -132,7 +132,7 @@ public class ChangeLogCreateEventTests(HostFixture hostFixture) : TestBase(hostF
             TrnRequestMetadata = null
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(createdEvent);
             await dbContext.SaveChangesAsync();

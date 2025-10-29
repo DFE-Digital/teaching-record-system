@@ -2,14 +2,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public class SetStatusTests : TestBase
+public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public SetStatusTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
-    [Test]
+    [Fact]
     public async Task Deactivate()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -35,7 +30,7 @@ public class SetStatusTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: "Ethelred The Unready’s record has been deactivated");
     }
 
-    [Test]
+    [Fact]
     public async Task Reactivate()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -43,7 +38,7 @@ public class SetStatusTests : TestBase
             .WithMiddleName("The")
             .WithLastName("Unready"));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;
@@ -68,7 +63,7 @@ public class SetStatusTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: "Ethelred The Unready’s record has been reactivated");
     }
 
-    [Test]
+    [Fact]
     public async Task Deactivate_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -96,7 +91,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task Reactivate_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -104,7 +99,7 @@ public class SetStatusTests : TestBase
             .WithMiddleName("The")
             .WithLastName("Unready"));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;
@@ -131,7 +126,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task Deactivate_CYA_ChangeReason_ContinuesToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -159,7 +154,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
     }
 
-    [Test]
+    [Fact]
     public async Task Reactivate_CYA_ChangeReason_ContinuesToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -167,7 +162,7 @@ public class SetStatusTests : TestBase
             .WithMiddleName("The")
             .WithLastName("Unready"));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;
@@ -194,7 +189,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
     }
 
-    [Test]
+    [Fact]
     public async Task Deactivate_CYA_NavigatesBackToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -228,7 +223,7 @@ public class SetStatusTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task Reactivate_CYA_NavigatesBackToCYA()
     {
         var person = await TestData.CreatePersonAsync(p => p
@@ -236,7 +231,7 @@ public class SetStatusTests : TestBase
             .WithMiddleName("The")
             .WithLastName("Unready"));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

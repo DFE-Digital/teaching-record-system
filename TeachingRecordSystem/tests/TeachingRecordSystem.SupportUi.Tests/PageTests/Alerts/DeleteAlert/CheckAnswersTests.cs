@@ -167,7 +167,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert deleted");
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var alertExists = await dbContext.Alerts.AnyAsync(a => a.AlertId == alert.AlertId);
             Assert.False(alertExists);
@@ -239,7 +239,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

@@ -60,7 +60,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             Induction = induction
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(createdEvent);
             await dbContext.SaveChangesAsync();
@@ -142,7 +142,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             DqtState = (int)dfeta_inductionState.Active
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(importedEvent);
             await dbContext.SaveChangesAsync();
@@ -191,7 +191,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             Induction = induction
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(deactivatedEvent);
             await dbContext.SaveChangesAsync();
@@ -240,7 +240,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             Induction = induction
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(reactivatedEvent);
             await dbContext.SaveChangesAsync();
@@ -332,7 +332,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             Changes = changes
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();
@@ -442,7 +442,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             DqtInductionStatus = dqtInductionStatus
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(migratedEvent);
             await dbContext.SaveChangesAsync();
@@ -512,7 +512,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             OldInductionStatus = oldInductionStatus.ToString()
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(statusChangedEvent);
             await dbContext.SaveChangesAsync();
@@ -623,7 +623,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             EvidenceFile = evidenceFile
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();
@@ -788,7 +788,7 @@ public class ChangeLogInductionEventTests(HostFixture hostFixture) : TestBase(ho
             EvidenceFile = null
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();

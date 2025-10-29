@@ -110,7 +110,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "UploadEvidence", "False" }
+                { "Evidence.UploadEvidence", "False" }
             }
         };
 
@@ -133,7 +133,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                 { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() }
+                 { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() },
+                 { "Evidence.UploadEvidence", "" }
             }
         };
 
@@ -141,7 +142,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -157,7 +158,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContentBuilder
             {
                  { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() },
-                 { "UploadEvidence", "True" }
+                 { "Evidence.UploadEvidence", "True" }
             }
         };
 
@@ -165,7 +166,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Test]
@@ -179,7 +180,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var multipartContent = CreateFormFileUpload(".cs");
         multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
         multipartContent.Add(new StringContent("My deletion reason detail"), "DeletionReasonDetail");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
+        multipartContent.Add(new StringContent("True"), "Evidence.UploadEvidence");
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -190,7 +191,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -204,7 +205,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
         multipartContent.Add(new StringContent("True"), "HasAdditionalReasonDetail");
         multipartContent.Add(new StringContent("My deletion reason detail"), "DeletionReasonDetail");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
+        multipartContent.Add(new StringContent("True"), "Evidence.UploadEvidence");
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -247,7 +248,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;
@@ -278,7 +279,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var multipartContent = new MultipartFormDataContent
         {
-            { byteArrayContent, "EvidenceFile", $"evidence{fileExtension}" }
+            { byteArrayContent, "Evidence.EvidenceFile", $"evidence{fileExtension}" }
         };
 
         return multipartContent;

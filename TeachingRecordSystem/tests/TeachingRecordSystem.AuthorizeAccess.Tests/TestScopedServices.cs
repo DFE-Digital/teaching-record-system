@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -17,7 +18,8 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddTestScoped<IClock>(tss => tss.Clock)
+            .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<IEventObserver>(new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object);
 
     public static TestScopedServices GetCurrent() =>
@@ -40,6 +42,16 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 
     public Mock<IFileService> BlobStorageFileService { get; }
+
+    private class ForwardToTestScopedClock : IClock
+    {
+        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+    }
+
+    private class ForwardToTestScopedEventObserver : IEventObserver
+    {
+        public void OnEventCreated(LegacyEvents.EventBase @event) => GetCurrent().EventObserver.OnEventCreated(@event);
+    }
 }
 
 file static class ServiceCollectionExtensions

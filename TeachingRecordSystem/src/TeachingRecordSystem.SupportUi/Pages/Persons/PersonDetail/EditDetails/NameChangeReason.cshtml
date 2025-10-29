@@ -29,7 +29,7 @@
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <vc:upload-evidence evidence="@Model.Evidence" expression="Evidence" />
+            @Html.EditorFor(m => m.Evidence)
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>

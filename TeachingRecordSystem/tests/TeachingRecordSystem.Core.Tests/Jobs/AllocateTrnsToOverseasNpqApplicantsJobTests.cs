@@ -52,7 +52,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         FileStorageService.WriteFile(AllocateTrnsToOverseasNpqApplicantsJob.ContainerName, $"{AllocateTrnsToOverseasNpqApplicantsJob.PendingFolderName}/import.csv",
             $"""
             {InputCsvHeaders}
-            
+
             """);
 
         var job = CreateAllocateTrnsToOverseasNpqApplicantsJob();
@@ -68,7 +68,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         Assert.Equal(
             $"""
             {OutputCsvHeaders}
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -79,7 +79,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         FileStorageService.WriteFile(AllocateTrnsToOverseasNpqApplicantsJob.ContainerName, $"{AllocateTrnsToOverseasNpqApplicantsJob.PendingFolderName}/import.csv",
             $"""
             {InputCsvHeaders}
-            
+
             """);
 
         var job = CreateAllocateTrnsToOverseasNpqApplicantsJob();
@@ -93,7 +93,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
         Assert.Equal(
             $"""
             {OutputCsvHeaders}
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -235,7 +235,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,12/31/2001,jim.smith@email.com,,,,,Validation errors,Date of Birth is in an incorrect format,,
             Jim,,Smith,1 Jan 2001,jim.smith@email.com,,,,,Validation errors,Date of Birth is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim.smith@email.com,,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -272,7 +272,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email,,,,,Validation errors,Email Address is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim@.com,,,,,Validation errors,Email Address is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim@email.com,,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -309,7 +309,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email.com,QV123456E,,,,Validation errors,NI Number is in an incorrect format,,
             Jim,,Smith,01/01/2001,jim@email.com,AB123456C,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 1},
             Jim,,Smith,01/01/2001,jim@email.com,AB 12 34 56 C,,,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -348,7 +348,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
             Jim,,Smith,01/01/2001,jim@email.com,,,Male,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 2},
             Jim,,Smith,01/01/2001,jim@email.com,,,Female,,TRN allocated,,{TrnGenerator.LastGeneratedTrn - 1},
             Jim,,Smith,01/01/2001,jim@email.com,,,Other,,TRN allocated,,{TrnGenerator.LastGeneratedTrn},
-            
+
             """, file.Content, ignoreLineEndingDifferences: true);
     }
 
@@ -587,12 +587,12 @@ public class AllocateTrnsToOverseasNpqApplicantsJobFixture : IAsyncLifetime
         Clock = new();
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);
 
-        DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
+        DbContext = dbFixture.DbContextFactory.CreateDbContext();
         TrnGenerator = trnGenerator;
     }
 

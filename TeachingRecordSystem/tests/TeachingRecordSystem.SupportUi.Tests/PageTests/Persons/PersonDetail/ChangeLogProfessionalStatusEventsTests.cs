@@ -195,7 +195,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Update(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -301,7 +301,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Update(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -384,7 +384,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var updatedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Update(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -454,7 +454,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Delete(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -509,7 +509,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Delete(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -548,7 +548,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Delete(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -587,7 +587,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Delete(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -626,7 +626,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             professionalStatus.Delete(
                 allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
@@ -800,7 +800,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             OldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person.Person)
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(migratedEvent);
             await dbContext.SaveChangesAsync();
@@ -876,7 +876,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             }
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(createdEvent);
             await dbContext.SaveChangesAsync();
@@ -922,7 +922,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             Changes = DqtInitialTeacherTrainingUpdatedEventChanges.Result
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();
@@ -973,7 +973,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             }
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(createdEvent);
             await dbContext.SaveChangesAsync();
@@ -1069,7 +1069,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             Changes = changes
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();

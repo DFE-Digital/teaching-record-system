@@ -36,7 +36,7 @@ public abstract class AddRouteCommonPageModel(
     protected SupportUiLinkGenerator LinkGenerator => linkGenerator;
 
     protected ReferenceDataCache ReferenceDataCache => referenceDataCache;
-    protected EvidenceUploadManager EvidenceController { get; } = evidenceController;
+    protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceController;
 
     public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
 
@@ -64,7 +64,7 @@ public abstract class AddRouteCommonPageModel(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
+        await EvidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(LinkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

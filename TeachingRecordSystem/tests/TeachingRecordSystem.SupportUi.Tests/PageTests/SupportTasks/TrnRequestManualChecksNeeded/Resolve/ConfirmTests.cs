@@ -74,7 +74,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal("/support-tasks/manual-checks-needed", response.Headers.Location?.ToString());
 
-        var updatedSupportTask = await WithDbContext(dbContext => dbContext
+        var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);

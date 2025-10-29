@@ -53,7 +53,7 @@ public class OtherDetailsChangeReasonModel(
             ModelState.AddModelError(nameof(ReasonDetail), "Enter a reason");
         }
 
-        await EvidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await EvidenceUploadManager.ValidateAndUploadAsync<OtherDetailsChangeReasonModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

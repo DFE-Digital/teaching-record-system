@@ -155,14 +155,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         AssertEx.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}");
 
-        var primaryPerson = await WithDbContext(dbContext => dbContext.Persons
+        var primaryPerson = await WithDbContextAsync(dbContext => dbContext.Persons
             .IgnoreQueryFilters()
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personA.PersonId));
         Assert.Equal(PersonStatus.Active, primaryPerson.Status);
         Assert.Null(primaryPerson.MergedWithPersonId);
 
-        var secondaryPerson = await WithDbContext(dbContext => dbContext.Persons
+        var secondaryPerson = await WithDbContextAsync(dbContext => dbContext.Persons
             .IgnoreQueryFilters()
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personB.PersonId));

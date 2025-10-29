@@ -109,6 +109,7 @@
     <None Remove="Services\DqtReporting\Migrations\0077_TrsIntegrationTranactionFKCorrection.sql" />
     <None Remove="Services\DqtReporting\Migrations\0078_TrsPersonsCreatedByTps.sql" />
     <None Remove="Services\DqtReporting\Migrations\0082_TrsPersonDateOfDeath.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0093_RemoveITRPersonForeignKey.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -247,11 +248,15 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0090_AlterRouteToProfessionalTypeHoldsFromColumn.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0091_InsertRouteToProfessionalTypeData.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0092_Processes.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0093_RemoveITRPersonForeignKey.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0094_SupportTasksDeletedOn.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0095_IntegrationTransactionWarningCount.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" />
     <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="Azure.Storage.Files.DataLake" />
     <PackageReference Include="CloudNative.CloudEvents" />
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="CsvHelper" />

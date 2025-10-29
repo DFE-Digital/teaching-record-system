@@ -57,7 +57,7 @@ public class BatchSendInductionCompletedEmailsJobTests(NightlyEmailJobFixture db
 
         var job = new BatchSendInductionCompletedEmailsJob(
             jobOptions,
-            Fixture.DbFixture.GetDbContextFactory(),
+            Fixture.DbFixture.DbContextFactory,
             backgroundJobScheduler.Object,
             Clock);
 

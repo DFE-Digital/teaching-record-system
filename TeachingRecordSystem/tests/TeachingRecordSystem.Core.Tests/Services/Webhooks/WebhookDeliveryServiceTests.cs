@@ -20,7 +20,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -51,7 +51,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -76,7 +76,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -98,7 +98,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -128,7 +128,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 
@@ -182,7 +182,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
 
         var service = new WebhookDeliveryService(
             senderMock.Object,
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             Clock,
             new NullLogger<WebhookDeliveryService>());
 

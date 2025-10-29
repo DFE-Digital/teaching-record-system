@@ -25,7 +25,7 @@ public class ChangeLogSetStatusEventTests(HostFixture hostFixture) : TestBase(ho
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;
@@ -54,7 +54,7 @@ public class ChangeLogSetStatusEventTests(HostFixture hostFixture) : TestBase(ho
             DateOfDeath = null
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(statusUpdatedEvent);
             await dbContext.SaveChangesAsync();
@@ -112,7 +112,7 @@ public class ChangeLogSetStatusEventTests(HostFixture hostFixture) : TestBase(ho
             DateOfDeath = null
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(statusUpdatedEvent);
             await dbContext.SaveChangesAsync();

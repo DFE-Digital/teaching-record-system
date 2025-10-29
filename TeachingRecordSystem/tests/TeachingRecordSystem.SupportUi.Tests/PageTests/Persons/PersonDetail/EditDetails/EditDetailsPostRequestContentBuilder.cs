@@ -1,5 +1,4 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -15,9 +14,7 @@ public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
     public Gender? Gender { get; set; }
     public object? Reason { get; set; }
     public string? ReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public (HttpContent, string)? EvidenceFile { get; set; }
-    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
+    public TestEvidenceUploadModel Evidence { get; set; } = new();
 
     public EditDetailsPostRequestContentBuilder WithFirstName(string? firstName)
     {
@@ -82,15 +79,15 @@ public class EditDetailsPostRequestContentBuilder : PostRequestContentBuilder
 
     public EditDetailsPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
-        UploadEvidence = uploadEvidence;
-        EvidenceFile = evidenceFile;
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.EvidenceFile = evidenceFile;
         return this;
     }
 
     public EditDetailsPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
-        UploadEvidence = uploadEvidence;
-        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
         {
             FileId = id,
             FileName = evidenceFileName ?? "filename.jpg",

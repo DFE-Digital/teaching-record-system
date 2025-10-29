@@ -10,8 +10,7 @@ namespace TeachingRecordSystem.Api.UnitTests.V3;
 
 public class CreateTrnRequestTests : OperationTestBase
 {
-    [Before(Test)]
-    public void ConfigureMocks()
+    public CreateTrnRequestTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
     {
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
@@ -24,7 +23,7 @@ public class CreateTrnRequestTests : OperationTestBase
             });
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_RequestForSameUserAndIdAlreadyExists_ReturnsError()
     {
         // Arrange
@@ -45,7 +44,7 @@ public class CreateTrnRequestTests : OperationTestBase
         AssertError(result, 10029);  // Cannot resubmit request
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_WithNino_NormalizesNino()
     {
         // Arrange
@@ -68,7 +67,7 @@ public class CreateTrnRequestTests : OperationTestBase
         Assert.Equal(expectedNormalizedInsuranceNumber, metadata.NationalInsuranceNumber);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_WithNoEmail_Succeeds()
     {
         // Arrange
@@ -84,7 +83,7 @@ public class CreateTrnRequestTests : OperationTestBase
         AssertSuccess(result);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_WithNoNino_Succeeds()
     {
         // Arrange
@@ -100,8 +99,8 @@ public class CreateTrnRequestTests : OperationTestBase
         AssertSuccess(result);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetPotentialMatchCombinationsData))]
+    [Theory]
+    [MemberData(nameof(GetPotentialMatchCombinationsData))]
     public async Task HandleAsync_MatchingExistingPersonOnTwoNamesAndDateOfBirth_ReturnsPendingStatusAndCreatesSupportTask(MatchedField[] matchedFields)
     {
         // Arrange
@@ -165,7 +164,7 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_MatchingExistingPersonOnTrsNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePersonOrSupportTask()
     {
         // Arrange
@@ -202,7 +201,7 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_MatchingExistingPersonOnTrsNinoOnly_CreatesSupportTask()
     {
         // Arrange
@@ -240,7 +239,7 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_MatchingExistingPersonOnEmailOnly_CreatesSupportTask()
     {
         // Arrange
@@ -274,7 +273,7 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_MatchingMultipleExistingPersonsOnTrsNinoAndDob_CreatesSupportTask()
     {
         // Arrange
@@ -316,7 +315,7 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_MatchingExistingPersonOnWorkforceNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreatePerson()
     {
         // Arrange
@@ -363,7 +362,7 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_DefiniteMatchWithPersonDoesNotRequireFurthersChecks_ReturnsTrn()
     {
         // Arrange
@@ -413,7 +412,7 @@ public class CreateTrnRequestTests : OperationTestBase
         });
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_DefiniteMatchWithPersonDoesRequireFurthersChecks_CreatesSupportTaskAndDoesNotReturnTrn()
     {
         // Arrange
@@ -463,7 +462,7 @@ public class CreateTrnRequestTests : OperationTestBase
         });
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_NoMatches_CreatesPersonWithTrnButNoSupportTask()
     {
         // Arrange
@@ -614,7 +613,7 @@ public class CreateTrnRequestTests : OperationTestBase
         WorkforceNationalInsuranceNumber
     }
 
-    public static IEnumerable<object[]> GetPotentialMatchCombinationsData()
+    public static IEnumerable<ITheoryDataRow> GetPotentialMatchCombinationsData()
     {
         var allMatchFields = Enum.GetValues<MatchedField>();
 
@@ -632,12 +631,12 @@ public class CreateTrnRequestTests : OperationTestBase
             // Can't do potential matching against workforce data until this query is done wholly against the TRS DB
             // plus we don't have a great way to set up previous names yet
             .Except([MatchedField.WorkforceNationalInsuranceNumber, MatchedField.PreviousLastName])
-            .Permutations()
+            .Subsets()
             // Only consider combinations that include 3 distinct fields
             .Where(c => c.Select(field => fieldGroups.Single(g => g.Value.Contains(field))).Distinct().Count() >= 3)
             // DateOfBirth and Nino are considered a direct match rather than potential match
             .Where(c => !(c.Contains(MatchedField.DateOfBirth) &&
                           (c.Contains(MatchedField.TrsNationalInsuranceNumber) || c.Contains(MatchedField.WorkforceNationalInsuranceNumber))))
-            .Select(c => new object[] { c });
+            .Select(c => new TheoryDataRow(c.ToArray()));
     }
 }

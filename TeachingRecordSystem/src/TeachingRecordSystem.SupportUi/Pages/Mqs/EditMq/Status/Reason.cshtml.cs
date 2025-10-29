@@ -80,7 +80,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
             ModelState.AddModelError(nameof(StatusChangeReason), "Select a reason");
         }
 
-        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

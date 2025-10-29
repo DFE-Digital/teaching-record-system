@@ -1,6 +1,7 @@
 using Azure;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
+using Azure.Storage.Files.DataLake;
+using Azure.Storage.Files.DataLake.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -29,39 +30,43 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var expectedFailureCount = 0;
         var expectedTotalCount = 0;
         var expectedDuplicateCount = 0;
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
-
-        var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
+        var option = new CapitaTpsUserOption { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+
+        var job = new CapitaExportAmendJob(
+            dataLakeServiceClientMock.Object,
+            Fixture.Logger.Object,
+            dbContext,
+            Clock,
+            jobOption);
 
         // Act
         var integrationTransactionJobId = await job.ExecuteAsync(CancellationToken.None);
-        var integrationTransaction = dbContext.IntegrationTransactions.Include(x => x.IntegrationTransactionRecords).Single(x => x.IntegrationTransactionId == integrationTransactionJobId);
+        var integrationTransaction = dbContext.IntegrationTransactions
+            .Include(x => x.IntegrationTransactionRecords)
+            .Single(x => x.IntegrationTransactionId == integrationTransactionJobId);
 
         // Assert
         Assert.NotNull(integrationTransaction);
@@ -79,35 +84,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportAmendJob),
@@ -150,7 +151,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)dobChangedEvent.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent!);
+        dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -186,35 +187,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportAmendJob),
@@ -257,7 +254,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)changeEvent.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent!);
+        dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -292,35 +289,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var jobMetaData = new JobMetadata()
         {
             JobName = nameof(CapitaExportAmendJob),
@@ -364,7 +357,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             DetailsChangeEvidenceFile = null,
             Changes = (PersonDetailsUpdatedEventChanges)changeEvent.Changes
         };
-        await dbContext.AddEventAndBroadcastAsync(personUpdatedEvent!);
+        dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
         await dbContext.SaveChangesAsync();
 
         // Act
@@ -411,35 +404,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var lastName = new string('x', 25);
         var person = await TestData.CreatePersonAsync(x =>
         {
@@ -484,35 +473,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var lastName = "xx";
         var person = await TestData.CreatePersonAsync(x =>
         {
@@ -559,35 +544,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var person = await TestData.CreatePersonAsync(x =>
         {
             x.WithDateOfBirth(new DateOnly(1983, 01, 07));
@@ -635,35 +616,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
-            var blobServiceClientMock = new Mock<BlobServiceClient>();
-            var blobContainerClientMock = new Mock<BlobContainerClient>();
-            var blobClientMock = new Mock<BlobClient>();
-            blobServiceClientMock
-                .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-                .Returns(blobContainerClientMock.Object);
+            var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+            var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+            var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-            blobContainerClientMock
-                .Setup(c => c.CreateIfNotExistsAsync(
-                    PublicAccessType.None,
-                    null,
-                    null,
-                    It.IsAny<CancellationToken>()
-                ))
-                .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+            dataLakeServiceClientMock
+                .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+                .Returns(fileSystemClientMock.Object);
+            fileSystemClientMock
+                .Setup(f => f.CreateIfNotExistsAsync(
+                    It.IsAny<DataLakeFileSystemCreateOptions>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+            fileSystemClientMock
+                .Setup(f => f.GetFileClient(It.IsAny<string>()))
+                .Returns(dataLakeFileClientMock.Object);
 
-            blobContainerClientMock
-                .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-                .Returns(blobClientMock.Object);
-
-            blobClientMock
-                .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+            dataLakeFileClientMock
+                .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
             var user = await TestData.CreateApplicationUserAsync();
 
             var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
             var jobOption = Options.Create(option);
-            var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+            var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
             var person = await TestData.CreatePersonAsync(x =>
             {
                 x.WithDateOfBirth(new DateOnly(1983, 01, 07));
@@ -712,35 +689,32 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
 
         // Act
         var updateCode = job.GetUpdateCode(exportType);
@@ -754,35 +728,31 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
     {
         // Arrange
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
-        var blobServiceClientMock = new Mock<BlobServiceClient>();
-        var blobContainerClientMock = new Mock<BlobContainerClient>();
-        var blobClientMock = new Mock<BlobClient>();
-        blobServiceClientMock
-            .Setup(b => b.GetBlobContainerClient(It.IsAny<string>()))
-            .Returns(blobContainerClientMock.Object);
+        var dataLakeServiceClientMock = new Mock<DataLakeServiceClient>();
+        var fileSystemClientMock = new Mock<DataLakeFileSystemClient>();
+        var dataLakeFileClientMock = new Mock<DataLakeFileClient>();
 
-        blobContainerClientMock
-            .Setup(c => c.CreateIfNotExistsAsync(
-                PublicAccessType.None,
-                null,
-                null,
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(Mock.Of<Response<BlobContainerInfo>>());
+        dataLakeServiceClientMock
+            .Setup(s => s.GetFileSystemClient(It.IsAny<string>()))
+            .Returns(fileSystemClientMock.Object);
+        fileSystemClientMock
+            .Setup(f => f.CreateIfNotExistsAsync(
+                It.IsAny<DataLakeFileSystemCreateOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Files.DataLake.Models.FileSystemInfo>>());
+        fileSystemClientMock
+            .Setup(f => f.GetFileClient(It.IsAny<string>()))
+            .Returns(dataLakeFileClientMock.Object);
 
-        blobContainerClientMock
-            .Setup(c => c.GetBlobClient(It.IsAny<string>()))
-            .Returns(blobClientMock.Object);
-
-        blobClientMock
-            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+        dataLakeFileClientMock
+            .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         var user = await TestData.CreateApplicationUserAsync();
 
         var option = new CapitaTpsUserOption() { CapitaTpsUserId = user.UserId };
         var jobOption = Options.Create(option);
-        var job = new CapitaExportAmendJob(blobServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
+        var job = new CapitaExportAmendJob(dataLakeServiceClientMock.Object, Fixture.Logger.Object, dbContext, Clock, jobOption);
         var expectedFileName = $"Reg01_DTR_{Clock.UtcNow.ToString("yyyyMMdd")}_{Clock.UtcNow.ToString("HHmmss")}_Amend.txt"; ;
 
         // Act
@@ -822,7 +792,7 @@ public class CapitaExportAmendJobFixture
         Logger = new Mock<ILogger<CapitaExportAmendJob>>();
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);
