@@ -52,9 +52,11 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Successes</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>
-                        @Model.IntegrationTransaction!.SuccessesCount
-                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.SuccessesCount</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Warnings</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.WarningsCount</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Failures</govuk-summary-list-row-key>
@@ -137,6 +139,10 @@
                                     @if (result.Status == IntegrationTransactionRecordStatus.Success)
                                     {
                                         <span class="govuk-tag--green govuk-!-static-padding-1">@result.Status.GetDisplayName()</span>
+                                    }
+                                    else @if (result.Status == IntegrationTransactionRecordStatus.Warning)
+                                    {
+                                        <span class="govuk-tag--yellow govuk-!-static-padding-1">@result.Status.GetDisplayName()</span>
                                     }
                                     else @if (result.Status == IntegrationTransactionRecordStatus.Failure)
                                     {

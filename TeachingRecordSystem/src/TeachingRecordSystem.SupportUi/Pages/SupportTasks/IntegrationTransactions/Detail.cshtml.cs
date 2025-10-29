@@ -55,7 +55,7 @@ public class DetailModel(TrsDbContext context) : PageModel
         {
             IntegrationTransactionRecordSortByOption.IntegrationTransactionRecordId => r => r.IntegrationTransactionRecordId,
             IntegrationTransactionRecordSortByOption.Duplicate => r => r.Duplicate ?? false,
-            IntegrationTransactionRecordSortByOption.Status => r => r.Status,
+            IntegrationTransactionRecordSortByOption.Status => r => r.Status == IntegrationTransactionRecordStatus.Warning ? 1 : r.Status == IntegrationTransactionRecordStatus.Failure ? 2 : 0,
             IntegrationTransactionRecordSortByOption.Name => r => r.Person != null
                 ? r.Person.FirstName + " " + r.Person.LastName
                 : "Unknown",
@@ -71,6 +71,7 @@ public class DetailModel(TrsDbContext context) : PageModel
             ImportStatus: integrationTransaction.ImportStatus,
             TotalCount: integrationTransaction.TotalCount,
             SuccessesCount: integrationTransaction.SuccessCount,
+            WarningsCount: integrationTransaction.WarningCount,
             FailuresCount: integrationTransaction.FailureCount,
             DuplicatesCount: integrationTransaction.DuplicateCount,
             FileName: integrationTransaction.FileName
@@ -89,7 +90,6 @@ public class DetailModel(TrsDbContext context) : PageModel
             .ToList();
 
         HasFailures = IntegrationTransactionRecords.Any(r => r.Status == IntegrationTransactionRecordStatus.Failure);
-
 
         return Page();
     }
@@ -138,6 +138,7 @@ public record ItDetailResult(
     IntegrationTransactionImportStatus ImportStatus,
     int TotalCount,
     int SuccessesCount,
+    int WarningsCount,
     int FailuresCount,
     int DuplicatesCount,
     string FileName);

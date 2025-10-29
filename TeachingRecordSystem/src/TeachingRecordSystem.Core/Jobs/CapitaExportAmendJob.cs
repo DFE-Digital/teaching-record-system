@@ -32,6 +32,7 @@ public class CapitaExportAmendJob(BlobServiceClient blobServiceClient, ILogger<C
             ImportStatus = IntegrationTransactionImportStatus.InProgress,
             TotalCount = 0,
             SuccessCount = 0,
+            WarningCount = 0,
             FailureCount = 0,
             DuplicateCount = 0,
             FileName = fileName,

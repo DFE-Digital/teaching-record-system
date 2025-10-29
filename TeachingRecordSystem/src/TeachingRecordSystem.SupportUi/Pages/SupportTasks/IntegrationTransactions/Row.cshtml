@@ -50,7 +50,14 @@
         </govuk-summary-card>
     </div>
 
-    @if (Model.Row.Status == IntegrationTransactionRecordStatus.Failure)
+    @if (Model.Row.Status == IntegrationTransactionRecordStatus.Warning)
+    {
+        <div class="govuk-grid-column-full govuk-!-padding-top-0">
+            <govuk-inset-text>Some fields may have not been imported correctly. Review the row data.</govuk-inset-text>
+        </div>
+    }
+
+    @if (Model.Row.Status is IntegrationTransactionRecordStatus.Warning or IntegrationTransactionRecordStatus.Failure)
     {
         <div class="govuk-grid-column-full">
             <table class="govuk-table">

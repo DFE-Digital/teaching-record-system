@@ -78,6 +78,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         var records = csv.GetRecords<CapitaImportRecord>().ToList();
         var totalRowCount = 0;
         var successCount = 0;
+        var warningCount = 0;
         var duplicateRowCount = 0;
         var failureRowCount = 0;
         var failureMessage = new StringBuilder();
@@ -89,6 +90,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
             ImportStatus = IntegrationTransactionImportStatus.InProgress,
             TotalCount = 0,
             SuccessCount = 0,
+            WarningCount = 0,
             FailureCount = 0,
             DuplicateCount = 0,
             FileName = fileName,
@@ -108,6 +110,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                 var personId = default(Guid?);
                 var recordStatus = IntegrationTransactionRecordStatus.Success;
                 var potentialDuplicate = false;
+                var hasWarnings = warnings.Any();
                 var rowFailureMessage = new StringBuilder();
                 rowFailureMessage.Append(string.Concat(errors.Select(e => e + ",")));
                 rowFailureMessage.Append(string.Concat(warnings.Select(e => e + ",")));
@@ -224,20 +227,31 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
                         else if (ni is not null && person.NationalInsuranceNumber is not null && !person.NationalInsuranceNumber.Equals(row.NINumber))
                         {
                             rowFailureMessage.Append($"Warning: Attempted to update NationalInsuranceNumber from {person.NationalInsuranceNumber} to {row.NINumber}");
+                            hasWarnings = true;
                         }
 
                         // Gender is different to incomming record.
                         if (person.Gender is not null && (int?)person.Gender != row.Gender)
                         {
                             rowFailureMessage.Append($"Warning: Attempted to update gender from {person.Gender} to {(Gender?)row.Gender},");
+                            hasWarnings = true;
                         }
 
                         // lastname is different to incomming record
                         if (row.LastName is not null && !person.LastName.Equals(row.LastName, StringComparison.OrdinalIgnoreCase))
                         {
                             rowFailureMessage.Append($"Warning: Attempted to update lastname from {person.LastName} to {row.LastName},");
+                            hasWarnings = true;
                         }
-                        successCount++;
+                        if (hasWarnings)
+                        {
+                            recordStatus = IntegrationTransactionRecordStatus.Warning;
+                            warningCount++;
+                        }
+                        else
+                        {
+                            successCount++;
+                        }
                     }
                 }
 
@@ -266,6 +280,7 @@ public class CapitaImportJob(BlobServiceClient blobServiceClient, ILogger<Capita
         // mark job as complete
         integrationJob.TotalCount = totalRowCount;
         integrationJob.SuccessCount = successCount;
+        integrationJob.WarningCount = warningCount;
         integrationJob.FailureCount = failureRowCount;
         integrationJob.DuplicateCount = duplicateRowCount;
         integrationJob.ImportStatus = IntegrationTransactionImportStatus.Success;
