@@ -745,12 +745,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture),
             .SingleOrDefaultAsync(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest &&
                 t.TrnRequestMetadata!.ApplicationUserId == applicationUserId);
         var events = await dbContext.Events
-            .Where(e => e.EventName == nameof(SupportTaskCreatedEvent))
+            .Where(e => e.EventName == nameof(LegacyEvents.SupportTaskCreatedEvent))
             .ToListAsync();
         Assert.Single(events);
         var @event = events.Single();
 
-        var supportTaskCreatedEvent = JsonSerializer.Deserialize<SupportTaskCreatedEvent>(@event.Payload, EventBase.JsonSerializerOptions);
+        var supportTaskCreatedEvent = JsonSerializer.Deserialize<LegacyEvents.SupportTaskCreatedEvent>(@event.Payload, EventBase.JsonSerializerOptions);
         Assert.Equal(supportTask!.SupportTaskReference, supportTaskCreatedEvent!.SupportTask.SupportTaskReference);
 
         var data = supportTaskCreatedEvent.SupportTask.Data as NpqTrnRequestData;

@@ -14,7 +14,8 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateGenerateWebhookSignatureCertificateCommand(configuration),
     Commands.CreateWebhookEndpointCommand(configuration),
     Commands.CreateAddTrnRangeCommand(configuration),
-    Commands.CreateDeleteSupportTaskCommand(configuration)
+    Commands.CreateDeleteSupportTaskCommand(configuration),
+    Commands.CreateResetTrnRequestCommand(configuration)
 };
 
 var parseResult = rootCommand.Parse(args);

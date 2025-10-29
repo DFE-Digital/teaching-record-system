@@ -308,7 +308,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var supportTaskCreatedEvent = Assert.IsType<SupportTaskCreatedEvent>(e);
+            var supportTaskCreatedEvent = Assert.IsType<LegacyEvents.SupportTaskCreatedEvent>(e);
             Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
             Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
             Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);

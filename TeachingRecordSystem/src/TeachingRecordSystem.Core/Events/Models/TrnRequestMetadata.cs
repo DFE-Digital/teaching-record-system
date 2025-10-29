@@ -36,6 +36,9 @@ public record TrnRequestMetadata
     public required Guid? NpqEvidenceFileId { get; init; }
     public required string? NpqEvidenceFileName { get; init; }
 
+    // TODO Make this required and non-nullable when we've migrated fully to new event system
+    public TrnRequestStatus? Status { get; init; }
+
     public static TrnRequestMetadata FromModel(DataStore.Postgres.Models.TrnRequestMetadata model) =>
         new()
         {
@@ -63,6 +66,7 @@ public record TrnRequestMetadata
             Country = model.Country,
             TrnToken = model.TrnToken,
             ResolvedPersonId = model.ResolvedPersonId,
+            Status = model.Status ?? (model.ResolvedPersonId.HasValue ? TrnRequestStatus.Completed : TrnRequestStatus.Pending),
             Matches = model.Matches is not null && model.Matches.MatchedPersons is not null ?
                 new TrnRequestMatches()
                 {

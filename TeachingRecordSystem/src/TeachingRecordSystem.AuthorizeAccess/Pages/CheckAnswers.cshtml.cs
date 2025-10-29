@@ -58,7 +58,7 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
         };
         dbContext.SupportTasks.Add(supportTask);
 
-        await dbContext.AddEventAndBroadcastAsync(new SupportTaskCreatedEvent()
+        await dbContext.AddEventAndBroadcastAsync(new LegacyEvents.SupportTaskCreatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,
