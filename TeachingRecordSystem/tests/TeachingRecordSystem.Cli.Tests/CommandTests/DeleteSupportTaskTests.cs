@@ -1,20 +1,11 @@
 using System.CommandLine;
-using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-public class DeleteSupportTaskTests(CompositionRoot compositionRoot)
+public class DeleteSupportTaskTests(CompositionRoot compositionRoot) : CommandTestBase(compositionRoot)
 {
-    private IClock Clock => compositionRoot.Services.GetRequiredService<IClock>();
-
-    private IConfiguration Configuration => compositionRoot.Services.GetRequiredService<IConfiguration>();
-
-    private DbFixture DbFixture => compositionRoot.Services.GetRequiredService<DbFixture>();
-
-    private TestData TestData => compositionRoot.Services.GetRequiredService<TestData>();
-
     [Fact]
     public async Task ValidInvocation_DeletesSupportTask()
     {
@@ -32,7 +23,7 @@ public class DeleteSupportTaskTests(CompositionRoot compositionRoot)
         // Assert
         Assert.Equal(0, result);
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedTask = await dbContext.SupportTasks
                 .IgnoreQueryFilters()

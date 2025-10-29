@@ -30,10 +30,10 @@ public class EventMapperFixture
     {
         Clock = new TestableClock();
         DbFixture = dbFixture;
-        ReferenceDataCache = new ReferenceDataCache(dbFixture.GetDbContextFactory());
+        ReferenceDataCache = new ReferenceDataCache(dbFixture.DbContextFactory);
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             ReferenceDataCache,
             Clock,
             trnGenerator);

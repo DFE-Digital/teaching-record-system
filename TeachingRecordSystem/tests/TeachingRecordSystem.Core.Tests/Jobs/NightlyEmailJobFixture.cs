@@ -19,7 +19,7 @@ public class NightlyEmailJobFixture
         LoggerFactory = loggerFactory;
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);

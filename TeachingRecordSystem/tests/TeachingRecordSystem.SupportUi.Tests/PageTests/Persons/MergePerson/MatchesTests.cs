@@ -164,7 +164,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
 
         var personB = await TestData.CreatePersonAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(personB.Person);
             personB.Person.Status = PersonStatus.Deactivated;

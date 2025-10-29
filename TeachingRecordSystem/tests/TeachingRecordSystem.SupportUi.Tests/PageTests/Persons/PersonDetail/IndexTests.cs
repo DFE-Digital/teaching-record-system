@@ -403,7 +403,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;
@@ -429,7 +429,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;
@@ -524,7 +524,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (currentStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;
@@ -563,7 +563,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (currentStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;
@@ -636,7 +636,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (currentStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;
@@ -665,7 +665,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var secondaryPerson = await TestData.CreatePersonAsync(p => p
             .WithMergedWithPersonId(primaryPerson.PersonId));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(secondaryPerson.Person);
             secondaryPerson.Person.Status = PersonStatus.Deactivated;

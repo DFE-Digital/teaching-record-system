@@ -182,7 +182,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

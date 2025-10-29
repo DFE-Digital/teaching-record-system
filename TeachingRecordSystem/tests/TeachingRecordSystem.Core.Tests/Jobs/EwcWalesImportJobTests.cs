@@ -104,7 +104,7 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         Logger = new Mock<ILogger<EwcWalesImportJob>>();
         Job = ActivatorUtilities.CreateInstance<EwcWalesImportJob>(provider, dataLakeServiceClientMock.Object, qtsImporter, inductionImporter, Logger.Object);
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);

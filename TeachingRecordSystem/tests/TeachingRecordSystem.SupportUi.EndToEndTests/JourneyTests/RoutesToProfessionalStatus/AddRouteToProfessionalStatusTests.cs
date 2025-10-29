@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProf
 
 public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Route_AddJourneyToCyaPageAndBack()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
@@ -108,7 +108,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task Route_AddJourney()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
@@ -182,7 +182,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
 
-    [Test]
+    [Fact]
     public async Task Route_AddJourney_OnlyCountryApplicable()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
@@ -240,7 +240,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task Route_Add_HoldsJourney()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
@@ -310,7 +310,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
 
-    [Test]
+    [Fact]
     public async Task Route_AddAwardedJourneyToCyaPageAndBack()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
@@ -404,7 +404,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
 
-    [Test]
+    [Fact]
     public async Task Route_AddJourneyToCyaPage_EditFields_BackToCyaPage()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))

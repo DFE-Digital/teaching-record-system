@@ -1,17 +1,11 @@
 using System.CommandLine;
-using Microsoft.Extensions.DependencyInjection;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
+public class AddTrnRangeTests(CompositionRoot compositionRoot) : CommandTestBase(compositionRoot), IAsyncLifetime
 {
-    private IConfiguration Configuration => compositionRoot.Services.GetRequiredService<IConfiguration>();
-
-    private DbFixture DbFixture => compositionRoot.Services.GetRequiredService<DbFixture>();
-
     async ValueTask IAsyncLifetime.InitializeAsync() =>
-        await DbFixture.WithDbContextAsync(dbContext => dbContext.TrnRanges.ExecuteDeleteAsync());
+        await WithDbContextAsync(dbContext => dbContext.TrnRanges.ExecuteDeleteAsync());
 
     ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
@@ -136,7 +130,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         // Assert
         Assert.Equal(0, result);
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var trnRange = await dbContext.TrnRanges.SingleOrDefaultAsync();
             Assert.NotNull(trnRange);
@@ -165,7 +159,7 @@ public class AddTrnRangeTests(CompositionRoot compositionRoot) : IAsyncLifetime
         // Assert
         Assert.Equal(0, result);
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var trnRange = await dbContext.TrnRanges.SingleOrDefaultAsync();
             Assert.NotNull(trnRange);

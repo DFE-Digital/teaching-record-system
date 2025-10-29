@@ -1,15 +1,10 @@
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
-public class ChangeRequestTests : TestBase
+public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ChangeRequestTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task SelectChangeRequestAndApprove(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePersonAsync();
@@ -51,9 +46,9 @@ public class ChangeRequestTests : TestBase
         await page.AssertFlashMessageAsync("The request has been accepted");
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task SelectChangeRequestAndReject(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePersonAsync();
@@ -97,9 +92,9 @@ public class ChangeRequestTests : TestBase
         await page.AssertFlashMessageAsync("The request has been rejected");
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task SelectChangeRequestAndCancel(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePersonAsync();

@@ -154,7 +154,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             : "Lily The Pink\u2019s record has been reactivated";
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
                 .IgnoreQueryFilters()

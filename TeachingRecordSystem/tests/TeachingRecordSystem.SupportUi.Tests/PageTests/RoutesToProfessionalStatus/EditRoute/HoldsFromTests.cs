@@ -548,7 +548,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithHoldsFrom(holdsFrom)));
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

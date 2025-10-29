@@ -210,7 +210,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

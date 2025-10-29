@@ -385,7 +385,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

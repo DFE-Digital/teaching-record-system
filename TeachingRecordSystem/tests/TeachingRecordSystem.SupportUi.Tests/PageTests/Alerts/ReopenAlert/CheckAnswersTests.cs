@@ -191,7 +191,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert re-opened");
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedAlert = await dbContext.Alerts.SingleAsync(a => a.AlertId == alert.AlertId);
             Assert.Null(updatedAlert!.EndDate);
@@ -264,7 +264,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

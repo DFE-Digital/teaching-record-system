@@ -193,7 +193,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/application-users/{applicationUser.UserId}", response.Headers.Location?.OriginalString);
 
-        var apiKey = await WithDbContext(async dbContext =>
+        var apiKey = await WithDbContextAsync(async dbContext =>
         {
             var apiKey = await dbContext.ApiKeys.Where(k => k.ApplicationUserId == applicationUser.UserId).SingleOrDefaultAsync();
             Assert.NotNull(apiKey);

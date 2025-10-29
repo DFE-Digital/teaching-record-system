@@ -2,16 +2,16 @@ name: Run tests and report results
 
 inputs:
   test_project_path:
-    description: 'The path to the test project'
+    description: "The path to the test project"
     required: true
   report_name:
-    description: 'The name of the test report'
+    description: "The name of the test report"
     required: true
   dotnet_test_args:
-    description: 'Additional arguments to pass to dotnet test'
+    description: "Additional arguments to pass to dotnet test"
     required: false
   config_json:
-    description: 'JSON configuration'
+    description: "JSON configuration"
     required: false
 
 runs:
@@ -28,11 +28,11 @@ runs:
         cd $PROJECT_PATH
 
         case "$(basename $PWD)" in
-          "TeachingRecordSystem.Api.IntegrationTests" | "TeachingRecordSystem.AuthorizeAccess.Tests" | "TeachingRecordSystem.AuthorizeAccess.EndToEndTests" | "TeachingRecordSystem.Cli.Tests" | "TeachingRecordSystem.Core.Tests" | "TeachingRecordSystem.WebCommon.Tests")
-            dotnet test --blame-hang-timeout 10m --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
+          "TeachingRecordSystem.Api.UnitTests" | "TeachingRecordSystem.SupportUi.Tests")
+            dotnet test --configuration Release ${{ inputs.dotnet_test_args }} -- --report-trx
             ;;
           *)
-            dotnet test --configuration Release ${{ inputs.dotnet_test_args }} -- --report-trx
+            dotnet test --blame-hang-timeout 10m --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
             ;;
         esac
       shell: bash
@@ -44,5 +44,5 @@ runs:
       if: always()
       with:
         name: ${{ inputs.report_name }}
-        path: '${{ inputs.test_project_path }}/**/*.trx'
+        path: "${{ inputs.test_project_path }}/**/*.trx"
         reporter: dotnet-trx

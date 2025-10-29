@@ -31,7 +31,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         Clock = new();
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);
@@ -242,7 +242,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = DbFixture.GetDbContextFactory();
+        var dbContextFactory = DbFixture.DbContextFactory;
         var clock = new TestableClock();
         var tpsCsvExtractId = Guid.NewGuid();
         var filename = "establishments/test.csv";
@@ -288,7 +288,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = DbFixture.GetDbContextFactory();
+        var dbContextFactory = DbFixture.DbContextFactory;
         var giasEstablishmentHackney = await TestData.CreateEstablishmentAsync(localAuthorityCode: KnownGiasLaCodeHackney, localAuthorityName: KnownGiasLaNameHackney, establishmentNumber: KnownGiasEstablishmentNumberHackney, establishmentName: KnownGiasEstablishmentNameHackney);
         var giasEstablishmentCityOfLondon = await TestData.CreateEstablishmentAsync(localAuthorityCode: KnownGiasLaCodeCityOfLondon, localAuthorityName: KnownGiasLaNameCityOfLondon, establishmentNumber: KnownGiasEstablishmentNumberCityOfLondon, establishmentName: KnownGiasEstablishmentNameCityOfLondon);
 

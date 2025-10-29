@@ -150,7 +150,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
 
         // Assert
         // support task is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedSupportTask = await dbContext
                 .SupportTasks
@@ -230,7 +230,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
 
         // Assert
         // support task is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedSupportTask = await dbContext
                 .SupportTasks

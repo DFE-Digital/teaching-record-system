@@ -4,30 +4,26 @@ using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
-[SharedDependenciesDataSource]
-[NotInParallel]
-public abstract class TestBase(HostFixture hostFixture)
+public abstract class TestBase
 {
-    [Before(Test)]
-    public void SetInitialUser() => SetCurrentUser(TestUsers.Administrator);
+    protected TestBase(HostFixture hostFixture)
+    {
+        HostFixture = hostFixture;
 
-    protected HostFixture HostFixture { get; } = hostFixture;
+        SetCurrentUser(TestUsers.Administrator);
+    }
+
+    protected HostFixture HostFixture { get; }
+
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
-    protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
-    {
-        var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        return await action(dbContext);
-    }
+    public static string TextSelector(string? text) => $":text(\"{text}\")";
 
-    protected Task WithDbContext(Func<TrsDbContext, Task> action) =>
-        WithDbContext(async dbContext =>
-        {
-            await action(dbContext);
-            return 0;
-        });
+    public static string TextIsSelector(string? text) => $":text-is(\"{text}\")";
+
+    public static string HasTextSelector(string? text) => $":has-text(\"{text}\")";
 
     protected void SetCurrentUser(User user)
     {
@@ -35,9 +31,9 @@ public abstract class TestBase(HostFixture hostFixture)
         currentUserProvider.CurrentUser = user;
     }
 
-    public static string TextSelector(string? text) => $":text(\"{text}\")";
+    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 
-    public static string TextIsSelector(string? text) => $":text-is(\"{text}\")";
-
-    public static string HasTextSelector(string? text) => $":has-text(\"{text}\")";
+    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 }

@@ -401,7 +401,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Personal details have been updated");
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
@@ -478,7 +478,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Personal details have been updated");
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
                 .Include(p => p.PreviousNames)
@@ -532,7 +532,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Personal details have been updated");
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
                 .Include(p => p.PreviousNames)

@@ -2479,6 +2479,13 @@
           "xunit.v3.assert": "[3.1.0, )"
         }
       },
+      "teachingrecordsystem.testcommon.xunit3": {
+        "type": "Project",
+        "dependencies": {
+          "TeachingRecordSystem.TestCommon": "[1.0.0, )",
+          "xunit.v3.extensibility.core": "[3.1.0, )"
+        }
+      },
       "teachingrecordsystem.uitestcommon": {
         "type": "Project",
         "dependencies": {

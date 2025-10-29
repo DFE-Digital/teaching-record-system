@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -37,7 +36,6 @@ public abstract class TestBase : IDisposable
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
-        var options = scope.ServiceProvider.GetRequiredService<IOptions<FormFlowOptions>>();
 
         var journeyDescriptor = RequestTrnJourneyState.JourneyDescriptor;
 

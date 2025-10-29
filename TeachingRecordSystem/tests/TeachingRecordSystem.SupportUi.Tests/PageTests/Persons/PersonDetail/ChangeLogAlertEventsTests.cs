@@ -947,7 +947,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             CreatedUtc = Clock.UtcNow
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertCreatedEvent);
             await dbContext.SaveChangesAsync();
@@ -980,7 +980,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             CreatedUtc = Clock.UtcNow
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertCreatedEvent);
             await dbContext.SaveChangesAsync();
@@ -1011,7 +1011,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             CreatedUtc = Clock.UtcNow
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertDeletedEvent);
             await dbContext.SaveChangesAsync();
@@ -1033,7 +1033,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             CreatedUtc = Clock.UtcNow
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertDqtDeactivatedEvent);
             await dbContext.SaveChangesAsync();
@@ -1056,7 +1056,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             DqtState = 1
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertDqtImportedEvent);
             await dbContext.SaveChangesAsync();
@@ -1078,7 +1078,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             CreatedUtc = Clock.UtcNow
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertDqtReactivatedEvent);
             await dbContext.SaveChangesAsync();
@@ -1114,7 +1114,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
             CreatedUtc = Clock.UtcNow
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertMigratedEvent);
             await dbContext.SaveChangesAsync();
@@ -1144,7 +1144,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         : null
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(alertUpdatedEvent);
             await dbContext.SaveChangesAsync();

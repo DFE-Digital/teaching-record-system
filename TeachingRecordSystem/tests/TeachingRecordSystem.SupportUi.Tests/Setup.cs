@@ -51,15 +51,12 @@ public static class Setup
     {
         var services = new ServiceCollection();
 
-        var configuration = new ConfigurationBuilder()
-            .AddUserSecrets<SharedDependenciesDataSourceAttribute>()
-            .AddEnvironmentVariables()
-            .Build();
-
-        DbHelper.ConfigureDbServices(services, configuration.GetPostgresConnectionString());
+        var configuration = TestConfiguration.GetConfiguration();
 
         services
             .AddSingleton<IConfiguration>(configuration)
+            .AddSingleton(DbHelper.Instance)
+            .AddDatabase(configuration)
             .AddSingleton<HostFixture>();
 
         return services.BuildServiceProvider();

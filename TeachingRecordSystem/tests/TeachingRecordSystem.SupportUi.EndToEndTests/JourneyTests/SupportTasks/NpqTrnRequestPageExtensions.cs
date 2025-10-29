@@ -28,11 +28,11 @@ public static class NpqTrnRequestPageExtensions
     public static Task AssertOnRejectCheckYourAnswersPageAsync(this IPage page, string taskReference) =>
         page.WaitForUrlPathAsync($"/support-tasks/npq-trn-requests/{taskReference}/reject/check-answers");
 
-    public static async Task AssertOnAPersonDetailPageAsync(this IPage page)
+    public static void AssertOnAPersonDetailPage(this IPage page)
     {
         var asUri = new Uri(page.Url);
         var parts = asUri.LocalPath.Split("/persons/", StringSplitOptions.RemoveEmptyEntries);
         var guid = parts[0];
-        await Assert.That(Guid.TryParse(guid, out _)).IsTrue();
+        Assert.True(Guid.TryParse(guid, out _));
     }
 }

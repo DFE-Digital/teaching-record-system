@@ -42,6 +42,8 @@ public abstract class TestBase(HostFixture hostFixture)
 
     protected HostFixture HostFixture { get; } = hostFixture;
 
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+
     protected CaptureEventObserver EventObserver => TestScopedServices.GetCurrent().EventObserver;
 
     protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
@@ -116,19 +118,11 @@ public abstract class TestBase(HostFixture hostFixture)
     protected void SetCurrentUser(User user) =>
         TestScopedServices.GetCurrent().CurrentUserProvider.CurrentUser = user;
 
-    protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
-    {
-        var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        return await action(dbContext);
-    }
+    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 
-    protected Task WithDbContext(Func<TrsDbContext, Task> action) =>
-        WithDbContext(async dbContext =>
-        {
-            await action(dbContext);
-            return 0;
-        });
+    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 
     protected Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert(bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
     {

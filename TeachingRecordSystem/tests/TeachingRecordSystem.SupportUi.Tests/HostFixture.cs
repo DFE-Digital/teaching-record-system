@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
@@ -17,12 +16,10 @@ namespace TeachingRecordSystem.SupportUi.Tests;
 public class HostFixture : WebApplicationFactory<Program>
 {
     private readonly IConfiguration _configuration;
-    private readonly DbHelper _dbHelper;
 
-    public HostFixture(IConfiguration configuration, DbHelper dbHelper)
+    public HostFixture(IConfiguration configuration)
     {
         _configuration = configuration;
-        _dbHelper = dbHelper;
         _ = base.Services;  // Start the host
     }
 
@@ -47,17 +44,13 @@ public class HostFixture : WebApplicationFactory<Program>
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
             services
-                .AddSingleton(_dbHelper)
+                .AddSingleton(DbHelper.Instance)
                 .AddSingleton<CurrentUserProvider>()
                 .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
-                .AddSingleton(sp => ActivatorUtilities.CreateInstance<TestData>(
-                    sp,
-                    new ForwardToTestScopedClock()))
-                .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
+                .AddSingleton<TestData>()
                 .AddSingleton<FakeTrnGenerator>()
                 .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
-                .AddSingleton<TrsDataSyncHelper>()
-                .AddSingleton<IAuditRepository, TestableAuditRepository>()
+                .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                 .AddSingleton<INotificationSender, NoopNotificationSender>()
                 .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
 

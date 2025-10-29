@@ -577,7 +577,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var updatedUser = await WithDbContext(dbContext =>
+        var updatedUser = await WithDbContextAsync(dbContext =>
             dbContext.Users.SingleOrDefaultAsync(u => u.UserId == existingUser.UserId));
         Assert.NotNull(updatedUser);
 
@@ -625,7 +625,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var updatedUser = await WithDbContext(dbContext =>
+        var updatedUser = await WithDbContextAsync(dbContext =>
             dbContext.Users.SingleOrDefaultAsync(u => u.UserId == existingUser.UserId));
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
@@ -675,7 +675,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var updatedUser = await WithDbContext(dbContext =>
+        var updatedUser = await WithDbContextAsync(dbContext =>
             dbContext.Users.SingleOrDefaultAsync(u => u.UserId == existingUser.UserId));
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
@@ -725,7 +725,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var updatedUser = await WithDbContext(dbContext =>
+        var updatedUser = await WithDbContextAsync(dbContext =>
             dbContext.Users.SingleOrDefaultAsync(u => u.UserId == existingUser.UserId));
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);

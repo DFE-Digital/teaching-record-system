@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Users;
 
 public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task AddApplicationUser()
     {
         var applicationUserName = TestData.GenerateApplicationUserName();
@@ -24,7 +24,7 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
 
         await page.ClickButtonAsync("Save");
 
-        var applicationUserId = await WithDbContext(async dbContext =>
+        var applicationUserId = await WithDbContextAsync(async dbContext =>
         {
             var applicationUser = await dbContext.ApplicationUsers.Where(u => u.Name == applicationUserName).SingleOrDefaultAsync();
             return applicationUser!.UserId;
@@ -35,7 +35,7 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.AssertFlashMessageAsync("Application user added");
     }
 
-    [Test]
+    [Fact]
     public async Task EditApplicationUser()
     {
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -83,7 +83,7 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.AssertFlashMessageAsync("Application user updated");
     }
 
-    [Test]
+    [Fact]
     public async Task AddApiKey()
     {
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -114,7 +114,7 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.AssertFlashMessageAsync("API key added");
     }
 
-    [Test]
+    [Fact]
     public async Task EditApiKey()
     {
         var applicationUser = await TestData.CreateApplicationUserAsync();

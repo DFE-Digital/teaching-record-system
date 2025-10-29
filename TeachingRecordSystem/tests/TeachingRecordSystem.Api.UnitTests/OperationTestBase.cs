@@ -39,13 +39,13 @@ public abstract class OperationTestBase
         }
     }
 
-    protected TestableClock Clock => (TestableClock)Services.GetRequiredService<IClock>();
+    protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
 
     protected ICurrentUserProvider CurrentUserProvider => Services.GetRequiredService<ICurrentUserProvider>();
 
-    protected DbFixture DbFixture => Services.GetRequiredService<DbFixture>();
-
     protected DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     protected TestData TestData => Services.GetRequiredService<TestData>();
 
@@ -77,10 +77,6 @@ public abstract class OperationTestBase
         return error;
     }
 
-    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) => DbFixture.WithDbContextAsync(action);
-
-    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) => DbFixture.WithDbContextAsync(action);
-
     protected async Task<ApiResult<TResult>> ExecuteCommandAsync<TResult>(ICommand<TResult> command)
         where TResult : notnull
     {
@@ -93,4 +89,10 @@ public abstract class OperationTestBase
 
         return result;
     }
+
+    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
+        DbContextFactory.WithDbContextAsync(action);
+
+    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 }

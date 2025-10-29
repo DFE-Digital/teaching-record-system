@@ -198,7 +198,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var personA = await TestData.CreatePersonAsync();
         var personB = await TestData.CreatePersonAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(personB.Person);
             personB.Person.Status = PersonStatus.Deactivated;
@@ -231,7 +231,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         // Arrange
         var personA = await TestData.CreatePersonAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(personA.Person);
             personA.Person.Status = PersonStatus.Deactivated;

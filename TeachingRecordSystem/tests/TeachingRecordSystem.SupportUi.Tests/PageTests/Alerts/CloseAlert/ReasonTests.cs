@@ -404,7 +404,7 @@ public class ReasonTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtu
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

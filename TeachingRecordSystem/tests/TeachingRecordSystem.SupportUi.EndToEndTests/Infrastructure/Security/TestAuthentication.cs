@@ -8,23 +8,16 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 
-public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticationOptions>
+public class TestAuthenticationHandler(
+    CurrentUserProvider currentUserProvider,
+    IOptionsMonitor<TestAuthenticationOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder)
+    : AuthenticationHandler<TestAuthenticationOptions>(options, logger, encoder)
 {
-    private readonly CurrentUserProvider _currentUserProvider;
-
-    public TestAuthenticationHandler(
-        CurrentUserProvider currentUserProvider,
-        IOptionsMonitor<TestAuthenticationOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder)
-        : base(options, logger, encoder)
-    {
-        _currentUserProvider = currentUserProvider;
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var currentUser = _currentUserProvider.CurrentUser;
+        var currentUser = currentUserProvider.CurrentUser;
 
         if (currentUser is not null)
         {

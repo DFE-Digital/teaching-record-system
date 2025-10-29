@@ -36,7 +36,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddTestScoped<IClock>(tss => tss.Clock)
+            .AddSingleton<IClock>(new ForwardToTestScopedClock())
             .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
@@ -75,6 +75,11 @@ public class TestScopedServices
     public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
 
     public CurrentUserProvider CurrentUserProvider { get; }
+
+    private class ForwardToTestScopedClock : IClock
+    {
+        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+    }
 }
 
 file static class ServiceCollectionExtensions
