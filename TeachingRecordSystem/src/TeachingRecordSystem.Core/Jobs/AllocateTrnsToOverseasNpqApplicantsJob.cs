@@ -228,6 +228,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
 
                         var trns = await dbContext.Persons
                             .Where(p => personMatchingResult.PotentialMatchesPersonIds.Contains(p.PersonId))
+                            .OrderBy(p => p.Trn)
                             .Select(p => p.Trn)
                             .ToArrayAsync();
 
