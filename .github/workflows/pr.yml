@@ -18,7 +18,7 @@ permissions:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
+    runs-on: ubuntu-22.04 # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
 
     steps:
       - uses: actions/checkout@v5
@@ -35,26 +35,7 @@ jobs:
         run: just install-tools
 
       - name: Lint
-        run: |
-          set -eo pipefail
-
-          git fetch origin main --quiet --depth=1
-
-          CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
-          GLOBAL_SETTINGS_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.csproj$' -e '\.editorconfig$' -e '\.props$') || true
-          CS_FILES_CHANGED=$(echo "$CHANGED_FILES" | grep -c -e '\.cs$') || true
-
-          if [ "$GLOBAL_SETTINGS_CHANGED" -gt 0 ]; then
-            INCLUDE_ARG=""
-            echo "::notice::Linting entire .NET solution"
-          elif [ "$CS_FILES_CHANGED" -eq 0 ]; then
-            echo "::notice::No changes to lint"
-            exit 0
-          else
-            INCLUDE_ARG="--include $(echo "CS_FILES_CHANGED" | sed 's/^TeachingRecordSystem\///g' | tr '\n' ' ')"
-          fi
-
-          cd TeachingRecordSystem && dotnet dotnet-format --verify-no-changes $INCLUDE_ARG
+        run: cd TeachingRecordSystem && dotnet dotnet-format --verify-no-changes
 
   validate_terraform:
     name: Validate Terraform
@@ -137,7 +118,7 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
+    runs-on: ubuntu-22.04 # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
     needs: [get_affected_projects]
     if: needs.get_affected_projects.outputs.project_short_names != '[]'
     strategy:
