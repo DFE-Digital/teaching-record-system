@@ -298,6 +298,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<SyncAllDqtAnnotationAuditsJob>(
+                nameof(SyncAllDqtAnnotationAuditsJob),
+                job => job.ExecuteAsync(/*performContext: */null!, CancellationToken.None),
+                Cron.Never);
+
             return Task.CompletedTask;
         });
 
