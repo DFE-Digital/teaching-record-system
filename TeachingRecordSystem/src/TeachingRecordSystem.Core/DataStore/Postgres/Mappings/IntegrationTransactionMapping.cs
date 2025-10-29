@@ -13,6 +13,7 @@ public class IntegrationTransactionMapping : IEntityTypeConfiguration<Integratio
         builder.Property(p => p.FileName).IsRequired();
         builder.Property(p => p.ImportStatus).IsRequired();
         builder.Property(p => p.SuccessCount).IsRequired();
+        builder.Property(p => p.WarningCount).IsRequired();
         builder.Property(p => p.TotalCount).IsRequired();
         builder.Property(p => p.DuplicateCount).IsRequired();
         builder.Property(p => p.FailureCount).IsRequired();

@@ -33,6 +33,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var fileName = "SingleFile.txt";
         var expectedTotalRowCount = 1;
         var expectedSuccessCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedDuplicateRowCount = 1;
         var expectedFailureRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
@@ -78,6 +79,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -117,6 +119,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 1;
+        var expectedWarningRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1972, 01, 01);
         var expectedGender = Gender.Male;
@@ -160,6 +163,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -185,6 +189,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var fileName = "SingleFile.txt";
         var expectedTotalRowCount = 1;
         var expectedSuccessCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedDuplicateRowCount = 1;
         var expectedFailureRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
@@ -231,6 +236,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -265,7 +271,8 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         // Arrange
         var fileName = "SingleFile.txt";
         var expectedTotalRowCount = 1;
-        var expectedSuccessCount = 1;
+        var expectedSuccessCount = 0;
+        var expectedWarningRowCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
@@ -311,6 +318,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -321,7 +329,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                 {
                     Assert.NotNull(item1.PersonId);
                     Assert.Equal(person.PersonId, item1.PersonId);
-                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Warning, item1.Status);
                     Assert.Null(item1.HasActiveAlert);
                     Assert.False(item1.Duplicate);
                     Assert.NotNull(item1.RowData);
@@ -343,6 +351,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1972, 01, 01);
         var expectedGender = Gender.Male;
@@ -386,6 +395,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -414,9 +424,10 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         // Arrange
         var fileName = "SingleFile.txt";
         var expectedTotalRowCount = 1;
-        var expectedSuccessCount = 1;
+        var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 1;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1972, 01, 01);
         var expectedGender = Gender.Female;
@@ -460,6 +471,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -470,7 +482,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                 {
                     Assert.NotNull(item1.PersonId);
                     Assert.Equal(person.PersonId, item1.PersonId);
-                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Warning, item1.Status);
                     Assert.Null(item1.HasActiveAlert);
                     Assert.False(item1.Duplicate);
                     Assert.NotNull(item1.RowData);
@@ -488,9 +500,10 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         // Arrange
         var fileName = "SingleFile.txt";
         var expectedTotalRowCount = 1;
-        var expectedSuccessCount = 1;
+        var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 1;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1972, 01, 01);
         var expectedGender = Gender.Female;
@@ -535,6 +548,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -545,7 +559,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
                 {
                     Assert.NotNull(item1.PersonId);
                     Assert.Equal(person.PersonId, item1.PersonId);
-                    Assert.Equal(IntegrationTransactionRecordStatus.Success, item1.Status);
+                    Assert.Equal(IntegrationTransactionRecordStatus.Warning, item1.Status);
                     Assert.Null(item1.HasActiveAlert);
                     Assert.False(item1.Duplicate);
                     Assert.NotNull(item1.RowData);
@@ -566,6 +580,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 1;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1981, 08, 20);
         var expectedGender = Gender.Male;
@@ -607,6 +622,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -642,6 +658,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1981, 08, 20);
         var expectedGender = Gender.Male;
@@ -692,6 +709,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -721,6 +739,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1981, 08, 20);
         var expectedGender = Gender.Male;
@@ -755,6 +774,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -784,6 +804,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedTrn = "9988776";
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1981, 08, 20);
@@ -827,6 +848,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -857,6 +879,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedTrn = "9988776";
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1981, 08, 20);
@@ -901,6 +924,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
         Assert.NotNull(integrationTransaction.IntegrationTransactionRecords);
@@ -931,6 +955,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedTrn = "9988776";
         var expectedNI = Faker.Identification.UkNationalInsuranceNumber();
         var expectedDob = new DateOnly(1981, 08, 20);
@@ -972,6 +997,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -1003,6 +1029,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedTrn = "9988776";
         var expectedNI = "JL5618AAB";
         var expectedDob = new DateOnly(1981, 08, 20);
@@ -1044,6 +1071,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);
@@ -1072,6 +1100,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         var expectedSuccessCount = 0;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
+        var expectedWarningRowCount = 0;
         var expectedStatus = IntegrationTransactionImportStatus.Success;
         await using var dbContext = await DbFixture.DbHelper.DbContextFactory.CreateDbContextAsync();
         var csvContent = $"";
@@ -1088,6 +1117,7 @@ public class CapitaImportJobTests(CapitaImportJobFixture Fixture) : IClassFixtur
         Assert.Equal(expectedTotalRowCount, integrationTransaction.TotalCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.FailureCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.SuccessCount);
+        Assert.Equal(expectedWarningRowCount, integrationTransaction.WarningCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.DuplicateCount);
         Assert.Equal(expectedStatus, integrationTransaction.ImportStatus);
         Assert.Equal(fileName, integrationTransaction.FileName);

@@ -63,6 +63,10 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         {
             query = query.OrderBy(sortDirection, t => t.SuccessCount!);
         }
+        else if (sortBy == IntegrationTransactionSortByOption.Warnings)
+        {
+            query = query.OrderBy(sortDirection, t => t.WarningCount!);
+        }
 
         Results = await query
             .Include(x => x.IntegrationTransactionRecords)
@@ -73,6 +77,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 x.ImportStatus,
                 x.TotalCount,
                 x.SuccessCount,
+                x.WarningCount,
                 x.FailureCount,
                 x.DuplicateCount
             ))
@@ -92,5 +97,6 @@ public record ItResult(
     IntegrationTransactionImportStatus ImportStatus,
     int TotalCount,
     int SuccessesCount,
+    int WarningsCount,
     int FailuresCount,
     int DuplicatesCount);

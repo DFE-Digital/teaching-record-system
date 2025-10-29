@@ -51,6 +51,11 @@
                         Successes
                     </th>
                     <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Warnings ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Warnings, direction))">
+                        Warnings
+                    </th>
+                    <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Failures ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Failures, direction))">
                         Failures
@@ -110,6 +115,10 @@
                             <td class="govuk-table__cell"
                                 data-testid="integration-transaction:@result.IntegrationTransactionId:successes">
                                 @result.SuccessesCount
+                            </td>
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:warnings">
+                                @result.WarningsCount
                             </td>
                             <td class="govuk-table__cell"
                                 data-testid="integration-transaction:@result.IntegrationTransactionId:failures">

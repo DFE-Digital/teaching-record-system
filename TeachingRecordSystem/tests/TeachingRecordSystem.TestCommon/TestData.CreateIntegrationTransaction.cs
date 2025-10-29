@@ -15,6 +15,7 @@ public partial class TestData
     {
         private int? _totalCount;
         private int? _successCount;
+        private int? _warningCount;
         private int? _failureCount;
         private int? _duplicateCount;
         private string? _fileName;
@@ -35,14 +36,25 @@ public partial class TestData
             return this;
         }
 
-        public CreateIntegrationTransactionBuilder WithSuccesCount(int successCount)
+        public CreateIntegrationTransactionBuilder WithSuccessCount(int successCount)
         {
             if (_successCount is not null && _successCount != successCount)
             {
-                throw new InvalidOperationException("WithSuccesCount has already been set");
+                throw new InvalidOperationException("WithSuccessCount has already been set");
             }
 
             _successCount = successCount;
+            return this;
+        }
+
+        public CreateIntegrationTransactionBuilder WithWarningCount(int warningCount)
+        {
+            if (_warningCount is not null && _warningCount != warningCount)
+            {
+                throw new InvalidOperationException("WithWarningCount has already been set");
+            }
+
+            _warningCount = warningCount;
             return this;
         }
 
@@ -132,6 +144,7 @@ public partial class TestData
                     TotalCount = _totalCount!.Value,
                     DuplicateCount = _duplicateCount!.Value,
                     SuccessCount = _successCount!.Value,
+                    WarningCount = _warningCount!.Value,
                     FailureCount = _failureCount!.Value,
                     FileName = _fileName!,
                     InterfaceType = _interfaceType!.Value,

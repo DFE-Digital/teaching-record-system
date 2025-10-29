@@ -6,14 +6,16 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Test]
     [Arguments(IntegrationTransactionRecordStatus.Success)]
+    [Arguments(IntegrationTransactionRecordStatus.Warning)]
     [Arguments(IntegrationTransactionRecordStatus.Failure)]
     public async Task Get_Row_RowStatusIsCorrect(IntegrationTransactionRecordStatus rowStatus)
     {
         // Arrange
         var person1 = await TestData.CreatePersonAsync();
-        var totalCount1 = 0;
-        var successCount1 = 1;
-        var failureCount1 = 0;
+        var totalCount1 = 1;
+        var successCount1 = rowStatus == IntegrationTransactionRecordStatus.Success ? 1 : 0;
+        var warningCount1 = rowStatus == IntegrationTransactionRecordStatus.Warning ? 1 : 0;
+        var failureCount1 = rowStatus == IntegrationTransactionRecordStatus.Failure ? 1 : 0;
         var duplicateCount1 = 0;
         var fileName1 = "FileName.csv";
         var importStatus1 = IntegrationTransactionImportStatus.Success;
@@ -22,7 +24,8 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         var integrationTransaction1 = await TestData.CreateIntegrationTransactionAsync(p =>
         {
             p.WithTotalCount(totalCount1);
-            p.WithSuccesCount(successCount1);
+            p.WithSuccessCount(successCount1);
+            p.WithWarningCount(warningCount1);
             p.WithFailureCount(failureCount1);
             p.WithDuplicateCount(duplicateCount1);
             p.WithFileName(fileName1);
@@ -60,6 +63,7 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person1 = await TestData.CreatePersonAsync();
         var totalCount1 = 0;
         var successCount1 = 1;
+        var warningCount1 = 0;
         var failureCount1 = 0;
         var duplicateCount1 = 0;
         var fileName1 = "FileName.csv";
@@ -69,7 +73,8 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         var integrationTransaction1 = await TestData.CreateIntegrationTransactionAsync(p =>
         {
             p.WithTotalCount(totalCount1);
-            p.WithSuccesCount(successCount1);
+            p.WithSuccessCount(successCount1);
+            p.WithWarningCount(warningCount1);
             p.WithFailureCount(failureCount1);
             p.WithDuplicateCount(duplicateCount1);
             p.WithFileName(fileName1);
