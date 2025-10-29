@@ -56,6 +56,7 @@ public partial class PersonMatchingServiceTests
 
     [Theory]
     [MemberData(nameof(GetMatchFromTrnRequestData))]
+    [MemberData(nameof(GetMatchFromTrnRequestDataWithMissingNino))]
     public Task MatchFromTrnRequestAsync_ReturnsExpectedResult(
             EmailAddressArgumentOption emailAddressOption,
             FirstNameArgumentOption firstNameOption,
@@ -63,6 +64,7 @@ public partial class PersonMatchingServiceTests
             LastNameArgumentOption lastNameOption,
             DateOfBirthArgumentOption dateOfBirthOption,
             NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
+            GenderArgumentOption genderOption,
             TrnRequestMatchResultOutcome expectedOutcome) =>
         DbFixture.WithDbContextAsync(async dbContext =>
         {
@@ -87,7 +89,11 @@ public partial class PersonMatchingServiceTests
                 await dbContext.SaveChangesAsync();
             }
 
-            var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(personFirstName).WithEmailAddress(TestData.GenerateUniqueEmail()));
+            var person = await TestData.CreatePersonAsync(p => p
+                .WithNationalInsuranceNumber()
+                .WithFirstName(personFirstName)
+                .WithEmailAddress(TestData.GenerateUniqueEmail())
+                .WithGender());
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
             var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
@@ -125,9 +131,16 @@ public partial class PersonMatchingServiceTests
 
             var nationalInsuranceNumber = nationalInsuranceNumberOption switch
             {
+                NationalInsuranceNumberArgumentOption.NotProvided => null,
                 NationalInsuranceNumberArgumentOption.MatchesPersonNino => person.NationalInsuranceNumber!,
                 NationalInsuranceNumberArgumentOption.MatchesEmploymentNino => personEmployment.NationalInsuranceNumber!,
                 _ => TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!)
+            };
+
+            var gender = genderOption switch
+            {
+                GenderArgumentOption.Matches => person.Gender,
+                _ => TestData.GenerateChangedGender(person.Gender)
             };
 
             var requestData = new TrnRequestMetadata()
@@ -145,7 +158,8 @@ public partial class PersonMatchingServiceTests
                 PreviousLastName = null,
                 Name = [firstName, middleName, lastName],
                 DateOfBirth = dateOfBirth,
-                NationalInsuranceNumber = nationalInsuranceNumber
+                NationalInsuranceNumber = nationalInsuranceNumber,
+                Gender = gender
             };
 
             var service = new PersonMatchingService(dbContext);
@@ -225,89 +239,27 @@ public partial class PersonMatchingServiceTests
                 r => Assert.Equal(person3.PersonId, r.PersonId));
         });
 
-    public static TheoryData<
-                EmailAddressArgumentOption,
-                FirstNameArgumentOption,
-                MiddleNameArgumentOption,
-                LastNameArgumentOption,
-                DateOfBirthArgumentOption,
-                NationalInsuranceNumberArgumentOption,
-                TrnRequestMatchResultOutcome> GetMatchFromTrnRequestData()
+    public static TrnRequestTheoryData GetMatchFromTrnRequestData()
     {
-        var data =
-            new TheoryData<
-                EmailAddressArgumentOption,
-                FirstNameArgumentOption,
-                MiddleNameArgumentOption,
-                LastNameArgumentOption,
-                DateOfBirthArgumentOption,
-                NationalInsuranceNumberArgumentOption,
-                TrnRequestMatchResultOutcome>();
-
-        void AddCase(
-            TrnRequestMatchResultOutcome expectedOutcome,
-            EmailAddressArgumentOption emailAddress = EmailAddressArgumentOption.DoesNotMatch,
-            FirstNameArgumentOption firstName = FirstNameArgumentOption.DoesNotMatch,
-            MiddleNameArgumentOption middleName = MiddleNameArgumentOption.DoesNotMatch,
-            LastNameArgumentOption lastName = LastNameArgumentOption.DoesNotMatch,
-            DateOfBirthArgumentOption dateOfBirth = DateOfBirthArgumentOption.DoesNotMatch,
-            NationalInsuranceNumberArgumentOption nationalInsuranceNumber = NationalInsuranceNumberArgumentOption.DoesNotMatch)
-        {
-            data.Add(emailAddress, firstName, middleName, lastName, dateOfBirth, nationalInsuranceNumber, expectedOutcome);
-        }
+        var data = new TrnRequestTheoryData();
 
         // Definite matches
 
-        AddCase(
+        data.AddCase(
             TrnRequestMatchResultOutcome.DefiniteMatch,
             dateOfBirth: DateOfBirthArgumentOption.Matches,
             nationalInsuranceNumber: NationalInsuranceNumberArgumentOption.MatchesPersonNino);
 
-        AddCase(
+        data.AddCase(
             TrnRequestMatchResultOutcome.DefiniteMatch,
             dateOfBirth: DateOfBirthArgumentOption.Matches,
             nationalInsuranceNumber: NationalInsuranceNumberArgumentOption.MatchesEmploymentNino);
 
+        var allSubsets = MatchableAttributes.Subsets().ToList();
 
-        // Potential matches
+        // Match on 3 or more attributes
 
-        string[] matchableAttributes =
-        [
-            "FirstName",
-            "FirstNameAlias",
-            "MiddleName",
-            "LastName",
-            "DateOfBirth",
-            "EmailAddress",
-            "NationalInsuranceNumber",
-            "WorkforceNationalInsuranceNumber"
-        ];
-
-        static ISet<string> GetDistinctAttributeTypes(IEnumerable<string> attributes)
-        {
-            var attrNames = new HashSet<string>();
-
-            foreach (var attr in attributes)
-            {
-                if (attr == "FirstNameAlias")
-                {
-                    attrNames.Add("FirstName");
-                    continue;
-                }
-
-                if (attr == "WorkforceNationalInsuranceNumber")
-                {
-                    attrNames.Add("NationalInsuranceNumber");
-                    continue;
-                }
-
-                attrNames.Add(attr);
-            }
-
-            return attrNames;
-        }
-
-        foreach (var matchedAttrs in matchableAttributes.Subsets())
+        foreach (var matchedAttrs in allSubsets)
         {
             if (GetDistinctAttributeTypes(matchedAttrs).Count < 3)
             {
@@ -327,19 +279,24 @@ public partial class PersonMatchingServiceTests
                 continue;
             }
 
-            AddCase(
+            data.AddCase(
                 TrnRequestMatchResultOutcome.PotentialMatches,
                 matchedAttrs.Contains("EmailAddress") ? EmailAddressArgumentOption.Matches : EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? FirstNameArgumentOption.Matches : matchedAttrs.Contains("FirstNameAlias") ? FirstNameArgumentOption.MatchesAlias : FirstNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
-                matchedAttrs.Contains("NationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesPersonNino : matchedAttrs.Contains("WorkforceNationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino : NationalInsuranceNumberArgumentOption.DoesNotMatch);
+                matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("NationalInsuranceNumber")
+                    ? NationalInsuranceNumberArgumentOption.MatchesPersonNino
+                    : matchedAttrs.Contains("WorkforceNationalInsuranceNumber")
+                        ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino
+                        : NationalInsuranceNumberArgumentOption.DoesNotMatch);
         }
 
         // Match on 2 or fewer attributes
 
-        foreach (var matchedAttrs in matchableAttributes.Permutations())
+        foreach (var matchedAttrs in allSubsets)
         {
             if (GetDistinctAttributeTypes(matchedAttrs).Count >= 3)
             {
@@ -367,17 +324,189 @@ public partial class PersonMatchingServiceTests
                 continue;
             }
 
-            AddCase(
+            data.AddCase(
                 TrnRequestMatchResultOutcome.NoMatches,
+                matchedAttrs.Contains("EmailAddress") ? EmailAddressArgumentOption.Matches : EmailAddressArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("FirstName") ? FirstNameArgumentOption.Matches
+                    : matchedAttrs.Contains("FirstNameAlias") ? FirstNameArgumentOption.MatchesAlias : FirstNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("NationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesPersonNino
+                    : matchedAttrs.Contains("WorkforceNationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino : NationalInsuranceNumberArgumentOption.DoesNotMatch);
+        }
+
+        return data;
+    }
+
+    public static TrnRequestTheoryData GetMatchFromTrnRequestDataWithMissingNino()
+    {
+        var data = new TrnRequestTheoryData();
+
+        // Definite matches
+
+        data.AddCase(
+            TrnRequestMatchResultOutcome.DefiniteMatch,
+            firstName: FirstNameArgumentOption.Matches,
+            lastName: LastNameArgumentOption.Matches,
+            dateOfBirth: DateOfBirthArgumentOption.Matches,
+            emailAddress: EmailAddressArgumentOption.Matches,
+            gender: GenderArgumentOption.Matches,
+            nationalInsuranceNumber: NationalInsuranceNumberArgumentOption.NotProvided);
+
+        var allSubsetsExcludingNino = MatchableAttributes
+            .Except(["NationalInsuranceNumber", "WorkforceNationalInsuranceNumber"])
+            .Subsets().ToList();
+
+        // Match on 3 or more attributes
+
+        foreach (var matchedAttrs in allSubsetsExcludingNino)
+        {
+            if (GetDistinctAttributeTypes(matchedAttrs).Count < 3)
+            {
+                continue;
+            }
+
+            // Can't match on both FirstName and FirstNameAlias
+            if (matchedAttrs.Contains("FirstName") && matchedAttrs.Contains("FirstNameAlias"))
+            {
+                continue;
+            }
+
+            // Exclude definite match cases
+            if ((matchedAttrs.Contains("FirstName") || matchedAttrs.Contains("FirstNameAlias")) &&
+                matchedAttrs.Contains("LastName") &&
+                matchedAttrs.Contains("DateOfBirth") &&
+                matchedAttrs.Contains("EmailAddress") &&
+                matchedAttrs.Contains("Gender"))
+            {
+                continue;
+            }
+
+            data.AddCase(
+                TrnRequestMatchResultOutcome.PotentialMatches,
                 matchedAttrs.Contains("EmailAddress") ? EmailAddressArgumentOption.Matches : EmailAddressArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("FirstName") ? FirstNameArgumentOption.Matches : matchedAttrs.Contains("FirstNameAlias") ? FirstNameArgumentOption.MatchesAlias : FirstNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
-                matchedAttrs.Contains("NationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesPersonNino : matchedAttrs.Contains("WorkforceNationalInsuranceNumber") ? NationalInsuranceNumberArgumentOption.MatchesEmploymentNino : NationalInsuranceNumberArgumentOption.DoesNotMatch);
+                matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
+                NationalInsuranceNumberArgumentOption.NotProvided);
+        }
+
+        // Match on 2 or fewer attributes
+
+        foreach (var matchedAttrs in allSubsetsExcludingNino)
+        {
+            if (GetDistinctAttributeTypes(matchedAttrs).Count >= 3)
+            {
+                continue;
+            }
+
+            // Can't match on both FirstName and FirstNameAlias
+            if (matchedAttrs.Contains("FirstName") && matchedAttrs.Contains("FirstNameAlias"))
+            {
+                continue;
+            }
+
+            // Exclude definite match cases
+            if ((matchedAttrs.Contains("FirstName") || matchedAttrs.Contains("FirstNameAlias")) &&
+                matchedAttrs.Contains("LastName") &&
+                matchedAttrs.Contains("DateOfBirth") &&
+                matchedAttrs.Contains("EmailAddress") &&
+                matchedAttrs.Contains("Gender"))
+            {
+                continue;
+            }
+
+            // Email matches is always a potential match
+            if (matchedAttrs.Contains("EmailAddress"))
+            {
+                continue;
+            }
+
+            data.AddCase(
+                TrnRequestMatchResultOutcome.NoMatches,
+                matchedAttrs.Contains("EmailAddress") ? EmailAddressArgumentOption.Matches : EmailAddressArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("FirstName") ? FirstNameArgumentOption.Matches
+                    : matchedAttrs.Contains("FirstNameAlias") ? FirstNameArgumentOption.MatchesAlias : FirstNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
+                NationalInsuranceNumberArgumentOption.NotProvided);
         }
 
         return data;
+    }
+
+    public class TrnRequestTheoryData : TheoryData<
+        EmailAddressArgumentOption,
+        FirstNameArgumentOption,
+        MiddleNameArgumentOption,
+        LastNameArgumentOption,
+        DateOfBirthArgumentOption,
+        NationalInsuranceNumberArgumentOption,
+        GenderArgumentOption,
+        TrnRequestMatchResultOutcome>
+    {
+        public void AddCase(
+            TrnRequestMatchResultOutcome expectedOutcome,
+            EmailAddressArgumentOption emailAddress = EmailAddressArgumentOption.DoesNotMatch,
+            FirstNameArgumentOption firstName = FirstNameArgumentOption.DoesNotMatch,
+            MiddleNameArgumentOption middleName = MiddleNameArgumentOption.DoesNotMatch,
+            LastNameArgumentOption lastName = LastNameArgumentOption.DoesNotMatch,
+            DateOfBirthArgumentOption dateOfBirth = DateOfBirthArgumentOption.DoesNotMatch,
+            GenderArgumentOption gender = GenderArgumentOption.DoesNotMatch,
+            NationalInsuranceNumberArgumentOption nationalInsuranceNumber = NationalInsuranceNumberArgumentOption.DoesNotMatch)
+        {
+            Add(emailAddress, firstName, middleName, lastName, dateOfBirth, nationalInsuranceNumber, gender, expectedOutcome);
+        }
+    }
+
+    private static readonly string[] MatchableAttributes =
+        [
+            "FirstName",
+            "FirstNameAlias",
+            "MiddleName",
+            "LastName",
+            "DateOfBirth",
+            "EmailAddress",
+            "NationalInsuranceNumber",
+            "WorkforceNationalInsuranceNumber",
+            // Adding gender as it's used to determine a definite match if NINO is not provided.
+            "Gender"
+        ];
+
+    private static ISet<string> GetDistinctAttributeTypes(IEnumerable<string> attributes)
+    {
+        var attrNames = new HashSet<string>();
+
+        foreach (var attr in attributes)
+        {
+            // Gender does not count towards the initial matching pass so we exclude it from the count of distinct attributes.
+            if (attr == "Gender")
+            {
+                continue;
+            }
+
+            if (attr == "FirstNameAlias")
+            {
+                attrNames.Add("FirstName");
+                continue;
+            }
+
+            if (attr == "WorkforceNationalInsuranceNumber")
+            {
+                attrNames.Add("NationalInsuranceNumber");
+                continue;
+            }
+
+            attrNames.Add(attr);
+        }
+
+        return attrNames;
     }
 
     public static class TrnRequest
@@ -413,8 +542,15 @@ public partial class PersonMatchingServiceTests
             DoesNotMatch
         }
 
+        public enum GenderArgumentOption
+        {
+            Matches,
+            DoesNotMatch
+        }
+
         public enum NationalInsuranceNumberArgumentOption
         {
+            NotProvided,
             MatchesPersonNino,
             MatchesEmploymentNino,
             DoesNotMatch
