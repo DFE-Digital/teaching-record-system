@@ -90,7 +90,7 @@ public class MatchesModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGen
                 DateOfBirth = p.DateOfBirth,
                 EmailAddress = p.EmailAddress,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,
-                Trn = p.Trn!,
+                Trn = p.Trn,
                 Gender = p.Gender,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,

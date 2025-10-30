@@ -87,7 +87,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                         RouteToProfessionalStatusTypeId = e.route_to_professional_status_type_id
                     })
                 .Where(p => p.QtsDate != null) // Check the person still has QTS
-                .Where(p => p.Trn != null && p.EmailAddress != null)
+                .Where(p => p.EmailAddress != null)
                 .ToArrayAsync(cancellationToken: cancellationToken);
 
             foreach (var qtsAwardee in qtsAwardees.DistinctBy(p => p.Trn))
@@ -102,7 +102,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                     ["last name"] = qtsAwardee.LastName
                 };
 
-                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = qtsAwardee.Trn! };
+                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = qtsAwardee.Trn };
 
                 var email = new Email
                 {
@@ -146,7 +146,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                         p.EytsDate
                     })
                 .Where(p => p.EytsDate != null) // Check the person still has EYTS
-                .Where(p => p.Trn != null && p.EmailAddress != null)
+                .Where(p => p.EmailAddress != null)
                 .ToArrayAsync(cancellationToken: cancellationToken);
 
             foreach (var eytsAwardee in eytsAwardees.DistinctBy(p => p.Trn))
@@ -157,7 +157,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                     ["last name"] = eytsAwardee.LastName
                 };
 
-                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = eytsAwardee.Trn! };
+                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = eytsAwardee.Trn };
 
                 var email = new Email
                 {
@@ -201,7 +201,7 @@ public class BatchSendProfessionalStatusEmailsJob(
                         p.QtlsStatus
                     })
                 .Where(p => p.QtlsStatus == QtlsStatus.Expired)
-                .Where(p => p.Trn != null && p.EmailAddress != null)
+                .Where(p => p.EmailAddress != null)
                 .ToArrayAsync(cancellationToken: cancellationToken);
 
             foreach (var qtlsLoser in qtlsLosers.DistinctBy(p => p.Trn))

@@ -39,7 +39,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     CASE WHEN p.date_of_birth = ANY(vars.dates_of_birth) THEN true ELSE false END date_of_birth_matches,
                     array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers national_insurance_number_matches
                 FROM persons p, vars
-                WHERE p.status = 0 AND p.trn IS NOT NULL AND (
+                WHERE p.status = 0 AND (
                     p.names && vars.first_names AND
                     p.names && vars.last_names AND
                     p.date_of_birth = ANY(vars.dates_of_birth) AND (
@@ -295,7 +295,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers national_insurance_number_matches
                 FROM persons p, vars
                 WHERE
-                    p.status = 0 and p.trn IS NOT NULL AND (
+                    p.status = 0 AND (
                         (p.names && vars.first_names AND p.names && vars.middle_names AND p.names && vars.last_names) OR
                         (p.names && vars.first_names AND p.names && vars.middle_names AND p.date_of_birth = vars.date_of_birth) OR
                         (p.names && vars.middle_names AND p.names && vars.last_names AND p.date_of_birth = vars.date_of_birth) OR

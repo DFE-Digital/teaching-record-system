@@ -39,7 +39,7 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
 
         await page.WaitForUrlPathAsync($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}");
-        await page.FillAsync($"label:text-is('Connect to TRN (optional)')", person.Trn!);
+        await page.FillAsync($"label:text-is('Connect to TRN (optional)')", person.Trn);
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}/connect");

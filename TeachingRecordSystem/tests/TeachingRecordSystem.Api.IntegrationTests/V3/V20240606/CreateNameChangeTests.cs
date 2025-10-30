@@ -39,7 +39,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
@@ -70,7 +70,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
@@ -121,7 +121,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);

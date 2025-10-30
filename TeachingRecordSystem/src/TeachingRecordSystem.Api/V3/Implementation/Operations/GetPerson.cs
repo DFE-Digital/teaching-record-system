@@ -272,7 +272,7 @@ public class GetPersonHandler(TrsDbContext dbContext, ReferenceDataCache referen
 
         return new GetPersonResult()
         {
-            Trn = person.Trn!,
+            Trn = person.Trn,
             FirstName = person.FirstName,
             MiddleName = person.MiddleName,
             LastName = person.LastName,

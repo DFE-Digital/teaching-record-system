@@ -24,7 +24,7 @@ public class GetQtlsTests : OperationTestBase
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var command = new GetQtlsCommand(person.Trn!);
+        var command = new GetQtlsCommand(person.Trn);
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -47,7 +47,7 @@ public class GetQtlsTests : OperationTestBase
                 .WithStatus(RouteToProfessionalStatusStatus.Holds)
                 .WithHoldsFrom(qtlsDate)));
 
-        var command = new GetQtlsCommand(person.Trn!);
+        var command = new GetQtlsCommand(person.Trn);
 
         // Act
         var result = await ExecuteCommandAsync(command);

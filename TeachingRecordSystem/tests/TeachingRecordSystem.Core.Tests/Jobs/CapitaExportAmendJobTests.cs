@@ -439,7 +439,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var amendedPerson = new CapitaExportAmendJobResult()
         {
-            Trn = trsPerson.Trn!,
+            Trn = trsPerson.Trn,
             LastName = trsPerson.LastName,
             DateOfBirth = trsPerson.DateOfBirth,
             NationalInsuranceNumber = null,
@@ -508,7 +508,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var amendedPerson = new CapitaExportAmendJobResult()
         {
-            Trn = trsPerson.Trn!,
+            Trn = trsPerson.Trn,
             LastName = trsPerson.LastName,
             DateOfBirth = trsPerson.DateOfBirth,
             NationalInsuranceNumber = null,
@@ -577,7 +577,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
         var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
         var amendedPerson = new CapitaExportAmendJobResult()
         {
-            Trn = trsPerson.Trn!,
+            Trn = trsPerson.Trn,
             LastName = trsPerson.LastName,
             DateOfBirth = trsPerson.DateOfBirth,
             NationalInsuranceNumber = null,
@@ -650,7 +650,7 @@ public class CapitaExportAmendJobTests(CapitaExportAmendJobFixture Fixture) : IC
             var trsPerson = dbContext.Persons.Single(x => x.PersonId == person.PersonId);
             var amendedPerson = new CapitaExportAmendJobResult()
             {
-                Trn = trsPerson.Trn!,
+                Trn = trsPerson.Trn,
                 LastName = trsPerson.LastName,
                 DateOfBirth = trsPerson.DateOfBirth,
                 NationalInsuranceNumber = person.NationalInsuranceNumber,

@@ -373,7 +373,7 @@ public partial class TestData
 
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData, IClock clock)
         {
-            var trn = await testData.GenerateTrnAsync();
+            string trn = await testData.GenerateTrnAsync();
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
             var statedMiddleName = _middleName ?? testData.GenerateMiddleName();
             var firstAndMiddleNames = $"{statedFirstName} {statedMiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -387,7 +387,7 @@ public partial class TestData
             var personStatus = PersonStatus.Active;
             var gender = _gender ?? testData.GenerateGender();
 
-            if (trn is not null && _trnToken is null && _email is not null)
+            if (_trnToken is null && _email is not null)
             {
                 _trnToken = Guid.NewGuid().ToString();
             }
@@ -1036,7 +1036,7 @@ public partial class TestData
         public required Guid PersonId { get; init; }
         public required Person Person { get; init; }
         public required IReadOnlyCollection<EventBase> Events { get; init; }
-        public required string? Trn { get; init; }
+        public required string Trn { get; init; }
         public required DateOnly DateOfBirth { get; init; }
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }

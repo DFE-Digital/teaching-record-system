@@ -238,9 +238,6 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
         if (string.IsNullOrEmpty(previousName))
             return string.Empty;
 
-        if (string.IsNullOrEmpty(person.Trn))
-            throw new Exception("Person does not have a trn");
-
         if (string.IsNullOrEmpty(previousName))
             throw new Exception($"Previous name not found in {nameof(PersonDetailsUpdatedEvent)} events.");
 
@@ -286,9 +283,6 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
     public string GetNewPersonAsStringRow(Person person, bool hasPreviousLastName)
     {
         var builder = new StringBuilder();
-
-        if (string.IsNullOrEmpty(person.Trn))
-            throw new Exception("Person does not have a trn");
 
         // ssis job either puts gender as 1,2 or a padded empty string
         var gender = " ";
@@ -383,7 +377,6 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
     public async Task<List<Person>> GetNewPersonsAsync(DateTime? lastRunDate)
     {
         var persons = await dbContext.Persons.Where(x => x.CreatedOn > lastRunDate &&
-            x.Trn != null &&
             x.CreatedByTps != true &&
             (x.Gender == Gender.Male || x.Gender == Gender.Female)).ToListAsync();
         return persons;

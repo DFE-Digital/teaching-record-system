@@ -54,11 +54,6 @@ public static class Extensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddOptions<DeletePersonAndChildRecordsWithoutATrnOptions>()
-            .BindConfiguration("RecurringJobs:DeletePersonAndChildRecordsWithoutATrn")
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
         services.AddHttpClient<PopulateNameSynonymsJob>();
 
         services.AddTransient<QtsImporter>();
@@ -268,15 +263,8 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 CapitaImportJob.JobSchedule);
 
-            recurringJobManager.AddOrUpdate<DeletePersonAndChildRecordsWithoutATrnJob>(
-                $"{nameof(DeletePersonAndChildRecordsWithoutATrnJob)} (dry-run)",
-                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
-                Cron.Never);
-
-            recurringJobManager.AddOrUpdate<DeletePersonAndChildRecordsWithoutATrnJob>(
-                nameof(DeletePersonAndChildRecordsWithoutATrnJob),
-                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("DeletePersonAndChildRecordsWithoutATrnJob (dry-run)");
+            recurringJobManager.RemoveIfExists("DeletePersonAndChildRecordsWithoutATrnJob");
 
             recurringJobManager.AddOrUpdate<DeleteStaleJourneyStatesJob>(
                 nameof(DeleteStaleJourneyStatesJob),

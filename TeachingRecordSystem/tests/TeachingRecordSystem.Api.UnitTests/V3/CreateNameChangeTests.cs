@@ -25,7 +25,7 @@ public class CreateNameChangeTests : OperationTestBase
         var createPersonResult = await TestData.CreatePersonAsync();
         var command = await CreateCommand() with
         {
-            Trn = createPersonResult.Trn!,
+            Trn = createPersonResult.Trn,
             EvidenceFileUrl = "https://nonexistenturl.com"
         };
 
@@ -43,7 +43,7 @@ public class CreateNameChangeTests : OperationTestBase
         var createPersonResult = await TestData.CreatePersonAsync();
         var command = await CreateCommand() with
         {
-            Trn = createPersonResult.Trn!
+            Trn = createPersonResult.Trn
         };
         // Act
         var result = await ExecuteCommandAsync(command);

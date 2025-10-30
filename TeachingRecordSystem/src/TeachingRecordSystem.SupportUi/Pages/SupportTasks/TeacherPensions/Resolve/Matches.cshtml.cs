@@ -78,10 +78,10 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
         SupportTask = GetSupportTask();
         RequestData = SupportTask!.TrnRequestMetadata!;
 
-        var person = await DbContext.Persons.SingleAsync(x => x.PersonId == SupportTask!.PersonId);
+        var person = await DbContext.Persons.SingleOrDefaultAsync(x => x.PersonId == SupportTask!.PersonId);
         if (person != null)
         {
-            Trn = person.Trn!;
+            Trn = person.Trn;
         }
 
         var matchedPersonIds = JourneyInstance!.State.MatchedPersonIds.ToArray();
@@ -100,7 +100,7 @@ public class Matches(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerato
                 EmailAddress = p.EmailAddress,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,
                 Gender = p.Gender,
-                Trn = p.Trn!,
+                Trn = p.Trn,
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null,
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)

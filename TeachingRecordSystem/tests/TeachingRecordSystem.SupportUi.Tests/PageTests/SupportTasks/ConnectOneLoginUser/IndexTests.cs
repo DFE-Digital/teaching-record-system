@@ -108,7 +108,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Trn", person.Trn! }
+                { "Trn", person.Trn }
             }
         };
 
@@ -151,7 +151,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Trn", person.Trn! }
+                { "Trn", person.Trn }
             }
         };
 
@@ -160,7 +160,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}/connect?trn={person.Trn!}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}/connect?trn={person.Trn}", response.Headers.Location?.OriginalString);
     }
 
     [Test]
@@ -176,7 +176,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContentBuilder
             {
                 { "Trn", ConnectOneLoginUserIndexModel.NoneOfTheAboveTrnSentinel },
-                { "TrnOverride", person.Trn! }
+                { "TrnOverride", person.Trn }
             }
         };
 
@@ -185,6 +185,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}/connect?trn={person.Trn!}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}/connect?trn={person.Trn}", response.Headers.Location?.OriginalString);
     }
 }
