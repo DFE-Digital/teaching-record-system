@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers.EditAp
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -23,7 +23,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -38,7 +38,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -77,7 +77,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(applicationUser.OneLoginPrivateKeyPem, doc.GetElementById("OneLoginPrivateKeyPem")?.TrimmedText()?.Trim());
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -102,7 +102,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -124,7 +124,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NameNotProvided_RendersError()
     {
         // Arrange
@@ -146,7 +146,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NameTooLong_RendersError()
     {
         // Arrange
@@ -168,8 +168,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetInvalidOidcDetailsData))]
+    [Theory]
+    [MemberData(nameof(GetInvalidOidcDetailsData))]
     public async Task Post_WithOidcClientButInvalidDetails_RendersExpectedError(
         string clientId,
         string clientSecret,
@@ -212,7 +212,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, expectedErrorMessage);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettingsAndCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange

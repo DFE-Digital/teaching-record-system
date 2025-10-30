@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithPersonCreatingInDqtProcess_RendersExpectedEntry()
     {
         // Arrange
@@ -52,7 +52,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             ("Gender", person.Gender?.GetDisplayName()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonImportedIntoDqtProcess_RendersExpectedEntry()
     {
         // Arrange
@@ -111,7 +111,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             ("DQT induction status", person.Person.InductionStatus.ToDqtInductionStatus(out _)));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonUpdatingInDqtProcess_RendersExpectedEntry()
     {
         // Arrange
@@ -181,7 +181,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             ("DQT induction status", person.Person.InductionStatus.ToDqtInductionStatus(out _)));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonDeactivatingInDqtProcess_RendersExpectedEntry()
     {
         // Arrange
@@ -219,7 +219,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             process.CreatedOn);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonReactivatingInDqtProcess_RendersExpectedEntry()
     {
         // Arrange
@@ -271,7 +271,7 @@ file static class Extensions
 
         var date = changeHistoryItem.GetElementsByClassName("moj-timeline__date").SingleOrDefault();
         var expectedDateBlock = $"By {expectedUserName} on {expectedTimestamp:d MMMMM yyyy 'at' h:mm tt}";
-        Assert.Equal(expectedDateBlock, date?.TrimmedText().ReplaceNewLines(), ignoreAllWhiteSpace: true);
+        Assert.Equal(expectedDateBlock, date?.TrimmedText().ReplaceLineEndings(" "), ignoreAllWhiteSpace: true);
 
         if (expectedSummaryListRows.Length > 0)
         {

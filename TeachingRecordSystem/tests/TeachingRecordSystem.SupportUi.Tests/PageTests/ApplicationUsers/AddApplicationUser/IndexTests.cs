@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApplicationUsers.AddApp
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -20,7 +20,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedContent()
     {
         // Arrange
@@ -33,7 +33,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseAsync(response);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NameNotSpecified_RendersError()
     {
         // Arrange
@@ -77,7 +77,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NameTooLong_RendersError()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_CreatesApplicationUserCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange

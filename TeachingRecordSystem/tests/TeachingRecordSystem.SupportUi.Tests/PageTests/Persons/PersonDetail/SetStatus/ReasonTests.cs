@@ -8,8 +8,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Se
 
 public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 {
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices(PersonStatus targetStatus)
     {
         // Arrange
@@ -78,8 +78,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Get_ExpectedRadioButtonsExistOnPage(PersonStatus targetStatus)
     {
         // Arrange
@@ -131,8 +131,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_SetValidReasonDetails_PersistsDetails(PersonStatus targetStatus)
     {
         // Arrange
@@ -181,8 +181,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         }
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors(PersonStatus targetStatus)
     {
         // Arrange
@@ -217,8 +217,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_AnotherReason_NoDetailAdded_ReturnsError(PersonStatus targetStatus)
     {
         // Arrange
@@ -261,8 +261,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         }
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError(PersonStatus targetStatus)
     {
         // Arrange
@@ -298,8 +298,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError(PersonStatus targetStatus)
     {
         // Arrange
@@ -336,8 +336,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -387,8 +387,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -439,8 +439,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -481,8 +481,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile(PersonStatus targetStatus)
     {
         // Arrange
@@ -522,8 +522,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_SetValidFileUpload_PersistsDetails(PersonStatus targetStatus)
     {
         // Arrange
@@ -564,8 +564,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload(PersonStatus targetStatus)
     {
         // Arrange
@@ -602,8 +602,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo(PersonStatus targetStatus)
     {
         // Arrange

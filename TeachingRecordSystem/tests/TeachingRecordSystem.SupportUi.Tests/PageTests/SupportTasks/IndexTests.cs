@@ -1,12 +1,12 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks;
 
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_NoSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
@@ -28,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_DateRequestedSortByQueryParam_ShowsTasksSortedByDateRequested()
     {
         // Arrange
@@ -50,7 +50,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_TypeSortByQueryParam_ShowsTasksSortedByType()
     {
         // Arrange
@@ -72,7 +72,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertResults(doc, dobChangeRequest.SupportTaskReference, connectOneLoginUser.SupportTaskReference);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NoCategoriesSpecifiedAndNoFiltersApplied_ReturnsAllCategories()
     {
         // Arrange
@@ -96,7 +96,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(connectOneLoginUser.SupportTaskReference, references);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NoCategoriesSpecifiedAndFiltersApplied_ReturnsNoResults()
     {
         // Arrange
@@ -114,7 +114,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(references);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_CategoriesSpecified_ReturnsResultsMatchingCategoriesOnly()
     {
         // Arrange
@@ -138,7 +138,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.DoesNotContain(connectOneLoginUser.SupportTaskReference, references);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ReferenceSpecified_ReturnsResultMatchingReferenceOnly()
     {
         // Arrange

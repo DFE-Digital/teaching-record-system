@@ -5,10 +5,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogEditDetailsEventTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeLogEditDetailsEventTests : TestBase
 {
-    [Before(Test)]
-    public void Initialize()
+    public ChangeLogEditDetailsEventTests(HostFixture hostFixture) : base(hostFixture)
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -19,23 +18,23 @@ public class ChangeLogEditDetailsEventTests(HostFixture hostFixture) : TestBase(
         Clock.UtcNow = nows.SingleRandom();
     }
 
-    [Test]
-    [Arguments(PersonDetailsUpdatedEventChanges.FirstName, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.MiddleName, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.LastName, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.DateOfBirth, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.EmailAddress, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.EmailAddress, true, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.EmailAddress, false, true)]
-    [Arguments(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, true)]
-    [Arguments(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, true, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.Gender, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.Gender, false, true)]
-    [Arguments(PersonDetailsUpdatedEventChanges.Gender, true, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, false)]
-    [Arguments(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, true)]
-    [Arguments(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, true, false)]
+    [Theory]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.MiddleName, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.LastName, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress, true, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress, false, true)]
+    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, false, true)]
+    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber, true, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender, false, true)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender, true, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, false)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, false, true)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender, true, false)]
     public async Task Person_WithPersonDetailsUpdatedEvent_RendersExpectedContent(PersonDetailsUpdatedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange

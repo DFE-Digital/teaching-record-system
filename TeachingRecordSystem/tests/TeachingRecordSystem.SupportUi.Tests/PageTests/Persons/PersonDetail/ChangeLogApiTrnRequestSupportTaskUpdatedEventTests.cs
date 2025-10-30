@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 {
     private string _oldFirstName = "Alfred";
     private string _oldMiddleName = "The";
@@ -22,8 +22,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture host
     private string _nino = "XY 98 76 54 A";
     private Gender _gender = Gender.Female;
 
-    [Before(Test)]
-    public void Initialize()
+    public ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture hostFixture) : base(hostFixture)
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -37,23 +36,23 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture host
         _dob = Clock.Today.AddYears(-20);
     }
 
-    [Test]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress, true, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress, false, true)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber, false, true)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber, true, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender, false, true)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender, true, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.AllChanges, false, false)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.AllChanges, false, true)]
-    [Arguments(ApiTrnRequestSupportTaskUpdatedEventChanges.AllChanges, true, false)]
+    [Theory]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress, true, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress, false, true)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber, false, true)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber, true, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender, false, true)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender, true, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.AllChanges, false, false)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.AllChanges, false, true)]
+    [InlineData(ApiTrnRequestSupportTaskUpdatedEventChanges.AllChanges, true, false)]
     public async Task Person_WithPersonDetailsUpdatedEvent_RendersExpectedContent(ApiTrnRequestSupportTaskUpdatedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
@@ -174,7 +173,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests(HostFixture host
         item.AssertSummaryListRowValue("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Person_WithUnknownApplicationSource_RendersExpectedContent()
     {
         // Arrange

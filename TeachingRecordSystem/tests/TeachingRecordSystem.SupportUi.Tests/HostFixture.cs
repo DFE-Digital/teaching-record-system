@@ -2,68 +2,112 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.SupportUi.Tests;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-[SharedDependenciesDataSource]
-public class HostFixture : WebApplicationFactory<Program>
+public class HostFixture : InitializeDbFixture
 {
-    private readonly IConfiguration _configuration;
+    private readonly SupportUiApplicationFactory _webApplicationFactory;
 
-    public HostFixture(IConfiguration configuration)
+    public HostFixture()
     {
-        _configuration = configuration;
-        _ = base.Services;  // Start the host
+        _webApplicationFactory = new SupportUiApplicationFactory();
     }
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    public static User AdminUser { get; private set; } = null!;
+
+    public IServiceProvider Services => _webApplicationFactory.Services;
+
+    public HttpClient CreateClient() => _webApplicationFactory.CreateClient();
+
+    public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => _webApplicationFactory.CreateClient(options);
+
+    public override async ValueTask InitializeAsync()
     {
-        builder.UseEnvironment("Tests");
+        await InitializeDbAsync();
 
-        // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
-        // i.e. Program.cs and that has a dependency on IConfiguration
-        builder.UseConfiguration(_configuration);
+        _ = Services;  // Start the host
 
-        builder.ConfigureServices((context, services) =>
+        AdminUser = await CreateUser();
+
+        async Task<User> CreateUser()
         {
-            services.AddAuthentication()
-                .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
+            await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
 
-            // Remove the built-in antiforgery filters
-            // (we want to be able to POST directly from a test without having to set antiforgery cookies etc.)
-            services.AddSingleton<IPageApplicationModelProvider, RemoveAutoValidateAntiforgeryPageApplicationModelProvider>();
+            var user = new User
+            {
+                Active = true,
+                Name = "Test admin user",
+                Email = "test.admin@example.org",
+                Role = UserRoles.Administrator,
+                UserId = Guid.NewGuid(),
+                AzureAdUserId = null
+            };
 
-            // Publish events synchronously
-            PublishEventsDbCommandInterceptor.ConfigureServices(services);
+            dbContext.Users.Add(user);
 
-            services
-                .AddSingleton(DbHelper.Instance)
-                .AddSingleton<CurrentUserProvider>()
-                .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
-                .AddSingleton<TestData>()
-                .AddSingleton<FakeTrnGenerator>()
-                .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
-                .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
-                .AddSingleton<INotificationSender, NoopNotificationSender>()
-                .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
+            await dbContext.SaveChangesAsync();
 
-            TestScopedServices.ConfigureServices(services);
-        });
+            return user;
+        }
     }
 
-    protected override IHost CreateHost(IHostBuilder builder)
+    private class SupportUiApplicationFactory : WebApplicationFactory<Program>
     {
-        // Ensure we can flow AsyncLocals from tests to the server
-        builder.ConfigureServices(services => services.Configure<TestServerOptions>(o => o.PreserveExecutionContext = true));
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.UseEnvironment("Tests");
 
-        return base.CreateHost(builder);
+            // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
+            // i.e. Program.cs and that has a dependency on IConfiguration
+            var configuration = TestConfiguration.GetConfiguration();
+            builder.UseConfiguration(configuration);
+
+            builder.ConfigureServices((context, services) =>
+            {
+                services.AddAuthentication()
+                    .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
+
+                // Remove the built-in antiforgery filters
+                // (we want to be able to POST directly from a test without having to set antiforgery cookies etc.)
+                services.AddSingleton<IPageApplicationModelProvider, RemoveAutoValidateAntiforgeryPageApplicationModelProvider>();
+
+                // Publish events synchronously
+                PublishEventsDbCommandInterceptor.ConfigureServices(services);
+
+                services
+                    .AddSingleton(DbHelper.Instance)
+                    .AddSingleton<CurrentUserProvider>()
+                    .AddSingleton<TestData>()
+                    .AddSingleton<FakeTrnGenerator>()
+                    .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
+                    .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
+                    .AddSingleton<INotificationSender, NoopNotificationSender>()
+                    .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
+                    .AddStartupTask<AddTestRouteTypesStartupTask>();
+
+                TestScopedServices.ConfigureServices(services);
+            });
+        }
+
+        protected override IHost CreateHost(IHostBuilder builder)
+        {
+            // Ensure we can flow AsyncLocals from tests to the server
+            builder.ConfigureServices(services => services.Configure<TestServerOptions>(o => o.PreserveExecutionContext = true));
+
+            return base.CreateHost(builder);
+        }
     }
 
     private class RemoveAutoValidateAntiforgeryPageApplicationModelProvider : IPageApplicationModelProvider
@@ -86,19 +130,7 @@ public class HostFixture : WebApplicationFactory<Program>
         }
     }
 
-    // IEventObserver needs to be a singleton but we want it to resolve to a test-scoped CaptureEventObserver.
-    // This provides a wrapper that can be registered as a singleton that delegates to the test-scoped IEventObserver instance.
-    private class ForwardToTestScopedEventObserver : IEventObserver
-    {
-        public void OnEventCreated(EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventCreated(@event);
-    }
-
-    private class ForwardToTestScopedClock : IClock
-    {
-        public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
-    }
-
-    public class ExecuteScheduledJobsStartupFilter : IStartupFilter
+    private class ExecuteScheduledJobsStartupFilter : IStartupFilter
     {
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) =>
             app =>

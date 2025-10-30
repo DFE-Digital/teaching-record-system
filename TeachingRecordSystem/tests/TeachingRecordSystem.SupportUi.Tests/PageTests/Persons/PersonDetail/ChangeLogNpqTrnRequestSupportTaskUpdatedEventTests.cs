@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
 {
     private string _oldFirstName = "Alfred";
     private string _oldMiddleName = "The";
@@ -22,8 +22,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hos
     private string _nino = "XY 98 76 54 A";
     private Gender _gender = Gender.Female;
 
-    [Before(Test)]
-    public void Initialize()
+    public ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hostFixture) : base(hostFixture)
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -37,21 +36,33 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hos
         _dob = Clock.Today.AddYears(-20);
     }
 
-    [Test]
-    [MatrixDataSource]
+    public static TheoryData<NpqTrnRequestSupportTaskResolvedEventChanges, bool, bool, NpqTrnRequestResolvedReason>
+        Person_WithNpqTrnRequestSupportTaskResolvedEvent_RendersExpectedContentData =>
+        new MatrixTheoryData<NpqTrnRequestSupportTaskResolvedEventChanges, bool, bool, NpqTrnRequestResolvedReason>(
+            [
+                NpqTrnRequestSupportTaskResolvedEventChanges.PersonFirstName,
+                NpqTrnRequestSupportTaskResolvedEventChanges.PersonMiddleName,
+                NpqTrnRequestSupportTaskResolvedEventChanges.PersonLastName,
+                NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth,
+                NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress,
+                NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber,
+                NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender,
+                NpqTrnRequestSupportTaskResolvedEventChanges.AllChanges
+            ],
+            [true, false],
+            [true, false],
+            [
+                NpqTrnRequestResolvedReason.RecordCreated,
+                NpqTrnRequestResolvedReason.RecordMerged
+            ]);
+
+    [Theory]
+    [MemberData(nameof(Person_WithNpqTrnRequestSupportTaskResolvedEvent_RendersExpectedContentData))]
     public async Task Person_WithNpqTrnRequestSupportTaskResolvedEvent_RendersExpectedContent(
-        [Matrix(NpqTrnRequestSupportTaskResolvedEventChanges.PersonFirstName,
-            NpqTrnRequestSupportTaskResolvedEventChanges.PersonMiddleName,
-            NpqTrnRequestSupportTaskResolvedEventChanges.PersonLastName,
-            NpqTrnRequestSupportTaskResolvedEventChanges.PersonDateOfBirth,
-            NpqTrnRequestSupportTaskResolvedEventChanges.PersonEmailAddress,
-            NpqTrnRequestSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber,
-            NpqTrnRequestSupportTaskResolvedEventChanges.PersonGender,
-            NpqTrnRequestSupportTaskResolvedEventChanges.AllChanges)]
         NpqTrnRequestSupportTaskResolvedEventChanges changes,
-        [Matrix(false, true)] bool previousValueIsDefault,
-        [Matrix(false, true)] bool newValueIsDefault,
-        [Matrix(NpqTrnRequestResolvedReason.RecordCreated, NpqTrnRequestResolvedReason.RecordMerged)] NpqTrnRequestResolvedReason reason)
+        bool previousValueIsDefault,
+        bool newValueIsDefault,
+        NpqTrnRequestResolvedReason reason)
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
@@ -186,9 +197,9 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hos
         item.AssertSummaryListRowValue("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? UiDefaults.EmptyDisplayContent, v.TrimmedText()));
     }
 
-    [Test]
-    [Arguments(NpqTrnRequestResolvedReason.RecordCreated)]
-    [Arguments(NpqTrnRequestResolvedReason.RecordMerged)]
+    [Theory]
+    [InlineData(NpqTrnRequestResolvedReason.RecordCreated)]
+    [InlineData(NpqTrnRequestResolvedReason.RecordMerged)]
     public async Task Person_WithNpqTrnRequestSupportTaskResolvedEvent_WithUnknownApplicationSource_RendersExpectedContent(NpqTrnRequestResolvedReason reason)
     {
         // Arrange
@@ -227,9 +238,9 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hos
         item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Test]
-    [Arguments(NpqTrnRequestResolvedReason.RecordCreated)]
-    [Arguments(NpqTrnRequestResolvedReason.RecordMerged)]
+    [Theory]
+    [InlineData(NpqTrnRequestResolvedReason.RecordCreated)]
+    [InlineData(NpqTrnRequestResolvedReason.RecordMerged)]
     public async Task Person_WithNpqTrnRequestSupportTaskResolvedEvent_ChangeReason_RendersExpectedContent(NpqTrnRequestResolvedReason reason)
     {
         // Arrange

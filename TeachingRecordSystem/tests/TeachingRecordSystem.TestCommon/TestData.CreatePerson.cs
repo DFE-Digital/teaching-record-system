@@ -1023,12 +1023,8 @@ public partial class TestData
         internal static DateOnly? GetDefaultCompletedDate(InductionStatus status, DateOnly? startDate) =>
             status.RequiresCompletedDate() ? startDate!.Value.AddMonths(12) : null;
 
-#pragma warning disable IDE1007
-#pragma warning disable format
         internal static Guid[] GetDefaultExemptionReasonIds(InductionStatus status) =>
-            status is InductionStatus.Exempt ? [InductionExemptionReason.PassedInWalesId] : [];
-#pragma warning restore format
-#pragma warning restore IDE1007
+            status is InductionStatus.Exempt ? new[] { InductionExemptionReason.PassedInWalesId } : [];
     }
 
     public record CreatePersonResult

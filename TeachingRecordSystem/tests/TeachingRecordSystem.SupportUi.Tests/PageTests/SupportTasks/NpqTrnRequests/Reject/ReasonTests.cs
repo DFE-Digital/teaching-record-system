@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequ
 
 public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_HasBackLinkExpected()
     {
         // Arrange
@@ -41,7 +41,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get__FromCYA_HasBackLinkToCYA()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsSelectedReasonFromJourneyState()
     {
         // Arrange
@@ -110,7 +110,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         Assert.Equal(state.RejectionReason.ToString(), reasonChoiceSelection);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoReasonSelected_RendersError()
     {
         // Arrange
@@ -137,7 +137,7 @@ public class ReasonTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, "RejectionReason", "Select a reason for rejecting this request");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ReasonSelected_PersistsDataAndRedirects()
     {
         // Arrange

@@ -1,14 +1,15 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
-public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.New;
     private const string ThisStep = JourneySteps.Index;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -27,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -43,7 +44,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -59,7 +60,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -76,7 +77,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(alert.ExternalLink, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -94,7 +95,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -117,7 +118,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -133,7 +134,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -152,9 +153,9 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_NoAddLinkOptionSelected_ReturnsError(bool hasCurrentLink)
     {
         // Arrange
@@ -180,9 +181,9 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments("invalid url")]
-    [Arguments(null)]
+    [Theory]
+    [InlineData("invalid url")]
+    [InlineData(null)]
     public async Task Post_WithInvalidLinkUrl_ReturnsError(string? invalidLink)
     {
         // Arrange
@@ -201,7 +202,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithUnchangedLink_ReturnsError()
     {
         // Arrange
@@ -220,7 +221,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a different link");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithNoCurrentLinkAndAddLinkOptionNoSelected_RedirectsToPersonAlertsPage()
     {
         // Arrange
@@ -243,7 +244,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithLink_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -268,7 +269,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(newLink, journeyInstance.State.Link);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithNoLink_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -292,7 +293,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Null(journeyInstance.State.Link);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -312,7 +313,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

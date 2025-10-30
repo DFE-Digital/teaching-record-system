@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusCreatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -69,7 +69,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(sourceApplicationReference, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusCreatedEvent_AffectsPersonProfessionalStatus_RendersExpectedContent()
     {
         // Arrange
@@ -105,7 +105,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal("Not provided", timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusCreatedEvent_RendersExpectedChangeReasonContent()
     {
         // Arrange
@@ -146,7 +146,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal($"{filename} (opens in new tab)", timelineItem.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusUpdatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -262,7 +262,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(oldSourceApplicationReference, timelineItem.GetElementByTestId("old-source-application-reference")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusUpdatedEvent_StatusChangedToHolds_PersonQtsChanged_RendersExpectedContent()
     {
         // Arrange
@@ -358,7 +358,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Null(timelineItem.GetElementByTestId("old-subjects"));
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusUpdatedEvent_RendersExpectedChangeReasonContent()
     {
         // Arrange
@@ -416,7 +416,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(changeReasonDetail, timelineItem.GetElementByTestId("reason-detail")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusDeletedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -500,7 +500,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(sourceApplicationReference, timelineItem.GetElementByTestId("source-application-reference")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonQts_RendersExpectedContent()
     {
         // Arrange
@@ -539,7 +539,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonEyts_RendersExpectedContent()
     {
         // Arrange
@@ -578,7 +578,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonPqts_RendersExpectedContent()
     {
         // Arrange
@@ -617,7 +617,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonEyps_RendersExpectedContent()
     {
         // Arrange
@@ -656,9 +656,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal("Yes", timelineItem.GetElementByTestId("old-has-eyps")?.TrimmedText());
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task ProfessionalStatusMigratedEvent_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -856,7 +856,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(populateOptional ? $"{ittSubject1!.dfeta_Value} - {ittSubject1!.dfeta_name}{ittSubject2!.dfeta_Value} - {ittSubject2!.dfeta_name}{ittSubject3!.dfeta_Value} - {ittSubject3!.dfeta_name}" : UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("dqt-subjects")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task DqtInitialTeacherTrainingCreatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -896,7 +896,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(ittResult.ToString(), timelineItem.GetElementByTestId("itt-result")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task DqtInitialTeacherTrainingUpdatedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -943,11 +943,11 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(oldIttResult.ToString(), timelineItem.GetElementByTestId("old-itt-result")?.TrimmedText());
     }
 
-    [Test]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.QtsDate)]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.EytsDate)]
+    [Theory]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.QtsDate)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EytsDate)]
     public async Task DqtQtsRegistrationCreatedEvent_RendersExpectedContent(DqtQtsRegistrationUpdatedEventChanges changes)
     {
         // Arrange
@@ -1027,11 +1027,11 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         }
     }
 
-    [Test]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.QtsDate)]
-    [Arguments(DqtQtsRegistrationUpdatedEventChanges.EytsDate)]
+    [Theory]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.QtsDate)]
+    [InlineData(DqtQtsRegistrationUpdatedEventChanges.EytsDate)]
     public async Task DqtQtsRegistrationUpdatedEvent_RendersExpectedContent(DqtQtsRegistrationUpdatedEventChanges changes)
     {
         // Arrange

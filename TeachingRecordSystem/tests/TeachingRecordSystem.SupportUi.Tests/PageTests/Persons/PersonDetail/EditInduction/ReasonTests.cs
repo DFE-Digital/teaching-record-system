@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -51,7 +51,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(reasonDetail, additionalDetailTextArea!.Value);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
@@ -131,7 +131,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -160,7 +160,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AdditionalDetailYes_NoDetailAdded_ReturnsError()
     {
         // Arrange
@@ -187,7 +187,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -216,7 +216,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -258,7 +258,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileSizeDescription"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -300,7 +300,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("3 KB", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileSizeDescription"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -332,7 +332,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -363,7 +363,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -396,7 +396,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -428,7 +428,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange

@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -42,7 +42,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AttributesDifferent_ReturnsHighlightedDifferences()
     {
         // Arrange
@@ -132,7 +132,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -173,7 +173,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithoutSelectingAnswerToUploadEvidence_ReturnsError()
     {
         // Arrange
@@ -217,7 +217,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithoutSelectingAnyRadioButtons_ReturnsErrors()
     {
         // Arrange
@@ -259,7 +259,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "GenderSource", "Select a gender");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange
@@ -319,7 +319,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(false, journeyInstance.State.Evidence.UploadEvidence);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequestWithEvidenceAttachment_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange
@@ -379,7 +379,6 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(mergeComments, journeyInstance.State.MergeComments);
         Assert.Equal(true, journeyInstance.State.Evidence.UploadEvidence);
         Assert.Equal(evidenceFile, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
-        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
     }
 
     private static MultipartFormDataContentBuilder CreatePostContent(

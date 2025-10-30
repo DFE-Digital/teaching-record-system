@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -21,9 +21,9 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(KeepingRecordSeparateReason.RecordDoesNotMatch, null)]
-    [Arguments(KeepingRecordSeparateReason.AnotherReason, "Keeping them separate for some reason")]
+    [Theory]
+    [InlineData(KeepingRecordSeparateReason.RecordDoesNotMatch, null)]
+    [InlineData(KeepingRecordSeparateReason.AnotherReason, "Keeping them separate for some reason")]
     public async Task Post_Reason_RedirectsToConfirm(KeepingRecordSeparateReason reason, string? additionalComments)
     {
         // Arrange
@@ -74,7 +74,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal($"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/confirm-keep-record-separate?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ReasonNotProvided_ReturnsError()
     {
         // Arrange
@@ -125,7 +125,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : TestBase(hostFix
         await AssertEx.HtmlResponseHasErrorAsync(response, "Reason", "Enter Reason");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange

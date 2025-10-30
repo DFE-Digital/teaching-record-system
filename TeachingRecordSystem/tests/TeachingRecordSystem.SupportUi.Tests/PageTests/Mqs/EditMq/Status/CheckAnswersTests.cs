@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
 
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -29,10 +29,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(true, false, "some reason", true)]
-    [Arguments(false, true, null, true)]
-    [Arguments(true, true, null, false)]
+    [Theory]
+    [InlineData(true, false, "some reason", true)]
+    [InlineData(false, true, null, true)]
+    [InlineData(true, true, null, false)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
         bool isStatusChange,
         bool isEndDateChange,
@@ -151,7 +151,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -177,10 +177,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(true, false, "some reason", true)]
-    [Arguments(false, true, null, true)]
-    [Arguments(true, true, null, false)]
+    [Theory]
+    [InlineData(true, false, "some reason", true)]
+    [InlineData(false, true, null, true)]
+    [InlineData(true, true, null, false)]
     public async Task Post_Confirm_UpdatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(
         bool isStatusChange,
         bool isEndDateChange,
@@ -344,7 +344,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyRedirectsAndDoesNotUpdateMq()
     {
         // Arrange
@@ -392,7 +392,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

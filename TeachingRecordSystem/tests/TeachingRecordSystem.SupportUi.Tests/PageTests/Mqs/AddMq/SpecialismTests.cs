@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
 public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -22,7 +22,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ProviderMissingFromState_RedirectsToProvider()
     {
         // Arrange
@@ -40,7 +40,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -63,7 +63,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(specialism.ToString(), selectedSpecialism.GetAttribute("value"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -87,7 +87,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ProviderMissingFromState_RedirectsToProvider()
     {
         // Arrange
@@ -112,7 +112,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoSpecialismIsSelected_ReturnsError()
     {
         // Arrange
@@ -132,7 +132,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenSpecialismIsSelected_RedirectsToStartDatePage()
     {
         // Arrange
@@ -157,7 +157,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

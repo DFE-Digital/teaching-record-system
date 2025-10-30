@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -23,7 +23,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForValidPersonReturnsOk()
     {
         // Arrange
@@ -54,10 +54,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(MandatoryQualificationStatus.InProgress)]
-    [Arguments(MandatoryQualificationStatus.Failed)]
-    [Arguments(MandatoryQualificationStatus.Passed)]
+    [Theory]
+    [InlineData(MandatoryQualificationStatus.InProgress)]
+    [InlineData(MandatoryQualificationStatus.Failed)]
+    [InlineData(MandatoryQualificationStatus.Passed)]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState(MandatoryQualificationStatus status)
     {
         // Arrange
@@ -99,7 +99,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -119,10 +119,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(MandatoryQualificationStatus.InProgress)]
-    [Arguments(MandatoryQualificationStatus.Failed)]
-    [Arguments(MandatoryQualificationStatus.Passed)]
+    [Theory]
+    [InlineData(MandatoryQualificationStatus.InProgress)]
+    [InlineData(MandatoryQualificationStatus.Failed)]
+    [InlineData(MandatoryQualificationStatus.Passed)]
     public async Task Post_Confirm_CreatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(MandatoryQualificationStatus status)
     {
         // Arrange
@@ -203,7 +203,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyRedirectsAndDoesNotCreateMq()
     {
         // Arrange
@@ -246,7 +246,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

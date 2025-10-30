@@ -15,7 +15,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
             return;
         }
 
-        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required.");
 
         var currentSupportTaskQuery = dbContext.SupportTasks
             .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update");  // https://github.com/dotnet/efcore/issues/26042

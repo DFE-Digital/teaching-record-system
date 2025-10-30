@@ -30,7 +30,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
             return;
         }
 
-        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required.");
 
         var query = dbContext.Alerts
             .FromSql($"select * from alerts where alert_id = {alertId} for update")  // https://github.com/dotnet/efcore/issues/26042

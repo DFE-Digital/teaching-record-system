@@ -42,6 +42,6 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
         return person;
     }
 
-    public static PersonStatus[] GetAllStatuses() =>
-        [PersonStatus.Active, PersonStatus.Deactivated];
+    public static TheoryData<PersonStatus> GetAllStatuses() =>
+        new(PersonStatus.Active, PersonStatus.Deactivated);
 }

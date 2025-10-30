@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequ
 
 public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_ShowsExpected()
     {
         // Arrange
@@ -35,7 +35,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         doc.AssertSummaryListRowValueContentMatches("Evidence", $"{metadata.NpqEvidenceFileName} (opens in new tab)");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_CreateARecordSelected_HasMatches_RedirectsToExpected()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_CreateARecordSelected_NoMatches_RedirectsToExpected()
     {
         // Arrange
@@ -90,7 +90,7 @@ public class DetailsTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_CreateNewRecordFalse_RedirectsToExpected()
     {
         // Arrange

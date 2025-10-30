@@ -5,12 +5,11 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
-[NotInParallel]
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-    [Test]
+    [Fact]
     public async Task Get_ConfirmAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -38,7 +37,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             b => Assert.Equal("Cancel", b.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsPersonalDetails_AsExpected()
     {
         // Arrange
@@ -70,7 +69,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Other", v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsMissingOptionalPersonalDetails_AsNotProvided()
     {
         // Arrange
@@ -97,7 +96,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsCreateReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
@@ -132,7 +131,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WhenMissingAdditionalDetailAndEvidenceFile_ShowsAsNotProvided()
     {
         // Arrange
@@ -159,7 +158,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowValues("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange

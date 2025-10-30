@@ -2,14 +2,15 @@ using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
-public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.Index;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
@@ -27,7 +28,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -43,9 +44,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
     {
         // Arrange
@@ -62,11 +63,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(true, true)]
-    [Arguments(true, false)]
-    [Arguments(false, true)]
-    [Arguments(false, false)]
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(false, false)]
     public async Task Get_WithValidJourneyState_ReturnsOk(bool isOpenAlert, bool populateOptional)
     {
         // Arrange
@@ -90,7 +91,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -109,7 +110,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -125,9 +126,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task GPost_MissingDataInJourneyState_RedirectsToIndexPage(bool isOpenAlert)
     {
         // Arrange
@@ -144,9 +145,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.StartsWith($"/alerts/{alert.AlertId}/delete", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_Confirm_DeletesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool isOpenAlert)
     {
         // Arrange
@@ -204,9 +205,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_Cancel_DeletesJourneyAndRedirects(bool isOpenAlert)
     {
         // Arrange
@@ -233,7 +234,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(ho
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
