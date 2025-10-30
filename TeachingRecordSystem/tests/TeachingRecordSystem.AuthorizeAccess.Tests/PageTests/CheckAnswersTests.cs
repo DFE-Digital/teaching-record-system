@@ -257,7 +257,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var trnToken = await CreateTrnTokenAsync(person.Trn!);
+        var trnToken = await CreateTrnTokenAsync(person.Trn);
         var applicationUser = await TestData.CreateApplicationUserAsync(isOidcClient: true);
         var state = CreateNewState(clientApplicationUserId: applicationUser.UserId, trnToken: trnToken);
         var journeyInstance = await CreateJourneyInstanceAsync(state);

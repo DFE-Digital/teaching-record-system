@@ -70,7 +70,7 @@ public partial class PersonMatchingServiceTests
 
             var trn = trnOption switch
             {
-                TrnArgumentOption.SpecifiedAndMatches => person.Trn!,
+                TrnArgumentOption.SpecifiedAndMatches => person.Trn,
                 TrnArgumentOption.SpecifiedButDifferent => await TestData.GenerateTrnAsync(),
                 _ => null
             };
@@ -109,7 +109,7 @@ public partial class PersonMatchingServiceTests
             string[][] names = [[firstName, lastName]];
             DateOnly[] datesOfBirth = [dateOfBirth];
             var nationalInsuranceNumber = person1.NationalInsuranceNumber!;
-            var trn = person2.Trn!;
+            var trn = person2.Trn;
 
             var service = new PersonMatchingService(dbContext);
 
@@ -140,7 +140,7 @@ public partial class PersonMatchingServiceTests
             string[][] names = [[person.FirstName, person.LastName], [alias, person.LastName]];
             DateOnly[] datesOfBirth = [person.DateOfBirth];
             var nationalInsuranceNumber = person.NationalInsuranceNumber!;
-            var trn = person.Trn!;
+            var trn = person.Trn;
 
             var service = new PersonMatchingService(dbContext);
 
@@ -174,11 +174,11 @@ public partial class PersonMatchingServiceTests
 
             // Person who matches on TRN
             var person3 = await TestData.CreatePersonAsync();
-            var trn = person3.Trn!;
+            var trn = person3.Trn;
 
             // Person who matches on last name, DOB & TRN
             var person4 = await TestData.CreatePersonAsync(p => p.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-            var trnTokenHintTrn = person4.Trn!;
+            var trnTokenHintTrn = person4.Trn;
 
             string[][] names = [[firstName, lastName]];
             DateOnly[] datesOfBirth = [dateOfBirth];

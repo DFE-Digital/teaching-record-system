@@ -57,7 +57,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var startDate = new DateOnly(2023, 02, 03);
         var endDate = new DateOnly(2024, 03, 30);
         var extractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person.Trn!, establishment1.LaCode, nonExistentEstablishmentNumber, establishment1.Postcode!, startDate, endDate, extractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person.Trn, establishment1.LaCode, nonExistentEstablishmentNumber, establishment1.Postcode!, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -81,7 +81,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var startDate = new DateOnly(2023, 02, 03);
         var endDate = new DateOnly(2024, 03, 30);
         var extractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -110,7 +110,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var startDate = new DateOnly(2023, 02, 03);
         var endDate = new DateOnly(2024, 10, 30);
         var extractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -139,7 +139,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var startDate = new DateOnly(2023, 02, 03);
         var endDate = new DateOnly(2024, 03, 30);
         var extractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate, withdrawalIndicator: "W"));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate, withdrawalIndicator: "W"));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -168,7 +168,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var startDate = new DateOnly(2023, 02, 03);
         var endDate = new DateOnly(2023, 10, 30);
         var extractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -204,7 +204,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var startDate = new DateOnly(2023, 02, 03);
         var endDate = new DateOnly(2024, 03, 30);
         var extractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, laCode, establishmentNumber, postcode, startDate, endDate, extractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, laCode, establishmentNumber, postcode, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -237,8 +237,8 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var higherEductionEstablishment = await TestData.CreateEstablishmentAsync(laCode1, postcode: postcode2, isHigherEducationInstitution: true);
         await TestData.CreateTpsCsvExtractAsync(
             b => b.WithTpsCsvExtractId(tpsCsvExtractId)
-                .WithItem(person!.Trn!, laCode1, establishmentNumber1, postcode1, new DateOnly(2023, 02, 03), new DateOnly(2024, 03, 30), new DateOnly(2024, 04, 25))
-                .WithItem(person!.Trn!, laCode1, establishmentNumber2, postcode2, new DateOnly(2023, 04, 05), new DateOnly(2024, 03, 30), new DateOnly(2024, 04, 25)));
+                .WithItem(person!.Trn, laCode1, establishmentNumber1, postcode1, new DateOnly(2023, 02, 03), new DateOnly(2024, 03, 30), new DateOnly(2024, 04, 25))
+                .WithItem(person!.Trn, laCode1, establishmentNumber2, postcode2, new DateOnly(2023, 04, 05), new DateOnly(2024, 03, 30), new DateOnly(2024, 04, 25)));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -270,7 +270,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var updatedEndDate = new DateOnly(2024, 03, 30);
         var updatedLastExtractDate = new DateOnly(2024, 04, 25);
         var updatedMemberEmailAddress = "updated@email.com";
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate, memberEmailAddress: updatedMemberEmailAddress));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate, memberEmailAddress: updatedMemberEmailAddress));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -301,7 +301,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var existingPersonEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
         var updatedEndDate = new DateOnly(2024, 10, 30);
         var updatedLastExtractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -330,7 +330,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var updatedEndDate = new DateOnly(2024, 03, 30);
         var updatedWithdrawalIndicator = "W";
         var updatedLastExtractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate, withdrawalIndicator: updatedWithdrawalIndicator));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate, withdrawalIndicator: updatedWithdrawalIndicator));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -360,7 +360,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var personPostcode = Faker.Address.UkPostCode();
         var existingPersonEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2023, 10, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
         var updatedLastExtractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), existingPersonEmployment.LastKnownTpsEmployedDate, updatedLastExtractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), existingPersonEmployment.LastKnownTpsEmployedDate, updatedLastExtractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -388,7 +388,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var personPostcode = Faker.Address.UkPostCode();
         var existingPersonEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode, withdrawalConfirmed: true);
         var updatedLastExtractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), existingPersonEmployment.LastKnownTpsEmployedDate, updatedLastExtractDate));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), existingPersonEmployment.LastKnownTpsEmployedDate, updatedLastExtractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -416,7 +416,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
         var personPostcode = Faker.Address.UkPostCode();
         var existingPersonEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, existingPersonEmployment.StartDate, existingPersonEmployment.LastKnownTpsEmployedDate, existingPersonEmployment.LastExtractDate, "FT"));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, existingPersonEmployment.StartDate, existingPersonEmployment.LastKnownTpsEmployedDate, existingPersonEmployment.LastExtractDate, "FT"));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -493,7 +493,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var memberPostcode = Faker.Address.UkPostCode();
         var employerEmailAddress = Faker.Internet.Email();
         var personEmploymentWithoutEmployerEmailAddress = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, memberPostcode);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, personEmploymentWithoutEmployerEmailAddress.StartDate, personEmploymentWithoutEmployerEmailAddress.LastKnownTpsEmployedDate, personEmploymentWithoutEmployerEmailAddress.LastExtractDate, "FT", personEmploymentWithoutEmployerEmailAddress.NationalInsuranceNumber, memberPostcode: personEmploymentWithoutEmployerEmailAddress.PersonPostcode, employerEmailAddress: employerEmailAddress));
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, personEmploymentWithoutEmployerEmailAddress.StartDate, personEmploymentWithoutEmployerEmailAddress.LastKnownTpsEmployedDate, personEmploymentWithoutEmployerEmailAddress.LastExtractDate, "FT", personEmploymentWithoutEmployerEmailAddress.NationalInsuranceNumber, memberPostcode: personEmploymentWithoutEmployerEmailAddress.PersonPostcode, employerEmailAddress: employerEmailAddress));
 
         // Act
         var processor = new TpsCsvExtractProcessor(

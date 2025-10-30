@@ -110,7 +110,7 @@ public class DebugIdentityModel(
 
         if (_oneLoginUser!.PersonId is not null && !DetachPerson)
         {
-            await JourneyInstance!.UpdateStateAsync(state => helper.Complete(state, _oneLoginUser.Person!.Trn!));
+            await JourneyInstance!.UpdateStateAsync(state => helper.Complete(state, _oneLoginUser.Person!.Trn));
             return GetNextPage();
         }
 
@@ -167,5 +167,5 @@ public class DebugIdentityModel(
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
-    public record PersonInfo(Guid PersonId, string? Trn, string FirstName, string LastName, DateOnly? DateOfBirth, string? NationalInsuranceNumber);
+    public record PersonInfo(Guid PersonId, string Trn, string FirstName, string LastName, DateOnly? DateOfBirth, string? NationalInsuranceNumber);
 }

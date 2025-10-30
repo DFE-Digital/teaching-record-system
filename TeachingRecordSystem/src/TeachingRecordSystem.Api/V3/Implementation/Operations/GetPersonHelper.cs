@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using OneOf;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
@@ -42,11 +41,9 @@ public class GetPersonHelper(TrsDbContext dbContext)
             return ApiError.RecordIsNotActive(trn);
         }
 
-        Debug.Assert(person.Trn is not null);
-
         if (person.Trn != trn)
         {
-            return ApiError.RecordIsMerged(trn, person.Trn!);
+            return ApiError.RecordIsMerged(trn, person.Trn);
         }
 
         return person;

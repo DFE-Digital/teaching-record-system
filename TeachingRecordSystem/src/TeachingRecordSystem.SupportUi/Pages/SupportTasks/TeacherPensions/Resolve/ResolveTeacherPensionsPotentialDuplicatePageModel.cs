@@ -127,7 +127,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
             DateOfBirth = person.DateOfBirth,
             NationalInsuranceNumber = person.NationalInsuranceNumber,
             Gender = person.Gender,
-            Trn = person.Trn!
+            Trn = person.Trn
         };
 
     protected async Task<TeacherPensionsPotentialDuplicateAttributes> GetPersonAttributesAsync(Guid personId)
@@ -155,7 +155,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
             DateOfBirth = personAttributes.DateOfBirth,
             NationalInsuranceNumber = personAttributes.NationalInsuranceNumber,
             Gender = personAttributes.Gender,
-            Trn = personAttributes.Trn!
+            Trn = personAttributes.Trn
         };
     }
 
@@ -173,7 +173,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(TrsDbCon
             DateOfBirth = requestData.DateOfBirth,
             NationalInsuranceNumber = requestData.NationalInsuranceNumber,
             Gender = requestData.Gender,
-            Trn = person.Trn!
+            Trn = person.Trn
         };
     }
 

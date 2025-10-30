@@ -53,7 +53,7 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.GetMatchedAttributesAsync(new(names, datesOfBirth, nationalInsuranceNumber, person.Trn!, TrnTokenTrnHint: null), person.PersonId);
+            var result = await service.GetMatchedAttributesAsync(new(names, datesOfBirth, nationalInsuranceNumber, person.Trn, TrnTokenTrnHint: null), person.PersonId);
 
             // Assert
             Assert.Collection(
@@ -61,7 +61,7 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
                 m => AssertAttributeMatch(PersonMatchedAttribute.LastName, lastName, m),
                 m => AssertAttributeMatch(PersonMatchedAttribute.DateOfBirth, dateOfBirth.ToString("yyyy-MM-dd"), m),
                 m => AssertAttributeMatch(PersonMatchedAttribute.NationalInsuranceNumber, nationalInsuranceNumber, m),
-                m => AssertAttributeMatch(PersonMatchedAttribute.Trn, person.Trn!, m),
+                m => AssertAttributeMatch(PersonMatchedAttribute.Trn, person.Trn, m),
                 m => AssertAttributeMatch(PersonMatchedAttribute.FirstName, firstName, m));
 
             static void AssertAttributeMatch(PersonMatchedAttribute expectedAttribute, string expectedValue, KeyValuePair<PersonMatchedAttribute, string> actual)

@@ -47,7 +47,7 @@ public static class HttpContextExtensions
         context.Features.Set(currentAlertFeature);
 }
 
-public record CurrentPersonFeature(Guid PersonId, string? Trn, PersonStatus Status, string FirstName, string MiddleName, string LastName)
+public record CurrentPersonFeature(Guid PersonId, string Trn, PersonStatus Status, string FirstName, string MiddleName, string LastName)
 {
     public string Name => (FirstName + " " + MiddleName).Trim() + " " + LastName;
 }

@@ -18,7 +18,7 @@ public class ChangeLogTrnAllocatedEventTests(HostFixture hostFixture) : TestBase
             CreatedUtc = Clock.UtcNow,
             RaisedBy = SystemUser.SystemUserId,
             PersonId = person.PersonId,
-            Trn = trn!
+            Trn = trn
         };
 
         await WithDbContext(async dbContext =>

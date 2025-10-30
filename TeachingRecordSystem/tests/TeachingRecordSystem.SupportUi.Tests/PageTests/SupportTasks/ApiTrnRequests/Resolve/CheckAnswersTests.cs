@@ -410,7 +410,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(requestData.EmailAddress, person.EmailAddress);
         Assert.Equal(requestData.NationalInsuranceNumber, person.NationalInsuranceNumber);
         Assert.Equal(requestData.Gender, person.Gender);
-        Assert.NotNull(person.Trn);
 
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));

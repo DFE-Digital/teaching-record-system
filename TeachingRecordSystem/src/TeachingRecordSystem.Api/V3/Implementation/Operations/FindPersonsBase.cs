@@ -35,7 +35,6 @@ public abstract class FindPersonsHandlerBase(
             .Include(p => p.Qualifications!).AsSplitQuery()
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Where(p => matchedPersonIds.Contains(p.PersonId))
-            .Where(p => p.Trn != null)
             .ToDictionaryAsync(p => p.PersonId, p => p);
 
         var items = await matchedPersonIds
@@ -44,7 +43,7 @@ public abstract class FindPersonsHandlerBase(
             .Select(id => persons[id])
             .SelectAwait(async person => new FindPersonsResultItem()
             {
-                Trn = person.Trn!,
+                Trn = person.Trn,
                 DateOfBirth = person.DateOfBirth!.Value,
                 FirstName = person.FirstName,
                 MiddleName = person.MiddleName,

@@ -46,7 +46,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForUrlPathAsync("/found");
         await page.ClickButtonAsync("Access your teaching record");
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -74,13 +74,13 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('Teacher reference number')", person.Trn!);
+        await page.FillAsync("label:text-is('Teacher reference number')", person.Trn);
         await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
         await page.ClickButtonAsync("Access your teaching record");
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -107,13 +107,13 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('Teacher reference number')", person.Trn!);
+        await page.FillAsync("label:text-is('Teacher reference number')", person.Trn);
         await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
         await page.ClickButtonAsync("Access your teaching record");
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
             idDbContext.TrnTokens.Add(new IdTrnToken()
             {
                 TrnToken = trnToken,
-                Trn = person.Trn!,
+                Trn = person.Trn,
                 CreatedUtc = Clock.UtcNow,
                 ExpiresUtc = Clock.UtcNow.AddDays(1),
                 Email = email,
@@ -220,7 +220,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GoToTestStartPageAsync(trnToken: trnToken);
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -247,7 +247,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Updated = Clock.UtcNow,
                 UserType = IdModelTypes.UserType.Teacher,
                 TrnVerificationLevel = TrnVerificationLevel.Medium,
-                Trn = person.Trn!
+                Trn = person.Trn
             });
 
             await idDbContext.SaveChangesAsync();
@@ -258,7 +258,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -286,7 +286,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                 UserType = IdModelTypes.UserType.Teacher,
                 TrnVerificationLevel = TrnVerificationLevel.Low,
                 TrnAssociationSource = TrnAssociationSource.TrnToken,
-                Trn = person.Trn!
+                Trn = person.Trn
             });
 
             await idDbContext.SaveChangesAsync();
@@ -297,7 +297,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -325,7 +325,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
                 UserType = IdModelTypes.UserType.Teacher,
                 TrnVerificationLevel = TrnVerificationLevel.Low,
                 TrnAssociationSource = TrnAssociationSource.SupportUi,
-                Trn = person.Trn!
+                Trn = person.Trn
             });
 
             await idDbContext.SaveChangesAsync();
@@ -336,7 +336,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -352,7 +352,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -375,7 +375,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 
     [Fact]
@@ -399,6 +399,6 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedInAsync(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn);
     }
 }

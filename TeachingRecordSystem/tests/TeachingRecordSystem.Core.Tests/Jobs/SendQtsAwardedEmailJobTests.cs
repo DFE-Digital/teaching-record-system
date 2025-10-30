@@ -38,7 +38,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
                     ["first name"] = person.FirstName,
                     ["last name"] = person.LastName
                 },
-                Metadata = new Dictionary<string, object> { ["Trn"] = person.Trn! },
+                Metadata = new Dictionary<string, object> { ["Trn"] = person.Trn },
                 SentOn = null
             };
 
@@ -48,7 +48,7 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
             var tokenResponse = new CreateTrnTokenResponse
             {
                 Email = person.EmailAddress!,
-                Trn = person.Trn!,
+                Trn = person.Trn,
                 TrnToken = "ThisIsMyTrnToken",
                 ExpiresUtc = Clock.UtcNow.AddDays(60)
             };

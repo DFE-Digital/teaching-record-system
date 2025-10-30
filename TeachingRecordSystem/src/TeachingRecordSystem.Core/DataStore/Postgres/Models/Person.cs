@@ -23,7 +23,7 @@ public class Person
     public PersonStatus Status { get; set; }
     public Guid? MergedWithPersonId { get; set; }
     public Person? MergedWithPerson { get; }
-    public required string? Trn { get; set; }
+    public required string Trn { get; set; }
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
     public required string LastName { get; set; }

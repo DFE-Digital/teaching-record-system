@@ -23,7 +23,7 @@ public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeac
         var matched = await dbContext.Persons.FromSql(
                 $"""
                 SELECT * FROM persons
-                WHERE status = 0 AND trn IS NOT NULL AND
+                WHERE status = 0 AND
                 date_of_birth = {birthDate}::date AND (
                     trn = {request.Trn} OR
                     (national_insurance_numbers && array_remove(ARRAY[{nationalInsuranceNumber}]::varchar[], null) COLLATE "case_insensitive")

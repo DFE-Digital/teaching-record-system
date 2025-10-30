@@ -4,7 +4,7 @@ public record PersonDetailViewModel
 {
     public required Guid PersonId { get; init; }
     public required PersonDetailViewModelOptions Options { get; init; }
-    public required string? Trn { get; init; }
+    public required string Trn { get; init; }
     public required string Name { get; init; }
     public required string[] PreviousNames { get; init; }
     public required DateOnly? DateOfBirth { get; init; }

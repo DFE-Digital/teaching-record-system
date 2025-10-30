@@ -16,7 +16,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/person?include=Alerts");
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn!);
+        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
 
         // Act
         var response = await httpClient.SendAsync(request);

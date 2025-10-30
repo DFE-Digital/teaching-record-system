@@ -864,7 +864,7 @@ public class TrsDataSyncHelper(
         public required DateTime? UpdatedOn { get; init; }
         public required PersonStatus Status { get; init; }
         public required Guid? MergedWithPersonId { get; init; }
-        public required string? Trn { get; init; }
+        public required string Trn { get; init; }
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }

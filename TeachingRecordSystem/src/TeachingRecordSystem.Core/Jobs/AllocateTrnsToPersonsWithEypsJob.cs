@@ -17,7 +17,7 @@ public class AllocateTrnsToPersonsWithEypsJob(
 
         // Get all persons where HasEyps has been set to true but there is no TRN
         var personsWithHasEypsAndNoTrn = await dbContext.Persons
-            .Where(p => p.HasEyps && p.Trn == null)
+            .Where(p => p.HasEyps)
             .ToListAsync(cancellationToken);
 
         var updatedPersons = new List<Guid>();
