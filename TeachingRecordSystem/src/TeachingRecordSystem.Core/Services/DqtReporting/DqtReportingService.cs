@@ -107,21 +107,7 @@ public partial class DqtReportingService : BackgroundService
             while (await timer.WaitForNextTickAsync(stoppingToken));
         }
 
-        async Task ProcessTrsChangesWrapperAsync()
-        {
-            try
-            {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChangesAsync(observer: null, ct), stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed processing TRS changes.");
-                return;
-            }
-        }
+        async Task ProcessTrsChangesWrapperAsync() => await ProcessTrsChangesAsync(observer: null, stoppingToken);
     }
 
     internal async Task LoadEntityMetadataAsync()
