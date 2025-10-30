@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
     private string _oldFirstName = "Alfred";
     private string _oldMiddleName = "The";
@@ -25,8 +25,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
     private TestData.CreatePersonResult? _person;
     private TestData.CreatePersonResult? _secondaryPerson;
 
-    [Before(Test)]
-    public async Task InitializeAsync()
+    async ValueTask IAsyncLifetime.InitializeAsync()
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
@@ -51,23 +50,25 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         });
     }
 
-    [Test]
-    [Arguments(PersonsMergedEventChanges.FirstName, false, false)]
-    [Arguments(PersonsMergedEventChanges.MiddleName, false, false)]
-    [Arguments(PersonsMergedEventChanges.LastName, false, false)]
-    [Arguments(PersonsMergedEventChanges.DateOfBirth, false, false)]
-    [Arguments(PersonsMergedEventChanges.EmailAddress, false, false)]
-    [Arguments(PersonsMergedEventChanges.EmailAddress, true, false)]
-    [Arguments(PersonsMergedEventChanges.EmailAddress, false, true)]
-    [Arguments(PersonsMergedEventChanges.NationalInsuranceNumber, false, false)]
-    [Arguments(PersonsMergedEventChanges.NationalInsuranceNumber, false, true)]
-    [Arguments(PersonsMergedEventChanges.NationalInsuranceNumber, true, false)]
-    [Arguments(PersonsMergedEventChanges.Gender, false, false)]
-    [Arguments(PersonsMergedEventChanges.Gender, false, true)]
-    [Arguments(PersonsMergedEventChanges.Gender, true, false)]
-    [Arguments(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, false, false)]
-    [Arguments(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, false, true)]
-    [Arguments(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, true, false)]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
+    [InlineData(PersonsMergedEventChanges.FirstName, false, false)]
+    [InlineData(PersonsMergedEventChanges.MiddleName, false, false)]
+    [InlineData(PersonsMergedEventChanges.LastName, false, false)]
+    [InlineData(PersonsMergedEventChanges.DateOfBirth, false, false)]
+    [InlineData(PersonsMergedEventChanges.EmailAddress, false, false)]
+    [InlineData(PersonsMergedEventChanges.EmailAddress, true, false)]
+    [InlineData(PersonsMergedEventChanges.EmailAddress, false, true)]
+    [InlineData(PersonsMergedEventChanges.NationalInsuranceNumber, false, false)]
+    [InlineData(PersonsMergedEventChanges.NationalInsuranceNumber, false, true)]
+    [InlineData(PersonsMergedEventChanges.NationalInsuranceNumber, true, false)]
+    [InlineData(PersonsMergedEventChanges.Gender, false, false)]
+    [InlineData(PersonsMergedEventChanges.Gender, false, true)]
+    [InlineData(PersonsMergedEventChanges.Gender, true, false)]
+    [InlineData(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, false, false)]
+    [InlineData(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, false, true)]
+    [InlineData(PersonsMergedEventChanges.FirstName | PersonsMergedEventChanges.MiddleName | PersonsMergedEventChanges.LastName | PersonsMergedEventChanges.DateOfBirth | PersonsMergedEventChanges.EmailAddress | PersonsMergedEventChanges.NationalInsuranceNumber | PersonsMergedEventChanges.Gender, true, false)]
     public async Task Person_WithPersonsMergedEvent_AsPrimaryPerson_RendersExpectedContent(PersonsMergedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
@@ -180,7 +181,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Person_WithPersonsMergedEvent_AsSecondaryPerson_RendersExpectedContent()
     {
         // Arrange
@@ -219,7 +220,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Person_WithPersonsMergedEvent_AsPrimaryPerson_WhenCommentsAndEvidenceEmpty_DoesNotRenderReasonForChangeSection()
     {
         // Arrange
@@ -244,7 +245,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Null(changeReasonSection);
     }
 
-    [Test]
+    [Fact]
     public async Task Person_WithPersonsMergedEvent_AsSecondaryPerson_WhenCommentsAndEvidenceEmpty_DoesNotRenderReasonForChangeSection()
     {
         // Arrange

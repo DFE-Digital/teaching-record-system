@@ -330,13 +330,13 @@ public partial class TestData
 
     protected async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
-        using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 
     protected async Task WithDbContextAsync(Func<TrsDbContext, Task> action)
     {
-        using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         await action(dbContext);
     }
 }

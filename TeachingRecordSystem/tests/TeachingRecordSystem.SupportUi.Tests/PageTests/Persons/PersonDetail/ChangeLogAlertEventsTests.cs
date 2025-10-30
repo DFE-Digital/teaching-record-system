@@ -6,24 +6,25 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    [Before(Test)]
-    public async Task Initialize()
+    async ValueTask IAsyncLifetime.InitializeAsync()
     {
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
         {
-            new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
-            new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
-        };
+             new DateTime(2024, 1, 1, 12, 13, 14, DateTimeKind.Utc),  // GMT
+             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
+         };
         Clock.UtcNow = nows.SingleRandom();
         SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertCreatedEventGeneratedInTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -54,17 +55,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertCreatedEventGeneratedInTrs_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -93,9 +94,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertCreatedEventGeneratedInDqt_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -123,17 +124,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertCreatedEventGeneratedInDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -162,11 +163,11 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
     }
 
-    [Test]
-    [Arguments(true, true)]
-    [Arguments(false, true)]
-    [Arguments(true, false)]
-    [Arguments(false, false)]
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
     public async Task Person_WithAlertDeletedEvent_RendersExpectedContent(bool populateOptional, bool isOpenAlert)
     {
         // Arrange
@@ -196,17 +197,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
              });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDeletedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -235,11 +236,11 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
     }
 
-    [Test]
-    [Arguments(true, true)]
-    [Arguments(false, true)]
-    [Arguments(true, false)]
-    [Arguments(false, false)]
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
     public async Task Person_WithAlertDqtDeactivatedEvent_RendersExpectedContent(bool populateOptional, bool isOpenAlert)
     {
         // Arrange
@@ -271,17 +272,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
              });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDqtDeactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -310,9 +311,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertDqtImportedEvent_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -340,17 +341,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDqtImportedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -379,9 +380,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertDqtReactivatedEvent_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -409,17 +410,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDqtReactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -448,7 +449,7 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Person_WithAlertMigratedEvent_RendersExpectedContent()
     {
         // Arrange
@@ -478,17 +479,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertMigratedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -517,9 +518,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
         }
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventStartChangedFromDqt_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -552,9 +553,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventStartChangedFromTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -590,9 +591,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventDetailsChangedFromDqt_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -626,9 +627,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventDetailsChangedFromTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -665,9 +666,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventExternalLinkChangedFromTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -704,10 +705,10 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(EndDateChangeType.Change, "Alert end date changed")]
-    [Arguments(EndDateChangeType.Close, "Alert closed")]
-    [Arguments(EndDateChangeType.Reopen, "Alert re-opened")]
+    [Theory]
+    [InlineData(EndDateChangeType.Change, "Alert end date changed")]
+    [InlineData(EndDateChangeType.Close, "Alert closed")]
+    [InlineData(EndDateChangeType.Reopen, "Alert re-opened")]
     public async Task Person_WithAlertUpdatedEventEndDateChangedFromDqt_RendersExpectedContent(EndDateChangeType changeType, string expectedHeading)
     {
         // Arrange
@@ -741,10 +742,10 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(EndDateChangeType.Change, "Alert end date changed")]
-    [Arguments(EndDateChangeType.Close, "Alert closed")]
-    [Arguments(EndDateChangeType.Reopen, "Alert re-opened")]
+    [Theory]
+    [InlineData(EndDateChangeType.Change, "Alert end date changed")]
+    [InlineData(EndDateChangeType.Close, "Alert closed")]
+    [InlineData(EndDateChangeType.Reopen, "Alert re-opened")]
     public async Task Person_WithAlertUpdatedEventEndDateChangedFromTrs_RendersExpectedContent(EndDateChangeType changeType, string expectedHeading)
     {
         // Arrange
@@ -778,9 +779,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventDqtSpentChanged_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -814,9 +815,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventDqtSanctionCodeChanged_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
@@ -850,17 +851,17 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
                 });
     }
 
-    [Test]
-    [Arguments(false, UserRoles.Viewer, true)]
-    [Arguments(false, UserRoles.RecordManager, true)]
-    [Arguments(false, UserRoles.AlertsManagerTra, true)]
-    [Arguments(false, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(false, UserRoles.Administrator, true)]
-    [Arguments(true, UserRoles.Viewer, false)]
-    [Arguments(true, UserRoles.RecordManager, false)]
-    [Arguments(true, UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(true, UserRoles.AlertsManagerTra, true)]
-    [Arguments(true, UserRoles.Administrator, true)]
+    [Theory]
+    [InlineData(false, UserRoles.Viewer, true)]
+    [InlineData(false, UserRoles.RecordManager, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
+    [InlineData(true, UserRoles.Viewer, false)]
+    [InlineData(true, UserRoles.RecordManager, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
+    [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertUpdatedEventFromDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
@@ -893,9 +894,9 @@ public class ChangeLogAlertEventsTests(HostFixture hostFixture) : TestBase(hostF
     }
 
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Person_WithAlertUpdatedEventMultipleChanges_RendersExpectedContent(bool populateOptional)
     {
         // Arrange

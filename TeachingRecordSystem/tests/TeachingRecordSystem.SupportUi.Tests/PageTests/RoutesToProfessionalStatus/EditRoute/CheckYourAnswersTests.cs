@@ -10,7 +10,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 {
     private static string _countryCode = "AG";
 
-    [Test]
+    [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -53,39 +53,39 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Test]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.StartAndEndDate, null)]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.HoldsFrom, "holds-from")]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.InductionExemption, "induction-exemption")]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.TrainingProvider, null)]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.DegreeType, null)]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.Country, "country")]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.AgeRangeSpecialism, null)]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.SubjectSpecialisms, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.StartAndEndDate, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.HoldsFrom, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.InductionExemption, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.TrainingProvider, "training-provider")]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.DegreeType, "degree-type")]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.Country, "country")]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.AgeRangeSpecialism, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.SubjectSpecialisms, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.StartAndEndDate, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.HoldsFrom, "holds-from")]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.InductionExemption, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.TrainingProvider, "training-provider")]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.DegreeType, "degree-type")]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.Country, "country")]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.AgeRangeSpecialism, null)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.SubjectSpecialisms, null)]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.StartAndEndDate, null)]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.HoldsFrom, "holds-from")]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.InductionExemption, null)]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.TrainingProvider, null)]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.DegreeType, "degree-type")]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.Country, "country")]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.AgeRangeSpecialism, "age-range")]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.SubjectSpecialisms, "subjects")]
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.StartAndEndDate, null)]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.HoldsFrom, "holds-from")]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.InductionExemption, "induction-exemption")]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.TrainingProvider, null)]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.DegreeType, null)]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.Country, "country")]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.AgeRangeSpecialism, null)]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, AddRoutePage.SubjectSpecialisms, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.StartAndEndDate, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.HoldsFrom, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.InductionExemption, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.TrainingProvider, "training-provider")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.DegreeType, "degree-type")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.Country, "country")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.AgeRangeSpecialism, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, AddRoutePage.SubjectSpecialisms, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.StartAndEndDate, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.HoldsFrom, "holds-from")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.InductionExemption, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.TrainingProvider, "training-provider")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.DegreeType, "degree-type")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.Country, "country")]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.AgeRangeSpecialism, null)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.SubjectSpecialisms, null)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.StartAndEndDate, null)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.HoldsFrom, "holds-from")]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.InductionExemption, null)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.TrainingProvider, null)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.DegreeType, "degree-type")]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.Country, "country")]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.AgeRangeSpecialism, "age-range")]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, AddRoutePage.SubjectSpecialisms, "subjects")]
     public async Task Get_IncompleteJourney_RedirectsToExpectedPage(string routeName, RouteToProfessionalStatusStatus status, AddRoutePage incompletePage, string? expectedRedirectPage)
     {
         // Arrange
@@ -185,7 +185,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Post_RedirectsToExpectedPage()
     {
         // Arrange
@@ -219,7 +219,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsAnswers_AsExpected()
     {
         // Arrange
@@ -279,7 +279,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertSummaryListRowValueContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsExemptionAnswer_AsExpected()
     {
         // Arrange
@@ -331,7 +331,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertSummaryListRowValueContentMatches("Induction exemption", "Yes");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsOptionalAnswersNotPopulated_AsExpected()
     {
         // Arrange
@@ -382,7 +382,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertSummaryListRowValueContentMatches("Subjects", "Not provided");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsChangeReasonAnswers_AsExpected()
     {
         // Arrange
@@ -418,7 +418,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertSummaryListRowValueContentMatches("Evidence", "Not provided");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_UpdatesProfessionalStatusCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -515,7 +515,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_WithAwardedQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
     {
         // Arrange
@@ -549,7 +549,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_WithAwardedEytsRouteTypeUpdatesPersonEytsDateAndHasChangesInEvent()
     {
         // Arrange
@@ -585,7 +585,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     // N.B. There's no test for EYPS since our one EYPS route has to have a Professional status date
     // (so there's no edit that can be made through this journey that can affect Person.HasEyps)
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_WithAwardedPqtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
     {
         // Arrange
@@ -619,7 +619,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         });
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

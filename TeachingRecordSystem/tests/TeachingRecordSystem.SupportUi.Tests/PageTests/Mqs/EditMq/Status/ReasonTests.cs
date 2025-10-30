@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
 
 public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -20,7 +20,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsOK()
     {
         // Arrange
@@ -71,7 +71,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -87,10 +87,10 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(true, false)]
-    [Arguments(false, true)]
-    [Arguments(true, true)]
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
     public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError(
         bool isStatusChange,
         bool isEndDateChange)
@@ -158,7 +158,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, "Select a reason");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
         // Arrange
@@ -193,7 +193,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
@@ -228,7 +228,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
@@ -264,10 +264,10 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
-    [Arguments(true, false)]
-    [Arguments(false, true)]
-    [Arguments(true, true)]
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
     public async Task Post_ValidInput_RedirectsToCheckAnswersPage(
         bool isStatusChange,
         bool isEndDateChange)
@@ -343,7 +343,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/status/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -377,7 +377,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

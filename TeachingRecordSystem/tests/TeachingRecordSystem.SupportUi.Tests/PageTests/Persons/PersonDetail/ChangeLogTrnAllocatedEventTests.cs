@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class ChangeLogTrnAllocatedEventTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task ChangeLogDisplaysTrnAllocatedEvent()
     {
         // arrange

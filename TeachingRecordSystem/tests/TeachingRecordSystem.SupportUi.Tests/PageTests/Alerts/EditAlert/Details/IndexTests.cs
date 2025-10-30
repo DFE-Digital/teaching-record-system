@@ -1,13 +1,14 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Details;
 
-public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture), IAsyncLifetime
 {
     private const string ThisStep = JourneySteps.Index;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -26,7 +27,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -42,7 +43,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -58,7 +59,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -75,7 +76,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(alert.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -92,7 +93,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -115,7 +116,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -131,7 +132,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -147,7 +148,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithUnchangedDetails_ReturnsError()
     {
         // Arrange
@@ -167,7 +168,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter changed details");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithEmptyDetails_ReturnsError()
     {
         // Arrange
@@ -187,7 +188,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter details");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenChangedDetailsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -211,7 +212,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Equal(newDetails, journeyInstance.State.Details);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -231,7 +232,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

@@ -2,12 +2,13 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Fact]
     public async Task Get_UserWithNoRoles_ReturnsForbidden()
     {
         // Arrange
@@ -26,7 +27,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Theory]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_UserWithoutSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -46,7 +47,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSupportTaskReferenceForNonExistentSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -61,7 +62,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -79,14 +80,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(true, false, false, false)]
-    [Arguments(false, true, false, true)]
-    [Arguments(false, false, true, false)]
-    [Arguments(true, true, false, true)]
-    [Arguments(true, false, true, false)]
-    [Arguments(false, true, true, true)]
-    [Arguments(true, true, true, true)]
+    [Theory]
+    [InlineData(true, false, false, false)]
+    [InlineData(false, true, false, true)]
+    [InlineData(false, false, true, false)]
+    [InlineData(true, true, false, true)]
+    [InlineData(true, false, true, false)]
+    [InlineData(false, true, true, true)]
+    [InlineData(true, true, true, true)]
     public async Task Get_WithSupportTaskReferenceForOpenChangeNameRequestSupportTask_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName, bool evidenceIsPdf)
     {
         // Arrange
@@ -158,7 +159,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSupportTaskReferenceForOpenChangeDateOfBirthRequestSupportTask_RendersExpectedContent()
     {
         // Arrange

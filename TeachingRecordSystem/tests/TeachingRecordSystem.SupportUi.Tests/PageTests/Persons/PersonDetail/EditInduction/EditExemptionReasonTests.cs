@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_InvalidInductionStatusForPage_RedirectToStart()
     {
         // Arrange
@@ -28,7 +28,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal($"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ReferenceDataExemptionsValuesNotInExemptionReasonCategories_NotShown()
     {
         // Arrange
@@ -76,7 +76,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsExemptionReasonsList()
     {
         // Arrange
@@ -115,7 +115,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasRouteWithInductionExemption_ShowsExemptionReasonsList()
     {
         // Arrange
@@ -164,8 +164,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         yield return [RouteToProfessionalStatusType.ScotlandRId];
         yield return [RouteToProfessionalStatusType.NiRId];
     }
-    [Test]
-    [MethodDataSource(nameof(SpecificInductionExemptedRoutesRequiringFilteredExemptionReasonsData))]
+    [Theory]
+    [MemberData(nameof(SpecificInductionExemptedRoutesRequiringFilteredExemptionReasonsData))]
     public async Task Get_PersonHasSomeSpecificRoutes_ShowsFilteredExceptionReasonsAndEditOnRouteMessage(Guid routeId)
     {
         // Arrange
@@ -226,8 +226,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         yield return [RouteToProfessionalStatusType.QtlsAndSetMembershipId, false];
     }
 
-    [Test]
-    [MethodDataSource(nameof(InductionExemptedRoutesRequiringRouteExemptionMessageData))]
+    [Theory]
+    [MemberData(nameof(InductionExemptedRoutesRequiringRouteExemptionMessageData))]
     public async Task Get_PersonHasInductionExemptionFromRoute_ShowsExpectedMessageContent(Guid routeId, bool hasExemption)
     {
         // Arrange
@@ -268,7 +268,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithExemptionReasonsSelected_ShowsExpected()
     {
         var selectedExemptionReasonIds = ExemptionReasonCategories.ExemptionReasonIds
@@ -296,7 +296,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
             });
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoExemptionReasonsSelected_ShowsError()
     {
         // Arrange
@@ -316,7 +316,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, "ExemptionReasonIds", "Select the reason for a teacher’s exemption to induction");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetExemptionReasons_PersistsExemptionReasons()
     {
         // Arrange

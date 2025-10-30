@@ -2,12 +2,13 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts;
 
-public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Fact]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -22,7 +23,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertIsOpen_ReturnsBadRequest()
     {
         // Arrange
@@ -40,7 +41,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -65,7 +66,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("End date"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertIsDbsAlertAndUserDoesNotHavePermissionToRead_ReturnsForbidden()
     {
         // Arrange
@@ -85,7 +86,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToRead_ReturnsOk()
     {
         // Arrange
@@ -105,7 +106,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToReadAndWrite_ReturnsOk()
     {
         // Arrange
@@ -125,7 +126,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_DbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
     {
         // Arrange
@@ -146,7 +147,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(doc.GetSummaryListActionsByKey("End date"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_DbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
     {
         // Arrange
@@ -167,7 +168,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotEmpty(doc.GetSummaryListActionsByKey("End date"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NonDbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
     {
         // Arrange
@@ -189,7 +190,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(doc.GetSummaryListActionsByKey("End date"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NonDbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
     {
         // Arrange

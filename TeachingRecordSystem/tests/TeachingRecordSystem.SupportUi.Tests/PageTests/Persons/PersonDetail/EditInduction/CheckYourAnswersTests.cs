@@ -29,8 +29,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         ];
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetInductionStatusData))]
+    [Theory]
+    [MemberData(nameof(GetInductionStatusData))]
     public async Task Get_WithInvalidJourneyState_RedirectToStart(EditInductionState editInductionState)
     {
         // Arrange
@@ -50,21 +50,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.InProgress, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Passed, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Failed, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Exempt, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.FailedInWales, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, true)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.InProgress, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Passed, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Failed, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Passed, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Failed, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, false)]
-    [Arguments(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false)]
+    [Theory]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.InProgress, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Passed, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Failed, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Exempt, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.FailedInWales, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.InProgress, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Passed, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Failed, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Passed, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Failed, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, false)]
+    [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false)]
     public async Task Get_ShowsInductionStatus_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool showChangeLink)
     {
         // Arrange
@@ -119,21 +119,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
     }
 
-    [Test]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.InProgress, true, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Passed, true, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Failed, true, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.FailedInWales, true, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Exempt, false, false)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.InProgress, true, true)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Passed, true, true)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Failed, true, true)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, true, true)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Passed, true, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Failed, true, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, true, false)]
-    [Arguments(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false, false)]
+    [Theory]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.InProgress, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Passed, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Failed, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.FailedInWales, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Exempt, false, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.InProgress, true, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Passed, true, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Failed, true, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, true, true)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Passed, true, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Failed, true, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, true, false)]
+    [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false, false)]
     public async Task Get_ShowsStartDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool showStartDateRow, bool showChangeLink)
     {
         // Arrange
@@ -194,21 +194,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
     }
 
-    [Test]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.InProgress, false)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Passed, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Failed, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.FailedInWales, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Exempt, false)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.InProgress, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Passed, true)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Failed, true)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, true)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Passed, true)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Failed, true)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, true)]
-    [Arguments(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false)]
+    [Theory]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.InProgress, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Passed, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Failed, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.FailedInWales, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Exempt, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.InProgress, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Passed, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Failed, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, true)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Passed, true)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Failed, true)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, true)]
+    [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false)]
     public async Task Get_ShowsCompletedDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool ShowsCompletedDate)
     {
         // Arrange
@@ -260,21 +260,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
     }
 
-    [Test]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.InProgress, false)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Passed, false)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Failed, false)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.FailedInWales, false)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.Exempt, true)]
-    [Arguments(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.InProgress, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Passed, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.Failed, false)]
-    [Arguments(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Passed, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.Failed, false)]
-    [Arguments(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, false)]
-    [Arguments(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, true)]
+    [Theory]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.InProgress, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Passed, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Failed, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.FailedInWales, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Exempt, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.InProgress, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Passed, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Failed, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Passed, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Failed, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, false)]
+    [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, true)]
     public async Task Get_ShowsExemptionReason_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool ShowsExemptionReason)
     {
         // Arrange
@@ -337,7 +337,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Cancel_RedirectsToExpectedPage()
     {
         // Arrange
@@ -374,7 +374,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/persons/{person.PersonId}/induction", location);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsChangeReason_AsExpected()
     {
         // Arrange
@@ -424,7 +424,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("Not provided", valueFileUpload!.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Post_InvalidCompletedDate_RedirectToCompletedDatePage()
     {
         // Arrange
@@ -463,7 +463,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/persons/{person.PersonId}/edit-induction/date-completed?fromCheckAnswers={JourneyFromCheckAnswersPage.CheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}", location);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_RedirectsToExpectedPage()
     {
         // Arrange
@@ -505,7 +505,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal($"/persons/{person.PersonId}/induction", location);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_UpdatesPersonInductionCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange

@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -20,7 +20,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithQualificationIdForValidQualification_ReturnsOk()
     {
         // Arrange
@@ -37,7 +37,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -82,7 +82,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(uploadedEvidenceLink);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoDeletionReasonIsSelected_ReturnsError()
     {
         // Arrange
@@ -121,7 +121,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "DeletionReason", "Select a reason");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
@@ -169,7 +169,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
@@ -194,7 +194,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidInput_RedirectsToCheckAnswersPage()
     {
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
@@ -220,7 +220,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualification.QualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
@@ -242,7 +242,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

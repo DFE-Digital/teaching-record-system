@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithNoCriteria_RedirectsToIndex()
     {
         // Arrange
@@ -16,7 +16,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("/", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSearchQueryParameterWithNoMatches_DisplaysNoMatches()
     {
         // Arrange
@@ -38,7 +38,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(noMatches);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSearchThatLooksLikeADate_DisplaysMatchesOnDateOfBirth()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.All(dateOfBirthResults.Select(r => r.TrimmedText()), t => Assert.Equal(search, t));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSearchThatLooksLikeAName_DisplaysMatchesOnName()
     {
         // Arrange
@@ -84,7 +84,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.All(nameResults.Select(r => r.TrimmedText()), t => Assert.Contains(search, t, StringComparison.OrdinalIgnoreCase));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSearchThatLooksLikeATrn_DisplaysMatchOnTrn()
     {
         // Arrange

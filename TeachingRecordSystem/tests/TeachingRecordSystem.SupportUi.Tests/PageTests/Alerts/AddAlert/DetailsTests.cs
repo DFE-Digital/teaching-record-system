@@ -2,15 +2,16 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
+public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.AlertType;
     private const string ThisStep = JourneySteps.Details;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +30,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -45,7 +46,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -62,7 +63,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.StartsWith($"/alerts/add/type?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -78,7 +79,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -95,7 +96,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -114,7 +115,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -130,7 +131,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithMissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -147,7 +148,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.StartsWith($"/alerts/add/type?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenDetailsIsBlank_Redirects()
     {
         // Arrange
@@ -171,7 +172,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         AlertType.SosDecisionNoProhibition
     ];
 
-    [Test]
+    [Fact]
     public async Task Post_DetailsAreTooLong_ReturnsError()
     {
         // Arrange
@@ -191,7 +192,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Details must be 4000 characters or less");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidInput_UpdatesStateAndRedirectsToLinkPage()
     {
         // Arrange
@@ -215,7 +216,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Equal(details, journeyInstance.State.Details);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -234,7 +235,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

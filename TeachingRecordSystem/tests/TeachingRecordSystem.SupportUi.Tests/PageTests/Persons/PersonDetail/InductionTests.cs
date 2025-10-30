@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForPersonWithNoQts_DisplaysExpectedContent()
     {
         // Arrange
@@ -31,8 +31,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         yield return [RouteToProfessionalStatusType.NiRId, false];
         yield return [RouteToProfessionalStatusType.QtlsAndSetMembershipId, false];
     }
-    [Test]
-    [MethodDataSource(nameof(InductionExemptedRoutes))]
+    [Theory]
+    [MemberData(nameof(InductionExemptedRoutes))]
     public async Task Get_ForPersonWithRouteInductionExemption_RoutesFeatureFlagOn_DisplaysExpectedRowContent(Guid routeId, bool hasExemption)
     {
         // Arrange
@@ -69,9 +69,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(InductionStatus.Exempt)]
-    [Arguments(InductionStatus.RequiredToComplete)]
+    [Theory]
+    [InlineData(InductionStatus.Exempt)]
+    [InlineData(InductionStatus.RequiredToComplete)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringNoStartDate_DisplaysExpected(InductionStatus setInductionStatus)
     {
         // Arrange
@@ -94,7 +94,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForPersonWithInductionStatusExempt_DisplaysExpected()
     {
         // Arrange
@@ -127,11 +127,11 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
-    [Test]
-    [Arguments(InductionStatus.InProgress)]
-    [Arguments(InductionStatus.Passed)]
-    [Arguments(InductionStatus.Failed)]
-    [Arguments(InductionStatus.FailedInWales)]
+    [Theory]
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
+    [InlineData(InductionStatus.FailedInWales)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDate_DisplaysExpectedContent(InductionStatus setInductionStatus)
     {
         var setStartDate = Clock.Today.AddMonths(-1);
@@ -157,7 +157,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDateButStartDateIsNull_DisplaysExpectedContent()
     {
         // Arrange
@@ -178,10 +178,10 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.True(string.IsNullOrWhiteSpace(startDate.Trim()));
     }
 
-    [Test]
-    [Arguments(InductionStatus.Passed)]
-    [Arguments(InductionStatus.Failed)]
-    [Arguments(InductionStatus.FailedInWales)]
+    [Theory]
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
+    [InlineData(InductionStatus.FailedInWales)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletedDate_DisplaysExpectedCompletedDate(InductionStatus setInductionStatus)
     {
         // Arrange
@@ -208,12 +208,12 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(setCompletedDate.ToString(UiDefaults.DateOnlyDisplayFormat), completedDate);
     }
 
-    [Test]
-    [Arguments(InductionStatus.RequiredToComplete, "passed, failed, or in progress", true)]
-    [Arguments(InductionStatus.InProgress, "required to complete, passed, or failed", true)]
-    [Arguments(InductionStatus.Passed, "required to complete, failed, or in progress", true)]
-    [Arguments(InductionStatus.Failed, "required to complete, passed, or in progress", true)]
-    [Arguments(InductionStatus.InProgress, "required to complete, passed, or failed", false)]
+    [Theory]
+    [InlineData(InductionStatus.RequiredToComplete, "passed, failed, or in progress", true)]
+    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed", true)]
+    [InlineData(InductionStatus.Passed, "required to complete, failed, or in progress", true)]
+    [InlineData(InductionStatus.Failed, "required to complete, passed, or in progress", true)]
+    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed", false)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsExpectedWarning(
         InductionStatus status,
         string expectedWarningMessage,
@@ -270,9 +270,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(InductionStatus.Exempt)]
-    [Arguments(InductionStatus.FailedInWales)]
+    [Theory]
+    [InlineData(InductionStatus.Exempt)]
+    [InlineData(InductionStatus.FailedInWales)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsNoWarning(InductionStatus trsInductionStatus)
     {
         // Arrange
@@ -321,7 +321,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("induction-status-warning"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCpd_DoesNotShowWarning()
     {
         //Arrange
@@ -343,7 +343,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("induction-status-warning"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonId_ShowsLinkToChangeStatus()
     {
         // Arrange
@@ -365,9 +365,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains("Change", inductionStatus!.GetElementsByTagName("a")[0].TrimmedText());
     }
 
-    [Test]
-    [Arguments(UserRoles.RecordManager, true)]
-    [Arguments(UserRoles.Viewer, false)]
+    [Theory]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.Viewer, false)]
     public async Task Get_InductionExemption_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange
@@ -410,9 +410,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(UserRoles.RecordManager, true)]
-    [Arguments(UserRoles.Viewer, false)]
+    [Theory]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.Viewer, false)]
     public async Task Get_InductionStartAndEndDate_UserRole_ShowsActionsAsExpected(string? userRole, bool canSeeActions)
     {
         // Arrange
@@ -446,9 +446,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(PersonStatus.Active, true)]
-    [Arguments(PersonStatus.Deactivated, false)]
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
     public async Task Get_InductionExemption_PersonStatus_ShowsActionsAsExpected(PersonStatus personStatus, bool canSeeActions)
     {
         // Arrange
@@ -499,9 +499,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(PersonStatus.Active, true)]
-    [Arguments(PersonStatus.Deactivated, false)]
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
     public async Task Get_InductionStartAndEndDate_PersonStatus_ShowsActionsAsExpected(PersonStatus personStatus, bool canSeeActions)
     {
         // Arrange

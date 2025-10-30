@@ -2,12 +2,13 @@ using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
 
-public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(hostFixture), IAsyncLifetime
 {
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -26,7 +27,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -42,7 +43,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertIsClosed_ReturnsBadRequest()
     {
         // Arrange
@@ -58,7 +59,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ReasonHasNotBeenSet_RedirectsToIndexPage()
     {
         // Arrange
@@ -75,9 +76,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.StartsWith($"/alerts/{alert.AlertId}/start-date", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Get_ValidJourneyState_ReturnsOk(bool populateOptional)
     {
         // Arrange
@@ -98,7 +99,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -119,7 +120,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -137,7 +138,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AlertIsClosed_ReturnsBadRequest()
     {
         // Arrange
@@ -155,7 +156,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ReasonHasNotBeenSet_RedirectsToIndexPage()
     {
         // Arrange
@@ -172,7 +173,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.StartsWith($"/alerts/{alert.AlertId}/start-date", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -240,7 +241,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -260,7 +261,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : StartDateTestBase(host
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

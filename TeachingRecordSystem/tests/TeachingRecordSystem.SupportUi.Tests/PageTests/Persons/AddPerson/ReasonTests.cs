@@ -6,10 +6,9 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
-[NotInParallel]
 public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -35,7 +34,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             b => Assert.Equal("Cancel", b.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -83,7 +82,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -121,7 +120,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
@@ -152,7 +151,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(changeReasonDetails, journeyInstance.State.ReasonDetail);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -176,7 +175,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AnotherReason_NoDetailAdded_ReturnsError()
     {
         // Arrange
@@ -201,7 +200,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReasonDetail), "Enter a reason");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -227,7 +226,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -254,7 +253,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -294,7 +293,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -335,7 +334,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -366,7 +365,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -396,7 +395,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -427,7 +426,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile.FileSizeDescription);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -454,7 +453,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange

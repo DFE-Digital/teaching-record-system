@@ -8,10 +8,10 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.NoMatches;
 
-public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
+public class CheckAnswersTests : NpqTrnRequestTestBase
 {
-    [Before(Test)]
-    public void ConfigureMocks() =>
+    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
+    {
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
             .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
@@ -21,8 +21,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
                 Trn = req.Trn,
                 TrnToken = Guid.NewGuid().ToString()
             });
+    }
 
-    [Test]
+    [Fact]
     public async Task Get_CreatingNewRecord_HasBackLinkToLandingPage()
     {
         // Arrange
@@ -46,7 +47,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventAndRedirects()
     {
         // Arrange

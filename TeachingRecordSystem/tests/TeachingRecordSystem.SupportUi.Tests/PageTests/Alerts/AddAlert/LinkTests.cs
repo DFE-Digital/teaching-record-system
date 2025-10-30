@@ -1,14 +1,15 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
+public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.Details;
     private const string ThisStep = JourneySteps.Link;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -27,7 +28,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -43,7 +44,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MissingDetailsInJourneyState_ReturnsOk()
     {
         // Arrange
@@ -59,7 +60,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -75,7 +76,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -92,7 +93,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -111,7 +112,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -127,7 +128,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithMissingDetailsDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
@@ -150,7 +151,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Null(journeyInstance.State.Link);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AddLinkNotAnswered_ReturnsError()
     {
         // Arrange
@@ -169,7 +170,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "AddLink", "Select yes if you want to add a link to a panel outcome");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithInvalidLinkUrl_ReturnsError()
     {
         // Arrange
@@ -188,7 +189,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithLink_UpdatesStateAndRedirectsToStartDatePage()
     {
         // Arrange
@@ -213,7 +214,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(link, journeyInstance.State.Link);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithNoLink_UpdatesStateAndRedirectsToStartDatePage()
     {
         // Arrange
@@ -237,7 +238,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Null(journeyInstance.State.Link);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -256,7 +257,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

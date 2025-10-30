@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {
         // Arrange
@@ -36,7 +36,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("Change name - Alfred The Great", caption!.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -117,7 +117,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(NameChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -160,7 +160,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -190,7 +190,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(NameChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -221,7 +221,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(NameChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -253,7 +253,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(NameChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -297,7 +297,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(NameChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -342,7 +342,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(NameChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -377,7 +377,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -411,7 +411,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -447,7 +447,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("1.2 KB", journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -479,7 +479,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange

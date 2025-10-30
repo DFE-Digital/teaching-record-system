@@ -4,10 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.Integratio
 
 public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
-    [Arguments(IntegrationTransactionRecordStatus.Success)]
-    [Arguments(IntegrationTransactionRecordStatus.Warning)]
-    [Arguments(IntegrationTransactionRecordStatus.Failure)]
+    [Theory]
+    [InlineData(IntegrationTransactionRecordStatus.Success)]
+    [InlineData(IntegrationTransactionRecordStatus.Warning)]
+    [InlineData(IntegrationTransactionRecordStatus.Failure)]
     public async Task Get_Row_RowStatusIsCorrect(IntegrationTransactionRecordStatus rowStatus)
     {
         // Arrange
@@ -56,7 +56,7 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowValue("Status", v => Assert.Equal(rowStatus.GetDisplayName(), v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NonExistentRow_ReturnsNotFound()
     {
         // Arrange
@@ -92,7 +92,7 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NonExistentIntegrationTransaction_ReturnsNotFound()
     {
         // Arrange

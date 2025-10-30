@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
 public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_RendersNonAttributeValues()
     {
         // Arrange
@@ -51,8 +51,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         doc.AssertSummaryListRowValue("Comments", v => Assert.Equal(comments, v.TrimmedText()));
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetPersonAttributeInfoData))]
+    [Theory]
+    [MemberData(nameof(GetPersonAttributeInfoData))]
     public async Task Get_AttributeSourceIsSecondaryPerson_RendersChosenAttributeValues(
         PersonAttributeInfo sourcedFromSecondaryPersonAttribute,
         bool useNullValues)
@@ -115,8 +115,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         }
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetPersonAttributeInfoData))]
+    [Theory]
+    [MemberData(nameof(GetPersonAttributeInfoData))]
     public async Task Post_UpdatesPrimaryPersonPublishesEventDeactivatesSecondaryPersonCompletesJourneyAndRedirects(
         PersonAttributeInfo sourcedFromSecondaryPersonAttribute,
         bool useNullValues)

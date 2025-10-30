@@ -6,10 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -46,10 +46,10 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -82,7 +82,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsPreviouslyStoredEntry()
     {
         // Arrange
@@ -118,7 +118,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(holdsFrom.Year.ToString(), displayedDate.ElementAt(2).Value);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenAwardDateIsEntered_SavesDateAndRedirectsToInductionExemptionPage()
     {
         // Arrange
@@ -164,7 +164,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ImplicitExemptionRoute_WhenAwardDateIsEntered_SavesDateAndRedirectsToNextPage()
     {
         // Arrange
@@ -207,7 +207,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_FromCya_WhenAwardDateIsEntered_RedirectsToCya()
     {
         // Arrange
@@ -252,7 +252,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(newAwardDate, journeyInstance.State.HoldsFrom);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -284,7 +284,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the date they first held this professional status");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenFutureDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -325,7 +325,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "The date they first held this professional status must not be in the future");
     }
 
-    [Test]
+    [Fact]
     public async Task Cancel_RedirectsToExpectedPage()
     {
         // Arrange
@@ -362,7 +362,7 @@ public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

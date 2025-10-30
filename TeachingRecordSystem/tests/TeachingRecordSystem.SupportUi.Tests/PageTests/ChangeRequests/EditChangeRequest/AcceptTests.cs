@@ -4,12 +4,13 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
 
-public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Fact]
     public async Task Get_WhenUserHasNoRoles_ReturnsForbidden()
     {
         // Arrange
@@ -28,7 +29,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Theory]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -48,7 +49,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSupportTaskReferenceForNonExistentSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -63,7 +64,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
@@ -81,7 +82,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Theory]
     [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Post_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
@@ -104,9 +105,9 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_ValidRequest_RedirectsWithFlashMessage(bool isNameChange)
     {
         // Arrange

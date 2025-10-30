@@ -1,14 +1,15 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
-public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.New;
     private const string ThisStep = JourneySteps.Index;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -27,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -43,7 +44,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -59,7 +60,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithUninitializedJourneyState_ReturnsOK()
     {
         // Arrange
@@ -75,7 +76,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -94,7 +95,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal($"{journeyInstance.State.EndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -117,7 +118,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -133,7 +134,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -149,7 +150,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoEndDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -165,7 +166,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenEndDateIsInTheFuture_ReturnsError()
     {
         // Arrange
@@ -185,7 +186,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date cannot be in the future");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenEndDateIsBeforeStartDate_ReturnsError()
     {
         // Arrange
@@ -205,7 +206,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after the start date");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenEndDateIsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -229,7 +230,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Equal(newEndDate, journeyInstance.State.EndDate);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -249,7 +250,7 @@ public class IndexTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixtur
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

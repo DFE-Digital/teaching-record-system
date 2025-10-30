@@ -1,8 +1,12 @@
+using System.Reflection;
+using Xunit.Sdk;
+using Xunit.v3;
+
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public class RoleNamesData(bool includeNoRoles = false, params string[] except) : DataSourceGeneratorAttribute<string?>
+public class RoleNamesData(bool includeNoRoles = false, params string[] except) : DataAttribute
 {
-    protected override IEnumerable<Func<string?>> GenerateDataSources(DataGeneratorMetadata dataGeneratorMetadata)
+    public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(MethodInfo testMethod, DisposalTracker disposalTracker)
     {
         var allRoles = UserRoles.All;
         IEnumerable<string?> roles = allRoles.Except(except);
@@ -12,6 +16,8 @@ public class RoleNamesData(bool includeNoRoles = false, params string[] except) 
             roles = roles.Append(null);
         }
 
-        return roles.Select(r => (Func<string?>)(() => r));
+        return new(roles.Select(r => new TheoryDataRow(r)).ToArray());
     }
+
+    public override bool SupportsDiscoveryEnumeration() => true;
 }
