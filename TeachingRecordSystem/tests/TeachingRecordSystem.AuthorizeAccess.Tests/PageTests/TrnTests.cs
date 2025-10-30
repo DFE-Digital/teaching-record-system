@@ -190,7 +190,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
-        var trn = person.Trn!;
+        var trn = person.Trn;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/trn?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -426,7 +426,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
-        var trn = person.Trn!;
+        var trn = person.Trn;
 
         await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber()));
 

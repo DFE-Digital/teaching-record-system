@@ -26,7 +26,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Merge with another record");
 
         await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn!);
+        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
@@ -65,7 +65,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Merge with another record");
 
         await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn!);
+        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
@@ -118,7 +118,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Merge with another record");
 
         await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn!);
+        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
@@ -184,7 +184,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Merge with another record");
 
         await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn!);
+        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);
@@ -240,7 +240,7 @@ public class MergePersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButtonAsync("Merge with another record");
 
         await page.AssertOnMergePersonEnterTrnPageAsync(person1.PersonId);
-        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn!);
+        await page.FillAsync("label:text-is('Enter the TRN of the other record you want to merge')", person2.Trn);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnMergePersonMatchesPageAsync(person1.PersonId);

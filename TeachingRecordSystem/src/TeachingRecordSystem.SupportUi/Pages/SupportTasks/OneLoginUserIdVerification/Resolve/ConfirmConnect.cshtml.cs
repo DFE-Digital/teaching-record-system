@@ -146,7 +146,7 @@ public class ConfirmConnect(
             .OrderBy(n => n.CreatedOn)
             .Select(n => $"{n.FirstName} {n.MiddleName} {n.LastName}")
             .ToList();
-        MatchedPersonTrn = matchedPerson.Trn!;
+        MatchedPersonTrn = matchedPerson.Trn;
         MatchedPersonDateOfBirth = matchedPerson.DateOfBirth!.Value;
         MatchedPersonNationalInsuranceNumber = matchedPerson.NationalInsuranceNumber;
 

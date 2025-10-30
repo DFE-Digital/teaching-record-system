@@ -283,7 +283,6 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
             from events e
             inner join persons p on p.person_id = e.person_ids[1]
             where event_name = any({eventNames})
-                and p.trn is not null
                 and(e.payload->'PersonAttributes'->> 'Gender')::int = any({filteredGenders})
                 and(e.payload->> 'RaisedBy')::uuid != {capitaUserId}
                 and ((e.payload->>'Changes')::int & {combinedChangeFlags}) != 0

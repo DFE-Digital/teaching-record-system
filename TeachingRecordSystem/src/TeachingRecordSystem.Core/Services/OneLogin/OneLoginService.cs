@@ -128,7 +128,7 @@ public class OneLoginService(
                     CASE WHEN p.date_of_birth = ANY(vars.dates_of_birth) THEN true ELSE false END date_of_birth_matches,
                     array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers national_insurance_number_matches
                 FROM persons p, vars
-                WHERE p.status = 0 AND p.trn IS NOT NULL AND (
+                WHERE p.status = 0 AND (
                     p.names && vars.first_names AND
                     p.names && vars.last_names AND
                     p.date_of_birth = ANY(vars.dates_of_birth) AND (

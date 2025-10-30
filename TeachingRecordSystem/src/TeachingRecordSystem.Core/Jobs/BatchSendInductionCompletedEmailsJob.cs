@@ -47,9 +47,9 @@ public class BatchSendInductionCompletedEmailsJob(
              """)
             .Join(dbContext.Persons, e => e.PersonIds.First(), p => p.PersonId, (e, p) => p)
             .Where(p => p.InductionStatus == InductionStatus.Passed)  // Check the status is still Passed
-            .Where(p => p.Trn != null && p.EmailAddress != null)
+            .Where(p => p.EmailAddress != null)
             .Where(p => !dbContext.InductionCompletedEmailsJobItems.Any(i => i.Trn == p.Trn))  // Ensure we haven't already processed this TRN
-            .Select(p => new { p.PersonId, Trn = p.Trn!, EmailAddress = p.EmailAddress!, p.FirstName, p.LastName })
+            .Select(p => new { p.PersonId, Trn = p.Trn, EmailAddress = p.EmailAddress!, p.FirstName, p.LastName })
             .ToArrayAsync(cancellationToken: cancellationToken);
 
         dbContext.InductionCompletedEmailsJobs.Add(job);

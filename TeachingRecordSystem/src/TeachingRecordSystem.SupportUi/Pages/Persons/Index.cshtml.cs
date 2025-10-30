@@ -156,7 +156,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }
         public required DateOnly? DateOfBirth { get; init; }
-        public required string? Trn { get; init; }
+        public required string Trn { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
         public required PersonStatus PersonStatus { get; init; }
 

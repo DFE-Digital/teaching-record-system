@@ -18,7 +18,7 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public PersonAttribute<string?>? EmailAddress { get; set; }
 
-    public PersonAttribute<string?>? Trn { get; set; }
+    public PersonAttribute<string>? Trn { get; set; }
 
     public PersonAttribute<string?>? FirstName { get; set; }
 
@@ -104,10 +104,10 @@ public class MergeModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             requestData.FirstName,
             Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
 
-        Trn = new PersonAttribute<string?>(
+        Trn = new PersonAttribute<string>(
             personAttributes.Trn,
             person.Trn,
-            Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
+            Different: false);
 
         PersonName = StringHelper.JoinNonEmpty(' ', personAttributes.FirstName, personAttributes.MiddleName, personAttributes.LastName);
 

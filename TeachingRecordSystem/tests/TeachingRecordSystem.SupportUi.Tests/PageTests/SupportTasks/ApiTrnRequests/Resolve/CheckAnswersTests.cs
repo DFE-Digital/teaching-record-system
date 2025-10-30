@@ -481,7 +481,6 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(requestData.EmailAddress, person.EmailAddress);
         Assert.Equal(requestData.NationalInsuranceNumber, person.NationalInsuranceNumber);
         Assert.Equal(requestData.Gender, person.Gender);
-        Assert.NotNull(person.Trn);
 
         var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));

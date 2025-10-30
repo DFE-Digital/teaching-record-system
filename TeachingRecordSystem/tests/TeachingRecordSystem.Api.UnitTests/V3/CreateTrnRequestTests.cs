@@ -538,8 +538,7 @@ public class CreateTrnRequestTests : OperationTestBase
 
         var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync());
         Assert.NotNull(person);
-        Assert.NotNull(person.Trn);
-        AssertPersonMatchesCommand(command, person, expectTrn: true);
+        AssertPersonMatchesCommand(command, person);
 
         await AssertNoSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
 
@@ -747,8 +746,7 @@ public class CreateTrnRequestTests : OperationTestBase
 
     private void AssertPersonMatchesCommand(
         CreateTrnRequestCommand command,
-        Person person,
-        bool expectTrn)
+        Person person)
     {
         Assert.Equal(command.FirstName, person.FirstName);
         Assert.Equal(command.MiddleName, person.MiddleName);
@@ -756,15 +754,6 @@ public class CreateTrnRequestTests : OperationTestBase
         Assert.Equal(command.DateOfBirth, person.DateOfBirth);
         Assert.Equal(command.Gender, person.Gender);
         Assert.Equal(command.NationalInsuranceNumber, person.NationalInsuranceNumber);
-
-        if (expectTrn)
-        {
-            Assert.NotNull(person.Trn);
-        }
-        else
-        {
-            Assert.Null(person.Trn);
-        }
     }
 
     private Task AssertMetadataMatchesCommandAsync(CreateTrnRequestCommand command, bool expectedPotentialDuplicate) =>

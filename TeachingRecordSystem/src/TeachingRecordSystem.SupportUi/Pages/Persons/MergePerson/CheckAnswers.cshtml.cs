@@ -164,9 +164,9 @@ public class CheckAnswersModel(
         var @event = new PersonsMergedEvent()
         {
             PersonId = primaryPersonId,
-            PersonTrn = primaryPerson.Trn!,
+            PersonTrn = primaryPerson.Trn,
             SecondaryPersonId = secondaryPersonId,
-            SecondaryPersonTrn = secondaryPerson.Trn!,
+            SecondaryPersonTrn = secondaryPerson.Trn,
             SecondaryPersonStatus = secondaryPerson.Status,
             PersonAttributes = newPrimaryPersonAttributes,
             OldPersonAttributes = primaryPersonAttributes,
