@@ -256,6 +256,7 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" />
     <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="Azure.Storage.Files.DataLake" />
     <PackageReference Include="CloudNative.CloudEvents" />
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="CsvHelper" />
