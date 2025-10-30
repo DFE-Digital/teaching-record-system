@@ -3,9 +3,9 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class CreateNameChangeTests : OperationTestBase
+public class CreateNameChangeTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
 {
-    [Test]
+    [Fact]
     public async Task HandleAsync_PersonDoesNotExist_ReturnsError()
     {
         // Arrange
@@ -18,7 +18,7 @@ public class CreateNameChangeTests : OperationTestBase
         AssertError(result, ApiError.ErrorCodes.PersonNotFound);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
@@ -36,7 +36,7 @@ public class CreateNameChangeTests : OperationTestBase
         AssertError(result, ApiError.ErrorCodes.SpecifiedResourceUrlDoesNotExist);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
     {
         // Arrange

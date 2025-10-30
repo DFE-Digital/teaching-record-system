@@ -10,34 +10,25 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
-public abstract class OperationTestBase
+public abstract class OperationTestBase : IDisposable
 {
-    [SharedDependenciesDataSource]
-    public required IServiceProvider Services { get; init; }
+    private readonly TransactionScope _transactionScope;
 
-    [Before(Test)]
-    public void TestSetup(TestContext context)
+    protected OperationTestBase(OperationTestFixture operationTestFixture)
     {
-        var transactionScope = new TransactionScope(
+        _transactionScope = new TransactionScope(
             TransactionScopeOption.RequiresNew,
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
-        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
 
-        var testScopedServices = TestScopedServices.Reset(Services);
-        testScopedServices.EventObserver.Clear();
+        TestScopedServices.Reset(operationTestFixture.Services);
 
-        context.AddAsyncLocalValues();
+        Services = operationTestFixture.Services;
     }
 
-    [After(Test)]
-    public void TestTeardown(TestContext context)
-    {
-        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
-        {
-            txn.Dispose();
-        }
-    }
+    public virtual void Dispose() => _transactionScope.Dispose();
+
+    public IServiceProvider Services { get; }
 
     protected TestableClock Clock => TestScopedServices.GetCurrent().Clock;
 

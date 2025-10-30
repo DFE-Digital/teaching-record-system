@@ -41,10 +41,13 @@ public sealed class DbHelper : IDisposable
 
     public async Task InitializeAsync()
     {
-        await EnsureSchemaAsync();
+        var updatedSchema = await EnsureSchemaAsync();
 
-        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-        await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
+        if (updatedSchema)
+        {
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
+        }
     }
 
     public async Task ClearDataAsync()
@@ -62,7 +65,7 @@ public sealed class DbHelper : IDisposable
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task EnsureSchemaAsync()
+    public async Task<bool> EnsureSchemaAsync()
     {
         await _schemaLock.WaitAsync();
 
@@ -72,12 +75,15 @@ public sealed class DbHelper : IDisposable
             {
                 await ResetSchemaAsync();
                 _haveResetSchema = true;
+                return true;
             }
         }
         finally
         {
             _schemaLock.Release();
         }
+
+        return false;
     }
 
     public async Task ResetSchemaAsync()

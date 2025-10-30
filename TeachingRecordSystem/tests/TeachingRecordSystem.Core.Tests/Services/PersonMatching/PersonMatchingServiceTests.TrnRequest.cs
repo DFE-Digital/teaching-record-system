@@ -307,7 +307,7 @@ public partial class PersonMatchingServiceTests
             return attrNames;
         }
 
-        foreach (var matchedAttrs in matchableAttributes.Permutations())
+        foreach (var matchedAttrs in matchableAttributes.Subsets())
         {
             if (GetDistinctAttributeTypes(matchedAttrs).Count < 3)
             {

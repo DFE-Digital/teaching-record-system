@@ -5,8 +5,7 @@ namespace TeachingRecordSystem.Api.UnitTests.V3;
 
 public class GetTrnRequestTests : OperationTestBase
 {
-    [Before(Test)]
-    public void ConfigureMocks()
+    public GetTrnRequestTests(OperationTestFixture operationTestFixture) : base(operationTestFixture)
     {
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
@@ -19,7 +18,7 @@ public class GetTrnRequestTests : OperationTestBase
             });
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_RequestDoesNotExist_ReturnsError()
     {
         // Arrange
@@ -34,7 +33,7 @@ public class GetTrnRequestTests : OperationTestBase
         AssertError(result, ApiError.ErrorCodes.TrnRequestDoesNotExist);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_RequestIsPending_ReturnsPendingStatus()
     {
         // Arrange
@@ -57,7 +56,7 @@ public class GetTrnRequestTests : OperationTestBase
         Assert.Null(success.AccessYourTeachingQualificationsLink);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_RequestIsCompleted_ReturnsTrnAndCompletedStatus()
     {
         // Arrange
