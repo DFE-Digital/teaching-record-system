@@ -2,7 +2,6 @@ using System.Diagnostics;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240101;
 
-[Collection(nameof(DisableParallelization))]
 public class FindTeachersTests : TestBase, IAsyncLifetime
 {
     public FindTeachersTests(HostFixture hostFixture)

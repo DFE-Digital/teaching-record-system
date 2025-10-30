@@ -4,7 +4,6 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
-[Collection(nameof(DisableParallelization))]  // Configures EvidenceFilesHttpClient
 public class CreateDateOfBirthChangeTests : TestBase
 {
     public CreateDateOfBirthChangeTests(HostFixture hostFixture) : base(hostFixture)
@@ -158,6 +157,7 @@ public class CreateDateOfBirthChangeTests : TestBase
 
         // Act
         var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
+        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);

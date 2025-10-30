@@ -3,7 +3,6 @@ using TeachingRecordSystem.Api.Properties;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V1.Operations;
 
-[Collection(nameof(DisableParallelization))]
 public class GetTeacherTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
     async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();

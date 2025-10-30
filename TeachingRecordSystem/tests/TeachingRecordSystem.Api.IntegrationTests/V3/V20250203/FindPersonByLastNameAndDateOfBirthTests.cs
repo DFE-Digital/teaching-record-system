@@ -2,7 +2,6 @@ using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsSta
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
 
-[Collection(nameof(DisableParallelization))]
 public class FindPersonByLastNameAndDateOfBirthTests : TestBase, IAsyncLifetime
 {
     public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
