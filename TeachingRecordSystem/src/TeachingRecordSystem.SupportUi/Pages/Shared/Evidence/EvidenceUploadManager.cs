@@ -1,15 +1,20 @@
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
-public class EvidenceUploadManager(IFileService fileService)
+public class EvidenceUploadManager(IFileService fileService, IModelExpressionProvider modelExpressionProvider)
 {
-    public async Task ValidateAndUploadAsync(EvidenceUploadModel evidence, ModelStateDictionary modelState)
+    public async Task ValidateAndUploadAsync<TModel>(Expression<Func<TModel, EvidenceUploadModel>> evidenceExpression, ViewDataDictionary viewData)
     {
+        var expressionBuilder = new ModelExpressionBuilder<TModel, EvidenceUploadModel>(modelExpressionProvider, evidenceExpression, viewData);
+        var evidence = expressionBuilder.Model;
+
         if (evidence.UploadEvidence == true && evidence.EvidenceFile is null && evidence.UploadedEvidenceFile is null)
         {
-            modelState.AddModelError(nameof(evidence.EvidenceFile), "Select a file");
+            var expression = expressionBuilder.GetModelExpressionFor(e => e.EvidenceFile);
+            viewData.ModelState.AddModelError(expression.Name, "Select a file");
         }
 
         // Delete any previously uploaded file if they're uploading a new one,
@@ -38,5 +43,27 @@ public class EvidenceUploadManager(IFileService fileService)
         {
             await fileService.DeleteFileAsync(file.FileId);
         }
+    }
+}
+
+public class ModelExpressionBuilder<TContainer, TModel>(
+    IModelExpressionProvider modelExpressionProvider,
+    Expression<Func<TContainer, TModel>> modelExpressionFromContainer,
+    ViewDataDictionary viewData)
+{
+    private ViewDataDictionary<TContainer> _typedViewData = new(viewData);
+    private Func<TContainer, TModel> _getModel = modelExpressionFromContainer.Compile();
+
+    public TModel Model => _getModel(_typedViewData.Model);
+
+    public ModelExpression GetModelExpressionFor<TValue>(Expression<Func<TModel, TValue>> propertyExpressionFromModel)
+    {
+        var propertyName = ((MemberExpression)propertyExpressionFromModel.Body).Member.Name;
+        var modelParameter = modelExpressionFromContainer.Parameters[0];
+        var propertyExpressionFromContainer = Expression.Lambda<Func<TContainer, TValue>>(
+            Expression.Property(modelExpressionFromContainer.Body, propertyName),
+            modelParameter);
+
+        return modelExpressionProvider.CreateModelExpression(_typedViewData, propertyExpressionFromContainer);
     }
 }

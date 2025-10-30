@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.Delete
 
 [Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class ReasonModel(SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceController) : PageModel
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
@@ -69,7 +69,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
 
-        await evidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {
@@ -90,7 +90,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

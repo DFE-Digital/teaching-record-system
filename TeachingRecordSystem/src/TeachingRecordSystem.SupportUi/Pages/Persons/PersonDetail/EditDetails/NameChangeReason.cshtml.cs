@@ -42,7 +42,7 @@ public class NameChangeReasonModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await EvidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await EvidenceUploadManager.ValidateAndUploadAsync<NameChangeReasonModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

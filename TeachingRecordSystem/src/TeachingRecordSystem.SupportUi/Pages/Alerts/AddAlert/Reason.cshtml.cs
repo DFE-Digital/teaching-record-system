@@ -62,7 +62,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
             ModelState.AddModelError(nameof(AddReasonDetail), "Enter additional detail");
         }
 
-        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

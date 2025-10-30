@@ -15,7 +15,7 @@ public abstract class CommonJourneyPage(
 
     protected TrsDbContext DbContext { get; } = dbContext;
     protected SupportUiLinkGenerator LinkGenerator { get; } = linkGenerator;
-    protected EvidenceUploadManager EvidenceController { get; } = evidenceUploadManager;
+    protected EvidenceUploadManager EvidenceUploadManager { get; } = evidenceUploadManager;
 
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -26,7 +26,7 @@ public abstract class CommonJourneyPage(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        await EvidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
+        await EvidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.Evidence.UploadedEvidenceFile);
         await JourneyInstance!.DeleteAsync();
         return Redirect(LinkGenerator.Persons.PersonDetail.Induction(PersonId));
     }

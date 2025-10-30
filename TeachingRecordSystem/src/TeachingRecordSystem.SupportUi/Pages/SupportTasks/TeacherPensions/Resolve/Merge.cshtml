@@ -1,7 +1,7 @@
 @page "/support-tasks/teacher-pensions/{supportTaskReference}/resolve/merge/{handler?}"
 @using TeachingRecordSystem.SupportUi.Pages.Shared
 @using static ResolveTeacherPensionsPotentialDuplicateState
-@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.Merge
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.MergeModel
 @{
     ViewBag.Title = $"Potential duplicates via Teachers&rsquo; Pensions";
 }
@@ -106,7 +106,7 @@
         </tbody>
     </table>
 
-    <vc:upload-evidence evidence="@Model.Evidence" />
+    @Html.EditorFor(m => m.Evidence)
 
     <govuk-textarea for="MergeComments" label-class="govuk-label--s" />
 

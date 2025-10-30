@@ -74,7 +74,7 @@ public class ReasonModel(
             }
         }
 
-        await EvidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

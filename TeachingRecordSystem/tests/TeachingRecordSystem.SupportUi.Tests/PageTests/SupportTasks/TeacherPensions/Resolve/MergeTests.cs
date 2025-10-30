@@ -201,14 +201,20 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var state = new ResolveTeacherPensionsPotentialDuplicateState { MatchedPersonIds = [duplicatePerson1.PersonId], PersonId = duplicatePerson1.PersonId };
         var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder
+            {
+                { "Evidence.UploadEvidence", "" }
+            }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -291,7 +297,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 { "GenderSource", PersonAttributeSource.ExistingRecord },
                 { "FirstNameSource", PersonAttributeSource.ExistingRecord },
                 { "LastNameSource", PersonAttributeSource.ExistingRecord },
-                { "UploadEvidence", false },
+                { "Evidence.UploadEvidence", false },
                 { "MergeComments", mergeComments }
             }
         };
@@ -386,43 +392,17 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
             string? MergeComments = null,
             (HttpContent Content, string FileName)? evidenceFile = null)
     {
-        var builder = new MultipartFormDataContentBuilder();
-
-        if (uploadEvidence is not null)
+        return new MultipartFormDataContentBuilder
         {
-            builder.Add("UploadEvidence", uploadEvidence);
-        }
-        if (dateOfBirthSource is not null)
-        {
-            builder.Add("dateOfBirthSource", dateOfBirthSource);
-        }
-        if (NationalInsuranceNumberSource is not null)
-        {
-            builder.Add("NationalInsuranceNumberSource", NationalInsuranceNumberSource);
-        }
-        if (FirstNameSource is not null)
-        {
-            builder.Add("FirstNameSource", FirstNameSource);
-        }
-        if (LastNameSource is not null)
-        {
-            builder.Add("LastNameSource", LastNameSource);
-        }
-        if (GenderSource is not null)
-        {
-            builder.Add("GenderSource", GenderSource);
-        }
-        if (MergeComments is not null)
-        {
-            builder.Add("MergeComments", MergeComments);
-        }
-
-        if (evidenceFile is not null)
-        {
-            builder.Add("EvidenceFile", evidenceFile.Value.Content, evidenceFile.Value.FileName);
-        }
-
-        return builder;
+            { "dateOfBirthSource", dateOfBirthSource },
+            { "NationalInsuranceNumberSource", NationalInsuranceNumberSource },
+            { "FirstNameSource", FirstNameSource },
+            { "LastNameSource", LastNameSource },
+            { "GenderSource", GenderSource },
+            { "MergeComments", MergeComments },
+            { "Evidence.UploadEvidence", uploadEvidence },
+            { "Evidence.EvidenceFile", evidenceFile }
+        };
     }
 
     private async Task<JourneyInstance<ResolveTeacherPensionsPotentialDuplicateState>> CreateJourneyInstance(SupportTask supportTask, Guid? personId)

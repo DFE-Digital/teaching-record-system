@@ -83,7 +83,7 @@ public class DeactivateModel(
             ModelState.AddModelError(nameof(MoreInformationDetail), "Enter more details");
         }
 
-        await evidenceUploadManager.ValidateAndUploadAsync(Evidence, ModelState);
+        await evidenceUploadManager.ValidateAndUploadAsync<DeactivateModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

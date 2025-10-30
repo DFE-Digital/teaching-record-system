@@ -1,5 +1,4 @@
 using TeachingRecordSystem.SupportUi.Pages.Persons.AddPerson;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
@@ -15,9 +14,7 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
     public Gender? Gender { get; set; }
     public AddPersonReasonOption? Reason { get; set; }
     public string? ReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public (HttpContent, string)? EvidenceFile { get; set; }
-    public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
+    public TestEvidenceUploadModel Evidence { get; set; } = new();
 
     public AddPersonPostRequestContentBuilder WithFirstName(string? firstName)
     {
@@ -76,20 +73,22 @@ public class AddPersonPostRequestContentBuilder : PostRequestContentBuilder
 
     public AddPersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, (HttpContent content, string filename)? evidenceFile = null)
     {
-        UploadEvidence = uploadEvidence;
-        EvidenceFile = evidenceFile;
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.EvidenceFile = evidenceFile;
+
         return this;
     }
 
     public AddPersonPostRequestContentBuilder WithUploadEvidence(bool uploadEvidence, Guid? evidenceFileId, string? evidenceFileName, string? evidenceFileSizeDescription)
     {
-        UploadEvidence = uploadEvidence;
-        UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
+        Evidence.UploadEvidence = uploadEvidence;
+        Evidence.UploadedEvidenceFile = evidenceFileId is not Guid id ? null : new()
         {
             FileId = id,
             FileName = evidenceFileName ?? "filename.jpg",
             FileSizeDescription = evidenceFileSizeDescription ?? "5 MB"
         };
+
         return this;
     }
 }

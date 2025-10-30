@@ -190,7 +190,7 @@ public class MergeModel(
             ModelState.AddModelError(nameof(GenderSource), "Select a gender");
         }
 
-        await EvidenceController.ValidateAndUploadAsync(Evidence, ModelState);
+        await EvidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData);
 
         if (!ModelState.IsValid)
         {

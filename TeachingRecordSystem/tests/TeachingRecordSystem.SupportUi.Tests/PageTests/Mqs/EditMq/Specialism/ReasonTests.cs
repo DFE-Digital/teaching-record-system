@@ -104,7 +104,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "UploadEvidence", "False" }
+                { "Evidence.UploadEvidence", "False" }
             }
         };
 
@@ -135,7 +135,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                 { "ChangeReason", MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString() }
+                 { "ChangeReason", MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString() },
+                 { "Evidence.UploadEvidence", "" }
             }
         };
 
@@ -143,7 +144,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -167,7 +168,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContentBuilder
             {
                  { "ChangeReason", MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString() },
-                 { "UploadEvidence", "True" }
+                 { "Evidence.UploadEvidence", "True" }
             }
         };
 
@@ -175,7 +176,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Test]
@@ -197,7 +198,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var multipartContent = CreateFormFileUpload(".cs");
         multipartContent.Add(new StringContent(MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString()), "ChangeReason");
         multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
+        multipartContent.Add(new StringContent("True"), "Evidence.UploadEvidence");
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -208,7 +209,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Test]
@@ -230,7 +231,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         multipartContent.Add(new StringContent(MqChangeSpecialismReasonOption.ChangeOfSpecialism.ToString()), "ChangeReason");
         multipartContent.Add(new StringContent("True"), "HasAdditionalReasonDetail");
         multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
+        multipartContent.Add(new StringContent("True"), "Evidence.UploadEvidence");
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -314,7 +315,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var multipartContent = new MultipartFormDataContent
         {
-            { byteArrayContent, "EvidenceFile", $"evidence{fileExtension}" }
+            { byteArrayContent, "Evidence.EvidenceFile", $"evidence{fileExtension}" }
         };
 
         return multipartContent;

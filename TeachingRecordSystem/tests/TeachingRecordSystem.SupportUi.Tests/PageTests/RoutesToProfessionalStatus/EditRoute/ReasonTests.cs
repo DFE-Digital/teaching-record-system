@@ -164,7 +164,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder
+            {
+                { "Evidence.UploadEvidence", "" }
+            }
+        };
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
@@ -172,7 +178,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re editing this route");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Test]
@@ -235,18 +241,19 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", changeReason)
-                .Add("HasAdditionalReasonDetail", false)
-                .Add("UploadEvidence", true)
-                .Build()
+            Content = new MultipartFormDataContentBuilder
+            {
+                { "ChangeReason", changeReason },
+                { "HasAdditionalReasonDetail", false },
+                { "Evidence.UploadEvidence", true }
+            }
         };
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Test]
@@ -275,12 +282,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", changeReason)
-                .Add("HasAdditionalReasonDetail", false)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName)
-                .Build()
+            Content = new MultipartFormDataContentBuilder
+            {
+                { "ChangeReason", changeReason },
+                { "HasAdditionalReasonDetail", false },
+                { "Evidence.UploadEvidence", true },
+                { "Evidence.EvidenceFile", (CreateEvidenceFileBinaryContent(), evidenceFileName) }
+            }
         };
 
         // Act
