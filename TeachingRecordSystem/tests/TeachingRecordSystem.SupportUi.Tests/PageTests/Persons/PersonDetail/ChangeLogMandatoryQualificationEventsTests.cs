@@ -306,7 +306,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
         await DeactivateMq(mq.QualificationId, dqtUser);
         Clock.Advance();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var now = Clock.UtcNow;
 
@@ -372,7 +372,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         Clock.Advance();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
                 .Where(q => q.PersonId == person.PersonId)
@@ -417,7 +417,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         Clock.Advance();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
                 .Where(q => q.PersonId == person.PersonId)
@@ -460,7 +460,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
                 .WithDqtMqEstablishment(establishmentWithProviderMapping.Value)));
         Clock.Advance();
 
-        var migratedProvider = await WithDbContext(async dbContext =>
+        var migratedProvider = await WithDbContextAsync(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
                 .Where(q => q.PersonId == person.PersonId)
@@ -513,7 +513,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
                 .WithDqtMqEstablishment(establishmentWithSpecialismMapping.Value)));
         Clock.Advance();
 
-        var migratedSpecialism = await WithDbContext(async dbContext =>
+        var migratedSpecialism = await WithDbContextAsync(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
                 .Where(q => q.PersonId == person.PersonId)
@@ -897,7 +897,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
                 }
             }));
 
-        var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
+        var mq = await WithDbContextAsync(dbContext => dbContext.MandatoryQualifications
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(mq.ProviderId.HasValue);
@@ -918,7 +918,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
                 .WithStatus(null)
                 .WithProvider(null)));
 
-        var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
+        var mq = await WithDbContextAsync(dbContext => dbContext.MandatoryQualifications
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(!mq.DqtMqEstablishmentId.HasValue);
@@ -937,7 +937,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
             .WithMandatoryQualification(q => q
                 .WithProvider(null)));
 
-        var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
+        var mq = await WithDbContextAsync(dbContext => dbContext.MandatoryQualifications
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(!mq.DqtMqEstablishmentId.HasValue);
@@ -954,7 +954,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishment(legacyProvider.Value, mandatoryQualificationProviderId: null)));
 
-        var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
+        var mq = await WithDbContextAsync(dbContext => dbContext.MandatoryQualifications
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(mq.DqtMqEstablishmentValue is not null);
@@ -963,7 +963,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
         return (person.PersonId, mq, legacyProvider);
     }
 
-    private Task DeactivateMq(Guid qualificationId, EventModels.RaisedByUserInfo deactivatedBy) => WithDbContext(async dbContext =>
+    private Task DeactivateMq(Guid qualificationId, EventModels.RaisedByUserInfo deactivatedBy) => WithDbContextAsync(async dbContext =>
     {
         if (!deactivatedBy.IsDqtUser)
         {
@@ -1021,7 +1021,7 @@ public class ChangeLogMandatoryQualificationEventsTests(HostFixture hostFixture)
         string? changeReasonDetail = null,
         (Guid FileId, string Name)? evidenceFile = null)
     {
-        return WithDbContext(async dbContext =>
+        return WithDbContextAsync(async dbContext =>
         {
             var now = Clock.UtcNow;
 

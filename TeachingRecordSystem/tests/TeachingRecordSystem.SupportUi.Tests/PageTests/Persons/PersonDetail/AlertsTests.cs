@@ -505,7 +505,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (personStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;

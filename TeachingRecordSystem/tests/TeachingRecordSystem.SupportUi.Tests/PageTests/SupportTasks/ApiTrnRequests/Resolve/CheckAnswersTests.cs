@@ -401,7 +401,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
 
-        var person = await WithDbContext(dbContext => dbContext.Persons.SingleOrDefaultAsync(p => p.SourceTrnRequestId == requestData.RequestId));
+        var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleOrDefaultAsync(p => p.SourceTrnRequestId == requestData.RequestId));
         Assert.NotNull(person);
         Assert.Equal(requestData.FirstName, person.FirstName);
         Assert.Equal(requestData.MiddleName, person.MiddleName);
@@ -412,7 +412,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(requestData.Gender, person.Gender);
         Assert.NotNull(person.Trn);
 
-        var updatedSupportTask = await WithDbContext(dbContext => dbContext
+        var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
@@ -473,10 +473,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
 
-        var person = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == matchedPerson.PersonId));
+        var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == matchedPerson.PersonId));
         Assert.Equal(requestData.MiddleName, person.MiddleName);
 
-        var updatedSupportTask = await WithDbContext(dbContext => dbContext
+        var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
@@ -534,11 +534,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var updatedTrnRequestMetadata = await WithDbContext(dbContext =>
+        var updatedTrnRequestMetadata = await WithDbContextAsync(dbContext =>
             dbContext.TrnRequestMetadata.SingleAsync(t => t.RequestId == requestData.RequestId));
         Assert.Equal(TrnRequestStatus.Completed, updatedTrnRequestMetadata.Status);
 
-        var furtherChecksRequiredTasks = await WithDbContext(dbContext =>
+        var furtherChecksRequiredTasks = await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t =>
                 t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded && t.TrnRequestId == requestData.RequestId).ToArrayAsync());
         Assert.Empty(furtherChecksRequiredTasks);
@@ -579,11 +579,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var updatedTrnRequestMetadata = await WithDbContext(dbContext =>
+        var updatedTrnRequestMetadata = await WithDbContextAsync(dbContext =>
             dbContext.TrnRequestMetadata.SingleAsync(t => t.RequestId == requestData.RequestId));
         Assert.Equal(TrnRequestStatus.Pending, updatedTrnRequestMetadata.Status);
 
-        var furtherChecksRequiredTasks = await WithDbContext(dbContext =>
+        var furtherChecksRequiredTasks = await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t =>
                 t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded && t.TrnRequestId == requestData.RequestId).ToArrayAsync());
         Assert.NotEmpty(furtherChecksRequiredTasks);

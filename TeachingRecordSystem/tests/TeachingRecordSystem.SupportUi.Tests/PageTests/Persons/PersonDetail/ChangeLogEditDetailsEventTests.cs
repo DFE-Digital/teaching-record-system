@@ -125,7 +125,7 @@ public class ChangeLogEditDetailsEventTests(HostFixture hostFixture) : TestBase(
             DetailsChangeEvidenceFile = detailsChangeEvidenceFile
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();

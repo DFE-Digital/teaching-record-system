@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks
 
 public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task ConnectOneLoginUser_WithSuggestion()
     {
         var person = await TestData.CreatePersonAsync(p => p.WithLastName("O'Reilly"));
@@ -25,7 +25,7 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForUrlPathAsync("/support-tasks");
     }
 
-    [Test]
+    [Fact]
     public async Task ConnectOneLoginUser_WithoutSuggestions()
     {
         var person = await TestData.CreatePersonAsync();

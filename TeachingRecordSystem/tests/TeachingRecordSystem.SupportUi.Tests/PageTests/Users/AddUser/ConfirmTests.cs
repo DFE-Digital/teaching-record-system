@@ -384,7 +384,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var newUser = await WithDbContext(dbContext => dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == userId));
+        var newUser = await WithDbContextAsync(dbContext => dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == userId));
         Assert.NotNull(newUser);
 
         Assert.Equal(UserType.Person, newUser.UserType);

@@ -373,7 +373,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

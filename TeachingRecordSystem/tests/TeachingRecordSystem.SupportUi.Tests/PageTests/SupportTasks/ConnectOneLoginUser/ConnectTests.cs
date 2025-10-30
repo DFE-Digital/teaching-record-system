@@ -32,7 +32,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
-        await WithDbContext(dbContext => dbContext.SupportTasks
+        await WithDbContextAsync(dbContext => dbContext.SupportTasks
             .Where(t => t.SupportTaskReference == supportTask.SupportTaskReference)
             .ExecuteUpdateAsync(s => s.SetProperty(t => t.Status, _ => SupportTaskStatus.Closed)));
 
@@ -108,7 +108,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
-        await WithDbContext(dbContext => dbContext.SupportTasks
+        await WithDbContextAsync(dbContext => dbContext.SupportTasks
             .Where(t => t.SupportTaskReference == supportTask.SupportTaskReference)
             .ExecuteUpdateAsync(s => s.SetProperty(t => t.Status, _ => SupportTaskStatus.Closed)));
 
@@ -155,7 +155,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal("/support-tasks", response.Headers.Location?.OriginalString);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             supportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(SupportTaskStatus.Closed, supportTask.Status);

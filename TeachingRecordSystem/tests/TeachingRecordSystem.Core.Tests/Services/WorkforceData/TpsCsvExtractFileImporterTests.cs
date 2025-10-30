@@ -746,7 +746,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = dbFixture.DbContextFactory;
         var clock = new TestableClock();
         var tpsCsvExtractId = Guid.NewGuid();
         var filename = "pending/test.csv";
@@ -783,7 +783,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
     {
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
-        var dbContextFactory = dbFixture.GetDbContextFactory();
+        var dbContextFactory = dbFixture.DbContextFactory;
         var clock = new TestableClock();
         var tpsCsvExtractId = Guid.NewGuid();
         var tpsCsvExtract = new TpsCsvExtract

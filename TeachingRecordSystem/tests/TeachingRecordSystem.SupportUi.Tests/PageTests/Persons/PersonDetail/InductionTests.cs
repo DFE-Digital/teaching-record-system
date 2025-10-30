@@ -228,7 +228,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
 
@@ -285,7 +285,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
             p => p.WithQts());
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
@@ -468,7 +468,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (personStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;
@@ -512,7 +512,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (personStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;

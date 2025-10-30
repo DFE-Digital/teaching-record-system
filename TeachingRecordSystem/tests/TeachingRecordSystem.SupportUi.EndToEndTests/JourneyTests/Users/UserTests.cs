@@ -1,13 +1,8 @@
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Users;
 
-public class UserTests : TestBase
+public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public UserTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
-    [Test]
+    [Fact]
     public async Task AddUser()
     {
         var testAzAdUser = TestUsers.TestAzureActiveDirectoryUser;
@@ -38,7 +33,7 @@ public class UserTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: $"{testAzAdUser.Name} has been added as a record manager.");
     }
 
-    [Test]
+    [Fact]
     public async Task EditUser()
     {
         var azAdUserId = Guid.NewGuid();
@@ -64,7 +59,7 @@ public class UserTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: $"{user.Name} has been changed to a record manager");
     }
 
-    [Test]
+    [Fact]
     public async Task DeactivateUser()
     {
         var azAdUserId = Guid.NewGuid();
@@ -96,7 +91,7 @@ public class UserTests : TestBase
         await page.AssertFlashMessageAsync($"{user.Name}\u2019s account has been deactivated");
     }
 
-    [Test]
+    [Fact]
     public async Task ReactivateUser()
     {
         var azAdUserId = Guid.NewGuid();

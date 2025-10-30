@@ -1298,12 +1298,12 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
         Clock = new();
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);
 
-        DbContext = dbFixture.GetDbContextFactory().CreateDbContext();
+        DbContext = dbFixture.DbContextFactory.CreateDbContext();
     }
 
     public TestableClock Clock { get; }

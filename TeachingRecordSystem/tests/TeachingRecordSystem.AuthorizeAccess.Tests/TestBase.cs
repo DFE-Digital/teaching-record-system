@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -27,21 +26,22 @@ public abstract class TestBase
         });
     }
 
-    public HostFixture HostFixture { get; }
+    protected HostFixture HostFixture { get; }
 
-    public CaptureEventObserver EventPublisher => _testServices.EventObserver;
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    public TestableClock Clock => _testServices.Clock;
+    protected CaptureEventObserver EventPublisher => _testServices.EventObserver;
 
-    public HttpClient HttpClient { get; }
+    protected TestableClock Clock => _testServices.Clock;
 
-    public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+    protected HttpClient HttpClient { get; }
 
-    public async Task<JourneyInstance<SignInJourneyState>> CreateJourneyInstanceAsync(SignInJourneyState state)
+    protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    protected async Task<JourneyInstance<SignInJourneyState>> CreateJourneyInstanceAsync(SignInJourneyState state)
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
-        var options = scope.ServiceProvider.GetRequiredService<IOptions<FormFlowOptions>>();
 
         var journeyDescriptor = SignInJourneyState.JourneyDescriptor;
 
@@ -58,7 +58,7 @@ public abstract class TestBase
         return (JourneyInstance<SignInJourneyState>)instance;
     }
 
-    public async Task<JourneyInstance<SignInJourneyState>> ReloadJourneyInstanceAsync(JourneyInstance<SignInJourneyState> journeyInstance)
+    protected async Task<JourneyInstance<SignInJourneyState>> ReloadJourneyInstanceAsync(JourneyInstance<SignInJourneyState> journeyInstance)
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
@@ -66,28 +66,20 @@ public abstract class TestBase
         return (JourneyInstance<SignInJourneyState>)reloadedInstance!;
     }
 
-    public virtual async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
-    {
-        var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        return await action(dbContext);
-    }
+    protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 
-    public virtual Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
-        WithDbContextAsync(async dbContext =>
-        {
-            await action(dbContext);
-            return 0;
-        });
+    protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        DbContextFactory.WithDbContextAsync(action);
 
-    public async Task WithSignInJourneyHelper(Func<SignInJourneyHelper, Task> action)
+    protected async Task WithSignInJourneyHelper(Func<SignInJourneyHelper, Task> action)
     {
         using var scope = HostFixture.Services.CreateScope();
         var signInJourneyHelper = scope.ServiceProvider.GetRequiredService<SignInJourneyHelper>();
         await action(signInJourneyHelper);
     }
 
-    public AuthenticationTicket CreateOneLoginAuthenticationTicket(
+    protected AuthenticationTicket CreateOneLoginAuthenticationTicket(
         string vtr,
         string? sub = null,
         string? email = null,
@@ -133,7 +125,7 @@ public abstract class TestBase
         return new AuthenticationTicket(principal, properties, authenticationScheme: "OneLogin");
     }
 
-    public AuthenticationTicket CreateOneLoginAuthenticationTicket(string vtr, OneLoginUser user) =>
+    protected AuthenticationTicket CreateOneLoginAuthenticationTicket(string vtr, OneLoginUser user) =>
         CreateOneLoginAuthenticationTicket(
             vtr,
             user.Subject,
@@ -142,10 +134,10 @@ public abstract class TestBase
             user.VerifiedNames?.First().Last(),
             user.VerifiedDatesOfBirth?.First());
 
-    public SignInJourneyState CreateNewState(IdTrnToken trnToken, string redirectUri = "/", Guid clientApplicationUserId = default) =>
+    protected SignInJourneyState CreateNewState(IdTrnToken trnToken, string redirectUri = "/", Guid clientApplicationUserId = default) =>
         CreateNewState(redirectUri, clientApplicationUserId, trnToken?.TrnToken, trnToken?.Trn);
 
-    public SignInJourneyState CreateNewState(string redirectUri = "/", Guid clientApplicationUserId = default, string? trnToken = null, string? trnTokenTrn = null) =>
+    protected SignInJourneyState CreateNewState(string redirectUri = "/", Guid clientApplicationUserId = default, string? trnToken = null, string? trnTokenTrn = null) =>
         new(
             redirectUri,
             serviceName: "Test Service",
@@ -159,7 +151,7 @@ public abstract class TestBase
 
     private static int _lastTrnToken;
 
-    public async Task<IdTrnToken> CreateTrnTokenAsync(string trn, string? email = null)
+    protected async Task<IdTrnToken> CreateTrnTokenAsync(string trn, string? email = null)
     {
         var trnTokenStr = Interlocked.Increment(ref _lastTrnToken).ToString("D12");
 

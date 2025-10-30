@@ -371,7 +371,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests(HostFixture hos
             Comments = comments
         };
 
-        return WithDbContext(async dbContext =>
+        return WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(updatedEvent);
             await dbContext.SaveChangesAsync();

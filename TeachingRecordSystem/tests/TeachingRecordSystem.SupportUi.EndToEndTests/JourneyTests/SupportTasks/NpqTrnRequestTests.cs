@@ -2,10 +2,10 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks
 
 public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Resolve_CreateNewRecord()
     {
-        await WithDbContext(dbContext =>
+        await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
 
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
@@ -49,10 +49,10 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerLinksToPersonRecord();
     }
 
-    [Test]
+    [Fact]
     public async Task Resolve_MergeWithExistingRecord_FieldValuesMatchExisting()
     {
-        await WithDbContext(dbContext =>
+        await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
 
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
@@ -117,10 +117,10 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerLinksToPersonRecord(matchedPerson1.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task NoMatches_CreateRecord()
     {
-        await WithDbContext(dbContext =>
+        await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
 
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");
@@ -160,10 +160,10 @@ public class NpqTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertBannerLinksToPersonRecord();
     }
 
-    [Test]
+    [Fact]
     public async Task RejectRequest()
     {
-        await WithDbContext(dbContext =>
+        await WithDbContextAsync(dbContext =>
             dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.NpqTrnRequest).ExecuteDeleteAsync());
 
         var applicationUser = await TestData.CreateApplicationUserAsync(name: "NPQ");

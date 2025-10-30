@@ -1535,13 +1535,13 @@ public class CapitaImportJobFixture : IAsyncLifetime
             .Setup(f => f.UploadAsync(It.IsAny<Stream>(), true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
-        var matchingService = new PersonMatchingService(dbFixture.GetDbContextFactory().CreateDbContext());
+        var matchingService = new PersonMatchingService(dbFixture.DbContextFactory.CreateDbContext());
         var user = new CapitaTpsUserOption() { CapitaTpsUserId = ApplicationUser.CapitaTpsImportUser.UserId };
         var option = Options.Create(user);
 
         Job = ActivatorUtilities.CreateInstance<CapitaImportJob>(provider, dataLakeServiceClientMock.Object, Logger.Object, Clock, matchingService!, option);
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);

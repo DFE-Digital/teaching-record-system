@@ -2,14 +2,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
-public class EditDetailsTests : TestBase
+public class EditDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public EditDetailsTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
-    [Test]
+    [Fact]
     public async Task EditDetails_ChangeName()
     {
         var person = await TestData.CreatePersonAsync();
@@ -36,7 +31,7 @@ public class EditDetailsTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: "Personal details have been updated");
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_ChangeOtherDetails()
     {
         var person = await TestData.CreatePersonAsync();
@@ -63,7 +58,7 @@ public class EditDetailsTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: "Personal details have been updated");
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_ChangeNameAndOtherDetails()
     {
         var person = await TestData.CreatePersonAsync();
@@ -96,7 +91,7 @@ public class EditDetailsTests : TestBase
         await page.AssertFlashMessageAsync(expectedHeader: "Personal details have been updated");
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_ChangeName_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync();
@@ -129,7 +124,7 @@ public class EditDetailsTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_ChangeOtherDetails_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync();
@@ -162,7 +157,7 @@ public class EditDetailsTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_ChangeNameAndOtherDetails_NavigateBack()
     {
         var person = await TestData.CreatePersonAsync();
@@ -205,7 +200,7 @@ public class EditDetailsTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_CYA_ChangeNameOrReason_WhenNameAndOtherDetailsPreviouslyChanged_ContinuesToCYA()
     {
         var person = await TestData.CreatePersonAsync();
@@ -252,7 +247,7 @@ public class EditDetailsTests : TestBase
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_CYA_ChangeNameOrReason_WhenNameAndOtherDetailsPreviouslyChanged_NavigatesBackToCYA()
     {
         var person = await TestData.CreatePersonAsync();
@@ -311,7 +306,7 @@ public class EditDetailsTests : TestBase
         await page.AssertOnPersonDetailPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_CYA_ChangeName_WhenNameNotPreviouslyChanged_ContinuesToNameChangeReasonAndThenCYA()
     {
         var person = await TestData.CreatePersonAsync();
@@ -352,7 +347,7 @@ public class EditDetailsTests : TestBase
         await page.AssertOnPersonEditDetailsCheckAnswersPageAsync(person.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task EditDetails_CYA_ChangeOtherDetails_WhenOtherDetailsNotPreviouslyChanged_ContinuesToOtherDetailsChangeReasonAndThenCYA()
     {
         var person = await TestData.CreatePersonAsync();

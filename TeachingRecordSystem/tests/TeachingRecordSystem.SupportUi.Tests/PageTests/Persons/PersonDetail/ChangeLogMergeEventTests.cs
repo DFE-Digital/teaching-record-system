@@ -43,7 +43,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         _person = await TestData.CreatePersonAsync();
         _secondaryPerson = await TestData.CreatePersonAsync();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(_secondaryPerson.Person);
             _secondaryPerson.Person.Status = PersonStatus.Deactivated;
@@ -330,7 +330,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             EvidenceFile = evidenceFile
         };
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.AddEventWithoutBroadcast(mergedEvent);
             await dbContext.SaveChangesAsync();

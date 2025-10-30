@@ -134,7 +134,7 @@ public static class Extensions
 
     public static IServiceCollection AddClock(this IServiceCollection services)
     {
-        services.AddTransient<IClock, Clock>();
+        services.AddSingleton<IClock, Clock>();
 
         return services;
     }

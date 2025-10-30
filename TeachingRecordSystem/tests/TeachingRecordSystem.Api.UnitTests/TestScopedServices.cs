@@ -26,11 +26,11 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddTestScoped<IClock>(tss => tss.Clock)
+            .AddSingleton<IClock>(new ForwardToTestScopedClock())
             .AddTestScoped(tss => tss.GetAnIdentityApiClient.Object)
             .AddTestScoped(tss => tss.BlobStorageFileService.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
-            .AddTestScoped(tss => tss.EventObserver)
+            .AddSingleton<IEventObserver>(new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler);
 
@@ -72,6 +72,16 @@ public class TestScopedServices
     public Mock<IFileService> BlobStorageFileService { get; }
 
     public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
+
+    private class ForwardToTestScopedClock : IClock
+    {
+        public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
+    }
+
+    private class ForwardToTestScopedEventObserver : IEventObserver
+    {
+        public void OnEventCreated(LegacyEvents.EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventCreated(@event);
+    }
 }
 
 file static class ServiceCollectionExtensions

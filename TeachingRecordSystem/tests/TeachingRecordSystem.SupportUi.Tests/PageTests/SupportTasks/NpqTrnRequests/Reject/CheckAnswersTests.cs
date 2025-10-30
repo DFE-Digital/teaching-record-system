@@ -107,7 +107,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         // Assert
 
         // support task is updated
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedSupportTask = await dbContext
                 .SupportTasks

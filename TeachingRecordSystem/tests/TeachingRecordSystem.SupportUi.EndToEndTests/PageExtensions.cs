@@ -30,42 +30,39 @@ public static class PageExtensions
     {
         if (expectedHeader != null)
         {
-            await Assert.That(expectedHeader).IsEqualTo(await page.InnerTextAsync($".govuk-notification-banner__heading{TestBase.TextIsSelector(expectedHeader)}"));
+            Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading{TestBase.TextIsSelector(expectedHeader)}"));
         }
         if (expectedMessage != null)
         {
-            await Assert.That(expectedMessage).IsEqualTo(await page.InnerTextAsync($".govuk-notification-banner p{TestBase.TextIsSelector(expectedMessage)}"));
+            Assert.Equal(expectedMessage, await page.InnerTextAsync($".govuk-notification-banner p{TestBase.TextIsSelector(expectedMessage)}"));
         }
     }
 
-    public static async Task AssertHasErrorSummaryAsync(this IPage page)
+    public static void AssertHasErrorSummary(this IPage page)
     {
         var element = page.Locator("h2:text('There is a problem')");
-        await Assert.That(element).IsNotNull();
+        Assert.NotNull(element);
     }
 
     public static async Task AssertDateInputAsync(this IPage page, DateOnly date)
     {
-        using var _ = Assert.Multiple();
-        await Assert.That(date.Day.ToString()).IsEqualTo(await page.InputValueAsync("label:text-is('Day')"));
-        await Assert.That(date.Month.ToString()).IsEqualTo(await page.InputValueAsync("label:text-is('Month')"));
-        await Assert.That(date.Year.ToString()).IsEqualTo(await page.InputValueAsync("label:text-is('Year')"));
+        Assert.Equal(date.Day.ToString(), await page.InputValueAsync("label:text-is('Day')"));
+        Assert.Equal(date.Month.ToString(), await page.InputValueAsync("label:text-is('Month')"));
+        Assert.Equal(date.Year.ToString(), await page.InputValueAsync("label:text-is('Year')"));
     }
 
     public static async Task AssertNameInputAsync(this IPage page, string firstName, string middleName, string lastName)
     {
-        using var _ = Assert.Multiple();
-        await Assert.That(firstName).IsEqualTo(await page.InputValueAsync("text=First Name"));
-        await Assert.That(middleName).IsEqualTo(await page.InputValueAsync("text=Middle Name"));
-        await Assert.That(lastName).IsEqualTo(await page.InputValueAsync("text=Last Name"));
+        Assert.Equal(firstName, await page.InputValueAsync("text=First Name"));
+        Assert.Equal(middleName, await page.InputValueAsync("text=Middle Name"));
+        Assert.Equal(lastName, await page.InputValueAsync("text=Last Name"));
     }
 
     public static async Task AssertDateInputEmptyAsync(this IPage page)
     {
-        using var _ = Assert.Multiple();
-        await Assert.That(await page.InputValueAsync("label:text-is('Day')")).IsEmpty();
-        await Assert.That(await page.InputValueAsync("label:text-is('Month')")).IsEmpty();
-        await Assert.That(await page.InputValueAsync("label:text-is('Year')")).IsEmpty();
+        Assert.Empty(await page.InputValueAsync("label:text-is('Day')"));
+        Assert.Empty(await page.InputValueAsync("label:text-is('Month')"));
+        Assert.Empty(await page.InputValueAsync("label:text-is('Year')"));
     }
 
     public static async Task AssertBannerAsync(this IPage page, string title, string text)
@@ -73,9 +70,8 @@ public static class PageExtensions
         var bannerTitle = page.Locator("h2.govuk-notification-banner__title");
         var bannerText = page.Locator("h3.govuk-notification-banner__heading");
 
-        using var _ = Assert.Multiple();
-        await Assert.That(title).IsEqualTo(await bannerTitle.TextContentAsync());
-        await Assert.That(text).IsEqualTo(await bannerText.TextContentAsync());
+        Assert.Equal(title, await bannerTitle.TextContentAsync());
+        Assert.Equal(text, await bannerText.TextContentAsync());
     }
 
     public static async Task FillDateInputAsync(this IPage page, string id, DateOnly date)
@@ -107,13 +103,13 @@ public static class PageExtensions
     public static async Task AssertContentEqualsAsync(this IPage page, string content, string label)
     {
         var ddText = await page.FindContentForLabelAsync(label);
-        await Assert.That(content).IsEqualTo(ddText);
+        Assert.Contains(content, ddText);
     }
 
     public static async Task AssertContentContainsAsync(this IPage page, string content, string label)
     {
         var ddText = await page.FindContentForLabelAsync(label);
-        await Assert.That(ddText).Contains(content);
+        Assert.Contains(content, ddText);
     }
 
     public static Task<string> FindContentForLabelAsync(this IPage page, string label)
@@ -126,7 +122,7 @@ public static class PageExtensions
     public static async Task AssertNoListElementAsync(this IPage page, string label)
     {
         var element = page.Locator($"dt{TestBase.HasTextSelector(label)}");
-        await Assert.That(await element.IsVisibleAsync()).IsFalse();
+        Assert.False(await element.IsVisibleAsync());
     }
 
     public static Task ClickAcceptChangeButtonAsync(this IPage page) =>
@@ -182,15 +178,15 @@ public static class PageExtensions
     public static async Task AssertBannerLinksToPersonRecord(this IPage page)
     {
         var href = await page.Locator("a.govuk-link").GetAttributeAsync("href");
-        await Assert.That(href).Contains($"/persons/");
+        Assert.Contains("persons/", href);
         var parts = href!.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        await Assert.That(Guid.TryParse(parts.Last(), out _)).IsTrue();
+        Assert.True(Guid.TryParse(parts.Last(), out _));
     }
 
     public static async Task AssertBannerLinksToPersonRecord(this IPage page, Guid personId)
     {
         var href = await page.Locator("a.govuk-link:has-text('View record (opens in a new tab)')").GetAttributeAsync("href");
-        await Assert.That(href).Contains($"/persons/{personId}");
+        Assert.Contains($"/persons/{personId}", href);
     }
 
     public static Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null) =>

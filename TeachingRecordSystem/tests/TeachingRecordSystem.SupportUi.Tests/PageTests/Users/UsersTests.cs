@@ -7,7 +7,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
     private const string RequestPath = "/users";
 
     [Before(Test)]
-    public Task DeleteUsersAsync() => WithDbContext(dbContext => dbContext.Users.ExecuteDeleteAsync());
+    public Task DeleteUsersAsync() => WithDbContextAsync(dbContext => dbContext.Users.ExecuteDeleteAsync());
 
     [Test]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()

@@ -12,7 +12,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
@@ -20,7 +19,7 @@ using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
-public sealed class HostFixture : IAsyncLifetime
+public sealed class HostFixture : InitializeDbFixture
 {
     public const string BaseUrl = "http://localhost:55649";
     public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
@@ -67,16 +66,11 @@ public sealed class HostFixture : IAsyncLifetime
             BaseUrl,
             builder =>
             {
-                var configuration = new ConfigurationBuilder()
-                    .AddUserSecrets<HostFixture>(optional: true)
-                    .AddEnvironmentVariables()
-                    .Build();
+                var configuration = TestConfiguration.GetConfiguration();
                 builder.UseConfiguration(configuration);
 
                 builder.ConfigureServices((context, services) =>
                 {
-                    DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
-
                     services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
 
                     services.Configure<AuthenticationOptions>(options =>
@@ -93,15 +87,16 @@ public sealed class HostFixture : IAsyncLifetime
                         });
 
                     services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
-                    services.AddSingleton<OneLoginCurrentUserProvider>();
-                    services.AddSingleton<TestData>();
-                    services.AddSingleton<FakeTrnGenerator>();
-                    services.AddSingleton<TrsDataSyncHelper>();
-                    services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
-                    services.AddSingleton<IAuditRepository, TestableAuditRepository>();
-                    services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
-                    services.AddSingleton(GetMockFileService());
-                    services.AddSingleton(Mock.Of<IGetAnIdentityApiClient>());
+
+                    services
+                        .AddSingleton(DbHelper.Instance)
+                        .AddSingleton<TestData>()
+                        .AddSingleton<FakeTrnGenerator>()
+                        .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
+                        .AddSingleton<OneLoginCurrentUserProvider>()
+                        .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
+                        .AddSingleton(GetMockFileService())
+                        .AddSingleton(Mock.Of<IGetAnIdentityApiClient>());
 
                     IFileService GetMockFileService()
                     {
@@ -148,8 +143,10 @@ public sealed class HostFixture : IAsyncLifetime
         await dbContext.SaveChangesAsync();
     }
 
-    async ValueTask IAsyncLifetime.InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
+        await base.InitializeAsync();
+
         _host = CreateHost();
 
         _playwright = await Playwright.CreateAsync();
@@ -177,7 +174,7 @@ public sealed class HostFixture : IAsyncLifetime
         await AddTestAppToApplicationUsers();
     }
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         if (_disposed)
         {
@@ -197,6 +194,8 @@ public sealed class HostFixture : IAsyncLifetime
         {
             await _host.DisposeAsync();
         }
+
+        await base.DisposeAsync();
     }
 
     public sealed class Host<T> : IAsyncDisposable
@@ -242,7 +241,7 @@ public sealed class HostFixture : IAsyncLifetime
                 get
                 {
                     EnsureServer();
-                    return _host!.Services!;
+                    return _host!.Services;
                 }
             }
 

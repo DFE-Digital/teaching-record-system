@@ -25,7 +25,7 @@ public class TestScopedServices
 
     public static void ConfigureServices(IServiceCollection services) =>
         services
-            .AddTestScoped<IClock>(tss => tss.Clock)
+            .AddSingleton<IClock>(new ForwardToTestScopedClock())
             .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AccessYourTeachingQualificationsOptions)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
@@ -65,6 +65,11 @@ public class TestScopedServices
     public Mock<IFileService> BlobStorageFileServiceMock { get; }
 
     public TestableFeatureProvider FeatureProvider { get; }
+
+    private class ForwardToTestScopedClock : IClock
+    {
+        public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
+    }
 }
 
 file static class ServiceCollectionExtensions

@@ -277,7 +277,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
             .WithStatus(status, endDate)));
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.Status = PersonStatus.Deactivated;

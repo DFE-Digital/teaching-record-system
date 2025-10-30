@@ -18,11 +18,12 @@ public class Startup
                 .AddEnvironmentVariables())
             .ConfigureServices((context, services) =>
             {
-                DbHelper.ConfigureDbServices(services, context.Configuration.GetPostgresConnectionString());
                 services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().InitializeAsync());
 
                 services
+                    .AddSingleton(DbHelper.Instance)
                     .AddMemoryCache()
+                    .AddDatabase(context.Configuration)
                     .AddSingleton<DbFixture>()
                     .AddSingleton<FakeTrnGenerator>()
                     .AddSingleton<ReferenceDataCache>()

@@ -204,7 +204,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: "Record created for Alfred The Great");
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == personId);
             Assert.Equal(Clock.UtcNow, createdPersonRecord.CreatedOn);

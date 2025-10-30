@@ -10,29 +10,24 @@ using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.SupportUi.EndToEndTests;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
+[assembly: AssemblyFixture(typeof(HostFixture))]
+
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
-public sealed class HostFixture : IAsyncDisposable
+public sealed class HostFixture : InitializeDbFixture
 {
     public const string BaseUrl = "http://localhost:55642";
 
-    private readonly IConfiguration _configuration;
-    private readonly DbHelper _dbHelper;
     private bool _initialized;
     private bool _disposed;
     private Host<Program>? _host;
     private IPlaywright? _playwright;
     private IBrowser? _browser;
-
-    public HostFixture(IConfiguration configuration, DbHelper dbHelper)
-    {
-        _configuration = configuration;
-        _dbHelper = dbHelper;
-    }
 
     public IBrowser Browser
     {
@@ -68,7 +63,8 @@ public sealed class HostFixture : IAsyncDisposable
             BaseUrl,
             builder =>
             {
-                builder.UseConfiguration(_configuration);
+                var configuration = TestConfiguration.GetConfiguration();
+                builder.UseConfiguration(configuration);
 
                 builder.ConfigureServices((context, services) =>
                 {
@@ -78,9 +74,9 @@ public sealed class HostFixture : IAsyncDisposable
                         .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
                     services
-                        .AddSingleton(_dbHelper)
                         .AddSingleton<CurrentUserProvider>()
                         .AddStartupTask<TestUsers.CreateUsersStartupTask>()
+                        .AddSingleton(DbHelper.Instance)
                         .AddSingleton<TestData>()
                         .AddSingleton<FakeTrnGenerator>()
                         .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
@@ -149,8 +145,10 @@ public sealed class HostFixture : IAsyncDisposable
         }
     }
 
-    public async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
+        await base.InitializeAsync();
+
         _host = CreateHost();
 
         _playwright = await Playwright.CreateAsync();
@@ -172,9 +170,11 @@ public sealed class HostFixture : IAsyncDisposable
         _browser = await browserType.LaunchAsync(browserOptions);
 
         _initialized = true;
+
+        await Services.GetRequiredService<DbHelper>().InitializeAsync();
     }
 
-    public async ValueTask DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         if (_disposed)
         {
@@ -194,6 +194,8 @@ public sealed class HostFixture : IAsyncDisposable
         {
             await _host.DisposeAsync();
         }
+
+        await base.DisposeAsync();
     }
 
     public sealed class Host<T> : IAsyncDisposable
@@ -222,17 +224,10 @@ public sealed class HostFixture : IAsyncDisposable
         public ValueTask DisposeAsync() => _applicationFactory.DisposeAsync();
 
         // See https://github.com/dotnet/aspnetcore/issues/4892
-        private class KestrelWebApplicationFactory<TFactory> : WebApplicationFactory<TFactory>
+        private class KestrelWebApplicationFactory<TFactory>(string url, Action<IWebHostBuilder> configureWebHostBuilder) : WebApplicationFactory<TFactory>
             where TFactory : class
         {
-            private readonly Action<IWebHostBuilder> _configureWebHostBuilder;
             private IHost? _host;
-
-            public KestrelWebApplicationFactory(string url, Action<IWebHostBuilder> configureWebHostBuilder)
-            {
-                Url = url;
-                _configureWebHostBuilder = configureWebHostBuilder;
-            }
 
             public override IServiceProvider Services
             {
@@ -243,7 +238,7 @@ public sealed class HostFixture : IAsyncDisposable
                 }
             }
 
-            public string Url { get; }
+            public string Url { get; } = url;
 
             protected override void ConfigureWebHost(IWebHostBuilder builder)
             {
@@ -251,7 +246,7 @@ public sealed class HostFixture : IAsyncDisposable
                     .UseUrls(Url)
                     .UseEnvironment("EndToEndTests");
 
-                _configureWebHostBuilder(builder);
+                configureWebHostBuilder(builder);
             }
 
             protected override IHost CreateHost(IHostBuilder builder)

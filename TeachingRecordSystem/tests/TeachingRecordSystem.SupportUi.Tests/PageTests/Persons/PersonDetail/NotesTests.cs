@@ -255,7 +255,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         if (personStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;

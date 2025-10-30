@@ -291,7 +291,7 @@ public class CommonPageTests(HostFixture hostFixture) : MergePersonTestBase(host
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(personA.Person);
             personA.Person.Status = PersonStatus.Deactivated;
@@ -410,7 +410,7 @@ public class CommonPageTests(HostFixture hostFixture) : MergePersonTestBase(host
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences();
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(personB.Person);
             personB.Person.Status = PersonStatus.Deactivated;

@@ -15,7 +15,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         Clock = new();
 
         TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
+            dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
             trnGenerator);

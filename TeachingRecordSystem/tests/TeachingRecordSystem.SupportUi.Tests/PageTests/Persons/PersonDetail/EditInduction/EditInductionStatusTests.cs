@@ -106,7 +106,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
@@ -153,7 +153,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
             p => p.WithQts());
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
@@ -276,7 +276,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     {
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
@@ -326,7 +326,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(
             p => p.WithQts());
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
 
@@ -391,7 +391,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
             p => p.WithQts());
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(

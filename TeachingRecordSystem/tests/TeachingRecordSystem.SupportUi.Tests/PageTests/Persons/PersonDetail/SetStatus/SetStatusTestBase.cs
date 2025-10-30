@@ -12,7 +12,7 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (currentStatus == PersonStatus.Deactivated)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;
@@ -31,7 +31,7 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (targetStatus == PersonStatus.Active)
         {
-            await WithDbContext(async dbContext =>
+            await WithDbContextAsync(async dbContext =>
             {
                 dbContext.Attach(person.Person);
                 person.Person.Status = PersonStatus.Deactivated;
