@@ -11,21 +11,6 @@ public static class EnumerableExtensions
     public static T Single<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
         source.SingleOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
 
-    public static IEnumerable<T[]> Permutations<T>(this IEnumerable<T> source, int length)
-    {
-        if (source is null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        if (length < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(length));
-        }
-
-        return source.Permutations().Select(p => p.ToArray()).Where(c => c.Length == length);
-    }
-
     public static string ToCommaDelimitedString(
         this IEnumerable<string> values,
         string finalValuesConjunction = "and")

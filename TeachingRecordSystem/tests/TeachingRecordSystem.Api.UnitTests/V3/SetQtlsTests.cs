@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class SetQtlsTests : OperationTestBase
+public class SetQtlsTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
 {
-    [Test]
+    [Fact]
     public async Task HandleAsync_PersonDoesNotExist_ReturnsError()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class SetQtlsTests : OperationTestBase
         AssertError(result, ApiError.ErrorCodes.PersonNotFound);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_NullQtsDateAndNoExistingRoute_DoesNotCreateEvent()
     {
         // Arrange
@@ -35,7 +35,7 @@ public class SetQtlsTests : OperationTestBase
         EventObserver.AssertNoEventsSaved();
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_NullQtsDateAndExistingQtlsRoute_DeletesRouteAndSetsQtlsStatusToExpired()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class SetQtlsTests : OperationTestBase
         });
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_NonNullQtsDateAndNoExistingRoute_CreatesRouteAndSetsQtlsStatusToActive()
     {
         // Arrange
@@ -102,7 +102,7 @@ public class SetQtlsTests : OperationTestBase
         });
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_NonNullQtsDateAndExistingRouteHoldsFromMatches_DoesNotCreateEvent()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class SetQtlsTests : OperationTestBase
         EventObserver.AssertNoEventsSaved();
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_NonNullQtsDateAndExistingRouteHoldFromDoesNotMatch_UpdatesRoute()
     {
         // Arrange

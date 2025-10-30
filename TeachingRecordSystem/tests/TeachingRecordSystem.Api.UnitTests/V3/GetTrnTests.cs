@@ -3,9 +3,9 @@ using TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-public class GetTrnTests : OperationTestBase
+public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
 {
-    [Test]
+    [Fact]
     public async Task HandleAsync_PersonDoesNotExist_ReturnsError()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class GetTrnTests : OperationTestBase
         AssertError(result, ApiError.ErrorCodes.PersonNotFound);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_PersonExistsButIsNotActive_ReturnsError()
     {
         // Arrange
@@ -39,7 +39,7 @@ public class GetTrnTests : OperationTestBase
         AssertError(result, ApiError.ErrorCodes.RecordIsNotActive);
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_PersonIsMerged_ReturnsError()
     {
         // Arrange
@@ -69,7 +69,7 @@ public class GetTrnTests : OperationTestBase
             });
     }
 
-    [Test]
+    [Fact]
     public async Task HandleAsync_PersonExistsAndIsActive_ReturnsSuccess()
     {
         // Arrange
