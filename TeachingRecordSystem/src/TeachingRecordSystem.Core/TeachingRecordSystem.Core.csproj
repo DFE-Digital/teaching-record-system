@@ -252,6 +252,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0094_SupportTasksDeletedOn.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0095_IntegrationTransactionWarningCount.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0096_TrnRequestMetadata.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0097_FixProcessesColumnName.sql" />
   </ItemGroup>
 
   <ItemGroup>
