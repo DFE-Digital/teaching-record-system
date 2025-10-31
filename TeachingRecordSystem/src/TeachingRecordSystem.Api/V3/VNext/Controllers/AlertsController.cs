@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.V20240920.Requests;
-using TeachingRecordSystem.Api.V3.V20240920.Responses;
+using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.VNext.Response;
 
-namespace TeachingRecordSystem.Api.V3.V20240920.Controllers;
+namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
 [Route("alerts")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = $"{ApiRoles.UpdateRole}")]
