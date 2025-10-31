@@ -251,6 +251,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0093_RemoveITRPersonForeignKey.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0094_SupportTasksDeletedOn.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0095_IntegrationTransactionWarningCount.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0096_TrnRequestMetadata.sql" />
   </ItemGroup>
 
   <ItemGroup>
