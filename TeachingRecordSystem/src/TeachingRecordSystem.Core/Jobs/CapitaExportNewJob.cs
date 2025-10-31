@@ -364,7 +364,7 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
 
     public async Task<(DateTime?, JobMetadata?)> GetLastRunDateAsync()
     {
-        var item = await dbContext.JobMetadata.AsNoTracking()
+        var item = await dbContext.JobMetadata
             .FirstOrDefaultAsync(i => i.JobName == nameof(CapitaExportNewJob));
 
         DateTime? lastRunDate = null;
