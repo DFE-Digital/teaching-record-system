@@ -1,7 +1,7 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 using PersonInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos.PersonInfo;
 
-namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
+namespace TeachingRecordSystem.Api.V3.VNext.Response;
 
 public record AlertResponse : Alert
 {
