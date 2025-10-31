@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
 public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PopulatesThisTrnFromPersonRecord()
     {
         var person = await TestData.CreatePersonAsync();
@@ -29,7 +29,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         Assert.Equal(person.Trn, thisTrn.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_OtherTrnAlreadyEntered_ShowsOtherTrn()
     {
         var personA = await TestData.CreatePersonAsync();
@@ -55,7 +55,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         Assert.Equal(personB.Trn, otherTrn.Value);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_OtherTrnMissing_ShowsPageError()
     {
         // Arrange
@@ -81,9 +81,9 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "Enter a TRN");
     }
 
-    [Test]
-    [Arguments("A234567")]
-    [Arguments("XYZ")]
+    [Theory]
+    [InlineData("A234567")]
+    [InlineData("XYZ")]
     public async Task Post_OtherTrnNotNumeric_ShowsPageError(string trn)
     {
         // Arrange
@@ -109,9 +109,9 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be a number");
     }
 
-    [Test]
-    [Arguments("12345678")]
-    [Arguments("123456")]
+    [Theory]
+    [InlineData("12345678")]
+    [InlineData("123456")]
     public async Task Post_OtherTrnNot7DigitsLong_ShowsPageError(string trn)
     {
         // Arrange
@@ -137,7 +137,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be 7 digits long");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_OtherTrnSameAsThisTrn_ShowsPageError()
     {
         // Arrange
@@ -163,7 +163,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be for a different record");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_OtherTrnDoesNotBelongToPerson_ShowsPageError()
     {
         // Arrange
@@ -191,7 +191,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "No record found with that TRN");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_OtherTrnBelongsToDeactivatedPerson_ShowsPageError()
     {
         // Arrange
@@ -225,7 +225,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "The TRN you entered belongs to a deactivated record");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_PersonAIsDeactivated_ReturnsBadRequest()
     {
         // Arrange
@@ -260,7 +260,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -289,10 +289,10 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Test]
-    [Arguments(InductionStatus.InProgress)]
-    [Arguments(InductionStatus.Passed)]
-    [Arguments(InductionStatus.Failed)]
+    [Theory]
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
     public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
     {
         // Arrange
@@ -325,7 +325,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_PersistsDetailsAndRedirectsToNextPage()
     {
         // Arrange

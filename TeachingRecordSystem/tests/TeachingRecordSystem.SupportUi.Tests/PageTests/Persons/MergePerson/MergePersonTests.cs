@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
 public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -40,8 +40,8 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
+    [Theory]
+    [MemberData(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsNotDifferent_RendersDisabledAndUnselectedRadioButtons(
         PersonMatchedAttribute _,
         string fieldName,
@@ -74,8 +74,8 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         }
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
+    [Theory]
+    [MemberData(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeIsDifferent_RendersRadioButtonsWithExistingValueHighlighted(
         PersonMatchedAttribute attribute,
         string fieldName,
@@ -115,8 +115,8 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
             });
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
+    [Theory]
+    [MemberData(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToPrimaryPersonInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName,
@@ -152,8 +152,8 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.True(radios[0].IsChecked());
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAttributesAndFieldsData))]
+    [Theory]
+    [MemberData(nameof(GetAttributesAndFieldsData))]
     public async Task Get_AttributeSourceSetToSecondaryPersonInState_RendersSelectedSourceRadioButton(
         PersonMatchedAttribute _,
         string fieldName,
@@ -189,7 +189,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.True(radios[1].IsChecked());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_EvidenceAndCommentsSetInState_RendersChoices()
     {
         // Arrange
@@ -234,14 +234,14 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TrimmedText());
     }
 
-    [Test]
-    [Arguments(PersonMatchedAttribute.FirstName, "FirstNameSource", "Select a first name")]
-    [Arguments(PersonMatchedAttribute.MiddleName, "MiddleNameSource", "Select a middle name")]
-    [Arguments(PersonMatchedAttribute.LastName, "LastNameSource", "Select a last name")]
-    [Arguments(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
-    [Arguments(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
-    [Arguments(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
-    [Arguments(PersonMatchedAttribute.Gender, "GenderSource", "Select a gender")]
+    [Theory]
+    [InlineData(PersonMatchedAttribute.FirstName, "FirstNameSource", "Select a first name")]
+    [InlineData(PersonMatchedAttribute.MiddleName, "MiddleNameSource", "Select a middle name")]
+    [InlineData(PersonMatchedAttribute.LastName, "LastNameSource", "Select a last name")]
+    [InlineData(PersonMatchedAttribute.DateOfBirth, "DateOfBirthSource", "Select a date of birth")]
+    [InlineData(PersonMatchedAttribute.EmailAddress, "EmailAddressSource", "Select an email")]
+    [InlineData(PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource", "Select a National Insurance number")]
+    [InlineData(PersonMatchedAttribute.Gender, "GenderSource", "Select a gender")]
     public async Task Post_AttributeSourceNotSelected_RendersError(
         PersonMatchedAttribute differentAttribute,
         string fieldName,
@@ -272,7 +272,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         await AssertEx.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -300,7 +300,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -329,7 +329,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -371,7 +371,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -414,7 +414,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -447,7 +447,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -479,7 +479,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -512,7 +512,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -541,7 +541,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Test]
+    [Fact]
     public async Task Post_EmptyRequestWithNoDifferencesToSelect_Succeeds()
     {
         // Arrange
@@ -569,7 +569,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         Assert.True((int)response.StatusCode < 400);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToCheckAnswers()
     {
         // Arrange

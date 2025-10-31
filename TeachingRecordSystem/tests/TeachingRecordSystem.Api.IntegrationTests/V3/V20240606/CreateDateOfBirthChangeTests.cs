@@ -157,7 +157,6 @@ public class CreateDateOfBirthChangeTests : TestBase
 
         // Act
         var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
-        await BackgroundJobScheduler.ExecuteDeferredJobsAsync();
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);

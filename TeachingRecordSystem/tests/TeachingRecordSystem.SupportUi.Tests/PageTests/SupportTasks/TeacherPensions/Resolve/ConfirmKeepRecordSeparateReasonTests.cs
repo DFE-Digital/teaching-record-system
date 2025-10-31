@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -23,7 +23,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ReasonProvided_RendersCorrectContent()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.Contains(state.Reason, reason.TextContent);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_RecordsDoNotMatch_RendersCorrectContent()
     {
         // Arrange
@@ -111,7 +111,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.Contains(state.KeepSeparateReason.GetDisplayName()!, reason.TextContent);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_RecordsDoNotMatch_SuccessfullyClosesSupportTask()
     {
         // Arrange
@@ -185,7 +185,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Tes
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AnotherReasonProvided_SuccessfullyClosesSupportTask()
     {
         // Arrange

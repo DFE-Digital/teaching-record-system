@@ -2,15 +2,16 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
-public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.New;
     private const string ThisStep = JourneySteps.Index;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +30,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -45,9 +46,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Get_ValidRequest_ReturnsOk(bool isOpenAlert)
     {
         // Arrange
@@ -64,9 +65,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
 
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsExpectedContent(bool isOpenAlert)
     {
         // Arrange
@@ -96,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         }
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -118,7 +119,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode); ;
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -134,7 +135,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError()
     {
         // Arrange
@@ -153,9 +154,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReason", "Select a reason");
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_NoHasAdditionalReasonDetailIsSelected_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -175,9 +176,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information");
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_AdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -199,9 +200,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReasonDetail", "Enter additional detail");
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -223,9 +224,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError(bool isOpenAlert)
     {
         // Arrange
@@ -247,9 +248,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage(bool isOpenAlert)
     {
         // Arrange
@@ -282,9 +283,9 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_ValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage(bool isOpenAlert)
     {
         // Arrange
@@ -315,13 +316,12 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.DeleteReasonDetail);
         Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
-        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
         Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_Cancel_DeletesJourneyAndRedirects(bool isOpenAlert)
     {
         // Arrange
@@ -348,7 +348,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

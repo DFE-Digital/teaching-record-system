@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPen
 
 public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PotentialDuplicateTaskDoesNotExist_ReturnsNotFound()
     {
         // Arranges
@@ -21,7 +21,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MergeDetails_ReturnsCorrectContent()
     {
         // Arrange
@@ -100,7 +100,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(evidenceFileName, evidenceFile.TextContent);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -153,7 +153,7 @@ public class CheckAnswers(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidData_ClosesTaskAndRedirectsToTeacherPensionsWithUpdatedDetails()
     {
         // Arrange

@@ -18,7 +18,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
 
-    [Test]
+    [Fact]
     public async Task Get_NoPotentialDuplicateTasks_ReturnsNoResults()
     {
         // Arrange
@@ -33,7 +33,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithSupportTask_RendersResults()
     {
         // Arrange
@@ -83,7 +83,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
 
-    [Test]
+    [Fact]
     public async Task Get_NoSortParametersSpecified_ShowsTasksOrderedByCreatedOnAscending()
     {
         // Arrange
@@ -134,7 +134,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithCreatedOnDescending_ShowsTasksOrderedByCreatedOnDescending()
     {
         // Arrange
@@ -185,7 +185,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithNameSortOrder_ShowsTasksOrderedByNameOnAscending()
     {
         // Arrange
@@ -240,7 +240,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithFilenameSortOrder_ShowsTasksOrderedByFilenameDescending()
     {
         // Arrange
@@ -295,7 +295,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithFilenameSortOrder_ShowsTasksOrderedByFilenamAscending()
     {
         // Arrange
@@ -350,7 +350,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 result2 => Assert.Equal(supportTask1.SupportTaskReference, result2));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithInterfaceIdSortOrder_ShowsTasksOrderedByInterfaceIdDescending()
     {
         // Arrange
@@ -405,7 +405,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 result2 => Assert.Equal(supportTask2.SupportTaskReference, result2));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithInterfaceIdSortOrder_ShowsTasksOrderedByInterfaceIdAscending()
     {
         // Arrange

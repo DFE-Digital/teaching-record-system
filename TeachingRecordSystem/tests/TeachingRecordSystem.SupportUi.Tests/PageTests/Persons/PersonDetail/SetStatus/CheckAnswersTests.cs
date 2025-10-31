@@ -16,8 +16,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
     //   * Check - identified duplicate - you'd need to check with devs if this is still relevant under how trs will deal with these
     // TODO: End-to-end tests (including manual merge)
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Get_WhenFieldChanged_ShowsReasonAndEvidenceFile_AsExpected(PersonStatus targetStatus)
     {
         // Arrange
@@ -63,8 +63,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         });
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Get_WhenFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided(PersonStatus targetStatus)
     {
         // Arrange
@@ -107,8 +107,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         doc.AssertSummaryListRowValues("Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetAllStatuses))]
+    [Theory]
+    [MemberData(nameof(GetAllStatuses))]
     public async Task Post_Confirm_UpdatesPersonStatusCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonStatus targetStatus)
     {
         // Arrange

@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {
         // Arrange
@@ -39,7 +39,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -71,7 +71,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
@@ -125,7 +125,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -169,7 +169,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal(["True", "False"], uploadEvidenceChoices);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WhenNameAlsoChanged_PageTitleChangesAccordingly()
     {
         // Arrange
@@ -203,7 +203,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal("Why are you changing the other personal details on this record?", reasonChoicesLegend!.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
@@ -240,7 +240,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal(changeReasonDetails, journeyInstance.State.OtherDetailsChangeReasonDetail);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
@@ -271,7 +271,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AnotherReason_NoDetailAdded_ReturnsError()
     {
         // Arrange
@@ -302,7 +302,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.ReasonDetail), "Enter a reason");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
@@ -334,7 +334,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -367,7 +367,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -413,7 +413,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue($"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -460,7 +460,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal("3 KB", doc.GetHiddenInputValue($"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadedEvidenceFile)}.{nameof(UploadedEvidenceFile.FileSizeDescription)}"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -497,7 +497,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -533,7 +533,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
@@ -570,7 +570,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         Assert.Equal("1.2 KB", journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile.FileSizeDescription);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
@@ -603,7 +603,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : TestBase(h
         await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
     {
         // Arrange

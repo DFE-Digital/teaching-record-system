@@ -11,36 +11,33 @@ using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-[SharedDependenciesDataSource]
-public abstract class TestBase(HostFixture hostFixture)
+public abstract class TestBase : IDisposable
 {
-    [Before(Test)]
-    public void TestSetup(TestContext context)
+    private readonly TransactionScope _transactionScope;
+
+    protected TestBase(HostFixture hostFixture)
     {
-        var transactionScope = new TransactionScope(
+        HostFixture = hostFixture;
+
+        _transactionScope = new TransactionScope(
             TransactionScopeOption.RequiresNew,
             new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
             TransactionScopeAsyncFlowOption.Enabled);
-        context.ObjectBag[nameof(TransactionScope)] = transactionScope;
 
         var testScopedServices = TestScopedServices.Reset(HostFixture.Services);
         testScopedServices.EventObserver.Clear();
 
-        SetCurrentUser(Setup.AdminUser);
+        HttpClient = hostFixture.CreateClient(new() { AllowAutoRedirect = false });
 
-        context.AddAsyncLocalValues();
+        SetCurrentUser(HostFixture.AdminUser);
     }
 
-    [After(Test)]
-    public void TestTeardown(TestContext context)
+    public virtual void Dispose()
     {
-        if (context.ObjectBag.TryGetValue(nameof(TransactionScope), out var txnObj) && txnObj is TransactionScope txn)
-        {
-            txn.Dispose();
-        }
+        _transactionScope.Dispose();
     }
 
-    protected HostFixture HostFixture { get; } = hostFixture;
+    protected HostFixture HostFixture { get; }
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
@@ -51,10 +48,7 @@ public abstract class TestBase(HostFixture hostFixture)
     protected Mock<Services.AzureActiveDirectory.IAadUserService> AzureActiveDirectoryUserServiceMock =>
         TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;
 
-    protected HttpClient HttpClient { get; } = hostFixture.CreateClient(new()
-    {
-        AllowAutoRedirect = false
-    });
+    protected HttpClient HttpClient { get; }
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 

@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
     private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> _roleAccess = [
         (null, false),
@@ -48,13 +48,12 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         (JourneyNames.DeleteRouteToProfessionalStatus, "/routes/{0}/delete/check-answers?{1}")
     ];
 
-    Guid _personId;
-    Guid _qualificationId;
-    RouteToProfessionalStatusType? _route;
-    RouteToProfessionalStatusStatus _status;
+    private Guid _personId;
+    private Guid _qualificationId;
+    private RouteToProfessionalStatusType? _route;
+    private RouteToProfessionalStatusStatus _status;
 
-    [Before(Test)]
-    public async Task InitializeAsync()
+    async ValueTask IAsyncLifetime.InitializeAsync()
     {
         _route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .First(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && r.InductionExemptionRequired != FieldRequirement.NotApplicable);
@@ -71,8 +70,10 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         _qualificationId = person.ProfessionalStatuses.First().QualificationId;
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetData))]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
+    [MemberData(nameof(GetData))]
     public async Task Get_RoutesPage_UserRoles_CanViewPageAsExpected(string journeyName, string pageFormat, string? userRole, bool canViewPage)
     {
         // Arrange

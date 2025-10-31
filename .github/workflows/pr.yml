@@ -204,7 +204,7 @@ jobs:
           report_name: "${{ matrix.project_short_name }} test results"
           dotnet_test_args: >-
             --no-build
-            -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+            -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=tr;Maximum Pool Size=1000;Timeout=30"
         timeout-minutes: 30
 
   check_test_results:

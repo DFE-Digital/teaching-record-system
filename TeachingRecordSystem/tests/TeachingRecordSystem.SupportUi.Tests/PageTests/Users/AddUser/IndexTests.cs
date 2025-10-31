@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -18,7 +18,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithAccessManagerUser_ReturnsOk()
     {
         // Arrange
@@ -34,7 +34,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -50,7 +50,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoEmailEntered_RendersErrorMessage()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
 
-    [Test]
+    [Fact]
     public async Task Post_UserNotFound_RendersErrorMessage()
     {
         // Arrange
@@ -101,7 +101,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "User does not exist");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_EmailDoesNotHaveSuffix_AppendsEducationSuffixBeforeSearching()
     {
         // Arrange
@@ -125,7 +125,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         AzureActiveDirectoryUserServiceMock.Verify(mock => mock.GetUserByEmailAsync(email + "@education.gov.uk"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserFound_RedirectsToConfirmPage()
     {
         // Arrange
@@ -159,7 +159,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/users/add/confirm?userId={userId}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserFound_ButAlreadyExistsInTrs_RedirectsToEditPage()
     {
         // Arrange

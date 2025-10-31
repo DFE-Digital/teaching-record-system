@@ -48,8 +48,6 @@ public abstract class TestBase : IDisposable
 
     public virtual void Dispose() => _transactionScope.Dispose();
 
-    protected DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler => _testServices.BackgroundJobScheduler;
-
     protected HostFixture HostFixture { get; }
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();

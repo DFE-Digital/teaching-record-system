@@ -2,15 +2,16 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
+public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.Index;
     private const string ThisStep = JourneySteps.AlertType;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +30,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -45,7 +46,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
@@ -61,7 +62,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsAlertType()
     {
         // Arrange
@@ -81,7 +82,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Contains(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_DoesNotShowDbsAlertType()
     {
         // Arrange
@@ -101,7 +102,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.DoesNotContain(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasAlertsReadWriteRole_ShowsAllNonDbsRoles()
     {
         // Arrange
@@ -122,7 +123,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.True(alertTypeOptions.SequenceEqualIgnoringOrder(nonDbsAlertTypes.Select(t => t.AlertTypeId)));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -141,7 +142,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(journeyInstance.State.AlertTypeId.ToString(), selectedRadioButton.GetAttribute("value"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -160,7 +161,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -176,7 +177,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenAlertTypeHasNotBeenSelected_ReturnsError()
     {
         // Arrange
@@ -192,7 +193,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "AlertTypeId", "Select an alert type");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidInput_UpdatesStateAndRedirectsToDetailsPage()
     {
         // Arrange
@@ -216,7 +217,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Equal(alertType.AlertTypeId, journeyInstance.State.AlertTypeId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -235,7 +236,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

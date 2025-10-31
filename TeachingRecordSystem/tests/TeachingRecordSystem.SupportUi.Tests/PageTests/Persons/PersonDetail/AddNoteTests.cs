@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Post_ContentIsEmpty_ReturnsError()
     {
         // Arrange
@@ -25,7 +25,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Text", "Enter text for the note");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ContentWithoutFile_CreatesNoteAndEventAndRedirects()
     {
         // Arrange
@@ -63,7 +63,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ContentWithFile_CreatesNoteAndEventAndRedirects()
     {
         // Arrange
@@ -103,7 +103,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

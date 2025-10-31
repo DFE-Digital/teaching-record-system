@@ -5,8 +5,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.AddPerson;
 
 public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
-    [MethodDataSource(nameof(GetPagesForUserWithoutPersonDataEditPermissionData))]
+    [Theory]
+    [MemberData(nameof(GetPagesForUserWithoutPersonDataEditPermissionData))]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string page, string? role)
     {
         // Arrange
@@ -29,10 +29,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
-    [Arguments("reason", false, false, "personal-details")]
-    [Arguments("check-answers", false, false, "personal-details")]
-    [Arguments("check-answers", true, false, "reason")]
+    [Theory]
+    [InlineData("reason", false, false, "personal-details")]
+    [InlineData("check-answers", false, false, "personal-details")]
+    [InlineData("check-answers", true, false, "reason")]
     public async Task Get_InvalidState_RedirectsToAppropriatePage(string attemptedPage, bool hasPersonalDetails, bool hasCreateReason, string expectedPage)
     {
         // Arrange
@@ -75,9 +75,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedUrl, location);
     }
 
-    [Test]
-    [Arguments("/reason", "/personal-details")]
-    [Arguments("/check-answers", "/reason")]
+    [Theory]
+    [InlineData("/reason", "/personal-details")]
+    [InlineData("/check-answers", "/reason")]
     public async Task Get_BacklinkContainsExpected(string fromPage, string expectedBackPage)
     {
         // Arrange
@@ -111,9 +111,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains($"/persons/add{expectedBackPage}", backlink.Href);
     }
 
-    [Test]
-    [Arguments("/personal-details", "/reason")]
-    [Arguments("/reason", "/check-answers")]
+    [Theory]
+    [InlineData("/personal-details", "/reason")]
+    [InlineData("/reason", "/check-answers")]
     public async Task Post_RedirectsToExpectedPage(string fromPage, string expectedNextPageUrl)
     {
         // Arrange
@@ -160,10 +160,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expectedUrl, location);
     }
 
-    [Test]
-    [Arguments("personal-details")]
-    [Arguments("reason")]
-    [Arguments("check-answers")]
+    [Theory]
+    [InlineData("personal-details")]
+    [InlineData("reason")]
+    [InlineData("check-answers")]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToAddPersonIndexPage(string page)
     {
         // Arrange
@@ -198,10 +198,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
-    [Arguments("personal-details")]
-    [Arguments("reason")]
-    [Arguments("check-answers")]
+    [Theory]
+    [InlineData("personal-details")]
+    [InlineData("reason")]
+    [InlineData("check-answers")]
     public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile(string page)
     {
         // Arrange
@@ -236,9 +236,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
-    [Arguments("personal-details")]
-    [Arguments("reason")]
+    [Theory]
+    [InlineData("personal-details")]
+    [InlineData("reason")]
     public async Task Get_WhenLinkedToFromFromCheckAnswersPage_BacklinkLinksToCheckAnswersPage(string page)
     {
         // Arrange
@@ -271,9 +271,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains($"/persons/add/check-answers", backlink!.Href);
     }
 
-    [Test]
-    [Arguments("personal-details")]
-    [Arguments("reason")]
+    [Theory]
+    [InlineData("personal-details")]
+    [InlineData("reason")]
     public async Task Post_WhenLinkedToFromCheckAnswersPage_AndMoreChangesMade_RedirectsToCheckAnswersPage(string page)
     {
         // Arrange

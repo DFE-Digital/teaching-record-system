@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PersonDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -17,7 +17,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NoChanges_DisplaysNoChangesMessage()
     {
         // Arrange
@@ -34,7 +34,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(noChanges);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_OutOfBoundsPageNumber_RedirectsToPage1()
     {
         // Arrange
@@ -50,7 +50,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/persons/{person.PersonId}/change-history?pageNumber=1", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_SinglePage_DoesNotShowPagination()
     {
         // Arrange
@@ -66,7 +66,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(doc.GetElementsByClassName("govuk-pagination"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PageIsNotLastPage_ShowsNextPageLink()
     {
         // Arrange
@@ -82,7 +82,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "next");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PageIsLastPage_DoesNotShowNextPageLink()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.DoesNotContain(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "next");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PageIsNotFirstPage_ShowsPreviousPageLink()
     {
         // Arrange
@@ -114,7 +114,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "prev");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PageIsFirstPage_DoesNotShowPreviousPageLink()
     {
         // Arrange

@@ -2,12 +2,13 @@ using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDate;
 
-public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
+public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFixture), IAsyncLifetime
 {
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -26,7 +27,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -42,7 +43,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithOpenAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -58,7 +59,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -75,9 +76,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.StartsWith($"/alerts/{alert.AlertId}/end-date", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Get_WithValidJourneyState_ReturnsOk(bool populateOptional)
     {
         // Arrange
@@ -98,7 +99,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Evidence"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -117,7 +118,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -133,7 +134,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithOpenAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -149,7 +150,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -167,9 +168,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.StartsWith($"/alerts/{alert.AlertId}/end-date", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(true)]
-    [Arguments(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional)
     {
         // Arrange
@@ -240,7 +241,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -260,7 +261,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

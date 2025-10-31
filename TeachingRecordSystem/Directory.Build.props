@@ -45,13 +45,6 @@
 
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
     <Using Include="Moq" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(IsTestProject)' == 'true' and '$(IsTUnitProject)' == 'true'">
-    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(IsTestProject)' == 'true' and '$(IsTUnitProject)' != 'true'">
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>

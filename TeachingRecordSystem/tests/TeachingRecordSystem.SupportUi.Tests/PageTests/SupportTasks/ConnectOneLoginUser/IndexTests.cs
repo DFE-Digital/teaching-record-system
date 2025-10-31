@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ConnectOne
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_SupportTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -17,14 +17,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Skip("Waiting for another support task type")]
+    [Fact(Skip = "Waiting for another support task type")]
     public Task Get_SupportTaskIsNotConnectOneLoginUserType_ReturnsNotFound()
     {
         throw new NotImplementedException();
     }
 
-    [Test]
+    [Fact]
     public async Task Get_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
@@ -45,7 +44,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -69,7 +68,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(statedTrn, doc.GetSummaryListValueByKey("TRN"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SupportTaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -85,14 +84,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
-    [Skip("Waiting for another support task type")]
+    [Fact(Skip = "Waiting for another support task type")]
     public Task Post_SupportTaskIsNotConnectOneLoginUserType_ReturnsNotFound()
     {
         throw new NotImplementedException();
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
@@ -119,7 +117,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoSuggestionChosen_RendersError()
     {
         // Arrange
@@ -139,7 +137,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "Select the record you wish to connect");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequestFromSuggestion_RedirectsToConnectPage()
     {
         // Arrange
@@ -163,7 +161,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}/connect?trn={person.Trn!}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequestWithOverridenTrn_RedirectsToConnectPage()
     {
         // Arrange

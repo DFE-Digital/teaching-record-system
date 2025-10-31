@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
@@ -20,7 +20,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
     {
         // Arrange
@@ -66,8 +66,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(createPersonResult.Gender?.GetDisplayName(), doc.GetSummaryListValueByKey("Gender"));
     }
 
-    [Test]
-    [Skip("Flaky on CI")]
+    [Fact(Skip = "Flaky on CI")]
     public async Task Get_AfterContactsMigrated_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
     {
         // Arrange
@@ -112,7 +111,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(createPersonResult.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPersonIdForExistingPersonWithMissingProperties_ReturnsExpectedContent()
     {
         // Arrange
@@ -134,7 +133,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueByKey("Gender"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasOpenAlert_ShowsAlertNotification()
     {
         // Arrange
@@ -152,7 +151,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("open-alert-notification"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasNoAlert_DoesNotShowAlertNotification()
     {
         // Arrange
@@ -169,7 +168,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("open-alert-notification"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasClosedAlertButNoOpenAlert_DoesNotShowAlertNotification()
     {
         // Arrange
@@ -187,7 +186,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("open-alert-notification"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NotesTab_IsRendered()
     {
         // Arrange
@@ -204,7 +203,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(notes);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasNoProfessionalStatusDetails_NoSummaryCardShown()
     {
         // Arrange
@@ -220,7 +219,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(doc.GetAllElementsByTestId("professional-status-details"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasQts_ShowsDetails()
     {
         // Arrange
@@ -249,7 +248,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasQtls_ShowsDetails()
     {
         // Arrange
@@ -278,7 +277,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasEyts_ShowsDetails()
     {
         // Arrange
@@ -307,7 +306,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasEyps_ShowsDetails()
     {
         // Arrange
@@ -336,7 +335,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetSummaryListValueByKey("PQTS held since"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasPqts_ShowsDetails()
     {
         // Arrange
@@ -365,12 +364,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueByKey("PQTS held since"));
     }
 
-    [Test]
-    [Arguments(UserRoles.Viewer, false)]
-    [Arguments(UserRoles.RecordManager, true)]
-    [Arguments(UserRoles.AlertsManagerTra, true)]
-    [Arguments(UserRoles.AlertsManagerTraDbs, true)]
-    [Arguments(UserRoles.AccessManager, true)]
+    [Theory]
+    [InlineData(UserRoles.Viewer, false)]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.AlertsManagerTra, true)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(UserRoles.AccessManager, true)]
     public async Task Get_UserRolesWithViewOrEditPersonDataPermissions_ChangeDetailsLinkShownAsExpected(string userRole, bool canSeeChangeDetailsLink)
     {
         // Arrange
@@ -397,7 +396,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonIsDeactivated_ChangeDetailsLinkIsHidden()
     {
         // Arrange
@@ -423,7 +422,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     // TODO: test user permission
 
-    [Test]
+    [Fact]
     public async Task Get_PersonIsDeactivated_DoesNotShowMergeButton()
     {
         // Arrange
@@ -446,7 +445,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasOpenAlert_DoesNotShowMergeButton()
     {
         // Arrange
@@ -463,7 +462,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonDoesNotHaveOpenAlert_ShowsMergeButton()
     {
         // Arrange
@@ -479,14 +478,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("merge-button"));
     }
 
-    [Test]
-    [Arguments(InductionStatus.InProgress, false)]
-    [Arguments(InductionStatus.Passed, false)]
-    [Arguments(InductionStatus.Failed, false)]
-    [Arguments(InductionStatus.None, true)]
-    [Arguments(InductionStatus.Exempt, true)]
-    [Arguments(InductionStatus.FailedInWales, true)]
-    [Arguments(InductionStatus.RequiredToComplete, true)]
+    [Theory]
+    [InlineData(InductionStatus.InProgress, false)]
+    [InlineData(InductionStatus.Passed, false)]
+    [InlineData(InductionStatus.Failed, false)]
+    [InlineData(InductionStatus.None, true)]
+    [InlineData(InductionStatus.Exempt, true)]
+    [InlineData(InductionStatus.FailedInWales, true)]
+    [InlineData(InductionStatus.RequiredToComplete, true)]
     public async Task Get_PersonWithInductionStatus_ShowsMergeButtonAsExpected(InductionStatus status, bool expectMergeButtonToBeShown)
     {
         // Arrange
@@ -514,9 +513,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(PersonStatus.Active, true)]
-    [Arguments(PersonStatus.Deactivated, false)]
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
     public async Task Get_PersonStatus_ShowsMergeButtonAsExpected(PersonStatus currentStatus, bool expectMergeButtonToBeShown)
     {
         // Arrange
@@ -550,9 +549,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(PersonStatus.Active, false)]
-    [Arguments(PersonStatus.Deactivated, true)]
+    [Theory]
+    [InlineData(PersonStatus.Active, false)]
+    [InlineData(PersonStatus.Deactivated, true)]
     public async Task Get_ShowsPersonStatusAsExpected(PersonStatus currentStatus, bool expectPersonToBeMarkedAsDeactivated)
     {
         // Arrange
@@ -592,14 +591,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(UserRoles.Viewer, false)]
-    [Arguments(UserRoles.RecordManager, true)]
-    [Arguments(UserRoles.AlertsManagerTra, false)]
-    [Arguments(UserRoles.AlertsManagerTraDbs, false)]
-    [Arguments(UserRoles.AccessManager, true)]
-    [Arguments(UserRoles.Administrator, true)]
-    [Arguments(null, false)]
+    [Theory]
+    [InlineData(UserRoles.Viewer, false)]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.AlertsManagerTra, false)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, false)]
+    [InlineData(UserRoles.AccessManager, true)]
+    [InlineData(UserRoles.Administrator, true)]
+    [InlineData(null, false)]
     public async Task Get_UserDoesNotHavePermission_DoesNotShowSetStatusButton(string? role, bool expectButtonToBeVisible)
     {
         // Arrange
@@ -626,9 +625,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
-    [Arguments(PersonStatus.Active, "Deactivate record", "Deactivated")]
-    [Arguments(PersonStatus.Deactivated, "Reactivate record", "Active")]
+    [Theory]
+    [InlineData(PersonStatus.Active, "Deactivate record", "Deactivated")]
+    [InlineData(PersonStatus.Deactivated, "Reactivate record", "Active")]
     public async Task Get_PersonStatus_RendersSetStatusButtonAsExpected(PersonStatus currentStatus, string expectedButtonText, string expectedTargetStatus)
     {
         // Arrange
@@ -657,7 +656,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains($"/persons/{person.PersonId}/set-status/{expectedTargetStatus}", setStatusButton.Href);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonWasDeactivatedAsPartOfAMerge_DoesNotShowSetStatusButton()
     {
         // Arrange

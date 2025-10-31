@@ -37,6 +37,7 @@ public class TestScopedServices
     public static void ConfigureServices(IServiceCollection services) =>
         services
             .AddSingleton<IClock>(new ForwardToTestScopedClock())
+            .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
             .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AzureActiveDirectoryUserServiceMock.Object)
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
@@ -79,6 +80,11 @@ public class TestScopedServices
     private class ForwardToTestScopedClock : IClock
     {
         public DateTime UtcNow => GetCurrent().Clock.UtcNow;
+    }
+
+    private class ForwardToTestScopedEventObserver : IEventObserver
+    {
+        public void OnEventCreated(LegacyEvents.EventBase @event) => GetCurrent().EventObserver.OnEventCreated(@event);
     }
 }
 
