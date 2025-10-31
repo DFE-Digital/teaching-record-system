@@ -6,7 +6,7 @@ The TRS is a database of people who work in Education in the UK. It is the prima
 The TRN is a unique 7-digit reference given to identify a person whose data is in the Teaching Record System (formerly Database Of Qualified Teachers). TRNs are given to trainee teachers, qualified teachers (QTS and many other teaching related qualifications), and anyone eligible for a teaching pension and other related services.
 
 It is a character string of len(7) e.g.:
-```shell
+```
 '1234567', '0001234'
 ```
 # High level architecture
@@ -71,7 +71,7 @@ If you're working on infrastructure you will also need:
 
 A `just` recipe will install the required local tools:
 ```shell
-just install-tools
+> just install-tools
 ```
 
 ### Blob storage emulator
@@ -82,27 +82,27 @@ use Visual Studio 2022 you probably have it installed already otherwise you can 
 The connection string to Blob Storage will need to be set up to point to the storage emulator:
 
 ```shell
-just set-secret StorageConnectionString "UseDevelopmentStorage=true"
+> just set-secret StorageConnectionString "UseDevelopmentStorage=true"
 ```
 
 The containers it needs are listed in the [storage terraform script](teaching-record-system/blob/main/terraform/aks/storage.tf), you will need to create them manually.
 
 You will need to start Azurite before running the Support UI:
 ```shell
-azurite --silent --location c:\azurite --debug c:\azurite\debug.log
+> azurite --silent --location c:\azurite --debug c:\azurite\debug.log
 ```
 
 Git bash:
 
 ```shell
-azurite --silent --location /c/azurite --debug /c/azurite/debug.log
+$ azurite --silent --location /c/azurite --debug /c/azurite/debug.log
 ```
 
 ### Install Playwright
 
 Playwright is used for end-to-end testing. Install it with a `just` recipe:
 ```shell
-just install-playwright
+> just install-playwright
 ```
 
 **Note:** the solution must be built first as the recipe requires the existence of `bin/Debug/net8.0/playwright.ps1` which is generated when the `Microsoft.Playwright` package is built.
@@ -115,17 +115,17 @@ Note you should use a different database for tests as the test database will be 
 e.g.
 ```shell
 # local settings
-just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
+> just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
 
 # test settings
-just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
+> just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
 To set up the initial TRS database schema run:
 ```shell
-just build
-just cli migrate-db
-just cli add-trn-range --from 1000000 --to 9999999
+> just build
+> just cli migrate-db
+> just cli add-trn-range --from 1000000 --to 9999999
 ```
 
 The trs_tests database will be created automatically when running the tests.
@@ -136,7 +136,7 @@ If you need to change the Postgres database tables, the best way to do this is t
 
 Once the model/mapping files have been changed, a migration file will need to be created - this can be done automatically by running:
 ```shell
-just ef migrations add <a migration name>
+> just ef migrations add <a migration name>
 ```
 where the migration name is conventionally a title-case short description of the change, e.g. `AddUserRoleColumn`.
 
@@ -146,8 +146,8 @@ If you are seeing the error `DbContext has pending changes not covered by a migr
 In order for the local `trs` database to pick up the change, the migrate recipe will need to be run:
 
 ```shell
-just build
-just cli migrate-db
+> just build
+> just cli migrate-db
 ```
 
 **Note:** `just build` needs to be run first to make sure that the latest migration is compiled into the `TeachingRecordSystem.Cli` dll - `just cli migrate-db` will fail if the dll doesn't exist.
@@ -159,8 +159,8 @@ To rollback a series of migrations, use the `--target-migration` parameter to in
 (the database will be left in the state just after applying this migration)
 
 ```shell
-just build
-just cli migrate-db --target-migration BeforeAddingUserRoleColumn
+> just build
+> just cli migrate-db --target-migration BeforeAddingUserRoleColumn
 ```
 
 #### Regenerating the test cache
@@ -172,7 +172,7 @@ Microsoft.EntityFrameworkCore.DbUpdateException : An error occurred while saving
 ```
 If this happens, regenerating the test cache usually fixes this, there's a `just` recipe:
 ```shell
-just remove-tests-schema-cache
+> just remove-tests-schema-cache
 ```
 
 #### DQT Reporting database setup
@@ -181,26 +181,26 @@ This solution contains a service that synchronises changes from CRM into a SQL S
 It also synchronises selected tables from TRS.
 By default, this is disabled for local development. For the tests to pass, you will need a test database and a connection string defined in user secrets e.g.
 ```shell
-just set-tests-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReportingTests;Integrated Security=Yes;TrustServerCertificate=True"
+> just set-tests-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReportingTests;Integrated Security=Yes;TrustServerCertificate=True"
 ```
 
 Your postgres server's `wal_level` must be set to `logical`:
 ```
-ALTER SYSTEM SET wal_level = logical;
+trs=# ALTER SYSTEM SET wal_level = logical;
 ```
 You will have to restart the server after amending this configuration.
 
 To run the service locally override the configuration option to run the service and ensure a connection string is provided e.g.
 ```shell
-just set-secret DqtReporting:RunService true
-just set-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReporting;Integrated Security=Yes;TrustServerCertificate=True"
+> just set-secret DqtReporting:RunService true
+> just set-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReporting;Integrated Security=Yes;TrustServerCertificate=True"
 ```
 The service will now run as a background service of the `Worker` project.
 
 It is a good idea to remove the replication slot when you're not working on this service to avoid a backlog on unprocessed changes accumulating in postgres.
 ```shell
-just set-secret DqtReporting:RunService false
-just cli drop-dqt-reporting-replication-slot
+> just set-secret DqtReporting:RunService false
+> just cli drop-dqt-reporting-replication-slot
 ```
 
 
@@ -208,7 +208,7 @@ just cli drop-dqt-reporting-replication-slot
 
 Add yourself to your local database as an administrator:
 ```shell
-just create-admin "your.name@education.gov.uk" "Your Name"
+> just create-admin "your.name@education.gov.uk" "Your Name"
 ```
 
 
@@ -224,18 +224,18 @@ The `build` CRM environment is used for local development and automated tests.
 The secrets you will need to set are as follows:
 ```shell
 # local settings
-just set-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
-just set-secret TrsSyncService:CrmConnectionString "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
-just set-secret CrmClientId "<REDACTED>"
-just set-secret CrmClientSecret "<REDACTED>"
-just set-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
+> just set-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+> just set-secret TrsSyncService:CrmConnectionString "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+> just set-secret CrmClientId "<REDACTED>"
+> just set-secret CrmClientSecret "<REDACTED>"
+> just set-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
 
 # test settings
-just set-tests-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
-just set-tests-secret TrsSyncService:CrmConnectionString "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
-just set-tests-secret CrmClientId "<REDACTED>"
-just set-tests-secret CrmClientSecret "<REDACTED>"
-just set-tests-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
+> just set-tests-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+> just set-tests-secret TrsSyncService:CrmConnectionString "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+> just set-tests-secret CrmClientId "<REDACTED>"
+> just set-tests-secret CrmClientSecret "<REDACTED>"
+> just set-tests-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
 ```
 
 #### TRN Generation API
@@ -245,12 +245,12 @@ The API calls the TRN Generation API to generate a TRNs.
 The secrets you will need to set are as follows:
 ```shell
 # local settings
-just set-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
+> just set-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
 just set-secret TrnGenerationApi:ApiKey "<REDACTED>"
 
 # test settings
-just set-tests-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
-just set-tests-secret TrnGenerationApi:ApiKey "<REDACTED>"
+> just set-tests-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
+> just set-tests-secret TrnGenerationApi:ApiKey "<REDACTED>"
 ```
 
 #### Azure AD
@@ -260,8 +260,8 @@ Azure AD is used for authenticating users in the Support UI.
 The secrets you will need to set are as follows:
 
 ```shell
-just set-secret AzureAd:ClientSecret "<REDACTED>"
-just set-secret AzureAd:ClientId "<REDACTED>"
+> just set-secret AzureAd:ClientSecret "<REDACTED>"
+> just set-secret AzureAd:ClientId "<REDACTED>"
 ```
 
 #### Other settings
@@ -270,27 +270,27 @@ There are additional secrets you will need to set are as follows:
 
 ```shell
 # local settings
-just set-secret AccessYourTeachingQualifications:BaseAddress "https://dev.access-your-teaching-qualifications.education.gov.uk/"
-just set-secret AccessYourTeachingQualifications:StartUrlPath "/qualifications/start"
+> just set-secret AccessYourTeachingQualifications:BaseAddress "https://dev.access-your-teaching-qualifications.education.gov.uk/"
+> just set-secret AccessYourTeachingQualifications:StartUrlPath "/qualifications/start"
 
-just set-secret GetAnIdentity:WebHookClientSecret "dummy"
-just set-secret GetAnIdentity:TokenEndpoint "https://dev.teaching-identity.education.gov.uk/connect/token"
-just set-secret GetAnIdentity:ClientSecret "<REDACTED>"
-just set-secret GetAnIdentity:ClientId "dqt-api"
-just set-secret GetAnIdentity:BaseAddress "https://dev.teaching-identity.education.gov.uk/"
+> just set-secret GetAnIdentity:WebHookClientSecret "dummy"
+> just set-secret GetAnIdentity:TokenEndpoint "https://dev.teaching-identity.education.gov.uk/connect/token"
+> just set-secret GetAnIdentity:ClientSecret "<REDACTED>"
+> just set-secret GetAnIdentity:ClientId "dqt-api"
+> just set-secret GetAnIdentity:BaseAddress "https://dev.teaching-identity.education.gov.uk/"
 
-just set-secret Webhooks:CanonicalDomain "https://localhost:5001"
-just set-secret Webhooks:SigningKeyId "devkey"
-just set-secret Webhooks:Keys:0:KeyId "devkey"
-just set-secret Webhooks:Keys:0:CertificatePem "<REDACTED>"
-just set-secret Webhooks:Keys:0:PrivateKeyPem "<REDACTED>"
+> just set-secret Webhooks:CanonicalDomain "https://localhost:5001"
+> just set-secret Webhooks:SigningKeyId "devkey"
+> just set-secret Webhooks:Keys:0:KeyId "devkey"
+> just set-secret Webhooks:Keys:0:CertificatePem "<REDACTED>"
+> just set-secret Webhooks:Keys:0:PrivateKeyPem "<REDACTED>"
 
-just set-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
-just set-secret BuildEnvLockBlobSasToken "<REDACTED>"
+> just set-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
+> just set-secret BuildEnvLockBlobSasToken "<REDACTED>"
 
 # test settings
-just set-tests-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
-just set-tests-secret BuildEnvLockBlobSasToken "<REDACTED>"
+> just set-tests-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
+> just set-tests-secret BuildEnvLockBlobSasToken "<REDACTED>"
 ```
 
 ## CRM code generation
@@ -315,6 +315,7 @@ This is retrieved via Terraform at deployment time and is set as an environment 
 When developing locally there are a number of recipes that may be useful (`just` with no parameters lists all available recipes):
 
 ```shell
+> just
 watch-api                  # Run the API project in Development mode and watch for file changes
 watch-authz                # Run the AuthorizeAccess project in Development mode and watch for file changes
 watch-ui                   # Run the UI project in Development mode and watch for file changes
@@ -334,12 +335,12 @@ Pull request builds will run format checks on .NET and Terraform code changes; i
 
 Before committing you can format any changed files by running:
 ```shell
-just format-changed
+> just format-changed
 ```
 
 To format the entire codebase run
 ```shell
-just format
+> just format
 ```
 
 For either of these recipes to work, the [Terraform tool must be installed](https://developer.hashicorp.com/terraform/install?product_intent=terraform) - on Windows, download the binary, copy into an appropriate location and update the PATH environment variable to point to the downloaded file.
@@ -354,3 +355,92 @@ To set this up, go to `Tools > Options > Text Editor > Code Cleanup` and click `
 - Format document
 
 Now you can use the "paintbrush" icon in the text editor status bar (to the left of the horizontal scrollbar) to format the document you're working on (keyboard shortcut: Ctrl+K, Ctrl+E) - or you can go to `Tools > Options > Text Editor > Code Cleanup` and check `Run Code Cleanup profile on Save`.
+
+# Using Kubernetes to connect to dev/pre-prod environments
+
+If you need to connect to one of the environments, for example to create yourself an admin account, you'll need to get Azure CLI and Kubernetes set up locally.
+
+1. Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest&pivots=msi)
+1. Log in to Azure locally (using Windows command prompt - doesn't work in Git bash):
+
+   ```shell
+   > az login --tenant 9c7d9dd3-840c-4b3f-818e-552865082e16
+   Select the account you want to log in with. For more information on login with Azure CLI, see https://go.microsoft.com/fwlink/?linkid=2271136
+   ```
+1. Choose your account and authenticate
+1. Select the default subscription to the subscription you want to access, e.g. `s189-teacher-services-cloud-test` (`20da9d12-7ee1-42bb-b969-3fe9112964a7`)
+
+   ```shell
+   Retrieving tenants and subscriptions for the selection...
+   The following tenants don't contain accessible subscriptions. Use `az login --allow-no-subscriptions` to have tenant level access.
+   fad277c9-c60a-4da1-b5f3-b3b8b34a82f9 'Department for Education'
+   
+   [Tenant and subscription selection]
+   
+   No     Subscription name                     Subscription ID                       Tenant
+   -----  ------------------------------------  ------------------------------------  ------------------------------------
+   [1]    N/A(tenant level account)             fad277c9-c60a-4da1-b5f3-b3b8b34a82f9  fad277c9-c60a-4da1-b5f3-b3b8b34a82f9
+
+   [...]
+
+   [15]   s189-teacher-services-cloud-devel...  5c83eb53-a94f-4778-b258-1f33efe49655  DfE Platform Identity
+   [16]   s189-teacher-services-cloud-produ...  3c033a0c-7a1c-4653-93cb-0f2a9f57a391  DfE Platform Identity
+   [17]   s189-teacher-services-cloud-test      20da9d12-7ee1-42bb-b969-3fe9112964a7  DfE Platform Identity   <-- this one
+   
+   The default is marked with an *; the default tenant is 'DfE Platform Identity' and subscription is [...].
+   
+   Select a subscription and tenant (Type a number or Enter for no changes): 17
+   ```
+
+   Alternatively, do
+
+   ```shell
+   > az account set --subscription s189-teacher-services-cloud-test
+   ```
+
+1. Pull down the credentials to authenticate with Kubernetes, in this case we want `s189t01-tsc-test-aks` in resource group `s189t01-tsc-ts-rg` (YMMV)
+
+   ```shell
+   > az aks get-credentials --overwrite-existing -g s189t01-tsc-ts-rg --name s189t01-tsc-test-aks
+   Merged "s189t01-tsc-test-aks" as current context in <your user directory>\.kube\config
+   The kubeconfig uses devicecode authentication which requires kubelogin. Please install kubelogin from https://github.com/Azure/kubelogin or run 'az aks install-cli' to install both kubectl and kubelogin. If devicecode login fails, try running 'kubelogin convert-kubeconfig -l azurecli' to unblock yourself.
+   ```
+
+1. As the output suggests, install kubectl/kubeconfig via `az aks install`  - this didn't work for me due to certificate issues, so manually:
+   1. [install kubectl](https://cjyabraham.gitlab.io/docs/tasks/tools/install-kubectl/#install-kubectl) - on Windows, download the binary directly from [this link](https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/windows/amd64/kubectl.exe) and add it to your PATH
+   1. [install kubelogin](https://github.com/Azure/kubelogin) - on Windows:
+      ```shell
+      > winget install --id=Kubernetes.kubectl  -e
+      > winget install --id=Microsoft.Azure.Kubelogin  -e
+      ```
+
+   1. Restart the command window to pick up the additions to PATH
+
+1. Convert kubeconfig to Exec plugin ([more info](https://github.com/Azure/kubelogin/blob/main/docs/book/src/cli/convert-kubeconfig.md)):
+1. ```shell
+   > kubelogin convert-kubeconfig -l azurecli
+   ```
+1. Now you should be able to connect to the Kubernetes cluster. To see the pods available to connect to call `get pods` (if you see a certificate error you might need to add the `--insecure-skip-tls-verify` argument):
+
+   ```shell
+   > kubectl get pods -n tra-development --insecure-skip-tls-verify
+   NAME                                              READY     STATUS      RESTARTS       AGE
+   [...]                                             
+   trs-dev-api-7bd486dcdc-z5zvw                      1/1       Running     0              2m18s
+   trs-dev-authz-6cd4545d94-fwfg7                    1/1       Running     0              2m18s
+   trs-dev-migrations-gvvpb                          0/1       Completed   0              2m46s
+   trs-dev-ui-6969874cc9-j96mz                       1/1       Running     0              2m18s
+   trs-dev-worker-7444b9cd96-v52bk                   1/1       Running     0              2m17s
+   ```
+1. Indentify the pod you want to connect to, in this case we want the Dev UI to create an admin account: `trs-dev-ui-6969874cc9-j96mz`
+1. Execute a bash shell on the pod (again, add `--insecure-skip-tls-verify` if there are cert issues):
+
+   ```shell
+   > kubectl exec -it trs-dev-ui-6969874cc9-j96mz -n tra-development --insecure-skip-tls-verify -- /bin/ash
+   ```
+
+1. Finally, use the TRS CLI to create yourself an admin account:
+
+   ```shell
+   /Apps $ trscli create-admin --email your.email@education.gov.uk --name "Your Name"
+   ```
