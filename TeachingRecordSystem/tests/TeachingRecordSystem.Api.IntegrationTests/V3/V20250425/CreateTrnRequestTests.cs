@@ -7,7 +7,6 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
-[Collection(nameof(DisableParallelization))]
 public class CreateTrnRequestTests : TestBase, IAsyncLifetime
 {
     public CreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)

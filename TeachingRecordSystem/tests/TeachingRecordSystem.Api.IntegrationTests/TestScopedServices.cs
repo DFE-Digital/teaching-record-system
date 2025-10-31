@@ -1,5 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using JustEat.HttpClientInterception;
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -16,6 +19,8 @@ public class TestScopedServices
         GetAnIdentityApiClientMock = new();
         BlobStorageFileServiceMock = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
+        BackgroundJobScheduler = new(serviceProvider);
+        EvidenceFilesHttpClientInterceptorOptions = new() { OnMissingRegistration = _ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)) };
 
         AccessYourTeachingQualificationsOptions = Options.Create(new AccessYourTeachingQualificationsOptions()
         {
@@ -29,7 +34,8 @@ public class TestScopedServices
             .AddTestScoped(tss => tss.GetAnIdentityApiClientMock.Object)
             .AddTestScoped(tss => tss.AccessYourTeachingQualificationsOptions)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
-            .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
+            .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
+            .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler);
 
     public static TestScopedServices GetCurrent() =>
         TryGetCurrent(out var current) ? current : throw new InvalidOperationException("No current instance has been set.");
@@ -65,6 +71,10 @@ public class TestScopedServices
     public Mock<IFileService> BlobStorageFileServiceMock { get; }
 
     public TestableFeatureProvider FeatureProvider { get; }
+
+    public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
+
+    public HttpClientInterceptorOptions EvidenceFilesHttpClientInterceptorOptions { get; }
 
     private class ForwardToTestScopedClock : IClock
     {

@@ -35,7 +35,10 @@ app.MapDefaultEndpoints();
 app.UseMiddleware<AssignRequestedVersionMiddleware>();
 
 app.UseRouting();
-app.UseTransactions();
+if (!builder.Environment.IsTests())
+{
+    app.UseTransactions();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

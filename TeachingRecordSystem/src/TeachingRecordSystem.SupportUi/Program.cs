@@ -81,7 +81,6 @@ if (!builder.Environment.IsTests() && !builder.Environment.IsEndToEndTests())
     app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.AdminOnly, "/_hangfire");
 }
 
-
 app.MapFiles();
 
 app.Run();

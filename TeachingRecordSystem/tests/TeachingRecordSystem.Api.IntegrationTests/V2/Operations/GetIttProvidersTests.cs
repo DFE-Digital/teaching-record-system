@@ -2,7 +2,6 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V2.Operations;
 
-[Collection(nameof(DisableParallelization))]  // To keep the set of training providers consistent
 public class GetIttProvidersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     // TODO: investigate!

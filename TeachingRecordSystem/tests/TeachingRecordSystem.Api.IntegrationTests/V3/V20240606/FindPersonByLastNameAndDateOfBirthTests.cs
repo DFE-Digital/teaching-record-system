@@ -1,6 +1,5 @@
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
-[Collection(nameof(DisableParallelization))]
 public class FindPersonByLastNameAndDateOfBirthTests : TestBase, IAsyncLifetime
 {
     public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture)

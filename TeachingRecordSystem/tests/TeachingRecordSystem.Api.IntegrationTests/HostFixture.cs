@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using JustEat.HttpClientInterception;
@@ -9,12 +10,10 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.IntegrationTests;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.Webhooks;
-using TeachingRecordSystem.TestCommon.Infrastructure;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
 
@@ -40,14 +39,12 @@ public class HostFixture : InitializeDbFixture
 
     public static Guid GetAnIdentityApplicationUserId { get; } = new("873f0cb0-7174-4256-921a-e8a8aaa06361");
 
-    public HttpClientInterceptorOptions EvidenceFilesHttpClientInterceptorOptions { get; } = new();
-
     public SigningCredentials JwtSigningCredentials { get; }
 
     public IServiceProvider Services => _webApplicationFactory.Services;
 
     public void ConfigureEvidenceFilesHttpClient(Action<HttpClientInterceptorOptions> configure) =>
-        configure(EvidenceFilesHttpClientInterceptorOptions);
+        configure(TestScopedServices.GetCurrent().EvidenceFilesHttpClientInterceptorOptions);
 
     public HttpClient CreateClient() => _webApplicationFactory.CreateClient();
 
@@ -113,7 +110,6 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton<FakeTrnGenerator>()
                     .AddSingleton<ITrnGenerator, FakeTrnGenerationApiClient>()
                     .AddSingleton<CurrentApiClientProvider>()
-                    .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>()
                     .AddSingleton<INotificationSender, NoopNotificationSender>();
 
                 services.Configure<GetAnIdentityOptions>(options =>
@@ -144,8 +140,7 @@ public class HostFixture : InitializeDbFixture
                 });
 
                 services.AddHttpClient("EvidenceFiles")
-                    .AddHttpMessageHandler(_ => hostFixture.EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
-                    .ConfigurePrimaryHttpMessageHandler(_ => new NotFoundHandler());
+                    .ConfigurePrimaryHttpMessageHandler(_ => new DelegateToEvidenceFilesHandler());
 
                 TestScopedServices.ConfigureServices(services);
             });
@@ -160,11 +155,21 @@ public class HostFixture : InitializeDbFixture
         }
     }
 
-    private class NotFoundHandler : HttpMessageHandler
+    // HttpClient caches these handlers so we can't use TestScopedServices.GetCurrent().EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler()
+    // since it will persist for multiple tests.
+    // This wrapper type delegates to the current test-scoped instance.
+    private class DelegateToEvidenceFilesHandler : DelegatingHandler
     {
+        protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
+            var testScopedHandler = TestScopedServices.GetCurrent().EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler();
+            var result = typeof(DelegatingHandler).GetMethod(nameof(SendAsync), BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(testScopedHandler, [request, cancellationToken]);
+            return (Task<HttpResponseMessage>)result!;
         }
     }
 }
