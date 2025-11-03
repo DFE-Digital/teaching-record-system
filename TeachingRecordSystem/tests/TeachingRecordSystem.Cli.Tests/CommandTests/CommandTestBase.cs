@@ -4,15 +4,15 @@ using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-public abstract class CommandTestBase(CompositionRoot compositionRoot)
+public abstract class CommandTestBase(IServiceProvider services)
 {
-    protected IClock Clock => compositionRoot.Services.GetRequiredService<IClock>();
+    protected IClock Clock => services.GetRequiredService<IClock>();
 
-    protected IConfiguration Configuration => compositionRoot.Services.GetRequiredService<IConfiguration>();
+    protected IConfiguration Configuration => services.GetRequiredService<IConfiguration>();
 
-    protected IDbContextFactory<TrsDbContext> DbContextFactory => compositionRoot.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    protected TestData TestData => compositionRoot.Services.GetRequiredService<TestData>();
+    protected TestData TestData => services.GetRequiredService<TestData>();
 
     protected Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action) =>
         DbContextFactory.WithDbContextAsync(action);

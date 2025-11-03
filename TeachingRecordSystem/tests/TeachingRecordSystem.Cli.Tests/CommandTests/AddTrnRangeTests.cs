@@ -2,7 +2,7 @@ using System.CommandLine;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-public class AddTrnRangeTests(CompositionRoot compositionRoot) : CommandTestBase(compositionRoot), IAsyncLifetime
+public class AddTrnRangeTests(IServiceProvider services) : CommandTestBase(services), IAsyncLifetime
 {
     async ValueTask IAsyncLifetime.InitializeAsync() =>
         await WithDbContextAsync(dbContext => dbContext.TrnRanges.ExecuteDeleteAsync());

@@ -4,7 +4,7 @@ using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-public class DeleteSupportTaskTests(CompositionRoot compositionRoot) : CommandTestBase(compositionRoot)
+public class DeleteSupportTaskTests(IServiceProvider services) : CommandTestBase(services)
 {
     [Fact]
     public async Task ValidInvocation_DeletesSupportTask()

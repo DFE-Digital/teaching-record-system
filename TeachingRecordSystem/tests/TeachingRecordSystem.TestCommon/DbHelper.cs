@@ -5,8 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-
-//using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
