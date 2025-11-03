@@ -100,7 +100,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
 
         var job = new BatchSendProfessionalStatusEmailsJob(
             jobOptions,
-            Fixture.DbFixture.GetDbContextFactory(),
+            Fixture.DbFixture.DbContextFactory,
             backgroundJobScheduler.Object,
             Clock);
 
