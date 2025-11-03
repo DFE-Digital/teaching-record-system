@@ -38,26 +38,12 @@ public static class Extensions
             .AddWorkforceData()
             .AddMemoryCache();
 
-        if (configuration.GetValue<string>("ConnectionStrings:Crm") is string crmConnectionString)
-        {
-            var crmServiceClient = new ServiceClient(crmConnectionString)
-            {
-                DisableCrossThreadSafeties = true,
-                EnableAffinityCookie = true,
-                MaxRetryCount = 2,
-                RetryPauseTime = TimeSpan.FromSeconds(1)
-            };
-
-            services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
-
-            services.AddSingleton<TrsDataSyncHelper>();
-        }
-
         if (configuration.GetValue<string>("TrsSyncService:CrmConnectionString") is string dataSyncCrmConnectionString)
         {
             var dataSyncCrmServiceClient = new ServiceClient(dataSyncCrmConnectionString);
             services.AddNamedServiceClient(TrsDataSyncHelper.CrmClientName, ServiceLifetime.Transient, _ => dataSyncCrmServiceClient);
             services.AddSingleton<IAuditRepository, BlobStorageAuditRepository>();
+            services.AddSingleton<TrsDataSyncHelper>();
         }
 
         if (!environment.IsTests() && !environment.IsEndToEndTests())
