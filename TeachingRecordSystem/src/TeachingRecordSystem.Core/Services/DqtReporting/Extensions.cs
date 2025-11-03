@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Services.DqtReporting;
 
@@ -19,13 +17,6 @@ public static class Extensions
             .ValidateOnStart();
 
         services.AddSingleton<IHostedService, DqtReportingService>();
-
-        services.AddNamedServiceClient(
-            DqtReportingService.CrmClientName,
-            ServiceLifetime.Singleton,
-            sp => new ServiceClient(sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.CrmConnectionString));
-
-        services.AddCrmEntityChangesService(name: DqtReportingService.CrmClientName);
 
         services.AddStartupTask(async sp =>
         {
