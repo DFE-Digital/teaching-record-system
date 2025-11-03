@@ -61,7 +61,6 @@ public static class Extensions
                 options.AddHybridBodyModelBinderProvider();
 
                 options.Filters.Add(new ServiceFilterAttribute<AddTrnToSentryScopeResourceFilter>() { Order = -1 });
-                options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
                 options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
                 options.Filters.Add(new ValidationExceptionFilter());
 
