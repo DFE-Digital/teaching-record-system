@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
 public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -25,7 +25,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -41,7 +41,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -91,7 +91,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserExistsButIsAlreadyDeactivated_ReturnsBadRequest()
     {
         // Arrange
@@ -117,7 +117,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserWithoutAdministratorRole_DeactivatingUserWithAdministratorRole_ReturnsBadRequest()
     {
         // Arrange
@@ -143,7 +143,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UserWithAdministratorRole_DeactivatingUserWithAdministratorRole_ReturnsFound()
     {
         // Arrange
@@ -169,7 +169,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_HasAdditionalReasonNotSelected_RendersError()
     {
         // Arrange
@@ -195,7 +195,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReason", "Select a reason for deactivating this user");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_HasAdditionalReasonSetToYes_ButAdditionalReasonDetailNotEntered_RendersError()
     {
         // Arrange
@@ -223,7 +223,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalReasonDetail", "Enter a reason");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_HasMoreInformationNotSelected_RendersError()
     {
         // Arrange
@@ -249,7 +249,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasMoreInformation", "Select yes if you want to provide more details");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_HasMoreInformationSetToYes_ButMoreInformationDetailNotEntered_RendersError()
     {
         // Arrange
@@ -277,7 +277,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "MoreInformationDetail", "Enter more details");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceNotSelected_RendersError()
     {
         // Arrange
@@ -304,7 +304,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_ButNoEvidenceFileSelected_RendersError()
     {
         // Arrange
@@ -331,7 +331,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
@@ -359,7 +359,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
@@ -399,7 +399,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("1.2 KB", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileSizeDescription"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
@@ -441,7 +441,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("3 KB", doc.GetHiddenInputValue("Evidence.UploadedEvidenceFile.FileSizeDescription"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -473,7 +473,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
@@ -504,7 +504,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task PostCancel_RedirectsToEditUserPage()
     {
         // Arrange
@@ -524,7 +524,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.StartsWith($"/users/{existingUser.UserId}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task PostCancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFileAndRedirectsToEditUserPage()
     {
         // Arrange
@@ -554,7 +554,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_DeactivatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -599,7 +599,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_WithAdditionalReasonMoreInformationAndEvidenceFile_DeactivatesUserUploadsEvidenceFileEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -648,7 +648,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_WithPreviouslyUploadedEvidenceFile_DeactivatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -698,7 +698,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DeactivatesUserAndDiscardsAdditionalInfo()
     {
         // Arrange

@@ -8,21 +8,22 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
-public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
+public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 {
-    [Before(Test)]
-    public void ConfigureMocks() =>
+    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
+    {
         GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
-            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
-            {
-                Email = req.Email,
-                ExpiresUtc = Clock.UtcNow.AddDays(1),
-                Trn = req.Trn,
-                TrnToken = Guid.NewGuid().ToString()
-            });
+                 .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+                 .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
+                 {
+                     Email = req.Email,
+                     ExpiresUtc = Clock.UtcNow.AddDays(1),
+                     Trn = req.Trn,
+                     TrnToken = Guid.NewGuid().ToString()
+                 });
+    }
 
-    [Test]
+    [Fact]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -52,7 +53,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -83,8 +84,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetPersonAttributeInfos))]
+    [Theory]
+    [MemberData(nameof(GetPersonAttributeInfosData))]
     public async Task Get_AttributeSourceIsTrnRequest_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromRequestDataAttribute)
     {
         // Arrange
@@ -150,7 +151,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Get_CreatingNewRecord_DoesNotShowTrnRow()
     {
         // Arrange
@@ -178,7 +179,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Null(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UpdatingExistingRecord_DoesShowTrnRow()
     {
         // Arrange
@@ -207,7 +208,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.NotNull(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsComments()
     {
         // Arrange
@@ -239,7 +240,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(comments, doc.GetSummaryListValueElementByKey("Comments")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_CreatingNewRecord_HasBackAndChangeLinksToMatchesPage()
     {
         // Arrange
@@ -271,7 +272,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
     {
         // Arrange
@@ -304,7 +305,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -334,7 +335,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -365,7 +366,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_CreatingNewRecord_CreatesNewRecordUpdatesSupportTaskStatusAndRedirects()
     {
         // Arrange
@@ -435,7 +436,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             $"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskAndRedirects()
     {
         // Arrange
@@ -499,7 +500,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             $"Records merged for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UpdatingExistingRecordAndMatchedRecordDoesNotRequireFurtherChecks_SetsTrnRequestToCompleted()
     {
         // Arrange
@@ -544,7 +545,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Empty(furtherChecksRequiredTasks);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UpdatingExistingRecordAndMatchedRecordDoesRequireFurtherChecks_CreatesSupportTaskAndKeepsTrnRequestPending()
     {
         // Arrange
@@ -646,6 +647,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         Assert.Equal(comments, @event.Comments);
     }
+
+    public static TheoryData<PersonAttributeInfo> GetPersonAttributeInfosData => new(GetPersonAttributeInfos());
 
     public static PersonAttributeInfo[] GetPersonAttributeInfos() =>
     [

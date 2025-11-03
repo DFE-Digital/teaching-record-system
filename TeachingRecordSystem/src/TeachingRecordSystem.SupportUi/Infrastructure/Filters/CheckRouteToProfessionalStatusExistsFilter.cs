@@ -25,7 +25,7 @@ public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) 
             return;
         }
 
-        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required.");
 
         var query = dbContext.RouteToProfessionalStatuses
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update") // https://github.com/dotnet/efcore/issues/26042

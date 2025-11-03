@@ -9,7 +9,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string ChangeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-    [Test]
+    [Fact]
     public async Task Get_PageLegend_PopulatedFromOriginalPersonName()
     {
         // Arrange
@@ -38,7 +38,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ConfirmAndCancelButtons_ExistOnPage()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsPersonalDetails_AsExpected()
     {
         // Arrange
@@ -104,7 +104,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Male", v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsMissingOptionalPersonalDetails_AsNotProvided()
     {
         // Arrange
@@ -137,7 +137,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowValue("Gender", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WhenNameFieldChanged_ShowsNameChangeReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
@@ -179,7 +179,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WhenOtherDetailsFieldChanged_ShowsDetailsChangeReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
@@ -221,7 +221,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WhenNameAndOtherFieldsChanged_ShowsNameChangeReasonAndOtherChangeReasonAndEvidenceFiles_AsExpected()
     {
         // Arrange
@@ -271,7 +271,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowDoesNotExist("Reason for personal details change");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WhenNameFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided()
     {
         // Arrange
@@ -305,7 +305,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WhenOtherDetailsFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided()
     {
         // Arrange
@@ -339,15 +339,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
-    [Test]
-    [Arguments(PersonDetailsUpdatedEventChanges.FirstName)]
-    [Arguments(PersonDetailsUpdatedEventChanges.MiddleName)]
-    [Arguments(PersonDetailsUpdatedEventChanges.LastName)]
-    [Arguments(PersonDetailsUpdatedEventChanges.DateOfBirth)]
-    [Arguments(PersonDetailsUpdatedEventChanges.EmailAddress)]
-    [Arguments(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
-    [Arguments(PersonDetailsUpdatedEventChanges.Gender)]
-    [Arguments(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
+    [Theory]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.MiddleName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.LastName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth)]
+    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress)]
+    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
     public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonDetailsUpdatedEventChanges changes)
     {
         // Arrange
@@ -443,7 +443,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsCorrectingAnError_DoesNotUpdatePersonPreviousNames()
     {
         // Arrange
@@ -495,9 +495,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    [Test]
-    [Arguments(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)]
-    [Arguments(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)]
+    [Theory]
+    [InlineData(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)]
+    [InlineData(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)]
     public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(EditDetailsNameChangeReasonOption reason)
     {
         // Arrange

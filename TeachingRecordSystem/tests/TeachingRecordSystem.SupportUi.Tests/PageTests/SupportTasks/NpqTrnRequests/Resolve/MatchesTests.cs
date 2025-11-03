@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequ
 
 public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    [Test]
-    [Arguments(false, "details")]
-    [Arguments(true, "resolve/check-answers")]
+    [Theory]
+    [InlineData(false, "details")]
+    [InlineData(true, "resolve/check-answers")]
     public async Task Get_HasExpectedBackLink(bool fromCheckAnswers, string expectedBackLink)
     {
         // Arrange
@@ -46,7 +46,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
 
     }
 
-    [Test]
+    [Fact]
     public async Task Get_TaskDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_TaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -79,7 +79,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_ShowsRequestDetails()
     {
         // Arrange
@@ -112,7 +112,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal($"{supportTask.TrnRequestMetadata!.NpqEvidenceFileName} (opens in new tab)", requestDetails.GetSummaryListValueByKey("Evidence"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_ShowsDetailsOfMatchedRecords()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(matchedPerson.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordButPopulatedInRequest_ShowsHighlightedNotProvided()
     {
         // Arrange
@@ -189,7 +189,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", true);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MatchedRecords_NullableFieldsEmptyInRecordAndEmptyInRequest_ShowsNotProvidedNotHighlighted
     ()
     {
@@ -233,7 +233,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", false);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsRefreshedMatchedPersons()
     {
         // Arrange
@@ -271,7 +271,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Contains(subsequentMatchedPerson.PersonId, shownMatchedPersonIds);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MatchedRecords_EmailRenderedAsExpected()
     {
         // Arrange
@@ -305,7 +305,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Email address", true);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MatchedRecordHasActiveAlerts_ShowsAlertsTag()
     {
         // Arrange
@@ -330,7 +330,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Contains("Alerts", tags);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MatchedRecordHasQts_ShowsQtsTag()
     {
         // Arrange
@@ -355,7 +355,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Contains("QTS", tags);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MatchedRecordHasEyts_ShowsEytsTag()
     {
         // Arrange
@@ -380,7 +380,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Contains("EYTS", tags);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonIdInState_SelectsChosenRecord()
     {
         // Arrange
@@ -412,7 +412,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .IsChecked());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_CreateNewRecordInState_SelectsCreateNewRecordOption()
     {
         // Arrange
@@ -442,8 +442,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
                 .IsChecked());
     }
 
-    public static PersonMatchedAttribute[][] GetHighlightedDifferencesData() =>
-    [
+    public static TheoryData<PersonMatchedAttribute[]> GetHighlightedDifferencesData() => new(
         [PersonMatchedAttribute.FirstName],
         [PersonMatchedAttribute.MiddleName],
         [PersonMatchedAttribute.LastName],
@@ -451,10 +450,10 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         [PersonMatchedAttribute.EmailAddress],
         [PersonMatchedAttribute.NationalInsuranceNumber],
         [PersonMatchedAttribute.Gender]
-    ];
+    );
 
-    [Test]
-    [MethodDataSource(nameof(GetHighlightedDifferencesData))]
+    [Theory]
+    [MemberData(nameof(GetHighlightedDifferencesData))]
     public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
     {
         // Arrange
@@ -517,7 +516,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         AssertMatchRowHasExpectedHighlight(firstMatchDetails, "Gender", !matchedAttributes.Contains(PersonMatchedAttribute.Gender));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_TaskIsClosed_ReturnsNotFound()
     {
         // Arrange
@@ -544,7 +543,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_SubmittedPersonIdIsNotValid_ReturnsBadRequest()
     {
         // Arrange
@@ -570,7 +569,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoChosenPersonId_ReturnsError()
     {
         // Arrange
@@ -593,7 +592,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         await AssertEx.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidPersonIdChosen_UpdatesStateAndRedirects()
     {
         // Arrange
@@ -624,7 +623,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(personId, journeyInstance.State.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_CreateNewRecordChosen_UpdatesStateAndRedirects()
     {
         // Arrange
@@ -655,7 +654,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.Equal(personId, journeyInstance.State.PersonId);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_PersonIdChangedFromState_ClearsPersonAttributes()
     {
         // Arrange
@@ -696,7 +695,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.False(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_PersonIdNotChangedFromState_DoesNotClearPersonAttributes()
     {
         // Arrange
@@ -737,7 +736,7 @@ public class MatchesTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostF
         Assert.True(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
-    [Test]
+    [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange

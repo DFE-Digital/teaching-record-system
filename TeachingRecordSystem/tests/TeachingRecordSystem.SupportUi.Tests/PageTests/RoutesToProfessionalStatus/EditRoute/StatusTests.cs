@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_ShowsExistingStatus()
     {
         // Arrange
@@ -40,7 +40,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(status.ToString(), statusChoice);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_StatusIsNotHoldsStatus_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
@@ -80,7 +80,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_StatusMovesToHolds_PersistsDataAndRedirectsToHoldsDate()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/routes/{qualificationid}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_StatusMovesFromHoldsToAnotherStatus_RemovesHoldsFromAndExemptionFlag()
     {
         // Arrange
@@ -167,7 +167,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance.State.IsExemptFromInduction);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_StatusMovesToHolds_RouteHasImplicitExemption_ExemptionSetToTrue()
     {
         // Arrange
@@ -218,7 +218,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(true, journeyInstance.State.EditStatusState!.InductionExemption);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_StatusStaysHolds_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
@@ -261,7 +261,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -303,7 +303,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

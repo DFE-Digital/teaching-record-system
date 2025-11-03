@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
 
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -29,10 +29,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason", true)]
-    [Arguments("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false)]
-    [Arguments(null, null, null, null, null, MqDeletionReasonOption.AnotherReason, null, false)]
+    [Theory]
+    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason", true)]
+    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false)]
+    [InlineData(null, null, null, null, null, MqDeletionReasonOption.AnotherReason, null, false)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
         string? providerName,
         MandatoryQualificationSpecialism? specialism,
@@ -100,7 +100,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
         // Arrange
@@ -126,7 +126,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Confirm_DeletesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
@@ -223,7 +223,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -257,7 +257,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

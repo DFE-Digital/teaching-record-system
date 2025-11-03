@@ -27,7 +27,7 @@ public class CheckPersonExistsFilter(TrsDbContext dbContext) : IAsyncResourceFil
             return;
         }
 
-        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required when enqueueing a background job.");
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required.");
 
         var person = await GetPersonAsync();
 

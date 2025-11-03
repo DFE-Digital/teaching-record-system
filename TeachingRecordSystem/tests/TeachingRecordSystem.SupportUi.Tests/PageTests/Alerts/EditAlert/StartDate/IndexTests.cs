@@ -1,14 +1,15 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
 
-public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.New;
     private const string ThisStep = JourneySteps.Index;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -27,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -43,7 +44,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_AlertIsClosed_ReturnsBadRequest()
     {
         // Arrange
@@ -59,7 +60,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
@@ -78,7 +79,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal($"{alert.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -97,7 +98,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal($"{journeyInstance.State.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -120,7 +121,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -139,7 +140,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_AlertIsClosed_ReturnsBadRequest()
     {
         // Arrange
@@ -158,7 +159,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoStartDateIsEntered_ReturnsError()
     {
         // Arrange
@@ -177,7 +178,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_StartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
@@ -196,7 +197,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date cannot be in the future");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_StartDateIsUnchanged_ReturnsError()
     {
         // Arrange
@@ -215,7 +216,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a different start date");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidStartDateIsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
@@ -239,7 +240,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Equal(newStartDate, journeyInstance.State.StartDate);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -259,7 +260,7 @@ public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

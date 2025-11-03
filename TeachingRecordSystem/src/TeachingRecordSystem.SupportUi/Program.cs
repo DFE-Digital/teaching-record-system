@@ -68,7 +68,7 @@ app.UseMiddleware<AppendSecurityResponseHeadersMiddleware>();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/_hangfire") && !builder.Environment.IsTests(), a => a.UseTransactions());
+app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/_hangfire"), a => a.UseTransactions());
 
 app.UseAuthentication();
 app.UseAuthorization();

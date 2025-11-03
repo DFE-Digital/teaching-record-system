@@ -2,15 +2,16 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
-public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IAsyncLifetime
 {
     private const string PreviousStep = JourneySteps.Index;
     private const string ThisStep = JourneySteps.Reason;
 
-    [Before(Test)]
-    public async Task SetUser() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
 
-    [Test]
+    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -29,7 +30,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -45,7 +46,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -61,7 +62,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -78,7 +79,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.StartsWith($"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_ReturnsOk()
     {
         // Arrange
@@ -94,7 +95,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequestWithReasonPopulatedDataInJourneyState_ReturnsExpectedContent()
     {
         // Arrange
@@ -125,7 +126,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         }
     }
 
-    [Test]
+    [Theory]
     [RolesWithoutAlertWritePermissionData]
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
@@ -147,7 +148,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -166,7 +167,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
@@ -185,7 +186,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
@@ -205,7 +206,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.StartsWith($"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError()
     {
         // Arrange
@@ -224,7 +225,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoHasAdditionalReasonDetailOptionIsSelected_ReturnsError()
     {
         // Arrange
@@ -245,7 +246,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenHasAdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError()
     {
         // Arrange
@@ -268,7 +269,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
@@ -291,7 +292,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
@@ -314,7 +315,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
@@ -348,7 +349,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
@@ -380,11 +381,10 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
         Assert.Equal(evidenceFileName, journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
-        Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileId);
         Assert.NotNull(journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
@@ -404,7 +404,7 @@ public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

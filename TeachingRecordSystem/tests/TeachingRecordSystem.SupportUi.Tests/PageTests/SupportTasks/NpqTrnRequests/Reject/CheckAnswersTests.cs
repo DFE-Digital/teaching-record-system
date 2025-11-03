@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequ
 
 public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_HasBackLinkExpected()
     {
         // Arrange
@@ -43,7 +43,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsSelectedReason()
     {
         // Arrange
@@ -74,7 +74,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(state.RejectionReason.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_UpdatesSupportTaskPublishesEventAndRedirects()
     {
         // Arrange

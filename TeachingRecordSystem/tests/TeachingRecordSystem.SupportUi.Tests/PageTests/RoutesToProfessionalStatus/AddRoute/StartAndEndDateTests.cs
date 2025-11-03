@@ -5,12 +5,12 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
-    [Arguments("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, false)]
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Get_FieldsMarkedAsOptional_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -44,12 +44,12 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
     }
 
-    [Test]
-    [Arguments("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
-    [Arguments("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
-    [Arguments("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
-    [Arguments("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, false)]
+    [Theory]
+    [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.InTraining, true)]
+    [InlineData("Postgraduate Teaching Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Early Years Teacher Degree Apprenticeship", RouteToProfessionalStatusStatus.Holds, true)]
+    [InlineData("Test Route With Mandatory Start/End Dates", RouteToProfessionalStatusStatus.Holds, false)]
     public async Task Post_MissingValues_ValidOrInvalid_BasedOnRouteAndStatusFieldRequirements(string routeName, RouteToProfessionalStatusStatus status, bool expectFieldsToBeOptional)
     {
         // Arrange
@@ -80,7 +80,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsPreviouslyStoredEntry()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(endDate.Year.ToString(), doc.QuerySelector("#TrainingEndDate\\.Year")?.GetAttribute("value"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenStartAndEndDateIsEntered_SavesDateAndRedirectsToNextPage()
     {
         // Arrange
@@ -169,7 +169,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_FromCya_WhenEndDateIsEntered_RedirectsToCya()
     {
         // Arrange
@@ -219,7 +219,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(newEndDate, journeyInstance.State.TrainingEndDate);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_EndDateBeforeStartDate_ShowsError()
     {
         // Arrange
@@ -265,7 +265,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "End date must be after start date");
     }
 
-    [Test]
+    [Fact]
     public async Task Cancel_RedirectsToExpectedPage()
     {
         // Arrange
@@ -304,7 +304,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {

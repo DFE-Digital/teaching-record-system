@@ -9,10 +9,10 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.NpqTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.NpqTrnRequests.Resolve;
 
-public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(hostFixture)
+public class CheckAnswersTests : NpqTrnRequestTestBase
 {
-    [Before(Test)]
-    public void ConfigureMocks() =>
+    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
+    {
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
             .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse
@@ -22,8 +22,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
                 Trn = req.Trn,
                 TrnToken = Guid.NewGuid().ToString()
             });
+    }
 
-    [Test]
+    [Fact]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -53,7 +54,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -84,8 +85,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetPersonAttributeInfos))]
+    [Theory]
+    [MemberData(nameof(GetPersonAttributeInfosData))]
     public async Task Get_AttributeSourceIsTrnRequest_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromRequestDataAttribute)
     {
         // Arrange
@@ -151,7 +152,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         }
     }
 
-    [Test]
+    [Fact]
     public async Task Get_CreatingNewRecord_DoesNotShowTrnRow()
     {
         // Arrange
@@ -179,7 +180,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Null(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UpdatingExistingRecord_DoesShowTrnRow()
     {
         // Arrange
@@ -208,7 +209,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.NotNull(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ShowsComments()
     {
         // Arrange
@@ -240,7 +241,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(comments, doc.GetSummaryListValueElementByKey("Comments")?.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
     {
         // Arrange
@@ -273,7 +274,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_CreatingNewRecord_RequestHasMatches_HasBackLinkAndChangeLinkToMatchPage()
     {
         // Arrange
@@ -306,7 +307,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoPersonIdSelected_RedirectsToMatches()
     {
         // Arrange
@@ -336,7 +337,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_NoAttributesSourcesSet_RedirectsToMerge()
     {
         // Arrange
@@ -367,11 +368,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
             response.Headers.Location?.OriginalString);
     }
 
-    [Test]
-    [Arguments(PersonMatchedAttribute.EmailAddress)]
-    [Arguments(PersonMatchedAttribute.DateOfBirth)]
-    [Arguments(PersonMatchedAttribute.NationalInsuranceNumber)]
-    [Arguments(PersonMatchedAttribute.Gender)]
+    [Theory]
+    [InlineData(PersonMatchedAttribute.EmailAddress)]
+    [InlineData(PersonMatchedAttribute.DateOfBirth)]
+    [InlineData(PersonMatchedAttribute.NationalInsuranceNumber)]
+    [InlineData(PersonMatchedAttribute.Gender)]
     public async Task Post_UpdatingExistingRecord_UpdatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects(PersonMatchedAttribute attribute)
     {
         // Arrange
@@ -507,8 +508,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.True(journeyInstance.Completed);
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetPersonAttributeInfos))]
+    [Theory]
+    [MemberData(nameof(GetPersonAttributeInfosData))]
     public async Task Post_UpdatingExistingRecord_OnlyUpdatesAttributesSourcedFromRequestData(PersonAttributeInfo attributeSourcedFromRequestData)
     {
         // Arrange
@@ -550,8 +551,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         });
     }
 
-    [Test]
-    [MethodDataSource(nameof(GetPersonAttributeInfos))]
+    [Theory]
+    [MemberData(nameof(GetPersonAttributeInfosData))]
     public async Task Post_UpdatingExistingRecord_UpdatesSupportTask(PersonAttributeInfo attributeSourcedFromRequestData)
     {
         // Arrange
@@ -607,7 +608,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         });
     }
 
-    [Test]
+    [Fact]
     public async Task Post_CreatingNewRecord_CreatesRecordUpdatesSupportTaskPublishesEventCompletesJourneyAndRedirects()
     {
         // Arrange
@@ -799,6 +800,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : NpqTrnRequestTestBase(
         Assert.Equal(expected.ResolvedPersonId, actual.ResolvedPersonId);
         Assert.Equivalent(expected.Matches, actual.Matches);
     }
+
+    public static TheoryData<PersonAttributeInfo> GetPersonAttributeInfosData() => new(GetPersonAttributeInfos());
 
     public static PersonAttributeInfo[] GetPersonAttributeInfos() =>
     [

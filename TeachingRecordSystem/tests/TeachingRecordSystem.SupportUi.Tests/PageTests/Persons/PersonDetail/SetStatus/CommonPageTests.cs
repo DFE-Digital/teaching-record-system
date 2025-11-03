@@ -5,7 +5,7 @@
 //
 // public class CommonPageTests(HostFixture hostFixture) : SetStatusTestBase(hostFixture)
 // {
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task UserDoesNotHavePermission_ReturnsForbidden(
 //         [Matrix("change-reason", "check-answers")] string page,
@@ -45,7 +45,7 @@
 //         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task PersonIsAlreadyTargetStatus_ReturnsBadRequest(
 //         [Matrix("change-reason", "check-answers")] string page,
@@ -82,7 +82,7 @@
 //         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task TargetStatusActive_PersonWasDeactivatedAsPartOfAMerge_ReturnsBadRequest(
 //         [Matrix("change-reason", "check-answers")] string page,
@@ -113,7 +113,7 @@
 //         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task ReasonNotSet_RedirectsToChangeReason(
 //         [Matrix("check-answers")] string page,
@@ -138,7 +138,7 @@
 //             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task ReasonSetToAnotherReason_ButReasonDetailNotProvided_RedirectsToChangeReason(
 //         [Matrix("check-answers")] string page,
@@ -173,7 +173,7 @@
 //             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task UploadEvidenceNotSet_RedirectsToChangeReason(
 //         [Matrix("check-answers")] string page,
@@ -207,7 +207,7 @@
 //             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task UploadEvidenceSetToTrue_ButEvidenceFileNotUploaded_RedirectsToChangeReason(
 //         [Matrix("check-answers")] string page,
@@ -244,7 +244,7 @@
 //             $"/persons/{person.PersonId}/set-status/{targetStatus}reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task Get_PageTitle_CaptionIsExpected(
 //         [Matrix("change-reason", "check-answers")] string page,
@@ -292,7 +292,7 @@
 //         }
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MethodDataSource(nameof(AllCombinationsOf),
 //         "change-reason", null, new[] { PersonStatus.Active, PersonStatus.Deactivated })]
 //     [MethodDataSource(nameof(AllCombinationsOf),
@@ -335,7 +335,7 @@
 //         Assert.Contains(expectedBackLink, backlink.Href);
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MethodDataSource(nameof(AllCombinationsOf),
 //         "change-reason", "check-answers", new[] { PersonStatus.Active, PersonStatus.Deactivated })]
 //     [MethodDataSource(nameof(AllCombinationsOf),
@@ -378,11 +378,11 @@
 //         Assert.Contains(expectedBackLink, backlink.Href);
 //     }
 //
-//     [Test]
-//     [Arguments("change-reason", PersonStatus.Active, "Continue", "Cancel and return to record")]
-//     [Arguments("change-reason", PersonStatus.Deactivated, "Continue", "Cancel and return to record")]
-//     [Arguments("check-answers", PersonStatus.Active, "Confirm and reactivate record", "Cancel")]
-//     [Arguments("check-answers", PersonStatus.Deactivated, "Confirm and deactivate record", "Cancel")]
+//     [Fact]
+//     [InlineData("change-reason", PersonStatus.Active, "Continue", "Cancel and return to record")]
+//     [InlineData("change-reason", PersonStatus.Deactivated, "Continue", "Cancel and return to record")]
+//     [InlineData("check-answers", PersonStatus.Active, "Confirm and reactivate record", "Cancel")]
+//     [InlineData("check-answers", PersonStatus.Deactivated, "Confirm and deactivate record", "Cancel")]
 //     public async Task Get_ContinueAndCancelButtons_ExistOnPage(string page, PersonStatus targetStatus, string continueButtonText, string cancelButtonText)
 //     {
 //         // Arrange
@@ -420,7 +420,7 @@
 //             b => Assert.Equal(cancelButtonText, b.TrimmedText()));
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MatrixDataSource]
 //     public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetailPage(
 //         [Matrix("change-reason", "check-answers")] string page,
@@ -461,7 +461,7 @@
 //         Assert.Null(journeyInstance);
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MethodDataSource(nameof(AllCombinationsOf),
 //         "change-reason", "check-answers", new[] { PersonStatus.Deactivated, PersonStatus.Active })]
 //     [MethodDataSource(nameof(AllCombinationsOf),
@@ -504,7 +504,7 @@
 //         AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
 //     }
 //
-//     [Test]
+//     [Fact]
 //     [MethodDataSource(nameof(AllCombinationsOf),
 //         "change-reason", "check-answers", new[] { PersonStatus.Deactivated, PersonStatus.Active })]
 //     [MethodDataSource(nameof(AllCombinationsOf),

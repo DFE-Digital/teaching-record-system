@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_PersonDoesNotExists_ReturnsNotFound()
     {
         // Arrange
@@ -19,7 +19,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonWithNoOpenAlerts_ShowsNoOpenAlertsMessage()
     {
         // Arrange
@@ -36,7 +36,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("no-open-alerts"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonWithOpenAlert_ShowsCardWithExpectedContent()
     {
         // Arrange
@@ -67,7 +67,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonWithNoClosedAlerts_ShowsNoClosedAlertsMessage()
     {
         // Arrange
@@ -84,7 +84,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("no-closed-alerts"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonWithClosedAlert_ShowsTableRowWithExpectedContent()
     {
         // Arrange
@@ -114,7 +114,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 column => { }));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserDoesNotHaveAddAlertPermission_DoesNotShowAddAnAlertButton()
     {
         // Arrange
@@ -132,7 +132,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasAddDbsAlertPermission_DoesShowAddAnAlertButton()
     {
         // Arrange
@@ -150,7 +150,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasAddNonDbsAlertPermission_DoesShowAddAnAlertButton()
     {
         // Arrange
@@ -168,7 +168,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserDoesNotHaveReadPermissionToOpenDbsAlert_DoesNotShowAlertCard()
     {
         // Arrange
@@ -187,7 +187,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("open-alert"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserDoesHaveReadPermissionToOpenDbsAlert_DoesShowAlertCard()
     {
         // Arrange
@@ -206,7 +206,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("open-alert"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadButNotWritePermissionToOpenDbsAlert_DoesNotShowActions()
     {
         // Arrange
@@ -230,7 +230,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(changeActions);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadAndWritePermissionsToOpenDbsAlert_DoesShowActions()
     {
         // Arrange
@@ -254,7 +254,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotEmpty(changeActions);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadButNotWritePermissionToOpenNonDbsAlert_DoesNotShowActions()
     {
         // Arrange
@@ -279,7 +279,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(changeActions);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadAndWritePermissionsToOpenNonDbsAlert_DoesShowActions()
     {
         // Arrange
@@ -304,7 +304,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotEmpty(changeActions);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserDoesNotHaveReadPermissionToClosedDbsAlert_DoesNotShowAlertRow()
     {
         // Arrange
@@ -323,7 +323,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("closed-alerts"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserDoesHaveReadPermissionToClosedDbsAlert_DoesShowAlertRow()
     {
         // Arrange
@@ -342,7 +342,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("closed-alerts"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadButNotWritePermissionToClosedDbsAlert_DoesNotShowActions()
     {
         // Arrange
@@ -365,7 +365,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("", actionColumn.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadAndWritePermissionsToClosedDbsAlert_DoesShowActions()
     {
         // Arrange
@@ -388,7 +388,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("Delete alert", actionColumn.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadButNotWritePermissionToClosedNonDbsAlert_DoesNotShowActions()
     {
         // Arrange
@@ -412,7 +412,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("", actionColumn.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_UserHasReadAndWritePermissionsToClosedNonDbsAlert_DoesShowActions()
     {
         // Arrange
@@ -436,7 +436,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("Delete alert", actionColumn.TrimmedText());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasOpenDbsAlertButUserCannotRead_ShowsFlagMessage()
     {
         // Arrange
@@ -455,7 +455,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasClosedDbsAlertAndUserCannotRead_DoesNotShowFlagMessage()
     {
         // Arrange
@@ -474,7 +474,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
-    [Test]
+    [Fact]
     public async Task Get_PersonHasOpenDbsAlertAndUserCanRead_DoesNotShowFlagMessage()
     {
         // Arrange
@@ -493,9 +493,9 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
-    [Test]
-    [Arguments(PersonStatus.Active, true)]
-    [Arguments(PersonStatus.Deactivated, false)]
+    [Theory]
+    [InlineData(PersonStatus.Active, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
     public async Task Get_PersonStatus_EditLinksShownAsExpected(PersonStatus personStatus, bool canSeeEditLinks)
     {
         // Arrange

@@ -2,9 +2,10 @@ using AngleSharp.Html.Dom;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.IntegrationTransactions;
 
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_IntegrationTransactionsReturnsOk()
     {
         // Arrange
@@ -17,7 +18,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_IntegrationTransactionsRendersNoRecords()
     {
         // Arrange
@@ -34,7 +35,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains("No integration transactions", noRecordsCell.TextContent);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_IntegrationSingleIntegrationTransaction_RendorMultipleRows()
     {
         // Arrange
@@ -97,7 +98,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertResultsContainsIntegrationTransaction(integrationTransaction2.IntegrationTransactionId.ToString());
     }
 
-    [Test]
+    [Fact]
     public async Task Get_IntegrationSingleIntegrationTransaction_RendersRow()
     {
         // Arrange
@@ -162,10 +163,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(duplicateCount.ToString(), duplicatesCell.TextContent.Trim());
     }
 
-    [Test]
-    [Arguments(IntegrationTransactionImportStatus.InProgress, "govuk-tag--light-blue")]
-    [Arguments(IntegrationTransactionImportStatus.Success, "govuk-tag--green")]
-    [Arguments(IntegrationTransactionImportStatus.Failed, "govuk-tag--red")]
+    [Theory]
+    [InlineData(IntegrationTransactionImportStatus.InProgress, "govuk-tag--light-blue")]
+    [InlineData(IntegrationTransactionImportStatus.Success, "govuk-tag--green")]
+    [InlineData(IntegrationTransactionImportStatus.Failed, "govuk-tag--red")]
     public async Task Get_IntegrationSingleIntegrationTransaction_RendersStatusWithCssClass(IntegrationTransactionImportStatus status, string cssClass)
     {
         // Arrange

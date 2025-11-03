@@ -54,23 +54,30 @@ public class HostFixture : InitializeDbFixture
     {
         await InitializeDbAsync();
 
-        await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
+        _ = Services;  // Start the server
 
-        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        await CreateAdminUsers();
+
+        async Task CreateAdminUsers()
         {
-            UserId = DefaultApplicationUserId,
-            Name = "Tests",
-            ApiRoles = ApiRoles.All.ToArray()
-        });
+            await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
 
-        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
-        {
-            UserId = GetAnIdentityApplicationUserId,
-            Name = "Get an identity",
-            ApiRoles = [ApiRoles.UpdatePerson]
-        });
+            dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+            {
+                UserId = DefaultApplicationUserId,
+                Name = "Tests",
+                ApiRoles = ApiRoles.All.ToArray()
+            });
 
-        await dbContext.SaveChangesAsync();
+            dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+            {
+                UserId = GetAnIdentityApplicationUserId,
+                Name = "Get an identity",
+                ApiRoles = [ApiRoles.UpdatePerson]
+            });
+
+            await dbContext.SaveChangesAsync();
+        }
     }
 
     private class ApiWebApplicationFactory(HostFixture hostFixture) : WebApplicationFactory<Program>
@@ -110,7 +117,8 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton<FakeTrnGenerator>()
                     .AddSingleton<ITrnGenerator, FakeTrnGenerationApiClient>()
                     .AddSingleton<CurrentApiClientProvider>()
-                    .AddSingleton<INotificationSender, NoopNotificationSender>();
+                    .AddSingleton<INotificationSender, NoopNotificationSender>()
+                    .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>();
 
                 services.Configure<GetAnIdentityOptions>(options =>
                 {
@@ -171,5 +179,21 @@ public class HostFixture : InitializeDbFixture
             var result = typeof(DelegatingHandler).GetMethod(nameof(SendAsync), BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(testScopedHandler, [request, cancellationToken]);
             return (Task<HttpResponseMessage>)result!;
         }
+    }
+
+    private class ExecuteScheduledJobsStartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) =>
+            app =>
+            {
+                app.Use(async (_, next) =>
+                {
+                    await next();
+
+                    await TestScopedServices.GetCurrent().BackgroundJobScheduler.ExecuteDeferredJobsAsync();
+                });
+
+                next(app);
+            };
     }
 }

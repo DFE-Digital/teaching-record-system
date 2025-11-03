@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_RedirectsToMqAddProvider()
     {
         // Arrange

@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Test]
+    [Fact]
     public async Task Get_WithInvalidRoute_ThrowsException()
     {
         // Arrange
@@ -45,7 +45,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_WithPreviouslyStoredChoice_ShowsChoice()
     {
         // Arrange
@@ -88,7 +88,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal(true.ToString(), inductionExemptionChoice);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenExemptionEntered_SavesDataAndRedirectsToDetail()
     {
         // Arrange
@@ -142,7 +142,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_WhenNoChoiceSelected_ReturnsError()
     {
         // Arrange
@@ -183,7 +183,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         await AssertEx.HtmlResponseHasErrorAsync(response, "IsExemptFromInduction", "Select yes if this route provides an induction exemption");
     }
 
-    [Test]
+    [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
@@ -232,7 +232,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    [Test]
+    [Theory]
     [HttpMethods(TestHttpMethods.GetAndPost)]
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
