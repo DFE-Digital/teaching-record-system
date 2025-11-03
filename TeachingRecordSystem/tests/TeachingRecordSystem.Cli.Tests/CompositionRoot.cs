@@ -1,9 +1,10 @@
 //using System.Reflection;
 
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Cli.Tests;
 using TeachingRecordSystem.TestCommon;
-//using Xunit.v3;
+using Xunit.v3;
 
 [assembly: AssemblyFixture(typeof(CompositionRoot))]
 
@@ -11,10 +12,10 @@ namespace TeachingRecordSystem.Cli.Tests;
 
 public class CompositionRoot : IAsyncLifetime
 {
-    // static CompositionRoot()
-    // {
-    //     Xunit.v3.TypeActivator.Current = new TypeActivator(Instance.Services);
-    // }
+    static CompositionRoot()
+    {
+        Xunit.v3.TypeActivator.Current = new TypeActivator(Instance.Services);
+    }
 
     public static CompositionRoot Instance => new();
 
@@ -42,17 +43,24 @@ public class CompositionRoot : IAsyncLifetime
 
     ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
-    // private class TypeActivator(IServiceProvider serviceProvider) : ITypeActivator
-    // {
-    //     public object CreateInstance(
-    //         ConstructorInfo constructor,
-    //         object?[]? arguments,
-    //         Func<Type, IReadOnlyCollection<ParameterInfo>, string> missingArgumentMessageFormatter)
-    //     {
-    //         return ActivatorUtilities.CreateInstance(
-    //             serviceProvider,
-    //             constructor.DeclaringType!,
-    //             (arguments ?? []).Where(a => a is not null));
-    //     }
-    // }
+    private class TypeActivator(IServiceProvider serviceProvider) : ITypeActivator
+    {
+        public object CreateInstance(
+            ConstructorInfo constructor,
+            object?[]? arguments,
+            Func<Type, IReadOnlyCollection<ParameterInfo>, string> missingArgumentMessageFormatter)
+        {
+            List<object> args = (arguments ?? []).Where(a => a is not null && a.GetType() != typeof(Missing)).ToList()!;
+
+            if (constructor.GetParameters().Any(p => p.ParameterType == typeof(IServiceProvider)))
+            {
+                args.Add(serviceProvider);
+            }
+
+            return ActivatorUtilities.CreateInstance(
+                serviceProvider,
+                constructor.DeclaringType!,
+                args.ToArray());
+        }
+    }
 }

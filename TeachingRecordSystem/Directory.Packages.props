@@ -109,9 +109,9 @@
     <PackageVersion Include="xunit.core" Version="2.9.3" />
     <PackageVersion Include="Xunit.DependencyInjection" Version="8.9.1" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
-    <PackageVersion Include="xunit.v3" Version="3.1.0" />
-    <PackageVersion Include="xunit.v3.assert" Version="3.1.0" />
-    <PackageVersion Include="xunit.v3.extensibility.core" Version="3.1.0" />
+    <PackageVersion Include="xunit.v3" Version="3.2.0" />
+    <PackageVersion Include="xunit.v3.assert" Version="3.2.0" />
+    <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.0" />
     <PackageVersion Include="Azure.Storage.Files.DataLake" Version="12.16.0" />
   </ItemGroup>
 </Project>
