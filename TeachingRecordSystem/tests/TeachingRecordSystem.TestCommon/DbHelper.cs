@@ -102,7 +102,6 @@ public sealed class DbHelper : IDisposable
 
         if (currentDbVersion == GetPreviousMigrationsVersion())
         {
-            await ClearDataAsync();
             return;
         }
 
