@@ -3213,6 +3213,46 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             EstablishmentNumber = "4091",
                             EstablishmentSourceId = 2,
                             LaCode = "928"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("837c3f31-980e-4393-8790-d38289d0deba"),
+                            EstablishmentName = "Tame River Educational Trust",
+                            EstablishmentNumber = "1600",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("2a5b113f-04af-494e-b09f-b90ee04712f4"),
+                            EstablishmentName = "The Forge Brook Trust",
+                            EstablishmentNumber = "1601",
+                            EstablishmentSourceId = 2,
+                            LaCode = "751"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("81d8d02f-35ad-4619-9a7a-15f3fb10acf7"),
+                            EstablishmentName = "Workers Educational Association",
+                            EstablishmentNumber = "0751",
+                            EstablishmentSourceId = 2,
+                            LaCode = "873"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("e6b9bd0b-5a10-4a82-91f5-942b871a2d16"),
+                            EstablishmentName = "Worcester",
+                            EstablishmentNumber = "9450",
+                            EstablishmentSourceId = 2,
+                            LaCode = "918"
+                        },
+                        new
+                        {
+                            EstablishmentId = new Guid("e71de82d-d56c-4e4e-9bdf-cc8bce890593"),
+                            EstablishmentName = "Northamptonshire",
+                            EstablishmentNumber = "0000",
+                            EstablishmentSourceId = 2,
+                            LaCode = "928"
                         });
                 });
 
