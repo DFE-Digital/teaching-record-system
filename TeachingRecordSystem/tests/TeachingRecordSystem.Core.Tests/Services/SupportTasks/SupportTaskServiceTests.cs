@@ -3,6 +3,7 @@ using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.Core.Tests.Services.SupportTasks;
 
+[Collection(nameof(DisableParallelization))]
 public class SupportTaskServiceTests(SupportTaskService supportTaskService, IClock clock, TestData testData, DbFixture dbFixture)
 {
     private IClock Clock => clock;

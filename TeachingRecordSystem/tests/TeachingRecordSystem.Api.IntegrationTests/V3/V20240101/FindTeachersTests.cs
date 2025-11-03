@@ -2,17 +2,14 @@ using System.Diagnostics;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240101;
 
-public class FindTeachersTests : TestBase, IAsyncLifetime
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
+public class FindTeachersTests : TestBase
 {
     public FindTeachersTests(HostFixture hostFixture)
         : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
-
-    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)

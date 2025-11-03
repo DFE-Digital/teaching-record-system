@@ -3,12 +3,9 @@ using TeachingRecordSystem.Api.Properties;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V1.Operations;
 
-public class GetTeacherTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
+public class GetTeacherTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
-
     [Theory]
     [InlineData("123456")]
     [InlineData("12345678")]

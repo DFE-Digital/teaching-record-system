@@ -125,20 +125,6 @@ public sealed class DbHelper : IDisposable
         }
     }
 
-    public async Task DeleteAllPersonsAsync()
-    {
-        using var dbContext = await DbContextFactory.CreateDbContextAsync();
-
-        await dbContext.Database.ExecuteSqlAsync(
-            $"""
-             delete from support_tasks where person_id is not null;
-             update persons set merged_with_person_id = null, source_application_user_id = null, source_trn_request_id = null;
-             delete from trn_request_metadata where resolved_person_id is not null;
-             delete from previous_names;
-             delete from persons;
-             """);
-    }
-
     private async Task EnsureRespawnerAsync(DbConnection connection) =>
         _respawner = await Respawner.CreateAsync(
             connection,
