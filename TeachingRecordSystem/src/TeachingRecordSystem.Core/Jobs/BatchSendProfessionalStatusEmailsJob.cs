@@ -94,6 +94,8 @@ public class BatchSendProfessionalStatusEmailsJob(
             {
                 var templateId = qtsAwardee.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId
                     ? EmailTemplateIds.InternationalQtsAwardedEmailConfirmation
+                    : qtsAwardee.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId
+                        ? EmailTemplateIds.QtlsPostLaunchForAllUsers
                     : EmailTemplateIds.QtsAwardedEmailConfirmation;
 
                 var personalization = new Dictionary<string, string>
