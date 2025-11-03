@@ -10,14 +10,14 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture dbFixture) : NightlyEmailJobTestBase(dbFixture)
 {
     [Fact]
-    public async Task Execute_WithQtsRouteOtherThanIqts_CreatesEmailWithQtsTemplateId()
+    public async Task Execute_WithQtsRouteOtherThanIqtsOrQtls_CreatesEmailWithQtsTemplateId()
     {
         // Arrange
         var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
         var jobOptions = CreateJobOptions();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
+            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.AssessmentOnlyRouteId, holdsFrom: Clock.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
         Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
@@ -76,6 +76,42 @@ public class BatchSendProfessionalStatusEmailsJobTests(NightlyEmailJobFixture db
         Assert.Equal(EmailTemplateIds.InternationalQtsAwardedEmailConfirmation, email.TemplateId);
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
+        Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
+
+        backgroundJobScheduler
+            .Verify(
+                s => s.EnqueueAsync(
+                    It.IsAny<System.Linq.Expressions.Expression<Func<SendAytqInviteEmailJob, Task>>>()),
+                Times.Once);
+    }
+
+    [Fact]
+    public async Task Execute_WithQtlsRoute_CreatesEmailWithQtlsTemplateId()
+    {
+        // Arrange
+        var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
+        var jobOptions = CreateJobOptions();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: Clock.Today)
+            .WithEmailAddress(TestData.GenerateUniqueEmail()));
+
+        Clock.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
+
+        var job = new BatchSendProfessionalStatusEmailsJob(
+            jobOptions,
+            Fixture.DbFixture.DbContextFactory,
+            backgroundJobScheduler.Object,
+            Clock);
+
+        // Act
+        await job.ExecuteAsync(CancellationToken.None);
+
+        // Assert
+        var email = await DbFixture.WithDbContextAsync(dbContext => dbContext.Emails.SingleOrDefaultAsync());
+        Assert.NotNull(email);
+        Assert.Equal(person.EmailAddress, email.EmailAddress);
+        Assert.Equal(EmailTemplateIds.QtlsPostLaunchForAllUsers, email.TemplateId);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
 
         backgroundJobScheduler
