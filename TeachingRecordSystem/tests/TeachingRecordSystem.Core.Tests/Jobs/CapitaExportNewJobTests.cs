@@ -635,7 +635,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
         Assert.NotEmpty(integrationTransaction.FileName);
         Assert.Contains(integrationTransaction.IntegrationTransactionRecords!, record =>
         {
-            Assert.Null(record.FailureMessage);
+            Assert.Empty(record.FailureMessage!);
             Assert.Equal(person1.PersonId, record.PersonId);
             Assert.Null(record.Duplicate);
             Assert.NotNull(record.RowData);
@@ -925,7 +925,7 @@ public class CapitaExportNewJobTests(CapitaExportNewJobFixture Fixture) : IClass
 
     bool MatchesExpectedRowData(IntegrationTransactionRecord record, string expectedRowData, Person person) =>
         record.PersonId == person.PersonId &&
-        record.FailureMessage == null &&
+        record.FailureMessage == string.Empty &&
         record.Duplicate == null &&
         record.RowData != null &&
         record.RowData.Length == EXPECTED_ROW_LENGTH &&

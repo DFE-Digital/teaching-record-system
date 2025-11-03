@@ -47,122 +47,138 @@ public class CapitaExportNewJob([FromKeyedServices("sftpstorage")] DataLakeServi
         var successCount = 0;
         var duplicateRowCount = 0;
         var failureRowCount = 0;
-        var failureMessage = new StringBuilder();
 
         // process file
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true);
         using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)))
         {
-            try
+            //write rows
+            foreach (var person in persons)
             {
-                //write header
-                foreach (var person in persons)
+                var hasFailed = false;
+                var row = string.Empty;
+                var previousNameRow = string.Empty;
+                var failureMessage = string.Empty;
+
+                try
                 {
-                    var previousNameRow = await GetNewPersonWithPreviousLastNameAsStringRowAsync(person, cancellationToken);
+                    // if present - fetch persons previousName
+                    previousNameRow = await GetNewPersonWithPreviousLastNameAsStringRowAsync(person, cancellationToken);
                     var hasPreviousLastName = !string.IsNullOrEmpty(previousNameRow);
 
-                    // Existing name row
-                    var row = GetNewPersonAsStringRow(person, hasPreviousLastName);
+                    // write current name row
+                    row = GetNewPersonAsStringRow(person, hasPreviousLastName);
                     csvWriter.WriteField(row);
                     csvWriter.NextRecord();
 
-                    // write current person exported row to integrationtransactionrecord
+                    // write a previous name row if one is present
+                    if (!string.IsNullOrEmpty(previousNameRow))
+                    {
+                        csvWriter.WriteField(previousNameRow);
+                        csvWriter.NextRecord();
+                    }
+                }
+                catch (Exception e)
+                {
+                    //in the event of a row level failure
+                    //e.g. fetching previous name for a person
+                    failureRowCount++;
+                    hasFailed = true;
+                    failureMessage = e.ToString();
+                    logger.LogError(e.ToString());
+                }
+
+                if (!hasFailed)
+                {
+                    totalRowCount++;
+                    successCount++;
+                }
+
+                // write current person exported row to integrationtransactionrecord
+                integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
+                {
+                    IntegrationTransactionRecordId = 0,
+                    CreatedDate = clock.UtcNow,
+                    RowData = row,
+                    Status = string.IsNullOrEmpty(failureMessage) ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
+                    PersonId = person.PersonId,
+                    FailureMessage = failureMessage,
+                    Duplicate = null,
+                    HasActiveAlert = null
+                });
+
+                // if there is a previous last name, append another row
+                if (!string.IsNullOrEmpty(previousNameRow))
+                {
+                    csvWriter.WriteField(previousNameRow);
+                    csvWriter.NextRecord();
+
+                    // write person previous name exported row to integrationtransactionrecord
                     integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                     {
                         IntegrationTransactionRecordId = 0,
                         CreatedDate = clock.UtcNow,
-                        RowData = row,
-                        Status = IntegrationTransactionRecordStatus.Success,
+                        RowData = previousNameRow,
+                        Status = string.IsNullOrEmpty(failureMessage) ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
                         PersonId = person.PersonId,
-                        FailureMessage = null,
+                        FailureMessage = failureMessage,
                         Duplicate = null,
                         HasActiveAlert = null
                     });
                     totalRowCount++;
                     successCount++;
-
-                    // if there is a previous last name, append another row
-
-                    if (!string.IsNullOrEmpty(previousNameRow))
-                    {
-                        csvWriter.WriteField(previousNameRow);
-                        csvWriter.NextRecord();
-
-                        // write person previous name exported row to integrationtransactionrecord
-                        integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
-                        {
-                            IntegrationTransactionRecordId = 0,
-                            CreatedDate = clock.UtcNow,
-                            RowData = previousNameRow,
-                            Status = IntegrationTransactionRecordStatus.Success,
-                            PersonId = person.PersonId,
-                            FailureMessage = null,
-                            Duplicate = null,
-                            HasActiveAlert = null
-                        });
-                        totalRowCount++;
-                        successCount++;
-                    }
-
-                    //update IntegrationTransaction so that it's always up to date with counts of rows
-                    integrationJob.TotalCount = totalRowCount;
-                    integrationJob.FailureCount = failureRowCount;
-                    integrationJob.SuccessCount = successCount;
-                    integrationJob.DuplicateCount = duplicateRowCount;
-                    await dbContext.SaveChangesAsync();
-
                 }
-                streamWriter.Flush();
 
-                // upload file contents to storage container
-                memoryStream.Position = 0;
-                await UploadFileAsync(memoryStream, fileName);
-            }
-            catch (Exception e)
-            {
-                failureRowCount++;
-                logger.LogError(e.ToString());
-            }
-            finally
-            {
-                // mark job as complete
+                //update IntegrationTransaction so that it's always up to date with counts of rows
                 integrationJob.TotalCount = totalRowCount;
-                integrationJob.SuccessCount = successCount;
                 integrationJob.FailureCount = failureRowCount;
+                integrationJob.SuccessCount = successCount;
                 integrationJob.DuplicateCount = duplicateRowCount;
-                integrationJob.ImportStatus = IntegrationTransactionImportStatus.Success;
-
-                //update last run date
-                if (jobMetaData != null)
-                {
-                    jobMetaData.Metadata = new Dictionary<string, string>
-                    {
-                        {
-                            LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
-                        }
-                    };
-                }
-                else
-                {
-                    // insert a job metadata record if one isn't present
-                    var job = new JobMetadata()
-                    {
-                        JobName = nameof(CapitaExportNewJob),
-                        Metadata = new Dictionary<string, string>
-                        {
-                            {
-                                LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
-                            }
-                        }
-                    };
-                    dbContext.JobMetadata.Add(job);
-                }
                 await dbContext.SaveChangesAsync();
-                await txn.CommitAsync();
+
             }
+            streamWriter.Flush();
+
+            // upload file contents to storage container
+            memoryStream.Position = 0;
+            await UploadFileAsync(memoryStream, fileName);
         }
 
+        // mark job as complete
+        integrationJob.TotalCount = totalRowCount;
+        integrationJob.SuccessCount = successCount;
+        integrationJob.FailureCount = failureRowCount;
+        integrationJob.DuplicateCount = duplicateRowCount;
+        integrationJob.ImportStatus = IntegrationTransactionImportStatus.Success;
+
+        //update last run date
+        if (jobMetaData != null)
+        {
+            jobMetaData.Metadata = new Dictionary<string, string>
+            {
+                {
+                    LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
+                }
+            };
+        }
+        else
+        {
+            // insert a job metadata record if one isn't present
+            var job = new JobMetadata()
+            {
+                JobName = nameof(CapitaExportNewJob),
+                Metadata = new Dictionary<string, string>
+                {
+                    {
+                        LastRunDateKey, clock.UtcNow.ToString("s", CultureInfo.InvariantCulture)
+                    }
+                }
+            };
+            dbContext.JobMetadata.Add(job);
+        }
+        await dbContext.SaveChangesAsync();
+        await txn.CommitAsync();
         return integrationJob.IntegrationTransactionId;
     }
 
