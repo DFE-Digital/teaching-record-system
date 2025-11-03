@@ -7,7 +7,8 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
-public class CreateTrnRequestTests : TestBase, IAsyncLifetime
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
+public class CreateTrnRequestTests : TestBase
 {
     public CreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -23,10 +24,6 @@ public class CreateTrnRequestTests : TestBase, IAsyncLifetime
                 TrnToken = Guid.NewGuid().ToString()
             });
     }
-
-    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
     public async Task Post_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)

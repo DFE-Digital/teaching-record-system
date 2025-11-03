@@ -1,15 +1,12 @@
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240920;
 
-public class FindPersonByLastNameAndDateOfBirthTests : TestBase, IAsyncLifetime
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
+public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 {
     public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
-
-    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task Get_ValidRequestWithMatchOnPersonWithAlerts_ReturnsExpectedAlertsContent()

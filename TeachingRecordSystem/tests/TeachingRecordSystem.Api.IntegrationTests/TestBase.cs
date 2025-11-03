@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using System.Transactions;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -14,7 +13,7 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
-public abstract class TestBase : IDisposable
+public abstract class TestBase
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
     {
@@ -32,22 +31,13 @@ public abstract class TestBase : IDisposable
     };
 
     private readonly TestScopedServices _testServices;
-    private readonly TransactionScope _transactionScope;
 
     protected TestBase(HostFixture hostFixture)
     {
-        _transactionScope = new TransactionScope(
-            TransactionScopeOption.RequiresNew,
-            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
-            TransactionScopeAsyncFlowOption.Enabled);
-
         HostFixture = hostFixture;
         _testServices = TestScopedServices.Reset(hostFixture.Services);
         SetCurrentApiClient([]);
     }
-
-    public virtual void Dispose() => _transactionScope.Dispose();
-
     protected HostFixture HostFixture { get; }
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();

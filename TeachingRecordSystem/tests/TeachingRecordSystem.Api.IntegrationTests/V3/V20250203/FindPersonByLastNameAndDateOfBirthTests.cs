@@ -2,16 +2,13 @@ using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsSta
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
 
-public class FindPersonByLastNameAndDateOfBirthTests : TestBase, IAsyncLifetime
+[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
+public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 {
     public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.GetPerson]);
     }
-
-    async ValueTask IAsyncLifetime.InitializeAsync() => await DbHelper.DeleteAllPersonsAsync();
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task Get_PersonHasNullDqtInductionStatus_ReturnsNoneInductionStatus()

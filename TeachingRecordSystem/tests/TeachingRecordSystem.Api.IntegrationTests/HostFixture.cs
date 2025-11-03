@@ -50,34 +50,30 @@ public class HostFixture : InitializeDbFixture
 
     public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => _webApplicationFactory.CreateClient(options);
 
+    public static void AddApplicationUsers(TrsDbContext dbContext)
+    {
+        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        {
+            UserId = DefaultApplicationUserId,
+            Name = "Tests",
+            ApiRoles = ApiRoles.All.ToArray()
+        });
+
+        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        {
+            UserId = GetAnIdentityApplicationUserId,
+            Name = "Get an identity",
+            ApiRoles = [ApiRoles.UpdatePerson]
+        });
+
+        dbContext.SaveChanges();
+    }
+
     public override async ValueTask InitializeAsync()
     {
         await InitializeDbAsync();
 
         _ = Services;  // Start the server
-
-        await CreateAdminUsers();
-
-        async Task CreateAdminUsers()
-        {
-            await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
-
-            dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
-            {
-                UserId = DefaultApplicationUserId,
-                Name = "Tests",
-                ApiRoles = ApiRoles.All.ToArray()
-            });
-
-            dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
-            {
-                UserId = GetAnIdentityApplicationUserId,
-                Name = "Get an identity",
-                ApiRoles = [ApiRoles.UpdatePerson]
-            });
-
-            await dbContext.SaveChangesAsync();
-        }
     }
 
     private class ApiWebApplicationFactory(HostFixture hostFixture) : WebApplicationFactory<Program>

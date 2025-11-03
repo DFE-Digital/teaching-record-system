@@ -78,7 +78,7 @@ public class TestScopedServices
 
     private class ForwardToTestScopedClock : IClock
     {
-        public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
+        public DateTime UtcNow => GetCurrent().Clock.UtcNow;
     }
 }
 
