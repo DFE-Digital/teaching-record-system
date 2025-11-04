@@ -9,8 +9,8 @@ public record PersonsMergedEvent : EventBase, IEventWithPersonId, IEventWithPers
     public required Guid SecondaryPersonId { get; init; }
     public required string SecondaryPersonTrn { get; init; }
     public required PersonStatus SecondaryPersonStatus { get; init; }
-    public required PersonAttributes PersonAttributes { get; init; }
-    public required PersonAttributes OldPersonAttributes { get; init; }
+    public required PersonDetails PersonAttributes { get; init; }
+    public required PersonDetails OldPersonAttributes { get; init; }
     public required EventModels.File? EvidenceFile { get; init; }
     public required string? Comments { get; init; }
     public required PersonsMergedEventChanges Changes { get; init; }

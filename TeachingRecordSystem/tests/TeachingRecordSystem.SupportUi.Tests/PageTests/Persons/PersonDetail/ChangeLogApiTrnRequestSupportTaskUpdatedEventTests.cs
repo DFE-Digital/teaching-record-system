@@ -225,7 +225,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
         Gender? gender, Gender? oldGender,
         ApiTrnRequestSupportTaskUpdatedEventChanges changes, string? comments)
     {
-        var attributes = new EventModels.PersonAttributes
+        var attributes = new EventModels.PersonDetails
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -236,7 +236,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             Gender = gender
         };
 
-        var oldAttributes = new EventModels.PersonAttributes
+        var oldAttributes = new EventModels.PersonDetails
         {
             FirstName = oldFirstName,
             MiddleName = oldMiddleName,

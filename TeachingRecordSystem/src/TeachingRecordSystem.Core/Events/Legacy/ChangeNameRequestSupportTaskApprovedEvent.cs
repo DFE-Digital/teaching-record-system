@@ -5,8 +5,8 @@ public record ChangeNameRequestSupportTaskApprovedEvent : SupportTaskUpdatedEven
     public required Guid PersonId { get; init; }
     public required EventModels.ChangeNameRequestData RequestData { get; init; }
     public required ChangeNameRequestSupportTaskApprovedEventChanges Changes { get; init; }
-    public required EventModels.PersonAttributes PersonAttributes { get; init; }
-    public required EventModels.PersonAttributes? OldPersonAttributes { get; init; }
+    public required EventModels.PersonDetails PersonAttributes { get; init; }
+    public required EventModels.PersonDetails? OldPersonAttributes { get; init; }
 }
 
 [Flags]

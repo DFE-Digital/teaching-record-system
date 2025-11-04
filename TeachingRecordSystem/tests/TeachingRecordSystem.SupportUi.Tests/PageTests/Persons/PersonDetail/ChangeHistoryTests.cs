@@ -16,13 +16,16 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            FirstName = person.FirstName,
-            MiddleName = person.MiddleName,
-            LastName = person.LastName,
-            DateOfBirth = person.DateOfBirth,
-            EmailAddress = person.EmailAddress,
-            NationalInsuranceNumber = person.NationalInsuranceNumber,
-            Gender = person.Gender,
+            Details = new EventModels.PersonDetails
+            {
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                LastName = person.LastName,
+                DateOfBirth = person.DateOfBirth,
+                EmailAddress = person.EmailAddress,
+                NationalInsuranceNumber = person.NationalInsuranceNumber,
+                Gender = person.Gender
+            },
             CreateReason = null,
             CreateReasonDetail = null,
             EvidenceFile = null,
@@ -76,7 +79,7 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             NationalInsuranceNumber = person.NationalInsuranceNumber,
             Gender = person.Gender,
             Trn = person.Trn!,
-            DateOfDeath = null,
+            DateOfDeath = person.Person.DateOfDeath,
             QtsDate = person.QtsDate,
             EytsDate = person.EytsDate,
             InductionStatus = person.Person.InductionStatus,
@@ -133,21 +136,42 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
             Changes = PersonUpdatedInDqtEventChanges.All,
-            FirstName = person.FirstName,
-            MiddleName = person.MiddleName,
-            LastName = person.LastName,
-            DateOfBirth = person.DateOfBirth,
-            EmailAddress = person.EmailAddress,
-            NationalInsuranceNumber = person.NationalInsuranceNumber,
-            Gender = person.Gender,
-            Trn = person.Trn!,
-            DateOfDeath = null,
-            QtsDate = person.QtsDate,
-            EytsDate = person.EytsDate,
-            InductionStatus = person.Person.InductionStatus,
-            DqtInductionStatus = person.Person.InductionStatus.ToDqtInductionStatus(out _),
-            QtlsDate = qtlsDate,
-            QtlsStatus = qtlsStatus
+            Details = new EventModels.DqtPersonDetails
+            {
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                LastName = person.LastName,
+                DateOfBirth = person.DateOfBirth,
+                EmailAddress = person.EmailAddress,
+                NationalInsuranceNumber = person.NationalInsuranceNumber,
+                Gender = person.Gender,
+                Trn = person.Trn!,
+                DateOfDeath = person.Person.DateOfDeath,
+                QtsDate = person.QtsDate,
+                EytsDate = person.EytsDate,
+                InductionStatus = person.Person.InductionStatus,
+                DqtInductionStatus = person.Person.InductionStatus.ToDqtInductionStatus(out _),
+                QtlsDate = qtlsDate,
+                QtlsStatus = qtlsStatus
+            },
+            OldDetails = new EventModels.DqtPersonDetails
+            {
+                FirstName = TestData.GenerateChangedFirstName(person.FirstName),
+                MiddleName = TestData.GenerateChangedMiddleName(person.MiddleName),
+                LastName = TestData.GenerateChangedLastName(person.LastName),
+                DateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth),
+                EmailAddress = TestData.GenerateUniqueEmail(),
+                NationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!),
+                Gender = TestData.GenerateChangedGender(person.Gender),
+                Trn = await TestData.GenerateTrnAsync(),
+                DateOfDeath = null,
+                QtsDate = null,
+                EytsDate = null,
+                InductionStatus = InductionStatus.None,
+                DqtInductionStatus = null,
+                QtlsDate = null,
+                QtlsStatus = QtlsStatus.None
+            }
         };
 
         var user = SystemUser.Instance;

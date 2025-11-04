@@ -94,7 +94,7 @@ public class CheckAnswersModel(
 
         var primaryPersonAttributes = _potentialDuplicates!.Single(p => p.PersonId == primaryPersonId).Attributes;
 
-        var newPrimaryPersonAttributes = new PersonAttributes()
+        var newPrimaryPersonAttributes = new PersonDetails()
         {
             FirstName = FirstName ?? string.Empty,
             MiddleName = MiddleName ?? string.Empty,

@@ -292,7 +292,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
         Gender? gender, Gender? oldGender,
         PersonsMergedEventChanges changes, string? comments, EventModels.File? evidenceFile)
     {
-        var details = new EventModels.PersonAttributes
+        var details = new EventModels.PersonDetails
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -303,7 +303,7 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
             Gender = gender
         };
 
-        var oldDetails = new EventModels.PersonAttributes
+        var oldDetails = new EventModels.PersonDetails
         {
             FirstName = oldFirstName,
             MiddleName = oldMiddleName,

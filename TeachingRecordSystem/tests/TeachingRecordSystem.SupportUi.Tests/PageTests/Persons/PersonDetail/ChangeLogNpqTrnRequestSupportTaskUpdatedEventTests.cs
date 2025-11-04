@@ -289,7 +289,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
         Gender? gender, Gender? oldGender,
         NpqTrnRequestSupportTaskResolvedEventChanges changes, NpqTrnRequestResolvedReason changeReason, string? comments)
     {
-        var attributes = new EventModels.PersonAttributes
+        var attributes = new EventModels.PersonDetails
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -300,7 +300,7 @@ public class ChangeLogNpqTrnRequestSupportTaskResolvedEventTests : TestBase
             Gender = gender
         };
 
-        var oldAttributes = new EventModels.PersonAttributes
+        var oldAttributes = new EventModels.PersonDetails
         {
             FirstName = oldFirstName,
             MiddleName = oldMiddleName,

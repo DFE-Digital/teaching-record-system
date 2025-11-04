@@ -103,7 +103,7 @@ public class Person
             CreatedByTps = createdByTps
         };
 
-        return new(person, EventModels.PersonAttributes.FromModel(person));
+        return new(person, EventModels.PersonDetails.FromModel(person));
     }
 
     public UpdatePersonDetailsResult UpdateDetails(
@@ -137,7 +137,7 @@ public class Person
         Option<Gender?> gender,
         DateTime now)
     {
-        var oldAttributes = EventModels.PersonAttributes.FromModel(this);
+        var oldAttributes = EventModels.PersonDetails.FromModel(this);
 
         firstName.MatchSome(v => FirstName = v);
         middleName.MatchSome(v => MiddleName = v);
@@ -161,7 +161,7 @@ public class Person
             UpdatedOn = now;
         }
 
-        return new(changes, EventModels.PersonAttributes.FromModel(this), oldAttributes);
+        return new(changes, EventModels.PersonDetails.FromModel(this), oldAttributes);
     }
 
     public void SetStatus(
@@ -750,14 +750,14 @@ public class Person
 
 public record CreatePersonResult(
     Person Person,
-    EventModels.PersonAttributes PersonAttributes);
+    EventModels.PersonDetails PersonAttributes);
 
 public record UpdatePersonDetailsResult(
     PersonAttributesChanges Changes,
-    EventModels.PersonAttributes PersonAttributes,
-    EventModels.PersonAttributes OldPersonAttributes);
+    EventModels.PersonDetails PersonAttributes,
+    EventModels.PersonDetails OldPersonAttributes);
 
 public record UpdateStatusResult(
     PersonAttributesChanges Changes,
-    EventModels.PersonAttributes PersonAttributes,
-    EventModels.PersonAttributes OldPersonAttributes);
+    EventModels.PersonDetails PersonAttributes,
+    EventModels.PersonDetails OldPersonAttributes);
