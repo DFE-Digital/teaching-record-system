@@ -268,7 +268,7 @@ public class DqtReportingService : BackgroundService
 
         for (var i = 0; i < idColumnNames.Length; i++)
         {
-            parameters.Add(new SqlParameter($"{idParameterNamePrefix}i", ids[i]));
+            parameters.Add(new SqlParameter($"{idParameterNamePrefix}{i}", ids[i]));
             sql += " AND " + $"{idColumnNames[i]} = {idParameterNamePrefix}{i}";
         }
 
