@@ -49,22 +49,7 @@ public class DqtReportingService : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return ProcessTrsChangesWrapperAsync();
-
-        async Task ProcessTrsChangesWrapperAsync()
-        {
-            try
-            {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChangesAsync(observer: null, ct), stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed processing TRS changes.");
-            }
-        }
+        return ProcessTrsChangesAsync(observer: null, stoppingToken);
     }
 
     internal async Task ProcessTrsChangesAsync(
