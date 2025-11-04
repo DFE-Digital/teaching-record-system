@@ -114,18 +114,19 @@ public class DqtReportingService : BackgroundService
                 var targetTableName = GetTargetTableName(relation);
                 var values = await GetTupleValuesAsync(tuple);
                 var columns = relation.Columns.ToArray();
-                var idColumn = columns.Single(c => c.Flags == RelationMessage.Column.ColumnFlags.PartOfKey);
+                var idColumns = columns.Where(c => c.Flags == RelationMessage.Column.ColumnFlags.PartOfKey).ToArray();
+                var idColumnNames = idColumns.Select(c => c.ColumnName).ToArray();
                 var columnValues = columns.Zip(values, (c, v) => (Column: c, Value: v)).ToDictionary(t => t.Column.ColumnName, t => t.Value);
-                var id = values[Array.IndexOf(columns, idColumn)]!;
+                var ids = idColumns.Select(c => values[Array.IndexOf(columns, c)]!).ToArray();
 
                 if (message is InsertMessage or UpdateMessage)
                 {
-                    await UpsertRowFromTrsAsync(targetTableName, idColumn.ColumnName, id, columnValues);
+                    await UpsertRowFromTrsAsync(targetTableName, idColumnNames, ids, columnValues);
                 }
                 else
                 {
                     Debug.Assert(message is DeleteMessage);
-                    await DeleteRowFromTrsAsync(targetTableName, idColumn.ColumnName, id);
+                    await DeleteRowFromTrsAsync(targetTableName, idColumnNames, ids);
                 }
 
                 replicationConn.SetReplicationStatus(message.WalEnd);
@@ -183,7 +184,7 @@ public class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task UpsertRowFromTrsAsync(string targetTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
+    private async Task UpsertRowFromTrsAsync(string targetTableName, string[] idColumnNames, object[] ids, IReadOnlyDictionary<string, object?> columnValues)
     {
         var parameters = new List<SqlParameter>();
         var columnNames = new List<string>();
@@ -221,24 +222,22 @@ public class DqtReportingService : BackgroundService
         var parametersAndColumns = parameters.Zip(columnNames, (p, c) => (ParameterName: p.ParameterName, ColumnName: c)).ToArray();
 
         var nowParameterName = "@UtcNow";
-        var idParameterName = "@id";
 
         var sql = $""""
             merge {targetTableName} as target
             using (
                 select {(string.Join(",\n\t", parametersAndColumns.Select(p => $"{p.ParameterName} as [{p.ColumnName}]")))}
             ) as source
-            on target.[{idColumnName}] = source.[{idColumnName}]
+            on 1 = 1 {string.Join(" ", idColumnNames.Select(n => $" and target.[{n}] = source.[{n}]"))}
             when not matched then
                 insert ({(string.Join(", ", parametersAndColumns.Select(p => $"[{p.ColumnName}]")))}, __Inserted, __Updated)
                 values ({(string.Join(", ", parametersAndColumns.Select(p => $"source.[{p.ColumnName}]")))}, {nowParameterName}, {nowParameterName})
             when matched then
-                update set {(string.Join(", ", parametersAndColumns.Where(p => p.ColumnName != idColumnName).Select(p => $"[{p.ColumnName}] = source.[{p.ColumnName}]")))}, __Updated = {nowParameterName}
+                update set {(string.Join(", ", parametersAndColumns.Where(p => !idColumnNames.Contains(p.ColumnName)).Select(p => $"[{p.ColumnName}] = source.[{p.ColumnName}]")))}, __Updated = {nowParameterName}
             ;
             """";
 
         parameters.Add(new SqlParameter(nowParameterName, _clock.UtcNow));
-        parameters.Add(new SqlParameter(idParameterName, id));
 
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
         await conn.OpenAsync();
@@ -256,18 +255,22 @@ public class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task DeleteRowFromTrsAsync(string targetTableName, string idColumnName, object id)
+    private async Task DeleteRowFromTrsAsync(string targetTableName, string[] idColumnNames, object[] ids)
     {
         var parameters = new List<SqlParameter>();
 
-        var idParameterName = "@id";
+        var idParameterNamePrefix = "@id";
 
         var sql = $"""
             delete from {targetTableName}
-            where {idColumnName} = {idParameterName}
+            where 1 = 1
             """;
 
-        parameters.Add(new SqlParameter(idParameterName, id));
+        for (var i = 0; i < idColumnNames.Length; i++)
+        {
+            parameters.Add(new SqlParameter($"{idParameterNamePrefix}i", ids[i]));
+            sql += " AND " + $"{idColumnNames[i]} = {idParameterNamePrefix}{i}";
+        }
 
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
         await conn.OpenAsync();
