@@ -13,6 +13,7 @@
     <PackageVersion Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" Version="1.5.1" />
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
     <PackageVersion Include="Azure.Storage.Files.DataLake" Version="12.16.0" />
+    <PackageVersion Include="Azure.Storage.Files.DataLake" Version="12.24.0" />
     <PackageVersion Include="Castle.Core" Version="5.1.1" />
     <PackageVersion Include="CloudNative.CloudEvents" Version="2.8.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
