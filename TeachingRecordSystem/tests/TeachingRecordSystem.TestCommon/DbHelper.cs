@@ -105,6 +105,7 @@ public sealed class DbHelper : IDisposable
 
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.MigrateAsync();
+        await SetTablesUnloggedAsync();
 
         WriteMigrationsVersion();
 
@@ -120,6 +121,29 @@ public sealed class DbHelper : IDisposable
             Directory.CreateDirectory(directory);
             File.WriteAllText(cachedMigrationsVersionPath, currentDbVersion);
         }
+
+        Task SetTablesUnloggedAsync() =>
+            dbContext.Database.ExecuteSqlRawAsync(
+                """
+                drop publication dqt_rep_sync;
+                alter table alerts set unlogged;
+                alter table integration_transaction_records set unlogged;
+                alter table notes set unlogged;
+                alter table one_login_users set unlogged;
+                alter table previous_names set unlogged;
+                alter table qualifications set unlogged;
+                alter table support_tasks set unlogged;
+                alter table tps_employments set unlogged;
+                alter table process_events set unlogged;
+                alter table processes set unlogged;
+                alter table events set unlogged;
+                alter table persons set unlogged;
+                alter table api_keys set unlogged;
+                alter table trn_request_metadata set unlogged;
+                alter table webhook_messages set unlogged;
+                alter table webhook_endpoints set unlogged;
+                alter table users set unlogged;
+                """);
     }
 
     private async Task EnsureRespawnerAsync(DbConnection connection) =>
