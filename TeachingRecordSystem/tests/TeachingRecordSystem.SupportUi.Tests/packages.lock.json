@@ -129,11 +129,6 @@
           "System.Diagnostics.TraceSource": "4.3.0"
         }
       },
-      "DistributedLock.Core": {
-        "type": "Transitive",
-        "resolved": "1.0.6",
-        "contentHash": "WFAz6x82K+4uiByDk1Qz2lmcm2FrOyCzZjNauzbLeHPou6Ur2C9Ig7d6vxP7/kKvzSrrQoW6k3pUOOcikb9Jgw=="
-      },
       "EntityFrameworkCore.Projectables.Abstractions": {
         "type": "Transitive",
         "resolved": "4.0.0",
@@ -2341,8 +2336,6 @@
           "CloudNative.CloudEvents": "[2.8.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[30.1.0, )",
-          "DistributedLock.Azure": "[1.0.0, )",
-          "DistributedLock.FileSystem": "[1.0.2, )",
           "EFCore.NamingConventions": "[9.0.0, )",
           "EntityFrameworkCore.Projectables": "[4.0.0, )",
           "FluentValidation": "[11.11.0, )",
@@ -2553,25 +2546,6 @@
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
           "Microsoft.Data.SqlClient": "5.1.1",
           "dbup-core": "5.0.37"
-        }
-      },
-      "DistributedLock.Azure": {
-        "type": "CentralTransitive",
-        "requested": "[1.0.0, )",
-        "resolved": "1.0.0",
-        "contentHash": "4ZhznBRIlngEtYxtCg9mSZnShESXyvV4P9PJdQlw341INuUcTfFtzxbNIQKwn15a0GrrLG6aebVIioVlp9TgQg==",
-        "dependencies": {
-          "Azure.Storage.Blobs": "12.7.0",
-          "DistributedLock.Core": "[1.0.0, 1.1.0)"
-        }
-      },
-      "DistributedLock.FileSystem": {
-        "type": "CentralTransitive",
-        "requested": "[1.0.2, )",
-        "resolved": "1.0.2",
-        "contentHash": "sr6p3R/DzRjb8bCYQTmZsWNIlvsULQY4Eg4Y4JPYcYwrzGhsftp+khOjOupcMoUDU48cijCm1xHQEULSwRq5cg==",
-        "dependencies": {
-          "DistributedLock.Core": "[1.0.6, 1.1.0)"
         }
       },
       "EFCore.NamingConventions": {

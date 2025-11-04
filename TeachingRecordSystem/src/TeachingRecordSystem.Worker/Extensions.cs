@@ -1,8 +1,4 @@
-using Azure.Storage.Blobs;
 using Hangfire;
-using Medallion.Threading;
-using Medallion.Threading.Azure;
-using Medallion.Threading.FileSystem;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,7 +30,6 @@ public static class Extensions
         services
             .AddWebhookDeliveryService(configuration)
             .AddHangfireServer()
-            .AddDistributedLocks(configuration, environment)
             .AddWorkforceData()
             .AddMemoryCache();
 
@@ -71,28 +66,6 @@ public static class Extensions
         if (configuration.GetValue<bool>("DqtReporting:RunService"))
         {
             services.AddDqtReporting(configuration);
-        }
-
-        return services;
-    }
-
-    private static IServiceCollection AddDistributedLocks(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
-    {
-        if (environment.IsProduction())
-        {
-            var containerName = configuration.GetRequiredValue("DistributedLockContainerName");
-
-            services.AddSingleton<IDistributedLockProvider>(sp =>
-            {
-                var blobServiceClient = sp.GetRequiredService<BlobServiceClient>();
-                var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-                return new AzureBlobLeaseDistributedSynchronizationProvider(blobContainerClient);
-            });
-        }
-        else
-        {
-            var lockFileDirectory = Path.Combine(Path.GetTempPath(), "qtlocks");
-            services.AddSingleton<IDistributedLockProvider>(new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory)));
         }
 
         return services;

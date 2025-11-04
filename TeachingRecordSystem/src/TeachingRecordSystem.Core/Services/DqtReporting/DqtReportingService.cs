@@ -1,7 +1,6 @@
 using System.Data;
 using System.Diagnostics;
 using System.Text.Json;
-using Medallion.Threading;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +30,6 @@ public class DqtReportingService : BackgroundService
         .Build();
 
     private readonly DqtReportingOptions _options;
-    private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IClock _clock;
     private readonly IConfiguration _configuration;
     private readonly ILogger<DqtReportingService> _logger;
@@ -39,13 +37,11 @@ public class DqtReportingService : BackgroundService
 
     public DqtReportingService(
         IOptions<DqtReportingOptions> optionsAccessor,
-        IDistributedLockProvider distributedLockProvider,
         IClock clock,
         IConfiguration configuration,
         ILogger<DqtReportingService> logger)
     {
         _options = optionsAccessor.Value;
-        _distributedLockProvider = distributedLockProvider;
         _clock = clock;
         _configuration = configuration;
         _logger = logger;
@@ -75,12 +71,6 @@ public class DqtReportingService : BackgroundService
         IObserver<TrsReplicationStatus>? observer,
         CancellationToken cancellationToken)
     {
-        await using var @lock = await _distributedLockProvider.TryAcquireLockAsync(DistributedLockKeys.DqtReportingReplicationSlot());
-        if (@lock is null)
-        {
-            return;
-        }
-
         await using var replicationConn = new LogicalReplicationConnection(_configuration.GetPostgresConnectionString());
         await replicationConn.Open();
 
