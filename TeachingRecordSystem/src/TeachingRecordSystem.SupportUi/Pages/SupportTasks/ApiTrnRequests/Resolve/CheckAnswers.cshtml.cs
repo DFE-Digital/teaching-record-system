@@ -57,7 +57,7 @@ public class CheckAnswers(
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
-        EventModels.PersonAttributes? oldPersonAttributes;
+        EventModels.PersonDetails? oldPersonAttributes;
 
         var now = clock.UtcNow;
 
@@ -157,7 +157,7 @@ public class CheckAnswers(
             OldSupportTask = oldSupportTaskEventModel,
             RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
             Changes = changes,
-            PersonAttributes = new EventModels.PersonAttributes
+            PersonAttributes = new EventModels.PersonDetails
             {
                 FirstName = resolvedPersonAttributes.FirstName,
                 MiddleName = resolvedPersonAttributes.MiddleName,

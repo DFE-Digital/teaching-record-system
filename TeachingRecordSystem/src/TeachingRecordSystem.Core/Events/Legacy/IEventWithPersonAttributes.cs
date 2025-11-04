@@ -2,8 +2,8 @@ namespace TeachingRecordSystem.Core.Events.Legacy;
 
 public interface IEventWithPersonAttributes : IEventWithPersonId
 {
-    EventModels.PersonAttributes PersonAttributes { get; }
-    EventModels.PersonAttributes? OldPersonAttributes { get; }
+    EventModels.PersonDetails PersonAttributes { get; }
+    EventModels.PersonDetails? OldPersonAttributes { get; }
 }
 
 [Flags]

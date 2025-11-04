@@ -19,7 +19,7 @@ public record PotentialDuplicate
     public required PersonStatus Status { get; init; }
     public required InductionStatus InductionStatus { get; init; }
     public required int ActiveAlertCount { get; init; }
-    public required PersonAttributes Attributes { get; init; }
+    public required PersonDetails Attributes { get; init; }
     public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
 
     public bool HasActiveAlerts => ActiveAlertCount > 0;

@@ -105,7 +105,7 @@ public class CheckAnswersModel(
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         TeacherPensionsPotentialDuplicateAttributes? selectedPersonAttributes;
-        EventModels.PersonAttributes? oldPersonAttributes;
+        EventModels.PersonDetails? oldPersonAttributes;
         var now = clock.UtcNow;
 
         var existingContactId = state.PersonId!.Value;
@@ -113,7 +113,7 @@ public class CheckAnswersModel(
 
         selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
         var attributesToUpdate = GetAttributesToUpdate();
-        oldPersonAttributes = new EventModels.PersonAttributes()
+        oldPersonAttributes = new EventModels.PersonDetails()
         {
             FirstName = selectedPersonAttributes.FirstName,
             MiddleName = selectedPersonAttributes.MiddleName,
@@ -152,7 +152,7 @@ public class CheckAnswersModel(
             RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
             ChangeReason = TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordMerged,
             Changes = changes,
-            PersonAttributes = EventModels.PersonAttributes.FromModel(existingPerson!),
+            PersonAttributes = EventModels.PersonDetails.FromModel(existingPerson!),
             OldPersonAttributes = oldPersonAttributes,
             SupportTask = EventModels.SupportTask.FromModel(supportTask),
             OldSupportTask = oldSupportTaskEventModel,

@@ -5,8 +5,8 @@ public record ApiTrnRequestSupportTaskUpdatedEvent : SupportTaskUpdatedEvent, IE
     public required Guid PersonId { get; init; }
     public required EventModels.TrnRequestMetadata RequestData { get; init; }
     public required ApiTrnRequestSupportTaskUpdatedEventChanges Changes { get; init; }
-    public required EventModels.PersonAttributes PersonAttributes { get; init; }
-    public required EventModels.PersonAttributes? OldPersonAttributes { get; init; }
+    public required EventModels.PersonDetails PersonAttributes { get; init; }
+    public required EventModels.PersonDetails? OldPersonAttributes { get; init; }
     public required string? Comments { get; init; }
 }
 

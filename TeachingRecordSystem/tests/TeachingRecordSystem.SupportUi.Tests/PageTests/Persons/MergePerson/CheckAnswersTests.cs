@@ -327,7 +327,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         string SummaryListRowKey,
         Func<TestData.CreatePersonResult, object?> GetValueFromPersonResult,
         Func<Person, object?> GetValueFromPerson,
-        Func<PersonAttributes, object?> GetValueFromPersonAttributes,
+        Func<PersonDetails, object?> GetValueFromPersonAttributes,
         Func<object?, object?>? MapValueToSummaryListRowValue = null);
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>

@@ -86,7 +86,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             }
             : null;
 
-        var details = new EventModels.PersonAttributes
+        var details = new EventModels.PersonDetails
         {
             FirstName = updatedFirstName,
             MiddleName = updatedMiddleName,
@@ -97,7 +97,7 @@ public class ChangeLogEditDetailsEventTests : TestBase
             Gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) && !newValueIsDefault ? gender : null
         };
 
-        var oldDetails = new EventModels.PersonAttributes
+        var oldDetails = new EventModels.PersonDetails
         {
             FirstName = oldFirstName,
             MiddleName = oldMiddleName,

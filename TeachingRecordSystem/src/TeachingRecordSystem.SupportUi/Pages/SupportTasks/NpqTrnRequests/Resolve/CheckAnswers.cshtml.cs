@@ -54,7 +54,7 @@ public class CheckAnswersModel(
 
         var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         NpqTrnRequestDataPersonAttributes? selectedPersonAttributes;
-        EventModels.PersonAttributes? oldPersonAttributes;
+        EventModels.PersonDetails? oldPersonAttributes;
 
         var now = clock.UtcNow;
 
@@ -86,7 +86,7 @@ public class CheckAnswersModel(
                 RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
                 ChangeReason = NpqTrnRequestResolvedReason.RecordCreated,
                 Changes = NpqTrnRequestSupportTaskResolvedEventChanges.Status,
-                PersonAttributes = EventModels.PersonAttributes.FromModel(person),
+                PersonAttributes = EventModels.PersonDetails.FromModel(person),
                 OldPersonAttributes = oldPersonAttributes,
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),
                 OldSupportTask = oldSupportTaskEventModel,
@@ -108,7 +108,7 @@ public class CheckAnswersModel(
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            oldPersonAttributes = new EventModels.PersonAttributes()
+            oldPersonAttributes = new EventModels.PersonDetails()
             {
                 FirstName = selectedPersonAttributes.FirstName,
                 MiddleName = selectedPersonAttributes.MiddleName,
@@ -149,7 +149,7 @@ public class CheckAnswersModel(
                 RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
                 ChangeReason = NpqTrnRequestResolvedReason.RecordMerged,
                 Changes = changes,
-                PersonAttributes = new EventModels.PersonAttributes()
+                PersonAttributes = new EventModels.PersonDetails()
                 {
                     FirstName = resolvedPersonAttributes.FirstName,
                     MiddleName = resolvedPersonAttributes.MiddleName,
