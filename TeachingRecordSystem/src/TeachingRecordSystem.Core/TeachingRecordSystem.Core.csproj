@@ -263,8 +263,6 @@
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="dbup-sqlserver" />
-    <PackageReference Include="DistributedLock.Azure" />
-    <PackageReference Include="DistributedLock.FileSystem" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="EntityFrameworkCore.Projectables" />
     <PackageReference Include="FluentValidation" />

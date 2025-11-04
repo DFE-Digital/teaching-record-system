@@ -1,4 +1,3 @@
-using Medallion.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,21 +17,15 @@ public static class Extensions
 
         services.AddSingleton<IHostedService, DqtReportingService>();
 
-        services.AddStartupTask(async sp =>
+        services.AddStartupTask(sp =>
         {
-            var distributedLockProvider = sp.GetRequiredService<IDistributedLockProvider>();
-
-            await using var @lock = await distributedLockProvider.TryAcquireLockAsync(DistributedLockKeys.DqtReportingMigrations());
-            if (@lock is null)
-            {
-                return;
-            }
-
             var migrator = new Migrator(
                 connectionString: sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.ReportingDbConnectionString,
                 logger: sp.GetRequiredService<ILoggerFactory>().CreateLogger<Migrator>());
 
             migrator.MigrateDb();
+
+            return Task.CompletedTask;
         });
 
         return services;

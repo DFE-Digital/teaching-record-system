@@ -12,6 +12,7 @@
     <PackageVersion Include="AutoMapper" Version="13.0.1" />
     <PackageVersion Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" Version="1.5.1" />
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.25.0" />
+    <PackageVersion Include="Azure.Storage.Files.DataLake" Version="12.16.0" />
     <PackageVersion Include="Castle.Core" Version="5.1.1" />
     <PackageVersion Include="CloudNative.CloudEvents" Version="2.8.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
@@ -19,8 +20,6 @@
     <PackageVersion Include="DartSassBuilder" Version="1.1.0" />
     <PackageVersion Include="dbup-sqlserver" Version="5.0.37" />
     <PackageVersion Include="Dfe.Analytics" Version="0.2.6" />
-    <PackageVersion Include="DistributedLock.Azure" Version="1.0.0" />
-    <PackageVersion Include="DistributedLock.FileSystem" Version="1.0.2" />
     <PackageVersion Include="EFCore.NamingConventions" Version="9.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Projectables" Version="4.0.0" />
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
@@ -112,6 +111,5 @@
     <PackageVersion Include="xunit.v3" Version="3.2.0" />
     <PackageVersion Include="xunit.v3.assert" Version="3.2.0" />
     <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.0" />
-    <PackageVersion Include="Azure.Storage.Files.DataLake" Version="12.16.0" />
   </ItemGroup>
 </Project>
