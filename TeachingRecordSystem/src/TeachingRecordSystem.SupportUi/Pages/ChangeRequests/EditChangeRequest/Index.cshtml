@@ -48,6 +48,14 @@
                             <td class="govuk-table__cell" data-testid="last-name-new">@Model.NameChangeRequest!.NewLastName</td>
                         </tr>
                     }
+                    <tr class="govuk-table__row" data-testid="email">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="email-title">Email</td>
+                        <td class="govuk-table__cell" colspan="2" data-testid="email-value">@Model.Email</td>
+                    </tr>
+                    <tr class="govuk-table__row" data-testid="linked-record">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="linked-record-title">Linked record</td>
+                        <td class="govuk-table__cell" colspan="2" data-testid="linked-record-value">@Model.Trn</td>
+                    </tr>
                 </tbody>
             }
             @if (Model.ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
