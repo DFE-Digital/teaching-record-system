@@ -202,5 +202,5 @@ Only the `/tmp` directory has write permissions so make sure to specify that in 
 
 Then you can copy the file down using `kubectl cp` (obviously specifying the correct pod and namespace):
 ```shell
-> kubectl cp trs-production-ui-7644c65bc-8vbjm:/tmp/results.csv /local/path/results.csv -n tra-production --insecure-skip-tls-verify
+> kubectl cp trs-production-ui-7644c65bc-8vbjm:/tmp/results.csv /local/path/to/results.csv -n tra-production --insecure-skip-tls-verify
 ```
