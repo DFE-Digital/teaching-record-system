@@ -29,6 +29,8 @@ public class IndexModel(
 
     public string? Trn { get; set; }
 
+    public Guid? PersonId { get; set; }
+
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
@@ -61,6 +63,7 @@ public class IndexModel(
             person.LastName);
         Email = person.EmailAddress?.ToString();
         Trn = person.Trn;
+        PersonId = person.PersonId;
         ChangeType = supportTask.SupportTaskType;
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (supportTask.SupportTaskType == SupportTaskType.ChangeNameRequest)
