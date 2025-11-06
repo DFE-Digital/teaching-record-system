@@ -9,6 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
@@ -32,11 +33,7 @@ public class ChangeHistoryModel(
 
     public TimelineItem[]? TimelineItems { get; set; }
 
-    public int[]? PaginationPages { get; set; }
-
-    public bool GotPreviousPage { get; set; }
-
-    public bool GotNextPage { get; set; }
+    public PaginationViewModel? Pagination { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -179,9 +176,10 @@ public class ChangeHistoryModel(
         }
 
         var totalPages = (int)Math.Ceiling(allResults.Length / (decimal)PageSize);
-        PaginationPages = Enumerable.Range(1, totalPages).ToArray();
-        GotPreviousPage = PageNumber.Value > 1;
-        GotNextPage = PageNumber.Value < totalPages;
+        Pagination = new PaginationViewModel(
+            PageNumber.Value,
+            totalPages,
+            pageNumber => linkGenerator.Persons.PersonDetail.ChangeHistory(PersonId, pageNumber));
 
         return Page();
     }
