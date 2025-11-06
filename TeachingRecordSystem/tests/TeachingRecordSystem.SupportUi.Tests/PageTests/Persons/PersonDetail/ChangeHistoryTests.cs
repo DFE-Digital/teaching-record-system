@@ -71,19 +71,24 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             EventId = Guid.NewGuid(),
             PersonId = person.PersonId,
-            FirstName = person.FirstName,
-            MiddleName = person.MiddleName,
-            LastName = person.LastName,
-            DateOfBirth = person.DateOfBirth,
-            EmailAddress = person.EmailAddress,
-            NationalInsuranceNumber = person.NationalInsuranceNumber,
-            Gender = person.Gender,
-            Trn = person.Trn!,
-            DateOfDeath = person.Person.DateOfDeath,
-            QtsDate = person.QtsDate,
-            EytsDate = person.EytsDate,
-            InductionStatus = person.Person.InductionStatus,
-            DqtInductionStatus = person.Person.InductionStatus.ToDqtInductionStatus(out _)
+            Details = new EventModels.DqtPersonDetails
+            {
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                LastName = person.LastName,
+                DateOfBirth = person.DateOfBirth,
+                EmailAddress = person.EmailAddress,
+                NationalInsuranceNumber = person.NationalInsuranceNumber,
+                Gender = person.Gender,
+                Trn = person.Trn!,
+                DateOfDeath = person.Person.DateOfDeath,
+                QtsDate = person.QtsDate,
+                EytsDate = person.EytsDate,
+                InductionStatus = person.Person.InductionStatus,
+                DqtInductionStatus = person.Person.InductionStatus.ToDqtInductionStatus(out _),
+                QtlsDate = null,
+                QtlsStatus = QtlsStatus.None
+            }
         };
 
         var user = SystemUser.Instance;
@@ -287,6 +292,86 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
             "Record reactivated",
+            user.Name,
+            process.CreatedOn);
+    }
+
+    [Fact]
+    public async Task Get_WithPersonMergingInDqtProcess_ForDeactivatedRecord_RendersExpectedEntry()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var mergedWithPerson = await TestData.CreatePersonAsync();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            // Note Person.MergedWithPersonId isn't set for merges that happened in DQT
+            await dbContext.SaveChangesAsync();
+        });
+
+        var @event = new PersonDeactivatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MergedWithPersonId = mergedWithPerson.PersonId
+        };
+
+        var user = SystemUser.Instance;
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, @event);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            $"Record merged with TRN {mergedWithPerson.Trn} and deactivated",
+            user.Name,
+            process.CreatedOn);
+    }
+
+    [Fact]
+    public async Task Get_WithPersonMergingInDqtProcess_ForReatainedRecord_RendersExpectedEntry()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var mergedWithPerson = await TestData.CreatePersonAsync();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.Status = PersonStatus.Deactivated;
+            // Note Person.MergedWithPersonId isn't set for merges that happened in DQT
+            await dbContext.SaveChangesAsync();
+        });
+
+        var @event = new PersonDeactivatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MergedWithPersonId = mergedWithPerson.PersonId
+        };
+
+        var user = SystemUser.Instance;
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, @event);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{mergedWithPerson.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            $"Record merged with TRN {person.Trn}",
             user.Name,
             process.CreatedOn);
     }
