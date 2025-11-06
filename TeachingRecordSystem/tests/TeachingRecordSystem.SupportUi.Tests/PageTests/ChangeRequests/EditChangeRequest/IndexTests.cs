@@ -157,6 +157,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             Assert.NotNull(doc.GetElementByTestId($"image-{changeNameRequestData.EvidenceFileId}"));
             Assert.Null(doc.GetElementByTestId($"pdf-{changeNameRequestData.EvidenceFileId}"));
         }
+
+        Assert.NotNull(doc.GetElementByTestId("email"));
+        Assert.NotNull(doc.GetElementByTestId("linked-record"));
     }
 
     [Fact]
@@ -187,5 +190,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var imageDocument = doc.GetElementByTestId($"image-{changeDateOfBirthRequestData.EvidenceFileId}");
         Assert.NotNull(imageDocument);
+
+        Assert.NotNull(doc.GetElementByTestId("email"));
+        Assert.NotNull(doc.GetElementByTestId("linked-record"));
     }
 }

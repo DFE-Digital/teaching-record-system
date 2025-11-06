@@ -48,18 +48,6 @@
                             <td class="govuk-table__cell" data-testid="last-name-new">@Model.NameChangeRequest!.NewLastName</td>
                         </tr>
                     }
-                    <tr class="govuk-table__row" data-testid="email">
-                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="email-title">Email</td>
-                        <td class="govuk-table__cell" colspan="2" data-testid="email-value">@Model.Email</td>
-                    </tr>
-                    <tr class="govuk-table__row" data-testid="linked-record">
-                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="linked-record-title">Linked record</td>
-                        <td class="govuk-table__cell" colspan="2" data-testid="linked-record-value">
-                            <a href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId!.Value)" target="_blank" rel="noopener noreferrer" class="govuk-link">
-                                @Model.Trn (opens in a new tab)
-                            </a>
-                        </td>
-                    </tr>
                 }
                 @if (Model.ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
                 {
@@ -68,19 +56,19 @@
                         <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                     </tr>
-                    <tr class="govuk-table__row" data-testid="email">
-                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="email-title">Email</td>
-                        <td class="govuk-table__cell" colspan="2" data-testid="email-value">@Model.Email</td>
-                    </tr>
-                    <tr class="govuk-table__row" data-testid="linked-record">
-                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="linked-record-title">Linked record</td>
-                        <td class="govuk-table__cell" colspan="2" data-testid="linked-record-value">
-                            <a href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId!.Value)" target="_blank" rel="noopener noreferrer" class="govuk-link">
-                                @Model.Trn (opens in a new tab)
-                            </a>
-                        </td>
-                    </tr>
                 }
+                <tr class="govuk-table__row" data-testid="email">
+                    <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="email-title">Email</td>
+                    <td class="govuk-table__cell" colspan="2" data-testid="email-value">@Model.Email</td>
+                </tr>
+                <tr class="govuk-table__row" data-testid="linked-record">
+                    <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="linked-record-title">Linked record</td>
+                    <td class="govuk-table__cell" colspan="2" data-testid="linked-record-value">
+                        <a href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId!.Value)" target="_blank" rel="noopener noreferrer" class="govuk-link">
+                            @Model.Trn (opens in a new tab)
+                        </a>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
