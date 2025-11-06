@@ -190,19 +190,37 @@ public class ChangeHistoryTests(HostFixture hostFixture) : TestBase(hostFixture)
             "Record updated",
             user.Name,
             process.CreatedOn,
-            ("TRN", person.Trn),
-            ("Name", $"{person.FirstName} {person.MiddleName} {person.LastName}"),
-            ("Date of birth", person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)),
-            ("Email address", person.EmailAddress),
-            ("National Insurance number", person.NationalInsuranceNumber),
-            ("Gender", person.Gender?.GetDisplayName()),
-            ("Date of death", person.Person.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-            ("QTS held since", person.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-            ("EYTS held since", person.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
-            ("QTLS held since", qtlsDate.ToString(UiDefaults.DateOnlyDisplayFormat)),
-            ("Qualified teacher learning and skills status (QTLS)", qtlsStatus.GetDisplayName()),
-            ("Induction status", person.Person.InductionStatus.GetDisplayName()),
-            ("DQT induction status", person.Person.InductionStatus.ToDqtInductionStatus(out _)));
+            expectedSummaryListRows:
+            [
+                ("TRN", person.Trn),
+                ("Name", $"{person.FirstName} {person.MiddleName} {person.LastName}"),
+                ("Date of birth", person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("Email address", person.EmailAddress),
+                ("National Insurance number", person.NationalInsuranceNumber),
+                ("Gender", person.Gender?.GetDisplayName()),
+                ("Date of death", person.Person.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("QTS held since", person.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("EYTS held since", person.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("QTLS held since", qtlsDate.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("Qualified teacher learning and skills status (QTLS)", qtlsStatus.GetDisplayName()),
+                ("Induction status", person.Person.InductionStatus.GetDisplayName()),
+                ("DQT induction status", person.Person.InductionStatus.ToDqtInductionStatus(out _))
+            ],
+            [
+                ("TRN", @event.OldDetails.Trn),
+                ("Name", $"{@event.OldDetails.FirstName} {@event.OldDetails.MiddleName} {@event.OldDetails.LastName}"),
+                ("Date of birth", @event.OldDetails.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("Email address", @event.OldDetails.EmailAddress),
+                ("National Insurance number", @event.OldDetails.NationalInsuranceNumber),
+                ("Gender", @event.OldDetails.Gender?.GetDisplayName()),
+                ("Date of death", @event.OldDetails.DateOfDeath?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("QTS held since", @event.OldDetails.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("EYTS held since", @event.OldDetails.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)),
+                ("QTLS held since", null),
+                ("Qualified teacher learning and skills status (QTLS)", QtlsStatus.None.GetDisplayName()),
+                ("Induction status", @event.OldDetails.InductionStatus.GetDisplayName()),
+                ("DQT induction status", @event.OldDetails.DqtInductionStatus)
+            ]);
     }
 
     [Fact]
@@ -284,6 +302,25 @@ file static class Extensions
         DateTime expectedTimestamp,
         params (string Key, string? Value)[] expectedSummaryListRows)
     {
+        AssertHasChangeHistoryEntry(
+            doc,
+            processId,
+            expectedTitle,
+            expectedUserName,
+            expectedTimestamp,
+            expectedSummaryListRows,
+            expectedPreviousDataSummaryListRows: []);
+    }
+
+    public static void AssertHasChangeHistoryEntry(
+        this IHtmlDocument doc,
+        Guid processId,
+        string expectedTitle,
+        string expectedUserName,
+        DateTime expectedTimestamp,
+        IReadOnlyCollection<(string Key, string? Value)> expectedSummaryListRows,
+        IReadOnlyCollection<(string Key, string? Value)> expectedPreviousDataSummaryListRows)
+    {
         var changeHistoryItem = doc.GetElementByDataAttribute("data-process-id", processId.ToString());
         if (changeHistoryItem is null)
         {
@@ -297,7 +334,7 @@ file static class Extensions
         var expectedDateBlock = $"By {expectedUserName} on {expectedTimestamp:d MMMMM yyyy 'at' h:mm tt}";
         Assert.Equal(expectedDateBlock, date?.TrimmedText().ReplaceLineEndings(" "), ignoreAllWhiteSpace: true);
 
-        if (expectedSummaryListRows.Length > 0)
+        if (expectedSummaryListRows.Count > 0)
         {
             var description = changeHistoryItem.GetElementsByClassName("moj-timeline__description").SingleOrDefault()?.FirstElementChild;
             if (description is null)
@@ -307,6 +344,19 @@ file static class Extensions
 
             description.AssertSummaryListHasRows(
                 expectedSummaryListRows.Select(e => e with { Value = e.Value ?? UiDefaults.EmptyDisplayContent }).ToArray());
+        }
+
+        if (expectedPreviousDataSummaryListRows.Count > 0)
+        {
+            var previousDetails = changeHistoryItem.GetElementsByClassName("govuk-details").SingleOrDefault()?
+                .GetElementsByClassName("govuk-summary-list").SingleOrDefault();
+            if (previousDetails is null)
+            {
+                throw new XunitException("Cannot find Previous Details.");
+            }
+
+            previousDetails.AssertSummaryListHasRows(
+                expectedPreviousDataSummaryListRows.Select(e => e with { Value = e.Value ?? UiDefaults.EmptyDisplayContent }).ToArray());
         }
     }
 }
