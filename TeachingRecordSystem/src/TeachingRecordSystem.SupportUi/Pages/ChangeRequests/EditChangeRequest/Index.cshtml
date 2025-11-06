@@ -1,7 +1,7 @@
 @page "/change-requests/{supportTaskReference}/{handler?}/{id?}"
 @model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.IndexModel
 @{
-    ViewBag.Title = "Request";
+    ViewBag.Title = "Change details request";
 }
 
 @section BeforeContent {
@@ -24,7 +24,7 @@
             <tbody class="govuk-table__body">
                 @if (Model.ChangeType == SupportTaskType.ChangeNameRequest)
                 {
-                    if (Model.NameChangeRequest!.CurrentFirstName != Model.NameChangeRequest!.NewFirstName)
+                    if (Model.NameChangeRequest!.NewFirstName is not null && Model.NameChangeRequest!.CurrentFirstName != Model.NameChangeRequest!.NewFirstName)
                     {
                         <tr class="govuk-table__row" data-testid="first-name">
                             <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="first-name-title">First name</td>
@@ -32,7 +32,7 @@
                             <td class="govuk-table__cell" data-testid="first-name-new">@Model.NameChangeRequest!.NewFirstName</td>
                         </tr>
                     }
-                    if (Model.NameChangeRequest!.CurrentMiddleName != Model.NameChangeRequest!.NewMiddleName)
+                    if (Model.NameChangeRequest!.NewMiddleName is not null && Model.NameChangeRequest!.CurrentMiddleName != Model.NameChangeRequest!.NewMiddleName)
                     {
                         <tr class="govuk-table__row" data-testid="middle-name">
                             <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="middle-name-title">Middle name</td>
@@ -40,7 +40,7 @@
                             <td class="govuk-table__cell" data-testid="middle-name-new">@Model.NameChangeRequest!.NewMiddleName</td>
                         </tr>
                     }
-                    if (Model.NameChangeRequest!.CurrentLastName != Model.NameChangeRequest!.NewLastName)
+                    if (Model.NameChangeRequest!.NewLastName is not null && Model.NameChangeRequest!.CurrentLastName != Model.NameChangeRequest!.NewLastName)
                     {
                         <tr class="govuk-table__row" data-testid="last-name">
                             <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="last-name-title">Last name</td>
