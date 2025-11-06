@@ -490,6 +490,142 @@ public class CreateTrnRequestTests : OperationTestBase
         await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: false);
     }
 
+    [Fact]
+    public async Task HandleAsync_RequestWithMissingNino_MatchingAllOfFirstNameLastNameDobEmailAndGender_ReturnsTrn()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithNationalInsuranceNumber()
+            .WithEmailAddress()
+            .WithGender());
+        Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+
+        var command = CreateCommand() with
+        {
+            FirstName = matchedPerson.FirstName,
+            LastName = matchedPerson.LastName,
+            DateOfBirth = matchedPerson.DateOfBirth,
+            EmailAddresses = [matchedPerson.EmailAddress!],
+            Gender = matchedPerson.Gender,
+            NationalInsuranceNumber = null
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Completed, success.Status);
+        Assert.NotNull(success.Trn);
+        Assert.NotNull(success.AccessYourTeachingQualificationsLink);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var metadata = await dbContext.TrnRequestMetadata
+                .SingleAsync(m => m.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId && m.RequestId == command.RequestId);
+            Assert.Equal(TrnRequestStatus.Completed, metadata.Status);
+            Assert.Equal(matchedPerson.PersonId, metadata.ResolvedPersonId);
+
+            var supportTasks = await dbContext.SupportTasks
+                .Where(t => t.SupportTaskType == SupportTaskType.TrnRequestManualChecksNeeded &&
+                    t.TrnRequestMetadata!.ApplicationUserId == CurrentUserProvider.GetCurrentApplicationUser().UserId &&
+                    t.TrnRequestMetadata!.RequestId == command.RequestId)
+                .ToArrayAsync();
+
+            Assert.Empty(supportTasks);
+        });
+    }
+
+    [Theory]
+    [InlineData(/* firstName: */ Field.DoesNotMatch, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.DoesNotMatch, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.DoesNotMatch, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.DoesNotMatch, /* gender: */ Field.Matches)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.DoesNotMatch)]
+    // Date of birth is optional on record but required on request
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.MissingFromRecord, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
+    // Email address is optional on both record and request
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.MissingFromRecord, /* gender: */ Field.Matches)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.MissingFromRequest, /* gender: */ Field.Matches)]
+    // Gender is optional on both record and request
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.MissingFromRecord)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.MissingFromRequest)]
+    public async Task HandleAsync_RequestWithMissingNino_NotMatchingOnAllOfFirstNameLastNameDobEmailAndGender_CreatesSupportTaskAndDoesNotReturnTrn(
+        Field firstName, Field lastName, Field dob, Field email, Field gender)
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithNationalInsuranceNumber()
+            .WithEmailAddress(email != Field.MissingFromRecord)
+            .WithGender(gender != Field.MissingFromRecord));
+        if (dob == Field.MissingFromRecord)
+        {
+            await WithDbContextAsync(async dbContext =>
+            {
+                var person = await dbContext.Persons.SingleAsync(p => p.PersonId == matchedPerson.PersonId);
+                person.DateOfBirth = null;
+                await dbContext.SaveChangesAsync();
+            });
+        }
+        Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+
+        var command = CreateCommand() with
+        {
+            FirstName = firstName switch
+            {
+                Field.Matches => matchedPerson.FirstName,
+                _ => TestData.GenerateChangedFirstName(matchedPerson.FirstName)
+            },
+            LastName = lastName switch
+            {
+                Field.Matches => matchedPerson.LastName,
+                _ => TestData.GenerateChangedFirstName(matchedPerson.LastName)
+            },
+            DateOfBirth = dob switch
+            {
+                Field.Matches => matchedPerson.DateOfBirth,
+                Field.MissingFromRecord => TestData.GenerateDateOfBirth(),
+                _ => TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth)
+            },
+            EmailAddresses = email switch
+            {
+                Field.MissingFromRequest => [],
+                Field.Matches => [matchedPerson.EmailAddress!],
+                _ => [TestData.GenerateUniqueEmail()]
+            },
+            Gender = gender switch
+            {
+                Field.MissingFromRequest => null,
+                Field.Matches => matchedPerson.Gender,
+                Field.MissingFromRecord => TestData.GenerateGender(),
+                _ => TestData.GenerateChangedGender(matchedPerson.Gender)
+            },
+            NationalInsuranceNumber = null
+        };
+
+        // Act
+        var result = await ExecuteCommandAsync(command);
+
+        // Assert
+        var success = AssertSuccess(result);
+
+        Assert.Equal(command.RequestId, success.RequestId);
+        Assert.Equal(TrnRequestStatus.Pending, success.Status);
+        Assert.Null(success.Trn);
+        Assert.Null(success.AccessYourTeachingQualificationsLink);
+        AssertResultPersonMatchesCommand(command, success.Person);
+
+        var persons = await WithDbContextAsync(dbContext =>
+            dbContext.Persons.Where(p => p.PersonId != matchedPerson.PersonId).ToArrayAsync());
+        Assert.Empty(persons);
+
+        await AssertSupportTaskCreatedAsync(CurrentUserProvider.GetCurrentApplicationUser().UserId, command.RequestId);
+
+        await AssertMetadataMatchesCommandAsync(command, expectedPotentialDuplicate: true);
+    }
+
     private CreateTrnRequestCommand CreateCommand() => new CreateTrnRequestCommand
     {
         RequestId = Guid.NewGuid().ToString(),
@@ -638,5 +774,13 @@ public class CreateTrnRequestTests : OperationTestBase
             .Where(c => !(c.Contains(MatchedField.DateOfBirth) &&
                           (c.Contains(MatchedField.TrsNationalInsuranceNumber) || c.Contains(MatchedField.WorkforceNationalInsuranceNumber))))
             .Select(c => new TheoryDataRow(c.ToArray()));
+    }
+
+    public enum Field
+    {
+        Matches,
+        DoesNotMatch,
+        MissingFromRequest,
+        MissingFromRecord
     }
 }
