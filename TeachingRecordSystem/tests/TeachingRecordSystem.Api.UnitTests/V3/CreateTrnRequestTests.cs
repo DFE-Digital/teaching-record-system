@@ -539,28 +539,40 @@ public class CreateTrnRequestTests : OperationTestBase
     }
 
     [Theory]
-    [InlineData(/* firstName: */ Field.DoesNotMatch, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.DoesNotMatch, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.DoesNotMatch, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.DoesNotMatch, /* gender: */ Field.Matches)]
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.DoesNotMatch)]
+    [InlineData(/* firstName: */ Field.DoesNotMatch, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.DoesNotMatch, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.DoesNotMatch, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.DoesNotMatch, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.DoesNotMatch, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.DoesNotMatch, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.DoesNotMatch, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.DoesNotMatch, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.DoesNotMatch, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.DoesNotMatch, /* nino */ Field.EmptyOnRequest)]
     // Date of birth is optional on record but required on request
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.MissingFromRecord, /* email: */ Field.Matches, /* gender: */ Field.Matches)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.NullOnRecord, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.NullOnRecord, /* email: */ Field.Matches, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
     // Email address is optional on both record and request
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.MissingFromRecord, /* gender: */ Field.Matches)]
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.MissingFromRequest, /* gender: */ Field.Matches)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.NullOnRecord, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.NullOnRecord, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.NullOnRequest, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.NullOnRequest, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.EmptyOnRequest, /* gender: */ Field.Matches, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.EmptyOnRequest, /* gender: */ Field.Matches, /* nino */ Field.EmptyOnRequest)]
     // Gender is optional on both record and request
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.MissingFromRecord)]
-    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.MissingFromRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.NullOnRecord, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.NullOnRecord, /* nino */ Field.EmptyOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.NullOnRequest, /* nino */ Field.NullOnRequest)]
+    [InlineData(/* firstName: */ Field.Matches, /* lastName: */ Field.Matches, /* dob: */ Field.Matches, /* email: */ Field.Matches, /* gender: */ Field.NullOnRequest, /* nino */ Field.EmptyOnRequest)]
     public async Task HandleAsync_RequestWithMissingNino_NotMatchingOnAllOfFirstNameLastNameDobEmailAndGender_CreatesSupportTaskAndDoesNotReturnTrn(
-        Field firstName, Field lastName, Field dob, Field email, Field gender)
+        Field firstName, Field lastName, Field dob, Field email, Field gender, Field nino)
     {
         // Arrange
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithNationalInsuranceNumber()
-            .WithEmailAddress(email != Field.MissingFromRecord)
-            .WithGender(gender != Field.MissingFromRecord));
-        if (dob == Field.MissingFromRecord)
+            .WithEmailAddress(email != Field.NullOnRecord)
+            .WithGender(gender != Field.NullOnRecord));
+        if (dob == Field.NullOnRecord)
         {
             await WithDbContextAsync(async dbContext =>
             {
@@ -586,23 +598,28 @@ public class CreateTrnRequestTests : OperationTestBase
             DateOfBirth = dob switch
             {
                 Field.Matches => matchedPerson.DateOfBirth,
-                Field.MissingFromRecord => TestData.GenerateDateOfBirth(),
+                Field.NullOnRecord => TestData.GenerateDateOfBirth(),
                 _ => TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth)
             },
             EmailAddresses = email switch
             {
-                Field.MissingFromRequest => [],
+                Field.EmptyOnRequest => [string.Empty],
+                Field.NullOnRequest => [],
                 Field.Matches => [matchedPerson.EmailAddress!],
                 _ => [TestData.GenerateUniqueEmail()]
             },
             Gender = gender switch
             {
-                Field.MissingFromRequest => null,
+                Field.NullOnRequest => null,
                 Field.Matches => matchedPerson.Gender,
-                Field.MissingFromRecord => TestData.GenerateGender(),
+                Field.NullOnRecord => TestData.GenerateGender(),
                 _ => TestData.GenerateChangedGender(matchedPerson.Gender)
             },
-            NationalInsuranceNumber = null
+            NationalInsuranceNumber = nino switch
+            {
+                Field.EmptyOnRequest => string.Empty,
+                _ => null
+            },
         };
 
         // Act
@@ -780,7 +797,8 @@ public class CreateTrnRequestTests : OperationTestBase
     {
         Matches,
         DoesNotMatch,
-        MissingFromRequest,
-        MissingFromRecord
+        NullOnRequest,
+        EmptyOnRequest,
+        NullOnRecord
     }
 }

@@ -131,7 +131,8 @@ public partial class PersonMatchingServiceTests
 
             var nationalInsuranceNumber = nationalInsuranceNumberOption switch
             {
-                NationalInsuranceNumberArgumentOption.NotProvided => null,
+                NationalInsuranceNumberArgumentOption.Null => null,
+                NationalInsuranceNumberArgumentOption.Empty => string.Empty,
                 NationalInsuranceNumberArgumentOption.MatchesPersonNino => person.NationalInsuranceNumber!,
                 NationalInsuranceNumberArgumentOption.MatchesEmploymentNino => personEmployment.NationalInsuranceNumber!,
                 _ => TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!)
@@ -353,7 +354,16 @@ public partial class PersonMatchingServiceTests
             dateOfBirth: DateOfBirthArgumentOption.Matches,
             emailAddress: EmailAddressArgumentOption.Matches,
             gender: GenderArgumentOption.Matches,
-            nationalInsuranceNumber: NationalInsuranceNumberArgumentOption.NotProvided);
+            nationalInsuranceNumber: NationalInsuranceNumberArgumentOption.Null);
+
+        data.AddCase(
+            TrnRequestMatchResultOutcome.DefiniteMatch,
+            firstName: FirstNameArgumentOption.Matches,
+            lastName: LastNameArgumentOption.Matches,
+            dateOfBirth: DateOfBirthArgumentOption.Matches,
+            emailAddress: EmailAddressArgumentOption.Matches,
+            gender: GenderArgumentOption.Matches,
+            nationalInsuranceNumber: NationalInsuranceNumberArgumentOption.Empty);
 
         var allSubsetsExcludingNino = MatchableAttributes
             .Except(["NationalInsuranceNumber", "WorkforceNationalInsuranceNumber"])
@@ -392,7 +402,17 @@ public partial class PersonMatchingServiceTests
                 matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
-                NationalInsuranceNumberArgumentOption.NotProvided);
+                NationalInsuranceNumberArgumentOption.Null);
+
+            data.AddCase(
+                TrnRequestMatchResultOutcome.PotentialMatches,
+                matchedAttrs.Contains("EmailAddress") ? EmailAddressArgumentOption.Matches : EmailAddressArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("FirstName") ? FirstNameArgumentOption.Matches : matchedAttrs.Contains("FirstNameAlias") ? FirstNameArgumentOption.MatchesAlias : FirstNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
+                NationalInsuranceNumberArgumentOption.Empty);
         }
 
         // Match on 2 or fewer attributes
@@ -435,7 +455,18 @@ public partial class PersonMatchingServiceTests
                 matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
                 matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
-                NationalInsuranceNumberArgumentOption.NotProvided);
+                NationalInsuranceNumberArgumentOption.Null);
+
+            data.AddCase(
+                TrnRequestMatchResultOutcome.NoMatches,
+                matchedAttrs.Contains("EmailAddress") ? EmailAddressArgumentOption.Matches : EmailAddressArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("FirstName") ? FirstNameArgumentOption.Matches
+                    : matchedAttrs.Contains("FirstNameAlias") ? FirstNameArgumentOption.MatchesAlias : FirstNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("MiddleName") ? MiddleNameArgumentOption.Matches : MiddleNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("LastName") ? LastNameArgumentOption.Matches : LastNameArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("DateOfBirth") ? DateOfBirthArgumentOption.Matches : DateOfBirthArgumentOption.DoesNotMatch,
+                matchedAttrs.Contains("Gender") ? GenderArgumentOption.Matches : GenderArgumentOption.DoesNotMatch,
+                NationalInsuranceNumberArgumentOption.Empty);
         }
 
         return data;
@@ -550,7 +581,8 @@ public partial class PersonMatchingServiceTests
 
         public enum NationalInsuranceNumberArgumentOption
         {
-            NotProvided,
+            Null,
+            Empty,
             MatchesPersonNino,
             MatchesEmploymentNino,
             DoesNotMatch

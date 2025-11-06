@@ -215,7 +215,13 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         return (request, results) switch
         {
 #pragma warning disable format
-            ({NationalInsuranceNumber: null}, [{ first_name_matches: true, last_name_matches: true, date_of_birth_matches: true, email_address_matches: true, gender_matches: true } singleMatch]) =>
+            ({NationalInsuranceNumber: var nino}, [{
+                first_name_matches: true,
+                last_name_matches: true,
+                date_of_birth_matches: true,
+                email_address_matches: true,
+                gender_matches: true
+            } singleMatch]) when String.IsNullOrEmpty(nino) =>
                 TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
             (_, [{ date_of_birth_matches: true, national_insurance_number_matches: true } singleMatch]) =>
                 TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
