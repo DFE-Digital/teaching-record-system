@@ -74,7 +74,7 @@ public partial class TestData
             return this;
         }
 
-        public async Task<SupportTask> ExecuteAsync(TestData testData)
+        public Task<SupportTask> ExecuteAsync(TestData testData)
         {
             var firstName = _firstName.ValueOr(testData.GenerateFirstName);
             var middleName = _middleName.ValueOr(testData.GenerateMiddleName);
@@ -108,7 +108,7 @@ public partial class TestData
                 out var createdEvent);
             supportTask.Status = status;
 
-            return await testData.WithDbContextAsync(async dbContext =>
+            return testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.SupportTasks.Add(supportTask);
                 dbContext.AddEventWithoutBroadcast(createdEvent);

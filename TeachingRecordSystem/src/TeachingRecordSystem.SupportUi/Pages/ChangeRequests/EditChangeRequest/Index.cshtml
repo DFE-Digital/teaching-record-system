@@ -1,7 +1,7 @@
 @page "/change-requests/{supportTaskReference}/{handler?}/{id?}"
 @model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.IndexModel
 @{
-    ViewBag.Title = "Request";
+    ViewBag.Title = "Change details request";
 }
 
 @section BeforeContent {
@@ -13,18 +13,18 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <table class="govuk-table">         
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
-                        <th scope="col" class="govuk-table__header">Current</th>
-                        <th scope="col" class="govuk-table__header">New</th>
-                    </tr>
-                </thead>
-            @if (Model.ChangeType == SupportTaskType.ChangeNameRequest)
-            {
-                <tbody class="govuk-table__body">
-                    @if (Model.NameChangeRequest!.CurrentFirstName != Model.NameChangeRequest!.NewFirstName)
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                    <th scope="col" class="govuk-table__header">Current</th>
+                    <th scope="col" class="govuk-table__header">New</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if (Model.ChangeType == SupportTaskType.ChangeNameRequest)
+                {
+                    if (Model.NameChangeRequest!.NewFirstName is not null && Model.NameChangeRequest!.CurrentFirstName != Model.NameChangeRequest!.NewFirstName)
                     {
                         <tr class="govuk-table__row" data-testid="first-name">
                             <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="first-name-title">First name</td>
@@ -32,7 +32,7 @@
                             <td class="govuk-table__cell" data-testid="first-name-new">@Model.NameChangeRequest!.NewFirstName</td>
                         </tr>
                     }
-                    @if (Model.NameChangeRequest!.CurrentMiddleName != Model.NameChangeRequest!.NewMiddleName)
+                    if (Model.NameChangeRequest!.NewMiddleName is not null && Model.NameChangeRequest!.CurrentMiddleName != Model.NameChangeRequest!.NewMiddleName)
                     {
                         <tr class="govuk-table__row" data-testid="middle-name">
                             <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="middle-name-title">Middle name</td>
@@ -40,7 +40,7 @@
                             <td class="govuk-table__cell" data-testid="middle-name-new">@Model.NameChangeRequest!.NewMiddleName</td>
                         </tr>
                     }
-                    @if (Model.NameChangeRequest!.CurrentLastName != Model.NameChangeRequest!.NewLastName)
+                    if (Model.NameChangeRequest!.NewLastName is not null && Model.NameChangeRequest!.CurrentLastName != Model.NameChangeRequest!.NewLastName)
                     {
                         <tr class="govuk-table__row" data-testid="last-name">
                             <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="last-name-title">Last name</td>
@@ -48,18 +48,28 @@
                             <td class="govuk-table__cell" data-testid="last-name-new">@Model.NameChangeRequest!.NewLastName</td>
                         </tr>
                     }
-                </tbody>
-            }
-            @if (Model.ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
-            {             
-                <tbody class="govuk-table__body">
+                }
+                @if (Model.ChangeType == SupportTaskType.ChangeDateOfBirthRequest)
+                {
                     <tr class="govuk-table__row" data-testid="date-of-birth">
                         <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="date-of-birth-title">Date of birth</td>
                         <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                     </tr>
-                </tbody>
-            }
+                }
+                <tr class="govuk-table__row" data-testid="email">
+                    <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="email-title">Email</td>
+                    <td class="govuk-table__cell" colspan="2" data-testid="email-value">@Model.Email</td>
+                </tr>
+                <tr class="govuk-table__row" data-testid="linked-record">
+                    <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="linked-record-title">Linked record</td>
+                    <td class="govuk-table__cell" colspan="2" data-testid="linked-record-value">
+                        <a href="@LinkGenerator.Persons.PersonDetail.Index(Model.PersonId!.Value)" target="_blank" rel="noopener noreferrer" class="govuk-link">
+                            @Model.Trn (opens in a new tab)
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>

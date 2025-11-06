@@ -25,6 +25,12 @@ public class IndexModel(
 
     public EvidenceInfo? Evidence { get; set; }
 
+    public string? Email { get; set; }
+
+    public string? Trn { get; set; }
+
+    public Guid? PersonId { get; set; }
+
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
@@ -55,7 +61,9 @@ public class IndexModel(
             person.FirstName,
             person.MiddleName,
             person.LastName);
-
+        Email = person.EmailAddress?.ToString();
+        Trn = person.Trn;
+        PersonId = person.PersonId;
         ChangeType = supportTask.SupportTaskType;
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (supportTask.SupportTaskType == SupportTaskType.ChangeNameRequest)
