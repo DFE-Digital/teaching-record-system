@@ -318,6 +318,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillUsersInReportingDb>(
+                nameof(BackfillUsersInReportingDb),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             return Task.CompletedTask;
         });
 
