@@ -61,7 +61,7 @@ public class IndexModel(
             person.FirstName,
             person.MiddleName,
             person.LastName);
-        Email = person.EmailAddress?.ToString();
+
         Trn = person.Trn;
         PersonId = person.PersonId;
         ChangeType = supportTask.SupportTaskType;
@@ -78,6 +78,7 @@ public class IndexModel(
                 NewMiddleName = data.MiddleName,
                 NewLastName = data.LastName
             };
+            Email = data.EmailAddress;
 
             if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))
             {
@@ -101,6 +102,7 @@ public class IndexModel(
                 CurrentDateOfBirth = person.DateOfBirth!.Value,
                 NewDateOfBirth = data.DateOfBirth
             };
+            Email = data.EmailAddress;
 
             if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))
             {

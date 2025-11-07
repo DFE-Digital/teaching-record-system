@@ -158,7 +158,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             Assert.Null(doc.GetElementByTestId($"pdf-{changeNameRequestData.EvidenceFileId}"));
         }
 
-        Assert.NotNull(doc.GetElementByTestId("email"));
+        Assert.Equal(changeNameRequestData.EmailAddress, doc.GetElementByTestId("email")?.InnerHtml);
         Assert.NotNull(doc.GetElementByTestId("linked-record"));
     }
 
