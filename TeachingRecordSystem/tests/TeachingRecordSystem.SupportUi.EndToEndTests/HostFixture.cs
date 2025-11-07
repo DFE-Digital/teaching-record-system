@@ -8,7 +8,6 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
@@ -78,8 +77,6 @@ public sealed class HostFixture : InitializeDbFixture
                         .AddStartupTask<TestUsers.CreateUsersStartupTask>()
                         .AddSingleton(DbHelper.Instance)
                         .AddSingleton<TestData>()
-                        .AddSingleton<FakeTrnGenerator>()
-                        .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
                         .AddSingleton<IAuditRepository, TestableAuditRepository>()
                         .AddSingleton(GetMockFileService())
                         .AddSingleton(GetMockAdUserService())

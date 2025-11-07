@@ -34,7 +34,7 @@ public class CompositionRoot : IAsyncLifetime
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
             .AddSingleton<IClock, TestableClock>()
-            .AddSingleton<FakeTrnGenerator>();
+            .AddTestTrnGeneration();
 
         return services.BuildServiceProvider();
     }

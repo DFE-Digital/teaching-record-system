@@ -10,7 +10,6 @@ public class NightlyEmailJobFixture
     public NightlyEmailJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
         ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
@@ -21,8 +20,7 @@ public class NightlyEmailJobFixture
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     public TestableClock Clock { get; }

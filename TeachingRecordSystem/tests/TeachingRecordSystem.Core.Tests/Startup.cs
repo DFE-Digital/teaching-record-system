@@ -25,7 +25,7 @@ public class Startup
                     .AddMemoryCache()
                     .AddDatabase(context.Configuration)
                     .AddSingleton<DbFixture>()
-                    .AddSingleton<FakeTrnGenerator>()
+                    .AddTestTrnGeneration()
                     .AddSingleton<ReferenceDataCache>()
                     .AddSingleton<TestData>()
                     .AddSingleton<WebhookReceiver>()
@@ -38,6 +38,4 @@ public class Startup
                     .AddEventPublisher()
                     .AddSupportTaskService();
             });
-
-
 }

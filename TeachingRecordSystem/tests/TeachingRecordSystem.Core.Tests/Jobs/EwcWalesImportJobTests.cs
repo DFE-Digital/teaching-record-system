@@ -74,7 +74,6 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
     public EwcWalesImportJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
         IServiceProvider provider)
     {
         DbFixture = dbFixture;
@@ -106,8 +105,7 @@ public class EwcWalesImportJobFixture : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     public DbFixture DbFixture { get; }

@@ -11,7 +11,6 @@ using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
@@ -91,8 +90,6 @@ public sealed class HostFixture : InitializeDbFixture
                     services
                         .AddSingleton(DbHelper.Instance)
                         .AddSingleton<TestData>()
-                        .AddSingleton<FakeTrnGenerator>()
-                        .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
                         .AddSingleton<OneLoginCurrentUserProvider>()
                         .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                         .AddSingleton(GetMockFileService())

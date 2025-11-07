@@ -942,7 +942,6 @@ public class CapitaExportNewJobFixture
     public CapitaExportNewJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
         IServiceProvider provider,
         ILoggerFactory loggerFactory,
         IConfiguration configuration,
@@ -976,8 +975,7 @@ public class CapitaExportNewJobFixture
         TestData = new TestData(
             DbFixture.DbHelper.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     public DbFixture DbFixture { get; }

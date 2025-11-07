@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -20,7 +21,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobTests(AllocateTrnsToOverseasN
     public TestableClock Clock => fixture.Clock;
     public TestFileStorageService FileStorageService => fixture.FileStorageService;
     public Mock<IBackgroundJobScheduler> BackgroundJobScheduler => fixture.BackgroundJobSchedulerMock;
-    public FakeTrnGenerator TrnGenerator => fixture.TrnGenerator;
+    public AllocateTrnsToOverseasNpqApplicantsJobTrnGenerator TrnGenerator => fixture.TrnGenerator;
 
     public async Task InitializeAsync()
     {
@@ -579,18 +580,19 @@ public class AllocateTrnsToOverseasNpqApplicantsJobFixture : IAsyncLifetime
     public AllocateTrnsToOverseasNpqApplicantsJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
         ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
         LoggerFactory = loggerFactory;
         Clock = new();
 
-        TestData = new TestData(
+        var trnGenerator = new AllocateTrnsToOverseasNpqApplicantsJobTrnGenerator(DbFixture.DbContextFactory);
+
+        TestData = TestData.CreateWithCustomTrnGeneration(
             dbFixture.DbContextFactory,
             referenceDataCache,
             Clock,
-            trnGenerator);
+            () => trnGenerator.GenerateTrnAsync());
 
         DbContext = dbFixture.DbContextFactory.CreateDbContext();
         TrnGenerator = trnGenerator;
@@ -600,7 +602,7 @@ public class AllocateTrnsToOverseasNpqApplicantsJobFixture : IAsyncLifetime
     public DbFixture DbFixture { get; }
     public ILoggerFactory LoggerFactory { get; }
     public TestData TestData { get; }
-    public FakeTrnGenerator TrnGenerator { get; }
+    public AllocateTrnsToOverseasNpqApplicantsJobTrnGenerator TrnGenerator { get; }
     public TestFileStorageService FileStorageService { get; } = new();
     public TrsDbContext DbContext { get; }
     public PersonMatchingService PersonMatchingService => new PersonMatchingService(DbContext);
@@ -612,4 +614,17 @@ public class AllocateTrnsToOverseasNpqApplicantsJobFixture : IAsyncLifetime
     }
 
     public async Task DisposeAsync() => await DbContext.DisposeAsync();
+}
+
+public class AllocateTrnsToOverseasNpqApplicantsJobTrnGenerator(IDbContextFactory<TrsDbContext> dbContextFactory) : ITrnGenerator
+{
+    private string _lastTrn = "0000000";
+    private readonly ITrnGenerator _innerGenerator = new TestTrnGenerator(dbContextFactory);
+
+    public async Task<string> GenerateTrnAsync()
+    {
+        return _lastTrn = await _innerGenerator.GenerateTrnAsync();
+    }
+
+    public int LastGeneratedTrn => int.Parse(_lastTrn);
 }

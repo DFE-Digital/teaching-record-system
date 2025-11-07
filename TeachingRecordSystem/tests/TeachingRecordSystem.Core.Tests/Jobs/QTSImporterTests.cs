@@ -11,7 +11,6 @@ public class QtsImporterTests : IAsyncLifetime
     public QtsImporterTests(
       DbFixture dbFixture,
       ReferenceDataCache referenceDataCache,
-      FakeTrnGenerator trnGenerator,
       IServiceProvider provider)
     {
         DbFixture = dbFixture;
@@ -20,8 +19,7 @@ public class QtsImporterTests : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
 
         Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
     }

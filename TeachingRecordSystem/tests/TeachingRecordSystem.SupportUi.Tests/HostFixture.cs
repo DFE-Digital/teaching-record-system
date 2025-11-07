@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Notify;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.SupportUi.Tests;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -90,8 +89,6 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton(DbHelper.Instance)
                     .AddSingleton<CurrentUserProvider>()
                     .AddSingleton<TestData>()
-                    .AddSingleton<FakeTrnGenerator>()
-                    .AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>())
                     .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                     .AddSingleton<INotificationSender, NoopNotificationSender>()
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()

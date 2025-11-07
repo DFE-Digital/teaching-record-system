@@ -783,8 +783,7 @@ public class CapitaExportAmendJobFixture
 {
     public CapitaExportAmendJobFixture(
         DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        ReferenceDataCache referenceDataCache)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -794,8 +793,7 @@ public class CapitaExportAmendJobFixture
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     public DbFixture DbFixture { get; }

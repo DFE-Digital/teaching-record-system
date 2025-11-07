@@ -25,7 +25,6 @@ public class EventMapperFixture
 {
     public EventMapperFixture(
         DbFixture dbFixture,
-        FakeTrnGenerator trnGenerator,
         IServiceProvider serviceProvider)
     {
         Clock = new TestableClock();
@@ -35,8 +34,7 @@ public class EventMapperFixture
         TestData = new TestData(
             dbFixture.DbContextFactory,
             ReferenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
 
         Services = serviceProvider;
     }

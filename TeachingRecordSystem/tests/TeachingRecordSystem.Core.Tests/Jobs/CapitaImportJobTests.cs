@@ -1507,7 +1507,6 @@ public class CapitaImportJobFixture : IAsyncLifetime
     public CapitaImportJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
         IServiceProvider provider)
     {
         DbFixture = dbFixture;
@@ -1543,8 +1542,7 @@ public class CapitaImportJobFixture : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     public DbFixture DbFixture { get; }

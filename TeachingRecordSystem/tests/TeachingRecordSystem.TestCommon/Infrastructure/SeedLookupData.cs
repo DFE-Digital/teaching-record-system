@@ -18,7 +18,7 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         {
             IsActive = true,
             Name = "TestProviderName",
-            TrainingProviderId = Guid.NewGuid(),
+            TrainingProviderId = new("2ad74790-0b31-405a-82c7-3ba6c7cc85b5"),
             Ukprn = "11111111"
         });
 
@@ -26,7 +26,7 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         {
             IsActive = false,
             Name = "TestProviderNameInactive",
-            TrainingProviderId = Guid.NewGuid(),
+            TrainingProviderId = new("cb942d4d-0922-47a3-ad41-c12f5757c6a0"),
             Ukprn = "23456789"
         });
 
@@ -34,7 +34,7 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         {
             IsActive = true,
             Name = "Non-UK establishment",
-            TrainingProviderId = Guid.NewGuid(),
+            TrainingProviderId = new("1f9b4093-fac1-4b5c-bf52-608bdd79cf0e"),
             Ukprn = null
         });
 
@@ -42,7 +42,7 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
         {
             IsActive = true,
             Name = "UK establishment (Scotland/Northern Ireland)",
-            TrainingProviderId = Guid.NewGuid(),
+            TrainingProviderId = new("6f0db415-e869-40b2-8fb2-3b040c69f9ce"),
             Ukprn = null
         });
 

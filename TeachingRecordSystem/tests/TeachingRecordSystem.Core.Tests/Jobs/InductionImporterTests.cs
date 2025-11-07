@@ -10,7 +10,6 @@ public class InductionImporterTests : IAsyncLifetime
     public InductionImporterTests(
       DbFixture dbFixture,
       ReferenceDataCache referenceDataCache,
-      FakeTrnGenerator trnGenerator,
       IServiceProvider provider)
     {
         DbFixture = dbFixture;
@@ -19,8 +18,7 @@ public class InductionImporterTests : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
 
         Importer = ActivatorUtilities.CreateInstance<InductionImporter>(provider, Clock);
     }
