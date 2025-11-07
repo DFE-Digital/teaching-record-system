@@ -38,7 +38,7 @@ public class AlertUpdatedNotificationMapper(PersonInfoCache personInfoCache, Ref
             return null;
         }
 
-        var person = await personInfoCache.GetPersonInfoAsync(@event.PersonId);
+        var person = await personInfoCache.GetRequiredPersonInfoAsync(@event.PersonId);
         var alert = await Alert.FromEventAsync(@event.Alert, referenceDataCache);
 
         return new()

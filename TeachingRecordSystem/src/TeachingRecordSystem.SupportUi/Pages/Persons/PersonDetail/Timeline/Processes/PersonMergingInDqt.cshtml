@@ -1,0 +1,29 @@
+@using System.Diagnostics
+@model TimelineItem<TimelineProcess>
+@{
+    var deactivatedEvent = Model.ItemModel.GetEvent<PersonDeactivatedEvent>();
+    Debug.Assert(deactivatedEvent.MergedWithPersonId is not null);
+    var updatedEvent = Model.ItemModel.GetEvents<PersonUpdatedInDqtEvent>(Model.PersonId).SingleOrDefault();
+
+    var thisRecordWasDeactivated = Model.PersonId == deactivatedEvent.PersonId;
+
+    var title = !thisRecordWasDeactivated
+        ? $"Record merged{(Model.ItemModel.PersonInfo.TryGetValue(deactivatedEvent.PersonId, out var childRecordInfo) ? $" with TRN {childRecordInfo.Trn}" : null)}"
+        : $"Record merged{(Model.ItemModel.PersonInfo.TryGetValue(deactivatedEvent.MergedWithPersonId!.Value, out var masterRecordInfo) ? $" with TRN {masterRecordInfo.Trn}" : null)}" + " and deactivated";
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-process-id="@Model.ItemModel.Process.ProcessId">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">@title</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span>By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        @if (updatedEvent is not null)
+        {
+            <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent"/>
+        }
+    </div>
+</div>

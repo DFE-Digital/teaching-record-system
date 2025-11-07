@@ -70,26 +70,35 @@ public static class Modifiers
 
     public static void Events(JsonTypeInfo typeInfo)
     {
-        if (typeInfo.Type != typeof(IEvent))
+        // Remove any required constraints;
+        // we want to be able to evolve the events by adding new properties with the required modifier
+        // without breaking deserialization for older events.
+        if (typeInfo.Kind == JsonTypeInfoKind.Object)
         {
-            return;
+            foreach (var propertyInfo in typeInfo.Properties)
+            {
+                propertyInfo.IsRequired = false;
+            }
         }
 
-        typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+        if (typeInfo.Type == typeof(IEvent))
         {
-            TypeDiscriminatorPropertyName = "$event-name",
-            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
-        };
+            typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+            {
+                TypeDiscriminatorPropertyName = "$event-name",
+                UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
+            };
 
-        var eventTypes = typeof(IEvent).Assembly.GetTypes()
-            .Where(t => typeof(IEvent).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
+            var eventTypes = typeof(IEvent).Assembly.GetTypes()
+                .Where(t => typeof(IEvent).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false });
 
-        foreach (var eventType in eventTypes)
-        {
-            var eventName = eventType.Name;
+            foreach (var eventType in eventTypes)
+            {
+                var eventName = eventType.Name;
 
-            typeInfo.PolymorphismOptions.DerivedTypes.Add(
-                new JsonDerivedType(eventType, eventName));
+                typeInfo.PolymorphismOptions.DerivedTypes.Add(
+                    new JsonDerivedType(eventType, eventName));
+            }
         }
     }
 }

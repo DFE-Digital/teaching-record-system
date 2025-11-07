@@ -17,6 +17,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 public class ChangeHistoryModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
+    PersonInfoCache personInfoCache,
     IAuthorizationService authorizationService,
     SupportUiLinkGenerator linkGenerator) : PageModel
 {
@@ -150,7 +151,8 @@ public class ChangeHistoryModel(
             ProcessType.PersonImportingIntoDqt,
             ProcessType.PersonUpdatingInDqt,
             ProcessType.PersonDeactivatingInDqt,
-            ProcessType.PersonReactivatingInDqt
+            ProcessType.PersonReactivatingInDqt,
+            ProcessType.PersonMergingInDqt
         };
 
         var processes = await dbContext.Processes
@@ -159,8 +161,16 @@ public class ChangeHistoryModel(
             .Include(p => p.Events).AsSplitQuery()
             .ToListAsync();
 
+        var personInfo = await processes
+            .SelectMany(p => p.PersonIds)
+            .Distinct()
+            .ToAsyncEnumerable()
+            .SelectAwait(async id => await personInfoCache.GetPersonInfoAsync(id))
+            .Where(i => i is not null)
+            .ToDictionaryAsync(i => i!.PersonId, i => i!);
+
         var allResults = eventsWithUser.Select(MapTimelineEvent)
-            .Concat(processes.Select(MapTimelineProcess))
+            .Concat(processes.Select(p => MapTimelineProcess(p, personInfo)))
             .ToArray();
 
         TimelineItems = allResults
@@ -205,12 +215,12 @@ public class ChangeHistoryModel(
         return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, PersonId, timelineEvent.Event.CreatedUtc.ToGmt(), timelineEvent)!;
     }
 
-    private TimelineItem MapTimelineProcess(Process process) =>
+    private TimelineItem MapTimelineProcess(Process process, IReadOnlyDictionary<Guid, PersonInfo> personInfo) =>
         new TimelineItem<TimelineProcess>(
             TimelineItemType.Process,
             PersonId,
             process.CreatedOn.ToGmt(),
-            new TimelineProcess(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }));
+            new TimelineProcess(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, personInfo));
 
     /// <summary>
     /// Flattened out record to allow Event, TRS User and DQT User to be returned in a single SQL query
