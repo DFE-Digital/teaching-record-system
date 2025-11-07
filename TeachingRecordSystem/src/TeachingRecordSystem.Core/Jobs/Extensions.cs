@@ -313,6 +313,11 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillTrnRequestMetadataInReportingDb>(
+                nameof(BackfillTrnRequestMetadataInReportingDb),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             return Task.CompletedTask;
         });
 

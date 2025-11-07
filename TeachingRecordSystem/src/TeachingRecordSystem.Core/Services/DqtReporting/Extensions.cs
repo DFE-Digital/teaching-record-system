@@ -16,6 +16,7 @@ public static class Extensions
             .ValidateOnStart();
 
         services.AddSingleton<IHostedService, DqtReportingService>();
+        services.AddSingleton<ReportingHelper>();
 
         services.AddStartupTask(sp =>
         {
