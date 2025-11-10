@@ -2094,7 +2094,7 @@
         "dependencies": {
           "Faker.Net": "[2.0.163, )",
           "Moq": "[4.20.72, )",
-          "Respawn": "[6.2.0, )",
+          "Respawn": "[6.2.1, )",
           "System.Linq.Async": "[6.0.3, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "xunit.v3.assert": "[3.2.0, )"
@@ -2653,11 +2653,11 @@
       },
       "Respawn": {
         "type": "CentralTransitive",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "Y0PKczNgFJA5gs6C/mQPirG5QbxMxn2J4ZZKTktnGBAyvaFIRF8Hz8tp5A+x1RrzkUx7rLukd/FL28j27sppdw==",
+        "requested": "[6.2.1, )",
+        "resolved": "6.2.1",
+        "contentHash": "b8v9a1+08FKiDtqi6KllaJEeJiB1cmkD3kmOXDNIR+U85gEaZitwl6Gxq6RU5NL34OLmdQ5dB+QE0rhVCX+lEA==",
         "dependencies": {
-          "Microsoft.Data.SqlClient": "4.0.0"
+          "Microsoft.Data.SqlClient": "4.0.5"
         }
       },
       "Scrutor": {
