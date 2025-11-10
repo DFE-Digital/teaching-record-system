@@ -21,6 +21,22 @@ public class ServiceProviderFixture : InitializeDbFixture
 
     public IServiceProvider Services { get; set; }
 
+    public async Task WithServiceAsync<TService>(Func<TService, Task> action, params object[] arguments)
+        where TService : notnull
+    {
+        using var scope = Services.CreateScope();
+        var service = ActivatorUtilities.CreateInstance<TService>(scope.ServiceProvider, arguments);
+        await action(service);
+    }
+
+    public async Task<TResult> WithServiceAsync<TService, TResult>(Func<TService, Task<TResult>> action, params object[] arguments)
+        where TService : notnull
+    {
+        using var scope = Services.CreateScope();
+        var service = ActivatorUtilities.CreateInstance<TService>(scope.ServiceProvider, arguments);
+        return await action(service);
+    }
+
     protected virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
     }
