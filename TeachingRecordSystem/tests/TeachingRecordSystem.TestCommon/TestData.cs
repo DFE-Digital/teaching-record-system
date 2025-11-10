@@ -127,6 +127,20 @@ public partial class TestData
         return newFirstName;
     }
 
+    public string GenerateChangedFirstName(string?[] currentNames)
+    {
+        var names = currentNames.GetNonEmptyValues();
+        string newFirstName;
+
+        do
+        {
+            newFirstName = GenerateFirstName();
+        }
+        while (names.Contains(newFirstName));
+
+        return newFirstName;
+    }
+
     public string GenerateMiddleName() => Faker.Name.Middle();
 
     public string GenerateChangedMiddleName(string currentMiddleName)
@@ -138,6 +152,20 @@ public partial class TestData
             newMiddleName = GenerateMiddleName();
         }
         while (newMiddleName == currentMiddleName);
+
+        return newMiddleName;
+    }
+
+    public string GenerateChangedMiddleName(string?[] currentNames)
+    {
+        var names = currentNames.GetNonEmptyValues();
+        string newMiddleName;
+
+        do
+        {
+            newMiddleName = GenerateMiddleName();
+        }
+        while (names.Contains(newMiddleName));
 
         return newMiddleName;
     }
