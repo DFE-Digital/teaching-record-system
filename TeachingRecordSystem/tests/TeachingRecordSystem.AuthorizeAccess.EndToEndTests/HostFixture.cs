@@ -157,7 +157,6 @@ public sealed class HostFixture : InitializeDbFixture
         if (Debugger.IsAttached)
         {
             browserOptions.Headless = false;
-            browserOptions.Devtools = true;
             browserOptions.SlowMo = 250;
         }
 
