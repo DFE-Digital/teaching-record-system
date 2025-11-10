@@ -123,7 +123,7 @@ public partial class TestData
 
         do
         {
-            newFirstName = GenerateLastName();
+            newFirstName = GenerateFirstName();
         }
         while (newFirstName == currentFirstName);
 
