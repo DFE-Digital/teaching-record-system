@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Suppor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Core", "src\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj", "{BB84ECB4-583D-4068-9A66-883233661594}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Core.Tests", "tests\TeachingRecordSystem.Core.Tests\TeachingRecordSystem.Core.Tests.csproj", "{3380ADC3-A691-4B07-9FE3-CB5306974965}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Core.LegacyTests", "tests\TeachingRecordSystem.Core.LegacyTests\TeachingRecordSystem.Core.LegacyTests.csproj", "{3380ADC3-A691-4B07-9FE3-CB5306974965}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.SupportUi.EndToEndTests", "tests\TeachingRecordSystem.SupportUi.EndToEndTests\TeachingRecordSystem.SupportUi.EndToEndTests.csproj", "{EB46905A-F7B4-4BDC-B376-6091264D6303}"
 EndProject
@@ -61,6 +61,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeachingRecordSystem.Cli.Tests", "tests\TeachingRecordSystem.Cli.Tests\TeachingRecordSystem.Cli.Tests.csproj", "{65511C24-6517-497A-BF36-74C57301F342}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeachingRecordSystem.TestCommon.XUnit3", "tests\TeachingRecordSystem.TestCommon.XUnit3\TeachingRecordSystem.TestCommon.XUnit3.csproj", "{6CD1972B-C253-41DB-859F-D59E1AE3DE69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeachingRecordSystem.Core.Tests", "tests\TeachingRecordSystem.Core.Tests\TeachingRecordSystem.Core.Tests.csproj", "{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -300,6 +302,18 @@ Global
 		{6CD1972B-C253-41DB-859F-D59E1AE3DE69}.Release|x64.Build.0 = Release|Any CPU
 		{6CD1972B-C253-41DB-859F-D59E1AE3DE69}.Release|x86.ActiveCfg = Release|Any CPU
 		{6CD1972B-C253-41DB-859F-D59E1AE3DE69}.Release|x86.Build.0 = Release|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Debug|x64.Build.0 = Debug|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Debug|x86.Build.0 = Debug|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Release|x64.ActiveCfg = Release|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Release|x64.Build.0 = Release|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Release|x86.ActiveCfg = Release|Any CPU
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -324,6 +338,7 @@ Global
 		{6AC91DA6-EBC0-4820-AD1C-2137A4188F57} = {91DCFC76-6636-4AC1-B81C-7F8AE1F22116}
 		{65511C24-6517-497A-BF36-74C57301F342} = {91DCFC76-6636-4AC1-B81C-7F8AE1F22116}
 		{6CD1972B-C253-41DB-859F-D59E1AE3DE69} = {91DCFC76-6636-4AC1-B81C-7F8AE1F22116}
+		{41A86C50-A4ED-4BA6-B6B2-44596992C1A6} = {91DCFC76-6636-4AC1-B81C-7F8AE1F22116}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61D239F9-888B-4D01-84BC-9276C92383EA}
