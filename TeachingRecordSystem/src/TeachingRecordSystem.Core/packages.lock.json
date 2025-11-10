@@ -557,9 +557,9 @@
       },
       "System.Reactive": {
         "type": "Direct",
-        "requested": "[6.0.1, )",
-        "resolved": "6.0.1",
-        "contentHash": "rHaWtKDwCi9qJ3ObKo8LHPMuuwv33YbmQi7TcUK1C264V3MFnOr5Im7QgCTdLniztP3GJyeiSg5x8NqYJFqRmg=="
+        "requested": "[6.1.0, )",
+        "resolved": "6.1.0",
+        "contentHash": "M5cCC1ZMkZr9jbSQGTHnVkb5TDN67qWCV7AP8TAHdGkvDlu0puT5NzemESNn9+HkYIDpWpocP68/i+/ame2/2w=="
       },
       "Apache.Arrow": {
         "type": "Transitive",
