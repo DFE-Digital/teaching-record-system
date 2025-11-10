@@ -2446,7 +2446,7 @@
           "CsvHelper": "[33.1.0, )",
           "EFCore.NamingConventions": "[9.0.0, )",
           "EntityFrameworkCore.Projectables": "[4.0.0, )",
-          "FluentValidation": "[11.11.0, )",
+          "FluentValidation": "[12.1.0, )",
           "Google.Cloud.Storage.V1": "[4.10.0, )",
           "GovukNotify": "[6.1.0, )",
           "Hangfire.Core": "[1.8.22, )",
@@ -2609,9 +2609,9 @@
       },
       "FluentValidation": {
         "type": "CentralTransitive",
-        "requested": "[11.11.0, )",
-        "resolved": "11.11.0",
-        "contentHash": "cyIVdQBwSipxWG8MA3Rqox7iNbUNUTK5bfJi9tIdm4CAfH71Oo5ABLP4/QyrUwuakqpUEPGtE43BDddvEehuYw=="
+        "requested": "[12.1.0, )",
+        "resolved": "12.1.0",
+        "contentHash": "FqWEn8BdbbFEHGanj9K8SVo+LyBeFWy2rolaE+e1TNUbifr8M7Iss+I1AqTSc8kjKtvjl/WN4XIHiRpslh42bA=="
       },
       "Google.Cloud.Storage.V1": {
         "type": "CentralTransitive",
