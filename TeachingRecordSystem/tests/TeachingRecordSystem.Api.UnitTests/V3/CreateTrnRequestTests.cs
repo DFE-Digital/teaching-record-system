@@ -105,15 +105,15 @@ public class CreateTrnRequestTests : OperationTestBase
     {
         // Arrange
         var firstName = TestData.GenerateFirstName();
-        var middleName = TestData.GenerateMiddleName();
+        var middleName = TestData.GenerateChangedMiddleName(firstName);
         var lastName = TestData.GenerateLastName();
         var dateOfBirth = TestData.GenerateDateOfBirth();
         var emailAddress = TestData.GenerateUniqueEmail();
         var nino = TestData.GenerateNationalInsuranceNumber();
 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
-            .WithFirstName(matchedFields.Contains(MatchedField.FirstName) ? firstName : TestData.GenerateChangedFirstName(firstName))
-            .WithMiddleName(matchedFields.Contains(MatchedField.MiddleName) ? middleName : TestData.GenerateChangedMiddleName(middleName))
+            .WithFirstName(matchedFields.Contains(MatchedField.FirstName) ? firstName : TestData.GenerateChangedFirstName([firstName, middleName]))
+            .WithMiddleName(matchedFields.Contains(MatchedField.MiddleName) ? middleName : TestData.GenerateChangedMiddleName([firstName, middleName]))
             .WithLastName(matchedFields.Contains(MatchedField.LastName) ? lastName : TestData.GenerateChangedLastName(lastName))
             .WithDateOfBirth(matchedFields.Contains(MatchedField.DateOfBirth) ? dateOfBirth : TestData.GenerateChangedDateOfBirth(dateOfBirth))
             .WithEmailAddress(matchedFields.Contains(MatchedField.EmailAddress) ? emailAddress : TestData.GenerateUniqueEmail())
@@ -588,12 +588,13 @@ public class CreateTrnRequestTests : OperationTestBase
             FirstName = firstName switch
             {
                 Field.Matches => matchedPerson.FirstName,
-                _ => TestData.GenerateChangedFirstName(matchedPerson.FirstName)
+                _ => TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName])
             },
+            MiddleName = TestData.GenerateChangedMiddleName(matchedPerson.FirstName),
             LastName = lastName switch
             {
                 Field.Matches => matchedPerson.LastName,
-                _ => TestData.GenerateChangedFirstName(matchedPerson.LastName)
+                _ => TestData.GenerateChangedLastName(matchedPerson.LastName)
             },
             DateOfBirth = dob switch
             {

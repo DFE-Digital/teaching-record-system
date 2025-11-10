@@ -88,9 +88,12 @@ public partial class PersonMatchingServiceTests
                 await dbContext.SaveChangesAsync();
             }
 
+            var personMiddleName = TestData.GenerateChangedMiddleName([personFirstName, alias]);
+
             var person = await TestData.CreatePersonAsync(p => p
                 .WithNationalInsuranceNumber()
                 .WithFirstName(personFirstName)
+                .WithMiddleName(personMiddleName)
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
                 .WithGender());
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
@@ -107,13 +110,13 @@ public partial class PersonMatchingServiceTests
             {
                 TrnRequest.FirstNameArgumentOption.Matches => person.FirstName,
                 TrnRequest.FirstNameArgumentOption.MatchesAlias => alias!,
-                _ => TestData.GenerateChangedFirstName(person.FirstName)
+                _ => TestData.GenerateChangedFirstName([person.FirstName, alias, person.MiddleName])
             };
 
             var middleName = middleNameOption switch
             {
                 TrnRequest.MiddleNameArgumentOption.Matches => person.MiddleName,
-                _ => TestData.GenerateChangedMiddleName(person.MiddleName)
+                _ => TestData.GenerateChangedMiddleName([person.FirstName, alias, person.MiddleName])
             };
 
             var lastName = lastNameOption switch
