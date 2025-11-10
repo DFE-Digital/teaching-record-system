@@ -25,13 +25,13 @@
       },
       "Microsoft.Playwright": {
         "type": "Direct",
-        "requested": "[1.41.2, )",
-        "resolved": "1.41.2",
-        "contentHash": "UtfjOhh52rDi5D7FTk0+9fWFgEO6mbOX3//YvO1yiuEFfCfe1/C9mkhnZkyzDmTSdox/FmDGZ5EmuG4murT5MQ==",
+        "requested": "[1.55.0, )",
+        "resolved": "1.55.0",
+        "contentHash": "iPVHeRI5EZB1gK43MC/qnINvGUV3pYh/PJn5wNmeaiZ4ARlFAfK3azf46c7/kx/lmVaknZ5rSNT1F8SZgSaWSQ==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
           "System.ComponentModel.Annotations": "5.0.0",
-          "System.Text.Json": "6.0.0"
+          "System.Text.Json": "6.0.10"
         }
       },
       "xunit.runner.visualstudio": {
