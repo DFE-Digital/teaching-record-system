@@ -79,7 +79,7 @@
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.1.0" />
     <PackageVersion Include="Optional" Version="4.0.0" />
     <PackageVersion Include="Parquet.Net" Version="4.24.0" />
-    <PackageVersion Include="Polly.Core" Version="8.2.1" />
+    <PackageVersion Include="Polly.Core" Version="8.6.4" />
     <PackageVersion Include="prometheus-net.AspNetCore" Version="8.2.1" />
     <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.1.0" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
