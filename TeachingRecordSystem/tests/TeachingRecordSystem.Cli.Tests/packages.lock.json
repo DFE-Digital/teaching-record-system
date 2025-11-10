@@ -799,8 +799,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "5.14.0",
-        "contentHash": "AxLvTHMDnLG/t0xuHDC5husprmJxbLHgZChOgV1Q4wyFfyCDjGZ7JKsetqWge0YHcLjDMB/5JHz4KMsz35InMQ=="
+        "resolved": "5.16.2",
+        "contentHash": "JZiKizATWdBe4dSdvMhp3d/TiMUug3VvWjiu9ZH5UfTbrwGWYUexZ4ZGdyrIB2GuWlLBUWs3Vi1GFv3pNhRKFg=="
       },
       "Snappier": {
         "type": "Transitive",
@@ -1959,7 +1959,7 @@
           "Parquet.Net": "[4.24.0, )",
           "Polly.Core": "[8.2.1, )",
           "Scrutor": "[6.1.0, )",
-          "Sentry.Serilog": "[5.14.0, )",
+          "Sentry.Serilog": "[5.16.2, )",
           "Serilog.Expressions": "[5.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
           "Serilog.Settings.Configuration": "[9.0.0, )",
@@ -2493,11 +2493,11 @@
       },
       "Sentry.Serilog": {
         "type": "CentralTransitive",
-        "requested": "[5.14.0, )",
-        "resolved": "5.14.0",
-        "contentHash": "VYH7KBYp21HpQEB7F4mP5IAo3s9hN+OwHvjJaRXP6gYNOPHJ2gW1s5rEI2G6vipmxT5PNxMsAqQQuvjfxL/gVw==",
+        "requested": "[5.16.2, )",
+        "resolved": "5.16.2",
+        "contentHash": "U+eW1sFpmPGZZhHrsNtvsz0txEFz032c38OlCxAlbygL0YjRyXnyZnNbXxMHnLR8BpJX1OTPyXSbYJ3dbwBdxA==",
         "dependencies": {
-          "Sentry": "5.14.0",
+          "Sentry": "5.16.2",
           "Serilog": "2.10.0"
         }
       },
