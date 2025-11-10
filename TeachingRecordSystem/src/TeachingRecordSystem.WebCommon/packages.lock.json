@@ -159,56 +159,57 @@
       },
       "Google.Api.Gax": {
         "type": "Transitive",
-        "resolved": "4.8.0",
-        "contentHash": "xlV8Jq/G5CQAA3PwYAuKGjfzGOP7AvjhREnE6vgZlzxREGYchHudZWa2PWSqFJL+MBtz9YgitLpRogANN3CVvg==",
+        "resolved": "4.9.0",
+        "contentHash": "fjHHYcQ99u0ztqwT537rvVtJMdDy6G2VHBZ+F1cBjDGYNVZfrpk40DMQ/OpUGToT9ZGHVirhh3eJ73bw2ANVPQ==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
-          "Newtonsoft.Json": "13.0.3"
+          "Newtonsoft.Json": "13.0.3",
+          "System.Diagnostics.DiagnosticSource": "6.0.1"
         }
       },
       "Google.Api.Gax.Rest": {
         "type": "Transitive",
-        "resolved": "4.8.0",
-        "contentHash": "zaA5LZ2VvGj/wwIzRB68swr7khi2kWNgqWvsB0fYtScIAl3kGkGtqiBcx63H1YLeKr5xau1866bFjTeReH6FSQ==",
+        "resolved": "4.9.0",
+        "contentHash": "xzHvOe8WzmSWVurtRFG+uSMWIKPHAAyhGdnGfBNSr4xSBzHsx7G5rWjjZhGcyeCYc0ZdaKEVyidtQS7A2OD2mg==",
         "dependencies": {
-          "Google.Api.Gax": "4.8.0",
-          "Google.Apis.Auth": "[1.67.0, 2.0.0)",
+          "Google.Api.Gax": "4.9.0",
+          "Google.Apis.Auth": "1.68.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0"
         }
       },
       "Google.Apis": {
         "type": "Transitive",
-        "resolved": "1.67.0",
-        "contentHash": "XM8/fViJaB1pN61OdXy5RMZoQEqd3hKlWvA/K431gFSb5XtQ48BynfgrbBkUtFcPbSRa4BdjBHzSbkBh/skyMg==",
+        "resolved": "1.69.0",
+        "contentHash": "1TfjsXFejwIf7iWaE7A0FbnOEsk8FPlbdFAt1r+I8aSMQfLLdSVWCLdZz6TzuWVwoCGEuJUHTZ/FXdptdU3qWw==",
         "dependencies": {
-          "Google.Apis.Core": "1.67.0"
+          "Google.Apis.Core": "1.69.0"
         }
       },
       "Google.Apis.Auth": {
         "type": "Transitive",
-        "resolved": "1.67.0",
-        "contentHash": "Bs9BlbZ12Y4NXzMONjpzQhZr9VbwLUTGMHkcQRF36aYnk2fYrmj5HNVNh7PPHDDq1fcEQpCtPic2nSlpYQLKXw==",
+        "resolved": "1.69.0",
+        "contentHash": "ar07yxn/s41jdqQ3sMh8EAehiSvXQ9yE1MS4McmZINeSWvolnLHmIZ9Yxj4tHVIYYz0c7H/lpToVqm7C2aYx9g==",
         "dependencies": {
-          "Google.Apis": "1.67.0",
-          "Google.Apis.Core": "1.67.0",
+          "Google.Apis": "1.69.0",
+          "Google.Apis.Core": "1.69.0",
           "System.Management": "7.0.2"
         }
       },
       "Google.Apis.Core": {
         "type": "Transitive",
-        "resolved": "1.67.0",
-        "contentHash": "IPq0I3B01NYZraPoMl8muELFLg4Vr2sbfyZp4PR2Xe3MAhHkZCiKyV28Yh1L14zIKUb0X0snol1sR5/mx4S6Iw==",
+        "resolved": "1.69.0",
+        "contentHash": "SXUcurNUPxYMtOnawvB2Av18VrPBC9W7So9q9ikmXIXLGiv4RX7Zbu4kc+8PbwTdd8wLt54r0PBGOT5RaKoTjQ==",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3"
         }
       },
       "Google.Apis.Storage.v1": {
         "type": "Transitive",
-        "resolved": "1.67.0.3365",
-        "contentHash": "N9Rp8aRUV8Fsjl6uojZeJnzZ/zwtImB+crkPz/HsUtIKcC8rx/ZhNdizNJ5YcNFKiVlvGC60p0K7M+Ywk2xTPQ==",
+        "resolved": "1.69.0.3707",
+        "contentHash": "XzNH0Xx4w+11o9rR71tVpVq3Ji+BFB9621PtNOScrm4f3I8pU3/vKRaKo2JAKRiX6fi1TpJgI5nfHbYJtc88BQ==",
         "dependencies": {
-          "Google.Apis": "1.67.0",
-          "Google.Apis.Auth": "1.67.0"
+          "Google.Apis": "1.69.0",
+          "Google.Apis.Auth": "1.69.0"
         }
       },
       "IronCompress": {
@@ -2172,7 +2173,7 @@
           "EFCore.NamingConventions": "[9.0.0, )",
           "EntityFrameworkCore.Projectables": "[4.0.0, )",
           "FluentValidation": "[12.1.0, )",
-          "Google.Cloud.Storage.V1": "[4.10.0, )",
+          "Google.Cloud.Storage.V1": "[4.13.0, )",
           "GovukNotify": "[6.1.0, )",
           "Hangfire.Core": "[1.8.22, )",
           "Hangfire.NetCore": "[1.8.22, )",
@@ -2303,12 +2304,12 @@
       },
       "Google.Cloud.Storage.V1": {
         "type": "CentralTransitive",
-        "requested": "[4.10.0, )",
-        "resolved": "4.10.0",
-        "contentHash": "a4hHQzDkzR/5Fm2gvfKnvuajYwgTJAZ944+8S3gO7S3qxXkXI+rasx8Jz8ldflyq1zHO5MWTyFiHc7+dfmwYhg==",
+        "requested": "[4.13.0, )",
+        "resolved": "4.13.0",
+        "contentHash": "TMHPYZM3o9YtwkvdNqMciECtXzgptFCJUGa8r4MQuY8Y+uBKLvv3/PfijJhATESJw7dQdFcMGm+TOKJfKBfeWA==",
         "dependencies": {
-          "Google.Api.Gax.Rest": "[4.8.0, 5.0.0)",
-          "Google.Apis.Storage.v1": "[1.67.0.3365, 2.0.0)"
+          "Google.Api.Gax.Rest": "[4.9.0, 5.0.0)",
+          "Google.Apis.Storage.v1": "[1.69.0.3707, 2.0.0)"
         }
       },
       "GovukNotify": {
