@@ -2015,7 +2015,7 @@
           "Microsoft.PowerPlatform.Dataverse.Client": "[1.2.10, )",
           "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "[1.2.10, )",
           "NSign.Client": "[1.2.1, )",
-          "NSign.SignatureProviders": "[1.1.0, )",
+          "NSign.SignatureProviders": "[1.2.1, )",
           "Npgsql.DependencyInjection": "[9.0.4, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[9.0.4, )",
           "OneOf": "[3.0.271, )",
@@ -2438,11 +2438,11 @@
       },
       "NSign.SignatureProviders": {
         "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "poa3Qez1ds4w28TWQyPzKa/Yd4WOY9Pto8qWI96wNRHp76ZfV9M2kfZ6JH7ma3uAgInwpYEoAc+2Z0h6/E/sSA==",
+        "requested": "[1.2.1, )",
+        "resolved": "1.2.1",
+        "contentHash": "XWqtAV0ZV80R4TYkDFw3jAObtmWmq0qL+yr2uItZn0VHNP9gSnjrgKLI4vct+dDD5DnKmOZGATZ9Uhvc4o34uQ==",
         "dependencies": {
-          "NSign.Abstractions": "1.1.0"
+          "NSign.Abstractions": "1.2.1"
         }
       },
       "OneOf": {
