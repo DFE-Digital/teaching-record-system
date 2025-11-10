@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ChangeRequests.EditChangeRequest;
 
 public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
@@ -20,7 +20,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}/accept");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/accept");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -40,7 +40,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}/accept");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/accept");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -55,7 +55,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         // Arrange
         var nonExistentSupportTaskReference = Guid.NewGuid().ToString();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{nonExistentSupportTaskReference}/accept");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{nonExistentSupportTaskReference}/accept");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -73,7 +73,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}/accept");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/accept");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -93,7 +93,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             createPersonResult.PersonId,
             b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{supportTask.SupportTaskReference}/accept")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/accept")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -131,7 +131,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
 
         EventObserver.Clear();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{supportTask.SupportTaskReference}/accept")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/accept")
         {
             Content = new FormUrlEncodedContentBuilder()
         };

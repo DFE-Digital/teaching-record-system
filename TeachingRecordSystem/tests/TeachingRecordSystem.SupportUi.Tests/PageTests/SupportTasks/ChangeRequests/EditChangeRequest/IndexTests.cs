@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ChangeRequests.EditChangeRequest;
 
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
 {
@@ -18,7 +18,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -38,7 +38,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -53,7 +53,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Arrange
         var nonExistentSupportTaskReference = Guid.NewGuid().ToString();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{nonExistentSupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{nonExistentSupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -71,7 +71,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             createPersonResult.PersonId,
             b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -109,7 +109,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var changeNameRequestData = (ChangeNameRequestData)supportTask.Data;
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -199,7 +199,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var changeDateOfBirthRequestData = (ChangeDateOfBirthRequestData)supportTask.Data;
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{supportTask.SupportTaskReference}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

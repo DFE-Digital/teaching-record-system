@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class AcceptModel(
@@ -143,6 +143,7 @@ public class AcceptModel(
             $"The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 
+        // TODO change this once we've added search and filter to the change requests index page
         return Redirect(linkGenerator.SupportTasks.Index(categories: [SupportTaskCategory.ChangeRequests], sortBy: SupportTasks.IndexModel.SortByOption.DateRequested, filtersApplied: true));
     }
 
