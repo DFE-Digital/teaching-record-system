@@ -4,9 +4,9 @@
     "net9.0": {
       "Faker.Net": {
         "type": "Direct",
-        "requested": "[2.0.154, )",
-        "resolved": "2.0.154",
-        "contentHash": "pkabhT7wxNR1gkPO6ga77XdeqBblaE8a1oY47eMGGvM7DMZ9S8ARZrKkRWaPUNjGCOqtH3oeQSMuEPxd98ir4w==",
+        "requested": "[2.0.163, )",
+        "resolved": "2.0.163",
+        "contentHash": "nQZA+V19Jf6tSeFnuRWpoVZzSHRmtfOYAnX5RbkY6+HBHpLg55DYTnxUSXeFHpmsgQzmkjG7Ucomk7FisJnfhA==",
         "dependencies": {
           "NETStandard.Library": "2.0.3"
         }
