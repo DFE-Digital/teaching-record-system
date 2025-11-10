@@ -831,10 +831,10 @@
       },
       "RedisRateLimiting": {
         "type": "Transitive",
-        "resolved": "1.1.0",
-        "contentHash": "r5Wx6NswJp+HhDMv0ANPAzjweTtPROjRnLvEztN3zuNByHjpXgSASorOHZA+mWVij+b4GTf2V3NowmMXTn0k2w==",
+        "resolved": "1.2.0",
+        "contentHash": "8PFC4H7/enImkKt+japd5pvtEofGH9tuRWTJ/Ty7QY0x0gtxaH4lfqm9JXPCXQMBfSDjIWvc2pmW233udS4IUQ==",
         "dependencies": {
-          "StackExchange.Redis": "2.7.4",
+          "StackExchange.Redis": "2.7.33",
           "System.Threading.RateLimiting": "8.0.0"
         }
       },
@@ -973,8 +973,8 @@
       },
       "StackExchange.Redis": {
         "type": "Transitive",
-        "resolved": "2.7.27",
-        "contentHash": "Uqc2OQHglqj9/FfGQ6RkKFkZfHySfZlfmbCl+hc+u2I/IqunfelQ7QJi7ZhvAJxUtu80pildVX6NPLdDaUffOw==",
+        "resolved": "2.7.33",
+        "contentHash": "2kCX5fvhEE824a4Ab5Imyi8DRuGuTxyklXV01kegkRpsWJcPmO6+GAQ+HegKxvXAxlXZ8yaRspvWJ8t3mMClfQ==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
           "Pipelines.Sockets.Unofficial": "2.2.8"
@@ -2130,7 +2130,7 @@
           "MediatR": "[12.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[9.0.10, )",
           "Moq": "[4.20.72, )",
-          "RedisRateLimiting.AspNetCore": "[1.1.0, )",
+          "RedisRateLimiting.AspNetCore": "[1.2.0, )",
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )",
@@ -2790,11 +2790,11 @@
       },
       "RedisRateLimiting.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "oasv5RlVJy74L38tRmX/NxmsBvC81KUd9J3Hg+ZetxGPmCARPkq20gzHdt8cswPfk+1Tej/Toi7qqJlXKPXGBg==",
+        "requested": "[1.2.0, )",
+        "resolved": "1.2.0",
+        "contentHash": "o41D6Mp/eKdj6xue1sQ2VzHlnJgH3U/At8Mu1+q3vph5kXDYdMU5E5S0PP+CKXNJMmbGOMGwLZa2L0rRbwSB+Q==",
         "dependencies": {
-          "RedisRateLimiting": "1.1.0"
+          "RedisRateLimiting": "1.2.0"
         }
       },
       "Respawn": {
