@@ -7,8 +7,7 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
 {
     public PersonMatchingServiceTests(
         DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        ReferenceDataCache referenceDataCache)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -16,8 +15,7 @@ public partial class PersonMatchingServiceTests : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     private DbFixture DbFixture { get; }

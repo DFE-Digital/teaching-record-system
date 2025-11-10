@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -12,16 +13,12 @@ public partial class TestData
 
     private readonly Func<Task<string>> _generateTrn;
 
+    [ActivatorUtilitiesConstructor]
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ReferenceDataCache referenceDataCache,
-        IClock clock,
-        FakeTrnGenerator trnGenerator)
-        : this(
-              dbContextFactory,
-              referenceDataCache,
-              clock,
-              generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()))
+        IClock clock) :
+        this(dbContextFactory, referenceDataCache, clock, () => new TestTrnGenerator(dbContextFactory).GenerateTrnAsync())
     {
     }
 

@@ -24,8 +24,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
 
     public TpsEstablishmentRefresherTests(
         DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        ReferenceDataCache referenceDataCache)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -33,8 +32,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     public static TheoryData<TpsEstablishmentFileImportTestScenarioData> GetImportFileTestScenarioData()

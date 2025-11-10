@@ -39,28 +39,23 @@ public sealed class DbHelper : IDisposable
 
     public async Task InitializeAsync()
     {
-        var updatedSchema = await EnsureSchemaAsync();
+        var schemaUpdated = await EnsureSchemaAsync();
 
-        if (updatedSchema)
+        if (!schemaUpdated)
         {
             await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-            await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
+            await SeedDbAsync(dbContext);
         }
     }
 
     public async Task ClearDataAsync()
     {
-        using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         await dbContext.Database.OpenConnectionAsync();
         var connection = dbContext.Database.GetDbConnection();
         await EnsureRespawnerAsync(connection);
         await _respawner!.ResetAsync(connection);
-
-        // Ensure we have the System User around
-        dbContext.Set<SystemUser>().Add(SystemUser.Instance);
-        dbContext.Set<ApplicationUser>().Add(ApplicationUser.NpqApplicationUser);
-        dbContext.Set<ApplicationUser>().Add(ApplicationUser.CapitaTpsImportUser);
-        await dbContext.SaveChangesAsync();
+        await SeedDbAsync(dbContext);
     }
 
     public async Task<bool> EnsureSchemaAsync()
@@ -72,6 +67,10 @@ public sealed class DbHelper : IDisposable
             if (!_haveResetSchema)
             {
                 await ResetSchemaAsync();
+
+                await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+                await SeedDbAsync(dbContext);
+
                 _haveResetSchema = true;
                 return true;
             }
@@ -141,9 +140,42 @@ public sealed class DbHelper : IDisposable
                     "degree_types",
                     "training_providers",
                     "support_task_types",
-                    "induction_statuses"
+                    "induction_statuses",
+                    "trn_ranges"
                 ]
             });
+
+    private async Task SeedDbAsync(TrsDbContext dbContext)
+    {
+        await SeedLookupData.ResetTrainingProvidersAsync(dbContext);
+
+        var existingUserIds = await dbContext.Set<UserBase>().Select(u => u.UserId).ToArrayAsync();
+
+        void AddUserIfNotExists<T>(T user) where T : UserBase
+        {
+            if (!existingUserIds.Contains(user.UserId))
+            {
+                dbContext.Set<T>().Add(user);
+            }
+        }
+
+        AddUserIfNotExists(SystemUser.Instance);
+        AddUserIfNotExists(ApplicationUser.NpqApplicationUser);
+        AddUserIfNotExists(ApplicationUser.CapitaTpsImportUser);
+
+        if (!await dbContext.Set<TrnRange>().AnyAsync())
+        {
+            dbContext.Set<TrnRange>().Add(new TrnRange
+            {
+                FromTrn = 8000000,
+                ToTrn = 9999999,
+                NextTrn = 8000000,
+                IsExhausted = false
+            });
+        }
+
+        await dbContext.SaveChangesAsync();
+    }
 
     public void Dispose()
     {

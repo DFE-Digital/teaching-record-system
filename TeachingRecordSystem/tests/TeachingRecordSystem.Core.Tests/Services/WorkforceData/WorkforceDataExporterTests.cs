@@ -12,8 +12,7 @@ public class WorkforceDataExporterTests : IAsyncLifetime
 {
     public WorkforceDataExporterTests(
         DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        ReferenceDataCache referenceDataCache)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -21,8 +20,7 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     [Fact]

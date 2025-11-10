@@ -87,8 +87,6 @@ public static class Extensions
                 .Bind(configuration.GetSection("AccessYourTeachingQualifications"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
-
-            services.AddTrnGeneration();
         }
 
         services
@@ -106,7 +104,8 @@ public static class Extensions
             .AddPersonMatching()
             .AddEventPublisher()
             .AddSupportTaskService()
-            .AddSingleton<PersonInfoCache>();
+            .AddSingleton<PersonInfoCache>()
+            .AddTrnGeneration();
 
         return services;
     }

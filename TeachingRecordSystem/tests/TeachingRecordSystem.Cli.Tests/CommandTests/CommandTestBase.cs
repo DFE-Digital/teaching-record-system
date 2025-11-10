@@ -4,9 +4,12 @@ using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
+[Collection(nameof(DisableParallelization))]
 public abstract class CommandTestBase(IServiceProvider services)
 {
     protected IClock Clock => services.GetRequiredService<IClock>();
+
+    protected DbHelper DbHelper => services.GetRequiredService<DbHelper>();
 
     protected IConfiguration Configuration => services.GetRequiredService<IConfiguration>();
 

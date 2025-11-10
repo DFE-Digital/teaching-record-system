@@ -1290,7 +1290,6 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
     public DeletePersonAndChildRecordsWithoutATrnJobFixture(
         DbFixture dbFixture,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator,
         ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
@@ -1300,8 +1299,7 @@ public class DeletePersonAndChildRecordsWithoutATrnJobFixture : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
 
         DbContext = dbFixture.DbContextFactory.CreateDbContext();
     }

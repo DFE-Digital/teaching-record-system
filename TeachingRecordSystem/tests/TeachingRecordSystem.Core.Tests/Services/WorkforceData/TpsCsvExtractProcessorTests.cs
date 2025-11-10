@@ -8,8 +8,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
 {
     public TpsCsvExtractProcessorTests(
         DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        ReferenceDataCache referenceDataCache)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -17,8 +16,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     [Fact]

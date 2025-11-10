@@ -7,7 +7,7 @@ public class AddTrnRangeTests(IServiceProvider services) : CommandTestBase(servi
     async ValueTask IAsyncLifetime.InitializeAsync() =>
         await WithDbContextAsync(dbContext => dbContext.TrnRanges.ExecuteDeleteAsync());
 
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    async ValueTask IAsyncDisposable.DisposeAsync() => await DbHelper.ClearDataAsync();  // Restore TRN ranges for other tests
 
     [Theory]
     [InlineData(999999)]

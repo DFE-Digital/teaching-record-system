@@ -7,8 +7,7 @@ public class EstablishmentRefresherTests
 {
     public EstablishmentRefresherTests(
         DbFixture dbFixture,
-        ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        ReferenceDataCache referenceDataCache)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -16,8 +15,7 @@ public class EstablishmentRefresherTests
         TestData = new TestData(
             dbFixture.DbContextFactory,
             referenceDataCache,
-            Clock,
-            trnGenerator);
+            Clock);
     }
 
     [Fact]
