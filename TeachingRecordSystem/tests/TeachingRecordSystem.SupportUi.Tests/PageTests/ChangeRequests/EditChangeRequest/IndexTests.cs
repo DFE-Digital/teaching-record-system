@@ -81,23 +81,31 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     }
 
     [Theory]
-    [InlineData(true, false, false, false)]
-    [InlineData(false, true, false, true)]
-    [InlineData(false, false, true, false)]
-    [InlineData(true, true, false, true)]
-    [InlineData(true, false, true, false)]
-    [InlineData(false, true, true, true)]
-    [InlineData(true, true, true, true)]
-    public async Task Get_WithSupportTaskReferenceForOpenChangeNameRequestSupportTask_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName, bool evidenceIsPdf)
+    [InlineData(true, false, false, false, false)]
+    [InlineData(false, true, false, true, true)]
+    [InlineData(false, false, true, false, false)]
+    [InlineData(true, true, false, true, true)]
+    [InlineData(true, false, true, false, false)]
+    [InlineData(false, true, true, true, true)]
+    [InlineData(true, true, true, true, false)]
+    public async Task Get_WithSupportTaskReferenceForOpenChangeNameRequestSupportTask_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName, bool evidenceIsPdf, bool hasRequestEmail)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             createPersonResult.PersonId,
-            b => b.WithFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
-                .WithMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(createPersonResult.MiddleName) : createPersonResult.MiddleName)
-                .WithLastName(hasNewLastName ? TestData.GenerateChangedLastName(createPersonResult.LastName) : createPersonResult.LastName)
-                .WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg"));
+            b =>
+            {
+                var builder = b
+                    .WithFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
+                    .WithMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(createPersonResult.MiddleName) : createPersonResult.MiddleName)
+                    .WithLastName(hasNewLastName ? TestData.GenerateChangedLastName(createPersonResult.LastName) : createPersonResult.LastName)
+                    .WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg");
+                if (!hasRequestEmail)
+                {
+                    builder = builder.WithoutEmailAddress();
+                }
+            });
 
         var changeNameRequestData = (ChangeNameRequestData)supportTask.Data;
 
@@ -158,18 +166,36 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             Assert.Null(doc.GetElementByTestId($"pdf-{changeNameRequestData.EvidenceFileId}"));
         }
 
-        Assert.NotNull(doc.GetElementByTestId("email"));
+        if (hasRequestEmail)
+        {
+            Assert.Equal(changeNameRequestData.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
+        }
+        else
+        {
+            Assert.Equal(createPersonResult.Person.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
+        }
+
         Assert.NotNull(doc.GetElementByTestId("linked-record"));
     }
 
-    [Fact]
-    public async Task Get_WithSupportTaskReferenceForOpenChangeDateOfBirthRequestSupportTask_RendersExpectedContent()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Get_WithSupportTaskReferenceForOpenChangeDateOfBirthRequestSupportTask_RendersExpectedContent(bool requestHasEmail)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
             createPersonResult.PersonId,
-            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+            b =>
+            {
+                var builder = b
+                    .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth));
+                if (!requestHasEmail)
+                {
+                    builder = builder.WithoutEmailAddress();
+                }
+            });
 
         var changeDateOfBirthRequestData = (ChangeDateOfBirthRequestData)supportTask.Data;
 
@@ -191,7 +217,15 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var imageDocument = doc.GetElementByTestId($"image-{changeDateOfBirthRequestData.EvidenceFileId}");
         Assert.NotNull(imageDocument);
 
-        Assert.NotNull(doc.GetElementByTestId("email"));
+        if (requestHasEmail)
+        {
+            Assert.Equal(changeDateOfBirthRequestData.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
+        }
+        else
+        {
+            Assert.Equal(createPersonResult.Person.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
+        }
+
         Assert.NotNull(doc.GetElementByTestId("linked-record"));
     }
 }
