@@ -2075,7 +2075,7 @@
           "EntityFrameworkCore.Projectables": "[4.0.0, )",
           "FluentValidation": "[12.1.0, )",
           "Google.Cloud.Storage.V1": "[4.13.0, )",
-          "GovukNotify": "[6.1.0, )",
+          "GovukNotify": "[7.2.0, )",
           "Hangfire.Core": "[1.8.22, )",
           "Hangfire.NetCore": "[1.8.22, )",
           "Hangfire.PostgreSql": "[1.20.12, )",
@@ -2291,9 +2291,9 @@
       },
       "GovukNotify": {
         "type": "CentralTransitive",
-        "requested": "[6.1.0, )",
-        "resolved": "6.1.0",
-        "contentHash": "gQxZtymzwlSruHdTaQL0ItberaBspk2K2WgoHja5wn8Kyzq++fapT/9/7bMEbLKKyJ5eOdR9VjZxF7V9AZETzQ==",
+        "requested": "[7.2.0, )",
+        "resolved": "7.2.0",
+        "contentHash": "FMGqbjf+WO9uhEgrat9MQ7N1hnAsD3ycn2g24FnPPR3/UNFbIT5PxKDobE/kRRU0rxdx27yWG83FrraszL/+LQ==",
         "dependencies": {
           "JWT": "[7.1.0, 9.0.0)",
           "Newtonsoft.Json": "[10.0.3, 14.0.0)",
