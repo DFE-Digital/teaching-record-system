@@ -2341,8 +2341,8 @@
           "FluentValidation": "[11.11.0, )",
           "Google.Cloud.Storage.V1": "[4.10.0, )",
           "GovukNotify": "[6.1.0, )",
-          "Hangfire.Core": "[1.8.21, )",
-          "Hangfire.NetCore": "[1.8.21, )",
+          "Hangfire.Core": "[1.8.22, )",
+          "Hangfire.NetCore": "[1.8.22, )",
           "Hangfire.PostgreSql": "[1.20.12, )",
           "IdentityModel": "[6.2.0, )",
           "Microsoft.Data.SqlClient": "[6.1.2, )",
@@ -2432,7 +2432,7 @@
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.1, )",
-          "Hangfire.AspNetCore": "[1.8.21, )",
+          "Hangfire.AspNetCore": "[1.8.22, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[9.0.10, )",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "[9.0.10, )",
           "Sentry.AspNetCore": "[5.14.0, )",
@@ -2629,29 +2629,29 @@
       },
       "Hangfire.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.8.21, )",
-        "resolved": "1.8.21",
-        "contentHash": "G3yP92rPC313zRA1DIaROmF6UYB9NRtMHy64CCq4StqWmyUuFQQsYgZxo+Kp6gd2CbjaSI8JN8canTMYSGfrMw==",
+        "requested": "[1.8.22, )",
+        "resolved": "1.8.22",
+        "contentHash": "Ud5ZNnH9q5+3MryiuPTW7baRERN9QYLyX+8muLwH9BqumoE9eWZRxna9RrunYaMVkNGbTUUuwOfSYIvCC222TQ==",
         "dependencies": {
-          "Hangfire.NetCore": "[1.8.21]"
+          "Hangfire.NetCore": "[1.8.22]"
         }
       },
       "Hangfire.Core": {
         "type": "CentralTransitive",
-        "requested": "[1.8.21, )",
-        "resolved": "1.8.21",
-        "contentHash": "UfIDfDKJTue82ShKV/HHEBScAIJMnuiS8c5jcLHThY8i8O0eibCcNjFkVqlvY9cnDiOBZ7EBGWJ8horH9Ykq+g==",
+        "requested": "[1.8.22, )",
+        "resolved": "1.8.22",
+        "contentHash": "fjgEtlfkLNnUcX9IB+fp3gTPtt5G7VJ0PCcoKLEWnXJXn5qTm/mvrm/t3/T+Xj35ZePtbWBm+j2PXE0beFwzbA==",
         "dependencies": {
           "Newtonsoft.Json": "11.0.1"
         }
       },
       "Hangfire.NetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.8.21, )",
-        "resolved": "1.8.21",
-        "contentHash": "NR8BvQqgvVstgY/YZVisuV/XdkKSZGiD+5b+NABuGxu/xDEhycFHS1uIC9zhIYkPr1tThGoThRIH07JWxPZTvQ==",
+        "requested": "[1.8.22, )",
+        "resolved": "1.8.22",
+        "contentHash": "I7LiUHpC3ks7k+vLFOdwwCwDHxT83H+Mv6bT+7vkI1SLOc4Vwv2zOWdeeN1K86vddu7R36ho+eKP0gvfYlSZjg==",
         "dependencies": {
-          "Hangfire.Core": "[1.8.21]",
+          "Hangfire.Core": "[1.8.22]",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "3.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "3.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "3.0.0"
