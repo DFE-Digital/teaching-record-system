@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Notify;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -18,10 +17,11 @@ public class SendEmailJob(TrsDbContext dbContext, INotificationSender notificati
     protected Task<Email> GetEmailByIdAsync(Guid emailId) =>
         dbContext.Emails.SingleAsync(e => e.EmailId == emailId);
 
-    protected async Task SendEmailAsync(Guid emailId)
+    protected async Task<Email> SendEmailAsync(Guid emailId)
     {
         var email = await GetEmailByIdAsync(emailId);
         await SendEmailAsync(email);
+        return email;
     }
 
     protected async Task SendEmailAsync(Email email)
@@ -33,7 +33,7 @@ public class SendEmailJob(TrsDbContext dbContext, INotificationSender notificati
 
         email.SentOn = clock.UtcNow;
 
-        dbContext.AddEventWithoutBroadcast(new EmailSentEvent
+        dbContext.AddEventWithoutBroadcast(new LegacyEvents.EmailSentEvent
         {
             EventId = Guid.NewGuid(),
             Email = EventModels.Email.FromModel(email),

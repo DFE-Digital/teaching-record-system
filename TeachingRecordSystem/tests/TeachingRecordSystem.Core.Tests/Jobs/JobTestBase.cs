@@ -6,6 +6,8 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 [Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public abstract class JobTestBase(JobFixture fixture)
 {
+    protected EventCapture Events => fixture.Services.GetRequiredService<EventCapture>();
+
     protected TestableClock Clock => (TestableClock)fixture.Services.GetRequiredService<IClock>();
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => fixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();

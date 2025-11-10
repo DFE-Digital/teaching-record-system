@@ -15,6 +15,9 @@ public class JobFixture : ServiceProviderFixture
         services
             .AddSingleton<IClock>(Clock)
             .AddSingleton<TestData>()
-            .AddSingleton<ReferenceDataCache>();
+            .AddSingleton<ReferenceDataCache>()
+            .AddEventPublisher()
+            .AddSingleton<EventCapture>()
+            .AddSingleton<IEventHandler>(sp => sp.GetRequiredService<EventCapture>());
     }
 }

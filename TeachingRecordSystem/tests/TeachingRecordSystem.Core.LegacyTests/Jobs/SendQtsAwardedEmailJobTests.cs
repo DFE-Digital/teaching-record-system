@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -77,11 +76,11 @@ public class SendAytqInviteEmailJobTests(NightlyEmailJobFixture dbFixture) : Nig
             Assert.Equal(Clock.UtcNow, email.SentOn);
 
             var events = await dbContext.Events
-                .Where(e => e.EventName == nameof(EmailSentEvent))
+                .Where(e => e.EventName == nameof(LegacyEvents.EmailSentEvent))
                 .ToListAsync();
 
             var @event = Assert.Single(events);
-            var emailSentEvent = (EmailSentEvent)@event.ToEventBase();
+            var emailSentEvent = (LegacyEvents.EmailSentEvent)@event.ToEventBase();
 
             Assert.NotNull(emailSentEvent);
         });
