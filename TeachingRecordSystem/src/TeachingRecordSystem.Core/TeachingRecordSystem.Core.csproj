@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="TeachingRecordSystem.Core.Tests" />
+    <InternalsVisibleTo Include="TeachingRecordSystem.Core.LegacyTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="DataStore\Postgres\Procedures\fn_delete_person_employments_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_delete_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_delete_tps_employments_person_search_attributes_v1.sql" />

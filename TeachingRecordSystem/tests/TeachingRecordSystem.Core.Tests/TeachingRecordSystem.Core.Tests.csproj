@@ -1,27 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);xUnit1041</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="Moq" />
-    <PackageReference Include="NSign.AspNetCore" />
-    <PackageReference Include="xunit.analyzers">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="xunit.core" />
-    <PackageReference Include="Xunit.DependencyInjection" />
     <PackageReference Include="xunit.runner.visualstudio">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="xunit.v3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.TestCommon.XUnit3\TeachingRecordSystem.TestCommon.XUnit3.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>
 
