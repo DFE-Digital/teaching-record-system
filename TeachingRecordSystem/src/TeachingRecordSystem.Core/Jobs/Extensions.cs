@@ -1,6 +1,7 @@
 using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
@@ -10,44 +11,26 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public static class Extensions
 {
-    public static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        if (configuration.GetValue<bool>("RecurringJobsEnabled"))
-        {
-            services.AddOptions<BatchSendProfessionalStatusEmailsOptions>()
-                .Bind(configuration.GetSection("BatchSendProfessionalStatusEmailsJob"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
+        services.AddHttpClient<PopulateNameSynonymsJob>();
+        services.AddTransient<QtsImporter>();
+        services.AddTransient<InductionImporter>();
 
-            services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
-                .Bind(configuration.GetSection("BatchSendInductionCompletedEmailsJob"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
+        services.AddOptions<BatchSendProfessionalStatusEmailsOptions>()
+            .Bind(configuration.GetSection("BatchSendProfessionalStatusEmailsJob"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-            services.AddOptions<InductionStatusUpdatedSupportJobOptions>()
-                .Bind(configuration.GetSection("RecurringJobs:InductionStatusUpdatedSupportJob"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
+        services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
+            .Bind(configuration.GetSection("BatchSendInductionCompletedEmailsJob"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-            services.AddStartupTask(sp =>
-            {
-                var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
-
-                var professionalStatusEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendProfessionalStatusEmailsOptions>>().Value;
-                recurringJobManager.AddOrUpdate<BatchSendProfessionalStatusEmailsJob>(
-                    nameof(BatchSendProfessionalStatusEmailsJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    professionalStatusEmailJobOptions.JobSchedule);
-
-                var inductionEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendInductionCompletedEmailsJobOptions>>().Value;
-                recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
-                    nameof(BatchSendInductionCompletedEmailsJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    inductionEmailJobOptions.JobSchedule);
-
-                return Task.CompletedTask;
-            });
-        }
+        services.AddOptions<InductionStatusUpdatedSupportJobOptions>()
+            .Bind(configuration.GetSection("RecurringJobs:InductionStatusUpdatedSupportJob"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddOptions<CapitaTpsUserOption>()
             .BindConfiguration("RecurringJobs:CapitaTpsImport")
@@ -59,47 +42,24 @@ public static class Extensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddHttpClient<PopulateNameSynonymsJob>();
-
-        services.AddTransient<QtsImporter>();
-        services.AddTransient<InductionImporter>();
+        string GetRecurringJobSchedule(string cronExpression) =>
+            configuration.GetValue<bool>("RecurringJobsEnabled") && environment.IsProduction() ? cronExpression : Cron.Never();
 
         services.AddStartupTask(sp =>
         {
             var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
 
-            recurringJobManager.RemoveIfExists("MopUpQtsAwardeesJob");
-            recurringJobManager.RemoveIfExists("SyncAllMqsFromCrmJob");
-            recurringJobManager.RemoveIfExists("BackfillNinoAndPersonPostcodeInEmploymentHistoryJob");
-            recurringJobManager.RemoveIfExists("BatchSendQtsAwardedEmailsJob");
-            recurringJobManager.RemoveIfExists("BatchSendInternationalQtsAwardedEmailsJob");
-            recurringJobManager.RemoveIfExists("BatchSendEytsAwardedEmailsJob");
-            recurringJobManager.RemoveIfExists("DeleteOldAttachmentsJob");
+            var professionalStatusEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendProfessionalStatusEmailsOptions>>().Value;
+            recurringJobManager.AddOrUpdate<BatchSendProfessionalStatusEmailsJob>(
+                nameof(BatchSendProfessionalStatusEmailsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                GetRecurringJobSchedule(professionalStatusEmailJobOptions.JobSchedule));
 
-            recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob");
-            recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
-            recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob & migrate");
-
-            recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob");
-            recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & (dry-run)");
-            recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & migrate");
-
-            recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob");
-            recurringJobManager.RemoveIfExists("MigrateRoutesFromCrmJob (dry-run)");
-
-            recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob (dry-run)");
-            recurringJobManager.RemoveIfExists("ResetIncorrectHasEypsOnPersonsJob");
-
-            recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob (dry-run)");
-            recurringJobManager.RemoveIfExists("SetMissingHasEypsOnPersonsJob");
-
-            recurringJobManager.RemoveIfExists("AllocateTrnsToPersonsWithEyps (dry-run)");
-            recurringJobManager.RemoveIfExists("AllocateTrnsToPersonsWithEyps");
-
-            recurringJobManager.RemoveIfExists("BackfillDqtReportingAlertTypes");
-            recurringJobManager.RemoveIfExists("BackfillDqtReportingPersons");
-            recurringJobManager.RemoveIfExists("BackfillDqtReportingQualifications");
-            recurringJobManager.RemoveIfExists("BackfillDqtReportingWorkforceData");
+            var inductionEmailJobOptions = sp.GetRequiredService<IOptions<BatchSendInductionCompletedEmailsJobOptions>>().Value;
+            recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
+                nameof(BatchSendInductionCompletedEmailsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                GetRecurringJobSchedule(inductionEmailJobOptions.JobSchedule));
 
             recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
                 nameof(SyncAllPersonsFromCrmJob),
@@ -120,7 +80,7 @@ public static class Extensions
             recurringJobManager.AddOrUpdate<RefreshEstablishmentsJob>(
                 nameof(RefreshEstablishmentsJob),
                 job => job.ExecuteAsync(CancellationToken.None),
-                giasOptions.Value.RefreshEstablishmentsJobSchedule);
+                GetRecurringJobSchedule(giasOptions.Value.RefreshEstablishmentsJobSchedule));
 
             recurringJobManager.AddOrUpdate<ImportTpsCsvExtractFileJob>(
                 nameof(ImportTpsCsvExtractFileJob),
@@ -156,10 +116,6 @@ public static class Extensions
                 nameof(ExportWorkforceDataJob),
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
-
-            recurringJobManager.RemoveIfExists("InductionStatusUpdatedSupportJob");
-
-            recurringJobManager.RemoveIfExists("BackfillDqtNotesJob");
 
             recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
                 nameof(CpdInductionImporterJob),
@@ -204,7 +160,7 @@ public static class Extensions
             recurringJobManager.AddOrUpdate<EwcWalesImportJob>(
                 nameof(EwcWalesImportJob),
                 job => job.ExecuteAsync(CancellationToken.None),
-                EwcWalesImportJob.JobSchedule);
+                GetRecurringJobSchedule(EwcWalesImportJob.JobSchedule));
 
             var publishApiOptions = sp.GetRequiredService<IOptions<PublishApiOptions>>().Value;
             recurringJobManager.AddOrUpdate<RefreshTrainingProvidersJob>(
@@ -217,8 +173,6 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.RemoveIfExists("AppendTrainingProvidersFromCrmJob");
-
             recurringJobManager.AddOrUpdate<ResyncAllPersonsJob>(
                 nameof(ResyncAllPersonsJob),
                 job => job.ExecuteAsync(new DateTime(2025, 8, 22, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None),
@@ -228,10 +182,6 @@ public static class Extensions
                 nameof(FixIncorrectOttRouteMigrationMappingsJob),
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
-
-            recurringJobManager.RemoveIfExists("BackfillDqtIttQtsBusinessEventAuditsJob (dry-run)");
-            recurringJobManager.RemoveIfExists("BackfillDqtIttQtsBusinessEventAuditsJob");
-            recurringJobManager.RemoveIfExists("SyncAllPreviousNamesFromCrmJob");
 
             recurringJobManager.AddOrUpdate<BackfillPersonCreatedByTpsJob>(
                 nameof(BackfillPersonCreatedByTpsJob),
@@ -246,12 +196,12 @@ public static class Extensions
             recurringJobManager.AddOrUpdate<CapitaExportNewJob>(
                 nameof(CapitaExportNewJob),
                 job => job.ExecuteAsync(CancellationToken.None),
-                CapitaExportNewJob.JobSchedule);
+                GetRecurringJobSchedule(CapitaExportNewJob.JobSchedule));
 
             recurringJobManager.AddOrUpdate<CapitaExportAmendJob>(
                 nameof(CapitaExportAmendJob),
                 job => job.ExecuteAsync(CancellationToken.None),
-                CapitaExportAmendJob.JobSchedule);
+                GetRecurringJobSchedule(CapitaExportAmendJob.JobSchedule));
 
             recurringJobManager.AddOrUpdate<AllocateTrnToPersonJob>(
                 $"{nameof(AllocateTrnToPersonJob)} (dry-run)",
@@ -266,7 +216,7 @@ public static class Extensions
             recurringJobManager.AddOrUpdate<CapitaImportJob>(
                 nameof(CapitaImportJob),
                 job => job.ExecuteAsync(CancellationToken.None),
-                CapitaImportJob.JobSchedule);
+                GetRecurringJobSchedule(CapitaImportJob.JobSchedule));
 
             recurringJobManager.AddOrUpdate<DeletePersonAndChildRecordsWithoutATrnJob>(
                 $"{nameof(DeletePersonAndChildRecordsWithoutATrnJob)} (dry-run)",
@@ -281,7 +231,7 @@ public static class Extensions
             recurringJobManager.AddOrUpdate<DeleteStaleJourneyStatesJob>(
                 nameof(DeleteStaleJourneyStatesJob),
                 job => job.ExecuteAsync(CancellationToken.None),
-                DeleteStaleJourneyStatesJob.JobSchedule);
+                GetRecurringJobSchedule(DeleteStaleJourneyStatesJob.JobSchedule));
 
             recurringJobManager.AddOrUpdate<BackfillPersonAttributesJob>(
                 nameof(BackfillPersonAttributesJob),

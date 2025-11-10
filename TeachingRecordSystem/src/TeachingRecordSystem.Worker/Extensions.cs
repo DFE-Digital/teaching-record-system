@@ -60,7 +60,7 @@ public static class Extensions
             services
                 .AddIdentityApi(configuration)
                 .AddPublishApi(configuration)
-                .AddBackgroundJobs(configuration);
+                .AddBackgroundJobs(configuration, environment);
         }
 
         if (configuration.GetValue<bool>("DqtReporting:RunService"))
