@@ -2416,7 +2416,7 @@
           "GovUk.Frontend.AspNetCore": "[3.4.1, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.0, )",
           "Humanizer.Core": "[2.14.1, )",
-          "Joonasw.AspNetCore.SecurityHeaders": "[5.0.0, )",
+          "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "[8.14.0, )",
           "OpenIddict.AspNetCore": "[7.1.0, )",
           "OpenIddict.EntityFrameworkCore": "[7.1.0, )",
@@ -2772,12 +2772,12 @@
       },
       "Joonasw.AspNetCore.SecurityHeaders": {
         "type": "CentralTransitive",
-        "requested": "[5.0.0, )",
-        "resolved": "5.0.0",
-        "contentHash": "e2qDJIM5mISS/4+Chz9zPtD8VitI2dSPBdtL28KDFtBx0Icl0mD+fv9FbspASFTX/fZj7Vx3p67iUFyX7SSePw==",
+        "requested": "[6.0.0, )",
+        "resolved": "6.0.0",
+        "contentHash": "tuiKMG/YEMXzDC5Wpi6/HMPC2nUW9OgNZ0w5iPckd0Y9RI8zZ5i4eicN554P//lBn9Ht2pRLwK7NdTk1BAeqew==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
-          "Microsoft.Extensions.Options": "7.0.1"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.3",
+          "Microsoft.Extensions.Options": "9.0.3"
         }
       },
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
