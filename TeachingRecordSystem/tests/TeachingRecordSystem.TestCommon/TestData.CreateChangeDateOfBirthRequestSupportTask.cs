@@ -23,6 +23,7 @@ public partial class TestData
         private Option<string> _emailAddress;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
+        private bool _hasEmailAddress = true;
 
         public CreateChangeDateOfBirthRequestSupportTaskBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
@@ -41,9 +42,24 @@ public partial class TestData
         }
         public CreateChangeDateOfBirthRequestSupportTaskBuilder WithEmailAddress(string emailAddress)
         {
+            if (!_hasEmailAddress)
+            {
+                throw new InvalidOperationException("Cannot specify an email address and also indicate that there is no email address.");
+            }
             _emailAddress = Option.Some(emailAddress);
             return this;
         }
+        public CreateChangeDateOfBirthRequestSupportTaskBuilder WithoutEmailAddress()
+        {
+            if (_emailAddress.HasValue)
+            {
+                throw new InvalidOperationException("Cannot specify an email address and also indicate that there is no email address.");
+            }
+            _emailAddress = Option.None<string>();
+            _hasEmailAddress = false;
+            return this;
+        }
+
         public CreateChangeDateOfBirthRequestSupportTaskBuilder WithStatus(SupportTaskStatus status)
         {
             _status = Option.Some(status);
@@ -55,12 +71,12 @@ public partial class TestData
             return this;
         }
 
-        public async Task<SupportTask> ExecuteAsync(TestData testData)
+        public Task<SupportTask> ExecuteAsync(TestData testData)
         {
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid);
             var evidenceFileName = _evidenceFileName.ValueOr("evidence-file.jpg");
-            var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail);
+            var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
             var status = _status.ValueOr(SupportTaskStatus.Open);
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
 
@@ -85,7 +101,7 @@ public partial class TestData
                 out var createdEvent);
             supportTask.Status = status;
 
-            return await testData.WithDbContextAsync(async dbContext =>
+            return testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.SupportTasks.Add(supportTask);
                 dbContext.AddEventWithoutBroadcast(createdEvent);

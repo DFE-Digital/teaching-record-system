@@ -78,7 +78,7 @@ public class IndexModel(
                 NewMiddleName = data.MiddleName,
                 NewLastName = data.LastName
             };
-            Email = data.EmailAddress;
+            Email = !string.IsNullOrEmpty(data.EmailAddress) ? data.EmailAddress : person.EmailAddress;
 
             if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))
             {
@@ -102,7 +102,7 @@ public class IndexModel(
                 CurrentDateOfBirth = person.DateOfBirth!.Value,
                 NewDateOfBirth = data.DateOfBirth
             };
-            Email = data.EmailAddress;
+            Email = !string.IsNullOrEmpty(data.EmailAddress) ? data.EmailAddress : person.EmailAddress;
 
             if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))
             {

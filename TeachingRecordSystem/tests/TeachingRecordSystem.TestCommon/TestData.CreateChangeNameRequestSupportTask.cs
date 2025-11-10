@@ -25,6 +25,7 @@ public partial class TestData
         private Option<string> _emailAddress;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
+        private bool _hasEmailAddress = true;
 
         public CreateChangeNameRequestSupportTaskBuilder WithFirstName(string firstName)
         {
@@ -58,7 +59,22 @@ public partial class TestData
 
         public CreateChangeNameRequestSupportTaskBuilder WithEmailAddress(string emailAddress)
         {
+            if (!_hasEmailAddress)
+            {
+                throw new InvalidOperationException("Cannot specify an email address and also indicate that there is no email address.");
+            }
             _emailAddress = Option.Some(emailAddress);
+            return this;
+        }
+
+        public CreateChangeNameRequestSupportTaskBuilder WithoutEmailAddress()
+        {
+            if (_emailAddress.HasValue)
+            {
+                throw new InvalidOperationException("Cannot specify an email address and also indicate that there is no email address.");
+            }
+            _hasEmailAddress = false;
+            _emailAddress = Option.None<string>();
             return this;
         }
 
@@ -81,7 +97,7 @@ public partial class TestData
             var lastName = _lastName.ValueOr(testData.GenerateLastName);
             var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid);
             var evidenceFileName = _evidenceFileName.ValueOr("evidence-file.jpg");
-            var emailAddress = _emailAddress.ValueOr(testData.GenerateUniqueEmail);
+            var emailAddress = _hasEmailAddress ? _emailAddress.ValueOr(testData.GenerateUniqueEmail) : null;
             var status = _status.ValueOr(SupportTaskStatus.Open);
             var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
 
