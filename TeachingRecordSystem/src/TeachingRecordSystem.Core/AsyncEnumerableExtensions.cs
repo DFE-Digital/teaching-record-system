@@ -2,8 +2,6 @@ namespace TeachingRecordSystem.Core;
 
 public static class AsyncEnumerableExtensions
 {
-    public static async ValueTask<IReadOnlyCollection<T>> AsReadOnlyAsync<T>(this IAsyncEnumerable<T> enumerable) => await enumerable.ToArrayAsync();
-
     public static async IAsyncEnumerable<T[]> ChunkAsync<T>(this IAsyncEnumerable<T> source, int size)
     {
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(size, 0);

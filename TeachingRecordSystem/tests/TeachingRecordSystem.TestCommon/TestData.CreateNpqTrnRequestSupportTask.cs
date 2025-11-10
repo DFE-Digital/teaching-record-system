@@ -196,33 +196,32 @@ public partial class TestData
             {
                 // Matches wasn't explicitly specified; create two person records that match details in this request
 
-                matchedPersons = await Enumerable.Range(1, 2)
-                    .ToAsyncEnumerable()
-                    .SelectAwait(async _ =>
-                    {
-                        var person = await testData.CreatePersonAsync(p =>
+                matchedPersons = await AsyncEnumerable.ToArrayAsync(Enumerable.Range(1, 2)
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async _ =>
                         {
-                            p
-                                .WithFirstName(firstName)
-                                .WithMiddleName(middleName)
-                                .WithLastName(lastName)
-                                .WithDateOfBirth(dateOfBirth)
-                                .WithEmailAddress(emailAddress);
-
-                            if (nationalInsuranceNumber is not null)
+                            var person = await testData.CreatePersonAsync(p =>
                             {
-                                p.WithNationalInsuranceNumber(nationalInsuranceNumber);
-                            }
+                                p
+                                    .WithFirstName(firstName)
+                                    .WithMiddleName(middleName)
+                                    .WithLastName(lastName)
+                                    .WithDateOfBirth(dateOfBirth)
+                                    .WithEmailAddress(emailAddress);
 
-                            if (gender is not null)
-                            {
-                                p.WithGender(gender.Value);
-                            }
-                        });
+                                if (nationalInsuranceNumber is not null)
+                                {
+                                    p.WithNationalInsuranceNumber(nationalInsuranceNumber);
+                                }
 
-                        return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
-                    })
-                    .ToArrayAsync();
+                                if (gender is not null)
+                                {
+                                    p.WithGender(gender.Value);
+                                }
+                            });
+
+                            return new TrnRequestMatchedPerson() { PersonId = person.PersonId };
+                        }));
             }
 
             var matches = new TrnRequestMatches() { MatchedPersons = matchedPersons };

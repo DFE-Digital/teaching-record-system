@@ -20,13 +20,13 @@
       },
       "Azure.Storage.Files.DataLake": {
         "type": "Direct",
-        "requested": "[12.16.0, )",
-        "resolved": "12.16.0",
-        "contentHash": "D+mkKzL5diWWqGX4pDNeHOIYfv91H15BJSfSLeBCjV3mHFAhykxYDWXOTVJ0ThobJ3yI2R4SahjbVmdgd0vlyg==",
+        "requested": "[12.24.0, )",
+        "resolved": "12.24.0",
+        "contentHash": "b1i4LL10EBXfBb9pOO9Q0C9lo2CvHkcPeLWw26dyOEZO3cNlNejAbAVYDW1Ct3aG8g1unm2/mSs9MTfyC1IZaw==",
         "dependencies": {
-          "Azure.Storage.Blobs": "12.18.0",
-          "Azure.Storage.Common": "12.17.0",
-          "System.Text.Json": "4.7.2"
+          "Azure.Core": "1.47.3",
+          "Azure.Storage.Blobs": "12.26.0",
+          "Azure.Storage.Common": "12.25.0"
         }
       },
       "CloudNative.CloudEvents": {
@@ -46,12 +46,9 @@
       },
       "CsvHelper": {
         "type": "Direct",
-        "requested": "[30.1.0, )",
-        "resolved": "30.1.0",
-        "contentHash": "R7sRLng2mOBOCtpg9q3B8Wna7qw4CARq9d68t4rBh09obGjEP2OC2RzGojtnIN0LBau15VRMmh1MfYpQwk2Kbw==",
-        "dependencies": {
-          "System.Linq.Async": "4.0.0"
-        }
+        "requested": "[33.1.0, )",
+        "resolved": "33.1.0",
+        "contentHash": "kqfTOZGrn7NarNeXgjh86JcpTHUoeQDMB8t9NVa/ZtlSYiV1rxfRnQ49WaJsob4AiGrbK0XDzpyKkBwai4F8eg=="
       },
       "dbup-sqlserver": {
         "type": "Direct",
@@ -545,6 +542,12 @@
         "dependencies": {
           "Serilog": "2.10.0"
         }
+      },
+      "System.Linq.Async": {
+        "type": "Direct",
+        "requested": "[6.0.3, )",
+        "resolved": "6.0.3",
+        "contentHash": "hSHiq2m1ky7zUQgTp+/2h1K3lABIQ+GltRixoclHPg/Sc1vnfeS6g/Uy5moOVZKrZJdQiFPFZd6OobBp3tZcFg=="
       },
       "System.Net.Http.Json": {
         "type": "Direct",
@@ -2693,12 +2696,6 @@
           "Microsoft.IdentityModel.JsonWebTokens": "7.5.0",
           "Microsoft.IdentityModel.Tokens": "7.5.0"
         }
-      },
-      "System.Linq.Async": {
-        "type": "CentralTransitive",
-        "requested": "[6.0.3, )",
-        "resolved": "4.0.0",
-        "contentHash": "WbiYEedFZeM+psmMyoCt1AKbZppAZg8Eq1ZTQ+521fGNeXqlgJj0tZYV5n1LsKRO5osQuitYxGNuzPTy3213sg=="
       },
       "System.Text.Json": {
         "type": "CentralTransitive",
