@@ -25,6 +25,8 @@ public abstract class TestBase
 
     public static string HasTextSelector(string? text) => $":has-text(\"{text}\")";
 
+    public static string LinkHrefContains(string hrefPart) => $"a[href*=\"{hrefPart}\"]";
+
     protected void SetCurrentUser(User user)
     {
         var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentUserProvider>();
