@@ -258,7 +258,7 @@ public partial class PersonMatchingServiceTests
             dateOfBirth: TrnRequest.DateOfBirthArgumentOption.Matches,
             nationalInsuranceNumber: TrnRequest.NationalInsuranceNumberArgumentOption.MatchesEmploymentNino);
 
-        var allSubsets = MatchableAttributes.Subsets().ToList();
+        var allSubsets = _matchableAttributes.Subsets().ToList();
 
         // Match on 3 or more attributes
 
@@ -367,7 +367,7 @@ public partial class PersonMatchingServiceTests
             gender: TrnRequest.GenderArgumentOption.Matches,
             nationalInsuranceNumber: TrnRequest.NationalInsuranceNumberArgumentOption.Empty);
 
-        var allSubsetsExcludingNino = MatchableAttributes
+        var allSubsetsExcludingNino = _matchableAttributes
             .Except(["NationalInsuranceNumber", "WorkforceNationalInsuranceNumber"])
             .Subsets().ToList();
 
@@ -498,19 +498,19 @@ public partial class PersonMatchingServiceTests
         }
     }
 
-    private static readonly string[] MatchableAttributes =
-        [
-            "FirstName",
-            "FirstNameAlias",
-            "MiddleName",
-            "LastName",
-            "DateOfBirth",
-            "EmailAddress",
-            "NationalInsuranceNumber",
-            "WorkforceNationalInsuranceNumber",
-            // Adding gender as it's used to determine a definite match if NINO is not provided.
-            "Gender"
-        ];
+    private static readonly string[] _matchableAttributes =
+    [
+        "FirstName",
+        "FirstNameAlias",
+        "MiddleName",
+        "LastName",
+        "DateOfBirth",
+        "EmailAddress",
+        "NationalInsuranceNumber",
+        "WorkforceNationalInsuranceNumber",
+        // Adding gender as it's used to determine a definite match if NINO is not provided.
+        "Gender"
+    ];
 
     private static ISet<string> GetDistinctAttributeTypes(IEnumerable<string> attributes)
     {
