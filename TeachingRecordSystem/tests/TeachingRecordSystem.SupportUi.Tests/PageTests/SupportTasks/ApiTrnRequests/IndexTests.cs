@@ -21,6 +21,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Empty(doc.GetElementsByTagName("table"));
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
     }
 
