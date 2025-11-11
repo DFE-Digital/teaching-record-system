@@ -9,25 +9,24 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        <span class="govuk-caption-l">Support tasks</span>
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    <span class="govuk-caption-l">Support tasks</span>
+    <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form action="@LinkGenerator.SupportTasks.ApiTrnRequests.Index()" method="get" asp-antiforgery="false">
-            <div class="moj-search govuk-!-margin-bottom-4">
-                <govuk-input for="Search" input-class="moj-search__input" type="search" autocomplete="off">
-                    <govuk-input-label class="moj-search__label">
-                        <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Search</h3>
-                    </govuk-input-label>
-                    <govuk-input-hint class="moj-search__hint">
-                        Enter a name, email address or request date, for example 31/3/2025
-                    </govuk-input-hint>
-                </govuk-input>
-                @* TODO move this inside input when GFA library is updated *@
-                <govuk-button class="moj-search__button" type="submit" style="margin-bottom:0;">Search</govuk-button>
-            </div>
-        </form>
-    </div>
+    <form action="@LinkGenerator.SupportTasks.ApiTrnRequests.Index()" method="get" asp-antiforgery="false">
+        <div class="moj-search govuk-!-margin-bottom-4">
+            <govuk-input for="Search" input-class="moj-search__input" type="search" autocomplete="off">
+                <govuk-input-label class="moj-search__label">
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Search</h3>
+                </govuk-input-label>
+                <govuk-input-hint class="moj-search__hint">
+                    Enter a name, email address or request date, for example 31/3/2025
+                </govuk-input-hint>
+            </govuk-input>
+            @* TODO move this inside input when GFA library is updated *@
+            <govuk-button class="moj-search__button" type="submit" style="margin-bottom:0;">Search</govuk-button>
+        </div>
+    </form>
+
     <div class="govuk-grid-column-full-from-desktop" data-testid="results">
         @if(Model.Results!.Count == 0)
         {
