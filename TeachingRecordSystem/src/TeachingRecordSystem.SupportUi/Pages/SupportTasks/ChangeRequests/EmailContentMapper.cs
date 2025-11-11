@@ -1,6 +1,6 @@
-using static TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel;
+using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest.RejectModel;
 
-namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests;
 
 public static class EmailContentMapper
 {

@@ -1,0 +1,63 @@
+@page "/support-tasks/change-requests"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.IndexModel
+@{
+    ViewBag.Title = "Change details requests";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Index()" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">Support tasks</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    </div>
+    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        @if (Model.Results!.Count == 0)
+        {
+            <p class="govuk-body-l govuk-!-font-weight-bold" data-testid="no-tasks-message">
+                No matching requests found
+            </p>
+            <p class="govuk-body-m">Try searching again with different details.</p>
+        }
+        else
+        {
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                            sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.Name ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.Name, sortDirection: direction))">
+                            Name
+                        </th>                    
+                        <th scope="col" class="govuk-table__header trs-!-width-150"
+                            sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.RequestedOn, sortDirection: direction))">
+                            Requested on
+                        </th>
+                        <th scope="col" class="govuk-table__header trs-!-width-150"
+                            sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.ChangeType ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.ChangeType, sortDirection: direction))">
+                            Type
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var result in Model.Results)
+                    {
+                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                            <th scope="row" class="govuk-table__header" data-testid="name">
+                                <a href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(result.SupportTaskReference)" class="govuk-link">@result.Name</a>
+                            </th>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                            <td class="govuk-table__cell" data-testid="change-type">@(result.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest ? "DOB" : "Name")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <partial name="_Pagination" model=@Model.Pagination />
+    </div>
+</div>

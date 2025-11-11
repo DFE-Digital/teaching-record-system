@@ -1,12 +1,12 @@
-@page "/change-requests/{supportTaskReference}/reject"
-@using static TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel;
-@model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel
+@page "/support-tasks/change-requests/{supportTaskReference}/reject"
+@using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest.RejectModel;
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest.RejectModel
 @{
     ViewBag.Title = "Reject the change";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.ChangeRequests.EditChangeRequest.Index(Model.SupportTaskReference)" />
+    <govuk-back-link href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(Model.SupportTaskReference)" />
 }
 
 <span class="govuk-caption-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Change of Name" : "Change of Date of Birth") - @Model.PersonName</span>
@@ -14,7 +14,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.ChangeRequests.EditChangeRequest.Reject(Model.SupportTaskReference)" method="post">
+        <form action="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Reject(Model.SupportTaskReference)" method="post">
             <govuk-radios for="RejectionReasonChoice">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>

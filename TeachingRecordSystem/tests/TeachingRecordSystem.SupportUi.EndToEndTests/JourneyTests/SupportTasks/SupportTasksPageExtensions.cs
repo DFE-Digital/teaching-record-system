@@ -11,11 +11,11 @@ public static class SupportTasksPageExtensions
         page.ClickAsync($"a{TestBase.TextIsSelector(caseReference)}");
 
     public static Task AssertOnChangeRequestDetailPageAsync(this IPage page, string caseReference) =>
-        page.WaitForUrlPathAsync($"/change-requests/{caseReference}");
+        page.WaitForUrlPathAsync($"/support-tasks/change-requests/{caseReference}");
 
     public static Task AssertOnAcceptChangeRequestPageAsync(this IPage page, string caseReference) =>
-        page.WaitForUrlPathAsync($"/change-requests/{caseReference}/accept");
+        page.WaitForUrlPathAsync($"/support-tasks/change-requests/{caseReference}/accept");
 
     public static Task AssertOnRejectChangeRequestPageAsync(this IPage page, string caseReference) =>
-        page.WaitForUrlPathAsync($"/change-requests/{caseReference}/reject");
+        page.WaitForUrlPathAsync($"/support-tasks/change-requests/{caseReference}/reject");
 }

@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest;
 
 public record DateOfBirthChangeRequestInfo
 {

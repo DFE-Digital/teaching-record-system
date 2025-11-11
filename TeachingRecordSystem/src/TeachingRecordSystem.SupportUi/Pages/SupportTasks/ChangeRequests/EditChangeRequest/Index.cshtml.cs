@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ChangeRequests.EditChangeRequest;
 
 [Authorize(Policy = AuthorizationPolicies.SupportTasksEdit)]
 public class IndexModel(
