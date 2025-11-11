@@ -23,7 +23,7 @@
                 </govuk-input-hint>
             </govuk-input>
             @* TODO move this inside input when GFA library is updated *@
-            <govuk-button class="moj-search__button" type="submit" style="margin-bottom:0;">Search</govuk-button>
+            <govuk-button class="moj-search__button govuk-!-margin-bottom-0" type="submit">Search</govuk-button>
         </div>
     </form>
 
@@ -63,27 +63,18 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    @if (Model.Results!.Count == 0)
+                    @foreach (var result in Model.Results)
                     {
-                        <tr class="govuk-table__row" data-testid="no-tasks-message">
-                            <td class="govuk-table__cell" colspan="4">No potential duplicate records from APIs</td>
+                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                            <th scope="row" class="govuk-table__header" data-testid="name">
+                                <a href="@LinkGenerator.SupportTasks.ApiTrnRequests.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
+                                    @result.FirstName @result.MiddleName @result.LastName
+                                </a>
+                            </th>
+                            <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                            <td class="govuk-table__cell" data-testid="source"><colored-tag>@result.Source</colored-tag></td>
                         </tr>
-                    }
-                    else
-                    {
-                        foreach (var result in Model.Results)
-                        {
-                            <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                                <th scope="row" class="govuk-table__header" data-testid="name">
-                                    <a href="@LinkGenerator.SupportTasks.ApiTrnRequests.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
-                                        @result.FirstName @result.MiddleName @result.LastName
-                                    </a>
-                                </th>
-                                <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
-                                <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                                <td class="govuk-table__cell" data-testid="source"><colored-tag>@result.Source</colored-tag></td>
-                            </tr>
-                        }
                     }
                 </tbody>
             </table>
