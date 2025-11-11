@@ -9,53 +9,61 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        <span class="govuk-caption-l">Support tasks</span>
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    <span class="govuk-caption-l">Support tasks</span>
+    <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" method="get" asp-antiforgery="false">
-            <govuk-input for="Search" label-class="govuk-label--s" autocomplete="off" />
+    <form action="@LinkGenerator.SupportTasks.NpqTrnRequests.Index()" method="get" asp-antiforgery="false">
+        <div class="moj-search govuk-!-margin-bottom-4">
+            <govuk-input name="Search" input-class="moj-search__input" type="search" autocomplete="off">
+                <govuk-input-label class="moj-search__label">
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Search</h3>
+                </govuk-input-label>
+                <govuk-input-hint class="moj-search__hint">
+                    Enter a name, email address or request date, for example 31/3/2025
+                </govuk-input-hint>
+            </govuk-input>
             @* TODO move this inside input when GFA library is updated *@
-            <govuk-button type="submit">Search</govuk-button>
-        </form>
-    </div>
-    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
-        <table class="govuk-table">
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                    sort-direction="@(Model.SortBy == SortByOption.Name ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Name, direction))">
-                        Name
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                    sort-direction="@(Model.SortBy == SortByOption.Email ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Email, direction))">
-                        Email
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-150"
-                    sort-direction="@(Model.SortBy == SortByOption.RequestedOn ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.RequestedOn, direction))">
-                        Requested on
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-150"
-                    sort-direction="@(Model.SortBy == SortByOption.PotentialDuplicate ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.PotentialDuplicate, direction))">
-                        Potential duplicate
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @if (Model.Results!.Count == 0)
-                {
-                    <tr class="govuk-table__row" data-testid="no-tasks-message">
-                        <td class="govuk-table__cell" colspan="4">No TRN requests matching search criteria</td>
-                    </tr>
+            <govuk-button class="moj-search__button govuk-!-margin-bottom-0" type="submit">Search</govuk-button>
+        </div>
+    </form>
 
-                }
-                else
-                {
-                    foreach (var result in Model.Results)
+    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        @if(Model.Results!.Count == 0)
+        {
+            <p class="govuk-body-l govuk-!-font-weight-bold" data-testid="no-tasks-message">
+                No matching requests found
+            </p>
+            <p class="govuk-body-m">Try searching again with different details</p>
+        }
+        else
+        {
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                        sort-direction="@(Model.SortBy == SortByOption.Name ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Name, direction))">
+                            Name
+                        </th>
+                        <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == SortByOption.Email ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.Email, direction))">
+                            Email
+                        </th>
+                        <th scope="col" class="govuk-table__header trs-!-width-150"
+                        sort-direction="@(Model.SortBy == SortByOption.RequestedOn ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.RequestedOn, direction))">
+                            Requested on
+                        </th>
+                        <th scope="col" class="govuk-table__header trs-!-width-150"
+                        sort-direction="@(Model.SortBy == SortByOption.PotentialDuplicate ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.NpqTrnRequests.Index(search: Model.Search, SortByOption.PotentialDuplicate, direction))">
+                            Potential duplicate
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var result in Model.Results)
                     {
                         var tagValue = result.PotentialDuplicate.HasValue ? (result.PotentialDuplicate.Value ? "Yes" : "No") : null;
                         var tagClass = result.PotentialDuplicate.HasValue ? (result.PotentialDuplicate.Value ? "govuk-tag--red" : "govuk-tag--green") : null;
@@ -70,10 +78,10 @@
                             <td class="govuk-table__cell" data-testid="potential-duplicate"><colored-tag class="@tagClass">@tagValue</colored-tag></td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
 
-        <partial name="_Pagination" model=@Model.Pagination />
+            <partial name="_Pagination" model=@Model.Pagination />
+        }
     </div>
 </div>

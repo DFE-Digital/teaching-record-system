@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,7 +10,6 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 {
     private const int TasksPerPage = 20;
 
-    [Display(Name = "Search", Description = "By name, email or request date, for example 4/3/1975")]
     [BindProperty(SupportsGet = true)]
     [FromQuery]
     public string? Search { get; set; }
