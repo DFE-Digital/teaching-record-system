@@ -14,49 +14,82 @@
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
     </div>
     <div class="govuk-grid-column-full-from-desktop" data-testid="results">
-        @if (Model.Results!.Count == 0)
-        {
-            <p class="govuk-body-l govuk-!-font-weight-bold" data-testid="no-tasks-message">
-                No matching requests found
-            </p>
-            <p class="govuk-body-m">Try searching again with different details.</p>
-        }
-        else
-        {
-            <table class="govuk-table">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                            sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.Name ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.Name, sortDirection: direction))">
-                            Name
-                        </th>                    
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.RequestedOn, sortDirection: direction))">
-                            Requested on
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.ChangeType ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.ChangeType, sortDirection: direction))">
-                            Type
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @foreach (var result in Model.Results)
-                    {
-                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                            <th scope="row" class="govuk-table__header" data-testid="name">
-                                <a href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(result.SupportTaskReference)" class="govuk-link">@result.Name</a>
-                            </th>
-                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                            <td class="govuk-table__cell" data-testid="change-type">@(result.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest ? "DOB" : "Name")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+        <filter-layout>
+            <filter-layout-filter>
+                <filter>
+                    <input type="hidden" asp-for="@Model.SortBy" />
+                    <input type="hidden" asp-for="@Model.SortDirection" />
+                    @* This flag is so we can track when the filters have been applied vs a fresh page load *@
+                    <input type="hidden" name="_f" value="true" />
+
+                    <filter-options>
+                        <govuk-checkboxes for="ChangeRequestTypes" class="govuk-checkboxes--small">
+                            <govuk-checkboxes-fieldset>
+                                <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">
+                                    Type of request
+                                </govuk-checkboxes-fieldset-legend>
+                                <govuk-checkboxes-item value="@SupportTaskType.ChangeDateOfBirthRequest">
+                                    DOB (@Model.DateOfBirthChangeRequestCount)
+                                </govuk-checkboxes-item>
+                                <govuk-checkboxes-item value="@SupportTaskType.ChangeNameRequest">
+                                    Name (@Model.NameChangeRequestCount)
+                                </govuk-checkboxes-item>
+                            </govuk-checkboxes-fieldset>
+                        </govuk-checkboxes>
+
+                        <div class="govuk-button-group">
+                            <govuk-button type="submit">Apply filters</govuk-button>
+                            <a class="govuk-link govuk-link--no-visited-state" href="@LinkGenerator.SupportTasks.ChangeRequests.Index()">Clear filters</a>
+                        </div>
+                    </filter-options>
+                </filter>
+            </filter-layout-filter>
+            <filter-layout-content>
+                @if (Model.Results!.Count == 0)
+                {
+                    <p class="govuk-body-l govuk-!-font-weight-bold" data-testid="no-tasks-message">
+                        No matching requests found
+                    </p>
+                    <p class="govuk-body-m">Try searching again with different details.</p>
+                }
+                else
+                {
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
+                                    sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.Name ? Model.SortDirection : null)"
+                                    link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.Name, sortDirection: direction))">
+                                    Name
+                                </th>                    
+                                <th scope="col" class="govuk-table__header trs-!-width-150"
+                                    sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
+                                    link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.RequestedOn, sortDirection: direction))">
+                                    Requested on
+                                </th>
+                                <th scope="col" class="govuk-table__header trs-!-width-150"
+                                    sort-direction="@(Model.SortBy == ChangeRequestsSortByOption.ChangeType ? Model.SortDirection : null)"
+                                    link-template="@(direction => LinkGenerator.SupportTasks.ChangeRequests.Index(sortBy: ChangeRequestsSortByOption.ChangeType, sortDirection: direction))">
+                                    Type
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            @foreach (var result in Model.Results)
+                            {
+                                <tr class="govuk-table__row" data-reference="@result.SupportTaskReference">
+                                    <th scope="row" class="govuk-table__header" data-testid="name">
+                                        <a href="@LinkGenerator.SupportTasks.ChangeRequests.EditChangeRequest.Index(result.SupportTaskReference)" class="govuk-link">@result.Name</a>
+                                    </th>
+                                    <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                                    <td class="govuk-table__cell" data-testid="change-type">@(result.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest ? "DOB" : "Name")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </filter-layout-content>
+        </filter-layout>
 
         <partial name="_Pagination" model=@Model.Pagination />
     </div>
