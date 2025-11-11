@@ -20,7 +20,7 @@
                     <govuk-summary-list-row-value data-testid="new-start-date">@Model.NewStartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Current start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Previous start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="current-start-date">@(Model.CurrentStartDate.HasValue ? Model.CurrentStartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
