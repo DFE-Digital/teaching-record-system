@@ -569,6 +569,9 @@ public partial class TestData
                     };
                     trnRequestMetadata.SetResolvedPerson(PersonId);
 
+                    newPerson.SourceApplicationUserId = trnRequestMetadata.ApplicationUserId;
+                    newPerson.SourceTrnRequestId = trnRequestMetadata.RequestId;
+
                     dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
                 }
             });

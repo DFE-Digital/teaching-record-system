@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
@@ -9,7 +10,7 @@ public interface IEventPublisher
     Task PublishEventAsync(IEvent @event, ProcessContext processContext);
 }
 
-public class EventPublisher(TrsDbContext dbContext) : IEventPublisher
+public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProvider) : IEventPublisher
 {
     public async Task PublishEventAsync(IEvent @event, ProcessContext processContext)
     {
@@ -31,6 +32,18 @@ public class EventPublisher(TrsDbContext dbContext) : IEventPublisher
         dbContext.Set<ProcessEvent>().Add(processEvent);
 
         await dbContext.SaveChangesAsync();
+
+        await InvokeEventHandlersAsync(@event, processContext);
+    }
+
+    private async Task InvokeEventHandlersAsync(IEvent @event, ProcessContext processContext)
+    {
+        var handlers = serviceProvider.GetServices<IEventHandler>();
+
+        foreach (var handler in handlers)
+        {
+            await handler.HandleEventAsync(@event, processContext);
+        }
     }
 }
 

@@ -205,7 +205,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         },
         e2 =>
         {
-            var emailEvent = Assert.IsType<EmailSentEvent>(e2);
+            var emailEvent = Assert.IsType<LegacyEvents.EmailSentEvent>(e2);
         });
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);

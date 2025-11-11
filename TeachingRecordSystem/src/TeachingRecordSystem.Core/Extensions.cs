@@ -142,6 +142,11 @@ public static class Extensions
     {
         services.AddScoped<IEventPublisher, EventPublisher>();
 
+        services.Scan(s => s.FromAssemblyOf<IEvent>()
+            .AddClasses(c => c.AssignableTo<IEventHandler>())
+            .AsImplementedInterfaces()
+            .WithTransientLifetime());
+
         return services;
     }
 

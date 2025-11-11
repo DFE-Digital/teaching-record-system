@@ -27,6 +27,11 @@ public static class Extensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<ScheduleTrnRecipientEmailsJobOptions>()
+            .Bind(configuration.GetSection("ScheduleTrnRecipientEmailsJob"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddOptions<InductionStatusUpdatedSupportJobOptions>()
             .Bind(configuration.GetSection("RecurringJobs:InductionStatusUpdatedSupportJob"))
             .ValidateDataAnnotations()
@@ -277,6 +282,11 @@ public static class Extensions
                 nameof(BackfillSupportTasksInReportingDb),
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
+
+            recurringJobManager.AddOrUpdate<ScheduleTrnRecipientEmailsJob>(
+                nameof(ScheduleTrnRecipientEmailsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                GetRecurringJobSchedule(professionalStatusEmailJobOptions.JobSchedule));
 
             return Task.CompletedTask;
         });

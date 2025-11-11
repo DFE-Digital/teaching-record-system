@@ -10,5 +10,6 @@ public enum ProcessType
     PersonReactivatingInDqt = 6,
     PersonMergingInDqt = 7,
     SupportTaskDeleting = 8,
-    TrnRequestResetting = 9
+    TrnRequestResetting = 9,
+    NotifyingTrnRecipient = 10
 }
