@@ -21,17 +21,14 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you deleting this mandatory qualification?")]
     [Required(ErrorMessage = "Select a reason")]
     public MqDeletionReasonOption? DeletionReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to provide more information?")]
     [Required(ErrorMessage = "Select yes if you want to add more information")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details about this change")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? DeletionReasonDetail { get; set; }
 

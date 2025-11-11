@@ -19,20 +19,16 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you changing the status?")]
     public MqChangeStatusReasonOption? StatusChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you changing the end date?")]
     public MqChangeEndDateReasonOption? EndDateChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to provide more information?")]
     [Required(ErrorMessage = "Select yes if you want to add more information")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details about this change")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 

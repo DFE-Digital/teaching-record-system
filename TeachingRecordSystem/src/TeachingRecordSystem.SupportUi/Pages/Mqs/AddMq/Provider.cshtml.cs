@@ -21,7 +21,6 @@ public class ProviderModel(SupportUiLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Select a training provider")]
-    [Display(Name = "Enter a training provider")]
     public Guid? ProviderId { get; set; }
 
     public ProviderInfo[]? Providers { get; set; }

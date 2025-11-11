@@ -19,7 +19,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Specialism")]
     [Required(ErrorMessage = "Select a specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 

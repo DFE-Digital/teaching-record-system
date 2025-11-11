@@ -19,7 +19,6 @@ public class SpecialismModel(SupportUiLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Select a specialism")]
     [Required(ErrorMessage = "Select a specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 

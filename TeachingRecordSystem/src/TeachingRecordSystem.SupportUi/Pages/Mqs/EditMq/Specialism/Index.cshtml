@@ -15,7 +15,7 @@
 
             <govuk-radios for="Specialism" data-testid="specialism-list">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l">Specialism</govuk-radios-fieldset-legend>
                     @foreach (var specialism in Model.Specialisms!)
                     {
                         <govuk-radios-item value="@specialism.Value">

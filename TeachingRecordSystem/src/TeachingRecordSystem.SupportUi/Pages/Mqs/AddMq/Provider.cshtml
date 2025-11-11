@@ -31,7 +31,7 @@
             <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
 
             <govuk-select for="ProviderId" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true" />
+                <govuk-select-label is-page-heading="true" >Enter a training provider</govuk-select-label>
                 <govuk-select-hint>Start typing the name of the training provider</govuk-select-hint>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var provider in Model.Providers!)

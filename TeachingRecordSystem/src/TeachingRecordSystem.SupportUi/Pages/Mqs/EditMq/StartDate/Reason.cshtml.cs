@@ -19,17 +19,14 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMan
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Why are you changing the start date?")]
     [Required(ErrorMessage = "Select a reason")]
     public MqChangeStartDateReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to provide more information?")]
     [Required(ErrorMessage = "Select yes if you want to add more information")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details about this change")]
     [MaxLength(UiDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {UiDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
