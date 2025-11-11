@@ -20,9 +20,19 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public SupportTaskType[]? ChangeRequestTypes { get; set; }
+
+    public int? NameChangeRequestCount { get; set; }
+
+    public int? DateOfBirthChangeRequestCount { get; set; }
+
     public ResultPage<Result>? Results { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
+
+    [BindProperty(SupportsGet = true, Name = "_f")]
+    public bool FormSubmitted { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -32,6 +42,15 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             .Include(t => t.Person)
             .Where(t => (t.SupportTaskType == SupportTaskType.ChangeNameRequest || t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest)
                         && t.Status == SupportTaskStatus.Open);
+
+        NameChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeNameRequest);
+        DateOfBirthChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest);
+
+        if (FormSubmitted || ChangeRequestTypes?.Length > 0)
+        {
+            ChangeRequestTypes ??= [];
+            tasks = tasks.Where(t => ChangeRequestTypes.Contains(t.SupportTaskType));
+        }
 
         if (sortBy == ChangeRequestsSortByOption.Name)
         {
