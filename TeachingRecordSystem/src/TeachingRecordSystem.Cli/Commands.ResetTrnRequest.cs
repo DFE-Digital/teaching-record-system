@@ -2,8 +2,10 @@ using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.Something;
 
 namespace TeachingRecordSystem.Cli;
 
@@ -43,6 +45,7 @@ public partial class Commands
                     .AddDatabase(connectionString)
                     .AddEventPublisher()
                     .AddPersonMatching()
+                    .AddSomething()
                     .BuildServiceProvider();
 
                 using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -52,89 +55,34 @@ public partial class Commands
 
                 var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
 
-                var request = await dbContext.TrnRequestMetadata
-                    .SingleOrDefaultAsync(r => r.ApplicationUserId == sourceApplicationUserId && r.RequestId == trnRequestId);
+                var somethingService = scope.ServiceProvider.GetRequiredService<SomethingService>();
 
-                if (request is null)
+                var request = new ResetTrnRequestInfo
+                {
+                    ApplicationUserId = sourceApplicationUserId,
+                    RequestId = trnRequestId,
+                    Reason = reason
+                };
+
+                try
+                {
+                    var result = await somethingService.ResetTrnRequestAsync(request);
+                    transaction.Complete();
+
+                    parseResult.InvocationConfiguration.Output.WriteLine(
+                        $"Created new {result.SupportTaskType} support task: {result.SupportTaskReference}");
+                    return 0;
+                }
+                catch (TrnRequestNotFoundException)
                 {
                     parseResult.InvocationConfiguration.Error.WriteLine("TRN request was not found");
                     return 1;
                 }
-
-                // Check if there are any Open support tasks already for this request - we can't reset if there are
-                var haveSupportTasksForRequest = await dbContext.SupportTasks
-                    .Where(t => t.TrnRequestApplicationUserId == sourceApplicationUserId && t.TrnRequestId == trnRequestId)
-                    .Where(t => t.Status == SupportTaskStatus.Open)
-                    .AnyAsync();
-
-                if (haveSupportTasksForRequest)
+                catch (TrnRequestAlreadyHasOpenSupportTasksException)
                 {
                     parseResult.InvocationConfiguration.Error.WriteLine("TRN request already has open support tasks");
                     return 1;
                 }
-
-                var personMatchingService = scope.ServiceProvider.GetRequiredService<IPersonMatchingService>();
-
-                var now = clock.UtcNow;
-
-                var matchResult = await personMatchingService.MatchFromTrnRequestAsync(request);
-
-                // We only handle PotentialMatches for now
-                if (matchResult.Outcome is not TrnRequestMatchResultOutcome.PotentialMatches)
-                {
-                    throw new NotImplementedException();
-                }
-
-                var eventPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
-
-                var processContext = new ProcessContext(ProcessType.TrnRequestResetting, now, SystemUser.SystemUserId);
-
-                var oldTrnRequest = EventModels.TrnRequestMetadata.FromModel(request);
-                request.Reset();
-
-                var changes = (oldTrnRequest.Status != request.Status ? TrnRequestUpdatedChanges.Status : 0) |
-                    (oldTrnRequest.ResolvedPersonId != request.ResolvedPersonId ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
-
-                var supportTask = SupportTask.Create(
-                    SupportTaskType.ApiTrnRequest,
-                    new ApiTrnRequestData(),
-                    personId: null,
-                    request.OneLoginUserSubject,
-                    request.ApplicationUserId,
-                    request.RequestId,
-                    createdBy: SystemUser.SystemUserId,
-                    now,
-                    out _);
-
-                dbContext.SupportTasks.Add(supportTask);
-                await dbContext.SaveChangesAsync();
-
-                await eventPublisher.PublishEventAsync(
-                    new SupportTaskCreatedEvent
-                    {
-                        EventId = Guid.NewGuid(),
-                        SupportTask = EventModels.SupportTask.FromModel(supportTask)
-                    },
-                    processContext);
-
-                await eventPublisher.PublishEventAsync(
-                    new TrnRequestUpdatedEvent
-                    {
-                        EventId = Guid.NewGuid(),
-                        SourceApplicationUserId = sourceApplicationUserId,
-                        RequestId = trnRequestId,
-                        Changes = changes,
-                        TrnRequest = EventModels.TrnRequestMetadata.FromModel(request),
-                        OldTrnRequest = oldTrnRequest,
-                        ReasonDetails = reason
-                    },
-                    processContext);
-
-                transaction.Complete();
-
-                parseResult.InvocationConfiguration.Output.WriteLine(
-                    $"Created new {supportTask.SupportTaskType} support task: {supportTask.SupportTaskReference}");
-                return 0;
             });
 
         return command;

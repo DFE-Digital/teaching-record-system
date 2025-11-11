@@ -6,18 +6,15 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
-using PersonCreatedEvent = TeachingRecordSystem.Core.Events.Legacy.PersonCreatedEvent;
+using TeachingRecordSystem.Core.Services.Something;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class AllocateTrnsToOverseasNpqApplicantsJob(
     TrsDbContext dbContext,
-    IPersonMatchingService personMatchingService,
-    IBackgroundJobScheduler backgroundJobScheduler,
-    ITrnGenerator trnGenerator,
+    SomethingService somethingService,
     IImportFileStorageService fileStorageService,
+    IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock)
 {
     public const string ContainerName = "overseas-npq-applicants";
@@ -25,9 +22,6 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
     public const string ImportedFolderName = "imported";
     public const string OutputFolderName = "output";
     public const string OutputFileNamePrefix = "overseas-npq-applicants-allocated-trns-";
-    public const string FirstNamePersonalisationKey = "first name";
-    public const string LastNamePersonalisationKey = "last name";
-    public const string TrnPersonalisationKey = "trn";
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -142,118 +136,51 @@ public class AllocateTrnsToOverseasNpqApplicantsJob(
             }
             else
             {
-                var firstName = inputRow.FirstName!.Trim();
-                var middleName = inputRow.MiddleName?.Trim();
-                var lastName = inputRow.LastName!.Trim();
-                var applicationUserId = ApplicationUser.NpqApplicationUserGuid;
-                var requestId = Guid.NewGuid().ToString();
-
-                var trnRequestMetadata = new TrnRequestMetadata
+                var request = new AllocateTrnIfNotExistInfo
                 {
-                    ApplicationUserId = applicationUserId,
-                    RequestId = requestId,
-                    CreatedOn = now,
-                    IdentityVerified = null,
-                    OneLoginUserSubject = null,
-                    Name = new[] { firstName, middleName, lastName }.GetNonEmptyValues(),
-                    FirstName = inputRow.FirstName,
-                    MiddleName = inputRow.MiddleName,
-                    LastName = inputRow.LastName,
+                    ApplicationUserId = ApplicationUser.NpqApplicationUserGuid,
+                    RequestId = Guid.NewGuid().ToString(),
+                    FirstName = inputRow.FirstName!.Trim(),
+                    MiddleName = (inputRow.MiddleName?.Trim()),
+                    LastName = inputRow.LastName!.Trim(),
                     DateOfBirth = dateOfBirth!.Value,
-                    EmailAddress = email?.ToString(),
-                    NationalInsuranceNumber = nino?.ToString(),
+                    EmailAddress = email,
+                    NationalInsuranceNumber = nino,
                     Gender = gender
                 };
 
-                var personMatchingResult = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
+                var result = await somethingService.AllocateTrnIfNotExistsAsync(request);
 
-                switch (personMatchingResult.Outcome)
+                switch (result.Outcome)
                 {
-                    case TrnRequestMatchResultOutcome.NoMatches:
-                        var newTrn = await trnGenerator.GenerateTrnAsync();
+                    case AllocateTrnIfNotExistResultOutcome.TrnAllocated:
                         outputRow.Result = "TRN allocated";
-                        outputRow.AllocatedTrn = newTrn;
-
-                        var person = Person.Create(
-                            newTrn,
-                            firstName!,
-                            middleName ?? "",
-                            lastName!,
-                            dateOfBirth,
-                            email,
-                            nino,
-                            gender,
-                            now,
-                            sourceTrnRequest: (applicationUserId, requestId));
-
-                        dbContext.Persons.Add(person.Person);
-
-                        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
-
-                        dbContext.AddEventWithoutBroadcast(new PersonCreatedEvent
-                        {
-                            EventId = Guid.NewGuid(),
-                            CreatedUtc = now,
-                            RaisedBy = SystemUser.SystemUserId,
-                            PersonId = person.Person.PersonId,
-                            PersonAttributes = person.PersonAttributes,
-                            CreateReason = null,
-                            CreateReasonDetail = null,
-                            EvidenceFile = null,
-                            TrnRequestMetadata = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata),
-
-                        });
-
-                        var emailId = Guid.NewGuid();
-
-                        dbContext.Emails.Add(new Email
-                        {
-                            EmailId = emailId,
-                            TemplateId = EmailTemplateIds.TrnGeneratedForNpq,
-                            EmailAddress = email!.ToString(),
-                            Personalization = new Dictionary<string, string>()
-                            {
-                                [FirstNamePersonalisationKey] = firstName,
-                                [LastNamePersonalisationKey] = lastName,
-                                [TrnPersonalisationKey] = newTrn!,
-                            },
-                        });
-
-                        await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(x => x.ExecuteAsync(emailId));
-
+                        outputRow.AllocatedTrn = result.AllocatedTrn!;
+                        await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(x => x.ExecuteAsync(result.EmailId!.Value));
                         break;
 
                     default:
                         outputRow.Result = "TRN not allocated due to potential duplicates";
-
-                        var trns = await dbContext.Persons
-                            .Where(p => personMatchingResult.PotentialMatchesPersonIds.Contains(p.PersonId))
-                            .OrderBy(p => p.Trn)
-                            .Select(p => p.Trn)
-                            .ToArrayAsync();
-
-                        outputRow.PotentialDuplicateTrns = string.Join(",", trns);
+                        outputRow.PotentialDuplicateTrns = string.Join(",", result.PotentialDuplicateTrns);
                         break;
                 }
             }
-        }
 
-        await dbContext.SaveChangesAsync();
-        txn.Complete();
+            txn.Complete();
 
-        await fileStorageService.MoveFileAsync(ContainerName, fileName, ImportedFolderName, cancellationToken);
+            await fileStorageService.MoveFileAsync(ContainerName, fileName, ImportedFolderName, cancellationToken);
 
-        using var outputStream = await fileStorageService.WriteFileAsync(ContainerName, $"{OutputFolderName}/{OutputFileNamePrefix}{now:yyyyMMddHHmmss}.csv", cancellationToken);
-        using var outputStreamWriter = new StreamWriter(outputStream);
-        using var csvWriter = new CsvWriter(outputStreamWriter, new CsvConfiguration(CultureInfo.CurrentCulture) { HasHeaderRecord = true });
+            using var outputStream = await fileStorageService.WriteFileAsync(ContainerName, $"{OutputFolderName}/{OutputFileNamePrefix}{now:yyyyMMddHHmmss}.csv", cancellationToken);
+            using var outputStreamWriter = new StreamWriter(outputStream);
+            using var csvWriter = new CsvWriter(outputStreamWriter, new CsvConfiguration(CultureInfo.CurrentCulture) { HasHeaderRecord = true });
 
-        csvWriter.WriteHeader<AllocateTrnsToOverseasNpqApplicantsOutputRowRaw>();
-        await csvWriter.NextRecordAsync();
-        foreach (var row in outputRows)
-        {
-            csvWriter.WriteRecord(row);
+            csvWriter.WriteHeader<AllocateTrnsToOverseasNpqApplicantsOutputRowRaw>();
             await csvWriter.NextRecordAsync();
-            await csvWriter.FlushAsync();
+            foreach (var row in outputRows)
+            {
+                csvWriter.WriteRecord(row);
+                await csvWriter.NextRecordAsync();
+                await csvWriter.FlushAsync();
+            }
         }
     }
-}

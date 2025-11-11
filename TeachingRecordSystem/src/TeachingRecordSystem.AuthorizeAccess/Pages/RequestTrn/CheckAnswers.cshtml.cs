@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.Something;
 using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -13,10 +11,8 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
 public class CheckAnswersModel(
     AuthorizeAccessLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    IPersonMatchingService matchingService,
-    IFileService fileService,
-    IClock clock) : PageModel
+    SomethingService somethingService,
+    IFileService fileService) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -98,24 +94,20 @@ public class CheckAnswersModel(
         var state = JourneyInstance!.State;
         var requestId = Guid.NewGuid().ToString();
 
-        var trnRequestMetadata = new TrnRequestMetadata
+        var request = new CreateTrnRequestInfo2
         {
-            OneLoginUserSubject = null,
-            CreatedOn = clock.UtcNow,
-            RequestId = requestId,
-            IdentityVerified = false,
             ApplicationUserId = ApplicationUser.NpqApplicationUserGuid,
+            RequestId = requestId,
             FirstName = state.FirstName,
             MiddleName = state.MiddleName,
             LastName = state.LastName,
+            DateOfBirth = state.DateOfBirth!.Value,
+            EmailAddress = state.PersonalEmail,
+            NationalInsuranceNumber = state.NationalInsuranceNumber,
             PreviousFirstName = state.PreviousFirstName,
             PreviousMiddleName = state.PreviousMiddleName,
             PreviousLastName = state.PreviousLastName,
             WorkEmailAddress = state.WorkEmail,
-            Name = new[] { state.FirstName, state.MiddleName, state.LastName }.GetNonEmptyValues(),
-            EmailAddress = state.PersonalEmail,
-            DateOfBirth = state.DateOfBirth!.Value,
-            NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber),
             NpqApplicationId = state.NpqApplicationId,
             NpqName = state.NpqName,
             NpqTrainingProvider = state.NpqTrainingProvider,
@@ -129,39 +121,7 @@ public class CheckAnswersModel(
             NpqWorkingInEducationalSetting = state.WorkingInSchoolOrEducationalSetting
         };
 
-        // look for potential matches
-        var matchResult = await matchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
-        trnRequestMetadata.PotentialDuplicate = matchResult.Outcome is not TrnRequestMatchResultOutcome.NoMatches;
-
-        trnRequestMetadata.Matches = new TrnRequestMatches()
-        {
-            MatchedPersons = matchResult.Outcome switch
-            {
-                TrnRequestMatchResultOutcome.PotentialMatches =>
-                    matchResult.PotentialMatchesPersonIds
-                        .Select(id => new TrnRequestMatchedPerson() { PersonId = id })
-                        .ToList(),
-                TrnRequestMatchResultOutcome.DefiniteMatch => [new TrnRequestMatchedPerson() { PersonId = matchResult.PersonId }],
-                _ => []
-            }
-        };
-
-        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
-
-        var supportTask = SupportTask.Create(
-            supportTaskType: SupportTaskType.NpqTrnRequest,
-            data: new NpqTrnRequestData(),
-            personId: null,
-            oneLoginUserSubject: null,
-            trnRequestApplicationUserId: ApplicationUser.NpqApplicationUserGuid,
-            trnRequestId: requestId,
-            createdBy: ApplicationUser.NpqApplicationUserGuid,
-            now: clock.UtcNow,
-            out var createdEvent
-            );
-        dbContext.SupportTasks.Add(supportTask);
-        await dbContext.AddEventAndBroadcastAsync(createdEvent);
-        dbContext.SaveChanges();
+        await somethingService.CreateTrnRequest2Async(request);
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
 

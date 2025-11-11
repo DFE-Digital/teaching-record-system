@@ -212,13 +212,15 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
     {
         var results = await GetMatchesFromTrnRequestAsync(request);
 
-        return results switch
+        return (request, results) switch
         {
 #pragma warning disable format
-            [{ date_of_birth_matches: true, national_insurance_number_matches: true } singleMatch] =>
+            ({NationalInsuranceNumber: null}, [{ first_name_matches: true, last_name_matches: true, date_of_birth_matches: true, email_address_matches: true, gender_matches: true } singleMatch]) =>
+                TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
+            (_, [{ date_of_birth_matches: true, national_insurance_number_matches: true } singleMatch]) =>
                 TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
 #pragma warning restore format
-            [] => TrnRequestMatchResult.NoMatches(),
+            (_, []) => TrnRequestMatchResult.NoMatches(),
             _ => TrnRequestMatchResult.PotentialMatches(results.Select(r => r.person_id))
         };
     }
@@ -276,7 +278,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                         (fn_split_names(:last_names, include_synonyms => false) collate "case_insensitive") last_names,
                         :date_of_birth date_of_birth,
                         (:email_address COLLATE "case_insensitive") email_address,
-                        array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers
+                        array_remove(ARRAY[:national_insurance_number] COLLATE "case_insensitive", null)::varchar[] national_insurance_numbers,
+                        :gender gender
                 )
                 SELECT
                     p.person_id,
@@ -287,12 +290,14 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     p.date_of_birth,
                     p.email_address,
                     p.national_insurance_number,
+                    p.gender,
                     CASE WHEN p.names && vars.first_names THEN true ELSE false END first_name_matches,
                     CASE WHEN p.names && vars.middle_names THEN true ELSE false END middle_name_matches,
                     CASE WHEN p.names && vars.last_names THEN true ELSE false END last_name_matches,
                     CASE WHEN p.date_of_birth = vars.date_of_birth THEN true ELSE false END date_of_birth_matches,
                     CASE WHEN vars.email_address IS NOT NULL AND p.email_address = vars.email_address THEN true ELSE false END email_address_matches,
-                    array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers national_insurance_number_matches
+                    array_length(vars.national_insurance_numbers, 1) > 0 AND p.national_insurance_numbers && vars.national_insurance_numbers national_insurance_number_matches,
+                    CASE WHEN vars.gender IS NOT NULL AND p.gender = vars.gender THEN true ELSE false END gender_matches
                 FROM persons p, vars
                 WHERE
                     p.status = 0 and p.trn IS NOT NULL AND (
@@ -312,7 +317,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     CreateArrayParameter("last_names", lastNames),
                     new NpgsqlParameter("date_of_birth", NpgsqlDbType.Date) { Value = (object?)request.DateOfBirth ?? DBNull.Value },
                     new NpgsqlParameter("national_insurance_number", NpgsqlDbType.Varchar) { Value = (object?)nationalInsuranceNumber ?? DBNull.Value },
-                    new NpgsqlParameter("email_address", NpgsqlDbType.Varchar) { Value = (object?)request.EmailAddress ?? DBNull.Value }
+                    new NpgsqlParameter("email_address", NpgsqlDbType.Varchar) { Value = (object?)request.EmailAddress ?? DBNull.Value },
+                    new NpgsqlParameter("gender", NpgsqlDbType.Integer) { Value = (object?)(int?)request.Gender ?? DBNull.Value }
                 ]
                 // ReSharper restore FormatStringProblem
             ).ToArrayAsync();
@@ -369,12 +375,14 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         DateOnly? date_of_birth,
         string? email_address,
         string? national_insurance_number,
+        Gender? gender,
         bool first_name_matches,
         bool middle_name_matches,
         bool last_name_matches,
         bool date_of_birth_matches,
         bool email_address_matches,
-        bool national_insurance_number_matches);
+        bool national_insurance_number_matches,
+        bool gender_matches);
 #pragma warning restore IDE1006 // Naming Styles
 }
 
