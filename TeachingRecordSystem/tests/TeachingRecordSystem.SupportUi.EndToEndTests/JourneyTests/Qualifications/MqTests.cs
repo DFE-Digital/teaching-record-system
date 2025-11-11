@@ -309,7 +309,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnDeleteMqConfirmPageAsync(qualificationId);
 
-        await page.ClickButtonAsync("Delete qualification");
+        await page.ClickButtonAsync("Confirm and delete qualification");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
 
