@@ -15,7 +15,7 @@
 
             <govuk-radios for="ChangeReason" data-testid="change-reason-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">Why are you changing the start date?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@MqChangeStartDateReasonOption.IncorrectStartDate">
                         @MqChangeStartDateReasonOption.IncorrectStartDate.GetDisplayName()
                     </govuk-radios-item>
@@ -33,11 +33,13 @@
 
             <govuk-radios for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">Do you want to provide more information?</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional data-testid="additional-detail">
-                            <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows" />
+                            <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.DetailMaxCharacterCount" rows="UiDefaults.DetailTextAreaRows">
+                                <govuk-character-count-label>Enter details about this change</govuk-character-count-label>
+                            </govuk-character-count>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">

@@ -23,7 +23,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
     public MandatoryQualificationStatus? Status { get; set; }
 
     [BindProperty]
-    [Display(Name = "End date")]
     public DateOnly? EndDate { get; set; }
 
     public DateOnly? StartDate { get; set; }

@@ -7,7 +7,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 public class EvidenceUploadModel
 {
     [BindProperty]
-    [Display(Name = "Do you want to upload evidence?")]
     [Required(ErrorMessage = "Select yes if you want to upload evidence")]
     public bool? UploadEvidence { get; set; }
 

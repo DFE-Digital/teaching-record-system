@@ -20,7 +20,6 @@ public class StartDateModel(SupportUiLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Enter a start date")]
-    [Display(Name = "Enter the start date")]
     public DateOnly? StartDate { get; set; }
 
     public void OnGet()

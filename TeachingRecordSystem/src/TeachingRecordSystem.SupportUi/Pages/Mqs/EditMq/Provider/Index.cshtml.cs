@@ -21,7 +21,6 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, EvidenceUploadMana
 
     [BindProperty]
     [Required(ErrorMessage = "Select a training provider")]
-    [Display(Name = "Training provider")]
     public Guid? ProviderId { get; set; }
 
     public ProviderInfo[]? Providers { get; set; }
