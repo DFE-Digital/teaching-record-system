@@ -12,7 +12,7 @@ public class AppendSecurityResponseHeadersMiddleware(RequestDelegate next)
         response.Headers["X-Xss-Protection"] = "0";
         response.Headers["X-Content-Type-Options"] = "nosniff";
         response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
-        response.Headers["Referrer-Policy"] = "no-referrer-when-downgrade";
+        response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
 
         return next(context);
     }
